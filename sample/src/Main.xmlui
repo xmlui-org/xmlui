@@ -1,21 +1,4 @@
 <App>
-  <VStack gap="space-4">
-    <ExpandableItem summary="Simple text summary" initiallyExpanded="true">
-      <Text>This expandable item uses a simple text string for its summary.</Text>
-    </ExpandableItem>
-    
-    <ExpandableItem initiallyExpanded="false">
-      <property name="summary">
-        <CHStack gap="space-2">
-          <Icon name="apps" />
-          <Text fontWeight="600">Custom Summary with Icon</Text>
-          <Badge label="New" />
-        </CHStack>
-      </property>
-      <Text>
-        This expandable item uses a rich component 
-        definition with icons and badges in the summary.
-      </Text>
-    </ExpandableItem>
-  </VStack>
+  <NumberBox hasSpinBox="true" initialValue="3" />
+  <NumberBox hasSpinBox="false" initialValue="34" />
 </App>

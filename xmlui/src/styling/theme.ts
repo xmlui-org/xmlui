@@ -476,7 +476,7 @@ export function extractScssThemeVars(sourceInput: unknown): Record<string, strin
         ? sourceInput.default
         : "";
   const themeVars: Record<string, string> = {};
-  const createThemeVarPattern = /createThemeVar\(\s*["']([^"']+)["']\s*\)/g;
+  const createThemeVarPattern = /createThemeVar\w*\(\s*["']([^"']+)["']\s*\)/g;
   for (const match of source.matchAll(createThemeVarPattern)) {
     const name = match[1];
     themeVars[name] = `Theme variable declared by ${name}.`;

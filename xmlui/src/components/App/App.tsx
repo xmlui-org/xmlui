@@ -75,7 +75,6 @@ export const AppMd = createMetadata({
     locale: {
       description: "Sets the active locale used by App.translate and I18n.",
       valueType: "string",
-      defaultValue: "en",
     },
     localeBundles: {
       description: "Locale message bundles used by App.translate and I18n.",

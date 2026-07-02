@@ -61,3 +61,33 @@ test("htmlTable width using themes", async ({ initTestBed, createHtmlTagDriver }
 
   expect(compWidth).toEqual(width);
 });
+
+test("htmlTable width is supplied by component CSS instead of inline theme variables", async ({
+  initTestBed,
+  createHtmlTagDriver,
+}) => {
+  await initTestBed(`<table />`, {
+    testThemeVars: {
+      "width-HtmlTable": "321px",
+    },
+  });
+  const driver = await createHtmlTagDriver();
+
+  await expect(driver.component).toHaveCSS("width", "321px");
+  await expect(driver.component).not.toHaveAttribute("style", /xmlui-current-width-HtmlTag/);
+});
+
+test("text-like html tags use XMLUI Text variants", async ({ initTestBed, page }) => {
+  await initTestBed(`<abbr testId="abbr">html</abbr>`);
+
+  await expect(page.getByTestId("abbr")).toHaveClass(/xmlui-abbr/);
+  await expect(page.getByTestId("abbr")).toHaveCSS("text-transform", "uppercase");
+});
+
+test("anchor html tag uses XMLUI Link behavior", async ({ initTestBed, page }) => {
+  await initTestBed(`<a testId="link" href="/accounts" disabled>Accounts</a>`);
+  const link = page.getByTestId("link");
+
+  await expect(link).toHaveAttribute("href", "/accounts");
+  await expect(link).toHaveClass(/linkDisabled/);
+});

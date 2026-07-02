@@ -10,6 +10,9 @@ import {
   toUsableNumber,
 } from "./numberbox-abstractions";
 import { useFormContext } from "../Form/FormContext";
+import { ThemedIcon } from "../Icon/Icon";
+import { useThemeVariables } from "../../runtime/rendering/theme";
+import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./NumberBox.module.scss";
 
 export type NumberBoxProps = {
@@ -48,6 +51,7 @@ export type NumberBoxProps = {
   verboseValidationFeedback?: boolean;
   validationStatus?: string;
   invalidMessages?: string[];
+  registerComponentApi?: (api: Record<string, unknown>) => void;
   onDidChange?: (value: number | string | null) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
@@ -86,8 +90,8 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     endIcon,
     gap,
     hasSpinBox = defaultProps.hasSpinBox,
-    spinnerUpIcon = "chevronup",
-    spinnerDownIcon = "chevrondown",
+    spinnerUpIcon,
+    spinnerDownIcon,
     step = defaultProps.step,
     integersOnly = defaultProps.integersOnly,
     zeroOrPositive = defaultProps.zeroOrPositive,
@@ -96,6 +100,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     verboseValidationFeedback,
     validationStatus = defaultProps.validationStatus,
     invalidMessages = defaultProps.invalidMessages,
+    registerComponentApi,
     onDidChange,
     onFocus,
     onBlur,
@@ -105,6 +110,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const form = useFormContext();
+  const themeVariables = useThemeVariables();
   const getFormValue = form?.getValue;
   const setFormValue = form?.setValue;
   const validateFormField = form?.validateField;
@@ -201,17 +207,44 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
     updateRepresentation(String(next));
   }, [boundedMax, boundedMin, enabled, integersOnly, localValue, parsedStep, readOnly, updateRepresentation]);
 
+  const focus = useCallback(() => {
+    if (enabled) {
+      inputRef.current?.focus();
+    }
+  }, [enabled]);
+
+  const setValue = useCallback((nextValue: unknown) => {
+    updateRepresentation(mapToRepresentation(nextValue));
+  }, [updateRepresentation]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      value: emitValue(localValue),
+    });
+  }, [emitValue, localValue, registerComponentApi]);
+
   useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        inputRef.current?.focus();
-      }
-    },
-    setValue: (nextValue) => updateRepresentation(mapToRepresentation(nextValue)),
+    focus,
+    setValue,
     get value() {
       return emitValue(localValue);
     },
-  }), [emitValue, enabled, localValue, updateRepresentation]);
+  }), [emitValue, focus, localValue, setValue]);
+
+  const relayFocus = useCallback((event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      if (enabled) {
+        inputRef.current?.focus({ preventScroll: true });
+      }
+    }
+  }, [enabled]);
 
   const rootStyle = useMemo<CSSProperties>(() => ({
     ...style,
@@ -248,12 +281,11 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
       data-xmlui-part="label"
       htmlFor={inputId}
       className={styles.numberBoxLabel}
+      style={labelWidth !== undefined ? { width: cssLength(labelWidth, themeVariables) } : undefined}
     >
-      <span style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}>
-        {labelText}
-        {showRequiredIndicator ? <span className={styles.numberBoxLabelRequired}>*</span> : null}
-        {showOptionalIndicator ? <span className={styles.numberBoxLabelOptional}>(Optional)</span> : null}
-      </span>
+      {labelText}
+      {showRequiredIndicator ? <span className={styles.numberBoxLabelRequired}>*</span> : null}
+      {showOptionalIndicator ? <span className={styles.numberBoxLabelOptional}>(Optional)</span> : null}
     </label>
   ) : null;
   const inputRoot = (
@@ -271,6 +303,8 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
         !hasLabel ? className : undefined,
       )}
       style={!hasLabel ? rootStyle : undefined}
+      tabIndex={-1}
+      onFocus={relayFocus}
     >
       <Adornment partId="startAdornment" text={startText} icon={startIcon} />
       <input
@@ -341,24 +375,34 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
             data-part-id="spinnerUp"
             data-xmlui-part="spinnerUp"
             className={styles.numberBoxSpinnerButton}
-            disabled={!enabled}
+            disabled={!enabled || readOnly}
             tabIndex={-1}
             aria-label="Increment"
             onClick={() => stepBy(1)}
           >
-            <span role="img" aria-label={spinnerUpIcon} data-icon-name={spinnerUpIcon} className={styles.numberBoxIconMarker} />
+            <ThemedIcon
+              name={spinnerUpIcon || "spinnerUp:NumberBox"}
+              fallback="chevronup"
+              size="14px"
+              aria-hidden="true"
+            />
           </button>
           <button
             type="button"
             data-part-id="spinnerDown"
             data-xmlui-part="spinnerDown"
             className={styles.numberBoxSpinnerButton}
-            disabled={!enabled}
+            disabled={!enabled || readOnly}
             tabIndex={-1}
             aria-label="Decrement"
             onClick={() => stepBy(-1)}
           >
-            <span role="img" aria-label={spinnerDownIcon} data-icon-name={spinnerDownIcon} className={styles.numberBoxIconMarker} />
+            <ThemedIcon
+              name={spinnerDownIcon || "spinnerDown:NumberBox"}
+              fallback="chevrondown"
+              size="14px"
+              aria-hidden="true"
+            />
           </button>
         </span>
       ) : null}
@@ -373,9 +417,9 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
           onBlur={() => setConciseTooltipVisible(false)}
           tabIndex={-1}
         >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
-            className={styles.numberBoxIconMarker}
+          <ThemedIcon
+            name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
+            className={styles.numberBoxIcon}
           />
           {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
             <span data-tooltip-container role="tooltip" className={styles.numberBoxConciseTooltip}>
@@ -406,7 +450,7 @@ export const NumberBoxNative = memo(forwardRef<NumberBoxApi, NumberBoxProps>(fun
   return (
     <div {...rest} className={className} style={rootStyle}>
       <div
-        className={cx(styles.numberBoxLabeledItem, labelPositionClass(labelPosition, direction))}
+        className={cx(styles.numberBoxLabeledItem, labelPositionClass(labelPosition))}
         data-part-id="labeledItem"
         data-xmlui-part="labeledItem"
         dir={direction === "rtl" ? "rtl" : direction === "ltr" ? "ltr" : undefined}
@@ -435,7 +479,7 @@ function Adornment({
   }
   return (
     <span data-part-id={partId} data-xmlui-part={partId} className={styles.numberBoxAdornment}>
-      {iconName ? <span role="img" aria-label={iconName} data-icon-name={iconName} className={styles.numberBoxIconMarker} /> : null}
+      {iconName ? <ThemedIcon name={iconName} className={styles.numberBoxIcon} /> : null}
       {content}
     </span>
   );
@@ -544,8 +588,16 @@ function stringifyValue(value: unknown): string {
   return value === undefined || value === null ? "" : String(value);
 }
 
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
+function cssLength(value: string | number, themeVariables: Record<string, unknown>): string {
+  const normalized = resolveThemeReferences(resolveThemeValue(value, themeVariables));
+  return typeof normalized === "number" ? `${normalized}px` : String(normalized);
+}
+
+function resolveThemeValue(value: string | number, themeVariables: Record<string, unknown>): string | number {
+  if (typeof value !== "string" || !value.startsWith("$")) {
+    return value;
+  }
+  return themeVariables[value.slice(1)] as string | number | undefined ?? value;
 }
 
 function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
@@ -555,11 +607,11 @@ function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
   return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
 }
 
-function labelPositionClass(value: string, direction?: string): string {
+function labelPositionClass(value: string): string {
   const normalized = value === "before"
-    ? direction === "rtl" ? "end" : "start"
+    ? "start"
     : value === "after"
-      ? direction === "rtl" ? "start" : "end"
+      ? "end"
       : value;
   if (normalized === "start") {
     return styles.numberBoxLabelPositionStart;

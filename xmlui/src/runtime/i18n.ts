@@ -1,6 +1,55 @@
-export type LocaleBundle = Record<string, string>;
+export interface LocaleBundle {
+  locale: string;
+  messages: ReadonlyMap<string, string> | Record<string, string>;
+}
 
-export type LocaleBundles = Record<string, LocaleBundle>;
+export interface BundleStore {
+  register(bundle: LocaleBundle): void;
+  available(): readonly string[];
+  lookup(locale: string, key: string): string | undefined;
+}
+
+export type I18nDiagnosticCode =
+  | "missing-key"
+  | "missing-bundle"
+  | "icu-parse-error"
+  | "untranslated-literal"
+  | "physical-css-property"
+  | "rtl-mismatch";
+
+export interface I18nDiagnostic {
+  code: I18nDiagnosticCode;
+  severity: "error" | "warn";
+  locale?: string;
+  key?: string;
+  bundleId?: string;
+  message: string;
+  data?: unknown;
+}
+
+export class IcuFormatError extends Error {
+  constructor(
+    message: string,
+    public readonly pattern: string,
+    public readonly cause?: unknown,
+  ) {
+    super(message);
+    this.name = "IcuFormatError";
+  }
+}
+
+export type LocaleBundles = Record<string, Record<string, string>>;
+
+export interface LocaleResolverInput {
+  appProp?: string;
+  userOverride?: string;
+  persisted?: string;
+  navigatorLanguages: readonly string[];
+  available: readonly string[];
+  fallback: string;
+}
+
+export type LocaleSource = "app" | "user" | "persisted" | "navigator" | "fallback";
 
 export type RuntimeI18nSnapshot = {
   locale: string;
@@ -11,7 +60,7 @@ export type RuntimeI18nSnapshot = {
 export type RuntimeI18n = {
   subscribe(listener: () => void): () => void;
   getSnapshot(): RuntimeI18nSnapshot;
-  setConfig(config: { locale?: string; bundles?: unknown }): void;
+  setConfig(config: { locale?: string; bundles?: unknown }, options?: { notify?: boolean }): void;
   setLocale(locale: string): void;
   translate(key: string, vars?: Record<string, unknown>): string;
   reference: {
@@ -21,10 +70,159 @@ export type RuntimeI18n = {
   };
 };
 
+export function createBundleStore(initial: readonly LocaleBundle[] = []): BundleStore {
+  const bundles = new Map<string, Map<string, string>>();
+  const store: BundleStore = {
+    register(bundle) {
+      const messages =
+        bundle.messages instanceof Map
+          ? new Map(bundle.messages)
+          : new Map(Object.entries(bundle.messages));
+      bundles.set(bundle.locale, messages);
+    },
+    available() {
+      return [...bundles.keys()];
+    },
+    lookup(locale, key) {
+      return bundles.get(locale)?.get(key) ?? bundles.get(locale.split("-")[0])?.get(key);
+    },
+  };
+  for (const bundle of initial) {
+    store.register(bundle);
+  }
+  return store;
+}
+
+export function normalizeLocaleBundle(input: unknown): LocaleBundle | undefined {
+  if (!input || typeof input !== "object") {
+    return undefined;
+  }
+  const candidate = input as { locale?: unknown; messages?: unknown };
+  if (typeof candidate.locale !== "string" || !candidate.messages || typeof candidate.messages !== "object") {
+    return undefined;
+  }
+  return {
+    locale: candidate.locale,
+    messages: candidate.messages instanceof Map
+      ? new Map(candidate.messages)
+      : Object.fromEntries(
+          Object.entries(candidate.messages as Record<string, unknown>)
+            .filter(([, value]) => value !== undefined && value !== null)
+            .map(([key, value]) => [key, String(value)]),
+        ),
+  };
+}
+
+export function isValidLocale(locale: string | undefined): locale is string {
+  if (!locale) {
+    return false;
+  }
+  try {
+    Intl.getCanonicalLocales(locale);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function normalizeLocale(locale: string): string {
+  return Intl.getCanonicalLocales(locale)[0] ?? locale;
+}
+
+export function resolveLocale(input: LocaleResolverInput): { locale: string; source: LocaleSource } {
+  const available = new Set(input.available.flatMap((locale) => {
+    const normalized = safeNormalizeLocale(locale);
+    return normalized ? [normalized] : [];
+  }));
+
+  for (const [source, candidate] of [
+    ["app", input.appProp],
+    ["user", input.userOverride],
+    ["persisted", input.persisted],
+  ] as const) {
+    const normalized = safeNormalizeLocale(candidate);
+    if (normalized && isAllowedLocale(normalized, available)) {
+      return { locale: normalized, source };
+    }
+  }
+
+  for (const candidate of input.navigatorLanguages) {
+    const normalized = safeNormalizeLocale(candidate);
+    if (normalized && isAllowedLocale(normalized, available)) {
+      return { locale: normalized, source: "navigator" };
+    }
+  }
+
+  return { locale: safeNormalizeLocale(input.fallback) ?? "en", source: "fallback" };
+}
+
+export function translateMessage(
+  key: string,
+  vars: Record<string, unknown> | undefined,
+  options: {
+    store: BundleStore;
+    locale: string;
+    strict?: boolean;
+    onDiagnostic?: (diagnostic: I18nDiagnostic) => void;
+  },
+): string {
+  const pattern = options.store.lookup(options.locale, key);
+  if (pattern === undefined) {
+    options.onDiagnostic?.({
+      code: "missing-key",
+      severity: options.strict ? "error" : "warn",
+      locale: options.locale,
+      key,
+      message: `Missing i18n key "${key}" for locale "${options.locale}".`,
+    });
+    return key;
+  }
+  try {
+    return formatIcuMessage(pattern, vars, options.locale);
+  } catch (error) {
+    options.onDiagnostic?.({
+      code: "icu-parse-error",
+      severity: options.strict ? "error" : "warn",
+      locale: options.locale,
+      key,
+      message: error instanceof Error ? error.message : String(error),
+      data: { pattern },
+    });
+    return key;
+  }
+}
+
+export const xmluiEnglishBundle: LocaleBundle = {
+  locale: "en",
+  messages: {
+    "xmlui.form.cancel": "Cancel",
+    "xmlui.form.save": "Save",
+    "xmlui.form.saving": "Saving...",
+    "xmlui.form.validating": "Validating...",
+    "xmlui.select.searchPlaceholder": "Search...",
+    "xmlui.drawer.ariaLabel": "Drawer",
+    "xmlui.drawer.closeAriaLabel": "Close",
+    "xmlui.modal.closeAriaLabel": "Close",
+    "xmlui.validation.email": "Not a valid email address",
+    "xmlui.validation.url": "Not a valid URL",
+    "xmlui.validation.phone": "Not a valid phone number",
+    "xmlui.validation.isoDate": "Not a valid ISO 8601 date",
+    "xmlui.validation.length": "Invalid length",
+    "xmlui.validation.iban": "Not a valid IBAN",
+    "xmlui.validation.creditCard": "Not a valid credit card number",
+    "xmlui.validation.strongPassword":
+      "Password must be at least 12 characters and include upper, lower, digit, and symbol",
+    "xmlui.validation.noLeadingTrailingWhitespace":
+      "Value must not start or end with whitespace",
+  },
+};
+
 export function createRuntimeI18n(): RuntimeI18n {
+  let configuredLocale: string | undefined;
+  let userLocaleOverride: string | undefined;
   let snapshot: RuntimeI18nSnapshot = {
     locale: "en",
-    bundles: {},
+    bundles: bundleMapFromLocaleBundles([xmluiEnglishBundle]),
     revision: 0,
   };
   const listeners = new Set<() => void>();
@@ -35,7 +233,7 @@ export function createRuntimeI18n(): RuntimeI18n {
     }
   };
 
-  const update = (next: Omit<RuntimeI18nSnapshot, "revision">) => {
+  const update = (next: Omit<RuntimeI18nSnapshot, "revision">, notifyListeners = true) => {
     if (snapshot.locale === next.locale && snapshot.bundles === next.bundles) {
       return;
     }
@@ -43,7 +241,9 @@ export function createRuntimeI18n(): RuntimeI18n {
       ...next,
       revision: snapshot.revision + 1,
     };
-    notify();
+    if (notifyListeners) {
+      notify();
+    }
   };
 
   const runtime: RuntimeI18n = {
@@ -54,16 +254,22 @@ export function createRuntimeI18n(): RuntimeI18n {
     getSnapshot() {
       return snapshot;
     },
-    setConfig(config) {
+    setConfig(config, options) {
       const bundles = normalizeLocaleBundles(config.bundles) ?? snapshot.bundles;
-      const locale = config.locale ? String(config.locale) : snapshot.locale;
-      update({ locale, bundles });
+      configuredLocale = config.locale ? String(config.locale) : undefined;
+      const locale = resolveActiveLocale(configuredLocale, userLocaleOverride, bundles);
+      update({ locale, bundles }, options?.notify !== false);
     },
     setLocale(locale) {
-      update({ locale: String(locale), bundles: snapshot.bundles });
+      userLocaleOverride = String(locale);
+      persistLocale(userLocaleOverride);
+      update({
+        locale: resolveActiveLocale(configuredLocale, userLocaleOverride, snapshot.bundles),
+        bundles: snapshot.bundles,
+      });
     },
     translate(key, vars) {
-      return translateMessage(String(key ?? ""), vars, snapshot.locale, snapshot.bundles);
+      return translateFromLocaleBundles(String(key ?? ""), vars, snapshot.locale, snapshot.bundles);
     },
     reference: {
       getLocale: () => snapshot.locale,
@@ -75,7 +281,61 @@ export function createRuntimeI18n(): RuntimeI18n {
   return runtime;
 }
 
+function resolveActiveLocale(
+  appProp: string | undefined,
+  userOverride: string | undefined,
+  bundles: LocaleBundles,
+): string {
+  return resolveLocale({
+    appProp,
+    userOverride,
+    persisted: getPersistedLocale(),
+    navigatorLanguages: getNavigatorLanguages(),
+    available: Object.keys(bundles),
+    fallback: "en",
+  }).locale;
+}
+
+function getNavigatorLanguages(): readonly string[] {
+  if (typeof navigator !== "undefined" && Array.isArray(navigator.languages)) {
+    return navigator.languages;
+  }
+  if (typeof navigator !== "undefined" && navigator.language) {
+    return [navigator.language];
+  }
+  return ["en"];
+}
+
+function getPersistedLocale(): string | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+  try {
+    return window.localStorage.getItem("xmlui.locale") ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function persistLocale(locale: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.setItem("xmlui.locale", locale);
+  } catch {
+    // Locale persistence is best effort, matching browser storage availability.
+  }
+}
+
 function normalizeLocaleBundles(input: unknown): LocaleBundles | undefined {
+  const normalizedBundles = normalizeLocaleBundleInput(input);
+  if (normalizedBundles.length > 0) {
+    return {
+      ...bundleMapFromLocaleBundles([xmluiEnglishBundle]),
+      ...bundleMapFromLocaleBundles(normalizedBundles),
+    };
+  }
   if (!input || typeof input !== "object") {
     return undefined;
   }
@@ -90,10 +350,57 @@ function normalizeLocaleBundles(input: unknown): LocaleBundles | undefined {
         .map(([key, value]) => [key, String(value)]),
     );
   }
-  return bundles;
+  return {
+    ...bundleMapFromLocaleBundles([xmluiEnglishBundle]),
+    ...bundles,
+  };
 }
 
-function translateMessage(
+function bundleMapFromLocaleBundles(bundles: readonly LocaleBundle[]): LocaleBundles {
+  return Object.fromEntries(
+    bundles.map((bundle) => [
+      bundle.locale,
+      bundle.messages instanceof Map
+        ? Object.fromEntries(bundle.messages)
+        : Object.fromEntries(
+            Object.entries(bundle.messages)
+              .filter(([, value]) => value !== undefined && value !== null)
+              .map(([key, value]) => [key, String(value)]),
+          ),
+    ]),
+  );
+}
+
+function normalizeLocaleBundleInput(input: unknown): LocaleBundle[] {
+  if (input == null) {
+    return [];
+  }
+  if (typeof input === "string") {
+    return [];
+  }
+  if (Array.isArray(input)) {
+    return input.flatMap(normalizeLocaleBundleInput);
+  }
+  const singleBundle = normalizeLocaleBundle(input);
+  if (singleBundle) {
+    return [singleBundle];
+  }
+  if (typeof input === "object") {
+    return Object.entries(input as Record<string, unknown>)
+      .filter(([, messages]) => messages && typeof messages === "object")
+      .map(([locale, messages]) => ({
+        locale,
+        messages: Object.fromEntries(
+          Object.entries(messages as Record<string, unknown>)
+            .filter(([, value]) => value !== undefined && value !== null)
+            .map(([key, value]) => [key, String(value)]),
+        ),
+      }));
+  }
+  return [];
+}
+
+function translateFromLocaleBundles(
   key: string,
   vars: Record<string, unknown> | undefined,
   locale: string,
@@ -118,8 +425,26 @@ function normalizeLanguage(locale: string): string {
   return locale.split("-")[0] || locale;
 }
 
-function formatIcuMessage(pattern: string, vars: Record<string, unknown> = {}, locale = "en"): string {
-  return formatSegment(pattern, vars, locale);
+function safeNormalizeLocale(locale: string | undefined): string | undefined {
+  if (!isValidLocale(locale)) {
+    return undefined;
+  }
+  return normalizeLocale(locale);
+}
+
+function isAllowedLocale(locale: string, available: Set<string>): boolean {
+  return available.size === 0 || available.has(locale) || available.has(locale.split("-")[0]);
+}
+
+export function formatIcuMessage(pattern: string, vars: Record<string, unknown> = {}, locale = "en"): string {
+  try {
+    return formatSegment(pattern, vars, locale);
+  } catch (error) {
+    if (error instanceof IcuFormatError) {
+      throw error;
+    }
+    throw new IcuFormatError(error instanceof Error ? error.message : String(error), pattern, error);
+  }
 }
 
 function formatSegment(segment: string, vars: Record<string, unknown>, locale: string): string {

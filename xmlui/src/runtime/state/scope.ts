@@ -72,7 +72,7 @@ export function createRuntimeScope({
     appContext: appContext ?? parent?.appContext ?? {},
     references,
     slots,
-    routing,
+    routing: routing ?? parent?.routing,
     toast: toast ?? parent?.toast,
     i18n: i18n ?? parent?.i18n,
     emitEvent,

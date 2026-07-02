@@ -9,6 +9,7 @@ const COMP = "I18n";
 
 export const I18nMd = createMetadata({
   status: "experimental",
+  allowArbitraryProps: true,
   description:
     "`I18n` renders a translated message from the active locale bundle. Variables are passed as props, and translated slot placeholders such as `<link/>` are replaced with matching named XMLUI slots.",
   props: {

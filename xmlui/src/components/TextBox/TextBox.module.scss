@@ -85,16 +85,24 @@ $paddingBottom-TextBox: createThemeVar("paddingBottom-TextBox");
   .textBoxLabeledItem {
     display: flex;
     align-items: center;
-    gap: var(--xmlui-gap-label-TextBox, var(--xmlui-gap-normal));
+    gap: var(--xmlui-gap-label-TextBox, var(--xmlui-gap-label-FormItem, 0.5em));
     width: 100%;
     max-width: 100%;
   }
 
   .textBoxLabel {
     flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-TextBox, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-TextBox, inherit);
+    color: var(--xmlui-textColor-label-TextBox, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-family: var(--xmlui-fontFamily-label-TextBox, var(--xmlui-fontFamily-label-formItem, var(--xmlui-fontFamily)));
+    font-size: var(--xmlui-fontSize-label-TextBox, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm)));
+    font-weight: var(--xmlui-fontWeight-label-TextBox, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium)));
+    font-style: var(--xmlui-fontStyle-label-TextBox, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-TextBox, var(--xmlui-textTransform-label-formItem, none));
+    user-select: none;
+    cursor: pointer;
+    word-break: normal;
     white-space: nowrap;
+    height: fit-content;
   }
 
   .textBoxLabelBreak {
@@ -102,11 +110,13 @@ $paddingBottom-TextBox: createThemeVar("paddingBottom-TextBox");
   }
 
   .textBoxLabelRequired {
-    margin-left: 0.25em;
+    margin-inline-start: 0.2em;
+    color: var(--xmlui-textColor-requiredMark-formItem, var(--xmlui-color-attention-500));
   }
 
   .textBoxLabelOptional {
-    margin-left: 0.25em;
+    margin-inline-start: 0.2em;
+    color: var(--xmlui-textColor-optionalTag-formItem, var(--xmlui-textColor-secondary));
   }
 
   .textBoxLabelPositionStart {

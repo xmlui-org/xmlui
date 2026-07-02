@@ -67,6 +67,10 @@ $textColor-NumberBox--disabled: createThemeVar("textColor-NumberBox--disabled");
 $borderColor-NumberBox--disabled: createThemeVar("borderColor-NumberBox--disabled");
 $paddingHorizontal-NumberBox: createThemeVar("paddingHorizontal-NumberBox");
 $paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
+$paddingLeft-NumberBox: createThemeVar("paddingLeft-NumberBox");
+$paddingRight-NumberBox: createThemeVar("paddingRight-NumberBox");
+$paddingTop-NumberBox: createThemeVar("paddingTop-NumberBox");
+$paddingBottom-NumberBox: createThemeVar("paddingBottom-NumberBox");
 
 :export {
   themeVars: "";
@@ -76,28 +80,34 @@ $paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
   .numberBoxLabeledItem {
     display: flex;
     align-items: center;
-    gap: var(--xmlui-gap-label-NumberBox, var(--xmlui-gap-normal));
+    gap: var(--xmlui-gap-label-NumberBox, var(--xmlui-gap-label-FormItem, 0.5em));
     width: 100%;
     max-width: 100%;
   }
 
   .numberBoxLabel {
     flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-NumberBox, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-NumberBox, inherit);
+    color: var(--xmlui-textColor-label-NumberBox, var(--xmlui-textColor-label-formItem, var(--xmlui-textColor)));
+    font-family: var(--xmlui-fontFamily-label-NumberBox, var(--xmlui-fontFamily-label-formItem, var(--xmlui-fontFamily)));
+    font-size: var(--xmlui-fontSize-label-NumberBox, var(--xmlui-fontSize-label-formItem, var(--xmlui-fontSize-sm)));
+    font-weight: var(--xmlui-fontWeight-label-NumberBox, var(--xmlui-fontWeight-label-formItem, var(--xmlui-fontWeight-medium)));
+    font-style: var(--xmlui-fontStyle-label-NumberBox, var(--xmlui-fontStyle-label-formItem, normal));
+    text-transform: var(--xmlui-textTransform-label-NumberBox, var(--xmlui-textTransform-label-formItem, none));
+    user-select: none;
+    cursor: pointer;
+    word-break: normal;
     white-space: nowrap;
-  }
-
-  .numberBoxLabel > span {
-    display: inline-block;
+    height: fit-content;
   }
 
   .numberBoxLabelRequired {
-    margin-left: 0.25em;
+    margin-inline-start: 0.2em;
+    color: var(--xmlui-textColor-requiredMark-formItem, var(--xmlui-color-attention-500));
   }
 
   .numberBoxLabelOptional {
-    margin-left: 0.25em;
+    margin-inline-start: 0.2em;
+    color: var(--xmlui-textColor-optionalTag-formItem, var(--xmlui-textColor-secondary));
   }
 
   .numberBoxLabelPositionStart {
@@ -136,7 +146,11 @@ $paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
     background-color: var(--xmlui-backgroundColor-NumberBox);
     box-shadow: var(--xmlui-boxShadow-NumberBox);
     color: var(--xmlui-textColor-NumberBox);
-    padding: var(--xmlui-padding-NumberBox, var(--xmlui-paddingVertical-NumberBox) var(--xmlui-paddingHorizontal-NumberBox));
+    padding: var(--xmlui-padding-NumberBox);
+    padding-left: var(--xmlui-paddingLeft-NumberBox, var(--xmlui-paddingHorizontal-NumberBox, var(--xmlui-padding-NumberBox)));
+    padding-right: var(--xmlui-paddingRight-NumberBox, var(--xmlui-paddingHorizontal-NumberBox, var(--xmlui-padding-NumberBox)));
+    padding-top: var(--xmlui-paddingTop-NumberBox, var(--xmlui-paddingVertical-NumberBox, var(--xmlui-padding-NumberBox)));
+    padding-bottom: var(--xmlui-paddingBottom-NumberBox, var(--xmlui-paddingVertical-NumberBox, var(--xmlui-padding-NumberBox)));
     transition: background-color ease-in 0.1s, border-color ease-in 0.1s;
   }
 
@@ -256,37 +270,40 @@ $paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
+    gap: var(--xmlui-space-2, 0.5rem);
     color: var(--xmlui-color-adornment-NumberBox);
   }
 
-  .numberBoxIconMarker {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    border-radius: 999px;
-    background-color: currentColor;
+  .numberBoxIcon {
+    color: currentColor;
   }
 
   .numberBoxSpinner {
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    align-self: stretch;
-    margin-block: calc(-1 * var(--xmlui-paddingVertical-NumberBox));
-    margin-inline-end: calc(-1 * var(--xmlui-paddingHorizontal-NumberBox));
-    border-inline-start: 1px solid currentColor;
+    height: 0;
+    align-items: center;
+    justify-content: center;
   }
 
   .numberBoxSpinnerButton {
     appearance: none;
-    border: 0;
-    min-width: 1.6rem;
-    flex: 1 1 0;
-    padding: 0;
+    border: none;
+    min-width: 0;
+    display: block;
+    width: 1.5rem;
+    min-height: fit-content;
+    padding: 0 !important;
     color: inherit;
     background: transparent;
     cursor: pointer;
     line-height: 1;
+  }
+
+  .numberBoxSpinnerButton [data-icon-name] {
+    width: 14px;
+    height: 14px;
   }
 
   .numberBoxSpinnerButton:disabled {

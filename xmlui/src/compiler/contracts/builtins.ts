@@ -5,7 +5,7 @@ import { AccordionItemMd, AccordionMd } from "../../components/Accordion/Accordi
 import { AvatarMd } from "../../components/Avatar/Avatar";
 import { BadgeMd } from "../../components/Badge/Badge";
 import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
-import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
+import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags.metadata";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
 import { CardMd } from "../../components/Card/Card";
 import { FragmentMd } from "../../components/Fragment/Fragment";

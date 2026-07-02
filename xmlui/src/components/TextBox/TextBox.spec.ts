@@ -1128,6 +1128,31 @@ test("labelWidth applies custom label width", async ({ initTestBed, createTextBo
   expect(width).toEqual(expected);
 });
 
+test("label uses ItemWithLabel typography and top-label spacing", async ({
+  initTestBed,
+  page,
+  createTextBoxDriver,
+}) => {
+  await initTestBed(`<TextBox testId="note" label="Quick note" />`);
+  const driver = await createTextBoxDriver("note");
+
+  await expect(driver.label).toHaveCSS("font-size", "14px");
+  await expect(driver.label).toHaveCSS("font-weight", "500");
+
+  const labeledItem = page.getByTestId("note").locator('[data-part-id="labeledItem"]');
+  await expect(labeledItem).toHaveCSS("row-gap", "8px");
+
+  const labelBox = await driver.label.boundingBox();
+  const inputBox = await page
+    .getByTestId("note")
+    .locator('[data-xmlui-part="input"]')
+    .first()
+    .boundingBox();
+  expect(labelBox).not.toBeNull();
+  expect(inputBox).not.toBeNull();
+  expect(inputBox!.y - (labelBox!.y + labelBox!.height)).toBeCloseTo(8, 0);
+});
+
 // =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================

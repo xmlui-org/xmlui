@@ -653,6 +653,48 @@ test.describe("Input Adornments", () => {
     expect(iconRight - compLeft).toBeGreaterThanOrEqual(compRight - iconLeft);
   });
 
+  test("endIcon keeps source-compatible spacing before spinner buttons", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<NumberBox testId="input" endIcon="email" />`);
+
+    const metrics = await page.getByTestId("input").evaluate((root) => {
+      const endIcon = root.querySelector("[data-part-id='endAdornment'] [data-icon-name]");
+      const spinnerUp = root.querySelector("[data-part-id='spinnerUp']");
+      const spinnerDown = root.querySelector("[data-part-id='spinnerDown']");
+      const spinner = spinnerUp?.parentElement;
+      const upIcon = spinnerUp?.querySelector("[data-icon-name]");
+      const downIcon = spinnerDown?.querySelector("[data-icon-name]");
+      const endIconRect = endIcon?.getBoundingClientRect();
+      const spinnerRect = spinner?.getBoundingClientRect();
+      const upIconRect = upIcon?.getBoundingClientRect();
+      const downIconRect = downIcon?.getBoundingClientRect();
+      const rootStyle = getComputedStyle(root);
+
+      return {
+        rootGap: rootStyle.gap,
+        endIconToSpinnerGap:
+          endIconRect && spinnerRect ? Math.round(spinnerRect.left - endIconRect.right) : null,
+        spinnerWidth: spinnerRect ? Math.round(spinnerRect.width) : null,
+        upIconWidth: upIconRect ? Math.round(upIconRect.width) : null,
+        upIconHeight: upIconRect ? Math.round(upIconRect.height) : null,
+        downIconWidth: downIconRect ? Math.round(downIconRect.width) : null,
+        downIconHeight: downIconRect ? Math.round(downIconRect.height) : null,
+      };
+    });
+
+    expect(metrics).toEqual({
+      rootGap: "8px",
+      endIconToSpinnerGap: 8,
+      spinnerWidth: 24,
+      upIconWidth: 14,
+      upIconHeight: 14,
+      downIconWidth: 14,
+      downIconHeight: 14,
+    });
+  });
+
   test("endIcon displays at end of input (rtl)", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" direction="rtl" endIcon="search" />`);
 
@@ -670,6 +712,67 @@ test.describe("Input Adornments", () => {
     await expect(page.getByTestId("input")).toContainText("USD");
     await expect(page.getByRole("img").first()).toBeVisible();
     await expect(page.getByRole("img").nth(1)).toBeVisible();
+  });
+
+  test("combined icon and text adornments keep source-compatible inner gaps", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <NumberBox
+        testId="input"
+        startIcon="hyperlink"
+        startText="www."
+        endIcon="email"
+        endText=".com"
+      />
+    `);
+
+    const metrics = await page.getByTestId("input").evaluate((root) => {
+      const measureText = (container: Element | null, needle: string) => {
+        if (!container) {
+          return null;
+        }
+        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+        let textNode = walker.nextNode();
+        while (textNode) {
+          if (textNode.textContent?.includes(needle)) {
+            const range = document.createRange();
+            range.selectNodeContents(textNode);
+            const rect = range.getBoundingClientRect();
+            range.detach();
+            return { left: rect.left, right: rect.right };
+          }
+          textNode = walker.nextNode();
+        }
+        return null;
+      };
+
+      const startAdornment = root.querySelector("[data-part-id='startAdornment']");
+      const endAdornment = root.querySelector("[data-part-id='endAdornment']");
+      const startIcon = startAdornment?.querySelector("[data-icon-name]");
+      const endIcon = endAdornment?.querySelector("[data-icon-name]");
+      const startIconRect = startIcon?.getBoundingClientRect();
+      const endIconRect = endIcon?.getBoundingClientRect();
+      const startTextRect = measureText(startAdornment, "www.");
+      const endTextRect = measureText(endAdornment, ".com");
+
+      return {
+        startAdornmentGap: startAdornment ? getComputedStyle(startAdornment).gap : null,
+        endAdornmentGap: endAdornment ? getComputedStyle(endAdornment).gap : null,
+        startIconToTextGap:
+          startIconRect && startTextRect ? Math.round(startTextRect.left - startIconRect.right) : null,
+        endIconToTextGap:
+          endIconRect && endTextRect ? Math.round(endTextRect.left - endIconRect.right) : null,
+      };
+    });
+
+    expect(metrics).toEqual({
+      startAdornmentGap: "8px",
+      endAdornmentGap: "8px",
+      startIconToTextGap: 8,
+      endIconToTextGap: 8,
+    });
   });
 
   test("all adornments appear in the right place", async ({ initTestBed, page }) => {
@@ -1540,6 +1643,34 @@ test.describe("Behaviors and Parts", () => {
     const spinnerDown = page.getByTestId("test").locator("[data-part-id='spinnerDown']");
     await expect(spinnerUp).not.toBeVisible();
     await expect(spinnerDown).not.toBeVisible();
+  });
+
+  test("disabled spinbox uses source-style ghost spinner chrome", async ({ page, initTestBed }) => {
+    await initTestBed(`<NumberBox testId="test" enabled="false" />`);
+
+    const spinnerUp = page.getByTestId("test").locator("[data-part-id='spinnerUp']");
+    const spinnerDown = page.getByTestId("test").locator("[data-part-id='spinnerDown']");
+    await expect(spinnerUp).toBeDisabled();
+    await expect(spinnerDown).toBeDisabled();
+
+    const spinnerStyle = await spinnerUp.evaluate((node) => {
+      const spinner = node.parentElement;
+      const style = spinner ? getComputedStyle(spinner) : null;
+      return {
+        borderInlineStartWidth: style?.borderInlineStartWidth,
+        height: style?.height,
+      };
+    });
+    expect(spinnerStyle).toEqual({
+      borderInlineStartWidth: "0px",
+      height: "0px",
+    });
+    await expect(spinnerUp).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(spinnerDown).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(spinnerUp.locator("[data-icon-name]")).toHaveCSS("width", "14px");
+    await expect(spinnerUp.locator("[data-icon-name]")).toHaveCSS("height", "14px");
+    await expect(spinnerDown.locator("[data-icon-name]")).toHaveCSS("width", "14px");
+    await expect(spinnerDown.locator("[data-icon-name]")).toHaveCSS("height", "14px");
   });
 
   test("parts are present when tooltip is added", async ({ page, initTestBed }) => {

@@ -22,6 +22,10 @@ export function popFocusScope(id: number): FocusScopeEntry | undefined {
   return entry;
 }
 
+export function topFocusScope(): FocusScopeEntry | undefined {
+  return stack[stack.length - 1];
+}
+
 export function topFocusScopeForElement(element: Element | null): FocusScopeEntry | undefined {
   if (!element) {
     return undefined;
@@ -39,4 +43,3 @@ export function clearFocusScopesForTests(): void {
   stack.length = 0;
   nextId = 1;
 }
-

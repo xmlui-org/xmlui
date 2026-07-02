@@ -207,7 +207,7 @@ export function App({ adapter }: XmluiAdapterRendererProps) {
   adapter.scope.i18n?.setConfig({
     locale: adapter.stringProp("locale"),
     bundles: adapter.prop("localeBundles"),
-  });
+  }, { notify: false });
 
   useEffect(() => {
     const name = adapter.stringProp("name");

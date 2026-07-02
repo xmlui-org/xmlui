@@ -62,6 +62,9 @@ export class RuntimeRoutingStore {
     if (typeof window === "undefined") {
       return () => undefined;
     }
+    if (this.mode === "hash" && !window.location.hash) {
+      window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}#/`);
+    }
     const listener = () => this.syncFromBrowser();
     window.addEventListener("hashchange", listener);
     window.addEventListener("popstate", listener);
@@ -103,6 +106,42 @@ export class RuntimeRoutingStore {
       return true;
     }
     window.history.pushState({}, "", url);
+    this.syncFromBrowser();
+    return true;
+  }
+
+  async replace(target: unknown, queryParams?: Record<string, unknown>): Promise<boolean> {
+    if (typeof window === "undefined" && !this.localOnly) {
+      return false;
+    }
+    if (typeof target === "number") {
+      if (this.localOnly) {
+        return false;
+      }
+      window.history.go(target);
+      return true;
+    }
+    const targetValue = String(target ?? "/");
+    const url = this.createUrl(targetValue, queryParams);
+    const willResult = await this.navigationHandlers.onWillNavigate?.(targetValue, queryParams);
+    if (willResult === false) {
+      return false;
+    }
+    if (this.localOnly) {
+      this.snapshot = snapshotFromUrl(url, this.snapshot.revision + 1);
+      this.onChange?.();
+      for (const listener of this.listeners) {
+        listener();
+      }
+      void this.navigationHandlers.onDidNavigate?.(snapshotToUrl(this.snapshot), this.snapshot.queryParams);
+      return true;
+    }
+    if (this.mode === "hash") {
+      window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}#${url}`);
+      this.syncFromBrowser();
+      return true;
+    }
+    window.history.replaceState({}, "", url);
     this.syncFromBrowser();
     return true;
   }

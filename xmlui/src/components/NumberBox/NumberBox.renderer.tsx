@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { NumberBoxMd } from "./NumberBox";
 import { defaultProps } from "./NumberBox.defaults";
-import { NumberBoxNative, type NumberBoxApi } from "./NumberBoxReact";
+import { NumberBoxNative } from "./NumberBoxReact";
 
 const COMP = "NumberBox";
 
@@ -13,11 +13,7 @@ export const numberBoxRenderer = wrapComponent({
     return (
       <NumberBoxNative
         {...adapter.rootAttrs("input")}
-        ref={(api: NumberBoxApi | null) => {
-          if (api) {
-            adapter.registerApi(api);
-          }
-        }}
+        registerComponentApi={adapter.registerApi}
         id={adapter.stringProp("id")}
         bindTo={adapter.stringProp("bindTo")}
         value={adapter.prop("value")}
@@ -39,8 +35,8 @@ export const numberBoxRenderer = wrapComponent({
         endIcon={adapter.prop("endIcon")}
         gap={adapter.stringProp("gap")}
         hasSpinBox={adapter.booleanProp("hasSpinBox", defaultProps.hasSpinBox)}
-        spinnerUpIcon={adapter.stringProp("spinnerUpIcon", "chevronup")}
-        spinnerDownIcon={adapter.stringProp("spinnerDownIcon", "chevrondown")}
+        spinnerUpIcon={adapter.stringProp("spinnerUpIcon")}
+        spinnerDownIcon={adapter.stringProp("spinnerDownIcon")}
         step={adapter.prop("step", defaultProps.step)}
         integersOnly={adapter.booleanProp("integersOnly", defaultProps.integersOnly)}
         zeroOrPositive={adapter.booleanProp("zeroOrPositive", defaultProps.zeroOrPositive)}

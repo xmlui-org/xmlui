@@ -80,6 +80,10 @@ $textColor-NumberBox--disabled: createThemeVar("textColor-NumberBox--disabled");
 $borderColor-NumberBox--disabled: createThemeVar("borderColor-NumberBox--disabled");
 $paddingHorizontal-NumberBox: createThemeVar("paddingHorizontal-NumberBox");
 $paddingVertical-NumberBox: createThemeVar("paddingVertical-NumberBox");
+$paddingLeft-NumberBox: createThemeVar("paddingLeft-NumberBox");
+$paddingRight-NumberBox: createThemeVar("paddingRight-NumberBox");
+$paddingTop-NumberBox: createThemeVar("paddingTop-NumberBox");
+$paddingBottom-NumberBox: createThemeVar("paddingBottom-NumberBox");
 `;
 
 export const NumberBoxMd = createMetadata({
@@ -200,7 +204,7 @@ export const NumberBoxMd = createMetadata({
     [`backgroundColor-${COMP}--hover`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--hover`]: "none",
     [`textColor-${COMP}--hover`]: "$textColor-Input",
-    [`borderColor-${COMP}--focus`]: "$borderColor-Input--hover",
+    [`borderColor-${COMP}--focus`]: `$borderColor-${COMP}`,
     [`backgroundColor-${COMP}--focus`]: "$backgroundColor-Input",
     [`boxShadow-${COMP}--focus`]: "none",
     [`textColor-${COMP}--focus`]: "$textColor-Input",

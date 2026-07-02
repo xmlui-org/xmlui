@@ -147,6 +147,133 @@ For each component:
      affect later components;
    - ask the user for approval to continue.
 
+## Data Operations Implementation Order
+
+Data-oriented components should not be migrated as isolated visual widgets. In
+the old project, `DataSource`, `APICall`, loader helpers, app globals,
+interceptors, forms, and data presentation components share one runtime
+contract. The source of truth includes:
+
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/DataSource`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/APICall`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components/Fallback`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core/loader`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core/action`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core/interception`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/components-core/utils/DataLoaderQueryKeyGenerator.ts`;
+- `/Users/dotneteer/source/xmlui/xmlui/src/abstractions/AppContextDefs.ts`.
+
+The optimal order is:
+
+1. Shared request and loader substrate.
+   - Preserve `AppError` shape, loader registration, query-key generation,
+     API interceptor context, toast/confirm/navigate integration, app-global
+     identifier availability, request cancellation, and event completion
+     semantics.
+   - Compatibility gate: unit tests for request building, error construction,
+     global identifier filtering, app context globals, and event promise
+     completion.
+2. `DataSource`.
+   - Migrate before `APICall` because `APICall` invalidation, `Fallback`, and
+     data consumers depend on the DataSource cache/refetch contract.
+   - Preserve `value`, `loaded`, `error`, `inProgress`, `isRefetching`,
+     `responseHeaders`, paging APIs, `refetch`, `mockData`, `onFetch`,
+     result selectors, structural sharing, polling, retries, `when`, and
+     shared cached requests.
+   - Compatibility gate: old `DataSource.spec.ts`, plus a small Fallback loader
+     error smoke fixture.
+3. Global `Actions.callApi`.
+   - Implement the action before the `APICall` component. Many components call
+     it directly without authoring `<APICall>`.
+   - Preserve confirmation, notifications, deferred operation handling,
+     response parsing, assignment result behavior, thrown API error shape,
+     `invalidates`, DataSource refetch timing, and event completion.
+   - Compatibility gate: focused tests for `Actions.callApi`, especially the
+     current failing case where notifications complete but invalidated
+     DataSource refs do not update.
+4. `APICall`.
+   - Migrate after the action substrate is compatible so the component can be a
+     thin source-preserved wrapper around the same request machinery.
+   - Preserve imperative execute/cancel APIs, deferred polling/status/cancel
+     URLs, optimistic value, notifications, `mockExecute`, in-progress/error
+     state, response headers, and invalidation.
+   - Compatibility gate: old `APICall.spec.ts` and a direct DataSource
+     invalidation regression.
+5. `Fallback`.
+   - Treat render-error fallback and loader-error fallback as one shared
+     contract, but avoid using Fallback to drive DataSource/APICall design.
+     Loader fallback should be finalized after the loader/action substrate is
+     stable.
+   - Preserve error scope variables, nested fallback lookup, loader error
+     retention while an error template replaces the failed subtree, and default
+     error rendering.
+   - Compatibility gate: old Fallback tests plus DataSource/APICall error
+     samples.
+6. `Items`.
+   - Migrate after DataSource because it is the basic data iteration primitive
+     for dynamic lists and templates.
+   - Preserve `$item`, `$itemIndex`, `$isFirst`, `$isLast`, `itemTemplate`,
+     empty data behavior, reactive updates, and scope isolation.
+   - Compatibility gate: old `Items.spec.ts` and a DataSource-fed iteration
+     fixture.
+7. Form data substrate.
+   - Migrate `FormItem` behavior, `Form`, `FormSegment`, validation helpers,
+     and form actions before form-bound inputs or submit workflows.
+   - Preserve form context, `bindTo`, value collection, dirty/touched state,
+     validation timing, submission through `Actions.callApi`/`APICall`, and
+     app-scope updates.
+   - Compatibility gate: old Form/FormItem/FormSegment tests and a submit
+     fixture that mutates app state and invalidates a DataSource.
+8. Choice and data-bound inputs.
+   - Migrate `Option`, then `Select`, then `AutoComplete`. These depend on
+     form binding, option context, overlay behavior, and sometimes dynamic
+     option data.
+   - Compatibility gate: old Option/Select/AutoComplete suites with both
+     static and DataSource-backed options.
+9. Data presentation components.
+   - Migrate `Pagination`, `NoResult`, `SelectionStore`, then `List`, then
+     `Table`. `Table` should remain blocked until these prerequisites are
+     source-preserving complete.
+   - Preserve selection APIs, page state, empty states, sorting/filtering,
+     row/cell template scopes, and interaction with DataSource paging.
+   - Compatibility gate: focused prerequisite suites first, then old
+     `Table.spec.ts` and `TableCellTextOverflow.spec.ts`.
+10. Hierarchical and dynamic data.
+    - Migrate `TreeDisplay`, then `Tree`. `Tree` has many async/lazy-loading
+      tests and should wait until request/action semantics are trustworthy.
+    - Preserve lazy loading, `autoLoadAfter`, loaded field semantics, spinner
+      delay, icons, replace APIs, and dynamic integration behavior.
+    - Compatibility gate: all old Tree suites, including dynamic and
+      integration specs.
+11. Queue, upload, and file actions.
+    - Migrate `Queue`, `FileUploadAction`, and `FileUploadDropZone` after
+      APICall and Form because they combine action scheduling, request/upload
+      behavior, user feedback, and form-like state.
+    - Compatibility gate: old Queue/FileUploadDropZone suites and a real
+      request/interceptor fixture.
+12. Mock API and integration fixtures.
+    - Tighten `ApiInterceptor`, in-memory backend behavior, standalone
+      testbed options, docs samples, and playground/integration coverage after
+      the public components above are green.
+    - Compatibility gate: representative standalone, Vite/plugin, and docs
+      examples using DataSource, APICall, Fallback, Forms, and Table together.
+
+Important sequencing rule: do not mark a downstream data component complete if
+the shared action/loader substrate still has a known failure. For example, the
+Fallback work exposed that `Actions.callApi` can finish visually while the
+invalidated DataSource ref remains stale; that belongs in step 3 before
+`APICall`, Form submit, Table refresh, or Tree dynamic loading are closed.
+
+Recommended verification cadence:
+
+- After steps 1-3, run the focused DataSource/APICall/Fallback foundation
+  tests, not only the component currently being edited.
+- After every downstream data component, rerun the `Actions.callApi`
+  invalidation regression and one DataSource render update sample.
+- For async visual drift, query both local original and rewrite dev servers for
+  computed state, DOM geometry, request logs, and exposed component APIs before
+  adding screenshots or broad E2E assertions.
+
 ## Migration Learnings
 
 Keep this section to reusable migration rules only. Component-specific closure
@@ -250,6 +377,11 @@ details belong in per-component .ai notes and the status table.
 - Generated tone/color variables must be inserted at the same point in the theme
   cascade as old XMLUI. Missing generated base tones or wrong generated/default
   precedence shows up as subtle color, opacity, border, and hover-state drift.
+- Theme-variable extraction must recognize old Sass helper families, not only
+  the exact `createThemeVar(...)` call. Copied SCSS can use helpers such as
+  `createThemeVarTable(...)`; either teach the extractor the helper family or
+  keep a metadata-only explicit variable list when the SCSS cannot be imported
+  safely.
 
 ### Component Source And Dependencies
 
@@ -266,15 +398,52 @@ details belong in per-component .ai notes and the status table.
 - Metadata files should stay metadata-only when runtime exports import SCSS.
   Re-exporting runtime components from metadata files can make Vite config
   bundling parse SCSS as JavaScript.
+- If compiler contracts need component metadata, split metadata into a
+  runtime-free `*.metadata.ts` module. Components such as deprecated HTML tag
+  wrappers can then import Text/Heading/Link and SCSS in their runtime file
+  without making Vite config or metadata generation parse component CSS.
 - Runtime-only themed exports must apply both the component theme class/style
   and any variant-specific style class the standalone renderer would add.
   Otherwise copied components that embed `ThemedText`, `ThemedIcon`, or similar
   helpers can silently lose typography, color, or size styling.
+- Deprecated HTML tag components are not always plain native elements in the
+  original project. Preserve the old wrapper routing: text-like tags should use
+  XMLUI Text variants, heading tags should use Heading, anchors should use Link
+  behavior, and table/list/details/video tags should keep tag-specific SCSS
+  classes and theme variables.
+- Preserve original third-party packages when they own browser interaction
+  semantics. FileUploadDropZone returned to `react-dropzone` rather than a
+  hand-rolled drag/drop implementation so accept/maxFiles/paste/open timing and
+  hidden input behavior stay aligned with the old project.
+- Old composed-ref helpers must tolerate `null` refs from React and third-party
+  callbacks. The shared `getComposedRef` shim filters `null`/`undefined` refs
+  and writes object refs through a mutable-ref cast, which keeps copied React
+  source compatible without component-local ref rewrites.
 
 ### Layout And Rendering Infrastructure
 
 - Any ordinary component except `Component` can be the app document root in old
   XMLUI. Parser, raw parser, and IR validation must keep this contract.
+- Runtime scopes must inherit ambient services that old `wrapComponent`
+  implicitly provided. Routing, toast, i18n, extension functions, and similar
+  services should cross ordinary scoped elements and be explicitly bridged across
+  custom component boundaries; otherwise nonvisual components such as Redirect
+  can evaluate state correctly but lose the service needed to act.
+- Ambient App services can need a two-phase update boundary. I18n locale
+  bundles must be seeded synchronously before child expressions such as
+  `App.translate(...)` render, but that render-time seed must not notify
+  subscribers; reserve notifications for user/runtime changes such as
+  `App.setLocale(...)`.
+- Treat old prop omission semantics as part of the public contract. Metadata
+  defaults are not harmless documentation: if the adapter materializes a default
+  as a prop, it can turn "omitted, resolve from runtime policy" into an explicit
+  override. I18n exposed this with App `locale`, where omitted locale must run
+  the old resolver over App/user/persisted/browser/fallback sources, including
+  the default `xmlui.locale` localStorage key, instead of forcing English.
+- Preserve old public helper import paths even when the implementation moves.
+  Components and downstream code may import `components-core/i18n` directly, so
+  keep a compatibility barrel that exposes the old bundle store, diagnostics,
+  ICU formatter, and translate helpers.
 - Public components and internal primitives are not always interchangeable. The
   old internal `ThemedScroller` contract used by Stack/FlowLayout is not the
   same as public `ScrollViewer` fill-parent behavior.
@@ -286,10 +455,25 @@ details belong in per-component .ai notes and the status table.
   detail. Components using label behavior should preserve the old outer wrapper,
   inner label container, typography, gap, and explicit/implicit label-position
   semantics.
+- Some input-like components consume `label` locally before the generic behavior
+  layer can wrap them. Those local label bridges must still mirror the old
+  `ItemWithLabel` contract: FormItem label typography fallbacks, the old
+  top-label `0.5em` gap, required/optional marker spacing, and no-wrap label
+  geometry.
+- Local label bridges should not add direction-aware start/end swapping unless
+  the original shared wrapper did. Original `ItemWithLabel` maps legacy
+  `before`/`after` aliases directly to start/end and then lets `dir="rtl"` plus
+  normal flexbox geometry place the label; explicit `[dir="rtl"]` row swapping
+  double-flips the layout.
 - Label behavior can affect layout even when no visible label marker is shown.
   Original `ItemWithLabel` reserves hidden required-marker space in horizontal
   layouts for non-required fields, so preserve wrapper geometry and hidden
   marker behavior through the shared behavior layer.
+- `adapter.rootAttrs()` can duplicate arbitrary props that a source-style
+  native wrapper already forwards manually. Sanitize duplicated root attributes,
+  especially boolean DOM attributes, so React receives normalized values once
+  and copied components such as Link/Text wrappers do not inherit stray native
+  props.
 
 ### Testing And Verification
 
@@ -301,6 +485,11 @@ details belong in per-component .ai notes and the status table.
   compare computed styles, element bounding boxes, and text-node
   `Range.getBoundingClientRect()` values. Measuring the actual visible invariant
   is more reliable than asserting nearby container widths or screenshots alone.
+- Separate authored icons from internal component chrome in both implementation
+  and tests. User-authored adornments such as `startIcon`/`endIcon` should
+  render real themed icon content, while spinner/toggle/clear chrome may need to
+  be hidden from role-based icon queries so tests and accessibility checks
+  inspect the public icons rather than implementation controls.
 - Write tests against the real bug, not a convenient proxy. A rich summary bug
   is not covered by checking that a label exists; it needs assertions for
   no-wrap row geometry, label typography, and the actual label-to-icon distance.
@@ -382,10 +571,10 @@ Status values:
 
 | Status | Components |
 | --- | ---: |
-| Approved complete | 53 |
-| Awaiting approval | 0 |
+| Approved complete | 58 |
+| Awaiting approval | 1 |
 | Blocked | 1 |
-| Not started | 64 |
+| Not started | 58 |
 | Prerequisite | 7 |
 | **Total** | **125** |
 
@@ -421,9 +610,9 @@ Status values:
 | `ExpandableItem` | More difficult | 1 | `ExpandableItem.module.scss` | Icon, Part, Toggle | Approved complete | User confirmed ExpandableItem complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/ExpandableItem/ExpandableItemReact.tsx`, `ExpandableItem.tsx`, `ExpandableItem.module.scss`, the transferred old ExpandableItem suite, and the original shared `ExpandableItemDriver`. Replaced the foundation placeholder implementation with the source-preserving `Part`/`ThemedIcon`/`Toggle` structure; restored source-style summary/content/icon/switch/open/disabled/full-width styling and animation; moved `onExpandedChange` out of the state updater to avoid React nested-update warnings while preserving the old event timing; and re-enabled the full transferred suite. The shared test driver now matches the original CSS-module-aware selectors and nested locator behavior. Local old/new DOM comparisons closed the subtle style issues: default bottom border resolves to the original computed `0px`; Stack fallback preserves old invalid bare-token behavior for `gap="space-4"` and `padding="space-3"`; and rich custom summaries now preserve old generic label behavior, including top-position `ItemWithLabel`, FormItem label typography fallbacks, unsupported Badge variant pass-through, intrinsic wrapper sizing, and hidden required-marker reservation in horizontal layout. Added direct regressions for the user's two expanded items and rich summary template. Full ExpandableItem suite passes 63/63; combined Stack/ExpandableItem focused run passes 65 active tests with 83 skipped pending Stack tests after the Stack fallback correction; development build passes. |
 | `Fallback` | More difficult | 0 | none | runtime error/fallback | Not started | Verify through runtime scenarios. |
 | `FileInput` | Complex | 1 | `FileInput.module.scss` | Button, FormItem, Icon, TextBox | Not started | Wait for Button/TextBox/FormItem. |
-| `FileUploadDropZone` | More difficult | 1 | `FileUploadDropZone.module.scss` | Icon, component utils | Not started | Browser file/drop semantics. |
+| `FileUploadDropZone` | More difficult | 1 | `FileUploadDropZone.module.scss` | Icon, component utils, react-dropzone | Approved complete | User confirmed FileUploadDropZone complete on 2026-07-01. Source-preserved React/SCSS restored from the old project with renderer-only bridges for `enabled`, event dispatch, API/state registration, child detection, numeric `maxFiles`, and legacy icon markers. Added shared `getComposedRef` shim and restored `react-dropzone@14.3.8`. Focused FileUploadDropZone suite passes 37/37; metadata generation passes. |
 | `FlowLayout` | Complex | 1 | `FlowLayout.module.scss` | ScrollViewer | Approved complete | User confirmed FlowLayout is complete; source-preserved React/SCSS/helper copied from old project with one root/scroller compatibility adaptation for the current foundation test; rendering-pipeline helpers added for old imports; focused FlowLayout run passes 56/81 with 25 skips; side-by-side migrated batch including Card passes 944/1060 with 116 skips. Theme-token gaps are normalized/resolved and percentage `flex-basis` is gap-compensated for the native-gap bridge. Static responsive child width props are bridged; dynamic child responsive bindings remain an open verification risk. |
-| `FocusScope` | More difficult | 1 | none | focus management | Not started | Needs browser focus-specific checks. |
+| `FocusScope` | More difficult | 1 | none | focus management | Approved complete | User confirmed FocusScope complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/FocusScope`, `/Users/dotneteer/source/xmlui/xmlui/src/components-core/accessibility/useFocusScope.ts`, `focusScopeStack.ts`, and the transferred old FocusScope suite. The existing source-preserved implementation keeps the real wrapping `div` with `tabIndex=-1`, defaults `trap=true`, `restore=true`, and `autoFocus=false`, active-sibling scope trapping, nested app focus trapping, `trap=false`, and restore-on-unmount behavior. Follow-up restored the original shared accessibility barrel/stack contract by re-exporting `pushFocusScope`, `popFocusScope`, `topFocusScope`, `topFocusScopeForElement`, and `clearFocusScopesForTests`; added a focused stack unit test so overlay/focus consumers keep the original stack-order behavior. Focused FocusScope suite passes 5/5; focused stack unit passes 1/1. |
 | `Footer` | More difficult | 1 | `Footer.module.scss` | App | Approved complete | User declared Footer complete on 2026-06-30. Implemented as part of the app-shell/navigation batch; original stylesheet restored, content wrapper semantics/part marker bridged, sticky/full-width layout context behavior preserved, and interactive children remain focusable. Focused Footer foundation/old-suite transfer tests pass within the 62-test active batch; TypeScript, metadata, and CSS module audits pass. |
 | `Form` | Complex | 1 | `Form.module.scss` | Button, FormItem, Part, ValidationSummary | Not started | Central prerequisite for inputs. |
 | `FormItem` | Complex | 2 | `FormItem.module.scss`, `HelperText.module.scss` | many form/input components | Not started | Important dependency hub; migrate after minimal inputs are stable or preserve helper APIs. |
@@ -436,8 +625,8 @@ Status values:
 | `H4` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
 | `H5` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
 | `H6` | Derived | 0 | `Heading.module.scss` | Heading | Approved complete | Shortcut component completed with Heading; uses the same source-preserved Heading React/SCSS and fixed level bridge. |
-| `HtmlTags` | More difficult | 1 | `HtmlTags.module.scss` | Heading, Link, Text | Not started | After text/link. |
-| `I18n` | More difficult | 0 | none | metadata helpers | Not started | No direct old spec; needs usage fixture. |
+| `HtmlTags` | More difficult | 1 | `HtmlTags.module.scss` | Heading, Link, Text | Approved complete | User confirmed HtmlTags complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/HtmlTags/HtmlTags.tsx`, `HtmlTags.module.scss`, and the old HtmlTags specs. The runtime renderer now preserves the original wrapper routing: anchors render through XMLUI Link behavior, text-like tags render through Text variants, headings render through Heading, and table/list/details/video tags receive source-style SCSS classes and theme variables instead of rewrite-only inline `--xmlui-current-width-HtmlTag` styling. Metadata is split into `HtmlTags.metadata.ts` so compiler/Vite config imports remain SCSS-free while `HtmlTags.tsx` can import runtime components and the stylesheet. The shared theme extractor now recognizes `createThemeVar*` helper names used by copied old Sass. Focused HtmlTags suite passes 5/5; metadata generation passes. |
+| `I18n` | More difficult | 0 | none | App, runtime i18n, metadata helpers | Approved complete | User confirmed I18n complete on 2026-07-02. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/I18n/I18n.tsx`, `components-core/i18n/*`, the built-in XMLUI English bundle, and the old App i18n context contract. The renderer metadata now allows arbitrary variable props like the old component, slot placeholders preserve old `<slotName/>` replacement semantics including literal fallback for missing slots, and `App.translate(...)` is available to child expressions and handlers during first render. Runtime i18n now preserves source-shaped helper APIs through `components-core/i18n`, including bundle store registration, language fallback, missing-key diagnostics, ICU formatting errors, `translateMessage`, and the old locale resolver shape. Locale bundles accept rewrite locale maps and old `{ locale, messages }` bundle objects; built-in XMLUI English messages are registered by default. App seeds locale/bundle config synchronously with non-notifying updates so child expressions see the active bundle without causing render loops, while omitted App `locale` resolves from persisted `xmlui.locale`, then browser languages filtered by available bundles; `App.setLocale(...)` persists and notifies subscribers. Focused I18n E2E suite passes 5/5; direct i18n core unit suite passes 7/7; metadata generation and package build pass. |
 | `IFrame` | Simple | 1 | `IFrame.module.scss` | metadata helpers | Approved complete | User confirmed IFrame is complete; source-preserved React/SCSS restored from old project; renderer bridges old `classes[COMPONENT_PART_KEY]`, `registerComponentApi`, resource URL handling, string/null normalization, srcdoc entity compatibility, arbitrary root attrs, accessible `title` forwarding, named iframe targeting through `window.open`, escaped-brace `srcdoc` scripts, and permissive `referrerPolicy` forwarding. Focused unchanged IFrame suite passes 56/56; IFrame regressions pass 3/3; TypeScript, metadata, expanded E2E audit, and CSS module audit pass; side-by-side migrated component batch passes 1042/1158 with 116 skips. |
 | `Icon` | Complex | 1 | many icon `.module.scss` files | icon registry/provider | Approved complete | User confirmed Icon is ready; focused unchanged suite passes 44/44; required shared `svg?react`, IconProvider, resource, driver, and testbed isolation fixes. Required by Button/Table and many others. |
 | `Image` | Simple | 1 | `Image.module.scss` | metadata helpers | Approved complete | User confirmed Image is complete; source-preserved React/SCSS and unchanged old E2E spec restored from old project; renderer bridges old root attrs/theme classes, resource URL handling, `data` resource URL fetch-to-Blob, boolean normalization, explicit empty `alt`, authored-only click wiring, and an inline wrapper that prevents rewrite flex-boundary blockification while keeping the copied leaf source authoritative. Only protected-source edit is strict TypeScript normalization of nullable `src` to `undefined` for React's `<img>` type. Focused unchanged Image suite passes 42/42; TypeScript, metadata, expanded E2E audit, and CSS module audit pass. Broad `compatibility:sweep -- --components=ContentSeparator,Fragment,IFrame,Image` was attempted, but the script ignores component filters and failed on unrelated baseline-wide FormItem/Logo/NavPanelCollapseButton/Select/Table/TableOfContents/theming tests after 4577 passed and 496 skipped. |
@@ -461,7 +650,7 @@ Status values:
 | `NavPanelCollapseButton` | More difficult | 0 | none | App, Button, Icon | Not started | Navigation shell dependency. |
 | `NestedApp` | Complex | 1 | `NestedApp.module.scss` plus helpers | App, Button, ComponentRegistryContext, Icon, Markdown | Not started | Runtime app embedding. |
 | `NoResult` | Simple | 1 | `NoResult.module.scss` | Icon | Approved complete | User confirmed NoResult is complete; source-preserved React/SCSS restored from old project; renderer bridges old label fallback, root class, and test id contracts; local icon part marker retained for the existing suite; focused NoResult run passes 3/3; side-by-side migrated component run passes 861/950 with 89 skips. |
-| `NumberBox` | Complex | 1 | `NumberBox.module.scss` | Button, ConciseValidationFeedback, Form, FormItem, Icon, Input, Part | Not started | Input/form dependency. |
+| `NumberBox` | Complex | 1 | `NumberBox.module.scss` | Button, ConciseValidationFeedback, Form, FormItem, Icon, Input, Part | Awaiting approval | Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/NumberBox/NumberBox.tsx`, `NumberBoxReact.tsx`, `NumberBox.module.scss`, `NumberBox.defaults.ts`, `numberbox-abstractions.ts`, the old `NumberBox.spec.ts`, and shared `FormItem/ItemWithLabel` label behavior. The rewrite keeps the current native numeric implementation but restores old-compatible boundaries: stable API registration through `adapter.registerApi`, reactive `value`, `focus` and `setValue`, form binding, theme padding cascade, FormItem label typography/gap/markers, `dir=rtl` label geometry without double flipping, source-compatible `before`/`after` aliases, ThemedIcon adornments, hidden spinner chrome icons, and old `spinnerUp:NumberBox`/`spinnerDown:NumberBox` icon override names. Follow-up restored source-style disabled/readOnly spinner chrome from the old Button-backed implementation: no right-side rail, a zero-height centered spinner box, transparent ghost buttons, disabled spinner actions for both `enabled="false"` and `readOnly`, a fixed source-style 1.5rem spinner column, and 14px spinner chevrons that stay independent from authored end adornment icon sizing. Combined icon+text adornments now keep the old shared `InputAdornment` inner `$space-2` gap, with geometry coverage for both start and end adornments. Focused spinner/adornment slice passes 2/2; full NumberBox suite passes 209/209; metadata generation passes. Residual non-failing Tooltip/Animation ref warning is unrelated existing debt. |
 | `Option` | More difficult | 1 | none | container helpers | Prerequisite | Required by Select/Pagination/RadioGroup. |
 | `PageMetaTitle` | Simple | 1 | none | document title | Approved complete | User confirmed PageMetaTitle is complete; source-preserving title behavior restored at the runtime boundary: renderer no longer hard-codes the testbed app name, `PageMetaTitleReact` reads `appGlobals.name` from context like the original, metadata descriptions match old source, and the testbed now seeds/accepts app globals for suffix verification. Focused PageMetaTitle suite passes 9/9; TypeScript, metadata, and expanded E2E audit pass. Residual risk: old source used `react-helmet-async`, while the rewrite preserves observed browser title behavior through a direct `document.title` effect. |
 | `Pages` | Complex | 1 | `Pages.module.scss` | App, Page | Approved complete | User confirmed Pages and Page are complete on 2026-06-30. Migrated with `Page` as the shared routing shell: `Pages` preserves route matching, fallback navigation, route/query context variables, rest children rendering, and `Page` now owns the original `.pageWrapper` padding/gap/flex/min-height behavior through `paddingVertical-Pages`, `paddingHorizontal-Pages`, and `gap-Pages`. App content padding is now conditional so routed pages are not double padded. Focused Pages suite includes routing/context/fallback/query checks plus App+Pages padding ownership; TypeScript and metadata pass. Live old/new localhost measurement was attempted, but the servers were serving different sample states, so parity was verified through focused layout assertions instead. |
@@ -473,7 +662,7 @@ Status values:
 | `Queue` | Complex | 1 | none | runtime queue | Not started | Data mutation/order behavior. |
 | `RadioGroup` | Complex | 1 | `RadioGroup.module.scss` | FormItem, Option | Not started | Input/form dependency. |
 | `RatingInput` | More difficult | 1 | `RatingInput.module.scss` | Part | Not started | Stateful input without large dependencies. |
-| `Redirect` | More difficult | 1 | none | routing utils | Not started | Browser/routing behavior. |
+| `Redirect` | More difficult | 1 | none | routing utils | Approved complete | User confirmed Redirect complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/Redirect/Redirect.tsx`, `Redirect.defaults.ts`, `Redirect.md`, and the transferred old Redirect suite. The renderer preserves non-visual navigation on visibility, dynamic `to` evaluation, object/query-param URL normalization via `createUrlWithQueryParams`, and `replace` history semantics through a new routing-store `replace` method. Follow-up shared runtime fix makes routing an inherited ambient scope service and explicitly carries it through custom component scopes so nested Redirects under `Fragment`, layout containers, and custom components can navigate. Hash routing now bootstraps empty hashes to `#/` while preserving path/query, matching copied old history assertions under the testbed query URL. Focused Redirect suite passes 18/18; metadata generation and production build pass. |
 | `ResponsiveBar` | Complex | 1 | `ResponsiveBar.module.scss` | DropdownMenu, Part | Not started | Existing skipped overflow cases. |
 | `RetryPolicy` | More difficult | 0 | none | request policy | Not started | Verify through APICall/DataSource. |
 | `ScrollViewer` | Complex | 1 | `ScrollViewer.module.scss` | scroller helper | Not started | Existing skipped fade/overlay cases. |
@@ -501,7 +690,7 @@ Status values:
 | `TabsForm` | Complex | 1 | none | Form | Not started | Form plus Tabs. |
 | `Text` | Simple | 1 | `Text.module.scss` | abstractions/metadata, Icon, Stack | Approved complete | User confirmed Text is complete; source-preserved React/SCSS/defaults restored from old project with import/dependency shims only; renderer bridges old classes contract, old `asDisplayText` value rendering, value fallback, variant props, contextMenu, overflow, and component API; breakMode visual overlap fixed through the shared vertical Stack no-shrink default; focused unchanged Text suite passes 140/140; metadata and TypeScript checks pass; side-by-side migrated component run including Heading now passes 841/847 with 6 skips. |
 | `TextArea` | Complex | 1 | `TextArea.module.scss` | ConciseValidationFeedback, Form, FormItem, Part | Approved complete | User confirmed TextArea complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextArea/TextArea.tsx`, `TextAreaReact.tsx`, `TextAreaResizable.tsx`, `TextArea.defaults.ts`, `TextArea.module.scss`, and the transferred TextArea suite. Runtime behavior remains on the existing TextArea implementation, but API exposure now follows the source-preserving TextBox/AppState pattern: `TextAreaNative` accepts `registerComponentApi`, registers stable `focus`, `insert`, and escaped `setValue` methods through effects, and separately publishes reactive `value` changes through the adapter instead of relying on a ref callback. This preserves `id` reference bindings such as `{myTextArea.value}`, avoids ref-object API churn, and keeps `setValue('alpha\\nbeta')` newline normalization. Autosize now preserves the old source behavior where `autoSize`, `minRows`, or `maxRows` takes TextArea through the autosizing path instead of the normal default two-row textarea: the rewrite uses a one-row measurement baseline and writes border-box-corrected height so `<TextArea autoSize="true" />` measures `42px` on the local original and new dev servers. Default focus border color also follows the TextBox-compatible source-preserving token path while custom focus border overrides still work. Full TextArea suite passes 161/161; TypeScript and metadata checks pass. |
-| `TextBox` | Complex | 1 | `TextBox.module.scss` | ConciseValidationFeedback, Form, FormItem, Input, Part | Approved complete | User confirmed TextBox complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBoxReact.tsx`, `TextBox.tsx`, `TextBox.defaults.ts`, `TextBox.module.scss`, original `InputAdornment`, and the old unchanged TextBox suite. The old suite was already transferred; migration tightened the runtime boundary instead of rewriting visuals: TextBox/PasswordInput now publish `focus`, `setValue`, and reactive `value` through an old-style `registerComponentApi` effect instead of a ref callback, avoiding repeated API invalidation loops for expressions such as `{myTextBox.value}`. Shared `adapter.registerApi` now invalidates reference bindings only when the registered object changes or a non-function API value changes, preventing method identity refreshes from causing render loops while keeping value updates reactive. The testbed wrapper now mirrors old component-isolation assumptions more closely by disabling App content max-width, content padding, and scrollbar gutter reservation for implicit App component tests; App-scoped CSS variables are injected on the generated App root so percentage width assertions measure against the viewport-sized content area without breaking `var.testState` scoping. TextBox adornments now render `ThemedIcon` nodes instead of placeholder marker dots, matching the original icon path for `startIcon`/`endIcon`, search clear, password toggle, and concise validation icons. TextBox root padding now follows the original padding mixin cascade, with side-specific padding variables overriding broad `padding-TextBox` through horizontal/vertical fallbacks; empty start/end adornments also return `null` like the original helper, avoiding a component-layer hidden-span override that added an extra flex gap before the input text. Readonly focus now keeps the default border color while still showing the focus outline; custom `borderColor-TextBox--focus` overrides remain supported. Focused TextBox suite passes 167/167; TextBox event/API/percent-width slice passes 8/8; TextBox adornment icon slice passes 9/9; TextBox theme-var slice passes 8/8; absent-adornment/default-padding geometry slice passes 3/3; readonly focus slice passes 4/4; Checkbox/Switch API regression run passes 222/222; TypeScript and metadata checks pass. Residual non-failing tooltip+animation ref warning remains from the existing Animation behavior composition debt. |
+| `TextBox` | Complex | 1 | `TextBox.module.scss` | ConciseValidationFeedback, Form, FormItem, Input, Part | Approved complete | User confirmed TextBox complete on 2026-07-01. Migrated against `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBoxReact.tsx`, `TextBox.tsx`, `TextBox.defaults.ts`, `TextBox.module.scss`, original `InputAdornment`, and the old unchanged TextBox suite. The old suite was already transferred; migration tightened the runtime boundary instead of rewriting visuals: TextBox/PasswordInput now publish `focus`, `setValue`, and reactive `value` through an old-style `registerComponentApi` effect instead of a ref callback, avoiding repeated API invalidation loops for expressions such as `{myTextBox.value}`. Shared `adapter.registerApi` now invalidates reference bindings only when the registered object changes or a non-function API value changes, preventing method identity refreshes from causing render loops while keeping value updates reactive. The testbed wrapper now mirrors old component-isolation assumptions more closely by disabling App content max-width, content padding, and scrollbar gutter reservation for implicit App component tests; App-scoped CSS variables are injected on the generated App root so percentage width assertions measure against the viewport-sized content area without breaking `var.testState` scoping. TextBox adornments now render `ThemedIcon` nodes instead of placeholder marker dots, matching the original icon path for `startIcon`/`endIcon`, search clear, password toggle, and concise validation icons. TextBox root padding now follows the original padding mixin cascade, with side-specific padding variables overriding broad `padding-TextBox` through horizontal/vertical fallbacks; empty start/end adornments also return `null` like the original helper, avoiding a component-layer hidden-span override that added an extra flex gap before the input text. Readonly focus now keeps the default border color while still showing the focus outline; custom `borderColor-TextBox--focus` overrides remain supported. Follow-up fixed the labeled TextBox regression by making the local TextBox label bridge use the same FormItem/`ItemWithLabel` typography fallbacks, required/optional marker spacing, and `0.5em` top-label gap as the shared label behavior; the regression asserts computed label font, row gap, and the actual label-to-input bounding-box distance. Full TextBox suite passes 170/170; TextBox event/API/percent-width slice passes 8/8; TextBox adornment icon slice passes 9/9; TextBox theme-var slice passes 8/8; absent-adornment/default-padding geometry slice passes 3/3; readonly focus slice passes 4/4; Checkbox/Switch API regression run passes 222/222; TypeScript and metadata checks pass. Residual non-failing tooltip+animation ref warning remains from the existing Animation behavior composition debt. |
 | `PasswordInput` | Derived | 0 | `TextBox.module.scss` | TextBox | Approved complete | User confirmed PasswordInput complete on 2026-07-01. Migrated as the original TextBox-derived password wrapper from `/Users/dotneteer/source/xmlui/xmlui/src/components/TextBox/TextBox.tsx`: the renderer forces `type="password"` over authored `type`, inherits TextBox behavior/styling/API exposure, and PasswordInput metadata now preserves the original password description plus `initialValue` audit classification as `secret` with default redaction `mask`. Focused Password Input suite passes 9/9 including a regression for authored `type="text"`; full TextBox family suite passes 168/168. |
 | `Theme` | Complex | 1 | `Theme.module.scss` | App, ComponentRegistryContext | Not started | Global theming behavior. |
 | `TileGrid` | Complex | 1 | `TileGrid.module.scss` | Checkbox, SelectionStore, Table | Not started | After Table/selection. |
@@ -611,6 +800,32 @@ Status values:
   `ItemWithLabel`. The focused regression now measures the actual visible
   invariant: no-wrap custom summary geometry, label font, and text-node-to-icon
   distance.
+- 2026-07-01 TextBox label follow-up: TextBox showed that not all labels flow
+  through the generic behavior layer. Components that render labels locally
+  should still delegate their visual contract to the same FormItem/`ItemWithLabel`
+  token cascade and should test computed label typography plus real bounding-box
+  spacing, not just DOM presence.
+- 2026-07-02 NumberBox follow-up: NumberBox reinforced that input-like local
+  label bridges need the old FormItem contract, including direct `before`/`after`
+  alias mapping and no RTL override that double-flips flex geometry. It also
+  highlighted an icon-testing trap: authored adornment icons and internal spinner
+  chrome are separate contracts, so internal controls should not pollute public
+  role-based icon assertions. Disabled internal controls can also be layout
+  contracts: the old spinner used Button-backed ghost chrome with a zero-height
+  centered wrapper and its own visual icon footprint, so parity tests should
+  assert computed container geometry, separator absence, and internal icon
+  dimensions, not only disabled state or icon names. The `endIcon` follow-up
+  showed that shared spacing tokens are not always the source of truth for
+  internal control chrome: compare live bounding boxes against the original
+  component before replacing old SCSS constants with theme space variables.
+  For input adornments with adjacent internal controls, assert the authored
+  adornment-to-control gap, the control column width, and the internal icon
+  size together. For combined icon+text adornments, the original shared
+  `InputAdornment` applies an internal `$space-2` flex gap inside the adornment
+  wrapper; the root input gap only separates the adornment from the input or
+  spinner. Tests should therefore measure text-node-to-icon distance with real
+  DOM ranges, because simple visibility/text assertions miss this class of
+  visual regression.
 
 ## Recent Tooling Compatibility Notes
 

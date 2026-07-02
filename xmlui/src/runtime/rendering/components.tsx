@@ -131,7 +131,10 @@ export function ComponentInstance({
       localOwnerId: ownerId,
       props,
       references: componentReferences,
+      routing: scope.routing,
+      toast: scope.toast,
       i18n: scope.i18n,
+      extensionFunctions: scope.extensionFunctions,
     });
     scope.store.createLocalOwner(ownerId);
     initializeStateValuesIntoStore({
@@ -151,7 +154,10 @@ export function ComponentInstance({
       localOwnerId: ownerId,
       props,
       references: componentReferences,
+      routing: scope.routing,
+      toast: scope.toast,
       i18n: scope.i18n,
+      extensionFunctions: scope.extensionFunctions,
     });
     for (const [name, value] of Object.entries(component.root.vars)) {
       const parsed = component.root.parsed?.vars?.[name];
@@ -180,7 +186,10 @@ export function ComponentInstance({
         props,
         references: componentReferences,
         slots: createSlots(node, scope),
+        routing: scope.routing,
+        toast: scope.toast,
         i18n: scope.i18n,
+        extensionFunctions: scope.extensionFunctions,
         emitEvent: (eventName, args) => runEvent(node.parsed?.events?.[eventName], scope, args),
       }),
     [componentReferences, node, ownerId, props, scope],
