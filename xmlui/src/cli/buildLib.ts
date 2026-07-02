@@ -9,6 +9,7 @@ import react from "@vitejs/plugin-react";
 import { build as viteBuild, createServer, type Plugin } from "vite";
 
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 
 const execFileAsync = promisify(execFile);
 
@@ -97,7 +98,7 @@ async function buildExtensionLibrary(options: {
   await viteBuild({
     root: options.root,
     configFile: false,
-    plugins: [rawXmluiPlugin(), rawScssModulePlugin(), react()],
+    plugins: [rawXmluiPlugin(), rawScssModulePlugin(), svgReactPlugin(), react()],
     build: {
       emptyOutDir: true,
       outDir: "dist",
@@ -134,7 +135,7 @@ async function buildExtensionMetadata(options: {
     server: { middlewareMode: true },
     appType: "custom",
     logLevel: "silent",
-    plugins: [rawXmluiPlugin(), rawScssModulePlugin(), react()],
+    plugins: [rawXmluiPlugin(), rawScssModulePlugin(), svgReactPlugin(), react()],
     resolve: {
       alias: [
         { find: /^xmlui$/, replacement: path.join(xmluiSrcDir, "index.ts") },

@@ -109,7 +109,13 @@ export type ComponentPartMetadata = {
   description: string;
 };
 
-export type DefaultThemeVars = Record<string, string | number | boolean>;
+export type DefaultThemeVarValue =
+  | string
+  | number
+  | boolean
+  | Record<string, string | number | boolean>;
+
+export type DefaultThemeVars = Record<string, DefaultThemeVarValue>;
 
 export type ComponentMetadata<
   TProps extends Record<string, ComponentPropertyMetadata> = Record<string, ComponentPropertyMetadata>,

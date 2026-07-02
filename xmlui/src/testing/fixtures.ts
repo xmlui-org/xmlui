@@ -211,13 +211,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       await _sharedPage.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
+        document.documentElement.style.fontSize = "";
         window.scrollTo(0, 0);
         if ((window as any).__originalMatchMedia) {
           window.matchMedia = (window as any).__originalMatchMedia;
           delete (window as any).__originalMatchMedia;
         }
       });
-      await _sharedPage.mouse.move(0, 0);
+      await moveMouseAwayFromOrigin(_sharedPage);
     } catch {
       // The shared page can already be gone after a hard test failure.
     }
@@ -711,9 +712,10 @@ async function initTestBed(
     source,
     components: options.components ?? [],
     extensionIds: normalizeExtensionIds(options.extensionIds),
+    resources: options.resources ?? {},
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[] }) => {
+  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -727,6 +729,7 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
     window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
+    window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -737,19 +740,15 @@ async function initTestBed(
         await window.__xmluiTestBedReinit?.(xmluiSource);
       }, source);
     } catch {
-      await page.addInitScript(installTestBedSource, testBedPayload);
-      await page.goto("/?__xmluiTestBed=1");
+      await navigateWithTestBedSource(page, installTestBedSource, testBedPayload);
     }
   } else {
-    await page.addInitScript(installTestBedSource, testBedPayload);
-    await page.goto("/?__xmluiTestBed=1");
+    await navigateWithTestBedSource(page, installTestBedSource, testBedPayload);
   }
+  await page.waitForFunction(() => window.__xmluiTestBedReady === true);
   const error = page.getByTestId("xmlui-testbed-error");
   if (await error.count()) {
     throw new Error(await error.textContent() ?? "XMLUI testbed failed to compile.");
-  }
-  if (source.includes(`testId="__xmlui-test-state"`)) {
-    await page.getByTestId("__xmlui-test-state").waitFor({ state: "attached" });
   }
   await page.evaluate(() =>
     document.fonts.ready.then(
@@ -759,7 +758,29 @@ async function initTestBed(
         }),
     ),
   );
+  await moveMouseAwayFromOrigin(page);
   await page.keyboard.press("Shift");
+}
+
+async function navigateWithTestBedSource(
+  page: Page,
+  installTestBedSource: (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => void,
+  testBedPayload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> },
+): Promise<void> {
+  await page.goto("/?__xmluiTestBed=1");
+  await page.waitForFunction(() =>
+    typeof window.__xmluiTestBedReinit === "function" ||
+    !!document.querySelector('[data-testid="xmlui-testbed-error"]'),
+  );
+  await page.evaluate(installTestBedSource, testBedPayload);
+  await page.evaluate(async (xmluiSource) => {
+    await window.__xmluiTestBedReinit?.(xmluiSource);
+  }, testBedPayload.source);
+}
+
+async function moveMouseAwayFromOrigin(page: Page): Promise<void> {
+  const viewport = page.viewportSize() ?? { width: 1280, height: 720 };
+  await page.mouse.move(Math.max(viewport.width - 1, 0), Math.max(viewport.height - 1, 0));
 }
 
 function normalizeExtensionIds(extensionIds: string | string[] | undefined): string[] {

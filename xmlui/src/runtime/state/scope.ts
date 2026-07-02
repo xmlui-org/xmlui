@@ -163,6 +163,10 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
   if (routeValue !== undefined) {
     return routeValue;
   }
+  const builtInReference = readBuiltInReference(scope, name);
+  if (builtInReference !== undefined) {
+    return builtInReference;
+  }
   return readContext(scope.parent, name);
 }
 

@@ -7,6 +7,7 @@ import { BadgeMd } from "../../components/Badge/Badge";
 import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { ButtonMd } from "../../components/Button/Button";
 import { CardMd } from "../../components/Card/Card";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
@@ -847,35 +848,13 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     }),
     events: {},
   },
-  {
+  contractFromMetadata(ButtonMd, {
     name: "Button",
-    kind: "builtin",
     allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
     declarations: { local: true },
-    props: withLayoutProps({
-      id: { name: "id" },
-      autoFocus: { name: "autoFocus" },
-      busyOnClick: { name: "busyOnClick" },
-      contentPosition: { name: "contentPosition" },
-      contextualLabel: { name: "contextualLabel" },
-      label: { name: "label" },
-      enabled: { name: "enabled" },
-      icon: { name: "icon" },
-      iconPosition: { name: "iconPosition" },
-      orientation: { name: "orientation" },
-      size: { name: "size" },
-      testId: { name: "testId" },
-      themeColor: { name: "themeColor" },
-      type: { name: "type" },
-      variant: { name: "variant" },
-    }),
-    events: {
-      click: { name: "click", attributeName: "onClick" },
-      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
-      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
-      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
-    },
-  },
+  }),
   contractFromMetadata(CardMd, {
     name: "Card",
     allowsChildren: true,

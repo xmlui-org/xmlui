@@ -164,6 +164,16 @@ describe("compileXmluiModule", () => {
     ).toThrow("Unresolved XMLUI script identifier 'missing'.");
   });
 
+  it("accepts AppContextObject global functions in event handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `<App><Button label="Click me!" onClick="toast('Button clicked')" /></App>`,
+    });
+
+    expect(code).toContain(`ctx.readContext?.("toast")`);
+    expect(code).toContain("Button clicked");
+  });
+
   it("surfaces IR diagnostics during compilation", () => {
     const dir = path.join(tmpdir(), `xmlui-rs-${Date.now()}-ir`);
     mkdirSync(dir, { recursive: true });

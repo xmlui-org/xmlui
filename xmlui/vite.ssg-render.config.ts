@@ -4,11 +4,13 @@ import { defineConfig } from "vite";
 import counterBadgeExtension from "../packages/xmlui-counter-badge/src";
 
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 export default defineConfig({
   plugins: [
     rawScssModulePlugin(),
+    svgReactPlugin(),
     xmluiPlugin({ extensions: [counterBadgeExtension] }),
     react(),
   ],

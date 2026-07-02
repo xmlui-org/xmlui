@@ -120,7 +120,10 @@ export function ThemeScope({
     [parent.tone, parent.variables, tone, variables],
   );
   const cssVariables = useMemo(
-    () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    () => ({
+      display: "contents",
+      ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    }),
     [variables],
   );
   const themeClassName = useDynamicStyle(cssVariables, "themes");

@@ -1280,8 +1280,8 @@ function componentRunnablePaths(flags: {
   if (flags.buttonTransferred) {
     return [
       "xmlui/src/components/Button/Button.spec.ts",
-      "xmlui/src/components/Button/Button.spec.tsx",
       "xmlui/src/components/Button/Button-style.spec.ts",
+      "xmlui/src/components/Button/Button.compat.spec.ts",
       "xmlui/tests/e2e/counter-components.spec.ts",
       "xmlui/tests/e2e/counter-globals.spec.ts",
     ];

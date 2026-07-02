@@ -5,16 +5,32 @@ import type { ComponentExtension, XmluiExtensionComponentProps } from "../extens
 import { COMPONENT_PART_KEY } from "../styling/layout";
 import { useComponentThemeClass } from "../runtime/rendering/theme";
 
+type ExtractValueCompat = ((value: unknown) => any) & {
+  asString(value: unknown, fallback?: string): string | undefined;
+  asDisplayText(value: unknown): string | undefined;
+  asOptionalBoolean(value: unknown, fallback?: boolean): boolean;
+  asOptionalNumber(value: unknown, fallback?: number): number | undefined;
+  asOptionalString(value: unknown, fallback?: string): string | undefined;
+};
+
 type WrapComponentOptions = {
+  booleans?: readonly string[];
+  numbers?: readonly string[];
+  strings?: readonly string[];
+  rename?: Record<string, string>;
   exclude?: readonly string[];
+  exposeRegisterApi?: boolean;
+  events?: readonly string[] | Record<string, string>;
   customRender?: (
     props: Record<string, unknown>,
     args: {
       className?: string;
       classes: Record<string, string>;
       node: any;
-      extractValue: (value: unknown) => any;
-      renderChild: (child: unknown) => ReactNode;
+      extractValue: ExtractValueCompat;
+      lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
+      registerComponentApi: (api: Record<string, unknown>) => void;
+      renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
     },
   ) => ReactNode;
 };
@@ -39,11 +55,42 @@ export function wrapComponent(
         delete props[name];
       }
       if (options.customRender) {
+        const extractValue = ((value: unknown) => value) as ExtractValueCompat;
+        extractValue.asString = (value, fallback) =>
+          value === undefined || value === null ? fallback : String(value);
+        extractValue.asDisplayText = (value) =>
+          value === undefined ? undefined : String(value);
+        extractValue.asOptionalBoolean = (value, fallback = false) => {
+          if (typeof value === "boolean") {
+            return value;
+          }
+          if (typeof value === "string") {
+            return value === "true" ? true : value === "false" ? false : fallback;
+          }
+          return value === undefined || value === null ? fallback : Boolean(value);
+        };
+        extractValue.asOptionalNumber = (value, fallback) => {
+          if (value === undefined || value === null || value === "") {
+            return fallback;
+          }
+          const numericValue = typeof value === "number" ? value : Number(value);
+          return Number.isFinite(numericValue) ? numericValue : fallback;
+        };
+        extractValue.asOptionalString = (value, fallback) =>
+          value === undefined || value === null ? fallback : String(value);
         return options.customRender(props, {
           className: themeClass.className,
           classes: { [COMPONENT_PART_KEY]: themeClass.className },
           node: { ...runtimeProps.node, props: runtimeProps.props },
-          extractValue: (value) => value,
+          extractValue,
+          lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+          registerComponentApi: (api) => {
+            const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+            if (id) {
+              runtimeProps.scope.references[id] = api;
+              runtimeProps.scope.store.invalidateReference(id);
+            }
+          },
           renderChild: () => runtimeProps.children,
         });
       }

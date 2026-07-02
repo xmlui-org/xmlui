@@ -71,6 +71,40 @@ describe("XMLUI script scope model", () => {
       name: "count",
     });
   });
+
+  it("resolves AppContextObject properties as context identifiers", () => {
+    const document = parseXmlui(`<App><Button onClick="toast('Button clicked')" /></App>`);
+    const appScope = createXmluiScope(document.root);
+    const button = document.root.children[0] as XmluiElement;
+    const buttonScope = createChildXmluiScope(appScope, button);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("toast('Button clicked')").node,
+      buttonScope,
+    );
+
+    expect(resolveXmluiIdentifier(buttonScope, "toast")).toMatchObject({
+      kind: "context",
+      name: "toast",
+      mutable: false,
+    });
+    expect(lowered.diagnostics).toEqual([]);
+    expect(lowered.ir).toMatchObject({
+      kind: "EventHandler",
+      body: [
+        {
+          kind: "ExpressionStatement",
+          expression: {
+            kind: "CallExpression",
+            callee: {
+              kind: "IdentifierRead",
+              name: "toast",
+              dependency: expect.objectContaining({ kind: "context", name: "toast" }),
+            },
+          },
+        },
+      ],
+    });
+  });
 });
 
 describe("XMLUI script event write analysis", () => {

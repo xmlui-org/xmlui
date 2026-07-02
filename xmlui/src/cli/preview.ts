@@ -2,6 +2,7 @@ import { preview as vitePreview } from "vite";
 import react from "@vitejs/plugin-react";
 import { xmluiPlugin } from "../vite-plugin/xmluiPlugin";
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
 import type { XmluiPluginOptions } from "../vite-plugin/xmluiPlugin";
 import * as path from "node:path";
@@ -108,7 +109,7 @@ export async function preview({ port, proxy }: PreviewOptions): Promise<void> {
 
   try {
     const server = await vitePreview({
-      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), xmlui, react()],
+      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
       resolve: {
         extensions: [
           ".js",

@@ -1,5 +1,6 @@
 import { createErrorDiagnostic, type ParserDiagnostic, type ScriptNode } from "../parser";
 import type { SourceSpan } from "../parser";
+import { isAppContextObjectProperty } from "../abstractions/AppContextDefs";
 import { loopNeedsPacing, statementNeedsCheckpoint } from "./eventHandlerAnalysis";
 import type { XmluiElement } from "./ir";
 
@@ -459,7 +460,7 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
       mutable: false,
     };
   }
-  if (name === "appGlobals") {
+  if (isAppContextObjectProperty(name)) {
     return {
       kind: "context",
       name,

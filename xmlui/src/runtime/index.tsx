@@ -15,6 +15,8 @@ import { XmluiAppContextProvider } from "./appContext";
 import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
+import { IconProvider } from "../components/IconProvider";
+import { LegacyThemeProvider } from "../components-core/theming/ThemeContext";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
@@ -73,6 +75,7 @@ export type MountXmluiAppOptions = {
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  resources?: Record<string, string>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -100,6 +103,7 @@ export function mountXmluiApp(
         defaultTone={options.defaultTone}
         extensions={options.extensions}
         appGlobals={options.appGlobals}
+        resources={options.resources}
         testProbe={options.testProbe}
       />,
     );
@@ -113,6 +117,7 @@ export function mountXmluiApp(
       defaultTone={options.defaultTone}
       extensions={options.extensions}
       appGlobals={options.appGlobals}
+      resources={options.resources}
       testProbe={options.testProbe}
     />,
   );
@@ -126,6 +131,7 @@ export function XmluiRoot({
   defaultTone,
   extensions,
   appGlobals = {},
+  resources = {},
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -134,6 +140,7 @@ export function XmluiRoot({
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  resources?: Record<string, string>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
@@ -247,12 +254,16 @@ export function XmluiRoot({
   return (
     <StyleProvider>
       <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
-        <XmluiThemeRoot tone={defaultTone}>
-          <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-          {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
-          <GlobalLiveRegion />
-          <ToastHost service={toastRef.current} />
-        </XmluiThemeRoot>
+        <IconProvider icons={{}}>
+          <XmluiThemeRoot tone={defaultTone}>
+            <LegacyThemeProvider resources={resources}>
+              <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+              {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+              <GlobalLiveRegion />
+              <ToastHost service={toastRef.current} />
+            </LegacyThemeProvider>
+          </XmluiThemeRoot>
+        </IconProvider>
       </XmluiAppContextProvider>
     </StyleProvider>
   );

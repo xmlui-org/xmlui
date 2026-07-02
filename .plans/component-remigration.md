@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 105 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 99 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 1 |
-| Complete | User approved after audit and verification. | 0 |
+| In review | Audit and tests passed; waiting for user approval. | 0 |
+| Complete | User approved after audit and verification. | 4 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -342,7 +342,7 @@ it.
 | Badge | `BadgeReact.tsx`, `Badge.module.scss` | theme variants | Audit required | font, color, size computed styles |
 | Bookmark | `Bookmark.module.scss` if original has it | router/hash scroll container | Audit required | hash navigation in page and nested scroll |
 | Br | no protected React file expected | renderer text flow | Audit required | line break rendering |
-| Button | `ButtonReact.tsx`, `Button.module.scss` | Icon, event handler, theme | Audit required | variants, disabled, icon spacing |
+| Button | `Button.tsx`, `ButtonReact.tsx`, `Button.module.scss`, `Button.defaults.ts`, `Button.md`, `Button.spec.ts`, `Button-style.spec.ts`; added `Button.compat.spec.ts` | Icon, event handler, theme, test resources | Complete | User approved after protected-file audit and verification. `node xmlui/scripts/verify-protected-component-copy.mjs Button` passed (`Button.tsx` entry-adapted; copied React/SCSS/defaults/docs/specs identical); `npm --prefix xmlui run check:metadata` passed; `XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Button/Button.spec.ts xmlui/src/components/Button/Button-style.spec.ts xmlui/src/components/Button/Button.compat.spec.ts --workers=1` passed 154/160 with 6 original skips. Added compatibility spec asserts original secondary solid hover colors: border `rgb(226, 229, 234)` and background `rgb(140, 151, 169)`. |
 | Card | `CardReact.tsx`, `Card.module.scss` | layout props | Audit required | card sections and border styles |
 | ChangeListener | original implementation file | reactive state graph | Audit required | change event trigger tests |
 | Checkbox | `CheckboxReact.tsx`, `Checkbox.module.scss` | label behavior, form | Audit required | checked/indeterminate/form tests |
@@ -373,7 +373,7 @@ it.
 | HtmlTags | `HtmlTags.tsx`, module SCSS | renderer | Audit required | native tag output |
 | I18n | original implementation file | locale bundle/app context | Audit required | initial locale and runtime switch |
 | IFrame | `IFrameReact.tsx`, module SCSS | layout props | Audit required | src/title/sizing tests |
-| Icon | `IconReact.tsx`, module SCSS | icon provider | Audit required | icon registry and sizing |
+| Icon | `Icon.tsx`, `IconReact.tsx`, `Icon.module.scss`, `Icon.md`, `Icon.spec.ts`, original helper icon TSX files, icon module SCSS files, `Icon/svg/*`, `IconProvider.tsx`, `IconRegistryContext.tsx`, `icons-abstractions.ts` | original icon provider/registry, SVG React transform, theme resource lookup | Complete | User approved after protected-file audit and verification. Original Icon folder, docs, copied spec, SVG assets, registry provider, registry context, and icon-name abstractions copied from the original. `Icon.tsx` is entry-adapted with rewrite runtime renderer appended; copied `IconReact.tsx`, `Icon.module.scss`, `Icon.md`, and `Icon.spec.ts` are identical under verifier. Added host shims for old `ThemeContext`, `useIsomorphicLayoutEffect`, and `toCssVar`; added `svgReactPlugin` so original `*.svg?react` imports work without editing icon helpers. `node xmlui/scripts/verify-protected-component-copy.mjs Icon` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/Icon/Icon.spec.ts --workers=1` passed 44/44; `npm --prefix xmlui run check:metadata` passed. |
 | Image | `ImageReact.tsx`, module SCSS | resource URLs | Audit required | fit/fallback/loading tests |
 | IncludeMarkup | `IncludeMarkupReact.tsx` | markup loader/compiler | Audit required | include loading/error |
 | Input helpers | `InputAdornment.tsx`, `InputDivider.tsx`, `InputLabel.tsx`, `PartialInput.tsx`, module SCSS | TextBox, NumberBox, ColorPicker | Audit required | shared label/adornment measurements |
@@ -401,7 +401,7 @@ it.
 | Pagination | `PaginationReact.tsx`, module SCSS | Button/Icon | Audit required | page navigation and styles |
 | Part / Slot | original implementation files | component composition | Audit required | slot/part rendering |
 | ProfileMenu | `ProfileMenuReact.tsx`, module SCSS | App shell, menu | Audit required | profile menu visibility |
-| ProgressBar | `ProgressBar.tsx`, `ProgressBarReact.tsx`, `ProgressBar.module.scss`, `ProgressBar.defaults.ts`, `ProgressBar.md`, `ProgressBar.spec.ts` | theme variants, single-file metadata/renderer entry | In review | `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar` passed (`ProgressBar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical); `npm --prefix xmlui run check:metadata` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts --workers=1` passed 22/22. Waiting for user approval. |
+| ProgressBar | `ProgressBar.tsx`, `ProgressBarReact.tsx`, `ProgressBar.module.scss`, `ProgressBar.defaults.ts`, `ProgressBar.md`, `ProgressBar.spec.ts` | theme variants, single-file metadata/renderer entry | Complete | User approved after protected-file audit and verification. `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar` passed (`ProgressBar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical); `npm --prefix xmlui run check:metadata` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts --workers=1` passed 22/22. |
 | QRCode | `QRCodeReact.tsx`, module SCSS | QR library/runtime | Audit required | generated code output |
 | Queue | original implementation file | async orchestration | Audit required | queue lifecycle tests |
 | RadioGroup | `RadioGroupReact.tsx`, module SCSS | Option, FormItem | Audit required | selection and keyboard |
@@ -427,7 +427,7 @@ it.
 | TableOfContents | `TableOfContentsReact.tsx`, module SCSS | headings, Bookmark | Audit required | active section links |
 | Tabs | `TabsReact.tsx`, `TabItemReact.tsx`, module SCSS | router optional, layout | Audit required | tab selection and style |
 | TabsForm | `TabsFormReact.tsx` | Form, Tabs | Audit required | form sections |
-| Text | `TextReact.tsx`, module SCSS | theme typography | Audit required | text style tests |
+| Text | `Text.tsx`, `TextReact.tsx`, `Text.module.scss`, `Text.defaults.ts`, `Text.md`, `Text.spec.ts` | theme typography, original style helper shims | Complete | User approved after protected-file audit and DOM/computed-style verification against the original dev server. `node xmlui/scripts/verify-protected-component-copy.mjs Text` passed (`Text.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Manual Playwright DOM comparison against `http://localhost:5173/` and `http://127.0.0.1:5173/` for preserve-linebreaks, custom variant, and built-in variant markup returned an empty diff for the built-in variant set after host theme fixes. Text completion required host changes outside protected files: dynamic `useComponentStyle`, original Text font-size generated theme aliases, a guard against self-referential variant theme aliases, root light-theme color alignment, and multiline `value` text normalization for original NBSP indentation behavior. `npm --workspace xmlui run build` still stops on pre-existing/non-Text TypeScript failures in `compileXmluiModule.ts`, `Button.tsx`, icon helper files, and `IconProvider.tsx`. |
 | TextArea | `TextAreaReact.tsx`, module SCSS | Input helpers | Audit required | autosize, focus, label |
 | TextBox | `TextBoxReact.tsx`, module SCSS | Input helpers | Audit required | label, adornment, padding |
 | Theme | renderer/original theme React if present | generated CSS variables | Audit required | no broad inline style emission |
@@ -490,13 +490,55 @@ completed only after APICall/DataSource behavior is available.
   copied React files, helper TSX files named in a future manifest,
   `*.module.scss`, non-module SCSS, `*.defaults.ts`, component-folder `*.md`,
   component-folder `*.spec.ts`, and `<Component>.tsx` metadata/renderer source.
-- ProgressBar is in `In review`, not `Complete`. Mark it `Complete` only after
-  user approval, and update the summary counts at the same time.
+- ProgressBar is `Complete`. The user approved it after protected-file audit,
+  metadata check, copied E2E tests, and the added compatibility spec passed.
 - ProgressBar copied React, SCSS, defaults, docs, and E2E files are
   byte-identical to the original. The main `ProgressBar.tsx` keeps the copied
   original metadata and original-style renderer, with rewrite renderer adapter
   code appended in the same file. Do not recreate `ProgressBar.metadata.ts` or
   `ProgressBar.renderer.tsx`.
+- Button is `Complete`. The user approved it after protected-file audit,
+  metadata check, copied E2E tests, original style tests, and the added
+  compatibility spec passed. Its copied protected files are auditable under the
+  verifier; host fixes landed in shared runtime/theme/test/Icon shims rather
+  than in copied Button React, SCSS, defaults, docs, or specs.
+- Button migration added shared compatibility for test resources, custom icon
+  resources, `borderThickness-*` theme variable aliases, hierarchical theme
+  variable fallbacks, secondary solid hover default colors, and E2E mouse
+  parking away from the top-left origin so hover styles do not leak between
+  copied tests.
+- Icon is `Complete`. The user approved it after protected-file audit,
+  metadata check, and copied E2E tests passed. The original Icon component
+  folder, SVG assets, `IconProvider.tsx`, `IconRegistryContext.tsx`, and
+  `icons-abstractions.ts` have been migrated from the original project. This
+  replaces the earlier temporary `drive` mapping with the original provider
+  registry pattern and the full original icon set.
+- Icon host adaptation lives outside copied protected implementation files:
+  `Icon.tsx` has the rewrite runtime renderer appended below the copied
+  original metadata/renderer source; `xmlui/src/runtime/index.tsx` wraps apps
+  with `IconProvider` in the original AppWrapper position; legacy shims provide
+  `components-core/theming/ThemeContext`, `components-core/utils/hooks`, and
+  `parsers/style-parser/StyleParser.toCssVar`; `svgReactPlugin` supports the
+  original `*.svg?react` imports across dev, production, standalone, SSG, CLI,
+  build-lib, and sample Vite configs.
+- Icon verification passed:
+  `node xmlui/scripts/verify-protected-component-copy.mjs Icon`,
+  `npm --workspace xmlui run test:e2e -- xmlui/src/components/Icon/Icon.spec.ts --workers=1`
+  (44/44), and `npm --prefix xmlui run check:metadata`. The E2E fixture now
+  resets `document.documentElement.style.fontSize` between shared-page tests;
+  this fixed leaked root font-size state from the copied Icon suite without
+  editing the copied spec.
+- Button's added `Button.compat.spec.ts` now asserts the user-reported
+  secondary solid hover colors from the original runtime: border
+  `rgb(226, 229, 234)` and background `rgb(140, 151, 169)`. Full Button
+  verification passed 154/160 with 6 original skips using
+  `XMLUI_REUSE_EXISTING_SERVER=0`; use that environment variable when a manual
+  sample Vite server is already occupying `127.0.0.1:5173`.
+- AppContext global identifiers are compiler-recognized through
+  `xmlui/src/abstractions/AppContextDefs.ts`. Add future app-level global
+  functions/properties there and keep compiler checks using
+  `isAppContextObjectProperty`; do not add one-off identifier exceptions in
+  `scriptSemantics.ts`.
 - Registry migration has started, but is intentionally partial:
   `xmlui/src/component-core/runtimeRegistry.ts` owns provider-style runtime
   renderer registration and `component-core/index.ts` exports
@@ -519,6 +561,13 @@ completed only after APICall/DataSource behavior is available.
   the sample `<VStack>` root at `http://127.0.0.1:5173/` showed five rendered
   ProgressBars, a generated `xmlui-css-*` class on `html`, generated style
   tags, and component inline style reduced to layout-only `box-sizing`.
+- Scoped `<Theme>` wrappers must stay layout-transparent like the original
+  `Theme.module.scss` `.themeWrapper { display: contents; }`. The rewrite now
+  emits `display: contents` through the generated `ThemeScope` class so themed
+  children remain direct layout participants of parent stacks. Regression
+  coverage lives in `xmlui/src/components/Theme/Theme.spec.ts` with the user's
+  `HStack` + `Theme width-Button="120px"` button grouping markup; the focused
+  Theme E2E file passed 6/6.
 - ProgressBar completed-state color regression: the original app resolves
   `$color-success-500` to `rgb(144, 226, 157)` through its transformed default
   success palette, while the browser-native interpretation of the old HSL token

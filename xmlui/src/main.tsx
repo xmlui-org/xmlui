@@ -346,6 +346,26 @@ if (params.has("__xmluiTestBed")) {
     }
   };
 
+  const readTestBedResources = (): Record<string, string> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedResources");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? Object.fromEntries(
+            Object.entries(parsed).filter(
+              (entry): entry is [string, string] =>
+                typeof entry[0] === "string" && typeof entry[1] === "string",
+            ),
+          )
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
   const readTestBedExtensions = async (): Promise<Extension[]> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
     if (!raw) {
@@ -393,12 +413,14 @@ if (params.has("__xmluiTestBed")) {
   const renderTestBedModule = async (module: Extract<XmluiModule, { kind: "app" }>): Promise<void> => {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
+    const resources = readTestBedResources();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
     if (!testBedRoot) {
       testBedRoot = mountXmluiApp(module, root, {
         extensions,
+        resources,
         testProbe,
       });
       return;
@@ -407,6 +429,7 @@ if (params.has("__xmluiTestBed")) {
       key,
       module,
       extensions,
+      resources,
       testProbe,
     }));
   };

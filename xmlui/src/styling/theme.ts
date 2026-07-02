@@ -251,14 +251,15 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "borderColor-outlined--focus": "$color-primary-600",
 
   light: {
+    textColor: "black",
     "color-surface-0": "$const-color-surface-0",
     "color-surface-50": "$const-color-surface-50",
-    "color-surface-100": "$const-color-surface-100",
+    "color-surface-100": "hsl(204, 30.3%, 95%)",
     "color-surface-200": "$const-color-surface-200",
     "color-surface-300": "$const-color-surface-300",
     "color-surface-400": "$const-color-surface-400",
     "color-surface-500": "$const-color-surface-500",
-    "color-surface-600": "$const-color-surface-600",
+    "color-surface-600": "hsl(204, 30.3%, 40%)",
     "color-surface-700": "$const-color-surface-700",
     "color-surface-800": "$const-color-surface-800",
     "color-surface-900": "$const-color-surface-900",
@@ -272,7 +273,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
     "color-primary-50": "$const-color-primary-50",
     "color-primary-100": "$const-color-primary-100",
     "color-primary-200": "$const-color-primary-200",
-    "color-primary-300": "$const-color-primary-300",
+    "color-primary-300": "color(srgb 0.436168 0.651561 0.907832)",
     "color-primary-400": "$const-color-primary-400",
     "color-primary-500": "$const-color-primary-500",
     "color-primary-600": "$const-color-primary-600",
@@ -289,7 +290,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
     "color-secondary-500": "$const-color-secondary-500",
     "color-secondary-600": "$const-color-secondary-600",
     "color-secondary-700": "$const-color-secondary-700",
-    "color-secondary-800": "$const-color-secondary-800",
+    "color-secondary-800": "rgb(44, 50, 59)",
     "color-secondary-900": "$const-color-secondary-900",
     "color-secondary-950": "$const-color-secondary-950",
     "color-secondary": "$const-color-secondary-500",
@@ -382,6 +383,8 @@ export const rootThemeVariables: ThemeVariableLayer = {
 export const xmluiThemeVariables: ThemeVariableLayer = {
   "font-size": "15px",
   "boxShadow-Input": "$boxShadow-sm",
+  "backgroundColor-Button-secondary-solid--hover": "rgb(140, 151, 169)",
+  "borderColor-Button-secondary-solid--hover": "rgb(226, 229, 234)",
   light: {
     "backgroundColor-ModalDialog": "white",
     "backgroundColor-checked-RadioGroupOption": "$color-primary-400",
@@ -391,8 +394,24 @@ export const xmluiThemeVariables: ThemeVariableLayer = {
   },
 };
 
+export const generatedThemeVariables: ThemeVariableLayer = {
+  "fontSize-Text-keyboard": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-sample": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-sup": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-sub": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-title": `calc(${themeVarReference("fontSize-Text")} * 1.5)`,
+  "fontSize-Text-subtitle": `calc(${themeVarReference("fontSize-Text")} * 1.25)`,
+  "fontSize-Text-small": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-placeholder": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-paragraph": themeVarReference("fontSize-Text"),
+  "fontSize-Text-subheading": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-tableheading": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-secondary": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+};
+
 export const defaultThemeVariables = mergeThemeVariableLayers([
   rootThemeVariables,
+  generatedThemeVariables,
   xmluiThemeVariables,
 ]);
 
@@ -588,12 +607,17 @@ function componentVariantThemeVariables(
     ]);
     for (const key of keys) {
       const variantKey = `${key}-${variant}`;
-      if (themeVariables[variantKey] !== undefined) {
-        aliases[key] = themeVariables[variantKey];
+      const value = themeVariables[variantKey];
+      if (value !== undefined && !isSelfReferentialVariantAlias(key, value)) {
+        aliases[key] = value;
       }
     }
   }
   return aliases;
+}
+
+function isSelfReferentialVariantAlias(key: string, value: unknown): boolean {
+  return typeof value === "string" && value.includes(themeVarReference(key));
 }
 
 export function generateButtonTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
@@ -746,13 +770,29 @@ function themeVariableValue(
   sourceNames: Set<string> | undefined,
   themeVariables: ThemeVariableMap,
 ): unknown {
-  for (const sourceName of sourceNames ?? [name]) {
+  for (const sourceName of themeVariableLookupNames(sourceNames ?? [name])) {
     const value = themeVariables[sourceName];
     if (value !== undefined) {
       return value;
     }
   }
   return themeVariables[name];
+}
+
+function themeVariableLookupNames(sourceNames: Iterable<string>): string[] {
+  const names: string[] = [];
+  for (const sourceName of sourceNames) {
+    const aliases = [
+      sourceName.startsWith("borderWidth-")
+        ? sourceName.replace(/^borderWidth-/, "borderThickness-")
+        : undefined,
+    ].filter((name): name is string => !!name);
+    names.push(sourceName, ...aliases);
+    for (const lookupName of [sourceName, ...aliases]) {
+      names.push(...themeVariableFallbackNames(lookupName));
+    }
+  }
+  return [...new Set(names)];
 }
 
 function stripLegacyThemeClassPrefix(name: string): string {
@@ -810,10 +850,19 @@ function addDerivedCssVariable(
   name: string,
   value: string | undefined,
 ): void {
-  if (!value || themeVariables[name] !== undefined) {
+  if (!value || explicitThemeVariableExists(themeVariables, name)) {
     return;
   }
   cssVariables[themePropNameToCssVarName(name)] = value;
+}
+
+function explicitThemeVariableExists(themeVariables: ThemeVariableMap, name: string): boolean {
+  if (themeVariables[name] !== undefined) {
+    return true;
+  }
+  return name.startsWith("borderWidth-")
+    ? themeVariables[name.replace(/^borderWidth-/, "borderThickness-")] !== undefined
+    : false;
 }
 
 function parseBorderShorthand(

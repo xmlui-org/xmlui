@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 
 import { rawScssModulePlugin } from "../xmlui/src/vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "../xmlui/src/vite-plugin/svgReactPlugin";
 
 const XMLUI_RE = /\.xmlui$/;
 const compilerPath = new URL("../xmlui/src/compiler/compileXmluiModule.ts", import.meta.url).pathname;
@@ -40,7 +41,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [rawScssModulePlugin(), sampleXmluiPlugin(), react()],
+  plugins: [rawScssModulePlugin(), svgReactPlugin(), sampleXmluiPlugin(), react()],
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui"],
   },

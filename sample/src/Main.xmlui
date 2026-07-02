@@ -1,9 +1,144 @@
-<Theme backgroundColor-ProgressBar="blue">
-<VStack>
-  <ProgressBar />
-  <ProgressBar value="0.2"/>
-  <ProgressBar value="0.6"/>
-  <ProgressBar value="1"/>
-  <ProgressBar value="1.2"/>
-</VStack>
-</Theme>  
+<App>
+  <HStack>
+    <Text width="150px">default:</Text>
+    <Text>This is an example text</Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">paragraph:</Text>
+    <Text variant="paragraph">This is an example paragraph</Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">abbr:</Text>
+    <Text variant="abbr">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">cite:</Text>
+    <Text variant="cite">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">code:</Text>
+    <Text variant="code">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">deleted:</Text>
+    <Text variant="deleted">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">inserted:</Text>
+    <Text variant="inserted">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">keyboard:</Text>
+    <Text variant="keyboard">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">marked:</Text>
+    <Text variant="marked">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sample:</Text>
+    <Text variant="sample">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sup:</Text>
+    <Text>
+      This is an example text
+      <Text variant="sup">(with some additional text)</Text>
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sub:</Text>
+    <Text>
+      This is an example text
+      <Text variant="sub">(with some additional text)</Text>
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">var:</Text>
+    <Text variant="var">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">mono:</Text>
+    <Text variant="mono">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">strong:</Text>
+    <Text variant="strong">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">em:</Text>
+    <Text variant="em">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">title:</Text>
+    <Text variant="title">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">subtitle:</Text>
+    <Text variant="subtitle">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">small:</Text>
+    <Text variant="small">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">caption:</Text>
+    <Text variant="caption">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">placeholder:</Text>
+    <Text variant="placeholder">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">subheading:</Text>
+    <Text variant="subheading">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">tableheading:</Text>
+    <Text variant="tableheading">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">secondary:</Text>
+    <Text variant="secondary">
+      This is an example text
+    </Text>
+  </HStack>
+</App>

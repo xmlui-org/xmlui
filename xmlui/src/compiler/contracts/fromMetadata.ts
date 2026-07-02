@@ -43,9 +43,24 @@ export function contractFromMetadata(
     apis: entriesFromMetadata(metadata.apis),
     parts: entriesFromMetadata(metadata.parts),
     themeVars: entriesFromMetadata(metadata.themeVars),
-    defaultThemeVars: metadata.defaultThemeVars,
+    defaultThemeVars: flatDefaultThemeVars(metadata.defaultThemeVars),
     toneSpecificThemeVars: metadata.toneSpecificThemeVars,
   };
+}
+
+function flatDefaultThemeVars(
+  defaultThemeVars: ComponentMetadata["defaultThemeVars"],
+): XmluiComponentContract["defaultThemeVars"] {
+  if (!defaultThemeVars) {
+    return undefined;
+  }
+  const flatVars: Record<string, string | number | boolean> = {};
+  for (const [name, value] of Object.entries(defaultThemeVars)) {
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      flatVars[name] = value;
+    }
+  }
+  return flatVars;
 }
 
 function propsFromMetadata(

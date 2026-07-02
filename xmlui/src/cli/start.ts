@@ -3,6 +3,7 @@ import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { xmluiPlugin } from "../vite-plugin/xmluiPlugin";
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
 import type { XmluiPluginOptions } from "../vite-plugin/xmluiPlugin";
 import * as path from "node:path";
@@ -109,7 +110,7 @@ export async function start({ port, proxy }: StartOptions): Promise<void> {
 
   try {
     const server = await createServer({
-      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), xmlui, react()],
+      plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
       server: {
         port,
         proxy: proxyDef,

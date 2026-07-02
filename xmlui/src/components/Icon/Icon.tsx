@@ -1,58 +1,159 @@
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { extractScssThemeVars } from "../../styling/theme";
-import {
-  createMetadata,
-  dClick,
-} from "../../component-core/metadata/helpers";
+import styles from "./Icon.module.scss";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import Icon from "./IconReact";
+import type { IconBaseProps } from "./IconReact";
+import { createMetadata } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { Icon } from "./IconReact";
-import iconStylesSource from "./Icon.module.scss?xmlui-theme-vars";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { useIconRegistry } from "../IconRegistryContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 const COMP = "Icon";
 
 export const IconMd = createMetadata({
   status: "stable",
   description:
-    "`Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references.",
+    "`Icon` displays scalable vector icons from XMLUI's built-in icon registry " +
+    "using simple name references. Icons are commonly used in buttons, navigation " +
+    "elements, and status indicators.",
   props: {
     name: {
-      description: "The name of the icon to display.",
+      description:
+        "This string property specifies the name of the icon to display. All icons have " +
+        "unique, case-sensitive names identifying them. If the icon name is not set, the " +
+        "`fallback` value is used.",
       valueType: "string",
     },
     size: {
-      description: "The size of the icon. Supports `xs`, `sm`, `md`, `lg`, CSS lengths, and theme references.",
-      valueType: "string",
+      description:
+        `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
+        `the \`width\` of the component will override this property. You can use az explicit size ` +
+        "value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.",
       availableValues: ["xs", "sm", "md", "lg"],
+      valueType: "string",
     },
     fallback: {
-      description: "Icon name to use when `name` cannot be resolved.",
-      valueType: "string",
-    },
-    testId: {
-      description: "Adds a test identifier to the icon element.",
+      description:
+        "This optional property provides a way to handle situations when the icon with the provided " +
+        "[icon name](#name) name does not exist. If the icon cannot be found, no icon is displayed.",
       valueType: "string",
     },
   },
   events: {
-    click: dClick(COMP),
+    click: {
+      description: "This event is triggered when the icon is clicked.",
+      signature: "click(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event object.",
+      },
+    },
   },
-  themeVars: extractScssThemeVars(iconStylesSource),
+
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`size-${COMP}`]: "1.2em",
   },
 });
 
-export const iconRenderer = wrapComponent({
+type ThemedIconProps = IconBaseProps & {
+  className?: string;
+  classes?: Record<string, string>;
+  tooltip?: string;
+  onClick?: React.MouseEventHandler;
+};
+
+export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(function ThemedIcon(
+  { className, classes, tooltip, ...props }: ThemedIconProps,
+  ref,
+) {
+  const themeClass = useComponentThemeClass(IconMd);
+  const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
+  return <Icon {...props} className={mergedClass} ref={ref} aria-label={tooltip} />;
+});
+
+export const iconComponentRenderer = wrapComponent(
+  COMP,
+  ThemedIcon,
+  IconMd,
+);
+
+export const iconRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: IconMd as ComponentMetadata,
   renderer: ({ adapter }) => (
-    <Icon
-      {...adapter.rootAttrs()}
-      data-testid={adapter.stringProp("testId", "test-id-component")}
-      name={adapter.prop("name")}
-      fallback={adapter.prop("fallback")}
-      size={adapter.prop("size")}
-      onClick={adapter.node.events.click ? (event) => void adapter.event("click")(event) : undefined}
+    <RuntimeIcon
+      rootAttrs={adapter.rootAttrs()}
+      name={adapter.stringProp("name")}
+      size={adapter.stringProp("size")}
+      fallback={adapter.stringProp("fallback")}
+      classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+      onClick={
+        Object.prototype.hasOwnProperty.call(adapter.node.events, "click")
+          ? adapter.event("click") as React.MouseEventHandler
+          : undefined
+      }
     />
   ),
 });
+
+function RuntimeIcon({
+  rootAttrs,
+  name,
+  fallback,
+  ...iconProps
+}: ThemedIconProps & {
+  rootAttrs: Record<string, unknown>;
+  name?: string;
+  fallback?: string;
+}) {
+  const iconRegistry = useIconRegistry();
+  const { getResourceUrl } = useTheme();
+  if (!hasRenderableIcon(name, fallback, iconRegistry.lookupIconRenderer, getResourceUrl)) {
+    return null;
+  }
+  const {
+    className,
+    style,
+    "data-testid": testId,
+    ...dataAttrs
+  } = rootAttrs as Record<string, unknown>;
+  return (
+    <span
+      {...dataAttrs}
+      data-testid={testId ?? "test-id-component"}
+      className={className as string | undefined}
+      style={style as React.CSSProperties | undefined}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          iconProps.onClick?.(event);
+        }
+      }}
+    >
+      <ThemedIcon
+        {...iconProps}
+        name={name}
+        fallback={fallback}
+        className={className as string | undefined}
+      />
+    </span>
+  );
+}
+
+function hasRenderableIcon(
+  name: string | undefined,
+  fallback: string | undefined,
+  lookupIconRenderer: (name: string) => unknown,
+  getResourceUrl: (name: string) => string | undefined,
+): boolean {
+  if (name && lookupIconRenderer(name.toLowerCase())) {
+    return true;
+  }
+  if (name && getResourceUrl(`resource:icon.${name}`)) {
+    return true;
+  }
+  return !!(fallback && lookupIconRenderer(fallback.toLowerCase()));
+}
