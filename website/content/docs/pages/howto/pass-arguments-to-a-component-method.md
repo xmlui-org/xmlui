@@ -76,7 +76,7 @@ way the component's markup bindings do:
 | The component's own `var.X` | **Yes** — read *and* write | Component state lives in this scope |
 | `$props.X` | **Yes** — read-only | The caller-supplied attributes ([Create a reusable component](/docs/howto/create-a-reusable-component)) |
 | An `id` declared **inside** this component | **Yes** | Call its API, e.g. `internalDialog.open()` ([Expose a method from a component](/docs/howto/expose-a-method-from-a-component)) |
-| A parent / outer / App-level `var.X` | Treat as **No** | Variables stop at the user-defined-component boundary ([Scoping](/docs/scoping)) — pass them in as a prop, or emit an event |
+| A parent / outer / App-level `var.X` | Treat as **No** | Variables stop at the user-defined-component boundary ([Scoping](/docs/guides/scoping)) — pass them in as a prop, or emit an event |
 | An `id` in the caller's scope | **No** | Same boundary |
 
 ## To change parent state, emit an event
@@ -105,4 +105,4 @@ user-defined-component story follows.
 - [Delegate a method](/docs/howto/delegate-a-method) — forwarding a method straight to an internal built-in component
 - [Emit a custom event from a component](/docs/howto/emit-a-custom-event-from-a-component) — the way to change parent state from inside a component
 - [Create a reusable component](/docs/howto/create-a-reusable-component) — `$props`, `id`, and the component boundary
-- [Scoping](/docs/scoping) — which variables cross a user-defined-component boundary
+- [Scoping](/docs/guides/scoping) — which variables cross a user-defined-component boundary
