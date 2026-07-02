@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 import { expect, test } from "../src/testing/fixtures";
 
-async function installExternalBridge(
+async function installPushSourceBridge(
   page: Page,
   options: { syncValue?: Record<string, any> | null } = {},
 ) {
@@ -13,8 +13,8 @@ async function installExternalBridge(
       unsubscribeCount: 0,
     };
 
-    (window as any).__externalBridge = bridge;
-    (window as any).__externalSubscribe = (emit: (value: any) => void) => {
+    (window as any).__pushSourceBridge = bridge;
+    (window as any).__pushSourceSubscribe = (emit: (value: any) => void) => {
       bridge.subscribeCount++;
       bridge.emitters.push(emit);
       if (syncValue !== null) {
@@ -24,10 +24,10 @@ async function installExternalBridge(
         bridge.unsubscribeCount++;
       };
     };
-    (window as any).__externalEmit = (value: any) => {
+    (window as any).__pushSourceEmit = (value: any) => {
       bridge.emitters.forEach((emit) => emit(value));
     };
-    (window as any).__externalStats = () => ({
+    (window as any).__pushSourceStats = () => ({
       subscribeCount: bridge.subscribeCount,
       unsubscribeCount: bridge.unsubscribeCount,
       emitterCount: bridge.emitters.length,
@@ -35,51 +35,51 @@ async function installExternalBridge(
   }, "syncValue" in options ? options.syncValue : { label: "sync", tick: 1 });
 }
 
-test.describe("External", () => {
+test.describe("PushSource", () => {
   test("exposes initial and emitted values through loader state", async ({ initTestBed, page }) => {
-    await installExternalBridge(page, { syncValue: null });
+    await installPushSourceBridge(page, { syncValue: null });
 
     await initTestBed(`
       <Fragment>
-        <External
-          id="externalSource"
+        <PushSource
+          id="pushSource"
           initial="{{ label: 'initial', tick: 0 }}"
-          subscribe="{window.__externalSubscribe}"
+          subscribe="{window.__pushSourceSubscribe}"
         />
         <Text
           testId="value"
-          value="{externalSource.value.label + ':' + externalSource.value.tick}"
+          value="{pushSource.value.label + ':' + pushSource.value.tick}"
         />
         <Text
           testId="loaded"
-          value="{externalSource.loaded ? 'loaded' : 'not-loaded'}"
+          value="{pushSource.loaded ? 'loaded' : 'not-loaded'}"
         />
       </Fragment>
     `);
 
     await expect(page.getByTestId("value")).toHaveText("initial:0");
     await expect(page.getByTestId("loaded")).toHaveText("loaded");
-    await expect.poll(() => page.evaluate(() => (window as any).__externalStats())).toMatchObject({
+    await expect.poll(() => page.evaluate(() => (window as any).__pushSourceStats())).toMatchObject({
       subscribeCount: 1,
       unsubscribeCount: 0,
       emitterCount: 1,
     });
 
     await page.evaluate(() => {
-      (window as any).__externalEmit({ label: "async", tick: 2 });
+      (window as any).__pushSourceEmit({ label: "async", tick: 2 });
     });
 
     await expect(page.getByTestId("value")).toHaveText("async:2");
   });
 
   test("emitted values are observable by ChangeListener", async ({ initTestBed, page }) => {
-    await installExternalBridge(page);
+    await installPushSourceBridge(page);
 
     await initTestBed(`
       <Fragment var.lastTick="{0}" var.changeCount="{0}">
-        <External id="externalSource" subscribe="{window.__externalSubscribe}" />
+        <PushSource id="pushSource" subscribe="{window.__pushSourceSubscribe}" />
         <ChangeListener
-          listenTo="{externalSource.value.tick}"
+          listenTo="{pushSource.value.tick}"
           onDidChange="(change) => { lastTick = change.newValue; changeCount++; }"
         />
         <Text testId="lastTick" value="{lastTick}" />
@@ -91,7 +91,7 @@ test.describe("External", () => {
     await expect(page.getByTestId("changeCount")).toHaveText("1");
 
     await page.evaluate(() => {
-      (window as any).__externalEmit({ label: "async", tick: 2 });
+      (window as any).__pushSourceEmit({ label: "async", tick: 2 });
     });
 
     await expect(page.getByTestId("lastTick")).toHaveText("2");
@@ -99,51 +99,51 @@ test.describe("External", () => {
   });
 
   test("calls unsubscribe when unmounted by a when condition", async ({ initTestBed, page }) => {
-    await installExternalBridge(page);
+    await installPushSourceBridge(page);
 
     await initTestBed(`
-      <Fragment var.showExternal="{true}">
-        <External
-          id="externalSource"
-          when="{showExternal}"
-          subscribe="{window.__externalSubscribe}"
+      <Fragment var.showPushSource="{true}">
+        <PushSource
+          id="pushSource"
+          when="{showPushSource}"
+          subscribe="{window.__pushSourceSubscribe}"
         />
-        <Button testId="toggle" label="Toggle" onClick="showExternal = !showExternal" />
+        <Button testId="toggle" label="Toggle" onClick="showPushSource = !showPushSource" />
         <Text
           testId="value"
-          value="{externalSource.value ? externalSource.value.label : 'none'}"
+          value="{pushSource.value ? pushSource.value.label : 'none'}"
         />
       </Fragment>
     `);
 
     await expect(page.getByTestId("value")).toHaveText("sync");
-    await expect.poll(() => page.evaluate(() => (window as any).__externalStats())).toMatchObject({
+    await expect.poll(() => page.evaluate(() => (window as any).__pushSourceStats())).toMatchObject({
       subscribeCount: 1,
       unsubscribeCount: 0,
     });
 
     await page.getByTestId("toggle").click();
 
-    await expect.poll(() => page.evaluate(() => (window as any).__externalStats())).toMatchObject({
+    await expect.poll(() => page.evaluate(() => (window as any).__pushSourceStats())).toMatchObject({
       subscribeCount: 1,
       unsubscribeCount: 1,
     });
   });
 
   test("works inside App when preceded by a script tag", async ({ initTestBed, page }) => {
-    await installExternalBridge(page);
+    await installPushSourceBridge(page);
 
     await initTestBed(`
       <App>
         <script>
           var greeting = "hello";
         </script>
-        <External id="externalSource" subscribe="{window.__externalSubscribe}" />
+        <PushSource id="pushSource" subscribe="{window.__pushSourceSubscribe}" />
         <Pages>
           <Page url="/">
             <Text
               testId="value"
-              value="{greeting + ':' + externalSource.value.label + ':' + externalSource.value.tick}"
+              value="{greeting + ':' + pushSource.value.label + ':' + pushSource.value.tick}"
             />
           </Page>
         </Pages>

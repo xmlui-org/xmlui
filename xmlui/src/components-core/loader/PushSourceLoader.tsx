@@ -19,7 +19,7 @@ import {
   xsConsoleLog,
 } from "../inspector/inspectorUtils";
 
-// --- ExternalLoader: wires an app-provided `subscribe` callback into the
+// --- PushSourceLoader: wires an app-provided `subscribe` callback into the
 // loader pipeline. The framework's role is narrow — call subscribe on
 // mount with an `emit(value)` function, dispatch every emit as a loader
 // "loaded" event so the value flows through the existing observability
@@ -30,21 +30,23 @@ import {
 // Producers may call it synchronously inside subscribe (to seed an
 // initial value) and asynchronously thereafter.
 //
-// Unlike `DataLoader` / `ApiLoader`, this loader does not own any fetch
-// or polling logic. It does not depend on React Query. Errors raised
-// inside subscribe are routed through `loaderError`; the loader stays
-// active and may continue receiving emits afterward.
+// PushSource is the push analogue of DataSource: DataSource pulls (fetch /
+// poll), PushSource receives pushed values. Unlike `DataLoader` / `ApiLoader`,
+// this loader does not own any fetch or polling logic. It does not depend on
+// React Query. Errors raised inside subscribe are routed through
+// `loaderError`; the loader stays active and may continue receiving emits
+// afterward.
 //
 // Inspector instrumentation mirrors DataLoader's xsLog plumbing:
-//  - external:mount        — component mounted (with initial value snapshot)
-//  - external:subscribe    — subscribe() called
-//  - external:emit         — producer pushed a value (payload included)
-//  - external:invalid      — subscribe prop is not a function
-//  - external:error        — subscribe() threw on registration
-//  - external:unsubscribe  — cleanup ran on unmount
+//  - pushsource:mount        — component mounted (with initial value snapshot)
+//  - pushsource:subscribe    — subscribe() called
+//  - pushsource:emit         — producer pushed a value (payload included)
+//  - pushsource:invalid      — subscribe prop is not a function
+//  - pushsource:error        — subscribe() threw on registration
+//  - pushsource:unsubscribe  — cleanup ran on unmount
 
-type ExternalLoaderProps = {
-  loader: ExternalLoaderDef;
+type PushSourceLoaderProps = {
+  loader: PushSourceLoaderDef;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
@@ -52,24 +54,24 @@ type ExternalLoaderProps = {
   state: ContainerState;
 };
 
-function ExternalLoader({
+function PushSourceLoader({
   loader,
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
   state,
-}: ExternalLoaderProps) {
+}: PushSourceLoaderProps) {
   const appContext = useAppContext();
   const xsVerbose = appContext.xmluiConfig?.xsVerbose === true;
   const xsLogMax = Number(appContext.xmluiConfig?.xsVerboseLogMax ?? 200);
 
   const instanceIdRef = useRef<string>(
-    `ext-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`,
+    `push-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`,
   );
   const emitSeqRef = useRef<number>(0);
 
   // Inspector verbose logging — no-op when xsVerbose is off. Emits a
-  // structured entry to the xs log ring buffer with full External
+  // structured entry to the xs log ring buffer with full PushSource
   // context. Mirrors the shape DataLoader uses so the Inspector UI's
   // existing filters/columns light up the same way.
   const xsLog = useCallback(
@@ -83,7 +85,7 @@ function ExternalLoader({
           traceId: getCurrentTrace(),
           instanceId: instanceIdRef.current,
           // Reuse dataSourceId field name so existing Inspector columns
-          // surface the id for both DataSource and External rows.
+          // surface the id for both DataSource and PushSource rows.
           dataSourceId: (loader?.props as any)?.id,
           ownerUid: loader?.uid,
           ownerFileId: loader?.debug?.source?.fileId,
@@ -94,7 +96,7 @@ function ExternalLoader({
           kind,
           eventName: detail?.eventName,
           uid: detail?.uid ? String(detail.uid) : undefined,
-          componentType: "External",
+          componentType: "PushSource",
         },
         xsLogMax,
       );
@@ -125,14 +127,14 @@ function ExternalLoader({
   // that need a synchronous initial value can either rely on `initial`
   // or call `emit(seed)` synchronously inside their subscribe body.
   useEffect(() => {
-    xsLogRef.current("external:mount", {
+    xsLogRef.current("pushsource:mount", {
       hasInitial: initialValue !== undefined,
       initialValuePreview: initialValue !== undefined ? safeStringify(initialValue) : undefined,
     });
     if (initialValue !== undefined) {
       loaderLoadedRef.current(initialValue);
     }
-    // Mark not-in-progress: External is always "ready" once mounted.
+    // Mark not-in-progress: PushSource is always "ready" once mounted.
     loaderInProgressChangedRef.current(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -143,22 +145,22 @@ function ExternalLoader({
   useEffect(() => {
     if (typeof subscribeFn !== "function") {
       if (subscribeFn !== undefined && subscribeFn !== null) {
-        xsLogRef.current("external:invalid", {
+        xsLogRef.current("pushsource:invalid", {
           subscribeFnType: typeof subscribeFn,
         });
         console.warn(
-          "[XMLUI] External: `subscribe` prop must be a function; got " +
+          "[XMLUI] PushSource: `subscribe` prop must be a function; got " +
             typeof subscribeFn,
         );
       }
       return;
     }
 
-    xsLogRef.current("external:subscribe", {});
+    xsLogRef.current("pushsource:subscribe", {});
 
     const emit = (value: any) => {
       const seq = (emitSeqRef.current += 1);
-      xsLogRef.current("external:emit", {
+      xsLogRef.current("pushsource:emit", {
         seq,
         valuePreview: safeStringify(value),
       });
@@ -169,14 +171,14 @@ function ExternalLoader({
     try {
       unsubscribe = subscribeFn(emit);
     } catch (err) {
-      xsLogRef.current("external:error", {
+      xsLogRef.current("pushsource:error", {
         message: String((err as Error)?.message ?? err),
       });
       loaderErrorRef.current(AppError.from(err));
     }
 
     return () => {
-      xsLogRef.current("external:unsubscribe", {
+      xsLogRef.current("pushsource:unsubscribe", {
         hadUnsubscribeFn: typeof unsubscribe === "function",
       });
       if (typeof unsubscribe === "function") {
@@ -185,7 +187,7 @@ function ExternalLoader({
         } catch (err) {
           // Unsubscribe errors are reported but do not propagate; the
           // component is being torn down regardless.
-          console.error("[XMLUI] External: unsubscribe threw:", err);
+          console.error("[XMLUI] PushSource: unsubscribe threw:", err);
         }
       }
     };
@@ -197,15 +199,15 @@ function ExternalLoader({
 // ---------------------------------------------------------------------------
 // Renderer registration
 
-const ExternalLoaderMd = createMetadata({
+const PushSourceLoaderMd = createMetadata({
   status: "experimental",
   description:
-    "Bridges an app-defined external value source into XMLUI's reactive " +
-    "model. The `subscribe` prop is a function that receives an `emit` " +
-    "callback; every emit becomes an observable value change. Use for " +
-    "host-bridge values (postMessage, Tauri events, WebSocket pushes, " +
-    "polling caches, DOM observers) that cannot be expressed as a " +
-    "DataSource.",
+    "Bridges an app-defined push source into XMLUI's reactive model — the " +
+    "push analogue of DataSource. The `subscribe` prop is a function that " +
+    "receives an `emit` callback; every emit becomes an observable value " +
+    "change. Use for host-bridge values (postMessage, Tauri events, " +
+    "WebSocket pushes, polling caches, DOM observers) that cannot be " +
+    "expressed as a DataSource.",
   props: {
     subscribe: {
       description:
@@ -225,10 +227,10 @@ const ExternalLoaderMd = createMetadata({
   },
 });
 
-type ExternalLoaderDef = ComponentDef<typeof ExternalLoaderMd>;
+type PushSourceLoaderDef = ComponentDef<typeof PushSourceLoaderMd>;
 
-export const externalLoaderRenderer = createLoaderRenderer(
-  "External",
+export const pushSourceLoaderRenderer = createLoaderRenderer(
+  "PushSource",
   ({
     loader,
     state,
@@ -238,7 +240,7 @@ export const externalLoaderRenderer = createLoaderRenderer(
     loaderError,
   }) => {
     return (
-      <ExternalLoader
+      <PushSourceLoader
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}
@@ -248,5 +250,5 @@ export const externalLoaderRenderer = createLoaderRenderer(
       />
     );
   },
-  ExternalLoaderMd,
+  PushSourceLoaderMd,
 );

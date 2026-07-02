@@ -233,20 +233,20 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
         when: child.when,
         debug: child.debug,
       });
-    } else if (child?.type === "External") {
+    } else if (child?.type === "PushSource") {
       didResolve = true;
       if (!loaders) {
         loaders = [];
       }
       loaders.push({
         uid: child.uid!,
-        type: "External",
+        type: "PushSource",
         props: child.props,
         events: child.events,
         when: child.when,
         debug: child.debug,
       });
-    } else if (node.scriptCollected && child?.type === "Fragment" && child.children?.some((c) => c?.type === "DataSource" || c?.type === "External")) {
+    } else if (node.scriptCollected && child?.type === "Fragment" && child.children?.some((c) => c?.type === "DataSource" || c?.type === "PushSource")) {
       // When a <script> tag and a <DataSource> are siblings, the parser wraps the non-helper
       // siblings in a synthetic Fragment (see transform.ts wrapWithFragment). The parent node
       // will have `scriptCollected` set in exactly this case. We must NOT apply this to
@@ -267,10 +267,10 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
             when: fragmentChild.when,
             debug: fragmentChild.debug,
           });
-        } else if (fragmentChild?.type === "External") {
+        } else if (fragmentChild?.type === "PushSource") {
           loaders!.push({
             uid: fragmentChild.uid!,
-            type: "External",
+            type: "PushSource",
             props: fragmentChild.props,
             events: fragmentChild.events,
             when: fragmentChild.when,
