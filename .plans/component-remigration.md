@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 99 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 98 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 4 |
+| Complete | User approved after audit and verification. | 5 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -369,7 +369,7 @@ it.
 | FormItem | `FormItemReact.tsx`, module SCSS | label behavior, validation | Audit required | label click, layout modes |
 | FormSegment | `FormSegmentReact.tsx`, module SCSS | Form | Audit required | segment layout and validation |
 | Fragment | original implementation file | renderer | Audit required | child rendering |
-| Heading family | `HeadingReact.tsx`, module SCSS | theme text styles | Audit required | H1-H6 shortcut tests |
+| Heading family | `Heading.tsx`, `HeadingReact.tsx`, `Heading.module.scss`, `Heading.defaults.ts`, `Heading.md`, `H1.md` ... `H6.md`, `Heading.spec.ts`, `HeadingShortcuts.spec.ts` | theme text styles, old app/TOC/context helper shims | Complete | User approved Heading, including `H1` ... `H6`, after protected-file audit and verification. Copied Heading protected files from the original. `Heading.tsx` is entry-adapted with rewrite runtime renderers for `Heading`, `H1`, `H2`, `H3`, `H4`, `H5`, and `H6` appended below the copied source; the generic `Heading` runtime renderer includes `H1` ... `H6` metadata as theme contributors so `level`-specific font variables are emitted for generic headings. Copied docs, SCSS, defaults, React implementation, and copied specs are identical under the verifier. Added host compatibility shims for old `AppContext`, `TableOfContentsContext`, `ComponentDefs`, `RendererDefs`, `resolveAndCleanProps`, `MemoizedItem`, and `dComponent` export; `wrapComponent` now provides the legacy `layoutContext` field expected by copied renderers. `node xmlui/scripts/verify-protected-component-copy.mjs Heading` passed; `npm --prefix xmlui run check:metadata` passed. A targeted TypeScript check for `Heading.tsx`, `HeadingReact.tsx`, and their shims no longer reports the VS Code diagnostics for missing old abstraction modules, missing `layoutContext`, or text nodes without `range`; the remaining standalone diagnostic is only the non-project SCSS module declaration. Before the final font-size contributor fix, `npm --workspace xmlui run test:e2e -- xmlui/src/components/Heading/Heading.spec.ts xmlui/src/components/Heading/HeadingShortcuts.spec.ts --workers=1` passed 135/135. After the fix, live DOM verification on `http://127.0.0.1:5173/` measured generic heading sizes H1-H6 as `24px`, `20px`, `18px`, `16px`, `14px`, and `12px`; E2E rerun was blocked by the comparison server occupying the hard-coded test port `127.0.0.1:5173`. |
 | HtmlTags | `HtmlTags.tsx`, module SCSS | renderer | Audit required | native tag output |
 | I18n | original implementation file | locale bundle/app context | Audit required | initial locale and runtime switch |
 | IFrame | `IFrameReact.tsx`, module SCSS | layout props | Audit required | src/title/sizing tests |

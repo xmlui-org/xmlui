@@ -31,6 +31,7 @@ type WrapComponentOptions = {
       lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
       renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
+      layoutContext?: unknown;
     },
   ) => ReactNode;
 };
@@ -92,6 +93,7 @@ export function wrapComponent(
             }
           },
           renderChild: () => runtimeProps.children,
+          layoutContext: undefined,
         });
       }
       return (

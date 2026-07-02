@@ -1,6 +1,7 @@
 export {
   createMetadata,
   dClick,
+  dComponent,
   dContextMenu,
   dGotFocus,
   dLostFocus,

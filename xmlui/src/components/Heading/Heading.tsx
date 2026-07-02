@@ -1,219 +1,682 @@
-import type { CSSProperties } from "react";
+import styles from "./Heading.module.scss";
 
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { extractScssThemeVars } from "../../styling/theme";
-import {
-  createMetadata,
-  dComponent,
-} from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { Heading, normalizeHeadingLevel } from "./HeadingReact";
-import headingStylesSource from "./Heading.module.scss?xmlui-theme-vars";
+import React from "react";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./Heading.defaults";
+import { Heading } from "./HeadingReact";
+import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
+import type { HeadingLevel } from "./abstractions";
+import { dComponent, createMetadata } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { MemoizedItem } from "../container-helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../../styling";
 
 const COMP = "Heading";
 
-const valueDescription = {
-  description: "`Heading` accepts nested text or a `value` prop. `value` wins when both are present.",
+/**
+ * Normalizes the level value to a valid HeadingLevel (h1-h6).
+ * Accepts: 1-6, "1"-"6", "h1"-"h6", "H1"-"H6"
+ * Returns "h1" for any invalid value.
+ */
+function normalizeHeadingLevel(value: any): HeadingLevel {
+  if (value === null || value === undefined) {
+    return "h1";
+  }
+
+  // Handle numeric values (1-6)
+  if (typeof value === "number") {
+    if (value >= 1 && value <= 6) {
+      return `h${value}` as HeadingLevel;
+    }
+    return "h1";
+  }
+
+  // Handle string values
+  if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase();
+
+    // Handle "h1"-"h6" (case insensitive)
+    if (/^h[1-6]$/.test(trimmed)) {
+      return trimmed as HeadingLevel;
+    }
+
+    // Handle "1"-"6"
+    if (/^[1-6]$/.test(trimmed)) {
+      return `h${trimmed}` as HeadingLevel;
+    }
+  }
+
+  // Default fallback
+  return "h1";
+}
+
+const VALUE_DESC = {
+  description:
+    `This property determines the text displayed in the heading. \`${COMP}\` also accepts nested ` +
+    `text instead of specifying the \`value\`. If both \`value\` and a nested text are used, ` +
+    `the \`value\` will be displayed.`,
   valueType: "string" as const,
 };
-
-const sharedHeadingProps = {
-  id: {
-    description: "Defines a component instance identifier used for references and APIs.",
-    valueType: "string" as const,
-  },
-  level: {
-    description: "Accepted by shortcut heading components for compatibility but ignored by fixed-level shortcuts.",
-    valueType: "string" as const,
-  },
-  value: valueDescription,
-  maxLines: {
-    description: "Maximum displayed line count before truncation.",
-    valueType: "number" as const,
-    defaultValue: defaultProps.maxLines,
-  },
-  ellipses: {
-    description: "Displays ellipses when truncated.",
-    valueType: "boolean" as const,
-    defaultValue: defaultProps.ellipses,
-  },
-  preserveLinebreaks: {
-    description: "Preserves line breaks when displaying heading text.",
-    valueType: "boolean" as const,
-    defaultValue: defaultProps.preserveLinebreaks,
-  },
-  omitFromToc: {
-    description: "Excludes this heading from table-of-contents collection.",
-    valueType: "boolean" as const,
-    defaultValue: defaultProps.omitFromToc,
-  },
-  showAnchor: {
-    description: "Displays an anchor link next to the heading.",
-    valueType: "boolean" as const,
-    defaultValue: defaultProps.showAnchor,
-  },
-  anchorId: {
-    description: "Sets the generated anchor id for this heading.",
-    valueType: "string" as const,
-  },
-  anchorTemplate: dComponent("Optional template for the heading anchor."),
-  testId: {
-    description: "Adds a test identifier to the rendered heading.",
-    valueType: "string" as const,
-  },
+const MAX_LINES_DESC = {
+  description:
+    "This optional property determines the maximum number of lines the component can wrap to. " +
+    "If there is not enough space for all of the text, the component wraps the text up to as many " +
+    "lines as specified. If the value is not specified, there is no limit on the number of " +
+    "displayed lines.",
+  valueType: "number" as const,
 };
-
-const apis = {
+const ELLIPSES_DESC = {
+  description:
+    `This property indicates whether ellipses should be displayed (\`true\`) when the heading ` +
+    `text is cropped or not (\`false\`).`,
+  valueType: "boolean" as const,
+  defaultValue: defaultProps.ellipses,
+};
+const PRESERVE_DESC = {
+  description:
+    `This property indicates whether linebreaks should be preserved when ` + `displaying text.`,
+  valueType: "boolean" as const,
+  defaultValue: defaultProps.preserveLinebreaks,
+};
+const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
+const OMIT_FROM_TOC_DESC = {
+  description: "If true, this heading will be excluded from the table of contents.",
+  valueType: "boolean" as const,
+  defaultValue: defaultProps.omitFromToc,
+};
+const SHOW_ANCHOR_DESC = {
+  description:
+    "This property indicates whether an anchor link should be displayed next to the heading. " +
+    "If set to `true`, an anchor link will be displayed on hover next to the heading.",
+  valueType: "boolean" as const,
+  defaultValue: defaultProps.showAnchor,
+};
+const ANCHOR_TEMPLATE_DESC = dComponent(
+  "An optional template to customize the anchor link rendered next to the heading when " +
+    "`showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) " +
+    "and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.",
+);
+const APIS_DESC = {
   scrollIntoView: {
     signature: "scrollIntoView()",
     description: "Scrolls the heading into view.",
   },
   hasOverflow: {
     signature: "hasOverflow()",
-    description: "Returns true when the heading text overflows its bounds.",
+    description:
+      "Returns true when the displayed text overflows the bounds of this heading component.",
   },
 };
-
-const contextVars = {
-  $anchorId: { description: "The generated id of the heading anchor." },
-  $anchorHref: { description: "The href of the heading anchor." },
+// Context vars injected into the anchorTemplate slot (see HeadingNative render).
+const ANCHOR_CONTEXT_VARS = {
+  $anchorId: { description: "The generated id of the current heading anchor." },
+  $anchorHref: { description: "The href (#id) of the current heading anchor." },
 };
 
 export const HeadingMd = createMetadata({
   status: "stable",
-  description: "`Heading` displays hierarchical text headings from H1 to H6.",
-  allowArbitraryProps: true,
+  description:
+    "`Heading` displays hierarchical text headings with semantic importance levels " +
+    "from H1 to H6, following HTML heading standards. It provides text overflow " +
+    "handling, anchor link generation, and integrates with " +
+    "[`TableOfContents`](/docs/reference/components/TableOfContents).",
   props: {
-    ...sharedHeadingProps,
+    value: VALUE_DESC,
     level: {
-      description: "Sets the heading level.",
+      description:
+        "This property sets the visual significance (level) of the heading. " +
+        "Accepts multiple formats: `h1`-`h6`, `H1`-`H6`, or `1`-`6`." +
+        "Invalid values default to `h1`.",
+      availableValues: [
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+      ],
       valueType: "string",
-      availableValues: ["h1", "h2", "h3", "h4", "h5", "h6", "1", "2", "3", "4", "5", "6"],
       defaultValue: defaultProps.level,
     },
+    maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
-  apis,
-  contextVars,
-  themeVars: extractScssThemeVars(headingStylesSource),
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`textColor-${COMP}`]: "$textColor",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
-    [`color-anchor-${COMP}`]: "$color-surface-400",
-    [`gap-anchor-${COMP}`]: "$space-2",
-    [`textDecorationLine-anchor-${COMP}`]: "underline",
+    [`letterSpacing-${COMP} `]: "0",
+    [`color-anchor-${COMP} `]: "$color-surface-400",
+    [`gap-anchor-${COMP} `]: "$space-2",
+    [`textDecorationLine-anchor-${COMP} `]: "underline",
+
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
   },
 });
+
+const H1 = "H1";
+
+type ThemedHeadingProps = React.ComponentProps<typeof Heading> & { className?: string };
+export const ThemedHeading = React.forwardRef<HTMLHeadingElement, ThemedHeadingProps>(
+  function ThemedHeading({ className, ...props }: ThemedHeadingProps, ref) {
+    const themeClass = useComponentThemeClass(HeadingMd);
+    return (
+      <Heading
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const H1Md = createMetadata({
   status: "stable",
-  description: "Represents a heading level 1 text.",
+  description: LEVEL_DESC(1),
   specializedFrom: COMP,
-  allowArbitraryProps: true,
-  props: sharedHeadingProps,
-  apis,
-  contextVars,
-  themeVars: extractScssThemeVars(headingStylesSource),
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "fontSize-H1": "$fontSize-2xl",
-    "lineHeight-H1": "$lineHeight-tight",
-    "marginTop-H1": "0",
-    "marginBottom-H1": "0",
-    "fontSize-H1-markdown": "$fontSize-2xl",
-    "marginTop-H1-markdown": "0",
-    "marginBottom-H1-markdown": "$space-6",
+    [`fontSize-${H1}`]: "$fontSize-2xl",
+    [`lineHeight-${H1}`]: "$lineHeight-tight",
+    [`marginTop-${H1}`]: "0",
+    [`marginBottom-${H1}`]: "0",
+    [`fontSize-${H1}-markdown`]: "$fontSize-2xl",
+    [`marginTop-${H1}-markdown`]: "0",
+    [`marginBottom-${H1}-markdown`]: "$space-6",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
   },
 });
 
-const shortcutMetadata: Record<string, ComponentMetadata> = {
-  H2: createHeadingShortcutMetadata("H2", "Represents a heading level 2 text."),
-  H3: createHeadingShortcutMetadata("H3", "Represents a heading level 3 text."),
-  H4: createHeadingShortcutMetadata("H4", "Represents a heading level 4 text."),
-  H5: createHeadingShortcutMetadata("H5", "Represents a heading level 5 text."),
-  H6: createHeadingShortcutMetadata("H6", "Represents a heading level 6 text."),
+const H2 = "H2";
+export const H2Md = createMetadata({
+  status: "stable",
+  description: LEVEL_DESC(2),
+  specializedFrom: COMP,
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`fontSize-${H2}`]: "$fontSize-xl",
+    [`lineHeight-${H2}`]: "$lineHeight-tight",
+    [`marginTop-${H2}`]: "0",
+    [`marginBottom-${H2}`]: "0",
+    [`fontSize-${H2}-markdown`]: "$fontSize-xl",
+    [`marginTop-${H2}-markdown`]: "$space-10",
+    [`marginBottom-${H2}-markdown`]: "$space-3",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+const H3 = "H3";
+export const H3Md = createMetadata({
+  status: "stable",
+  description: LEVEL_DESC(3),
+  specializedFrom: COMP,
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`fontSize-${H3}`]: "$fontSize-lg",
+    [`lineHeight-${H3}`]: "$lineHeight-tight",
+    [`marginTop-${H3}`]: "0",
+    [`marginBottom-${H3}`]: "0",
+    [`fontSize-${H3}-markdown`]: "$fontSize-lg",
+    [`marginTop-${H3}-markdown`]: "$space-6",
+    [`marginBottom-${H3}-markdown`]: "$space-2",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+const H4 = "H4";
+export const H4Md = createMetadata({
+  status: "stable",
+  description: LEVEL_DESC(4),
+  specializedFrom: COMP,
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`fontSize-${H4}`]: "$fontSize-base",
+    [`lineHeight-${H4}`]: "$lineHeight-tight",
+    [`marginTop-${H4}`]: "0",
+    [`marginBottom-${H4}`]: "0",
+    [`fontSize-${H4}-markdown`]: "$fontSize-base",
+    [`marginTop-${H4}-markdown`]: "$space-5",
+    [`marginBottom-${H4}-markdown`]: "$space-1",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+const H5 = "H5";
+export const H5Md = createMetadata({
+  status: "stable",
+  description: LEVEL_DESC(5),
+  specializedFrom: COMP,
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`fontSize-${H5}`]: "$fontSize-sm",
+    [`lineHeight-${H5}`]: "$lineHeight-tight",
+    [`marginTop-${H5}`]: "0",
+    [`marginBottom-${H5}`]: "0",
+    [`fontSize-${H5}-markdown`]: "$fontSize-sm",
+    [`marginTop-${H5}-markdown`]: "0",
+    [`marginBottom-${H5}-markdown`]: "$space-0",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+const H6 = "H6";
+export const H6Md = createMetadata({
+  status: "stable",
+  description: LEVEL_DESC(6),
+  specializedFrom: COMP,
+  props: {
+    value: VALUE_DESC,
+    maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
+    ellipses: ELLIPSES_DESC,
+    preserveLinebreaks: PRESERVE_DESC,
+    showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
+  },
+  apis: APIS_DESC,
+  contextVars: ANCHOR_CONTEXT_VARS,
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`fontSize-${H6}`]: "$fontSize-xs",
+    [`lineHeight-${H6}`]: "$lineHeight-tight",
+    [`marginTop-${H6}`]: "0",
+    [`marginBottom-${H6}`]: "0",
+    [`fontSize-${H6}-markdown`]: "$fontSize-xs",
+    [`marginTop-${H6}-markdown`]: "0",
+    [`marginBottom-${H6}-markdown`]: "$space-0",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+type HeadingComponentDef = ComponentDef<typeof HeadingMd>;
+
+type RenderHeadingProps = {
+  node: HeadingComponentDef;
+  extractValue: ValueExtractor;
+  classes?: Record<string, string>;
+  level: string;
+  renderChild: RenderChildFn;
+  registerComponentApi?: (api: any) => void;
+  layoutContext?: any;
 };
 
-export const H2Md = shortcutMetadata.H2;
-export const H3Md = shortcutMetadata.H3;
-export const H4Md = shortcutMetadata.H4;
-export const H5Md = shortcutMetadata.H5;
-export const H6Md = shortcutMetadata.H6;
+function renderHeading({
+  node,
+  extractValue,
+  classes,
+  level,
+  renderChild,
+  registerComponentApi,
+  layoutContext,
+}: RenderHeadingProps) {
+  const { maxLines, preserveLinebreaks, ellipses, anchorTemplate } = node.props;
+  const restProps = { ...node.props } as Record<string, any>;
+  delete restProps.level; // Remove level from restProps as it is handled separately
+  delete restProps.maxLines;
+  delete restProps.preserveLinebreaks;
+  delete restProps.ellipses;
+  delete restProps.showAnchor;
+  delete restProps.anchorTemplate;
+  delete restProps.omitFromToc;
+  delete restProps.withLiveRegion;
+  delete restProps.liveRegionMessage;
+  delete restProps.liveRegionPoliteness;
+  const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
 
-export const headingRenderer = createHeadingRenderer("Heading", HeadingMd);
-export const h1Renderer = createHeadingRenderer("H1", H1Md, "h1");
-export const h2Renderer = createHeadingRenderer("H2", H2Md, "h2");
-export const h3Renderer = createHeadingRenderer("H3", H3Md, "h3");
-export const h4Renderer = createHeadingRenderer("H4", H4Md, "h4");
-export const h5Renderer = createHeadingRenderer("H5", H5Md, "h5");
-export const h6Renderer = createHeadingRenderer("H6", H6Md, "h6");
+  // Extract and normalize the level value
+  const extractedLevel = extractValue(level);
+  const normalizedLevel = normalizeHeadingLevel(extractedLevel);
 
-function createHeadingShortcutMetadata(name: string, description: string): ComponentMetadata {
-  return createMetadata({
-    status: "stable",
-    description,
-    specializedFrom: COMP,
-    allowArbitraryProps: true,
-    props: sharedHeadingProps,
-    apis,
-    contextVars,
-    themeVars: extractScssThemeVars(headingStylesSource),
-    defaultThemeVars: {
-      [`fontSize-${name}`]: `$fontSize-${shortcutSize(name)}`,
-      [`lineHeight-${name}`]: "$lineHeight-tight",
-      [`marginTop-${name}`]: "0",
-      [`marginBottom-${name}`]: "0",
-      [`fontSize-${name}-markdown`]: `$fontSize-${shortcutSize(name)}`,
-      [`marginTop-${name}-markdown`]: "0",
-      [`marginBottom-${name}-markdown`]: "$space-6",
-    },
-  });
+  const anchorRenderer = anchorTemplate
+    ? (anchorId: string, anchorHref: string) => (
+        <MemoizedItem
+          node={anchorTemplate as any}
+          contextVars={{ $anchorId: anchorId, $anchorHref: anchorHref }}
+          renderChild={renderChild}
+          layoutContext={layoutContext}
+        />
+      )
+    : undefined;
+
+  return (
+    <Heading
+      uid={node.uid}
+      level={normalizedLevel}
+      maxLines={extractValue.asOptionalNumber(maxLines)}
+      preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
+      ellipses={extractValue.asOptionalBoolean(ellipses, true)}
+      showAnchor={showAnchorValue}
+      classes={classes}
+      omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
+      registerComponentApi={registerComponentApi}
+      anchorRenderer={anchorRenderer}
+      {...resolveAndCleanProps(restProps, extractValue)}
+    >
+      {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
+    </Heading>
+  );
 }
 
-function shortcutSize(name: string): string {
-  return ({
-    H2: "xl",
-    H3: "lg",
-    H4: "md",
-    H5: "sm",
-    H6: "xs",
-  } as Record<string, string>)[name] ?? "md";
-}
+export const headingComponentRenderer = wrapComponent(COMP, Heading, HeadingMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as HeadingComponentDef,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: context.node.props.level,
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
 
-function createHeadingRenderer(name: string, metadata: ComponentMetadata, fixedLevel?: string) {
-  return wrapComponent({
+export const h1ComponentRenderer = wrapComponent(H1, Heading, H1Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h1",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const h2ComponentRenderer = wrapComponent(H2, Heading, H2Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h2",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const h3ComponentRenderer = wrapComponent(H3, Heading, H3Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h3",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const h4ComponentRenderer = wrapComponent(H4, Heading, H4Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h4",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const h5ComponentRenderer = wrapComponent(H5, Heading, H5Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h5",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const h6ComponentRenderer = wrapComponent(H6, Heading, H6Md, {
+  exposeRegisterApi: true,
+  customRender: (_props, context) =>
+    renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: "h6",
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
+    }),
+});
+
+export const headingRenderer = createRuntimeHeadingRenderer(COMP, HeadingMd, undefined, [
+  H1Md,
+  H2Md,
+  H3Md,
+  H4Md,
+  H5Md,
+  H6Md,
+]);
+export const h1Renderer = createRuntimeHeadingRenderer(H1, H1Md, "h1");
+export const h2Renderer = createRuntimeHeadingRenderer(H2, H2Md, "h2");
+export const h3Renderer = createRuntimeHeadingRenderer(H3, H3Md, "h3");
+export const h4Renderer = createRuntimeHeadingRenderer(H4, H4Md, "h4");
+export const h5Renderer = createRuntimeHeadingRenderer(H5, H5Md, "h5");
+export const h6Renderer = createRuntimeHeadingRenderer(H6, H6Md, "h6");
+
+function createRuntimeHeadingRenderer(
+  name: string,
+  metadata: ComponentMetadata,
+  fixedLevel?: string,
+  themeContributors: readonly ComponentMetadata[] = fixedLevel ? [HeadingMd] : [],
+) {
+  return wrapRuntimeComponent({
     name,
     metadata,
-    themeContributors: fixedLevel ? [HeadingMd] : [],
+    themeContributors,
     renderer: ({ adapter }) => {
-      const rootAttrs = adapter.rootAttrs();
-      const hasValue = Object.prototype.hasOwnProperty.call(adapter.node.props, "value");
-      const value = adapter.prop("value");
-      const children = hasValue ? displayText(value) : adapter.renderChildren();
+      const {
+        className,
+        style,
+        id: _id,
+        ...rootAttrs
+      } = adapter.rootAttrs() as React.HTMLAttributes<HTMLHeadingElement>;
+      const anchorTemplate = adapter.node.children.find(
+        (child) => child.kind === "element" &&
+          child.type === "property" &&
+          child.props.name === "anchorTemplate",
+      );
+      const anchorRenderer = anchorTemplate
+        ? (anchorId: string, anchorHref: string) =>
+            adapter.renderTemplate("anchorTemplate", [
+              {
+                kind: "text",
+                value: anchorHref,
+                range: adapter.node.range,
+              },
+            ])
+        : undefined;
       const level = fixedLevel ?? normalizeHeadingLevel(adapter.prop("level", defaultProps.level));
+      const value = adapter.prop("value");
+      const valueText = displayText(value);
 
       return (
         <Heading
+          {...runtimeArbitraryAttrs(adapter.props, metadata)}
           {...rootAttrs}
-          id={adapter.stringProp("id")}
-          anchorId={adapter.stringProp("anchorId")}
+          uid={adapter.stringProp("id")}
           level={level}
           maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
           preserveLinebreaks={adapter.booleanProp("preserveLinebreaks", defaultProps.preserveLinebreaks)}
           ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
+          showAnchor={
+            Object.prototype.hasOwnProperty.call(adapter.props, "showAnchor")
+              ? adapter.booleanProp("showAnchor", defaultProps.showAnchor)
+              : undefined
+          }
           omitFromToc={adapter.booleanProp("omitFromToc", defaultProps.omitFromToc)}
-          showAnchor={adapter.booleanProp("showAnchor", defaultProps.showAnchor)}
-          style={rootAttrs.style as CSSProperties | undefined}
-          registerApi={adapter.registerApi}
+          anchorRenderer={anchorRenderer}
+          registerComponentApi={adapter.registerApi}
+          classes={className ? { [COMPONENT_PART_KEY]: className as string } : undefined}
+          style={style as React.CSSProperties | undefined}
         >
-          {children}
+          {valueText || adapter.renderChildren()}
         </Heading>
       );
     },
   });
 }
 
-function displayText(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
+function displayText(value: unknown): string | undefined {
+  return value === undefined || value === null ? undefined : String(value);
+}
+
+function runtimeArbitraryAttrs(
+  props: Record<string, unknown>,
+  metadata: ComponentMetadata,
+): Record<string, unknown> {
+  const knownProps = new Set([
+    ...Object.keys(metadata.props ?? {}),
+    ...supportedLayoutPropNames,
+    ...supportedResponsiveLayoutPropNames,
+    "id",
+    "testId",
+    "when",
+    "tooltip",
+    "tooltipMarkdown",
+    "tooltipOptions",
+  ]);
+
+  return Object.fromEntries(
+    Object.entries(props).filter(([name, value]) =>
+      !knownProps.has(name) &&
+      value !== undefined &&
+      value !== null &&
+      typeof value !== "object" &&
+      typeof value !== "function" &&
+      !name.startsWith("on"),
+    ),
+  );
 }
