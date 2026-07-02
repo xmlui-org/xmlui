@@ -37,7 +37,7 @@ re-evaluates bindings inside the component's subtree.
   </Form>
 
   <method name="setValue">
-    message = $params[0];
+    (v) => message = v
   </method>
 </Component>
 ```
@@ -77,7 +77,11 @@ state.
 field — clear it after a turn, prefill a template, append a voice transcript —
 expose a `<method name="setValue">` and call `composer.setValue(...)` by the
 component's `id` ([Expose a method from a component](/docs/howto/expose-a-method-from-a-component)).
-The parent reaches in without holding the variable.
+Write the method body as an arrow function so it receives the argument —
+`(v) => message = v`. A statement body like `message = $params[0]` does *not*
+work: `$param` / `$params` are not bound inside a user-defined component's method
+body (they belong to built-in component methods such as `APICall.execute` and
+`ModalDialog.open`). The parent reaches in without holding the variable.
 
 **What stays outside**: Pure pipeline state that the *parent* owns — an
 `awaiting` flag, a `submittedKind` marker, the dispatch that routes the message —
