@@ -551,6 +551,16 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Submit a form from a custom button or the Enter key"
+                            to="/docs/howto/submit-a-form-from-a-custom-button"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Control a TextArea from code"
+                            to="/docs/howto/control-a-textarea-from-code"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Use built-in form validation"
                             to="/docs/howto/use-built-in-form-validation"
                         />
@@ -775,6 +785,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Keep per-item state in an Items or List loop"
+                            to="/docs/howto/keep-per-item-state-in-a-loop"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Display an empty-state illustration"
                             to="/docs/howto/display-an-empty-state-illustration"
                         />
@@ -868,6 +883,21 @@
                             icon="article"
                             label="Make a sticky header in a scroll area"
                             to="/docs/howto/make-a-sticky-header-in-a-scroll-area"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Fill the viewport with one internal scroll region"
+                            to="/docs/howto/build-a-full-height-scroll-layout"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Keep a list scrolled to the newest item"
+                            to="/docs/howto/follow-a-list-to-the-bottom"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Stop a width=* element from collapsing"
+                            to="/docs/howto/keep-a-star-sized-element-from-collapsing"
                         />
                         <NavLink
                             icon="article"
@@ -2267,6 +2297,16 @@
                     content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}"
                 />
             </Page>
+            <Page url="/docs/howto/submit-a-form-from-a-custom-button">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/submit-a-form-from-a-custom-button.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/control-a-textarea-from-code">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/control-a-textarea-from-code.md']}"
+                />
+            </Page>
 
             <!-- New how-to articles: Data Loading & APIs -->
             <Page url="/docs/howto/poll-an-api-at-regular-intervals">
@@ -2370,6 +2410,11 @@
                     content="{appGlobals.docsContent['pages/howto/iterate-without-a-container-element.md']}"
                 />
             </Page>
+            <Page url="/docs/howto/keep-per-item-state-in-a-loop">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-per-item-state-in-a-loop.md']}"
+                />
+            </Page>
             <Page url="/docs/howto/display-an-empty-state-illustration">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/display-an-empty-state-illustration.md']}"
@@ -2447,6 +2492,21 @@
             <Page url="/docs/howto/make-a-sticky-header-in-a-scroll-area">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/make-a-sticky-header-in-a-scroll-area.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/build-a-full-height-scroll-layout">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/build-a-full-height-scroll-layout.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/follow-a-list-to-the-bottom">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/follow-a-list-to-the-bottom.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/keep-a-star-sized-element-from-collapsing">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-a-star-sized-element-from-collapsing.md']}"
                 />
             </Page>
             <Page url="/docs/howto/build-a-responsive-card-grid">
