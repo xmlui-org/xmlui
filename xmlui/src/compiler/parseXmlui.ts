@@ -82,12 +82,6 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     };
   }
 
-  if (transformedRoot.type !== "App") {
-    throw new Error(
-      `Expected <App> or <Component> as the document root, got <${transformedRoot.type}>.`,
-    );
-  }
-
   analyzeElementScripts(transformedRoot, {
     sourceId,
     allowImplicitGlobals: false,

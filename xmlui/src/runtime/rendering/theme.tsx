@@ -1,4 +1,13 @@
-import React, { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useInsertionEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
@@ -10,6 +19,12 @@ import {
   type ThemeTone,
 } from "../../styling";
 
+type StyleRegistryEntry = {
+  className: string;
+  hash: string;
+  css: string;
+};
+
 export type ThemeRuntimeContext = {
   variables: Record<string, unknown>;
   tone: ThemeTone;
@@ -17,11 +32,21 @@ export type ThemeRuntimeContext = {
 };
 
 const noopSetTone = () => undefined;
+const StyleRegistryContext = createContext<StyleRegistry | undefined>(undefined);
 const ThemeContext = createContext<ThemeRuntimeContext>({
   variables: defaultThemeVariables,
   tone: "light",
   setTone: noopSetTone,
 });
+
+export function StyleProvider({ children }: { children: ReactNode }) {
+  const [registry] = useState(() => new StyleRegistry());
+  return (
+    <StyleRegistryContext.Provider value={registry}>
+      {children}
+    </StyleRegistryContext.Provider>
+  );
+}
 
 export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { children: ReactNode; tone?: ThemeTone }) {
   const [tone, setTone] = useState<ThemeTone>(initialTone);
@@ -36,6 +61,11 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     () => ({ variables, tone, setTone }),
     [tone, variables],
   );
+  const rootClassName = useDynamicStyle(
+    themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    "themes",
+  );
+  useRootStyleClass(rootClassName);
   return (
     <ThemeContext.Provider value={value}>
       {children}
@@ -58,9 +88,18 @@ export function useComponentThemeClass(
   variant?: string,
 ) {
   const themeVariables = useThemeVariables();
-  return useMemo(
+  const themeClass = useMemo(
     () => createComponentThemeClass(componentName, metadata, themeVariables, contributors, variant),
     [componentName, metadata, themeVariables, contributors, variant],
+  );
+  const generatedClassName = useDynamicStyle(themeClass.style, "themes");
+  return useMemo(
+    () => ({
+      ...themeClass,
+      className: [themeClass.className, generatedClassName].filter(Boolean).join(" "),
+      style: {},
+    }),
+    [generatedClassName, themeClass],
   );
 }
 
@@ -84,6 +123,7 @@ export function ThemeScope({
     () => themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
     [variables],
   );
+  const themeClassName = useDynamicStyle(cssVariables, "themes");
   const value = useMemo<ThemeRuntimeContext>(
     () => ({
       variables: nextVariables,
@@ -98,10 +138,102 @@ export function ThemeScope({
         data-xmlui-component="Theme"
         data-xmlui-part="root"
         data-xmlui-tone={tone ?? parent.tone}
-        style={{ ...cssVariables, ...style }}
+        className={themeClassName}
+        style={style}
       >
         {children}
       </div>
     </ThemeContext.Provider>
   );
+}
+
+function useRootStyleClass(className: string | undefined): void {
+  useEffect(() => {
+    if (!className || typeof document === "undefined") {
+      return;
+    }
+    document.documentElement.classList.add(className);
+    return () => {
+      document.documentElement.classList.remove(className);
+    };
+  }, [className]);
+}
+
+function useDynamicStyle(styles: CSSProperties | undefined, layer = "dynamic"): string | undefined {
+  const registry = useContext(StyleRegistryContext);
+  const entry = useMemo(() => {
+    if (!registry || !styles || Object.keys(styles).length === 0) {
+      return undefined;
+    }
+    return registry.register(styles, layer);
+  }, [layer, registry, styles]);
+
+  useInsertionEffect(() => {
+    if (!entry || typeof document === "undefined") {
+      return;
+    }
+    if (document.head.querySelector(`style[data-xmlui-style-hash="${entry.hash}"]`)) {
+      return;
+    }
+    const style = document.createElement("style");
+    style.setAttribute("data-xmlui-style-hash", entry.hash);
+    style.textContent = `@layer ${layer} {${entry.css}}`;
+    document.head.appendChild(style);
+  }, [entry, layer]);
+
+  return entry?.className;
+}
+
+class StyleRegistry {
+  private readonly cache = new Map<string, StyleRegistryEntry>();
+
+  register(styles: CSSProperties, layer: string): StyleRegistryEntry {
+    const key = stableJSONStringify({ layer, styles });
+    const hash = hashString(key);
+    const cached = this.cache.get(hash);
+    if (cached) {
+      return cached;
+    }
+    const className = `xmlui-css-${hash}`;
+    const css = generateCss(`.${className}`, styles);
+    const entry = { className, hash, css };
+    this.cache.set(hash, entry);
+    return entry;
+  }
+}
+
+function generateCss(selector: string, styles: CSSProperties): string {
+  const declarations = Object.entries(styles)
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .map(([name, value]) => `${toKebabCase(name)}:${String(value)};`)
+    .join("");
+  return declarations ? `${selector}{${declarations}}` : "";
+}
+
+function toKebabCase(value: string): string {
+  return value.startsWith("--")
+    ? value
+    : value.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+function stableJSONStringify(value: unknown): string {
+  if (!value || typeof value !== "object") {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(stableJSONStringify).join(",")}]`;
+  }
+  return `{${Object.keys(value as Record<string, unknown>)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${stableJSONStringify((value as Record<string, unknown>)[key])}`)
+    .join(",")}}`;
+}
+
+function hashString(value: string): string {
+  let hash = 5381;
+  let index = value.length;
+  while (index) {
+    hash = (hash * 33) ^ value.charCodeAt(--index);
+  }
+  return (hash >>> 0).toString(36);
 }

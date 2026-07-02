@@ -1,66 +1,36 @@
-import {
-  forwardRef,
-  memo,
-  type CSSProperties,
-  type ForwardedRef,
-  type HTMLAttributes,
-} from "react";
+import type { ForwardedRef } from "react";
+import { forwardRef, memo } from "react";
+import classnames from "classnames";
+
+import styles from "./ProgressBar.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  value: number;
+  classes?: Record<string, string>;
+}
 
 import { defaultProps } from "./ProgressBar.defaults";
-import styles from "./ProgressBar.module.scss";
-
-export type ProgressBarProps = HTMLAttributes<HTMLDivElement> & {
-  value?: unknown;
-  className?: string;
-  style?: CSSProperties;
-};
 
 export const ProgressBar = memo(forwardRef(function ProgressBar(
-  {
-    value = defaultProps.value,
-    className,
-    style,
-    ...rest
-  }: ProgressBarProps,
+  { value = defaultProps.value, style, className, classes, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const normalizedValue = normalizeProgressValue(value);
-  const barClassName = [
-    styles.bar,
-    normalizedValue === 1 ? styles.complete : undefined,
-  ].filter(Boolean).join(" ");
-
   return (
     <div
       {...rest}
-      className={[styles.wrapper, className].filter(Boolean).join(" ")}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className)}
       style={style}
       ref={forwardedRef}
     >
       <div
         role="progressbar"
-        aria-valuenow={normalizedValue * 100}
+        aria-valuenow={value * 100}
         aria-valuemin={0}
         aria-valuemax={100}
-        style={{ width: `${normalizedValue * 100}%` }}
-        className={barClassName}
+        style={{ width: `${value * 100}%` }}
+        className={classnames(styles.bar, { [styles.complete]: value === 1 })}
       />
     </div>
   );
 }));
-
-function normalizeProgressValue(value: unknown): number {
-  const numeric = typeof value === "number"
-    ? value
-    : typeof value === "string" && value.trim() !== ""
-      ? Number(value)
-      : value === true
-        ? 1
-        : value === false || value === null || value === undefined || value === ""
-          ? 0
-          : Number(value);
-  if (!Number.isFinite(numeric)) {
-    return defaultProps.value;
-  }
-  return Math.max(0, Math.min(1, numeric));
-}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseXmlui } from "../../../src/compiler/parseXmlui";
+import { parseRawXmlui } from "../../../src/compiler/rawXmlui";
 
 describe("parser compatibility hardening", () => {
   it("ignores comments and decodes XML entities in attributes", () => {
@@ -15,10 +16,15 @@ describe("parser compatibility hardening", () => {
     });
   });
 
-  it("preserves old root validation errors", () => {
-    expect(() => parseXmlui(`<Button />`)).toThrow(
-      "Expected <App> or <Component> as the document root, got <Button>.",
-    );
+  it("accepts any non-Component root as an app document", () => {
+    const document = parseXmlui(`<Button />`);
+
+    expect(document.kind).toBe("app");
+    expect(document.root.type).toBe("Button");
+    expect(parseRawXmlui(`<VStack />`)).toMatchObject({
+      kind: "app",
+      root: { type: "VStack" },
+    });
     expect(() => parseXmlui(`<Component />`)).toThrow("<Component> requires a name attribute.");
   });
 

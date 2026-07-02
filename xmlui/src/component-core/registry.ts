@@ -37,7 +37,7 @@ import { linkRenderer } from "../components/Link/Link.renderer";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
-import { progressBarRenderer } from "../components/ProgressBar/ProgressBar.renderer";
+import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";

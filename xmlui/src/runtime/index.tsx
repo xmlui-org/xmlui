@@ -12,7 +12,7 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider } from "./appContext";
-import { XmluiThemeRoot } from "./rendering/theme";
+import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
@@ -245,14 +245,16 @@ export function XmluiRoot({
   );
 
   return (
-    <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
-      <XmluiThemeRoot tone={defaultTone}>
-        <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-        {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
-        <GlobalLiveRegion />
-        <ToastHost service={toastRef.current} />
-      </XmluiThemeRoot>
-    </XmluiAppContextProvider>
+    <StyleProvider>
+      <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
+        <XmluiThemeRoot tone={defaultTone}>
+          <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+          {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+          <GlobalLiveRegion />
+          <ToastHost service={toastRef.current} />
+        </XmluiThemeRoot>
+      </XmluiAppContextProvider>
+    </StyleProvider>
   );
 }
 

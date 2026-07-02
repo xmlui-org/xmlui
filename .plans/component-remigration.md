@@ -102,6 +102,49 @@ source files must remain unchanged except for import/export path rewrites. If a
 metadata mismatch is discovered, fix generation, registration, or host
 infrastructure rather than editing copied component metadata.
 
+For components whose original folder has a main `<Component>.tsx` file, keep
+component metadata and the rewrite renderer registration in that same
+`<Component>.tsx` file. Do not create separate `<Component>.metadata.ts` or
+`<Component>.renderer.tsx` sidecar files for newly migrated components. The
+copied original metadata block and original-style component renderer export in
+`<Component>.tsx` must remain unchanged except for import/export path rewrites;
+append rewrite-specific renderer adapter code in the same file below the copied
+source.
+
+### Component Registration Pattern
+
+Prefer the original XMLUI registry/provider shape from
+`/Users/dotneteer/source/xmlui/xmlui/src/components/ComponentProvider.tsx` when
+migrating registration code:
+
+- component folders should export their renderer definitions from the component
+  entry file, using the original-style `*ComponentRenderer` export where the
+  original has one and a rewrite runtime renderer export from the same file;
+- central registration should be a declarative list or table of renderer
+  definitions that the registry iterates over, not a growing body of
+  per-component conditional code;
+- registration should stay separate from migration inventory, source-path
+  reporting, runnable-test lists, and compatibility bookkeeping;
+- when a component has related aliases or family members, describe that once in
+  a small registry entry instead of scattering repeated booleans and nested
+  conditionals through `component-core/registry.ts`;
+- do not add new `<Component>.metadata.ts` or `<Component>.renderer.tsx`
+  sidecars for newly migrated components unless a future plan explicitly
+  documents why the original provider-style entry cannot work.
+
+The current `xmlui/src/component-core/registry.ts` still mixes runtime
+registration with transfer reporting. Refactor it toward the original pattern in
+stages: first keep new component migrations on the provider-style path, then
+move transfer inventory/reporting into separate data helpers before attempting a
+large registry rewrite.
+
+Registry migration has started. Runtime renderer registration now has a
+dedicated provider-style entry module at
+`xmlui/src/component-core/runtimeRegistry.ts`, and
+`xmlui/src/component-core/index.ts` exports `builtInComponentRenderers` from
+that module. Keep `registry.ts` temporarily as the migration inventory/reporting
+source until its transfer bookkeeping is moved into smaller audit/data helpers.
+
 Copied component-folder documentation files must be copied intact. If new
 rewrite-specific documentation is needed, add a separate note outside the copied
 component documentation instead of changing the original `*.md` file.
@@ -137,7 +180,7 @@ The helper should:
 - normalize import/export path lines only;
 - fail on any remaining diff;
 - print each protected file as `identical`, `import-only`, `missing`, or
-  `drifted`;
+  `entry-adapted`, `missing`, or `drifted`;
 - exit non-zero for `missing` or `drifted`;
 - support a manifest for helper files whose names do not follow `*React.tsx`.
 
@@ -154,16 +197,23 @@ For each component:
    files, component-folder `*.md` documentation, and component-folder
    `*.spec.ts` E2E tests when present.
 3. Rewrite imports only in protected files.
-4. Implement missing host contracts in adapters, shared runtime, metadata, or
+4. Keep each component's metadata and rewrite renderer registration together in
+   the main `<Component>.tsx` file. Do not split them into
+   `<Component>.metadata.ts` or `<Component>.renderer.tsx`; append rewrite
+   adapter code below the copied original source when host adaptation is needed.
+5. Register migrated components using the original provider-style pattern: add
+   renderer definitions to declarative registry tables/lists where possible,
+   and avoid adding new per-component conditionals to central registry code.
+6. Implement missing host contracts in adapters, shared runtime, metadata, or
    shims.
-5. Port original tests with only import/export or harness-entry changes,
+7. Port original tests with only import/export or harness-entry changes,
    preserving test cases, assertions, fixtures, and test names literally.
-6. Run the protected-file drift audit.
-7. Run all copied component-folder E2E tests, any added component-specific E2E
+8. Run the protected-file drift audit.
+9. Run all copied component-folder E2E tests, any added component-specific E2E
    tests, focused tests, and metadata checks.
-8. Compare old and new behavior only after the audit is clean.
-9. Ask the user to approve the component before marking it complete.
-10. Update both the detailed component table and the summary table.
+10. Compare old and new behavior only after the audit is clean.
+11. Ask the user to approve the component before marking it complete.
+12. Update both the detailed component table and the summary table.
 
 ## Failure Rules
 
@@ -209,6 +259,22 @@ For style-sensitive work, use local dev servers to query DOM and computed styles
 in both old and new apps. Record exact measured properties when the issue is
 subtle, such as padding, gap, font, line-height, border, outline, and box size.
 
+### Theme Style Emission
+
+Follow the original XMLUI theme pattern: theme variables must be emitted through
+generated CSS classes and injected stylesheet rules, not through broad inline
+`style` attributes on component DOM nodes. Runtime components may still use
+inline styles for layout props or genuinely dynamic values, but component/theme
+CSS variables should be carried by generated classes.
+
+The app runtime must provide the implicit root theme for every XMLUI app root,
+not only when the root markup component is `<App>`. A document rooted at
+`<VStack>`, `<HStack>`, or any other component except `<Component>` must still
+receive the same root theme variables. The current rewrite does this by wrapping
+the rendered app in `XmluiThemeRoot`, placing a generated root theme class on
+`document.documentElement`, and using generated theme classes for component and
+scoped `<Theme>` variables.
+
 ## Migration Order
 
 1. Safety infrastructure: protected-file verifier, manifest, and test helper
@@ -249,9 +315,9 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 106 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 105 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 0 |
+| In review | Audit and tests passed; waiting for user approval. | 1 |
 | Complete | User approved after audit and verification. | 0 |
 
 The `Audit required` count is a starting estimate from the current rewrite
@@ -335,7 +401,7 @@ it.
 | Pagination | `PaginationReact.tsx`, module SCSS | Button/Icon | Audit required | page navigation and styles |
 | Part / Slot | original implementation files | component composition | Audit required | slot/part rendering |
 | ProfileMenu | `ProfileMenuReact.tsx`, module SCSS | App shell, menu | Audit required | profile menu visibility |
-| ProgressBar | `ProgressBarReact.tsx`, module SCSS | theme variants | Audit required | value/indeterminate styles |
+| ProgressBar | `ProgressBar.tsx`, `ProgressBarReact.tsx`, `ProgressBar.module.scss`, `ProgressBar.defaults.ts`, `ProgressBar.md`, `ProgressBar.spec.ts` | theme variants, single-file metadata/renderer entry | In review | `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar` passed (`ProgressBar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical); `npm --prefix xmlui run check:metadata` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts --workers=1` passed 22/22. Waiting for user approval. |
 | QRCode | `QRCodeReact.tsx`, module SCSS | QR library/runtime | Audit required | generated code output |
 | Queue | original implementation file | async orchestration | Audit required | queue lifecycle tests |
 | RadioGroup | `RadioGroupReact.tsx`, module SCSS | Option, FormItem | Audit required | selection and keyboard |
@@ -401,6 +467,11 @@ completed only after APICall/DataSource behavior is available.
 - Theme variables should be emitted through generated CSS or scoped theme
   infrastructure. Component visuals should continue to come from CSS classes and
   CSS modules.
+- The implicit app theme is a runtime host contract, not an `App` component
+  behavior. Non-`App` roots must receive the root theme class too. In the
+  rewrite, `XmluiThemeRoot` applies generated root theme CSS to `html`, and
+  component/scoped `Theme` variables are emitted as generated stylesheet rules
+  plus classes rather than broad inline CSS variable maps.
 - Visual tests must assert the measured property that failed. A screenshot alone
   is useful for discovery, but E2E tests should query DOM/computed style for
   padding, gap, font, border, outline, size, and scroll parent when those are
@@ -411,6 +482,54 @@ completed only after APICall/DataSource behavior is available.
   input/menu helpers.
 - Portals, focus outlines, scroll parents, and star sizing are recurring app
   shell risks. Verify them with DOM queries in old and new local dev servers.
+
+## Current Handoff Notes
+
+- Protected-copy verifier exists at
+  `xmlui/scripts/verify-protected-component-copy.mjs`. It currently audits
+  copied React files, helper TSX files named in a future manifest,
+  `*.module.scss`, non-module SCSS, `*.defaults.ts`, component-folder `*.md`,
+  component-folder `*.spec.ts`, and `<Component>.tsx` metadata/renderer source.
+- ProgressBar is in `In review`, not `Complete`. Mark it `Complete` only after
+  user approval, and update the summary counts at the same time.
+- ProgressBar copied React, SCSS, defaults, docs, and E2E files are
+  byte-identical to the original. The main `ProgressBar.tsx` keeps the copied
+  original metadata and original-style renderer, with rewrite renderer adapter
+  code appended in the same file. Do not recreate `ProgressBar.metadata.ts` or
+  `ProgressBar.renderer.tsx`.
+- Registry migration has started, but is intentionally partial:
+  `xmlui/src/component-core/runtimeRegistry.ts` owns provider-style runtime
+  renderer registration and `component-core/index.ts` exports
+  `builtInComponentRenderers` from it. `registry.ts` still owns transfer
+  inventory/reporting and can be deleted only after that bookkeeping is split
+  into focused audit/data modules.
+- After the initial registry extraction, these checks passed:
+  `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar`,
+  `npm --prefix xmlui run check:metadata`, and
+  `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts`
+  (21/21). `npm --workspace xmlui run build` still stops at the pre-existing
+  `src/compiler/compileXmluiModule.ts(235,31)` `XmluiModuleIr.document` type
+  error.
+- Theme/style host contract update: `xmlui/src/runtime/rendering/theme.tsx`
+  now contains the rewrite's small generated-style registry. `StyleProvider`
+  injects generated stylesheet rules, `XmluiThemeRoot` applies the implicit
+  root theme class to `html` for any app root, `ThemeScope` uses a generated
+  class for scoped theme variables, and `useComponentThemeClass` returns
+  generated classes instead of broad inline CSS variable maps. Manual probe of
+  the sample `<VStack>` root at `http://127.0.0.1:5173/` showed five rendered
+  ProgressBars, a generated `xmlui-css-*` class on `html`, generated style
+  tags, and component inline style reduced to layout-only `box-sizing`.
+- ProgressBar completed-state color regression: the original app resolves
+  `$color-success-500` to `rgb(144, 226, 157)` through its transformed default
+  success palette, while the browser-native interpretation of the old HSL token
+  produced `rgb(59, 204, 82)` in the rewrite. The rewrite success palette in
+  `xmlui/src/styling/theme.ts` is now pinned to the original transformed tones,
+  and `xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts` asserts the
+  completed default color. Live sample probe of the exact `<VStack>` markup
+  reported the last two bars as `rgb(144, 226, 157)`.
+- `xmlui/src/vite-plugin/xmluiPlugin.ts` imports `XmluiComponentContract` from
+  the leaf `compiler/contracts/types` module so Vite config bundling does not
+  eagerly walk built-in component metadata and copied SCSS.
 
 ## New Session Bootstrap
 

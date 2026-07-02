@@ -1,0 +1,9 @@
+<Theme backgroundColor-ProgressBar="blue">
+<VStack>
+  <ProgressBar />
+  <ProgressBar value="0.2"/>
+  <ProgressBar value="0.6"/>
+  <ProgressBar value="1"/>
+  <ProgressBar value="1.2"/>
+</VStack>
+</Theme>  

@@ -17,15 +17,14 @@ import {
   useStringProp,
   useThemeOverrideProps,
 } from "./props";
-import { ThemeScope, useThemeVariables } from "./theme";
-import { themeVariablesToCssProperties } from "../../styling";
+import { ThemeScope } from "./theme";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
 export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
   App: ({ context, node, scope }) => (
     <div
       {...partAttrs("App")}
-      style={{ ...themeVariablesToCssProperties(useThemeVariables()), ...useLayoutStyle(node, scope) }}
+      style={useLayoutStyle(node, scope)}
     >
       {context.renderChildren(node.children, scope)}
     </div>
