@@ -158,6 +158,10 @@ export const TextAreaMd = createMetadata({
       signature: "get value(): string | undefined",
     },
     setValue: dSetValueApi(),
+    insert: {
+      description: `This method inserts the specified text at the current cursor position of the \`${COMP}\` component, leaving the caret just after the inserted text.`,
+      signature: "insert(text: string): void",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

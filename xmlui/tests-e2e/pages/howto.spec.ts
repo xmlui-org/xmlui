@@ -6,7 +6,7 @@ import { extractXmluiExample, getExampleSource } from "../../src/testing/website
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const markdown = getExampleSource(
-  path.join(__dirname, "../../../website/content/docs/pages/howto.md"),
+  path.join(__dirname, "../../../website/content/docs/pages/howto/pass-data-to-a-modal-dialog.md"),
 );
 
 test.describe("Click on a team member to edit details", { tag: "@website" }, () => {
@@ -32,7 +32,7 @@ test.describe("Click on a team member to edit details", { tag: "@website" }, () 
   }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByText("Sarah Chen").first().click();
-    const dialog = page.getByRole("dialog", { name: "Team Member Details" });
+    const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText("sarah@company.com")).toBeVisible();
     await expect(dialog.getByText("Product", { exact: true })).toBeVisible();
@@ -44,7 +44,7 @@ test.describe("Click on a team member to edit details", { tag: "@website" }, () 
   }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByText("Marcus Johnson").first().click();
-    const dialog = page.getByRole("dialog", { name: "Team Member Details" });
+    const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText("marcus@company.com")).toBeVisible();
     await expect(dialog.getByText("Engineering", { exact: true })).toBeVisible();

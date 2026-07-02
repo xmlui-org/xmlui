@@ -19169,6 +19169,10 @@ export default {
       },
       "setValue": {
         "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+      },
+      "insert": {
+        "description": "This method inserts the specified text at the current cursor position of the `TextArea` component, leaving the caret just after the inserted text.",
+        "signature": "insert(text: string): void"
       }
     },
     "themeVars": {
