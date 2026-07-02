@@ -23,71 +23,77 @@ re-evaluates bindings inside the component's subtree.
     <Text>• {$item}</Text>
   </List>
 </App>
----comp display /var.message/ /emitEvent/ /method name/ MessageComposer
-<Component name="MessageComposer" var.message="{''}">
-  <Form
-    data="{{ message }}"
-    onSubmit="(data) => { emitEvent('send', data.message); message = ''; }"
-  >
-    <TextArea
-      bindTo="message"
-      autoSize="true"
-      placeholder="Type a message, press Enter to send"
-    />
-  </Form>
+---comp display /var.draft/ /emitEvent/ /method name/ MessageComposer
+<Component name="MessageComposer" var.draft="{''}">
+  <TextArea
+    id="box"
+    autoSize="true"
+    placeholder="Type a message, then Send"
+    onDidChange="(v) => draft = v"
+  />
+  <Text variant="caption">{draft.length} characters</Text>
+  <Button
+    label="Send"
+    onClick="() => { emitEvent('send', box.value); box.setValue(''); }"
+  />
 
   <method name="setValue">
-    (v) => message = v
+    (v) => box.setValue(v)
   </method>
 </Component>
 ```
 
-The `message` variable — the one that changes on every keystroke — lives inside
-`MessageComposer`. Typing re-evaluates only the composer's own bindings. The
+The `draft` variable — reassigned on every keystroke by the TextArea's
+`onDidChange` — lives inside `MessageComposer`, and the `{draft.length} characters`
+counter is the only binding that re-evaluates as you type. Both stay in the
+component's subtree, so a keystroke never re-runs anything in App scope. The
 parent still drives the pipeline: it receives finished messages through the
-`send` event and writes into the field through the exposed `setValue` method,
-without ever putting `message` in App scope.
+`send` event and prefills the field through the exposed `setValue` method,
+without ever putting the input's state in App scope.
 
 ## Key points
 
 **The bound variable belongs inside the component**: Declare
-`var.message="{''}"` on the `<Component>`, not on the `<App>` or an outer
-container. Subtree variables don't cross a user-defined-component boundary
-([Scoping](/docs/guides/scoping)) — that isolation is exactly what bounds the
-keystroke re-evaluation. The nesting guide states the guarantee directly:
-"Variables and IDs declared in `TaskBoard` are invisible inside `TaskColumn` or
-`TaskCard`" ([Compose components with nesting](/docs/howto/compose-components-with-nesting)).
+`var.draft="{''}"` on the `<Component>`, not on the `<App>` or an outer
+container. The `{draft.length}` binding — and any other per-keystroke binding you
+add — then re-evaluates only within the component. Subtree variables don't cross
+a user-defined-component boundary ([Scoping](/docs/guides/scoping)) — that
+isolation is exactly what bounds the keystroke re-evaluation. The nesting guide
+states the guarantee directly: "Variables and IDs declared in `TaskBoard` are
+invisible inside `TaskColumn` or `TaskCard`"
+([Compose components with nesting](/docs/howto/compose-components-with-nesting)).
 
 **Finished values flow up through an event**: The parent needs the *committed*
-message, not every intermediate keystroke. `emitEvent('send', data.message)`
-hands the parent the final value on submit, and the parent listens with
+message, not every intermediate keystroke. `emitEvent('send', box.value)` hands
+the parent the final value when the user clicks Send, and the parent listens with
 `onSend`. This keeps the parent's dispatch logic at App scope where it belongs —
 props flow down, events flow up ([Emit a custom event from a component](/docs/howto/emit-a-custom-event-from-a-component)).
 
-**Let an emitting handler also complete its local state change**: Notice the
-`onSubmit` handler ends with `message = ''` *after* `emitEvent('send', …)`.
-Resetting the field is the obvious reason, but it also keeps event delivery
-prompt: a handler whose only effect is `emitEvent(...)`, with no trailing write
-to observable state, can have its emission flushed on a later reactive tick
-rather than immediately. Give an emit-only handler something local to do (clear
-the field, flip a flag), or fold the emit into a handler that already mutates
-state.
+**Let an emitting handler also complete its local state change**: Notice the Send
+handler ends with `box.setValue('')` *after* `emitEvent('send', …)`. Clearing the
+field is the obvious reason, but it also keeps event delivery prompt: a handler
+whose only effect is `emitEvent(...)`, with no trailing write to observable state,
+can have its emission flushed on a later reactive tick rather than immediately.
+Give an emit-only handler something local to do (clear the field, flip a flag), or
+fold the emit into a handler that already mutates state.
 
 **Imperative writes come in through a method**: When the parent must *write* the
 field — clear it after a turn, prefill a template, append a voice transcript —
 expose a `<method name="setValue">` and call `composer.setValue(...)` by the
 component's `id` ([Expose a method from a component](/docs/howto/expose-a-method-from-a-component)).
-Write the method body as an arrow function so it receives the argument —
-`(v) => message = v`. A statement body like `message = $params[0]` does *not*
-work: `$param` / `$params` are not bound inside a user-defined component's method
-body (they belong to built-in component methods such as `APICall.execute` and
+Drive the input's *own* `setValue` (`(v) => box.setValue(v)`) so the change shows
+in the field — see [Control a TextArea from code](/docs/howto/control-a-textarea-from-code).
+Write the method body as an arrow function so it receives the argument: a
+statement body like `box.setValue($params[0])` does *not* work, because
+`$param` / `$params` are not bound inside a user-defined component's method body
+(they belong to built-in component methods such as `APICall.execute` and
 `ModalDialog.open`). The parent reaches in without holding the variable.
 
 **What stays outside**: Pure pipeline state that the *parent* owns — an
 `awaiting` flag, a `submittedKind` marker, the dispatch that routes the message —
 belongs in the parent's `onSend` handler at App scope. Moving that state into the
-component defeats the purpose; the goal is to move only the high-frequency
-`bindTo` target inward, not the whole feature.
+component defeats the purpose; the goal is to move only the high-frequency input
+state inward, not the whole feature.
 
 ## Diagnose it first
 
