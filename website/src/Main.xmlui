@@ -561,6 +561,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Confine a hot input's reactivity to its own component"
+                            to="/docs/howto/confine-a-hot-input-to-its-own-component"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Use built-in form validation"
                             to="/docs/howto/use-built-in-form-validation"
                         />
@@ -2305,6 +2310,11 @@
             <Page url="/docs/howto/control-a-textarea-from-code">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/control-a-textarea-from-code.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/confine-a-hot-input-to-its-own-component">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/confine-a-hot-input-to-its-own-component.md']}"
                 />
             </Page>
 
