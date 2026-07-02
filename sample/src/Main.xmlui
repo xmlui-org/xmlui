@@ -1,5 +1,6 @@
 <App>
-  <Heading value="This is level 3 (value)" level="h3" />
-  <Heading level="h3">This is level 3 (child)</Heading>
-  <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+  <HStack var.shown="{false}">
+    <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
+    <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+  </HStack>
 </App>

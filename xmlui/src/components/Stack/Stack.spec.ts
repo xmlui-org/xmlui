@@ -1,20 +1,6 @@
 import { test, expect } from "../../testing/fixtures";
 import { overflows, getBounds } from "../../testing/component-test-helpers";
 
-const STACK_OLD_SUITE_PENDING =
-  "Literal old Stack suite copied for compatibility tracking; full scroller, dock, and layout semantics are pending in Phase 5 Wave D.";
-
-const ACTIVE_STACK_TESTS = new Set([
-  "can render empty",
-  "contextMenu event fires on right click",
-]);
-
-test.beforeEach(({}, testInfo) => {
-  if (!ACTIVE_STACK_TESTS.has(testInfo.title)) {
-    test.skip(true, STACK_OLD_SUITE_PENDING);
-  }
-});
-
 const PAGE_WIDTH = 1280;
 const PAGE_HEIGHT = 720;
 test.use({ viewport: { width: PAGE_WIDTH, height: PAGE_HEIGHT } });

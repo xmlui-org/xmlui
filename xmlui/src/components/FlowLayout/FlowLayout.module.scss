@@ -28,6 +28,18 @@ $rowGap-FlowLayout: createThemeVar("rowGap-FlowLayout");
       width: 100%;
       min-width: 0;
     }
+
+    &:has(> :nth-child(2)) {
+      display: contents;
+
+      & > * {
+        box-sizing: border-box;
+        flex: 0 0 var(--xmlui-itemWidth-FlowLayout);
+        min-width: var(--xmlui-minWidth-FlowLayoutItem, 0);
+        max-width: var(--xmlui-maxWidth-FlowLayoutItem, 100%);
+        width: auto;
+      }
+    }
   }
 
   .flowLayoutBreak,

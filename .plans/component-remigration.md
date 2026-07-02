@@ -318,7 +318,7 @@ branch.
 | Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 98 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 5 |
+| Complete | User approved after audit and verification. | 6 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -417,7 +417,7 @@ it.
 | SpaceFiller | `SpaceFillerReact.tsx`, module SCSS | flex layout | Audit required | flex fill behavior |
 | Spinner | `SpinnerReact.tsx`, module SCSS | theme | Audit required | size/color variants |
 | Splitter | `SplitterReact.tsx`, module SCSS | layout/star sizing | Audit required | horizontal/vertical resize |
-| Stack family | `StackReact.tsx`, module SCSS | layout props, star sizing | Audit required | H/V/C stacks, spacing |
+| Stack family | `StackReact.tsx`, `Stack.module.scss`, `Stack.defaults.ts`, `Stack.md`, `HStack.md`, `VStack.md`, `CHStack.md`, `CVStack.md`, `Stack.spec.ts`, `HStack.spec.ts`, `VStack.spec.ts`, `CHStack.spec.ts`, `CVStack.spec.ts` | layout props, star sizing, original ScrollViewer fade/scroll host contract, boolean attribute parsing | Complete | User approved after protected-file audit and verification. Protected-file audit clean: all copied Stack-family protected files are identical to `/Users/dotneteer/source/xmlui/xmlui/src/components/Stack`. Added rewrite Stack renderer adapter plus host shims for original `StackReact` imports, ScrollViewer fade compatibility, Stack child main-axis sizing normalization, FlowLayout transparent `Items` support, and parser normalization for bare boolean attributes such as `wrapContent`. `npm --workspace xmlui run build:metadata` passed. Full copied Stack-family suite `npm --workspace xmlui run test:e2e -- xmlui/src/components/Stack/Stack.spec.ts xmlui/src/components/Stack/HStack.spec.ts xmlui/src/components/Stack/VStack.spec.ts xmlui/src/components/Stack/CHStack.spec.ts xmlui/src/components/Stack/CVStack.spec.ts` passed 89/89. `npm --workspace xmlui run build` still stops on unrelated pre-existing compiler/Button/Icon/IconProvider type errors. |
 | Stepper | `StepperReact.tsx`, `StepReact.tsx`, module SCSS | Form, Tabs-like state | Audit required | step navigation |
 | StepperForm | `StepperFormReact.tsx`, module SCSS | Form, Stepper | Audit required | multi-step submit |
 | StickyBox | `StickyBoxReact.tsx`, module SCSS | scroll containers | Audit required | sticky behavior |

@@ -1,5 +1,8 @@
 import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
 import { defaultProps } from "./ScrollViewer.defaults";
+import { Scroller } from "./Scroller";
+export { Scroller as ThemedScroller };
+export type { ScrollStyle } from "./Scroller";
 
 const COMP = "ScrollViewer";
 const SCROLLER = "Scroller";
@@ -105,4 +108,3 @@ export const ScrollViewerMd = createMetadata({
     [`autoHideDelay-whenScrolling-${SCROLLER}`]: "400",
   },
 });
-

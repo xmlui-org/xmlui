@@ -1732,6 +1732,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
 
 function stackProps(): XmluiComponentContract["props"] {
   return {
+    id: { name: "id" },
     testId: { name: "testId" },
     desktopOnly: { name: "desktopOnly" },
     gap: { name: "gap" },

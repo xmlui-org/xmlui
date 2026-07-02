@@ -1,137 +1,131 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useRef } from "react";
+import {
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ForwardedRef,
+  type ReactNode,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+import React from "react";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
-import { defaultProps } from "./Stack.defaults";
 import styles from "./Stack.module.scss";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-type StackProps = Omit<HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu"> & {
+import { useContentAlignment } from "../../components-core/component-hooks";
+import { useOnMount } from "../../components-core/utils/hooks";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import { DEFAULT_ORIENTATION, defaultProps } from "./Stack.defaults";
+
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu"> & {
   orientation?: string;
+  uid?: string;
   horizontalAlignment?: string;
   verticalAlignment?: string;
+  classes?: Record<string, string>;
   reverse?: boolean;
-  wrapContent?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
+  onClick?: AsyncFunction;
+  onContextMenu?: AsyncFunction;
+  onMount?: AsyncFunction;
   desktopOnly?: boolean;
-  style?: CSSProperties;
-  className?: string;
-  onClick?: () => void | Promise<void>;
-  onContextMenu?: () => void | Promise<void>;
-  onMount?: () => void | Promise<void>;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
-  children?: ReactNode;
+  registerComponentApi?: (api: any) => void;
 };
 
-export const Stack = forwardRef<HTMLDivElement, StackProps>(function Stack(
+// =====================================================================================================================
+// Stack React component
+
+export const Stack = memo(forwardRef(function Stack(
   {
+    uid,
+    children,
     orientation = defaultProps.orientation,
     horizontalAlignment,
     verticalAlignment,
+    style,
     reverse = defaultProps.reverse,
-    wrapContent = false,
     hoverContainer = defaultProps.hoverContainer,
     visibleOnHover = defaultProps.visibleOnHover,
-    desktopOnly = defaultProps.desktopOnly,
-    className,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
     onClick,
     onContextMenu,
     onMount,
+    desktopOnly = defaultProps.desktopOnly,
+    className,
+    classes,
     registerComponentApi,
-    children,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const innerRef = useRef<HTMLDivElement | null>(null);
-  const normalizedOrientation = orientation === "horizontal" ? "horizontal" : "vertical";
+  useOnMount(onMount);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(forwardedRef, containerRef);
 
-  useEffect(() => {
-    void onMount?.();
-  }, [onMount]);
+  const { horizontal, vertical } = useContentAlignment(
+    orientation,
+    horizontalAlignment,
+    verticalAlignment,
+  );
 
   const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
-    innerRef.current?.scrollTo({ top: 0, behavior });
+    containerRef.current?.scrollTo({ top: 0, behavior });
   }, []);
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
-    innerRef.current?.scrollTo({ top: innerRef.current.scrollHeight, behavior });
+    containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight, behavior });
   }, []);
 
   const scrollToStart = useCallback((behavior: ScrollBehavior = "instant") => {
-    innerRef.current?.scrollTo({ left: 0, behavior });
+    containerRef.current?.scrollTo({ left: 0, behavior });
   }, []);
 
   const scrollToEnd = useCallback((behavior: ScrollBehavior = "instant") => {
-    innerRef.current?.scrollTo({ left: innerRef.current.scrollWidth, behavior });
+    containerRef.current?.scrollTo({ left: containerRef.current?.scrollWidth, behavior });
   }, []);
 
+  // Register API methods
   useEffect(() => {
-    registerComponentApi?.({ scrollToTop, scrollToBottom, scrollToStart, scrollToEnd });
-  }, [registerComponentApi, scrollToBottom, scrollToEnd, scrollToStart, scrollToTop]);
+    if (registerComponentApi) {
+      registerComponentApi({ scrollToTop, scrollToBottom, scrollToStart, scrollToEnd });
+    }
+  }, [registerComponentApi, scrollToTop, scrollToBottom, scrollToStart, scrollToEnd]);
 
   return (
-    <div
+    <Scroller
       {...rest}
-      ref={(node) => {
-        innerRef.current = node;
-        if (typeof ref === "function") {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      }}
-      className={cx(
-        styles.base,
-        normalizedOrientation === "horizontal" ? styles.horizontal : styles.vertical,
-        reverse ? styles.reverse : undefined,
-        wrapContent ? styles.wrap : undefined,
-        hoverContainer ? styles.hoverContainer : undefined,
-        visibleOnHover ? "display-on-hover" : undefined,
-        desktopOnly ? styles.desktopOnly : undefined,
-        onClick ? styles.handlesClick : undefined,
-        alignmentClass("horizontal", normalizedOrientation, horizontalAlignment),
-        alignmentClass("vertical", normalizedOrientation, verticalAlignment),
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      ref={composedRef}
+      style={style}
+      scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
+      className={classnames(
+        classes?.[COMPONENT_PART_KEY],
         className,
+        styles.base,
+        {
+          [styles.desktopOnly]: desktopOnly,
+          [styles.vertical]: orientation === "vertical",
+          [styles.horizontal]: orientation === "horizontal",
+          [styles.reverse]: reverse,
+          [styles.hoverContainer]: hoverContainer,
+          "display-on-hover": visibleOnHover,
+          [styles.handlesClick]: !!onClick,
+        },
+        horizontal ?? "",
+        vertical ?? "",
       )}
-      onClick={() => void onClick?.()}
-      onContextMenu={() => void onContextMenu?.()}
     >
       {children}
-    </div>
+    </Scroller>
   );
-});
-
-function alignmentClass(axis: "horizontal" | "vertical", orientation: string, value?: string): string | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const normalized = alignmentValue(value);
-  if (!normalized) {
-    return undefined;
-  }
-  const isMainAxis =
-    (axis === "horizontal" && orientation === "horizontal") ||
-    (axis === "vertical" && orientation === "vertical");
-  return styles[`${isMainAxis ? "justify" : "align"}Items${normalized}`];
-}
-
-function alignmentValue(value: string): "Start" | "Center" | "Stretch" | "End" | "Baseline" | undefined {
-  switch (value) {
-    case "start":
-      return "Start";
-    case "center":
-      return "Center";
-    case "stretch":
-      return "Stretch";
-    case "end":
-      return "End";
-    case "baseline":
-      return "Baseline";
-    default:
-      return undefined;
-  }
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

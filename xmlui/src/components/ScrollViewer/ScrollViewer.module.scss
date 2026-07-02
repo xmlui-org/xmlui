@@ -29,9 +29,9 @@ $offset-handleInteractiveArea-Scroller: createThemeVar("offset-handleInteractive
 $transition-Scroller: createThemeVar("transition-Scroller");
 $transition-track-Scroller: createThemeVar("transition-track-Scroller");
 $transition-handle-Scroller: createThemeVar("transition-handle-Scroller");
-$height-fade-Scroller: createThemeVar("height-fade-Scroller");
-$backgroundColor-fade-Scroller: createThemeVar("backgroundColor-fade-Scroller");
-$transition-fade-Scroller: createThemeVar("transition-fade-Scroller");
+$height-fade-Scroller: var(--xmlui-height-fade-Scroller, 64px);
+$backgroundColor-fade-Scroller: var(--xmlui-backgroundColor-fade-Scroller, rgb(255 255 255 / 0.75));
+$transition-fade-Scroller: var(--xmlui-transition-fade-Scroller, opacity 0.3s ease-in-out);
 $autoHideDelay-whenMouseOver-Scroller: createThemeVar("autoHideDelay-whenMouseOver-Scroller");
 $autoHideDelay-whenScrolling-Scroller: createThemeVar("autoHideDelay-whenScrolling-Scroller");
 
@@ -76,6 +76,44 @@ $autoHideDelay-whenScrolling-Scroller: createThemeVar("autoHideDelay-whenScrolli
 
   .showScrollerFade {
     position: relative;
+  }
+
+  .fadeContainer {
+    position: relative;
+    overflow: auto;
+
+    > * {
+      flex-shrink: 0;
+    }
+  }
+
+  .fadeOverlay {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    height: #{$height-fade-Scroller};
+    pointer-events: none;
+    opacity: 0;
+    transition: #{$transition-fade-Scroller};
+    z-index: 10;
+  }
+
+  .fadeTop {
+    top: 0;
+    background: linear-gradient(to bottom, #{$backgroundColor-fade-Scroller}, transparent);
+  }
+
+  .fadeBottom {
+    bottom: 0;
+    background: linear-gradient(to top, #{$backgroundColor-fade-Scroller}, transparent);
+  }
+
+  .fadeVisible {
+    opacity: 1;
+  }
+
+  .viewportCompat {
+    display: none;
   }
 }
 

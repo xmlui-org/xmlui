@@ -145,7 +145,7 @@ declare global {
 }
 
 export const expect = baseExpect.extend({
-  toEqualWithTolerance(actual: number, expected: number, tolerance: number) {
+  toEqualWithTolerance(actual: number, expected: number, tolerance = 0.001) {
     const pass = Math.abs(actual - expected) <= Math.abs(expected * tolerance);
     return {
       pass,
