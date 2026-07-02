@@ -235,19 +235,28 @@ function componentImports(
   documentKind: XmluiModuleIr["document"]["kind"],
   referencedComponents: readonly string[],
 ): XmluiModuleImport[] {
-  const imports = siblingComponentImports(id, referencedComponents);
+  const imports = siblingComponentImports(id, {
+    includeAll: documentKind === "app",
+    referencedComponents,
+  });
   if (documentKind === "app") {
     imports.push(...appComponentImports(id, imports, referencedComponents));
   }
   return imports;
 }
 
-function siblingComponentImports(id: string, referencedComponents: readonly string[]): XmluiModuleImport[] {
+function siblingComponentImports(
+  id: string,
+  options: {
+    includeAll: boolean;
+    referencedComponents: readonly string[];
+  },
+): XmluiModuleImport[] {
   const dir = path.dirname(id);
-  const referenced = new Set(referencedComponents);
+  const referenced = new Set(options.referencedComponents);
   return xmluiFilesInDirectory(dir)
     .filter((file) => file.endsWith(".xmlui") && file !== path.basename(id))
-    .filter((file) => referenced.has(path.basename(file, ".xmlui")))
+    .filter((file) => options.includeAll || referenced.has(path.basename(file, ".xmlui")))
     .sort()
     .map((file, index) => ({
       localName: `component${index}`,
