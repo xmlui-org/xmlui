@@ -7,3 +7,7 @@ export function useEvent<T extends (...args: any[]) => any>(handler: T): T {
   });
   return useCallback(((...args: Parameters<T>) => handlerRef.current(...args)) as T, []);
 }
+
+export function capitalizeFirstLetter(str: string) {
+  return str[0].toUpperCase() + str.substring(1);
+}

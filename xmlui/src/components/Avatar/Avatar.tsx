@@ -1,7 +1,11 @@
+import React from "react";
+
 import { createMetadata, dClick, dContextMenu } from "../../component-core/metadata/helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { extractScssThemeVars } from "../../styling/theme";
 import { sizeValues } from "../abstractions";
 import { defaultProps } from "./Avatar.defaults";
+import { Avatar } from "./AvatarReact";
 
 const COMP = "Avatar";
 
@@ -78,4 +82,20 @@ export const AvatarMd = createMetadata({
     [`border-${COMP}`]: "0px solid $color-surface-400A80",
     [`backgroundColor-${COMP}`]: "$color-surface-100",
   },
+});
+
+type ThemedAvatarProps = React.ComponentPropsWithoutRef<typeof Avatar>;
+
+export const ThemedAvatar = React.forwardRef<
+  React.ElementRef<typeof Avatar>,
+  ThemedAvatarProps
+>(function ThemedAvatar({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(AvatarMd);
+  return (
+    <Avatar
+      {...props}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
+      ref={ref}
+    />
+  );
 });

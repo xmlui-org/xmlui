@@ -7,7 +7,7 @@ import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
 import { badgeRenderer } from "../components/Badge/Badge.renderer";
 import { buttonRenderer } from "../components/Button/Button";
-import { cardRenderer } from "../components/Card/Card.renderer";
+import { cardRenderer } from "../components/Card/Card";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";

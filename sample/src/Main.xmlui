@@ -1,13 +1,9 @@
 <App>
-  <HStack verticalAlignment="center">
-    <NavGroup icon="email" label="Send To" >
-      <NavLink icon="arrowup" label="Boss" />
-      <NavGroup icon="users" label="Team">
-        <NavLink label="Jane" />
-        <NavLink label="Will" />
-        <NavLink label="Sandra" />
-      </NavGroup>
-      <NavLink icon="cube" label="Support" />
-    </NavGroup>
-  </HStack>
+  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
+    <HStack verticalAlignment="center">
+      <Icon name="info" />
+      <Text value="Double-click me" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
 </App>

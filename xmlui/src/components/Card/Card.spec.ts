@@ -194,7 +194,7 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual(1);
   });
 
-  test.skip("Card click does not interfere with link click", async ({
+  test("Card click does not interfere with link click", async ({
     page,
     initTestBed,
     createCardDriver,
@@ -213,7 +213,7 @@ test.describe("Event Handling", () => {
     await expect(page).not.toHaveURL(/\/test-link$/);
   });
 
-  test.skip("Link click does not interfere with Card click", async ({
+  test("Link click does not interfere with Card click", async ({
     page,
     initTestBed,
     createCardDriver,

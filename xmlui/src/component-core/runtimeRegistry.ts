@@ -9,7 +9,7 @@ import { badgeRenderer } from "../components/Badge/Badge.renderer";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { buttonRenderer } from "../components/Button/Button";
-import { cardRenderer } from "../components/Card/Card.renderer";
+import { cardRenderer } from "../components/Card/Card";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox.renderer";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";

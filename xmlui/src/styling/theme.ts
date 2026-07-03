@@ -794,10 +794,14 @@ export function createComponentThemeClass(
   contributors: readonly ComponentMetadata[] = [],
   variant?: string,
 ): ComponentThemeClass {
+  const effectiveContributors =
+    componentName === "Heading" && contributors.length === 0
+      ? [headingLevelThemeContributor]
+      : contributors;
   const baseThemeVariables = mergeThemeVariableLayers([
-    collectComponentThemeDefaults(metadata, contributors),
+    collectComponentThemeDefaults(metadata, effectiveContributors),
     themeVariables,
-    variant ? componentVariantThemeVariables(metadata, themeVariables, contributors, variant) : {},
+    variant ? componentVariantThemeVariables(metadata, themeVariables, effectiveContributors, variant) : {},
   ]);
   const mergedThemeVariables = mergeThemeVariableLayers([
     generateButtonTones(baseThemeVariables),
@@ -806,7 +810,7 @@ export function createComponentThemeClass(
   const style = componentThemeVariablesToCssProperties(
     metadata,
     mergedThemeVariables,
-    contributors,
+    effectiveContributors,
     themeVariables,
   );
   return {
@@ -820,6 +824,53 @@ export function createComponentThemeClass(
     ),
   };
 }
+
+const headingLevelThemeContributor = {
+  defaultThemeVars: {
+    "fontSize-H1": "$fontSize-2xl",
+    "lineHeight-H1": "$lineHeight-tight",
+    "marginTop-H1": "0",
+    "marginBottom-H1": "0",
+    "fontSize-H1-markdown": "$fontSize-2xl",
+    "marginTop-H1-markdown": "0",
+    "marginBottom-H1-markdown": "$space-6",
+    "fontSize-H2": "$fontSize-xl",
+    "lineHeight-H2": "$lineHeight-tight",
+    "marginTop-H2": "0",
+    "marginBottom-H2": "0",
+    "fontSize-H2-markdown": "$fontSize-xl",
+    "marginTop-H2-markdown": "$space-10",
+    "marginBottom-H2-markdown": "$space-3",
+    "fontSize-H3": "$fontSize-lg",
+    "lineHeight-H3": "$lineHeight-tight",
+    "marginTop-H3": "0",
+    "marginBottom-H3": "0",
+    "fontSize-H3-markdown": "$fontSize-lg",
+    "marginTop-H3-markdown": "$space-6",
+    "marginBottom-H3-markdown": "$space-2",
+    "fontSize-H4": "$fontSize-base",
+    "lineHeight-H4": "$lineHeight-tight",
+    "marginTop-H4": "0",
+    "marginBottom-H4": "0",
+    "fontSize-H4-markdown": "$fontSize-base",
+    "marginTop-H4-markdown": "$space-5",
+    "marginBottom-H4-markdown": "$space-1",
+    "fontSize-H5": "$fontSize-sm",
+    "lineHeight-H5": "$lineHeight-tight",
+    "marginTop-H5": "0",
+    "marginBottom-H5": "0",
+    "fontSize-H5-markdown": "$fontSize-sm",
+    "marginTop-H5-markdown": "0",
+    "marginBottom-H5-markdown": "$space-0",
+    "fontSize-H6": "$fontSize-xs",
+    "lineHeight-H6": "$lineHeight-tight",
+    "marginTop-H6": "0",
+    "marginBottom-H6": "0",
+    "fontSize-H6-markdown": "$fontSize-xs",
+    "marginTop-H6-markdown": "0",
+    "marginBottom-H6-markdown": "$space-0",
+  },
+} satisfies ComponentMetadata;
 
 function componentVariantThemeVariables(
   metadata: ComponentMetadata,
