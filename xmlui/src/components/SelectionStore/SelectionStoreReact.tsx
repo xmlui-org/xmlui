@@ -35,21 +35,24 @@ export const SelectionStoreNative = memo(function SelectionStoreNative({
 }: SelectionStoreProps) {
   const [selection, setSelection] = useState<unknown[]>(selectedItems);
   const currentItemsRef = useRef<unknown[]>(selectedItems);
+  const selectionRef = useRef<unknown[]>(selectedItems);
 
   useEffect(() => {
     setSelection(selectedItems);
+    selectionRef.current = selectedItems;
   }, [selectedItems]);
 
   const publishSelection = useCallback((items: unknown[]) => {
+    selectionRef.current = items;
     setSelection(items);
     void onSelectionChange?.(items);
   }, [onSelectionChange]);
 
   const refreshSelection = useCallback((allItems: unknown[] = currentItemsRef.current) => {
     currentItemsRef.current = allItems;
-    const selectedIds = new Set(selection.map((item) => itemKey(item, idKey)));
+    const selectedIds = new Set(selectionRef.current.map((item) => itemKey(item, idKey)));
     publishSelection(allItems.filter((item) => selectedIds.has(itemKey(item, idKey))));
-  }, [idKey, publishSelection, selection]);
+  }, [idKey, publishSelection]);
 
   const setSelectedRowIds = useCallback((rowIds: unknown[]) => {
     const ids = new Set(rowIds.map(String));
@@ -82,6 +85,25 @@ export const SelectionStoreNative = memo(function SelectionStoreNative({
 
   return <SelectionContext.Provider value={contextValue}>{children}</SelectionContext.Provider>;
 });
+
+export const StandaloneSelectionStore = ({
+  children,
+  idKey,
+}: {
+  children: ReactNode;
+  idKey?: string;
+}) => {
+  const [selection, setSelection] = useState<unknown[]>([]);
+  return (
+    <SelectionStoreNative
+      idKey={idKey}
+      selectedItems={selection}
+      onSelectionChange={setSelection}
+    >
+      {children}
+    </SelectionStoreNative>
+  );
+};
 
 export function useSelectionContext() {
   return useContext(SelectionContext);

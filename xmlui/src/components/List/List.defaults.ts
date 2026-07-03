@@ -1,3 +1,6 @@
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import type { ScrollAnchoring } from "../abstractions";
+
 export const selectionCheckboxPositionValues = ["before", "overlay"] as const;
 export type SelectionCheckboxPosition = (typeof selectionCheckboxPositionValues)[number];
 
@@ -13,16 +16,16 @@ export type SelectionCheckboxAnchor = (typeof selectionCheckboxAnchorValues)[num
 
 export const defaultProps = {
   idKey: "id",
-  scrollAnchor: "top",
+  scrollAnchor: "top" as ScrollAnchoring,
   hideEmptyGroups: true,
   borderCollapse: true,
   groupsInitiallyExpanded: true,
   rowsSelectable: false,
   enableMultiRowSelection: true,
-  initiallySelected: [] as string[],
+  initiallySelected: EMPTY_ARRAY as string[],
   hideSelectionCheckboxes: false,
   selectionCheckboxPosition: "before" as SelectionCheckboxPosition,
-  selectionCheckboxAnchor: "top-left" as SelectionCheckboxAnchor,
+  selectionCheckboxAnchor: "left-center" as SelectionCheckboxAnchor,
   selectionCheckboxOffsetX: "$space-2",
   selectionCheckboxOffsetY: "$space-2",
   keyBindings: {

@@ -388,10 +388,19 @@ function emitEventExpression(expression: XmluiScriptIr): string {
         }
         return emitEventExpression(expression.body);
       }
-      return emitExpression(expression);
+      return emitEventArrowFunctionExpression(expression);
     default:
       return emitAsyncExpression(expression);
   }
+}
+
+function emitEventArrowFunctionExpression(
+  expression: Extract<XmluiScriptIr, { kind: "ArrowFunctionExpression" }>,
+): string {
+  if (expression.body.kind === "BlockStatement") {
+    return `async (${expression.params.join(", ")}) => {\nlet __xmluiResult;\n${emitBlockStatement(expression.body, createArrowBlockCodegenContext())}\nreturn __xmluiResult;\n}`;
+  }
+  return `async (${expression.params.join(", ")}) => (${emitEventExpression(expression.body)})`;
 }
 
 function emitAsyncExpression(expression: XmluiScriptIr): string {

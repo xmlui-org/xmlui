@@ -12,8 +12,11 @@ import {
   dReadonly,
   dRequired,
 } from "../../component-core/metadata/helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./Checkbox.defaults";
+import { CheckboxNative } from "./CheckboxReact";
 
 const COMP = "Checkbox";
 
@@ -156,3 +159,17 @@ export const CheckboxMd = createMetadata({
   compactInlineLabel: true,
   limitThemeVarsToComponent: true,
 });
+
+type ThemedToggleProps = React.ComponentPropsWithoutRef<typeof CheckboxNative>;
+export const ThemedToggle = React.forwardRef<HTMLInputElement, ThemedToggleProps>(
+  function ThemedToggle({ className, ...props }: ThemedToggleProps, ref) {
+    const themeClass = useComponentThemeClass(CheckboxMd);
+    return (
+      <CheckboxNative
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref as React.Ref<any>}
+      />
+    );
+  },
+);

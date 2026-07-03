@@ -1,0 +1,15 @@
+<Component name="MyList">
+  <List
+    syncWithVar="selState"
+    data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+  >
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</Component>

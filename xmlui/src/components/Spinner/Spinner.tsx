@@ -1,6 +1,10 @@
+import React from "react";
+
 import { createMetadata } from "../../component-core/metadata/helpers";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./Spinner.defaults";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { Spinner } from "./SpinnerReact";
 
 const COMP = "Spinner";
 
@@ -44,3 +48,17 @@ export const SpinnerMd = createMetadata({
     [`borderColor-${COMP}`]: "$color-surface-400",
   },
 });
+
+type ThemedSpinnerProps = React.ComponentProps<typeof Spinner> & { className?: string };
+export const ThemedSpinner = React.forwardRef<HTMLDivElement, ThemedSpinnerProps>(
+  function ThemedSpinner({ className, ...props }: ThemedSpinnerProps, ref) {
+    const themeClass = useComponentThemeClass(SpinnerMd);
+    return (
+      <Spinner
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);

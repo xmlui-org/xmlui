@@ -1197,6 +1197,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       rowsSelectable: { name: "rowsSelectable" },
       enableMultiRowSelection: { name: "enableMultiRowSelection" },
       initiallySelected: { name: "initiallySelected" },
+      syncWithVar: { name: "syncWithVar" },
+      refreshOn: { name: "refreshOn" },
       rowUnselectablePredicate: { name: "rowUnselectablePredicate" },
       hideSelectionCheckboxes: { name: "hideSelectionCheckboxes" },
       selectionCheckboxPosition: { name: "selectionCheckboxPosition" },
@@ -1209,6 +1211,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {
       contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
       rowDoubleClick: { name: "rowDoubleClick", attributeName: "onRowDoubleClick" },
+      scroll: { name: "scroll", attributeName: "onScroll" },
       selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
       requestFetchPrevPage: { name: "requestFetchPrevPage", attributeName: "onRequestFetchPrevPage" },
       requestFetchNextPage: { name: "requestFetchNextPage", attributeName: "onRequestFetchNextPage" },

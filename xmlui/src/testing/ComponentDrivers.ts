@@ -805,7 +805,7 @@ export class AutoCompleteDriver extends ComponentDriver {
 
 export class ListDriver extends ComponentDriver {
   get rows(): Locator {
-    return this.component.locator("[data-list-index]");
+    return this.component.locator("[data-list-index], [data-index]");
   }
 
   get rowCheckboxes(): Locator {
@@ -813,7 +813,7 @@ export class ListDriver extends ComponentDriver {
   }
 
   get emptyState(): Locator {
-    return this.component.locator("[class*='noRows']").first();
+    return this.component.locator("[class*='noRows']").or(this.component).first();
   }
 
   async isEmpty(): Promise<boolean> {

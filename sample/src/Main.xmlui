@@ -1,9 +1,23 @@
-<App>
-  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
-    <HStack verticalAlignment="center">
-      <Icon name="info" />
-      <Text value="Double-click me" variant="strong" />
+<App layout="condensed-sticky" scrollWholePage="false">
+  <AppHeader>
+    <HStack>
+      <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
+      <Button onClick="myList.scrollToTop()">Scroll to Top</Button>
+      <Button onClick="myList.scrollToIndex(25)">Scroll to #25</Button>
+      <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
     </HStack>
-    <Text value="This is an example text" />
-  </Card>
+  </AppHeader>
+  <List 
+    id="myList" 
+    height="*"
+    data="{
+      Array.from({ length: 100 })
+      .map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))
+    }">
+    <property name="itemTemplate">
+      <Card>
+        <Text value="{$item.value}" />
+      </Card>
+    </property>
+  </List>
 </App>

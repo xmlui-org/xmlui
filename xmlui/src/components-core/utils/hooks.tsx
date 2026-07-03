@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState, type MutableRefObject } from "react";
 
 import { useEvent } from "./misc";
 
@@ -30,6 +30,14 @@ export const useResizeObserver = (
   }, [callback, current, element]);
 };
 
+export function usePrevious<T>(value: T): ReturnType<typeof useRef<T>>["current"] {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
 export function useDocumentKeydown(onDocumentKeydown: (event: KeyboardEvent) => void) {
   const onKeyDown = useEvent(onDocumentKeydown);
   useEffect(() => {
@@ -54,6 +62,95 @@ export function useShallowCompareMemoize<T extends Record<any, any> | undefined>
     signalRef.current++;
   }
   return React.useMemo(() => ref.current, [signalRef.current]);
+}
+
+function getScrollParent(element: HTMLElement): HTMLElement | null {
+  let style = getComputedStyle(element);
+  const excludeStaticParent = style.position === "absolute";
+  const overflowRegex = /(auto|scroll)/;
+
+  if (style.position === "fixed") {
+    return document.body;
+  }
+  for (let parent: HTMLElement | null = element; ; parent = parent.parentElement) {
+    if (!parent) {
+      return null;
+    }
+    style = getComputedStyle(parent);
+    if (excludeStaticParent && style.position === "static") {
+      continue;
+    }
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
+      return parent;
+    }
+  }
+}
+
+export const useScrollParent = (element?: HTMLElement | null): HTMLElement | null => {
+  const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null);
+  useIsomorphicLayoutEffect(() => {
+    setScrollParent(element ? getScrollParent(element) : null);
+  }, [element]);
+  return scrollParent;
+};
+
+export const useStartMargin = (
+  hasOutsideScroll: boolean,
+  parentRef: MutableRefObject<HTMLElement | null | undefined>,
+  scrollRef: MutableRefObject<HTMLElement | null | undefined>,
+) => {
+  const calculateStartMargin = useEvent(() => {
+    if (!hasOutsideScroll) {
+      return 0;
+    }
+    const precedingElement = parentRef.current;
+    const scrollContainer = scrollRef.current;
+    if (!precedingElement || !scrollContainer) {
+      return 0;
+    }
+    const precedingRect = precedingElement.getBoundingClientRect();
+    const scrollContainerRect = scrollContainer.getBoundingClientRect();
+    return precedingRect.top - scrollContainerRect.top + scrollContainer.scrollTop;
+  });
+
+  const [startMargin, setStartMargin] = useState<number>(() => calculateStartMargin());
+
+  useResizeObserver(scrollRef, () => {
+    setStartMargin(calculateStartMargin());
+  });
+
+  useIsomorphicLayoutEffect(() => {
+    const newMargin = calculateStartMargin();
+    setStartMargin(newMargin);
+    if (newMargin === 0 && hasOutsideScroll && parentRef.current && scrollRef.current) {
+      requestAnimationFrame(() => {
+        const recalculated = calculateStartMargin();
+        if (recalculated !== 0) {
+          setStartMargin(recalculated);
+        }
+      });
+    }
+  }, [hasOutsideScroll, calculateStartMargin, parentRef, scrollRef]);
+
+  return startMargin;
+};
+
+export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivElement | null>) {
+  const [hasHeight, setHasHeight] = useState(false);
+  useIsomorphicLayoutEffect(() => {
+    if (!parentRef.current) {
+      return;
+    }
+    const computedStyles = window.getComputedStyle(parentRef.current);
+    const hasMaxHeight = computedStyles.maxHeight !== "none";
+    const originalHeight = computedStyles.height;
+    const originalInlineHeight = parentRef.current.style.height || "";
+    parentRef.current.style.height = "auto";
+    const autoHeight = window.getComputedStyle(parentRef.current).height;
+    parentRef.current.style.height = originalInlineHeight;
+    setHasHeight(hasMaxHeight || originalHeight !== autoHeight || !!originalInlineHeight || computedStyles.display === "flex");
+  }, [parentRef]);
+  return hasHeight;
 }
 
 function shallowCompare(left: any, right: any) {

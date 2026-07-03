@@ -9,6 +9,7 @@ export type ValueExtractor = {
   asOptionalBoolean(expression?: any, defValue?: boolean): boolean | undefined;
   asOptionalNumber(expression?: any, defValue?: number): number | undefined;
   asOptionalString(expression?: any, defValue?: string): string | undefined;
+  asSize(expression?: any, defValue?: string): string | undefined;
 };
 
 export type LayoutContext<T extends ComponentDef = ComponentDef> = {
@@ -31,3 +32,15 @@ export type UpdateStateFn = (
   state: Record<string, any>,
   options?: { initial?: boolean },
 ) => void;
+
+export type RendererContext = {
+  extractValue: ValueExtractor;
+  node: ComponentDef;
+  renderChild: RenderChildFn;
+  lookupEventHandler: (name: string) => ((...args: any[]) => any) | undefined;
+  lookupAction: (expression: string, options?: Record<string, any>) => (() => any) | undefined;
+  lookupSyncCallback: (expression: unknown) => ((...args: any[]) => any) | undefined;
+  classes: Record<string, string>;
+  registerComponentApi: RegisterComponentApiFn;
+  layoutContext?: LayoutContext;
+};

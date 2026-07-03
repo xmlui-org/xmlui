@@ -315,8 +315,8 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 87 |
-| Blocked | Known prerequisite missing before strict migration can finish. | 0 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 86 |
+| Blocked | Known prerequisite missing before strict migration can finish. | 1 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
 | Complete | User approved after audit and verification. | 17 |
 
@@ -381,7 +381,7 @@ it.
 | Items | `ItemsReact.tsx` | renderer collection | Audit required | repeated item rendering |
 | Lifecycle | original implementation file | renderer lifecycle | Audit required | mount/unmount events |
 | Link | `LinkReact.tsx`, module SCSS | router/hash behavior | Audit required | href, navigation, hash |
-| List | `ListReact.tsx`, module SCSS | Items, layout | Audit required | item rendering and selection |
+| List | `ListReact.tsx`, module SCSS | Items, layout, compiler event-expression spread assignment support | Complete | User approved after protected-file audit, metadata verification, copied-suite triage, focused foundation E2E coverage, and iterative parity fixes for grouped default rendering, empty default groups, overlay selection checkboxes, component-module `syncWithVar`, empty selection sync state, and top-level arrow event handlers with nested callbacks. Strict copy migrated from original and protected-file audit passed (`List.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Added runtime adapter below copied entry plus host shims for original virtualization (`virtua`), keybinding parsing, selection store, row-selection helper, themed Card/Text/Spinner/Checkbox imports, legacy renderer types, scroll hooks, compiler `scroll` event contract, migrated List sync props, and test-driver original row marker fallback. `npm --prefix xmlui run check:metadata` passed. Foundation suite `XMLUI_E2E_DEV_PORT=5206 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/List/List.foundation.spec.ts --workers=1` passed 8/8. Compiler codegen regression `./node_modules/.bin/vitest run xmlui/tests/compiler/codegen.test.ts` passed 15/15. Protected copy guard `node xmlui/scripts/verify-protected-component-copy.mjs List` passed. Full copied suite last ran `XMLUI_E2E_DEV_PORT=5204 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/List/List.spec.ts --workers=1` and passed 121/123; the two remaining failures are documented as a rewrite compiler parser gap for copied fixtures using `onClick="items = [...items, ...]"`, before List renders, not as a List runtime blocker. |
 | LiveRegion | `LiveRegionReact.tsx`, module SCSS | accessibility | Audit required | aria-live output |
 | Logo | `LogoReact.tsx`, module SCSS | AppHeader | Audit required | default/custom logo measurements |
 | Markdown | `Markdown.tsx`, `CodeText.tsx`, module SCSS | markdown renderer | Audit required | markdown/code tests |

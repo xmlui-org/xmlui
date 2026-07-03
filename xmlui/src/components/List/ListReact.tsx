@@ -1,715 +1,1273 @@
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
-
-import { defaultProps } from "./List.defaults";
+import React, {
+  createContext,
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  get,
+  groupBy as groupByFunc,
+  noop,
+  omit,
+  orderBy as lodashOrderBy,
+  sortBy,
+  uniq,
+} from "lodash-es";
+import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
+import { ThemedCard as Card } from "../Card/Card";
+import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
+import { Virtualizer } from "virtua";
+import {
+  useHasExplicitHeight,
+  useIsomorphicLayoutEffect,
+  useScrollParent,
+  useStartMargin,
+} from "../../components-core/utils/hooks";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useEvent } from "../../components-core/utils/misc";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedToggle } from "../Checkbox/Checkbox";
+import { MemoizedItem } from "../container-helpers";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import useRowSelection from "../Table/useRowSelection";
+import {
+  parseKeyBinding,
+  matchesKeyEvent,
+  type ParsedKeyBinding,
+} from "../../parsers/keybinding-parser/keybinding-parser";
 
-export type ListApi = {
-  scrollToTop: () => void;
-  scrollToBottom: () => void;
-  scrollToIndex: (index: number) => void;
-  scrollToId: (id: unknown) => void;
-  selectAll: () => void;
-  clearSelection: () => void;
-  getSelectedIds: () => Array<string | number>;
-  getSelectedItems: () => unknown[];
-  selectId: (id: unknown) => void;
+import {
+  defaultProps,
+  selectionCheckboxPositionValues,
+  type SelectionCheckboxPosition,
+  selectionCheckboxAnchorValues,
+  type SelectionCheckboxAnchor,
+} from "./List.defaults";
+
+interface IExpandableListContext {
+  isExpanded: (id: any) => boolean;
+  toggleExpanded: (id: any, isExpanded: boolean) => void;
+}
+
+export const ListContext = React.createContext<IExpandableListContext>({
+  isExpanded: (id: any) => false,
+  toggleExpanded: (id: any, isExpanded: boolean) => {},
+});
+
+type OrderBy = FieldOrderBy | Array<FieldOrderBy>;
+
+enum RowType {
+  SECTION = "SECTION",
+  SECTION_FOOTER = "SECTION_FOOTER",
+  ITEM = "ITEM",
+}
+
+type GroupByValue = string | ((item: any) => any);
+
+type ListData = {
+  groupsInitiallyExpanded?: boolean;
+  defaultGroups?: Array<string>;
+  expanded?: Record<any, boolean>;
+  items: any[];
+  limit?: number;
+  groupBy?: GroupByValue;
+  orderBy?: OrderBy;
+  availableGroups?: string[];
 };
 
-export type ListProps = {
-  id?: string;
-  items?: unknown;
+export function useListData({
+  groupsInitiallyExpanded = true,
+  expanded = EMPTY_OBJECT,
+  items,
+  limit,
+  groupBy,
+  orderBy,
+  availableGroups,
+  defaultGroups = EMPTY_ARRAY,
+}: ListData) {
+  // Filter out null and undefined items
+  const validItems = useMemo(() => {
+    if (!Array.isArray(items)) return [];
+    return items.filter((item) => item != null);
+  }, [items]);
+
+  const sortedItems = useMemo(() => {
+    if (!orderBy) {
+      return validItems;
+    }
+    let arrayOrderBy = orderBy;
+    if (!Array.isArray(orderBy)) {
+      arrayOrderBy = [orderBy];
+    }
+
+    const fieldSelectorsToOrderBy = (arrayOrderBy as Array<FieldOrderBy>).map((ob) => {
+      return (item: any) => {
+        return get(item, ob.field);
+      };
+    });
+    const fieldDirectionsToOrderBy = (arrayOrderBy as Array<FieldOrderBy>).map(
+      (ob) => ob.direction,
+    );
+    return lodashOrderBy(validItems, fieldSelectorsToOrderBy, fieldDirectionsToOrderBy);
+  }, [validItems, orderBy]);
+
+  const cappedItems = useMemo(() => {
+    if (!limit) {
+      return sortedItems;
+    }
+    return sortedItems.slice(0, limit);
+  }, [sortedItems, limit]);
+
+  const sectionedItems: Record<string, any> = useMemo(() => {
+    if (groupBy === undefined) {
+      return EMPTY_OBJECT;
+    }
+    const iteratee =
+      typeof groupBy === "function" ? groupBy : (item: any) => item[groupBy];
+    return groupByFunc(cappedItems, iteratee);
+  }, [cappedItems, groupBy]);
+
+  const sections: string[] = useMemo(() => {
+    if (groupBy === undefined) {
+      return EMPTY_ARRAY;
+    }
+    let foundSectionKeys = uniq([...defaultGroups, ...Object.keys(sectionedItems)]);
+    if (availableGroups) {
+      foundSectionKeys = sortBy(foundSectionKeys, (item) => {
+        return availableGroups.indexOf(item);
+      });
+    }
+    return foundSectionKeys;
+  }, [groupBy, sectionedItems, defaultGroups, availableGroups]);
+
+  const rows = useMemo(() => {
+    if (groupBy === undefined) {
+      return cappedItems;
+    }
+    const ret: any[] = [];
+    sections.forEach((section) => {
+      ret.push({
+        id: section,
+        items: sectionedItems[section],
+        _row_type: RowType.SECTION,
+        key: section,
+      });
+      if (expanded[section] || (expanded[section] === undefined && groupsInitiallyExpanded)) {
+        ret.push(...(sectionedItems[section] || []));
+        ret.push({
+          id: `${section}_footer`,
+          items: sectionedItems[section],
+          _row_type: RowType.SECTION_FOOTER,
+          key: section,
+        });
+      }
+    });
+    return ret;
+  }, [groupBy, sections, cappedItems, expanded, groupsInitiallyExpanded, sectionedItems]);
+
+  return {
+    rows,
+    sectionedItems,
+    sections,
+  };
+}
+
+type PageInfo = {
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  isFetchingPrevPage: boolean;
+  isFetchingNextPage: boolean;
+};
+
+const defaultItemRenderer = (item: any, id: any) => {
+  if (!item) {
+    return null;
+  }
+  let title: string | undefined;
+  let subtitle: string | undefined;
+  if (typeof item === "object") {
+    const values = Object.values(omit(item, "id"));
+    if (!values.length) {
+      return null;
+    }
+    title = values[0] as string;
+    subtitle = undefined;
+    if (values.length > 1) {
+      subtitle = values[1] as string;
+    }
+  } else if (typeof item === "string" || typeof item === "number") {
+    title = item + "";
+    subtitle = undefined;
+  } else {
+    return null;
+  }
+
+  return <Card title={title} subtitle={subtitle} />;
+};
+
+type DynamicHeightListProps = {
+  items: any[];
+  itemRenderer?: (item: any, id: any, index: number, count: number, isSelected: boolean) => ReactNode;
+  sectionRenderer?: (group: any, id: any) => ReactNode;
+  sectionFooterRenderer?: (group: any, id: any) => ReactNode;
   loading?: boolean;
   limit?: number;
-  scrollAnchor?: string;
-  fixedItemSize?: boolean;
-  groupBy?: unknown;
-  orderBy?: unknown;
+  groupBy?: string;
+  orderBy?: OrderBy;
   availableGroups?: string[];
-  pageInfo?: unknown;
+  scrollAnchor?: ScrollAnchoring;
+  onContextMenu?: any;
+  requestFetchPrevPage?: () => any;
+  requestFetchNextPage?: () => any;
+  pageInfo?: PageInfo;
   idKey?: string;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  emptyListPlaceholder?: ReactNode;
   groupsInitiallyExpanded?: boolean;
-  defaultGroups?: string[];
-  hideEmptyGroups?: boolean;
+  defaultGroups: Array<string>;
+  registerComponentApi?: RegisterComponentApiFn;
   borderCollapse?: boolean;
+  fixedItemSize?: boolean;
+  // Selection props
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
-  initiallySelected?: unknown[];
+  initiallySelected?: string[];
+  syncWithAppState?: any; // Internal: used by syncWithVar
+  rowUnselectablePredicate?: (item: any) => boolean;
   hideSelectionCheckboxes?: boolean;
-  rowUnselectablePredicate?: (item: unknown) => unknown;
-  selectionCheckboxPosition?: string;
-  selectionCheckboxAnchor?: string;
+  selectionCheckboxPosition?: SelectionCheckboxPosition;
+  selectionCheckboxAnchor?: SelectionCheckboxAnchor;
   selectionCheckboxOffsetX?: string;
   selectionCheckboxOffsetY?: string;
   selectionCheckboxSize?: string;
+  onSelectionDidChange?: AsyncFunction;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
+  rowDoubleClick?: (item: any) => void;
+  onScroll?: (event: {
+    scrollTop: number;
+    scrollHeight: number;
+    viewportSize: number;
+    atEnd: boolean;
+  }) => void;
   keyBindings?: Record<string, string>;
-  className?: string;
-  style?: CSSProperties;
-  renderItem?: (item: unknown, index: number, count: number, isSelected: boolean) => ReactNode;
-  renderGroupHeader?: (group: string, items: unknown[]) => ReactNode;
-  renderGroupFooter?: (group: string, items: unknown[]) => ReactNode;
-  emptyListTemplate?: ReactNode;
-  onSelectionDidChange?: (items: unknown[]) => void | Promise<void>;
-  onRowDoubleClick?: (item: unknown) => void | Promise<void>;
-  onContextMenu?: () => void | Promise<void>;
-  onRequestFetchPrevPage?: () => void | Promise<void>;
-  onRequestFetchNextPage?: () => void | Promise<void>;
-  onSelectAllAction?: (row: ListRowContext | null, items: unknown[], ids: string[]) => void | Promise<void>;
-  onCutAction?: (row: ListRowContext | null, items: unknown[], ids: string[]) => void | Promise<void>;
-  onCopyAction?: (row: ListRowContext | null, items: unknown[], ids: string[]) => void | Promise<void>;
-  onPasteAction?: (row: ListRowContext | null, items: unknown[], ids: string[]) => void | Promise<void>;
-  onDeleteAction?: (row: ListRowContext | null, items: unknown[], ids: string[]) => void | Promise<void>;
-  registerApi?: (api: Record<string, unknown>) => void;
-  "data-testid"?: string;
 };
 
+// --- Selection context for List items
+type ListSelectionContextValue = {
+  rowsSelectable: boolean;
+  selectedRowIdMap: Record<string, boolean>;
+  focusedIndex: number;
+  getRowId: (index: number) => string | undefined;
+  getRowItem: (index: number) => any;
+  onRowClick: (index: number, event: React.MouseEvent) => void;
+  onRowDoubleClick: (index: number) => void;
+  hideSelectionCheckboxes: boolean;
+  enableMultiRowSelection: boolean;
+  toggleRow: (item: any, options?: any) => void;
+  checkAllRows: (checked: boolean) => void;
+  selectionCheckboxPosition: SelectionCheckboxPosition;
+  selectionCheckboxAnchor: SelectionCheckboxAnchor;
+  selectionCheckboxOffsetX: string;
+  selectionCheckboxOffsetY: string;
+  selectionCheckboxSize: string | undefined;
+  rowUnselectablePredicate?: (item: any) => boolean;
+};
+
+const ListSelectionContext = createContext<ListSelectionContextValue>({
+  rowsSelectable: false,
+  selectedRowIdMap: {},
+  focusedIndex: -1,
+  getRowId: () => undefined,
+  getRowItem: () => undefined,
+  onRowClick: () => {},
+  onRowDoubleClick: () => {},
+  hideSelectionCheckboxes: false,
+  enableMultiRowSelection: true,
+  toggleRow: () => {},
+  checkAllRows: () => {},
+  selectionCheckboxPosition: "before",
+  selectionCheckboxAnchor: "top-left",
+  selectionCheckboxOffsetX: "8px",
+  selectionCheckboxOffsetY: "8px",
+  selectionCheckboxSize: undefined,
+});
+
+/**
+ * Context information about a specific row in the list
+ */
 type ListRowContext = {
-  item: unknown;
+  item: any;
   rowIndex: number;
   rowId: string;
   isSelected: boolean;
   isFocused: boolean;
 };
 
-type Row =
-  | { type: "section"; group: string; items: unknown[]; index: number }
-  | { type: "footer"; group: string; items: unknown[]; index: number }
-  | { type: "item"; item: unknown; index: number };
+/**
+ * Helper function to build action context parameters from current list state.
+ */
+function buildListActionContext(
+  selectedItems: any[],
+  selectedRowIdMap: Record<string, boolean>,
+  focusedIndex: number,
+  data: any[],
+  idKey: string,
+): [ListRowContext | null, any[], string[]] {
+  const selectedIds = Object.keys(selectedRowIdMap).filter((id) => selectedRowIdMap[id]);
 
-const VIRTUALIZATION_THRESHOLD = 50;
-const ESTIMATED_ROW_HEIGHT = 48;
-const VIRTUALIZATION_OVERSCAN = 8;
+  let row: ListRowContext | null = null;
+  if (focusedIndex >= 0 && focusedIndex < data.length) {
+    const item = data[focusedIndex];
+    row = {
+      item,
+      rowIndex: focusedIndex,
+      rowId: String(item[idKey]),
+      isSelected: selectedRowIdMap[String(item[idKey])] ?? false,
+      isFocused: true,
+    };
+  }
 
-export const ListNative = memo(forwardRef<ListApi, ListProps>(function ListNative(
+  return [row, selectedItems, selectedIds];
+}
+
+/**
+ * Custom hook to handle keyboard actions for the List component
+ */
+function useListKeyboardActions({
+  keyBindings,
+  onSelectAllAction,
+  onCutAction,
+  onCopyAction,
+  onPasteAction,
+  onDeleteAction,
+  selectedItems,
+  selectedRowIdMap,
+  focusedIndex,
+  data,
+  idKey,
+  rowsSelectable,
+  selectionApi,
+}: {
+  keyBindings: Record<string, string>;
+  onSelectAllAction?: AsyncFunction;
+  onCutAction?: AsyncFunction;
+  onCopyAction?: AsyncFunction;
+  onPasteAction?: AsyncFunction;
+  onDeleteAction?: AsyncFunction;
+  selectedItems: any[];
+  selectedRowIdMap: Record<string, boolean>;
+  focusedIndex: number;
+  data: any[];
+  idKey: string;
+  rowsSelectable: boolean;
+  selectionApi: any;
+}) {
+  const mergedBindings = useMemo(() => {
+    return {
+      ...defaultProps.keyBindings,
+      ...keyBindings,
+    };
+  }, [keyBindings]);
+
+  const parsedBindings = useMemo(() => {
+    const parsed: Record<string, { binding: ParsedKeyBinding; action: string }> = {};
+    const keyToActions: Record<string, string[]> = {};
+
+    Object.entries(mergedBindings).forEach(([action, keyString]) => {
+      if (!keyString) return;
+      try {
+        const binding = parseKeyBinding(keyString);
+        parsed[action] = { binding, action };
+        const keySignature = keyString.toLowerCase().trim();
+        if (!keyToActions[keySignature]) {
+          keyToActions[keySignature] = [];
+        }
+        keyToActions[keySignature].push(action);
+      } catch (error) {
+        console.warn(`Failed to parse key binding for action '${action}': ${keyString}`, error);
+      }
+    });
+
+    Object.entries(keyToActions).forEach(([key, actions]) => {
+      if (actions.length > 1) {
+        console.warn(
+          `Key binding conflict: '${key}' is bound to multiple actions: [${actions.join(", ")}]. Using: ${actions[actions.length - 1]}`,
+        );
+      }
+    });
+
+    return parsed;
+  }, [mergedBindings]);
+
+  const handleKeyboardActions = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      for (const { binding, action } of Object.values(parsedBindings)) {
+        if (matchesKeyEvent(event.nativeEvent, binding)) {
+          let handled = false;
+          switch (action) {
+            case "selectAll":
+              if (rowsSelectable) {
+                selectionApi.selectAll();
+                const allSelectedRowIdMap: Record<string, boolean> = {};
+                data.forEach((item: any) => {
+                  allSelectedRowIdMap[String(item[idKey])] = true;
+                });
+                const [row, allItems, allIds] = buildListActionContext(
+                  data,
+                  allSelectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
+                if (onSelectAllAction) {
+                  onSelectAllAction(row, allItems, allIds);
+                }
+                handled = true;
+              }
+              break;
+            case "cut":
+              if (rowsSelectable && onCutAction) {
+                const [row, items, ids] = buildListActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
+                onCutAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "copy":
+              if (rowsSelectable && onCopyAction) {
+                const [row, items, ids] = buildListActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
+                onCopyAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "paste":
+              if (onPasteAction) {
+                const [row, items, ids] = buildListActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
+                onPasteAction(row, items, ids);
+                handled = true;
+              }
+              break;
+            case "delete":
+              if (rowsSelectable && onDeleteAction) {
+                const [row, items, ids] = buildListActionContext(
+                  selectedItems,
+                  selectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
+                onDeleteAction(row, items, ids);
+                handled = true;
+              }
+              break;
+          }
+
+          if (handled) {
+            event.preventDefault();
+            event.stopPropagation();
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
+    [
+      parsedBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      selectedItems,
+      selectedRowIdMap,
+      focusedIndex,
+      data,
+      idKey,
+      rowsSelectable,
+      selectionApi,
+    ],
+  );
+
+  return handleKeyboardActions;
+}
+
+// eslint-disable-next-line react/display-name
+const Item = forwardRef(
+  ({ children, style, index }: CustomItemComponentProps, forwardedRef: any) => {
+    const getItemType = useContext(ListItemTypeContext);
+    const selCtx = useContext(ListSelectionContext);
+    const itemType = getItemType(index) || RowType.ITEM;
+
+    const isRegularItem = itemType === RowType.ITEM;
+    const rowId = isRegularItem ? selCtx.getRowId(index) : undefined;
+    const isSelected = rowId != null ? !!selCtx.selectedRowIdMap[rowId] : false;
+    const isFocused = isRegularItem ? selCtx.focusedIndex === index : false;
+    const showCheckbox = isRegularItem && selCtx.rowsSelectable && !selCtx.hideSelectionCheckboxes;
+    const isOverlay = selCtx.selectionCheckboxPosition === "overlay";
+
+    // Check if the row is unselectable
+    const rowItem = isRegularItem ? selCtx.getRowItem(index) : undefined;
+    const isUnselectable = rowItem && selCtx.rowUnselectablePredicate?.(rowItem);
+
+    const checkboxInput = showCheckbox ? (
+      <div
+        className={classnames(styles.checkboxWrapper, {
+          [styles.checkboxOverlay]: isOverlay,
+          [styles.checkboxAnchorTopRight]: isOverlay && selCtx.selectionCheckboxAnchor === "top-right",
+          [styles.checkboxAnchorBottomLeft]: isOverlay && selCtx.selectionCheckboxAnchor === "bottom-left",
+          [styles.checkboxAnchorBottomRight]: isOverlay && selCtx.selectionCheckboxAnchor === "bottom-right",
+          [styles.checkboxDisabled]: isUnselectable,
+        })}
+        style={isOverlay ? {
+          ...(selCtx.selectionCheckboxAnchor.includes("center")
+            ? { top: "50%", bottom: undefined, transform: "translateY(-50%)" }
+            : selCtx.selectionCheckboxAnchor.includes("top")
+              ? { top: selCtx.selectionCheckboxOffsetY, bottom: undefined }
+              : { bottom: selCtx.selectionCheckboxOffsetY, top: undefined }),
+          ...(selCtx.selectionCheckboxAnchor.includes("left")
+            ? { left: selCtx.selectionCheckboxOffsetX, right: undefined }
+            : { right: selCtx.selectionCheckboxOffsetX, left: undefined }),
+        } : undefined}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ThemedToggle
+          value={isSelected}
+          enabled={!isUnselectable}
+          onDidChange={() => {
+            selCtx.onRowClick(index, { shiftKey: false, metaKey: true, ctrlKey: false } as React.MouseEvent);
+          }}
+          style={selCtx.selectionCheckboxSize ? {
+            width: selCtx.selectionCheckboxSize,
+            height: selCtx.selectionCheckboxSize,
+          } : undefined}
+        />
+      </div>
+    ) : null;
+
+    return (
+      <div
+        style={style}
+        ref={forwardedRef}
+        className={classnames({
+          [styles.row]: isRegularItem,
+          [styles.selected]: isRegularItem && isSelected,
+          [styles.focused]: isRegularItem && isFocused,
+          [styles.selectable]: isRegularItem && selCtx.rowsSelectable,
+          [styles.hasCheckboxes]: showCheckbox && !isOverlay,
+          [styles.hasOverlayCheckbox]: showCheckbox && isOverlay,
+          [styles.section]: itemType === RowType.SECTION,
+          [styles.sectionFooter]: itemType === RowType.SECTION_FOOTER,
+        })}
+        data-list-item-type={itemType}
+        data-index={index}
+        data-selected={isRegularItem && isSelected ? true : undefined}
+        onClick={
+          isRegularItem && selCtx.rowsSelectable
+            ? (e) => {
+                if (e.detail >= 2) return;
+                selCtx.onRowClick(index, e);
+              }
+            : undefined
+        }
+        onDoubleClick={
+          isRegularItem
+            ? (e) => {
+                e.preventDefault();
+                selCtx.onRowDoubleClick(index);
+              }
+            : undefined
+        }
+      >
+        {showCheckbox && !isOverlay && checkboxInput}
+        {children}
+        {showCheckbox && isOverlay && checkboxInput}
+      </div>
+    );
+  },
+);
+
+const ListItemTypeContext = createContext<(index: number) => RowType>((index) => RowType.ITEM);
+
+/**
+ * Virtua's `shift` prop helps maintain scroll position when prepending items (like message history).
+ * Unfortunately it's finicky and must only be `true` when the beginning of the list changes, otherwise
+ * rendering gets broken (see: https://github.com/inokawa/virtua/issues/284).
+ *
+ * Virtua also requires `shift` to be correct on the same render pass when items are updated — so we can't
+ * just use `useEffect` and `useState` to monitor items and update `shift` since those will update _after_ the
+ * render pass. Instead, we use refs to check if the underlying data has changed on each render pass, and
+ * update a `shift` ref in the same pass.
+ *
+ * That's all encapsulated in this handy hook, to keep the logic out of the component.
+ */
+const useShift = (listData: any[], idKey: any) => {
+  const previousListData = useRef<any[] | undefined>();
+  const shouldShift = useRef<boolean>();
+  if (listData !== previousListData.current) {
+    if (listData?.[0]?.[idKey] !== previousListData.current?.[0]?.[idKey]) {
+      shouldShift.current = true;
+    } else {
+      shouldShift.current = false;
+    }
+    previousListData.current = listData;
+  }
+  return shouldShift.current;
+};
+
+export const ListNative = memo(forwardRef(function DynamicHeightList2(
   {
-    id,
-    items = [],
-    loading = false,
+    items = EMPTY_ARRAY,
+    itemRenderer = defaultItemRenderer,
+    sectionRenderer,
+    sectionFooterRenderer,
+    loading,
     limit,
-    scrollAnchor = defaultProps.scrollAnchor,
-    fixedItemSize: _fixedItemSize,
     groupBy,
     orderBy,
     availableGroups,
+    scrollAnchor = defaultProps.scrollAnchor,
+    onContextMenu,
+    requestFetchPrevPage = noop,
+    requestFetchNextPage = noop,
     pageInfo,
     idKey = defaultProps.idKey,
-    groupsInitiallyExpanded = defaultProps.groupsInitiallyExpanded,
-    defaultGroups = [],
-    hideEmptyGroups = defaultProps.hideEmptyGroups,
+    style,
+    className,
+    classes,
+    emptyListPlaceholder,
+    groupsInitiallyExpanded = true,
+    defaultGroups = EMPTY_ARRAY,
+    registerComponentApi,
     borderCollapse = defaultProps.borderCollapse,
+    fixedItemSize,
+    // Selection props
     rowsSelectable = defaultProps.rowsSelectable,
     enableMultiRowSelection = defaultProps.enableMultiRowSelection,
     initiallySelected = defaultProps.initiallySelected,
-    hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+    syncWithAppState,
     rowUnselectablePredicate,
+    hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
     selectionCheckboxPosition = defaultProps.selectionCheckboxPosition,
     selectionCheckboxAnchor = defaultProps.selectionCheckboxAnchor,
-    selectionCheckboxOffsetX = defaultProps.selectionCheckboxOffsetX,
-    selectionCheckboxOffsetY = defaultProps.selectionCheckboxOffsetY,
+    selectionCheckboxOffsetX,
+    selectionCheckboxOffsetY,
     selectionCheckboxSize,
-    keyBindings = defaultProps.keyBindings,
-    className,
-    style,
-    renderItem = defaultRenderItem,
-    renderGroupHeader,
-    renderGroupFooter,
-    emptyListTemplate,
     onSelectionDidChange,
-    onRowDoubleClick,
-    onContextMenu,
-    onRequestFetchPrevPage,
-    onRequestFetchNextPage,
     onSelectAllAction,
     onCutAction,
     onCopyAction,
     onPasteAction,
     onDeleteAction,
-    registerApi,
-    "data-testid": dataTestId,
+    rowDoubleClick,
+    onScroll,
+    keyBindings = defaultProps.keyBindings,
     ...rest
-  },
+  }: DynamicHeightListProps,
   ref,
 ) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const [scrollTop, setScrollTop] = useState(0);
-  const normalizedItems = useMemo(
-    () => normalizeItems(items, orderBy, limit),
-    [items, limit, orderBy],
-  );
-  const rows = useMemo(
-    () => buildRows({
-      items: normalizedItems,
-      groupBy,
-      defaultGroups,
-      availableGroups,
-      hideEmptyGroups,
-      groupsInitiallyExpanded,
-    }),
-    [availableGroups, defaultGroups, groupBy, groupsInitiallyExpanded, hideEmptyGroups, normalizedItems],
-  );
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set((initiallySelected ?? []).map(String)),
-  );
-  const selectedItems = useMemo(
-    () => normalizedItems.filter((item) => selectedIds.has(String(itemId(item, idKey)))),
-    [idKey, normalizedItems, selectedIds],
-  );
-  const shouldVirtualize = rows.length > VIRTUALIZATION_THRESHOLD && hasConstrainedHeight(style);
-  const virtualWindow = useMemo(
-    () => shouldVirtualize
-      ? visibleWindow(rows.length, rootRef.current?.clientHeight ?? 400, scrollTop)
-      : { start: 0, end: rows.length, top: 0, bottom: 0 },
-    [rows.length, scrollTop, shouldVirtualize],
-  );
-  const renderedRows = shouldVirtualize ? rows.slice(virtualWindow.start, virtualWindow.end) : rows;
+  const virtualizerRef = useRef<VirtualizerHandle>(null);
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
+  
+  // State and ref for measuring first item size when fixedItemSize is enabled
+  const firstItemRef = useRef<HTMLDivElement>(null);
 
-  const publishSelection = useCallback((nextIds: Set<string>) => {
-    setSelectedIds(nextIds);
-    const nextItems = normalizedItems.filter((item) => nextIds.has(String(itemId(item, idKey))));
-    void onSelectionDidChange?.(nextItems);
-  }, [idKey, normalizedItems, onSelectionDidChange]);
+  const scrollParent = useScrollParent(parentRef.current?.parentElement);
+  const scrollRef = useRef(scrollParent);
+  scrollRef.current = scrollParent;
 
-  const toggleItem = useCallback((item: unknown, additive: boolean) => {
-    if (!rowsSelectable) {
-      return;
-    }
-    if (isUnselectable(item, rowUnselectablePredicate)) {
-      publishSelection(new Set(selectedIds));
-      return;
-    }
-    const id = String(itemId(item, idKey));
-    const next = enableMultiRowSelection && additive ? new Set(selectedIds) : new Set<string>();
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
-    publishSelection(next);
-  }, [enableMultiRowSelection, idKey, publishSelection, rowUnselectablePredicate, rowsSelectable, selectedIds]);
+  const hasHeight = useHasExplicitHeight(parentRef);
+  const hasOutsideScroll = scrollRef.current && !hasHeight;
 
-  const actionContext = useCallback((): [ListRowContext | null, unknown[], string[]] => {
-    const ids = [...selectedIds];
-    const firstId = ids[0];
-    const item = normalizedItems.find((candidate) => String(itemId(candidate, idKey)) === firstId);
-    const rowIndex = item === undefined ? -1 : normalizedItems.indexOf(item);
-    return [
-      item === undefined ? null : {
-        item,
-        rowIndex,
-        rowId: firstId,
-        isSelected: true,
-        isFocused: true,
-      },
-      selectedItems,
-      ids,
-    ];
-  }, [idKey, normalizedItems, selectedIds, selectedItems]);
+  // Create a ref for the Virtualizer's scroll container
+  // When using outside scroll, we need a ref that points to the scroll parent
+  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
-  const api = useMemo<ListApi>(() => ({
-    scrollToTop: () => rootRef.current?.scrollTo({ top: 0 }),
-    scrollToBottom: () => rootRef.current?.scrollTo({ top: rootRef.current.scrollHeight }),
-    scrollToIndex: (index) => {
-      if (shouldVirtualize) {
-        rootRef.current?.scrollTo({ top: Math.max(0, index * ESTIMATED_ROW_HEIGHT) });
-        return;
+  const shouldStickToBottom = useRef(scrollAnchor === "bottom");
+  // virtua's onScroll can't distinguish our own/auto scrolls from genuine user
+  // scrolls. A content-sized (e.g. maxHeight) bottom-anchored list grows from
+  // the top, so when content first overflows, the auto scroll-to-bottom would
+  // otherwise be read as "the user scrolled up" and follow would stop. We set
+  // this flag around our own scrollToIndex calls and ignore onScroll while set,
+  // so only a real user scroll can turn off stick-to-bottom.
+  const programmaticScroll = useRef(false);
+  const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
+  const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
+    setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
+  }, []);
+
+  const expandContextValue = useMemo(() => {
+    return {
+      isExpanded: (id: any) =>
+        expanded[id] || (expanded[id] === undefined && groupsInitiallyExpanded),
+      toggleExpanded,
+    };
+  }, [expanded, groupsInitiallyExpanded, toggleExpanded]);
+
+  const { rows } = useListData({
+    groupsInitiallyExpanded,
+    defaultGroups,
+    expanded,
+    items,
+    limit,
+    groupBy,
+    orderBy,
+    availableGroups,
+  });
+
+  const shift = useShift(rows, idKey);
+
+  // --- Safe items array for selection operations
+  const safeItems = Array.isArray(items) ? items : EMPTY_ARRAY;
+
+  // --- Get visible items (non-section items from rows) for selection
+  const visibleItems = useMemo(() => {
+    return rows.filter((row) => row._row_type === undefined);
+  }, [rows]);
+
+  // --- Row selection hook
+  const {
+    toggleRow,
+    toggleRowIndex,
+    checkAllRows,
+    focusedIndex,
+    onKeyDown: selectionKeyDown,
+    selectedRowIdMap,
+    selectedItems: selectionSelectedItems,
+    idKey: selectionIdKey,
+    selectionApi,
+  } = useRowSelection({
+    items: safeItems,
+    visibleItems,
+    rowsSelectable,
+    enableMultiRowSelection,
+    rowUnselectablePredicate,
+    onSelectionDidChange,
+    initiallySelected,
+    syncWithAppState,
+  });
+
+  // --- Keyboard actions (selectAll, cut, copy, paste, delete)
+  const handleKeyboardActions = useListKeyboardActions({
+    keyBindings,
+    onSelectAllAction,
+    onCutAction,
+    onCopyAction,
+    onPasteAction,
+    onDeleteAction,
+    selectedItems: selectionApi.getSelectedItems(),
+    selectedRowIdMap,
+    focusedIndex,
+    data: safeItems,
+    idKey: selectionIdKey,
+    rowsSelectable,
+    selectionApi,
+  });
+
+  // --- Composite keyboard handler combining actions and navigation
+  const compositeKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const actionHandled = handleKeyboardActions(event);
+      if (!actionHandled) {
+        selectionKeyDown(event);
       }
-      rootRef.current?.querySelector<HTMLElement>(`[data-list-index="${index}"]`)?.scrollIntoView();
     },
-    scrollToId: (targetId) => {
-      if (shouldVirtualize) {
-        const index = normalizedItems.findIndex((item) => String(itemId(item, idKey)) === String(targetId));
-        if (index >= 0) {
-          rootRef.current?.scrollTo({ top: index * ESTIMATED_ROW_HEIGHT });
+    [handleKeyboardActions, selectionKeyDown],
+  );
+
+  // --- Build a map from row index (in the `rows` array) to visible item index
+  const rowIndexToVisibleIndex = useMemo(() => {
+    const map: Record<number, number> = {};
+    let visIdx = 0;
+    rows.forEach((row, idx) => {
+      if (row._row_type === undefined) {
+        map[idx] = visIdx;
+        visIdx++;
+      }
+    });
+    return map;
+  }, [rows]);
+
+  // --- Get row ID from row index
+  const getRowId = useCallback(
+    (index: number) => {
+      const row = rows[index];
+      if (!row || row._row_type !== undefined) return undefined;
+      return String(row[idKey]);
+    },
+    [rows, idKey],
+  );
+
+  const getRowItem = useCallback(
+    (index: number) => {
+      const row = rows[index];
+      if (!row || row._row_type !== undefined) return undefined;
+      return row;
+    },
+    [rows],
+  );
+
+  // --- Handle a click on a list row
+  const onRowClick = useEvent((index: number, event: React.MouseEvent) => {
+    if (!rowsSelectable) return;
+    const row = rows[index];
+    if (!row || row._row_type !== undefined) return;
+
+    // Focus the wrapper to enable keyboard shortcuts
+    parentRef.current?.focus();
+
+    // Map from row index to visible item index for toggleRowIndex
+    const visIdx = rowIndexToVisibleIndex[index];
+    if (visIdx === undefined) return;
+
+    toggleRowIndex(visIdx, {
+      shiftKey: event.shiftKey,
+      metaKey: event.metaKey,
+      ctrlKey: event.ctrlKey,
+    });
+  });
+
+  // --- Handle double-click on a list row
+  const onRowDoubleClick = useEvent((index: number) => {
+    const row = rows[index];
+    if (!row || row._row_type !== undefined) return;
+    if (rowDoubleClick && typeof rowDoubleClick === "function") {
+      try {
+        rowDoubleClick(row);
+      } catch (e) {
+        console.error("Error in rowDoubleClick handler:", e);
+      }
+    }
+  });
+
+  // --- Selection context value for the Item component
+  // Always provide a non-null context so that onDoubleClick is registered regardless of rowsSelectable.
+  // Click-based selection still respects rowsSelectable via the rowsSelectable field.
+  const selectionContextValue = useMemo<ListSelectionContextValue>(() => {
+    return {
+      rowsSelectable,
+      selectedRowIdMap,
+      focusedIndex: (() => {
+        // Convert focused visible item index to row index
+        for (const [rowIdx, visIdx] of Object.entries(rowIndexToVisibleIndex)) {
+          if (visIdx === focusedIndex) return Number(rowIdx);
         }
-        return;
-      }
-      rootRef.current?.querySelector<HTMLElement>(`[data-list-id="${String(targetId)}"]`)?.scrollIntoView();
-    },
-    selectAll: () => {
-      if (!rowsSelectable) {
-        return;
-      }
-      publishSelection(new Set(normalizedItems
-        .filter((item) => !isUnselectable(item, rowUnselectablePredicate))
-        .map((item) => String(itemId(item, idKey)))));
-    },
-    clearSelection: () => publishSelection(new Set()),
-    getSelectedIds: () => [...selectedIds].map((id) => numericId(id)),
-    getSelectedItems: () => selectedItems,
-    selectId: (targetId) => {
-      if (!rowsSelectable) {
-        return;
-      }
-      const ids = Array.isArray(targetId) ? targetId : [targetId];
-      publishSelection(new Set(ids.map(String)));
-    },
-  }), [idKey, normalizedItems, publishSelection, rowUnselectablePredicate, rowsSelectable, selectedIds, selectedItems, shouldVirtualize]);
+        return -1;
+      })(),
+      getRowId,
+      getRowItem,
+      onRowClick,
+      onRowDoubleClick,
+      hideSelectionCheckboxes,
+      enableMultiRowSelection,
+      toggleRow,
+      checkAllRows,
+      selectionCheckboxPosition,
+      selectionCheckboxAnchor,
+      selectionCheckboxOffsetX,
+      selectionCheckboxOffsetY,
+      selectionCheckboxSize,
+      rowUnselectablePredicate,
+    };
+  }, [
+    rowsSelectable,
+    selectedRowIdMap,
+    focusedIndex,
+    rowIndexToVisibleIndex,
+    getRowId,
+    getRowItem,
+    onRowClick,
+    onRowDoubleClick,
+    hideSelectionCheckboxes,
+    enableMultiRowSelection,
+    toggleRow,
+    checkAllRows,
+    selectionCheckboxPosition,
+    selectionCheckboxAnchor,
+    selectionCheckboxOffsetX,
+    selectionCheckboxOffsetY,
+    selectionCheckboxSize,
+    rowUnselectablePredicate,
+  ]);
 
-  useImperativeHandle(ref, () => api, [api]);
-
+  const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
-    registerApi?.(api as unknown as Record<string, unknown>);
-  }, [api, registerApi]);
-
-  useEffect(() => {
-    if (scrollAnchor !== "bottom") {
-      return;
+    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
+      initiallyScrolledToBottom.current = true;
+      requestAnimationFrame(() => {
+        programmaticScroll.current = true;
+        virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+          align: "end",
+        });
+        requestAnimationFrame(() => {
+          programmaticScroll.current = false;
+        });
+      });
     }
-    requestAnimationFrame(() => rootRef.current?.scrollTo({ top: rootRef.current.scrollHeight }));
   }, [rows.length, scrollAnchor]);
 
   useEffect(() => {
-    if (!pageInfo || typeof pageInfo !== "object") {
-      return;
-    }
-    const info = pageInfo as Record<string, unknown>;
-    if (info.hasPrevPage && !info.isFetchingPrevPage && rootRef.current?.scrollTop === 0) {
-      void onRequestFetchPrevPage?.();
-    }
-    const isAtBottom = rootRef.current
-      ? rootRef.current.scrollTop + rootRef.current.clientHeight >= rootRef.current.scrollHeight - 1
-      : false;
-    if (info.hasNextPage && !info.isFetchingNextPage && isAtBottom) {
-      void onRequestFetchNextPage?.();
-    }
-  }, [onRequestFetchNextPage, onRequestFetchPrevPage, pageInfo, rows.length]);
+    if (!virtualizerRef.current) return;
+    if (!shouldStickToBottom.current) return;
+    requestAnimationFrame(() => {
+      const v = virtualizerRef.current;
+      if (!v) return;
+      programmaticScroll.current = true;
+      // Scroll to the absolute bottom of the scrollable content rather than to
+      // the last item's end: while a newly appended item is still measuring
+      // (e.g. async Markdown streaming in), aligning to its current end can land
+      // a hair short of the true bottom. scrollTo(scrollSize) clamps to the real
+      // bottom regardless of item boundaries or trailing space.
+      v.scrollTo(v.scrollSize);
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
+      });
+    });
+  }, [rows]);
 
-  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
-    const action = keyActionForEvent(event, keyBindings);
-    if (!action) {
-      return;
+  // Re-assert stick-to-bottom when the content GROWS while we are following.
+  // The effect above fires on `rows` (data) changes, but children that lay out
+  // asynchronously — Markdown, images, fold/unfold — keep growing *after* that
+  // scroll, below the fold. virtua's onScroll fires only on real scroll (not on
+  // content-height growth) and virtua does not auto-stick on append, so without
+  // this the list lands "almost" at the bottom and drifts up as late-measuring
+  // content settles. A ResizeObserver on the content wrapper catches exactly
+  // those size changes; we re-scroll only while shouldStickToBottom is set, so a
+  // user who scrolled up to read is never yanked back down.
+  const hasRows = rows.length > 0;
+  useEffect(() => {
+    if (scrollAnchor !== "bottom") return;
+    if (typeof ResizeObserver === "undefined") return;
+    const container = parentRef.current?.querySelector("[data-list-container]");
+    if (!container) return;
+    const observer = new ResizeObserver(() => {
+      if (!shouldStickToBottom.current) return;
+      if (programmaticScroll.current) return;
+      const v = virtualizerRef.current;
+      if (!v) return;
+      programmaticScroll.current = true;
+      // Absolute bottom (see the [rows] effect above) — robust to a still-
+      // measuring trailing item, which is exactly what the observer catches.
+      v.scrollTo(v.scrollSize);
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
+      });
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [scrollAnchor, hasRows]);
+
+  const isFetchingPrevPage = useRef(false);
+  const tryToFetchPrevPage = useCallback(() => {
+    if (
+      virtualizerRef.current &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset) < 10 &&
+      pageInfo &&
+      pageInfo.hasPrevPage &&
+      !pageInfo.isFetchingPrevPage &&
+      !isFetchingPrevPage.current
+    ) {
+      isFetchingPrevPage.current = true;
+      void (async function doFetch() {
+        try {
+          await requestFetchPrevPage();
+        } finally {
+          isFetchingPrevPage.current = false;
+        }
+      })();
     }
-    const [row, items, ids] = actionContext();
-    let handled = false;
-    if (action === "selectAll" && rowsSelectable) {
-      api.selectAll();
-      void onSelectAllAction?.(row, normalizedItems.filter((item) => !isUnselectable(item, rowUnselectablePredicate)), normalizedItems
-        .filter((item) => !isUnselectable(item, rowUnselectablePredicate))
-        .map((item) => String(itemId(item, idKey))));
-      handled = true;
-    } else if (action === "copy" && rowsSelectable) {
-      void onCopyAction?.(row, items, ids);
-      handled = true;
-    } else if (action === "cut" && rowsSelectable) {
-      void onCutAction?.(row, items, ids);
-      handled = true;
-    } else if (action === "delete" && rowsSelectable) {
-      void onDeleteAction?.(row, items, ids);
-      handled = true;
-    } else if (action === "paste") {
-      void onPasteAction?.(row, items, ids);
-      handled = true;
+  }, [pageInfo, requestFetchPrevPage]);
+
+  const isFetchingNextPage = useRef(false);
+  const tryToFetchNextPage = useCallback(() => {
+    if (
+      virtualizerRef.current &&
+      typeof virtualizerRef.current.findItemIndex === 'function' &&
+      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset + virtualizerRef.current.viewportSize) + 10 > rows.length &&
+      pageInfo &&
+      pageInfo.hasNextPage &&
+      !pageInfo.isFetchingNextPage &&
+      !isFetchingNextPage.current
+    ) {
+      isFetchingNextPage.current = true;
+      void (async function doFetch() {
+        try {
+          await requestFetchNextPage();
+        } finally {
+          isFetchingNextPage.current = false;
+        }
+      })();
     }
-    if (handled) {
-      event.preventDefault();
-      event.stopPropagation();
+  }, [rows.length, pageInfo, requestFetchNextPage]);
+
+  const initiallyFetchedExtraPages = useRef(false);
+  useEffect(() => {
+    if (rows.length && !initiallyFetchedExtraPages.current) {
+      initiallyFetchedExtraPages.current = true;
+      tryToFetchPrevPage();
     }
-  }, [
-    actionContext,
-    api,
-    idKey,
-    keyBindings,
-    normalizedItems,
-    onCopyAction,
-    onCutAction,
-    onDeleteAction,
-    onPasteAction,
-    onSelectAllAction,
-    rowUnselectablePredicate,
-    rowsSelectable,
-  ]);
+  }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
+
+  const lastScrollOffset = useRef(0);
+  const handleVirtuaScroll = useCallback(
+    (offset) => {
+      if (!virtualizerRef.current) return;
+      // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
+      const atEnd =
+        offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+      const prevOffset = lastScrollOffset.current;
+      lastScrollOffset.current = offset;
+      const movedTowardTop = offset < prevOffset - 0.5;
+      const offsetChanged = Math.abs(offset - prevOffset) > 0.5;
+      if (scrollAnchor === "bottom" && !programmaticScroll.current) {
+        // Stop following only on a genuine upward user scroll. When appended
+        // content grows below the fold, virtua fires onScroll with the SAME
+        // offset against a larger scrollSize, so atEnd is momentarily false —
+        // that must NOT be read as "the user scrolled up", or follow would die
+        // on every new item. In that case leave the flag unchanged; the
+        // re-stick effect/observer pins us back to the true bottom.
+        if (atEnd) {
+          shouldStickToBottom.current = true;
+        } else if (movedTowardTop) {
+          shouldStickToBottom.current = false;
+        }
+      }
+      // Report scroll state to consumers, but only for genuine user scrolls
+      // (the offset actually moved) and never during our own/auto programmatic
+      // scrolls — so a content-growth tick can't masquerade as the user
+      // leaving the bottom.
+      if (!programmaticScroll.current && offsetChanged) {
+        onScroll?.({
+          scrollTop: offset,
+          scrollHeight: virtualizerRef.current.scrollSize,
+          viewportSize: virtualizerRef.current.viewportSize,
+          atEnd,
+        });
+      }
+      tryToFetchPrevPage();
+      tryToFetchNextPage();
+    },
+    [scrollAnchor, onScroll, tryToFetchNextPage, tryToFetchPrevPage],
+  );
+
+  const scrollToBottom = useEvent(() => {
+    if (rows.length) {
+      virtualizerRef.current?.scrollToIndex(rows.length + 1, {
+        align: "end",
+        offset: startMargin,
+      });
+    }
+  });
+
+  const scrollToTop = useEvent(() => {
+    if (rows.length) {
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin });
+    }
+  });
+
+  const scrollToIndex = useEvent((index) => {
+    virtualizerRef.current?.scrollToIndex(index, {
+      offset: -startMargin,
+    });
+  });
+
+  const scrollToId = useEvent((id) => {
+    const index = rows?.findIndex((row) => row[idKey] === id);
+    if (index >= 0) {
+      scrollToIndex(index);
+    }
+  });
+
+  useIsomorphicLayoutEffect(() => {
+    registerComponentApi?.({
+      scrollToBottom,
+      scrollToTop,
+      scrollToIndex,
+      scrollToId,
+      ...selectionApi,
+    });
+  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, selectionApi]);
+  // REVIEW: I changed this code line because in the build version rows[index] was undefined
+  // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
+  const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
+
+  const rowCount = rows?.length ?? 0;
+
+  const startMargin = useStartMargin(hasOutsideScroll, parentRef, scrollRef);
 
   return (
-    <div
-      {...rest}
-      ref={rootRef}
-      id={id}
-      data-testid={dataTestId}
-      data-xmlui-component="List"
-      className={cx(styles.outerListWrapper, className)}
-      style={style}
-      tabIndex={0}
-      onContextMenu={(event) => {
-        event.preventDefault();
-        void onContextMenu?.();
-      }}
-      onKeyDown={handleKeyDown}
-      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-    >
-      <div className={styles.innerListWrapper}>
-        {loading && normalizedItems.length === 0 ? (
-          <div className={styles.loadingWrapper}>Loading...</div>
-        ) : normalizedItems.length === 0 ? (
-          <div className={styles.noRows}>{emptyListTemplate ?? "No data"}</div>
-        ) : (
-          <>
-            {shouldVirtualize && virtualWindow.top > 0 ? (
-              <div aria-hidden="true" style={{ height: virtualWindow.top, flex: "0 0 auto" }} />
-            ) : null}
-            {renderedRows.map((row) => {
-            if (row.type === "section") {
-              return (
-                <div
-                  key={`section:${row.group}`}
-                  data-list-item-type="SECTION"
-                  data-index={row.index}
-                  className={styles.section}
-                  style={shouldVirtualize ? virtualRowStyle() : undefined}
-                >
-                  <div className={styles.listGroupHeader}>
-                    {renderGroupHeader?.(row.group, row.items) ?? row.group}
-                  </div>
+    <ListItemTypeContext.Provider value={rowTypeContextValue}>
+      <ListContext.Provider value={expandContextValue}>
+        <ListSelectionContext.Provider value={selectionContextValue}>
+          <div
+            {...rest}
+            ref={rootRef}
+            style={style}
+            onContextMenu={onContextMenu}
+            tabIndex={rowsSelectable ? 0 : undefined}
+            onKeyDown={rowsSelectable ? compositeKeyDown : undefined}
+            className={classnames(
+              styles.outerListWrapper,
+              {
+                [styles.hasOutsideScroll]: hasOutsideScroll,
+              },
+              classes?.[COMPONENT_PART_KEY],
+              className,
+            )}
+          >
+            {loading && rows.length === 0 && (
+              <div className={styles.loadingWrapper}>
+                <Spinner />
+              </div>
+            )}
+            {!loading &&
+              rows.length === 0 &&
+              (emptyListPlaceholder ?? (
+                <div className={styles.noRows}>
+                  <Text>No data available</Text>
                 </div>
-              );
-            }
-            if (row.type === "footer") {
-              return renderGroupFooter ? (
-                <div
-                  key={`footer:${row.group}`}
-                  data-list-item-type="SECTION_FOOTER"
-                  data-index={row.index}
-                  className={styles.sectionFooter}
-                  style={shouldVirtualize ? virtualRowStyle() : undefined}
+              ))}
+            {rows.length > 0 && (
+              <div
+                className={classnames(styles.innerListWrapper, {
+                  [styles.reverse]: scrollAnchor === "bottom",
+                  [styles.borderCollapse]: borderCollapse,
+                  [styles.sectioned]: groupBy !== undefined,
+                })}
+                data-list-container={true}
+              >
+                <Virtualizer
+                  ref={virtualizerRef}
+                  scrollRef={scrollElementRef}
+                  shift={shift}
+                  onScroll={handleVirtuaScroll}
+                  startMargin={startMargin}
+                  item={Item as CustomItemComponent}
                 >
-                  <div className={styles.listGroupFooter}>{renderGroupFooter(row.group, row.items)}</div>
-                </div>
-              ) : null;
-            }
-            return renderRow({
-              item: row.item,
-              index: row.index,
-              count: normalizedItems.length,
-              idKey,
-              selectedIds,
-              rowsSelectable,
-              hideSelectionCheckboxes,
-              rowUnselectablePredicate,
-              selectionCheckboxPosition,
-              selectionCheckboxAnchor,
-              selectionCheckboxOffsetX,
-              selectionCheckboxOffsetY,
-              selectionCheckboxSize,
-              borderCollapse,
-              renderItem,
-              toggleItem,
-              onRowDoubleClick,
-              virtualized: shouldVirtualize,
-            });
-            })}
-            {shouldVirtualize && virtualWindow.bottom > 0 ? (
-              <div aria-hidden="true" style={{ height: virtualWindow.bottom, flex: "0 0 auto" }} />
-            ) : null}
-          </>
-        )}
-      </div>
-    </div>
+                  {rows.map((row, rowIndex) => {
+                    const key = row?.[idKey] ?? rowIndex;
+                    const isFirstItem = rowIndex === 0;
+                    const shouldMeasure = isFirstItem && fixedItemSize && row != null;
+                    const isSelected = row._row_type === undefined
+                      ? !!selectedRowIdMap[String(row[idKey])]
+                      : false;
+                    // Render different row types
+                    switch (row._row_type) {
+                      case RowType.SECTION:
+                        return (
+                          <React.Fragment key={key}>
+                            {shouldMeasure ? (
+                              <div ref={firstItemRef}>{sectionRenderer?.(row, key)}</div>
+                            ) : (
+                              sectionRenderer?.(row, key)
+                            )}
+                          </React.Fragment>
+                        );
+                      case RowType.SECTION_FOOTER:
+                        return (
+                          <React.Fragment key={key}>
+                            {shouldMeasure ? (
+                              <div ref={firstItemRef}>{sectionFooterRenderer?.(row, key)}</div>
+                            ) : (
+                              sectionFooterRenderer?.(row, key)
+                            )}
+                          </React.Fragment>
+                        );
+                      default:
+                        return (
+                          <React.Fragment key={key}>
+                            {shouldMeasure ? (
+                              <div ref={firstItemRef}>{itemRenderer(row, key, rowIndex, rowCount, isSelected)}</div>
+                            ) : (
+                              itemRenderer(row, key, rowIndex, rowCount, isSelected)
+                            )}
+                          </React.Fragment>
+                        );
+                    }
+                  })}
+                </Virtualizer>
+              </div>
+            )}
+          </div>
+        </ListSelectionContext.Provider>
+      </ListContext.Provider>
+    </ListItemTypeContext.Provider>
   );
 }));
 
-function hasConstrainedHeight(style: CSSProperties | undefined): boolean {
-  return style?.height !== undefined || style?.maxHeight !== undefined;
-}
-
-function visibleWindow(rowCount: number, viewportHeight: number, scrollTop: number): {
-  start: number;
-  end: number;
-  top: number;
-  bottom: number;
-} {
-  const visibleCount = Math.ceil(Math.max(1, viewportHeight) / ESTIMATED_ROW_HEIGHT);
-  const start = Math.max(0, Math.floor(scrollTop / ESTIMATED_ROW_HEIGHT) - VIRTUALIZATION_OVERSCAN);
-  const end = Math.min(rowCount, start + visibleCount + VIRTUALIZATION_OVERSCAN * 2);
-  return {
-    start,
-    end,
-    top: start * ESTIMATED_ROW_HEIGHT,
-    bottom: Math.max(0, (rowCount - end) * ESTIMATED_ROW_HEIGHT),
-  };
-}
-
-function renderRow({
+// --- Helper function for List item rendering
+export function MemoizedSection({
+  node,
+  renderChild,
   item,
-  index,
-  count,
-  idKey,
-  selectedIds,
-  rowsSelectable,
-  hideSelectionCheckboxes,
-  rowUnselectablePredicate,
-  selectionCheckboxPosition,
-  selectionCheckboxAnchor,
-  selectionCheckboxOffsetX,
-  selectionCheckboxOffsetY,
-  selectionCheckboxSize,
-  borderCollapse,
-  renderItem,
-  toggleItem,
-  onRowDoubleClick,
-  virtualized,
+  contextVars = EMPTY_OBJECT,
 }: {
-  item: unknown;
-  index: number;
-  count: number;
-  idKey: string;
-  selectedIds: Set<string>;
-  rowsSelectable: boolean;
-  hideSelectionCheckboxes: boolean;
-  rowUnselectablePredicate?: (item: unknown) => unknown;
-  selectionCheckboxPosition: string;
-  selectionCheckboxAnchor: string;
-  selectionCheckboxOffsetX: string;
-  selectionCheckboxOffsetY: string;
-  selectionCheckboxSize?: string;
-  borderCollapse: boolean;
-  renderItem: NonNullable<ListProps["renderItem"]>;
-  toggleItem: (item: unknown, additive: boolean) => void;
-  onRowDoubleClick?: (item: unknown) => void | Promise<void>;
-  virtualized?: boolean;
+  node: ComponentDef;
+  item: any;
+  renderChild: RenderChildFn;
+  contextVars?: Record<string, any>;
 }) {
-  const id = String(itemId(item, idKey));
-  const selected = selectedIds.has(id);
-  const unselectable = isUnselectable(item, rowUnselectablePredicate);
-  const showCheckbox = rowsSelectable && !hideSelectionCheckboxes;
-  const overlay = selectionCheckboxPosition === "overlay";
-  const checkbox = showCheckbox ? (
-    <span
-      className={cx(
-        styles.checkboxWrapper,
-        overlay ? styles.checkboxOverlay : undefined,
-      )}
-      style={overlay ? overlayStyle(selectionCheckboxAnchor, selectionCheckboxOffsetX, selectionCheckboxOffsetY) : undefined}
-      onClick={(event) => {
-        event.stopPropagation();
-        toggleItem(item, event.metaKey || event.ctrlKey);
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={selected}
-        disabled={unselectable}
-        readOnly
-        aria-label={`Select row ${index + 1}`}
-        style={{
-          ...(selectionCheckboxSize ? { width: selectionCheckboxSize, height: selectionCheckboxSize } : {}),
-          ...(unselectable ? { pointerEvents: "none" } : {}),
-        }}
-        onClick={(event) => {
-          event.stopPropagation();
-          toggleItem(item, event.metaKey || event.ctrlKey);
-        }}
-      />
-    </span>
-  ) : null;
+  const { isExpanded, toggleExpanded } = useContext(ListContext);
+  const id = item.id;
+  const expanded = isExpanded(id);
+  const sectionContext = useMemo(() => {
+    return {
+      isExpanded: expanded,
+      toggle: () => {
+        toggleExpanded(id, !expanded);
+      },
+    };
+  }, [expanded, id, toggleExpanded]);
+
   return (
-    <div
-      key={`${id}:${index}`}
-      data-list-index={index}
-      data-index={index}
-      data-list-id={id}
-      data-list-item-type="ITEM"
-      data-selected={selected ? "true" : undefined}
-      className={cx(
-        styles.listRow,
-        styles.row,
-        borderCollapse ? styles.borderCollapse : undefined,
-        rowsSelectable ? styles.listRowSelectable : undefined,
-        rowsSelectable ? styles.selectable : undefined,
-        selected ? styles.listRowSelected : undefined,
-        selected ? styles.selected : undefined,
-        showCheckbox && !overlay ? styles.listRowHasCheckboxes : undefined,
-        showCheckbox && !overlay ? styles.hasCheckboxes : undefined,
-        showCheckbox && overlay ? styles.hasOverlayCheckbox : undefined,
-      )}
-      style={virtualized ? virtualRowStyle() : undefined}
-      onClick={(event) => toggleItem(item, event.metaKey || event.ctrlKey)}
-      onDoubleClick={() => void onRowDoubleClick?.(item)}
-    >
-      {!overlay ? checkbox : null}
-      {renderItem(item, index, count, selected)}
-      {overlay ? checkbox : null}
-    </div>
+    <MemoizedItem
+      node={node}
+      renderChild={renderChild}
+      contextVars={{
+        $group: { ...item, ...sectionContext },
+        ...contextVars,
+        $isFirst: item.index === 0,
+        $isLast: item.index === item.count - 1,
+      }}
+    />
   );
-}
-
-function virtualRowStyle(): CSSProperties {
-  return {
-    height: ESTIMATED_ROW_HEIGHT,
-    minHeight: ESTIMATED_ROW_HEIGHT,
-    maxHeight: ESTIMATED_ROW_HEIGHT,
-    overflow: "hidden",
-    flex: "0 0 auto",
-  };
-}
-
-function normalizeItems(items: unknown, orderBy: unknown, limit: number | undefined): unknown[] {
-  const array = arrayItems(items).filter((item) => item != null);
-  const sorters = orderByFields(orderBy);
-  const sorted = sorters.length ? [...array].sort((left, right) => compareByFields(left, right, sorters)) : array;
-  return limit && limit > 0 ? sorted.slice(0, limit) : sorted;
-}
-
-function arrayItems(items: unknown): unknown[] {
-  if (Array.isArray(items)) {
-    return items;
-  }
-  if (items && typeof items === "object") {
-    return Object.keys(items as Record<string, unknown>)
-      .sort((left, right) => left.localeCompare(right))
-      .map((key) => (items as Record<string, unknown>)[key]);
-  }
-  return [];
-}
-
-function buildRows({
-  items,
-  groupBy,
-  defaultGroups,
-  availableGroups,
-  hideEmptyGroups,
-  groupsInitiallyExpanded,
-}: {
-  items: unknown[];
-  groupBy: unknown;
-  defaultGroups: string[];
-  availableGroups?: string[];
-  hideEmptyGroups: boolean;
-  groupsInitiallyExpanded: boolean;
-}): Row[] {
-  if (groupBy === undefined || groupBy === null || groupBy === "") {
-    return items.map((item, index) => ({ type: "item", item, index }));
-  }
-  const groups = new Map<string, unknown[]>();
-  for (const item of items) {
-    const key = groupKey(item, groupBy);
-    groups.set(key, [...(groups.get(key) ?? []), item]);
-  }
-  let groupNames = unique([...defaultGroups, ...groups.keys()]);
-  if (availableGroups?.length) {
-    const allowed = new Set(availableGroups);
-    groupNames = groupNames
-      .filter((name) => allowed.has(name))
-      .sort((left, right) => availableGroups.indexOf(left) - availableGroups.indexOf(right));
-  }
-  const rows: Row[] = [];
-  for (const group of groupNames) {
-    const groupItems = groups.get(group) ?? [];
-    if (hideEmptyGroups && groupItems.length === 0) {
-      continue;
-    }
-    rows.push({ type: "section", group, items: groupItems, index: rows.length });
-    if (groupsInitiallyExpanded) {
-      for (const item of groupItems) {
-        rows.push({ type: "item", item, index: items.indexOf(item) });
-      }
-      rows.push({ type: "footer", group, items: groupItems, index: rows.length });
-    }
-  }
-  return rows;
-}
-
-function groupKey(item: unknown, groupBy: unknown): string {
-  if (typeof groupBy === "function") {
-    return String(groupBy(item) ?? "");
-  }
-  return String(fieldValue(item, String(groupBy)) ?? "");
-}
-
-function unique(values: Iterable<string>): string[] {
-  return [...new Set(values)];
-}
-
-function itemId(item: unknown, idKey: string): unknown {
-  return fieldValue(item, idKey) ?? item;
-}
-
-function numericId(id: string): string | number {
-  return /^-?\d+(\.\d+)?$/.test(id) ? Number(id) : id;
-}
-
-function defaultRenderItem(item: unknown): ReactNode {
-  if (item === null || item === undefined) {
-    return null;
-  }
-  if (typeof item === "object") {
-    const values = Object.entries(item as Record<string, unknown>)
-      .filter(([key]) => key !== "id")
-      .map(([, value]) => value)
-      .filter((value) => value !== null && value !== undefined);
-    return <div>{values.length ? values.map(String).join(" ") : String(itemId(item, "id"))}</div>;
-  }
-  return <div>{String(item)}</div>;
-}
-
-function fieldValue(item: unknown, field: string): unknown {
-  if (item !== null && typeof item === "object") {
-    return field.split(".").reduce<unknown>((current, part) => {
-      if (current !== null && typeof current === "object") {
-        return (current as Record<string, unknown>)[part];
-      }
-      return undefined;
-    }, item);
-  }
-  return item;
-}
-
-function orderByFields(orderBy: unknown): Array<{ field: string; direction: "asc" | "desc" }> {
-  const fields = Array.isArray(orderBy) ? orderBy : orderBy ? [orderBy] : [];
-  return fields.flatMap((entry) => {
-    if (typeof entry === "string") {
-      return [{ field: entry, direction: "asc" as const }];
-    }
-    if (entry && typeof entry === "object" && "field" in entry) {
-      const object = entry as Record<string, unknown>;
-      return [{ field: String(object.field), direction: object.direction === "desc" ? "desc" as const : "asc" as const }];
-    }
-    return [];
-  });
-}
-
-function compareByFields(
-  left: unknown,
-  right: unknown,
-  fields: Array<{ field: string; direction: "asc" | "desc" }>,
-): number {
-  for (const { field, direction } of fields) {
-    const result = String(fieldValue(left, field) ?? "").localeCompare(String(fieldValue(right, field) ?? ""));
-    if (result !== 0) {
-      return direction === "desc" ? -result : result;
-    }
-  }
-  return 0;
-}
-
-function isUnselectable(item: unknown, predicate?: (item: unknown) => unknown): boolean {
-  return !!predicate?.(item);
-}
-
-function overlayStyle(anchor: string, offsetX: string, offsetY: string): CSSProperties {
-  return {
-    ...(anchor.includes("center")
-      ? { top: "50%", transform: "translateY(-50%)" }
-      : anchor.includes("bottom")
-        ? { bottom: offsetY }
-        : { top: offsetY }),
-    ...(anchor.includes("right") ? { right: offsetX } : { left: offsetX }),
-  };
-}
-
-function keyActionForEvent(event: KeyboardEvent<HTMLDivElement>, bindings: Record<string, string>): string | undefined {
-  return Object.entries({ ...defaultProps.keyBindings, ...bindings }).find(([, value]) =>
-    matchesBinding(event, value),
-  )?.[0];
-}
-
-function matchesBinding(event: KeyboardEvent<HTMLDivElement>, binding: string): boolean {
-  const normalized = binding.toLowerCase();
-  const needsCommand = normalized.includes("cmdorctrl") || normalized.includes("ctrl") || normalized.includes("cmd");
-  if (needsCommand && !(event.ctrlKey || event.metaKey)) {
-    return false;
-  }
-  const key = normalized.split("+").at(-1);
-  return key === event.key.toLowerCase();
-}
-
-function cx(...parts: Array<string | undefined | false>): string {
-  return parts.filter(Boolean).join(" ");
 }

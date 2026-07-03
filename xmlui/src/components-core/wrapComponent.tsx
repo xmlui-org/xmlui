@@ -33,9 +33,11 @@ type WrapComponentOptions = {
       state?: Record<string, any>;
       updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
       lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
+      lookupAction: (expression: string, options?: Record<string, unknown>) => (() => unknown) | undefined;
+      lookupSyncCallback: (expression: unknown) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
       renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
-      layoutContext?: unknown;
+      layoutContext?: any;
     },
   ) => ReactNode;
 };
@@ -94,6 +96,8 @@ export function wrapComponent(
           state,
           updateState: (nextState) => setState((prevState) => ({ ...prevState, ...nextState })),
           lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+          lookupAction: () => undefined,
+          lookupSyncCallback: (expression) => typeof expression === "function" ? expression as (...args: unknown[]) => unknown : undefined,
           registerComponentApi: (api) => {
             const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
             if (id) {
