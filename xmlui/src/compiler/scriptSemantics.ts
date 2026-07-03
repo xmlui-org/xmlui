@@ -43,7 +43,7 @@ export type BoundWriteTarget = {
   kind: "local" | "global" | "handlerLocal" | "member" | "index" | "unresolved" | "invalid";
   name: string;
   path: string[];
-  operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=";
+  operator: "++" | "--" | "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "mutate";
   span: SourceSpan;
   binding?: XmluiBinding;
   object?: XmluiScriptIr;
@@ -580,6 +580,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         visit(current.argument);
         return;
       case "CallExpression":
+        bindMutatingMethodCall(current);
         if (!isDebugHelperCallee(current.callee)) {
           visit(current.callee);
         }
@@ -711,6 +712,64 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
     result.diagnostics.push(
       createErrorDiagnostic("XS204", "Unsupported XMLUI expression call target.", current.callee.span),
     );
+  }
+
+  function bindMutatingMethodCall(current: Extract<ScriptNode, { kind: "CallExpression" }>): void {
+    if (
+      current.callee.kind !== "MemberExpression" ||
+      current.callee.property.kind !== "Identifier" ||
+      !isAllowedMutatingMethodName(current.callee.property.name)
+    ) {
+      return;
+    }
+    const target = mutatingMethodRootWrite(current.callee.object, current.callee.property.name, current.span);
+    if (target) {
+      result.writes.push(target);
+    }
+  }
+
+  function mutatingMethodRootWrite(
+    object: ScriptNode,
+    methodName: string,
+    span: SourceSpan,
+  ): BoundWriteTarget | undefined {
+    const path = dependencyPathFromNode(object);
+    if (!path?.length) {
+      return undefined;
+    }
+    const [rootName] = path;
+    if (findLexicalBinding(rootName)) {
+      return undefined;
+    }
+    const binding = resolveXmluiIdentifier(scope, rootName);
+    if (!binding) {
+      return undefined;
+    }
+    if ((binding.kind !== "local" && binding.kind !== "global") || !binding.mutable) {
+      result.diagnostics.push(
+        createErrorDiagnostic(
+          "XS202",
+          `Cannot mutate read-only XMLUI script target '${rootName}.${methodName}'.`,
+          span,
+        ),
+      );
+      return {
+        kind: "invalid",
+        name: rootName,
+        path,
+        operator: "mutate",
+        span,
+        binding,
+      };
+    }
+    return {
+      kind: binding.kind,
+      name: rootName,
+      path,
+      operator: "mutate",
+      span,
+      binding,
+    };
   }
 }
 
@@ -1543,6 +1602,7 @@ function isDebugHelperCallee(callee: ScriptNode): boolean {
 
 function isAllowedMethodName(name: string): boolean {
   return [
+    ...allowedMutatingMethodNames,
     "map",
     "filter",
     "find",
@@ -1591,6 +1651,12 @@ function isAllowedMethodName(name: string): boolean {
     "getAutoLoadAfter",
     "getNodeAutoLoadAfter",
   ].includes(name);
+}
+
+const allowedMutatingMethodNames = ["push"];
+
+function isAllowedMutatingMethodName(name: string): boolean {
+  return allowedMutatingMethodNames.includes(name);
 }
 
 function isAllowedBuiltInCallName(name: string): boolean {

@@ -1,4 +1,7 @@
 {
+  "AutoComplete": [
+    "AutoCompleteContext.tsx"
+  ],
   "Option": [
     "OptionTypeProvider.tsx"
   ],

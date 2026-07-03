@@ -1,11 +1,10 @@
 export const defaultProps = {
   enabled: true,
-  placeholder: "",
+  readOnly: false,
   autoFocus: false,
-  initiallyOpen: false,
-  creatable: false,
-  validationStatus: "none",
   multi: false,
   required: false,
-  readOnly: false,
+  validationStatus: "none" as const,
+  creatable: false,
+  initiallyOpen: false,
 };

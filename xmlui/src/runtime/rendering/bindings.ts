@@ -202,6 +202,11 @@ export function runEvent(event: ParsedEvent | undefined, scope: RuntimeScope, ar
 
 function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]): Promise<unknown> {
   const context = createEventContext(scope);
+  const completeEvent = async (promise: Promise<unknown>) => {
+    const result = await promise;
+    invalidateMutatedState(event, scope);
+    return result;
+  };
   const arrow = event.ir?.body.length === 1 &&
     event.ir.body[0].kind === "ExpressionStatement" &&
     event.ir.body[0].expression.kind === "ArrowFunctionExpression"
@@ -210,11 +215,11 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]):
   if (arrow) {
     const fn = compileXmluiExpression(arrow, event.dependencies ?? []).execute(context);
     if (typeof fn === "function") {
-      return Promise.resolve(fn(...args));
+      return completeEvent(Promise.resolve(fn(...args)));
     }
   }
   if (event.execute) {
-    return event.execute(context);
+    return completeEvent(event.execute(context));
   }
   if (!event.ir) {
     throw new Error(`XMLUI event handler was not compiled: ${event.source}`);
@@ -224,7 +229,23 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]):
     compiled = compileXmluiEventHandler(event.ir, event.dependencies ?? [], event.writes ?? []);
     eventCache.set(event, compiled);
   }
-  return compiled.execute(context);
+  return completeEvent(compiled.execute(context));
+}
+
+function invalidateMutatedState(event: ParsedEvent, scope: RuntimeScope): void {
+  for (const write of event.writes ?? []) {
+    if (write.operator !== "mutate") {
+      continue;
+    }
+    if (write.kind === "global") {
+      scope.store.invalidateGlobal(write.name);
+    } else if (write.kind === "local") {
+      const ownerId = resolveLocalOwner(scope, write.name);
+      if (ownerId) {
+        scope.store.invalidateLocal(ownerId, write.name);
+      }
+    }
+  }
 }
 
 function scheduleEvent(event: ParsedEvent, execute: () => Promise<unknown>): Promise<unknown> {

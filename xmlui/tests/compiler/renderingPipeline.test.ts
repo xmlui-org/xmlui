@@ -215,6 +215,51 @@ describe("rendering binding evaluation", () => {
     expect(store.readLocal("root", "selected")).toBe("alpha");
   });
 
+  it("invalidates state mutated by arrow event handler method calls", async () => {
+    const document = parseXmlui(`
+      <App var.newItems="{[]}">
+        <AutoComplete onItemCreated="item => newItems.push(item)" />
+        <Text>New items: {newItems.join(", ")}</Text>
+      </App>
+    `);
+    const store = createRuntimeStateStore();
+    store.createLocalOwner("root");
+    const scope = createRuntimeScope({ store, localOwnerId: "root" });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: "root",
+      expressions: document.root.vars,
+      parsed: document.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    const autoComplete = document.root.children[0];
+    const text = document.root.children[1];
+    if (autoComplete.kind !== "element" || text.kind !== "element" || text.children[0].kind !== "text") {
+      throw new Error("Unexpected test fixture shape.");
+    }
+    const invalidations: unknown[] = [];
+    const unsubscribe = store.subscribeToSlot(
+      { kind: "local", ownerId: "root", name: "newItems" },
+      (invalidation) => invalidations.push(invalidation),
+    );
+
+    await runEvent(autoComplete.parsed?.events?.itemCreated, scope, ["Peter Parker"]);
+    unsubscribe();
+
+    expect(store.readLocal("root", "newItems")).toEqual(["Peter Parker"]);
+    expect(invalidations).toEqual([
+      expect.objectContaining({
+        slot: { kind: "local", ownerId: "root", name: "newItems" },
+        previousValue: ["Peter Parker"],
+        nextValue: ["Peter Parker"],
+      }),
+    ]);
+    expect(evaluateExpressionOrText(text.children[0].value, text.children[0].segments, scope)).toBe(
+      "New items: Peter Parker",
+    );
+  });
+
   it("resolves component references from event handlers", async () => {
     const document = parseXmlui(
       `<App var.visible="{0}"><Button onClick="counter.increment(); visible = counter.getCount()" /></App>`,

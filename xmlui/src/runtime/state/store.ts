@@ -191,6 +191,20 @@ export class RuntimeStateStore {
     return invalidation;
   }
 
+  invalidateLocal(ownerId: StateOwnerId, name: string): StateInvalidation {
+    const value = this.readLocal(ownerId, name);
+    const invalidation = this.emit({ kind: "local", ownerId, name }, value, value);
+    this.recomputeReactiveDependents({ kind: "local", ownerId, name });
+    return invalidation;
+  }
+
+  invalidateGlobal(name: string): StateInvalidation {
+    const value = this.readGlobal(name);
+    const invalidation = this.emit({ kind: "global", name }, value, value);
+    this.recomputeReactiveDependents({ kind: "global", name });
+    return invalidation;
+  }
+
   invalidateProp(ownerId: StateOwnerId | undefined, name: string): void {
     this.recomputeReactiveDependents({ kind: "prop", ownerId, name });
   }

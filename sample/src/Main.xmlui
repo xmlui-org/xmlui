@@ -1,15 +1,12 @@
-<App>
-  <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-  <HStack>
-    <Button
-      label="Select 2nd Item"
-      onClick="inputControl.setValue('opt2')" />
-    <Button
-      label="Remove Selection"
-      onClick="inputControl.setValue('')" />
-  </HStack>
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
 </App>

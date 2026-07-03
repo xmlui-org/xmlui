@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 85 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 84 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 1 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 18 |
+| Complete | User approved after audit and verification. | 19 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -337,7 +337,7 @@ it.
 | App | `AppReact.tsx`, `App.module.scss` | router, app shell, theme, globals, locale | Complete | User approved after protected-file audit, metadata verification, focused E2E coverage, DOM probes, and iterative parity fixes for App layout, AppHeader/NavPanel/Footer/content spacing, narrow-screen drawer behavior, active NavLink state, vertical logo/nav spacing, `loggedInUser`, star sizing, and `messageReceived` from component event handlers. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs App` passed (`App.tsx` entry-adapted; copied React/SCSS/docs/defaults/specs identical). Added runtime adapter below copied entry, plus host shims for Router, HelmetProvider, AppContext, theme hooks, app shell hooks, CSS utilities, and original dependencies. `npm --prefix xmlui run check:metadata` passed. Focused copied smoke `XMLUI_INCLUDE_INCOMPLETE_COMPAT=1 XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/App/App.spec.ts --grep "renders with basic props" --workers=1` passed 1/1. Follow-up focused regressions passed for `loggedInUser`, App star sizing, and Button-posted `messageReceived`. |
 | AppHeader | `AppHeaderReact.tsx`, `AppHeader.module.scss` | Logo, NavPanel context | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs AppHeader` passed (`AppHeader.tsx` entry-adapted; `AppHeaderReact.tsx` import-only; copied SCSS/docs/defaults/spec identical). Runtime adapter appended below copied entry and root-attribute bridge added outside copied React implementation. `npm --prefix xmlui run check:metadata` passed. Focused copied smoke `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/AppHeader/AppHeader.spec.ts --grep "renders with basic props" --workers=1` passed 1/1. |
 | AppState | renderer only unless original has protected files | runtime state registry | Audit required | cross-component state sharing tests |
-| AutoComplete | `AutoCompleteReact.tsx`, `AutoComplete.module.scss` | Input, Option, popover | Audit required | original suite and keyboard behavior |
+| AutoComplete | `AutoCompleteReact.tsx`, `AutoComplete.module.scss`, `AutoComplete.defaults.ts`, `AutoComplete.md`, `AutoComplete.spec.ts`, `AutoCompleteContext.tsx` | Input, Option, popover, event mutation invalidation | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs AutoComplete` passed (`AutoComplete.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec/context identical). Runtime adapter appended below copied entry; host fixes stayed outside copied protected files. `npm --prefix xmlui run check:metadata` passed. Focused compiler/runtime coverage passed for `item => newItems.push(item)` compilation and in-place mutation invalidation. Focused AutoComplete E2E `XMLUI_E2E_DEV_PORT=5224 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/AutoComplete/AutoComplete.spec.ts --grep "creates new option" --workers=1` passed 1/1. Manual Playwright probe against the sample confirmed typing `Peter Parker` and pressing Enter renders `New items: Peter Parker`. |
 | Avatar | `AvatarReact.tsx`, `Avatar.module.scss` | image/icon fallback | Audit required | visual variants and initials |
 | Badge | `BadgeReact.tsx`, `Badge.module.scss` | theme variants | Audit required | font, color, size computed styles |
 | Bookmark | `Bookmark.module.scss` if original has it | router/hash scroll container | Audit required | hash navigation in page and nested scroll |
@@ -490,6 +490,14 @@ completed only after APICall/DataSource behavior is available.
   copied React files, helper TSX files named in a future manifest,
   `*.module.scss`, non-module SCSS, `*.defaults.ts`, component-folder `*.md`,
   component-folder `*.spec.ts`, and `<Component>.tsx` metadata/renderer source.
+- AutoComplete is `Complete`. The user approved it after protected-file audit,
+  metadata check, focused compiler/runtime coverage, focused copied E2E
+  coverage, and a live sample probe for creatable Enter behavior. Original
+  protected files were recopied from
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/AutoComplete`,
+  `AutoCompleteContext.tsx` was added to the protected-copy manifest, and
+  rewrite runtime adapter code was appended below the copied `AutoComplete.tsx`
+  entry.
 - ProgressBar is `Complete`. The user approved it after protected-file audit,
   metadata check, copied E2E tests, and the added compatibility spec passed.
 - ProgressBar copied React, SCSS, defaults, docs, and E2E files are
@@ -579,6 +587,18 @@ completed only after APICall/DataSource behavior is available.
 - `xmlui/src/vite-plugin/xmluiPlugin.ts` imports `XmluiComponentContract` from
   the leaf `compiler/contracts/types` module so Vite config bundling does not
   eagerly walk built-in component metadata and copied SCSS.
+- AutoComplete strict remigration exposed a compiler compatibility gap in the
+  original component docs: `onItemCreated="item => newItems.push(item)"` must
+  compile and invalidate `newItems`. The rewrite now treats allowed mutating
+  method calls such as `push` on mutable XMLUI local/global state as writes for
+  invalidation while preserving the method call semantics. Runtime event
+  execution also emits store invalidations for those in-place mutations so
+  bindings such as `newItems.join(", ")` rerender after arrow event handlers.
+  Regression coverage is in `xmlui/tests/compiler/scriptSemantics.test.ts` and
+  `xmlui/tests/compiler/renderingPipeline.test.ts`; the exact sample import at
+  `http://127.0.0.1:5173/src/Main.xmlui?import` returned HTTP 200 after the
+  compile fix, and a Playwright probe of the sample rendered
+  `New items: Peter Parker` after typing a new item and pressing Enter.
 
 ## New Session Bootstrap
 

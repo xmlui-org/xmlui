@@ -609,6 +609,7 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
 
 function isAllowedMethodName(name: string): boolean {
   return [
+    "push",
     "map",
     "filter",
     "find",

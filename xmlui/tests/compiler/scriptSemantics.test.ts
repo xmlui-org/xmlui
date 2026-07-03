@@ -217,6 +217,26 @@ describe("XMLUI script event write analysis", () => {
       ]),
     );
   });
+
+  it("tracks array push calls against mutable state as invalidating writes", () => {
+    const document = parseXmlui(`
+      <App var.newItems="{[]}">
+        <AutoComplete onItemCreated="item => newItems.push(item)" />
+      </App>
+    `);
+    const autoComplete = document.root.children[0] as XmluiElement;
+    const event = autoComplete.parsed?.events?.itemCreated;
+
+    expect(event?.writes).toEqual([
+      expect.objectContaining({
+        kind: "local",
+        name: "newItems",
+        path: ["newItems"],
+        operator: "mutate",
+      }),
+    ]);
+    expect(event?.invalidates).toEqual([{ kind: "local", name: "newItems" }]);
+  });
 });
 
 describe("XMLUI expression and event semantic IR", () => {
