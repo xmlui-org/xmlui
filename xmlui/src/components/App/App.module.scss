@@ -1,8 +1,10 @@
-// This block mirrors the old component pattern: App.tsx extracts the
-// available theme variables from createThemeVar declarations in this file.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $width-navPanel-App: createThemeVar("width-navPanel-App");
@@ -23,31 +25,492 @@ $paddingHorizontal-content-App: createThemeVar("paddingHorizontal-content-App");
 $paddingVertical-content-App: createThemeVar("paddingVertical-content-App");
 $gap-content-App: createThemeVar("gap-content-App");
 
-.mainContentArea {
-  position: relative;
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  background-color: $backgroundColor-content-App;
-  border-left: $borderLeft-content-App;
+// --- Mixin for desktop layout spacing reset ---
+// Desktop layout requires full viewport coverage with zero constraints.
+// These !important declarations override theme system defaults (padding/margins)
+// and layout-specific max-width constraints that would otherwise limit the desktop layout.
+@mixin desktop-reset-all {
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-inline: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
 }
 
-.pageContentContainer {
-  max-width: $maxWidth-content-App;
-  width: 100%;
-  margin: 0 auto;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding-inline-start: $paddingHorizontal-content-App;
-  padding-inline-end: $paddingHorizontal-content-App;
-  padding-top: $paddingVertical-content-App;
-  padding-bottom: $paddingVertical-content-App;
-  gap: $gap-content-App;
+@layer components {
+  .appContainer {
+    --footer-height: 0px;
+    --header-height: 0px;
+
+    // --- Layout styles
+    width: 100%;
+    height: 100%;
+    position: relative; //leave it here, otherwise there could be double scrollbars because of the absolute positionings (typically radix's visuallyHidden)
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+    scroll-padding-block: $scrollPaddingBlockPage;
+
+
+    &.vertical {
+      flex-direction: row;
+
+      .mainContentArea {
+        scrollbar-gutter: stable both-edges;
+      }
+      &.noScrollbarGutters {
+        .mainContentArea {
+          scrollbar-gutter: auto;
+        }
+      }
+      &:not(.scrollWholePage) {
+        .mainContentArea {
+          overflow: initial;
+        }
+      }
+      .navPanelWrapper {
+        width: $width-navPanel-App;
+        flex-shrink: 0;
+        border-right: $borderRight-navPanelWrapper-App;
+
+        &.navPanelWrapperCollapsed {
+          width: $width-navPanel-collapsed-App;
+          min-width: $width-navPanel-collapsed-App;
+          overflow: hidden;
+        }
+      }
+
+      .footerWrapper {
+        position: static;
+      }
+    }
+
+    &.horizontal {
+      overflow: auto;
+      .footerWrapper {
+        position: static;
+      }
+      &.sticky {
+        min-height: 100%;
+      }
+      .navPanelWrapper {
+        border-bottom: $borderBottom-NavPanel;
+        justify-content: end;
+        background-color: $backgroundColor-navPanel-App;
+        padding: 0;
+      }
+      .headerWrapper {
+        padding-inline: 0;
+
+        > div {
+          padding-inline: 0;
+        }
+      }
+      
+      // Override overflow when scrollWholePage is false
+      &:not(.scrollWholePage) {
+        overflow: hidden;
+        height: 100dvh;
+        
+        &:global(.nested-app) {
+          height: 100%;
+        }
+        
+        &.sticky {
+          min-height: initial;
+        }
+      }
+    }
+
+    &.desktop {
+      width: 100vw;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      scrollbar-gutter: auto;
+      max-width: none;
+
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        width: 100%;
+        height: 100%;
+      }
+
+      .headerWrapper {
+        flex-shrink: 0;
+        z-index: 1;
+        @include desktop-reset-all;
+
+        & > * {
+          @include desktop-reset-all;
+        }
+      }
+
+      .pagesContainer {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        width: 100%;
+      }
+
+      .pageContentContainer {
+        flex: 1;
+        min-height: 0;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        scrollbar-gutter: auto;
+      }
+
+      .footerWrapper {
+        flex-shrink: 0;
+        @include desktop-reset-all;
+
+        & > * {
+          @include desktop-reset-all;
+        }
+      }
+    }
+
+    &.verticalFullHeader {
+      // Set effective footer height based on whether footer is sticky
+      --effective-footer-height: var(--footer-height);
+      --content-available-height: calc(
+        var(--containerHeight, 100dvh) - var(--header-height) - var(--effective-footer-height)
+      );
+      
+      &.noFooter {
+        --effective-footer-height: 0px;
+      }
+
+      min-height: 100%;
+      height: 100%;
+      overflow: auto;
+      overflow-x: hidden;
+      
+      .mainContentArea {
+        overflow: initial;
+      }
+      
+      .navPanelWrapper {
+        width: $width-navPanel-App;
+        position: sticky;
+        height: var(--content-available-height);
+        top: var(--header-height);
+        border-right: $borderRight-navPanelWrapper-App;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          inset-inline-end: 0;
+          bottom: 0;
+          width: 50vw;
+          z-index: -1;
+          background-color: $backgroundColor-navPanel-App;
+        }
+
+        // Collapsed state: narrow strip so main content can use the space
+        &.navPanelWrapperCollapsed {
+          width: $width-navPanel-collapsed-App;
+          min-width: $width-navPanel-collapsed-App;
+          overflow: hidden;
+        }
+
+        // Hide on small screens
+        @include t.withMaxScreenSize(0) {
+          display: none;
+        }
+      }
+
+      .pagesContainer {
+        overflow: initial;
+        min-height: var(--content-available-height);
+        height: 100%;
+      }
+
+      .pageContentContainer {
+        height: 100%;
+        & > :global(.xmlui-page-root) {
+          height: 100%;
+        }
+      }
+
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
+      }
+
+      // When scrollWholePage is false, mainContentArea becomes the scroll container
+      // instead of the appContainer (which gets overflow:clip from :not(.scrollWholePage))
+      &:not(.scrollWholePage) {
+        .mainContentArea {
+          overflow: auto;
+          scrollbar-gutter: stable both-edges;
+        }
+        // Allow pagesContainer and pageContentContainer to grow to content height
+        // so mainContentArea can scroll them into view
+        .pagesContainer {
+          overflow: initial;
+          height: auto;
+          min-height: 0;
+        }
+        .pageContentContainer {
+          overflow: initial;
+          height: auto;
+        }
+      }
+    }
+
+    &.scrollWholePage {
+      scrollbar-gutter: stable both-edges;
+
+      .headerWrapper {
+        margin-inline: calc(-1 * var(--scrollbar-width));
+        & > div {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      .footerWrapper {
+        margin-inline: calc(-1 * var(--scrollbar-width));
+        & > div {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      &.verticalFullHeader {
+        .mainContentRow {
+          margin-inline: calc(-1 * var(--scrollbar-width));
+          width: calc(100% + (2 * var(--scrollbar-width)));
+        }
+        .mainContentArea {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+
+      &.desktop {
+        scrollbar-gutter: auto;
+        .headerWrapper,
+        .footerWrapper {
+          margin-inline: 0;
+          & > * {
+            padding-inline: 0;
+          }
+        }
+      }
+    }
+
+    // fitContent: app sizes itself to its content's natural height rather
+    // than filling its container's viewport. Intended for iframe embedding
+    // or use as a block within a larger page. Takes precedence over
+    // scrollWholePage's viewport pinning and all per-layout rules; the host
+    // page becomes the sole scroll container. Nothing inside the app should
+    // create a height-bounded scroll container.
+    //
+    // !important is used deliberately: this is an escape-hatch mode that
+    // must override the layout-specific cascade (e.g. .horizontal.sticky's
+    // min-height: 100%). Trying to out-specificity every layout combination
+    // would be brittle.
+    &.fitContent {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: visible !important;
+
+      .mainContentRow,
+      .mainContentArea,
+      .pagesContainer,
+      .pageContentContainer,
+      .pageContentContainer > :global(.xmlui-page-root) {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+    }
+
+    &:not(.scrollWholePage) {
+      overflow: clip; // clip (not hidden) — prevents this element from acting as a scroll container,
+      // so focus-driven scrollIntoView cannot scroll appContainer. overflow:hidden creates a scroll
+      // container which, combined with scroll-padding-block, causes a permanent 16px layout jump
+      // when tree items receive focus. overflow:clip clips visually identically but is not scrollable.
+      height: 100dvh; // Use dynamic viewport height for mobile browser compatibility
+      
+      // When nested (like in playground), use container dimensions instead of viewport
+      &:global(.nested-app) {
+        height: 100%;
+      }
+      
+      .mainContentRow {
+        min-height: 0;
+        height: 100%;
+      }
+      .pagesContainer {
+        flex: 1;
+        min-height: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .pageContentContainer {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden; // Children with star sizing handle their own scrolling
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    // Common sticky footer positioning for sticky layouts
+    &.sticky {
+      .footerWrapper {
+        position: sticky;
+        bottom: 0;
+        &.nonSticky {
+          position: static;
+        }
+      }
+    }
+
+    &.noScrollbarGutters {
+      scrollbar-gutter: auto;
+      .pagesContainer {
+        scrollbar-gutter: auto;
+      }
+      .mainContentArea {
+        scrollbar-gutter: auto;
+      }
+    }
+  }
+
+  .headerWrapper {
+    z-index: 1;
+    min-height: 0;
+    flex-shrink: 0;
+    overflow-x: clip;
+    top: 0;
+    box-shadow: $boxShadow-header-App;
+    background-color: $backgroundColor-AppHeader;
+    &.sticky {
+      position: sticky;
+    }
+  }
+
+  .mainContentRow {
+    display: flex;
+    flex-direction: row;
+    isolation: isolate;
+    align-self: center;
+    width: 100%;
+    max-width: $maxWidth-App;
+  }
+
+  .mainContentArea {
+    position: relative;
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    box-shadow: $boxShadow-navPanel-App;
+    background-color: $backgroundColor-content-App;
+    border-left: $borderLeft-content-App;
+  }
+
+  .navPanelWrapper {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    transition: width 0.2s ease;
+    > *:first-child {
+      flex: 1;
+      min-height: 0;
+    }
+
+    &:empty {
+      display: none;
+    }
+
+    &.navPanelWrapperCollapsed {
+      width: $width-navPanel-collapsed-App;
+      min-width: $width-navPanel-collapsed-App;
+      overflow: hidden;
+
+      // Keep inner slot (and NavPanel) at expanded width so only the viewport clips; no resize during animation
+      > .navPanelWrapper {
+        width: $width-navPanel-App;
+        min-width: $width-navPanel-App;
+      }
+    }
+  }
+
+  .pagesContainer {
+    flex: 1;
+    min-height: initial;
+    isolation: isolate;
+    background-color: t.$backgroundColor;
+  }
+
+  .pageContentContainer {
+    max-width: $maxWidth-content-App;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: max-width 0.2s ease;
+
+    // When TOC is active (e.g. blog post with tableOfContents), use wider content width
+    &.withToc {
+      max-width: $maxWidth-content-App--withToc;
+    }
+
+    // When nav panel is collapsed, content grows by the freed width
+    .navPanelCollapsed & {
+      max-width: calc(
+        #{$maxWidth-content-App} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+      );
+    }
+
+    .navPanelCollapsed &.withToc {
+      max-width: calc(
+        #{$maxWidth-content-App--withToc} + (#{$width-navPanel-App} - #{$width-navPanel-collapsed-App})
+      );
+    }
+
+    &.withDefaultContentPadding {
+      padding-inline-start: $paddingHorizontal-content-App;
+      padding-inline-end: $paddingHorizontal-content-App;
+      padding-top: $paddingVertical-content-App;
+      padding-bottom: $paddingVertical-content-App;
+      gap: $gap-content-App;
+    }
+  }
+
+  .footerWrapper {
+    flex-shrink: 0;
+  }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

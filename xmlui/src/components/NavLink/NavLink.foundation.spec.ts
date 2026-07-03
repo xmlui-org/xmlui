@@ -64,6 +64,38 @@ test.describe("NavLink foundation", () => {
     await expect(page.getByTestId("page")).toHaveClass(/xmlui-navlink-active/);
   });
 
+  test("root link is not active on sibling routes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="horizontal">
+        <NavPanel>
+          <NavLink testId="home" label="Home" to="/" />
+          <NavLink testId="page1Link" label="Page 1" to="/page1" />
+          <NavLink testId="page2Link" label="Page 2" to="/page2" />
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Text testId="page">Home</Text>
+          </Page>
+          <Page url="/page1">
+            <Text testId="page">Page 1</Text>
+          </Page>
+          <Page url="/page2">
+            <Text testId="page">Page 2</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    await expect(page.getByTestId("home")).toHaveClass(/xmlui-navlink-active/);
+
+    await page.getByTestId("page1Link").click();
+
+    await expect(page.getByTestId("page")).toHaveText("Page 1");
+    await expect(page.getByTestId("home")).not.toHaveClass(/xmlui-navlink-active/);
+    await expect(page.getByTestId("page1Link")).toHaveClass(/xmlui-navlink-active/);
+    await expect(page.getByTestId("page2Link")).not.toHaveClass(/xmlui-navlink-active/);
+  });
+
   test("preserves external href and target without routing rewrite", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>

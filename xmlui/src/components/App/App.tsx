@@ -1,31 +1,43 @@
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { extractScssThemeVars } from "../../styling/theme";
-import {
-  createMetadata,
-  dComponent,
-} from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { App } from "./AppReact";
-import appStylesSource from "./App.module.scss?xmlui-theme-vars";
+import styles from "./App.module.scss";
+import drawerStyles from "./Sheet.module.scss";
 
-export { defaultProps } from "./App.defaults";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+
+import { createMetadata, dComponent } from "../metadata-helpers";
+import { appLayoutMd } from "../App/AppLayoutContext";
+import { defaultProps } from "./App.defaults";
+import { App as AppComponent } from "./AppReact";
+import { useRef } from "react";
+import { SearchIndexCollector } from "./SearchIndexCollector";
+import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+const COMP = "App";
 
 export const AppMd = createMetadata({
   status: "stable",
   description:
-    "The `App` component is the root container that defines your application's overall structure and layout.",
+    "The `App` component is the root container that defines your application's overall " +
+    "structure and layout. It provides a complete UI framework with built-in navigation, " +
+    "header, footer, and content areas that work together seamlessly.",
   excludeBehaviors: ["tooltip", "animation", "label"],
   optimization: {
     unstableChildInjectedVars: ["$pathname", "$routeParams", "$queryParams", "$linkInfo"],
   },
   props: {
     layout: {
-      description: "This property sets the layout template of the app.",
+      description:
+        `This property sets the layout template of the app. This setting determines the position ` +
+        `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
+        `scroll behavior.`,
       valueType: "string",
-      availableValues: ["horizontal", "vertical", "vertical-sticky"],
+      availableValues: appLayoutMd,
     },
     loggedInUser: {
-      description: "Stores information about the currently logged-in user.",
+      description:
+        "Stores information about the currently logged-in user. By not defining this property, " +
+        "you can indicate that no user is logged in.",
       valueType: "string",
     },
     logoTemplate: dComponent("Optional template of the app logo"),
@@ -33,159 +45,543 @@ export const AppMd = createMetadata({
       description: "Optional logo path",
       valueType: "string",
     },
+    "logo-dark": {
+      description: "Optional logo path in dark tone",
+      valueType: "string",
+    },
+    "logo-light": {
+      description: "Optional logo path in light tone",
+      valueType: "string",
+    },
     name: {
-      description: "Optional application name.",
+      description:
+        "Optional application name (visible in the browser tab). When you do not define " +
+        "this property, the tab name falls back to the one defined in the app\'s configuration. " +
+        'If the name is not configured, "XMLUI App" is displayed in the tab.',
       valueType: "string",
     },
     scrollWholePage: {
-      description: "This boolean property specifies whether the whole page should scroll.",
+      description:
+        `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
+        `the content area (\`false\`). The default value is \`true\`.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.scrollWholePage,
+    },
+    fitContent: {
+      description:
+        `When \`true\`, the app sizes itself to its content's natural height rather than ` +
+        `filling its container's viewport. Intended for embedding an app inside an iframe ` +
+        `or as a block within a larger page: the host page becomes the sole scroll container. ` +
+        `This overrides \`scrollWholePage\`'s viewport pinning.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.fitContent,
     },
     noScrollbarGutters: {
-      description: "Controls whether the app reserves scrollbar gutter space.",
+      description:
+        "This boolean property specifies whether the scrollbar gutters should be hidden.",
       valueType: "boolean",
-      defaultValue: false,
-    },
-    "width-navPanel-App": {
-      description: "Overrides the App navigation panel width theme variable.",
-      valueType: "string",
-    },
-    "borderRight-navPanelWrapper-App": {
-      description: "Overrides the App navigation panel wrapper right border theme variable.",
-      valueType: "string",
+      defaultValue: defaultProps.noScrollbarGutters,
     },
     defaultTone: {
-      description: "This property sets the app's default tone.",
+      description: 'This property sets the app\'s default tone ("light" or "dark").',
       valueType: "string",
+      defaultValue: defaultProps.defaultTone,
       availableValues: ["light", "dark"],
       isStrictEnum: true,
-      defaultValue: "light",
     },
     defaultTheme: {
       description: "This property sets the app's default theme.",
       valueType: "string",
-      defaultValue: "xmlui",
+      defaultValue: defaultProps.defaultTheme,
     },
-    useHashBasedRouting: {
-      description: "Use hash-based routing instead of browser history routing.",
+    autoDetectTone: {
+      description:
+        "This boolean property enables automatic detection of the system theme preference. " +
+        "When set to true and no defaultTone is specified, the app will automatically use " +
+        '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
+        "also respond to changes in the system theme preference.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.autoDetectTone,
+    },
+    persistTheme: {
+      description:
+        'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
+        "automatically saved to `localStorage` and restored on the next visit. The persisted " +
+        "values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.",
+      valueType: "boolean",
+      defaultValue: defaultProps.persistTheme,
+      isInternal: true,
+    },
+    themeStorageKey: {
+      description:
+        "The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. " +
+        "Change this if you need to namespace the key per-app or per-user.",
+      valueType: "string",
+      defaultValue: defaultProps.themeStorageKey,
+      isInternal: true,
+    },
+    toneStorageKey: {
+      description:
+        "The `localStorage` key used to persist the tone when `persistTheme` is `true`. " +
+        "Change this if you need to namespace the key per-app or per-user.",
+      valueType: "string",
+      defaultValue: defaultProps.toneStorageKey,
+      isInternal: true,
     },
     locale: {
-      description: "Sets the active locale used by App.translate and I18n.",
+      description:
+        "BCP-47 locale override for the app. Use this to set the active locale from markup; " +
+        "user-driven locale changes through `App.setLocale()` can still update the active locale at runtime.",
       valueType: "string",
-      defaultValue: "en",
     },
     localeBundles: {
-      description: "Locale message bundles used by App.translate and I18n.",
+      description:
+        "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, " +
+        "or a locale-to-messages map used by `App.translate()` and the `I18n` component.",
       valueType: "any",
     },
-    testId: {
-      description: "Adds a test identifier to the app root element.",
+    direction: {
+      description:
+        "Text direction for the app. Use `auto` to derive left-to-right or right-to-left " +
+        "direction from the active locale.",
       valueType: "string",
+      availableValues: ["ltr", "rtl", "auto"],
+      isStrictEnum: true,
+      defaultValue: "auto",
+    },
+    scheduler: {
+      description: "Handler scheduler mode.",
+      valueType: "string",
+      availableValues: ["concurrent", "fifo"],
+      isStrictEnum: true,
+      defaultValue: "concurrent",
+      isInternal: true,
+    },
+    maxQueuedPerTrace: {
+      description: "Maximum number of queued handlers allowed per scheduler trace.",
+      valueType: "integer",
+      defaultValue: 64,
+      isInternal: true,
+    },
+    urlCase: {
+      description: "URL canonicalisation case policy.",
+      valueType: "string",
+      availableValues: ["preserve", "lower"],
+      isStrictEnum: true,
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    urlTrailingSlash: {
+      description: "URL canonicalisation trailing-slash policy.",
+      valueType: "string",
+      availableValues: ["preserve", "always", "never"],
+      isStrictEnum: true,
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    urlQueryParamOrder: {
+      description: "URL canonicalisation query-parameter ordering policy.",
+      valueType: "string",
+      availableValues: ["preserve", "alphabetical"],
+      isStrictEnum: true,
+      defaultValue: "preserve",
+      isInternal: true,
+    },
+    nonCanonicalUrl: {
+      description: "Action taken when the current URL is not canonical.",
+      valueType: "string",
+      availableValues: ["warn", "rewrite", "redirect"],
+      isStrictEnum: true,
+      defaultValue: "warn",
+      isInternal: true,
+    },
+    auditPolicy: {
+      description:
+        "Plan #15: declarative audit-pipeline policy. An object literal with " +
+        "`redact: RedactionRule[]`, `sample: { head?, tail? }`, `retention: { bufferSize, onOverflow }`, " +
+        "and optional `sink: { kind: 'otlp' | 'console' | 'custom', endpoint?, headers? }`. " +
+        "See `dev-docs/plans/15-audit-grade-observability.md`.",
+      valueType: "any",
+      isInternal: true,
     },
   },
   events: {
     ready: {
-      description: "This event fires when the `App` component finishes rendering on the page.",
-      signature: "ready(): void",
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`,
+      signature: "() => void",
       parameters: {},
     },
     messageReceived: {
-      description: "This event fires when the `App` component receives a window message.",
-      signature: "messageReceived(data: any): void",
+      description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
+      signature: "(data: any) => void",
       parameters: {
         data: "The data sent from the other window via postMessage.",
       },
     },
-    willNavigate: {
-      description:
-        "This event fires before programmatic navigation. Return false to cancel navigation.",
-      signature: "willNavigate(to: string, queryParams?: any): boolean | void",
-      parameters: {
-        to: "The target path or history delta to navigate to.",
-        queryParams: "Optional query parameters passed to the navigation request.",
-      },
-    },
-    didNavigate: {
-      description: "This event fires after the current route changes.",
-      signature: "didNavigate(to: string, queryParams?: any): void",
-      parameters: {
-        to: "The path navigated to.",
-        queryParams: "The query parameters for the current route.",
-      },
-    },
     keyDown: {
-      description: "This event fires when a key is pressed at the app level.",
-      signature: "keyDown(event: KeyboardEvent): void",
+      description:
+        `This event fires when a key is pressed while the \`${COMP}\` has focus or when the ` +
+        `event reaches the app level without being consumed by a child component.`,
+      signature: "(event: KeyboardEvent) => void",
       parameters: {
         event: "The keyboard event object.",
       },
     },
     keyUp: {
-      description: "This event fires when a key is released at the app level.",
-      signature: "keyUp(event: KeyboardEvent): void",
+      description:
+        `This event fires when a key is released while the \`${COMP}\` has focus or when the ` +
+        `event reaches the app level without being consumed by a child component.`,
+      signature: "(event: KeyboardEvent) => void",
       parameters: {
         event: "The keyboard event object.",
       },
     },
+    willNavigate: {
+      description:
+        `This event fires before the app is about to navigate programmatically via \`navigate()\` or \`Actions.navigate()\`. ` +
+        `The event handler receives the target path and optional query parameters. Returning \`false\` cancels the navigation; ` +
+        `returning \`null\`, \`undefined\`, or any other value proceeds with normal navigation. ` +
+        `Note: This event does NOT fire for Link clicks or browser back/forward navigation due to React Router limitations ` +
+        `(event handlers are async, but router blocking is synchronous).`,
+      signature:
+        "(to: string | number, queryParams?: Record<string, any>) => Promise<false | void | null | undefined>",
+      parameters: {
+        to: "The target path or history delta (e.g., -1 for back) to navigate to.",
+        queryParams: "Optional query parameters to include in the navigation.",
+      },
+    },
+    didNavigate: {
+      description:
+        `This event fires after the app has completed any navigation (including Link clicks, browser back/forward, ` +
+        `and programmatic navigation).`,
+      signature: "(to: string | number, queryParams?: Record<string, any>) => Promise<void>",
+      parameters: {
+        to: "The path that was navigated to.",
+        queryParams: "Query parameters (only available for programmatic navigation).",
+      },
+    },
+    error: {
+      description:
+        `This event fires whenever the framework signals an unhandled error (loader failure, ` +
+        `handler exception, or render-time throw). The handler receives the structured ` +
+        `\`AppError\` and an event-like object whose \`preventDefault()\` suppresses the ` +
+        `default toast. By default the toast is shown first; the handler can also return ` +
+        `\`false\` to suppress the toast. Use this hook for centralised telemetry or custom ` +
+        `error UI.`,
+      signature:
+        "(error: AppError, event: { preventDefault(): void; defaultPrevented: boolean }) => void | boolean | Promise<void | boolean>",
+      parameters: {
+        error: "The structured `AppError` (code, category, retryable, correlationId, data).",
+        event: "Cancellable event payload. Call `event.preventDefault()` to suppress the toast.",
+      },
+    },
   },
-  contextVars: {
-    $pathname: {
-      description: "The current app route pathname.",
-      valueType: "string",
-    },
-    $routeParams: {
-      description: "The current route parameters.",
-      valueType: "any",
-    },
-    $queryParams: {
-      description: "The current query parameters.",
-      valueType: "any",
-    },
-    $queryString: {
-      description: "The current query string.",
-      valueType: "string",
-    },
-  },
-  themeVars: extractScssThemeVars(appStylesSource),
+  themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
   themeVarContributorComponents: ["Footer", "Pages"],
   themeVarDescriptions: {
     "maxWidth-content-App":
       "This theme variable defines the maximum width of the main content. If the main " +
       "content is broader, the engine adds margins to keep the expected maximum size.",
-    "boxShadow-header-App": "This theme variable sets the shadow of the app's header section.",
-    "boxShadow-navPanel-App":
+    "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
+    "boxShadow‑navPanel‑App":
       "This theme variable sets the shadow of the app's navigation panel section " +
       "(visible only in vertical layouts).",
-    "width-navPanel-App":
+    "width‑navPanel‑App":
       "This theme variable sets the width of the navigation panel when the app is displayed " +
       "with one of the vertical layouts.",
   },
   defaultThemeVars: {
-    "maxWidth-drawer-App": "100%",
-    "top-closeButton-App": "$space-2",
-    "right-closeButton-App": "$space-2",
-    "width-navPanel-App": "$space-64",
-    "width-navPanel-collapsed-App": "48px",
-    "borderRight-navPanelWrapper-App": "1px solid $borderColor",
-    "backgroundColor-navPanel-App": "$backgroundColor",
-    "maxWidth-content-App": "$maxWidth-content",
-    "maxWidth-App": "$maxWidth-content",
-    "boxShadow-header-App": "none",
-    "boxShadow-navPanel-App": "none",
-    "scroll-padding-block-Pages": "$space-4",
-    "backgroundColor-content-App": "$backgroundColor",
-    "paddingHorizontal-content-App": "$space-4",
-    "paddingVertical-content-App": "$space-5",
-    "gap-content-App": "$space-5",
+    [`maxWidth-drawer-${COMP}`]: "100%",
+    [`top-closeButton-${COMP}`]: "$space-2",
+    [`right-closeButton-${COMP}`]: "$space-2",
+    [`width-navPanel-${COMP}`]: "$space-64",
+    [`width-navPanel-collapsed-${COMP}`]: "48px",
+    [`borderRight-navPanelWrapper-${COMP}`]: "1px solid $borderColor",
+    [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
+    [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`maxWidth-${COMP}`]: "$maxWidth-content",
+    [`boxShadow-header-${COMP}`]: "none",
+    [`boxShadow-navPanel-${COMP}`]: "none",
+    [`scroll-padding-block-Pages`]: "$space-4",
+    [`backgroundColor-content-${COMP}`]: "$backgroundColor",
+    [`paddingHorizontal-content-${COMP}`]: "$space-4",
+    [`paddingVertical-content-${COMP}`]: "$space-5",
+    [`gap-content-${COMP}`]: "$space-5",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
   },
 });
 
-export const appRenderer = wrapComponent({
-  name: "App",
-  metadata: AppMd as ComponentMetadata,
-  renderer: App,
+function AppNode({
+  node,
+  extractValue,
+  renderChild,
+  classes,
+  lookupEventHandler,
+  registerComponentApi,
+}) {
+  // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
+  const processedNavRef = useRef(false);
+
+  // --- Extract app components
+  const extracted = extractAppComponents(node.children);
+  const { AppHeader, Footer, Pages, restChildren } = extracted;
+
+  // --- Enhance NavPanel with page navigation inline
+  const { NavPanel: originalNavPanel } = extracted;
+
+  let NavPanel = originalNavPanel;
+
+  if (Pages && !processedNavRef.current) {
+    processedNavRef.current = true;
+
+    const extraNavs = extractNavPanelFromPages(Pages, originalNavPanel, extractValue);
+
+    if (extraNavs?.length) {
+      if (originalNavPanel) {
+        NavPanel = {
+          ...originalNavPanel,
+          children: originalNavPanel.children
+            ? [...originalNavPanel.children, ...extraNavs]
+            : extraNavs,
+        };
+      } else {
+        NavPanel = {
+          type: "NavPanel",
+          props: {},
+          children: extraNavs,
+        };
+      }
+    }
+  }
+
+  // Determine if default content padding should be applied
+  // Only apply if Pages is not present AND padding/paddingTop is not explicitly set
+  const hasExplicitPadding = node.props.padding !== undefined;
+  const applyDefaultContentPadding = !Pages && !hasExplicitPadding;
+  const footerSticky =
+    Footer?.props?.sticky !== undefined
+      ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
+      : true;
+  const logoContentDef = node.props.logoTemplate;
+  const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
+  const fitContent = extractValue.asOptionalBoolean(node.props.fitContent, false);
+
+  // When scrollWholePage is false, pageContentContainer is a vertical flex container
+  // Pass layout context so children can properly resolve star sizing
+  const contentLayoutContext = !scrollWholePage
+    ? { type: "Stack" as const, orientation: "vertical" as const }
+    : undefined;
+
+  return (
+    <AppComponent
+      scrollWholePage={scrollWholePage}
+      fitContent={fitContent}
+      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+      classes={classes}
+      layout={extractValue(node.props.layout)}
+      loggedInUser={extractValue(node.props.loggedInUser)}
+      onReady={lookupEventHandler("ready")}
+      onMessageReceived={lookupEventHandler("messageReceived")}
+      onKeyDown={lookupEventHandler("keyDown")}
+      onKeyUp={lookupEventHandler("keyUp")}
+      onWillNavigate={lookupEventHandler("willNavigate")}
+      onDidNavigate={lookupEventHandler("didNavigate")}
+      onError={lookupEventHandler("error")}
+      name={extractValue(node.props.name)}
+      logo={extractValue(node.props.logo)}
+      logoDark={extractValue(node.props["logo-dark"])}
+      logoLight={extractValue(node.props["logo-light"])}
+      defaultTone={extractValue(node.props.defaultTone)}
+      defaultTheme={extractValue(node.props.defaultTheme)}
+      autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
+      persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
+      themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
+      toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
+      locale={extractValue(node.props.locale)}
+      localeBundles={extractValue(node.props.localeBundles)}
+      auditPolicy={extractValue(node.props.auditPolicy)}
+      direction={extractValue.asOptionalString(node.props.direction, "auto")}
+      scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
+      maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
+      applyDefaultContentPadding={applyDefaultContentPadding}
+      header={renderChild(AppHeader)}
+      footer={renderChild(Footer)}
+      footerSticky={footerSticky}
+      navPanel={renderChild(NavPanel)}
+      navPanelDef={NavPanel}
+      logoContentDef={logoContentDef}
+      renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
+    >
+      {renderChild(restChildren, contentLayoutContext)}
+      <SearchIndexCollector Pages={Pages} NavPanel={NavPanel} renderChild={renderChild} />
+    </AppComponent>
+  );
+}
+
+export const appRenderer = wrapComponent(COMP, AppNode, AppMd, {
+  customRender: (
+    _props,
+    { node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi },
+  ) => {
+    return (
+      <AppNode
+        node={node}
+        renderChild={renderChild}
+        extractValue={extractValue}
+        classes={classes}
+        lookupEventHandler={lookupEventHandler}
+        registerComponentApi={registerComponentApi}
+      />
+    );
+  },
 });
+
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import { AppHeaderMd } from "../AppHeader/AppHeader";
+import { FooterMd } from "../Footer/Footer";
+import { PagesMd } from "../Pages/Pages";
+
+export const appRuntimeRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: AppMd as ComponentMetadata,
+  themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
+  renderer: ({ adapter }) => {
+    const directChildren = adapter.node.children.filter(
+      (child): child is XmluiElement => child.kind === "element",
+    );
+    const appHeader = directChildren.find((child) => child.type === "AppHeader");
+    const footer = directChildren.find((child) => child.type === "Footer");
+    const pages = directChildren.find((child) => child.type === "Pages");
+    const navPanel = directChildren.find((child) => child.type === "NavPanel") ??
+      (pages ? findRuntimeNavPanelInPages(pages) : undefined);
+    const logoContentDef = adapter.prop("logoTemplate");
+    const restChildren = adapter.node.children.filter((child) =>
+      !isRuntimeShellChild(child, appHeader, footer, navPanel),
+    );
+    const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
+    const contentLayoutContext = !scrollWholePage
+      ? { type: "Stack" as const, orientation: "vertical" as const }
+      : undefined;
+
+    const renderChild = (
+      child?: XmluiNode | XmluiNode[],
+      layoutContext?: Record<string, unknown>,
+    ) => {
+      if (!child) {
+        return undefined;
+      }
+      const childWithLayoutContext = applyRuntimeLayoutContext(child, layoutContext);
+      return Array.isArray(childWithLayoutContext)
+        ? adapter.context.renderChildren(childWithLayoutContext, adapter.scope)
+        : childWithLayoutContext.kind === "element"
+          ? adapter.context.renderElement(childWithLayoutContext, adapter.scope)
+          : adapter.context.renderChildren([childWithLayoutContext], adapter.scope);
+    };
+
+    return (
+      <BrowserRouter>
+      <HelmetProvider>
+      <AppComponent
+        {...adapter.rootAttrs()}
+        scrollWholePage={scrollWholePage}
+        fitContent={adapter.booleanProp("fitContent", defaultProps.fitContent)}
+        noScrollbarGutters={adapter.booleanProp("noScrollbarGutters", defaultProps.noScrollbarGutters)}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+        layout={adapter.stringProp("layout") as any}
+        loggedInUser={adapter.prop("loggedInUser")}
+        onReady={adapter.event("ready") as any}
+        onMessageReceived={adapter.event("messageReceived") as any}
+        onKeyDown={adapter.event("keyDown") as any}
+        onKeyUp={adapter.event("keyUp") as any}
+        onWillNavigate={adapter.event("willNavigate") as any}
+        onDidNavigate={adapter.event("didNavigate") as any}
+        onError={adapter.event("error") as any}
+        name={adapter.stringProp("name")}
+        logo={adapter.stringProp("logo")}
+        logoDark={adapter.stringProp("logo-dark")}
+        logoLight={adapter.stringProp("logo-light")}
+        defaultTone={adapter.stringProp("defaultTone")}
+        defaultTheme={adapter.stringProp("defaultTheme")}
+        autoDetectTone={adapter.booleanProp("autoDetectTone", defaultProps.autoDetectTone)}
+        persistTheme={adapter.booleanProp("persistTheme", defaultProps.persistTheme)}
+        themeStorageKey={adapter.stringProp("themeStorageKey", defaultProps.themeStorageKey)}
+        toneStorageKey={adapter.stringProp("toneStorageKey", defaultProps.toneStorageKey)}
+        locale={adapter.stringProp("locale")}
+        localeBundles={adapter.prop("localeBundles")}
+        auditPolicy={adapter.prop("auditPolicy")}
+        direction={adapter.stringProp("direction", "auto") as any}
+        scheduler={adapter.stringProp("scheduler") as any}
+        maxQueuedPerTrace={adapter.numberProp("maxQueuedPerTrace", 64)}
+        applyDefaultContentPadding={!pages && adapter.prop("padding") === undefined}
+        header={renderChild(appHeader)}
+        footer={renderChild(footer)}
+        navPanel={renderChild(navPanel)}
+        navPanelDef={navPanel as any}
+        logoContentDef={logoContentDef as any}
+        renderChild={renderChild as any}
+        registerComponentApi={(api) => adapter.registerApi(api as Record<string, unknown>)}
+      >
+        {renderChild(restChildren, contentLayoutContext)}
+      </AppComponent>
+      </HelmetProvider>
+      </BrowserRouter>
+    );
+  },
+});
+
+function applyRuntimeLayoutContext(
+  child: XmluiNode | XmluiNode[],
+  layoutContext?: Record<string, unknown>,
+): XmluiNode | XmluiNode[] {
+  if (!layoutContext) {
+    return child;
+  }
+  if (Array.isArray(child)) {
+    return child.map((item) => applyRuntimeLayoutContext(item, layoutContext) as XmluiNode);
+  }
+  if (child.kind !== "element") {
+    return child;
+  }
+  return {
+    ...child,
+    props: {
+      ...child.props,
+      ...layoutContext,
+    },
+  };
+}
+
+function isRuntimeShellChild(
+  child: XmluiNode,
+  appHeader: XmluiElement | undefined,
+  footer: XmluiElement | undefined,
+  navPanel: XmluiElement | undefined,
+): boolean {
+  return child === appHeader || child === footer || child === navPanel;
+}
+
+function findRuntimeNavPanelInPages(pages: XmluiElement): XmluiElement | undefined {
+  for (const page of pages.children) {
+    if (page.kind !== "element" || page.type !== "Page") {
+      continue;
+    }
+    const navPanel = page.children.find(
+      (child): child is XmluiElement => child.kind === "element" && child.type === "NavPanel",
+    );
+    if (navPanel) {
+      return navPanel;
+    }
+  }
+  return undefined;
+}

@@ -47,6 +47,8 @@ import {
   TreeDriver,
 } from "./ComponentDrivers";
 
+const e2eDevPort = process.env.XMLUI_E2E_DEV_PORT ?? "5173";
+
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
   components?: string[];
@@ -172,7 +174,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     async ({ browser }, use) => {
       const context = await browser.newContext({
         ...devices["Desktop Chrome"],
-        baseURL: "http://127.0.0.1:5173/",
+        baseURL: `http://127.0.0.1:${e2eDevPort}/`,
         permissions: ["clipboard-read", "clipboard-write"],
       });
       await use(context);

@@ -11,6 +11,7 @@ type ExtractValueCompat = ((value: unknown) => any) & {
   asOptionalBoolean(value: unknown, fallback?: boolean): boolean;
   asOptionalNumber(value: unknown, fallback?: number): number | undefined;
   asOptionalString(value: unknown, fallback?: string): string | undefined;
+  asSize(value: unknown, fallback?: string): string | undefined;
 };
 
 type WrapComponentOptions = {
@@ -83,6 +84,8 @@ export function wrapComponent(
         };
         extractValue.asOptionalString = (value, fallback) =>
           value === undefined || value === null ? fallback : String(value);
+        extractValue.asSize = (value, fallback) =>
+          value === undefined || value === null || value === "" ? fallback : String(value);
         return options.customRender(props, {
           className: themeClass.className,
           classes: { [COMPONENT_PART_KEY]: themeClass.className },

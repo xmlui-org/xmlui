@@ -5,13 +5,14 @@ const includeIncompleteCompatibility =
 const reuseExistingServer = process.env.XMLUI_REUSE_EXISTING_SERVER !== "0";
 const reuseDevServer =
   reuseExistingServer && process.env.XMLUI_REUSE_DEV_SERVER !== "0";
+const devServerPort = process.env.XMLUI_E2E_DEV_PORT ?? "5173";
 const isComponentSpecRun = process.argv.some((arg) =>
   arg.includes("src/components/") || arg.includes("src/components\\")
 );
 
 const devWebServer = {
-  command: "npm run dev -- --host 127.0.0.1 --port 5173",
-  url: "http://127.0.0.1:5173/",
+  command: `npm run dev -- --host 127.0.0.1 --port ${devServerPort}`,
+  url: `http://127.0.0.1:${devServerPort}/`,
   reuseExistingServer: reuseDevServer,
 };
 
@@ -56,6 +57,6 @@ export default defineConfig({
       ],
   webServer: isComponentSpecRun ? [devWebServer] : fullWebServers,
   use: {
-    baseURL: "http://127.0.0.1:5173/",
+    baseURL: `http://127.0.0.1:${devServerPort}/`,
   },
 });

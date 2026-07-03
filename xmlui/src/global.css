@@ -1,10 +1,61 @@
-html,
-body,
-#root {
-  min-width: 100%;
-  min-height: 100%;
-}
+@layer reset, base, components, themes, dynamic;
 
-body {
-  margin: 0;
+@layer base {
+  html,
+  body,
+  #root {
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border: 0 solid #e5e7eb;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+  }
+
+  button,
+  select {
+    text-transform: none;
+  }
+
+  button,
+  [type="button"],
+  [type="reset"],
+  [type="submit"] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+  }
 }

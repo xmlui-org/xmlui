@@ -71,6 +71,9 @@ function isActivePath(pathname: string, to: string | undefined, exact: boolean):
   }
   const target = normalizePathname(to);
   const current = normalizePathname(pathname);
+  if (target === "/") {
+    return current === "/";
+  }
   if (exact) {
     return current === target;
   }

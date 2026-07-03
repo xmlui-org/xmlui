@@ -47,5 +47,12 @@
   "optionalDependencies": {
     "@rolldown/binding-darwin-arm64": "^1.1.3",
     "lightningcss-darwin-arm64": "^1.32.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-visually-hidden": "^1.2.4",
+    "react-helmet-async": "^1.3.0",
+    "use-context-selector": "^1.4.1"
   }
 }

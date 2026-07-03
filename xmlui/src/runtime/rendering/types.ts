@@ -10,8 +10,22 @@ export type RenderContext = {
   components: Record<string, XmluiComponentModule>;
   extensionRenderers: Record<string, XmluiExtensionComponent>;
   renderElement(node: XmluiElement, scope: RuntimeScope): ReactNode;
-  renderChildren(children: XmluiNode[], scope: RuntimeScope): ReactNode;
+  renderChildren(
+    children: XmluiNode[],
+    scope: RuntimeScope,
+    parentEnd?: number,
+    layoutContext?: RuntimeRenderLayoutContext,
+  ): ReactNode;
   withComponents(components: Record<string, XmluiComponentModule>): RenderContext;
+};
+
+export type RuntimeRenderLayoutContext = {
+  wrapChild?: (
+    context: { node: XmluiElement; scope: RuntimeScope },
+    renderedChild: ReactNode,
+    hints?: { opaque?: boolean },
+  ) => ReactNode;
+  [key: string]: unknown;
 };
 
 export type XmluiRendererProps = {

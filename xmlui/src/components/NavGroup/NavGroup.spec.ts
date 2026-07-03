@@ -1,23 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-const NAVGROUP_OLD_SUITE_PENDING =
-  "The literal old NavGroup suite is copied for compatibility tracking, but old dropdown vs inline layout switching, menuitem roles, NavPanel/App layout context, icon variants, keyboard behavior, and theme-variable parity are not complete yet. Re-enable cases feature-by-feature.";
-
-const ACTIVE_NAVGROUP_TESTS = new Set([
-  "displays menuitems after click",
-  "disabled navgroup can't open",
-  "component trigger has correct aria labels",
-  "expanded in vertical layout to show link of current page",
-  "nested disabled navgroup can't open",
-  "initiallyExpanded works",
-]);
-
-test.beforeEach(({}, testInfo) => {
-  if (!ACTIVE_NAVGROUP_TESTS.has(testInfo.title)) {
-    test.skip(true, NAVGROUP_OLD_SUITE_PENDING);
-  }
-});
-
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("displays menuitems after click", async ({ initTestBed, page }) => {
     await initTestBed(`

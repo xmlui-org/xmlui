@@ -28,6 +28,32 @@ test.describe("App shell foundation", () => {
     await expect(page.getByTestId("message")).toHaveText("hello-app");
   });
 
+  test("messageReceived handles messages posted from component event handlers", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        var.message = "<none>"
+        onMessageReceived="(msg, ev) => {
+          message = JSON.stringify(msg);
+          console.log('Message event received:', ev);
+        }">
+        <Button
+          testId="send"
+          label="Send a message"
+          onClick="window.postMessage({type: 'message', messages:'Here you are!'})" />
+        <Text testId="message">Message received: {message}</Text>
+      </App>
+    `);
+
+    await expect(page.getByTestId("message")).toHaveText("Message received: <none>");
+    await page.getByTestId("send").click();
+    await expect(page.getByTestId("message")).toHaveText(
+      'Message received: {"type":"message","messages":"Here you are!"}',
+    );
+  });
+
   test("keyDown and keyUp receive keyboard events", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App

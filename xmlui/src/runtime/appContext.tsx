@@ -2,14 +2,38 @@ import React, { createContext, type ReactNode, useContext } from "react";
 
 export type XmluiAppContextValue = {
   appGlobals: Record<string, unknown>;
+  loggedInUser: unknown;
+  setLoggedInUser: (user: unknown) => void;
   mediaSize: {
     sizeIndex: number;
+    size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+    phone: boolean;
+    landscapePhone: boolean;
+    tablet: boolean;
+    desktop: boolean;
+    largeDesktop: boolean;
+    xlDesktop: boolean;
+    smallScreen: boolean;
+    largeScreen: boolean;
   };
 };
 
 const defaultAppContext: XmluiAppContextValue = {
   appGlobals: {},
-  mediaSize: { sizeIndex: 4 },
+  loggedInUser: undefined,
+  setLoggedInUser: () => {},
+  mediaSize: {
+    size: "xl",
+    sizeIndex: 4,
+    phone: false,
+    landscapePhone: false,
+    tablet: false,
+    desktop: false,
+    largeDesktop: true,
+    xlDesktop: false,
+    smallScreen: false,
+    largeScreen: true,
+  },
 };
 
 const XmluiAppContext = createContext<XmluiAppContextValue>(defaultAppContext);

@@ -1,71 +1,199 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import { type ReactNode, forwardRef, memo, useRef } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./AppHeader.defaults";
 import styles from "./AppHeader.module.scss";
 
-export type AppHeaderProps = HTMLAttributes<HTMLElement> & {
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import { useAppContext } from "../../components-core/AppContext";
+import { ThemedIcon } from "../Icon/Icon";
+import { Logo } from "../Logo/LogoReact";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedNavLink } from "../NavLink/NavLink";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_HAMBURGER } from "../../components-core/parts";
+import { defaultProps } from "./AppHeader.defaults";
+
+type Props = {
   children?: ReactNode;
-  drawerToggle?: ReactNode;
-  logoContent?: ReactNode;
   profileMenu?: ReactNode;
-  showLogo?: boolean;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  canRestrictContentWidth?: boolean;
+  className?: string;
+  classes?: Record<string, string>;
   title?: string;
+  navPanelVisible?: boolean;
+  showLogo?: boolean;
+  toggleDrawer?: () => void;
+  hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
+  registerSubNavPanelSlot?: (node: HTMLElement) => void;
+  renderChild?: RenderChildFn;
 };
 
-export const AppHeaderComponent = forwardRef<HTMLElement, AppHeaderProps>(function AppHeaderComponent(
-  {
-    children,
-    className,
-    drawerToggle,
-    logoContent,
-    profileMenu,
-    showLogo = defaultProps.showLogo,
-    title,
-    titleContent,
-    ...rest
-  },
-  ref,
-) {
-  const titleNode = titleContent ?? (title ? (
-    <a className={styles.title} href="/">
-      {title}
-    </a>
-  ) : null);
+export function useLogoUrl() {
+  const { logo, logoLight, logoDark } = useAppLayoutContext() || {};
+  const logoUrlByTone = {
+    light: logoLight,
+    dark: logoDark,
+  };
+  const { activeThemeTone, getResourceUrl } = useTheme();
+
+  const baseLogoUrl = getResourceUrl("resource:logo") || logo;
+  const toneLogoUrl =
+    getResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
+
+  return toneLogoUrl || baseLogoUrl;
+}
+
+export const AppHeader = memo(forwardRef<HTMLDivElement, Props>(function AppHeader({
+  children,
+  profileMenu,
+  style = EMPTY_OBJECT,
+  logoContent,
+  className,
+  classes,
+  canRestrictContentWidth,
+  navPanelVisible = true,
+  toggleDrawer,
+  showLogo = defaultProps.showLogo,
+  hasRegisteredNavPanel,
+  title,
+  titleContent,
+  registerSubNavPanelSlot,
+  ...rest
+}: Props, ref) {
+  const { mediaSize } = useAppContext();
+  const logoUrl = useLogoUrl();
+  const subNavPanelSlot = useRef(null);
+  const effectiveNavPanelVisible = navPanelVisible;
+  const safeLogoTitle =
+    mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
+      <ThemedNavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
+        {title}
+      </ThemedNavLink>
+    ) : (
+      titleContent
+    );
+
+  useIsomorphicLayoutEffect(() => {
+    registerSubNavPanelSlot?.(subNavPanelSlot.current);
+  }, []);
 
   return (
-    <header
-      {...rest}
-      className={[styles.header, className].filter(Boolean).join(" ")}
-      data-xmlui-component="AppHeader"
-      ref={ref}
-      role="banner"
-    >
-      <div className={[styles.headerInner, styles.full].join(" ")}>
-        {drawerToggle ? (
-          <div className={styles.drawerToggle} data-xmlui-part="drawerToggle">
-            {drawerToggle}
-          </div>
-        ) : null}
+    <div ref={ref} {...rest} className={classnames(styles.header, classes?.[COMPONENT_PART_KEY], className)} style={style} role="banner">
+      <div
+        className={classnames(styles.headerInner, {
+          [styles.full]: !canRestrictContentWidth,
+        })}
+      >
+        {hasRegisteredNavPanel && (
+          <Part partId={PART_HAMBURGER}>
+            <Button
+              onClick={toggleDrawer}
+              icon={<ThemedIcon name={"hamburger"} />}
+              variant={"ghost"}
+              className={styles.drawerToggle}
+              style={{ color: "inherit", flexShrink: 0 }}
+            />
+          </Part>
+        )}
         <div className={styles.logoAndTitle}>
-          {showLogo && logoContent ? (
-            <div className={styles.logoContainer} data-xmlui-part="logo">
-              {logoContent}
-            </div>
-          ) : null}
-          {titleNode}
+          {(showLogo || !effectiveNavPanelVisible) &&
+            (logoContent ? (
+              <>
+                <div className={styles.customLogoContainer}>{logoContent}</div>
+                {safeLogoTitle}
+              </>
+            ) : (
+              <>
+                {!!logoUrl && (
+                  <div className={styles.logoContainer}>
+                    <ThemedNavLink to={"/"} displayActive={false} className={styles.logoLink}>
+                      <Logo />
+                    </ThemedNavLink>
+                  </div>
+                )}
+                {safeLogoTitle}
+              </>
+            ))}
         </div>
-        <div className={styles.subNavPanelSlot} data-xmlui-part="subNavPanel" />
-        <div className={styles.childrenWrapper} data-xmlui-part="content">
-          {children}
-        </div>
-        {profileMenu ? (
-          <div className={styles.rightItems} data-xmlui-part="profileMenu">
-            {profileMenu}
-          </div>
-        ) : null}
+        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot} />
+        <div className={styles.childrenWrapper}>{children}</div>
+        {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>
-    </header>
+    </div>
   );
-});
+}));
+
+type AppContextAwareAppHeaderProps = {
+  children?: ReactNode;
+  profileMenu?: ReactNode;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  className?: string;
+  classes?: Record<string, string>;
+  title?: string;
+  titleContent?: ReactNode;
+  showLogo?: boolean;
+  renderChild: RenderChildFn;
+};
+
+export const AppContextAwareAppHeader = memo(forwardRef<HTMLDivElement, AppContextAwareAppHeaderProps>(function AppContextAwareAppHeader({
+  children,
+  logoContent,
+  profileMenu,
+  style,
+  className,
+  classes,
+  title,
+  titleContent,
+  showLogo = true,
+  renderChild,
+}: AppContextAwareAppHeaderProps, ref) {
+  const appLayoutContext = useAppLayoutContext();
+
+  const {
+    navPanelVisible,
+    toggleDrawer,
+    layout,
+    hasRegisteredNavPanel,
+    navPanelDef,
+    logoContentDef,
+    registerSubNavPanelSlot,
+  } = appLayoutContext || {};
+
+  // console.log("APP LAYOUT CONTEXT", appLayoutContext);
+  const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
+  const canRestrictContentWidth = layout !== "vertical-full-header";
+  const effectiveNavPanelVisible = navPanelVisible;
+
+  return (
+    <AppHeader
+      ref={ref}
+      hasRegisteredNavPanel={hasRegisteredNavPanel}
+      navPanelVisible={effectiveNavPanelVisible}
+      toggleDrawer={toggleDrawer}
+      canRestrictContentWidth={canRestrictContentWidth}
+      showLogo={displayLogo}
+      logoContent={logoContent || renderChild(logoContentDef)}
+      profileMenu={profileMenu}
+      style={style}
+      className={className}
+      classes={classes}
+      title={title}
+      titleContent={titleContent}
+      registerSubNavPanelSlot={registerSubNavPanelSlot}
+    >
+      {layout?.startsWith("condensed") && effectiveNavPanelVisible && (
+        <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>
+      )}
+      {children}
+    </AppHeader>
+  );
+}));

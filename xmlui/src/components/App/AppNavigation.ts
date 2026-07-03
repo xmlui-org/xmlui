@@ -1,0 +1,392 @@
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+
+// --- Type Definitions ---
+
+/**
+ * Structure to represent navigation hierarchy nodes.
+ */
+export interface NavHierarchyNode {
+  type: string;
+  label: string;
+  path?: string;
+  children?: NavHierarchyNode[];
+}
+
+/**
+ * Result of extracting special App components from children.
+ */
+interface ExtractedComponents {
+  AppHeader?: ComponentDef;
+  Footer?: ComponentDef;
+  NavPanel?: ComponentDef;
+  Pages?: ComponentDef;
+  restChildren: ComponentDef[];
+}
+
+// --- Navigation Helper Functions ---
+
+/**
+ * Parse a string into hierarchy labels, handling escaped pipe characters.
+ */
+export function parseHierarchyLabels(labelText: string): string[] {
+  const result: string[] = [];
+  let currentLabel = "";
+  let escaped = false;
+
+  for (let i = 0; i < labelText.length; i++) {
+    const char = labelText[i];
+
+    if (escaped) {
+      currentLabel += char;
+      escaped = false;
+    } else if (char === "\\") {
+      escaped = true;
+    } else if (char === "|") {
+      result.push(currentLabel.trim());
+      currentLabel = "";
+    } else {
+      currentLabel += char;
+    }
+  }
+
+  if (currentLabel.length > 0) {
+    result.push(currentLabel.trim());
+  }
+
+  return result;
+}
+
+// --- Component Extraction Helper Functions ---
+
+/**
+ * Extract App special components (AppHeader, Footer, NavPanel, Pages) from children.
+ * Handles Theme wrappers by unwrapping special components while preserving Theme for others.
+ */
+export function extractAppComponents(children: ComponentDef[] | undefined): ExtractedComponents {
+  const result: ExtractedComponents = { restChildren: [] };
+
+  if (!children) return result;
+
+  for (const child of children) {
+    if (child.type === "Theme") {
+      extractFromThemeWrapper(child, result);
+    } else {
+      extractDirectChild(child, result);
+    }
+  }
+
+  return result;
+}
+
+function isTransparentFragment(child: ComponentDef): boolean {
+  return (
+    child.type === "Fragment" &&
+    !!child.children &&
+    child.when === undefined &&
+    !hasEntries(child.vars) &&
+    !hasEntries(child.functions) &&
+    !child.loaders?.length &&
+    child.uses === undefined &&
+    !child.contextVars &&
+    !child.script &&
+    !child.scriptCollected &&
+    !child.scriptError
+  );
+}
+
+function hasEntries(value: Record<string, unknown> | undefined): boolean {
+  return !!value && Object.keys(value).length > 0;
+}
+
+/**
+ * Extract special components from within a Theme wrapper.
+ * Special components are unwrapped while other children remain in the Theme.
+ */
+function extractFromThemeWrapper(
+  themeNode: ComponentDef,
+  result: ExtractedComponents
+): void {
+  const otherChildren: ComponentDef[] = [];
+
+  themeNode.children?.forEach((child) => {
+    // When script tags are present inside Theme, children may be wrapped in a Fragment.
+    // Only unwrap transparent Fragments; user-authored Fragments can carry local scope.
+    if (isTransparentFragment(child)) {
+      // Process Fragment children
+      child.children.forEach((fragmentChild) => {
+        if (fragmentChild.type === "AppHeader") {
+          result.AppHeader = { ...themeNode, children: [fragmentChild] };
+        } else if (fragmentChild.type === "Footer") {
+          result.Footer = { ...themeNode, children: [fragmentChild] };
+        } else if (fragmentChild.type === "NavPanel") {
+          result.NavPanel = { ...themeNode, children: [fragmentChild] };
+        } else {
+          otherChildren.push(fragmentChild);
+        }
+      });
+    } else if (child.type === "AppHeader") {
+      result.AppHeader = { ...themeNode, children: [child] };
+    } else if (child.type === "Footer") {
+      result.Footer = { ...themeNode, children: [child] };
+    } else if (child.type === "NavPanel") {
+      result.NavPanel = { ...themeNode, children: [child] };
+    } else {
+      otherChildren.push(child);
+    }
+  });
+
+  // Only add Theme to restChildren if it has remaining children
+  if (otherChildren.length > 0) {
+    result.restChildren.push({ ...themeNode, children: otherChildren });
+  }
+}
+
+/**
+ * Extract a direct (non-Theme-wrapped) child component.
+ */
+function extractDirectChild(child: ComponentDef, result: ExtractedComponents): void {
+  // When script tags are present, the parser wraps other children in a Fragment.
+  // Only unwrap transparent Fragments; user-authored Fragments can carry local scope.
+  if (isTransparentFragment(child)) {
+    // Recursively process Fragment children
+    child.children.forEach((fragmentChild) => {
+      extractDirectChild(fragmentChild, result);
+    });
+    return;
+  }
+
+  switch (child.type) {
+    case "Theme":
+      // Theme can contain special components, extract them
+      extractFromThemeWrapper(child, result);
+      break;
+    case "AppHeader":
+      result.AppHeader = child;
+      break;
+    case "Footer":
+      result.Footer = child;
+      break;
+    case "NavPanel":
+      result.NavPanel = child;
+      break;
+    case "Pages":
+      result.Pages = child;
+      result.restChildren.push(child);
+      break;
+    default:
+      result.restChildren.push(child);
+  }
+}
+
+/**
+ * Find or create a NavGroup with the given label in the navItems array.
+ */
+function findOrCreateNavGroup(navItems: any[], groupLabel: string): any {
+  const existingGroup = navItems.find(
+    (item) => item.type === "NavGroup" && item.props?.label === groupLabel,
+  );
+
+  if (existingGroup) {
+    return existingGroup;
+  }
+
+  const newGroup = {
+    type: "NavGroup",
+    props: {
+      label: groupLabel,
+    },
+    children: [],
+  };
+
+  navItems.push(newGroup);
+  return newGroup;
+}
+
+/**
+ * Check if a label exists in a navigation hierarchy (recursive).
+ */
+function labelExistsInHierarchy(searchLabel: string, hierarchy: NavHierarchyNode[]): boolean {
+  return hierarchy.some((node) => {
+    if (node.label === searchLabel) {
+      return true;
+    }
+    if (node.children && node.children.length > 0) {
+      return labelExistsInHierarchy(searchLabel, node.children);
+    }
+    return false;
+  });
+}
+
+// --- NavGroup URL Extraction ---
+
+/**
+ * Recursively collects all `to` URLs from NavGroup components in a navigation tree.
+ * These URLs point to summary/overview pages that should be excluded from search indexing.
+ */
+export function extractNavGroupUrls(node: ComponentDef | undefined): Set<string> {
+  const urls = new Set<string>();
+  if (!node) return urls;
+  collectNavGroupUrls(node.children, urls);
+  return urls;
+}
+
+function collectNavGroupUrls(children: ComponentDef[] | undefined, urls: Set<string>): void {
+  if (!children) return;
+  for (const child of children) {
+    if (child.type === "NavGroup" && typeof child.props?.to === "string" && child.props.to) {
+      urls.add(child.props.to);
+    }
+    if (child.children) {
+      collectNavGroupUrls(child.children, urls);
+    }
+  }
+}
+
+// --- Navigation Extraction Functions ---
+
+/**
+ * Process navigation items recursively and build hierarchy tree.
+ * Handles NavLink and NavGroup items, extracting labels and building a tree structure.
+ */
+function processNavItems(
+  items: ComponentDef[],
+  parentHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any,
+) {
+  items.forEach((navItem) => {
+    // --- Process NavLink items
+    if (navItem.type === "NavLink") {
+      let itemLabel = navItem.props?.label;
+      let itemPath = navItem.props?.to;
+
+      if (!itemLabel) {
+        if (navItem.children?.length === 1 && navItem.children[0].type === "TextNode") {
+          itemLabel = navItem.children[0].props.value;
+        }
+      }
+
+      if (itemLabel) {
+        const labelValue = extractValue(itemLabel);
+
+        // --- Add to hierarchy
+        parentHierarchy.push({
+          type: "NavLink",
+          label: labelValue,
+          path: itemPath ? extractValue(itemPath) : undefined,
+        });
+      }
+    }
+    // --- Process NavGroup items (which may contain nested NavLink or NavGroup items)
+    else if (navItem.type === "NavGroup") {
+      let groupLabel = navItem.props?.label;
+
+      if (groupLabel) {
+        const labelValue = extractValue(groupLabel);
+
+        // --- Create group node
+        const groupNode: NavHierarchyNode = {
+          type: "NavGroup",
+          label: labelValue,
+          children: [],
+        };
+
+        // --- Add to parent hierarchy
+        parentHierarchy.push(groupNode);
+
+        // --- Recursively process children of the NavGroup
+        if (navItem.children && navItem.children.length > 0) {
+          processNavItems(navItem.children, groupNode.children, extractValue);
+        }
+      } else if (navItem.children && navItem.children.length > 0) {
+        // --- If no label but has children, still process them under parent
+        processNavItems(navItem.children, parentHierarchy, extractValue);
+      }
+    }
+  });
+}
+
+/**
+ * Extract navigation panel items from Pages component and build hierarchical structure.
+ * 
+ * Creates NavLink and NavGroup components based on Page navLabel props.
+ * Handles multi-level hierarchies using pipe-separated labels (e.g., "Parent|Child").
+ * Prevents duplicates and integrates with existing NavPanel structure.
+ */
+export function extractNavPanelFromPages(
+  Pages: ComponentDef,
+  NavPanel: ComponentDef | undefined,
+  extractValue: (value: any) => any,
+): ComponentDef[] | null {
+  if (!Pages) return null;
+
+  const extraNavs: ComponentDef[] = [];
+  const navigationHierarchy: NavHierarchyNode[] = [];
+
+  // --- Build navigation hierarchy from existing NavPanel
+  if (NavPanel?.children) {
+    processNavItems(NavPanel.children, navigationHierarchy, extractValue);
+  }
+
+  // --- Process Pages to create hierarchical navigation structure
+  Pages.children?.forEach((page) => {
+    if (page.type === "Page" && page.props.navLabel) {
+      const label = extractValue(page.props.navLabel);
+      const url = extractValue(page.props.url);
+
+      // --- Parse hierarchy labels separated by unescaped pipe characters
+      const hierarchyLabels = parseHierarchyLabels(label);
+
+      if (hierarchyLabels.length === 0) {
+        return;
+      }
+
+      // --- For a single level, just add a NavLink directly
+      if (hierarchyLabels.length === 1) {
+        if (!labelExistsInHierarchy(hierarchyLabels[0], navigationHierarchy)) {
+          extraNavs.push({
+            type: "NavLink",
+            props: {
+              label: hierarchyLabels[0],
+              to: url,
+            },
+          });
+        }
+        return;
+      }
+
+      // --- For multi-level hierarchies, create NavGroups and a final NavLink
+      let currentLevel = extraNavs;
+
+      // --- Create NavGroups for all levels except the last one
+      for (let i = 0; i < hierarchyLabels.length - 1; i++) {
+        const groupLabel = hierarchyLabels[i];
+        const navGroup = findOrCreateNavGroup(currentLevel, groupLabel);
+
+        if (!navGroup.children) {
+          navGroup.children = [];
+        }
+
+        currentLevel = navGroup.children;
+      }
+
+      // --- Add the leaf NavLink to the deepest NavGroup
+      const leafLabel = hierarchyLabels[hierarchyLabels.length - 1];
+
+      const existingNavLink = currentLevel.find(
+        (item) => item.type === "NavLink" && item.props?.label === leafLabel,
+      );
+
+      if (!existingNavLink) {
+        currentLevel.push({
+          type: "NavLink",
+          props: {
+            label: leafLabel,
+            to: url,
+          },
+        });
+      }
+    }
+  });
+
+  return extraNavs;
+}

@@ -9,4 +9,3 @@ export const defaultProps = {
   toneStorageKey: "appTone",
   themeStorageKey: "appTheme",
 };
-

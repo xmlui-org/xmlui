@@ -38,6 +38,30 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toContainText("Banana");
   });
 
+  test("loads data from an API URL", async ({ initTestBed, page, createListDriver }) => {
+    await page.route("**/api/list-items", async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify([
+          { id: 1, title: "Remote Alpha" },
+          { id: 2, title: "Remote Beta" },
+        ]),
+      });
+    });
+
+    await initTestBed(`
+      <List data="/api/list-items">
+        <Text>{$item.title}</Text>
+      </List>
+    `);
+
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Remote Alpha");
+    await expect(driver.component).toContainText("Remote Beta");
+    await expect(driver.component).not.toContainText("No data");
+  });
+
   test("renders array of primitives correctly", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`
       <List data="{['Apple', 'Banana', 'Cherry']}">

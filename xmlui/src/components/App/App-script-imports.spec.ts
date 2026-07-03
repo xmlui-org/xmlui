@@ -1,10 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
 
-test.skip(
-  true,
-  "Deferred to script-runtime compatibility: <script> import/function declarations require callable script-local bindings.",
-);
-
 // =============================================================================
 // SCRIPT IMPORT PROCESSING TESTS
 // =============================================================================

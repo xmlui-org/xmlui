@@ -22,7 +22,7 @@ import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
 import { useComponentThemeClass } from "./theme";
-import type { RenderContext } from "./types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export type XmluiAdapterRendererProps = {
   adapter: XmluiComponentAdapter;
@@ -42,6 +42,7 @@ export type XmluiWrappedRenderer = (props: {
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  [key: string]: unknown;
 }) => ReactNode;
 
 export type XmluiComponentAdapter = {
@@ -61,19 +62,25 @@ export type XmluiComponentAdapter = {
   numberProp(name: string, fallback?: number): number;
   booleanProp(name: string, fallback?: boolean): boolean;
   event(name: string): (...args: unknown[]) => Promise<unknown>;
-  renderChildren(children?: XmluiNode[]): ReactNode;
+  renderChildren(children?: XmluiNode[], layoutContext?: RuntimeRenderLayoutContext): ReactNode;
   renderTemplate(name: string, fallbackChildren?: XmluiNode[]): ReactNode;
   registerApi(api: Record<string, unknown>): void;
   resourceUrl(value: unknown): string | undefined;
 };
 
 export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrappedRenderer {
-  function WrappedXmluiComponent({ context, node, scope }: Parameters<XmluiWrappedRenderer>[0]) {
+  function WrappedXmluiComponent({
+    context,
+    node,
+    scope,
+    ...extraProps
+  }: Parameters<XmluiWrappedRenderer>[0]) {
     const adapter = useXmluiComponentAdapter({
       ...options,
       context,
       node,
       scope,
+      extraProps,
     });
     const rendered = options.renderer({ adapter });
     return <>{attachBehaviors({
@@ -93,10 +100,12 @@ export function useXmluiComponentAdapter({
   node,
   scope,
   defaultPart = "root",
+  extraProps = {},
 }: XmluiComponentAdapterOptions & {
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  extraProps?: Record<string, unknown>;
 }): XmluiComponentAdapter {
   const propDependencies = Object.values(node.parsed?.props ?? {}).flatMap((parsed) =>
     Array.isArray(parsed)
@@ -105,8 +114,11 @@ export function useXmluiComponentAdapter({
   );
   useBindingRevision(propDependencies, scope);
   const props = useMemo(
-    () => evaluateProps(node.props, node.parsed?.props, scope),
-    [node.props, node.parsed?.props, scope, scope.store.getSnapshot()],
+    () => ({
+      ...evaluateProps(node.props, node.parsed?.props, scope),
+      ...extraProps,
+    }),
+    [extraProps, node.props, node.parsed?.props, scope, scope.store.getSnapshot()],
   );
   const events = useMemo(
     () => Object.fromEntries(Object.keys(node.events).map((eventName) => [
@@ -187,6 +199,7 @@ export function useXmluiComponentAdapter({
       ...layoutStyle,
     },
     rootAttrs: (part = rootPart) => ({
+      ...externalRootAttrs(metadata, extraProps),
       ...arbitraryRootAttrs(metadata, props),
       "data-xmlui-component": name,
       "data-xmlui-part": part,
@@ -228,12 +241,13 @@ export function useXmluiComponentAdapter({
     },
     event: (eventName) =>
       events[eventName] ?? ((..._args: unknown[]) => Promise.resolve(undefined)),
-    renderChildren: (children = nonPropertyChildren(node.children)) =>
-      context.renderChildren(children, scope),
+    renderChildren: (children = nonPropertyChildren(node.children), layoutContext) =>
+      context.renderChildren(children, scope, node.range.end, layoutContext),
     renderTemplate: (templateName, fallbackChildren) =>
       context.renderChildren(
         templateChildren(node, templateName) ?? fallbackChildren ?? [],
         scope,
+        node.range.end,
       ),
     registerApi,
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
@@ -261,13 +275,21 @@ function resolveActiveLayoutStyle(
   props: Record<string, unknown>,
   viewportWidth: number | undefined,
 ): CSSProperties {
+  const style: CSSProperties = resolveLayoutStyle(props);
   const responsive = resolveResponsiveLayoutStyles(props);
   const componentStyle = responsive[COMPONENT_PART_KEY];
   if (!componentStyle) {
-    return resolveLayoutStyle(props);
+    return style;
   }
 
-  return resolveActiveLayoutStyleForPart(responsive, COMPONENT_PART_KEY, viewportWidth) ?? {};
+  if (viewportWidth !== undefined) {
+    for (const [breakpoint, minWidth] of Object.entries(responsiveBreakpoints)) {
+      if (viewportWidth >= minWidth) {
+        Object.assign(style, componentStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
+      }
+    }
+  }
+  return style;
 }
 
 function resolveActiveLayoutStyleForPart(
@@ -354,6 +376,27 @@ function arbitraryRootAttrs(
       typeof value !== "object" &&
       typeof value !== "function" &&
       !name.startsWith("on"),
+    ),
+  );
+}
+
+function externalRootAttrs(
+  metadata: ComponentMetadata,
+  props: Record<string, unknown>,
+): Record<string, unknown> {
+  const knownProps = new Set([
+    ...Object.keys(metadata.props ?? {}),
+    ...supportedLayoutPropNames,
+    ...supportedResponsiveLayoutPropNames,
+    "children",
+    "className",
+    "style",
+  ]);
+  return Object.fromEntries(
+    Object.entries(props).filter(([name, value]) =>
+      !knownProps.has(name) &&
+      value !== undefined &&
+      value !== null,
     ),
   );
 }

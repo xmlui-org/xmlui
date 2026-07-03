@@ -1,6 +1,9 @@
+import { useEffect, useMemo, useState } from "react";
+
 import { createMetadata, dComponent, dContextMenu, dInternal } from "../../component-core/metadata/helpers";
 import { createRuntimeScope } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent } from "../../runtime/rendering/adapter";
+import { managedFetchService } from "../../runtime/data/managedFetch";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./List.defaults";
 import { ListNative, type ListApi } from "./ListReact";
@@ -154,7 +157,11 @@ export const listRenderer = wrapComponent({
   name: COMP,
   metadata: ListMd,
   renderer: ({ adapter }) => {
-    const items = adapter.prop("items") ?? adapter.prop("data");
+    const explicitItems = adapter.prop("items");
+    const data = adapter.prop("data");
+    const dataUrl = explicitItems === undefined ? listDataUrl(data) : undefined;
+    const remoteData = useRemoteListData(dataUrl);
+    const items = explicitItems ?? (dataUrl ? remoteData.items : data);
     const itemTemplate = templateChildren(adapter.node, "itemTemplate") ?? nonPropertyChildren(adapter.node.children);
     const hasItemTemplate = Array.isArray(itemTemplate) ? itemTemplate.length > 0 : !!itemTemplate;
     const emptyTemplate = templateChildren(adapter.node, "emptyListTemplate");
@@ -184,7 +191,7 @@ export const listRenderer = wrapComponent({
         }}
         id={adapter.stringProp("id")}
         items={Array.isArray(items) ? items : []}
-        loading={adapter.booleanProp("loading", false)}
+        loading={adapter.booleanProp("loading", false) || remoteData.loading}
         limit={adapter.numberProp("limit", 0)}
         scrollAnchor={adapter.stringProp("scrollAnchor", defaultProps.scrollAnchor)}
         fixedItemSize={adapter.booleanProp("fixedItemSize", false)}
@@ -253,4 +260,62 @@ function objectValue(value: unknown): Record<string, string> | undefined {
 function groupContext(group: string, items: unknown[]): Record<string, unknown> {
   const groupInfo = { id: group, key: group, items };
   return { $item: groupInfo, $group: groupInfo };
+}
+
+function listDataUrl(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  return /^(https?:\/\/|\/)/.test(trimmed) ? trimmed : undefined;
+}
+
+function useRemoteListData(url: string | undefined): { items: unknown[]; loading: boolean } {
+  const request = useMemo(
+    () => url ? managedFetchService.buildRequest({ url, method: "get", dataType: "json" }) : undefined,
+    [url],
+  );
+  const [state, setState] = useState<{ url?: string; items: unknown[]; loading: boolean }>({
+    items: [],
+    loading: false,
+  });
+
+  useEffect(() => {
+    if (!request) {
+      setState({ items: [], loading: false });
+      return;
+    }
+
+    let cancelled = false;
+    setState((current) => ({
+      url: request.url,
+      items: current.url === request.url ? current.items : [],
+      loading: true,
+    }));
+
+    managedFetchService.load(request)
+      .then((entry) => {
+        if (!cancelled) {
+          setState({
+            url: request.url,
+            items: Array.isArray(entry.value) ? entry.value : [],
+            loading: false,
+          });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setState({ url: request.url, items: [], loading: false });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [request]);
+
+  if (url && state.url !== url) {
+    return { items: [], loading: true };
+  }
+  return state;
 }

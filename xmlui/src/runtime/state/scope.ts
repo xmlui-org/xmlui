@@ -287,6 +287,9 @@ function readActionPath(value: unknown, path: string): unknown {
 }
 
 function readBuiltInReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (name === "window") {
+    return typeof window === "undefined" ? undefined : window;
+  }
   if (name === "Array") {
     return Array;
   }

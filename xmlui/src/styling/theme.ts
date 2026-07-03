@@ -19,9 +19,13 @@ export type ComponentThemeClass = {
   variables: ThemeVariableMap;
 };
 
+const paddingRegExp = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const paddingHorizontalRegExp = /^paddingHorizontal-(.+)$/;
+const paddingVerticalRegExp = /^paddingVertical-(.+)$/;
+
 export const rootThemeVariables: ThemeVariableLayer = {
   "space-base": "0.25em",
-  "space-0": "0",
+  "space-0": "0em",
   "space-0_5": "calc(0.5 * var(--xmlui-space-base))",
   "space-1": "calc(1 * var(--xmlui-space-base))",
   "space-2": "calc(2 * var(--xmlui-space-base))",
@@ -150,7 +154,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "backgroundColor-attention": "$color-attention",
   "backgroundColor--disabled": "$color-surface-50",
   "backgroundColor--selected": "$color-primary-50",
-  backgroundColor: "$color-surface-subtle",
+  backgroundColor: "hsl(204, 30.3%, 98%)",
 
   "color-info": "$color-info-500",
   "color-valid": "$color-success-600",
@@ -524,7 +528,219 @@ export function mergeThemeVariableLayers(
     const { light, dark, tones, ...base } = layer;
     Object.assign(merged, base, layer[tone], tones?.[tone]);
   }
-  return merged;
+  return transformThemeVariables(merged);
+}
+
+function transformThemeVariables(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  return {
+    ...generateBootstrapBaseColumns(),
+    ...generateBaseSpacings(themeVariables),
+    ...generateBaseFontSizes(themeVariables),
+    ...generatePaddingSegments(themeVariables),
+    ...generateBorderSegments(themeVariables),
+    ...themeVariables,
+  };
+}
+
+function generateBootstrapBaseColumns(): ThemeVariableMap {
+  const columns: ThemeVariableMap = {};
+  for (let index = 1; index <= 12; index += 1) {
+    columns[`col-${index}`] = `${((100 / 12) * index).toFixed(4)}%`;
+  }
+  return columns;
+}
+
+function generateBaseSpacings(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const base = resolvedThemeValue("space-base", themeVariables);
+  if (typeof base !== "string") {
+    return {};
+  }
+  const parsed = parseCssNumber(base);
+  if (!parsed) {
+    return {};
+  }
+  const scale = [
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
+  ];
+  return Object.fromEntries(
+    scale.map((step) => [
+      `space-${String(step).replace(".", "_")}`,
+      `${step * parsed.value}${parsed.unit}`,
+    ]),
+  );
+}
+
+function generateBaseFontSizes(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const base = resolvedThemeValue("fontSize", themeVariables);
+  if (typeof base !== "string") {
+    return {};
+  }
+  const parsed = parseCssNumber(base);
+  const value = parsed?.unit === "px" ? parsed.value : 16;
+  return {
+    "const-fontSize-tiny": `${0.625 * value}px`,
+    "const-fontSize-xs": `${0.75 * value}px`,
+    "const-fontSize-code": `${0.85 * value}px`,
+    "const-fontSize-sm": `${0.875 * value}px`,
+    "const-fontSize-base": base,
+    "const-fontSize-lg": `${1.125 * value}px`,
+    "const-fontSize-xl": `${1.25 * value}px`,
+    "const-fontSize-2xl": `${1.5 * value}px`,
+    "const-fontSize-3xl": `${1.875 * value}px`,
+    "const-fontSize-4xl": `${2.25 * value}px`,
+    "const-fontSize-5xl": `${3 * value}px`,
+    "const-fontSize-6xl": `${3.75 * value}px`,
+    "const-fontSize-7xl": `${4.5 * value}px`,
+    "const-fontSize-8xl": `${6 * value}px`,
+    "const-fontSize-9xl": `${8 * value}px`,
+  };
+}
+
+function generatePaddingSegments(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const result: ThemeVariableMap = {};
+  for (const [key, rawValue] of Object.entries(themeVariables)) {
+    if (rawValue === null || rawValue === undefined || typeof rawValue === "object") {
+      continue;
+    }
+    const value = String(rawValue);
+    let match = paddingHorizontalRegExp.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingLeft-${suffix}`] ??= value;
+      result[`paddingRight-${suffix}`] ??= value;
+    }
+    match = paddingVerticalRegExp.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingTop-${suffix}`] ??= value;
+      result[`paddingBottom-${suffix}`] ??= value;
+    }
+    match = paddingRegExp.exec(key);
+    if (!match) {
+      continue;
+    }
+    const suffix = match[1];
+    const horizontal = themeVariables[`paddingHorizontal-${suffix}`];
+    const vertical = themeVariables[`paddingVertical-${suffix}`];
+    const segments = value.trim().replace(/ +/g, " ").split(" ");
+    if (segments.length < 1 || segments.length > 4) {
+      continue;
+    }
+    const [top, right = top, bottom = top, left = right] = segments.length === 2
+      ? [segments[0], segments[1], segments[0], segments[1]]
+      : segments.length === 3
+        ? [segments[0], segments[1], segments[2], segments[1]]
+        : [segments[0], segments[1] ?? segments[0], segments[2] ?? segments[0], segments[3] ?? segments[1] ?? segments[0]];
+    result[`paddingTop-${suffix}`] ??= vertical ?? top;
+    result[`paddingRight-${suffix}`] ??= horizontal ?? right;
+    result[`paddingBottom-${suffix}`] ??= vertical ?? bottom;
+    result[`paddingLeft-${suffix}`] ??= horizontal ?? left;
+  }
+  return result;
+}
+
+function generateBorderSegments(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const result: ThemeVariableMap = {};
+  const priorities: Record<string, number> = {};
+  const setSegment = (key: string, value: string, priority: number) => {
+    if ((priorities[key] ?? -1) <= priority) {
+      result[key] = value;
+      priorities[key] = priority;
+    }
+  };
+  for (const [key, rawValue] of Object.entries(themeVariables)) {
+    if (rawValue === null || rawValue === undefined || typeof rawValue === "object") {
+      continue;
+    }
+    const value = String(rawValue);
+    const shorthand = borderShorthandLonghandPrefix(key);
+    if (shorthand) {
+      const suffix = key.slice(shorthand.sourcePrefix.length);
+      const sides = borderSegmentSides(shorthand.targetPrefix);
+      const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+      const priority = borderSegmentPriority(shorthand.targetPrefix);
+      for (const side of sides) {
+        setSegment(`border${side}-${suffix}`, value, priority);
+        if (parsed?.width) setSegment(`border${side}Width-${suffix}`, parsed.width, priority);
+        if (parsed?.style) setSegment(`border${side}Style-${suffix}`, parsed.style, priority);
+        if (parsed?.color) setSegment(`border${side}Color-${suffix}`, parsed.color, priority);
+      }
+      if (shorthand.targetPrefix === "border") {
+        if (parsed?.width) setSegment(`borderWidth-${suffix}`, parsed.width, priority);
+        if (parsed?.style) setSegment(`borderStyle-${suffix}`, parsed.style, priority);
+        if (parsed?.color) setSegment(`borderColor-${suffix}`, parsed.color, priority);
+      }
+      continue;
+    }
+    const longhand = /^(border(?:Horizontal|Vertical|Left|Right|Top|Bottom)?)(Width|Style|Color)-(.+)$/.exec(key);
+    if (!longhand) {
+      continue;
+    }
+    const [, prefix, prop, suffix] = longhand;
+    const priority = borderSegmentPriority(prefix);
+    for (const side of borderSegmentSides(prefix)) {
+      setSegment(`border${side}${prop}-${suffix}`, value, priority);
+    }
+  }
+  return result;
+}
+
+function borderSegmentSides(prefix: string): string[] {
+  switch (prefix) {
+    case "borderHorizontal":
+      return ["Left", "Right"];
+    case "borderVertical":
+      return ["Top", "Bottom"];
+    case "borderLeft":
+      return ["Left"];
+    case "borderRight":
+      return ["Right"];
+    case "borderTop":
+      return ["Top"];
+    case "borderBottom":
+      return ["Bottom"];
+    default:
+      return ["Left", "Right", "Top", "Bottom"];
+  }
+}
+
+function borderSegmentPriority(prefix: string): number {
+  switch (prefix) {
+    case "borderLeft":
+    case "borderRight":
+    case "borderTop":
+    case "borderBottom":
+      return 2;
+    case "borderHorizontal":
+    case "borderVertical":
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function resolvedThemeValue(name: string, themeVariables: ThemeVariableMap): unknown {
+  const value = themeVariables[name];
+  if (typeof value === "string" && value.startsWith("$")) {
+    return resolvedThemeValue(value.slice(1), themeVariables);
+  }
+  return value;
+}
+
+function parseCssNumber(value: string): { value: number; unit: string } | undefined {
+  let source = value.trim();
+  if (source.startsWith(".")) {
+    source = `0${source}`;
+  }
+  const amount = Number.parseFloat(source);
+  if (!Number.isFinite(amount)) {
+    return undefined;
+  }
+  return {
+    value: amount,
+    unit: source.replace(String(amount), "") || "px",
+  };
 }
 
 export function collectComponentThemeDefaults(

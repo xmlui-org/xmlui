@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 
 import { rawScssModulePlugin } from "../xmlui/src/vite-plugin/rawScssModulePlugin";
@@ -43,10 +43,24 @@ export default defineConfig({
   },
   plugins: [rawScssModulePlugin(), svgReactPlugin(), sampleXmluiPlugin(), react()],
   resolve: {
+    alias: {
+      invariant: fileURLToPath(new URL("../xmlui/src/compat/invariant.ts", import.meta.url)),
+    },
     extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui"],
   },
   optimizeDeps: {
-    include: ["classnames", "react", "react-dom", "react-dom/client"],
+    include: [
+      "classnames",
+      "invariant",
+      "prop-types",
+      "react",
+      "react-dom",
+      "react-dom/client",
+      "react-fast-compare",
+      "react-helmet-async",
+      "scheduler",
+      "shallowequal",
+    ],
     noDiscovery: true,
   },
 });

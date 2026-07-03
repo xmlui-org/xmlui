@@ -6,6 +6,7 @@ export {
   dAutoFocus,
   dDidChange,
   dEnabled,
+  dInternal,
   dGotFocus,
   dInitialValue,
   dLabel,

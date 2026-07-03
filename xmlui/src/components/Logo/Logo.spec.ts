@@ -1,10 +1,12 @@
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("Basic Functionality", () => {
-  test("does not render without a source", async ({ page, initTestBed }) => {
+  test("renders the default resource logo without an explicit source", async ({ page, initTestBed }) => {
     await initTestBed(`<Logo testId="logo" />`);
 
-    await expect(page.getByTestId("logo")).toHaveCount(0);
+    const logo = page.getByTestId("logo");
+    await expect(logo).toBeVisible();
+    await expect(logo).toHaveAttribute("src", "/resources/xmlui-logo.svg");
   });
 
   test("renders explicit logo source as an image", async ({ page, initTestBed }) => {

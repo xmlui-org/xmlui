@@ -1,35 +1,52 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import type { ForwardedRef, ReactNode } from "react";
+import type React from "react";
+import { forwardRef, memo } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./Footer.defaults";
 import styles from "./Footer.module.scss";
 
-export type FooterProps = HTMLAttributes<HTMLDivElement> & {
-  children?: ReactNode;
-  sticky?: boolean;
-};
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Footer.defaults";
 
-export const FooterComponent = forwardRef<HTMLDivElement, FooterProps>(function FooterComponent(
+// =====================================================================================================================
+// React Footer component implementation
+
+export const Footer = memo(forwardRef(function Footer(
   {
     children,
+    style,
     className,
+    classes,
     sticky = defaultProps.sticky,
     ...rest
+  }: {
+    children: ReactNode;
+    style?: React.CSSProperties;
+    className?: string;
+    classes?: Record<string, string>;
+    sticky?: boolean;
   },
-  ref,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const { layout } = useAppLayoutContext() || {};
+  const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
-    <div
-      {...rest}
-      className={styles.outerWrapper}
-      data-sticky={sticky}
-      data-xmlui-component="Footer"
-      ref={ref}
+    <div 
+      {...rest} 
+      className={styles.outerWrapper} 
+      ref={forwardedRef} 
+      style={style} 
       role="contentinfo"
+      data-sticky={sticky}
     >
-      <div className={[styles.wrapper, styles.full, className].filter(Boolean).join(" ")} data-xmlui-part="content">
+      <div
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+          [styles.full]: !canRestrictContentWidth,
+        })}
+      >
         {children}
       </div>
     </div>
   );
-});
+}));

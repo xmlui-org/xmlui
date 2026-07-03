@@ -8,7 +8,7 @@ import { evaluateExpressionOrText, renderMixedText } from "./bindings";
 import { ComponentInstance, ScopedElement } from "./components";
 import { ExtensionComponentInstance } from "./extensionComponent";
 import { useBindingRevision } from "./reactive";
-import type { RenderContext } from "./types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 import { XmluiRenderError } from "./types";
 
 export function createRenderContext(
@@ -19,7 +19,8 @@ export function createRenderContext(
     components,
     extensionRenderers,
     renderElement: (node, scope) => renderElement(context, node, scope),
-    renderChildren: (children, scope) => renderChildren(context, children, scope),
+    renderChildren: (children, scope, parentEnd, layoutContext) =>
+      renderChildren(context, children, scope, parentEnd, layoutContext),
     withComponents: (childComponents) =>
       createRenderContext(
         { ...components, ...childComponents },
@@ -33,13 +34,17 @@ export function XmluiNodeRenderer({
   context,
   node,
   scope,
+  textPrefix,
+  textSuffix,
 }: {
   context: RenderContext;
   node: XmluiNode;
   scope: RuntimeScope;
+  textPrefix?: string;
+  textSuffix?: string;
 }): ReactNode {
   if (node.kind === "text") {
-    return <XmluiTextRenderer node={node} scope={scope} />;
+    return <XmluiTextRenderer node={node} scope={scope} prefix={textPrefix} suffix={textSuffix} />;
   }
   if (hasConditionalProps(node.props)) {
     return <ConditionalElementRenderer context={context} node={node} scope={scope} />;
@@ -94,17 +99,67 @@ function renderElement(context: RenderContext, node: Extract<XmluiNode, { kind: 
   throw new XmluiRenderError(`Unknown XMLUI component: ${node.type}`, node);
 }
 
-export function renderChildren(context: RenderContext, children: XmluiNode[], scope: RuntimeScope): ReactNode {
-  return children.map((child, index) => (
-    <React.Fragment key={index}>
-      <XmluiNodeRenderer context={context} node={child} scope={scope} />
-    </React.Fragment>
-  ));
+export function renderChildren(
+  context: RenderContext,
+  children: XmluiNode[],
+  scope: RuntimeScope,
+  parentEnd?: number,
+  layoutContext?: RuntimeRenderLayoutContext,
+): ReactNode {
+  return children.map((child, index) => {
+    const previous = children[index - 1];
+    const next = children[index + 1];
+    const needsBoundarySpace =
+      child.kind === "text" &&
+      previous?.kind === "element" &&
+      child.range.start > previous.range.end &&
+      !child.value.startsWith(" ");
+    const needsTrailingBoundarySpace =
+      child.kind === "text" &&
+      previous?.kind === "element" &&
+      !next &&
+      parentEnd !== undefined &&
+      child.range.end < parentEnd &&
+      !child.value.endsWith(" ");
+
+    const renderedChild =
+      layoutContext?.wrapChild && child.kind === "element"
+        ? renderElement(context, child, scope)
+        : (
+          <XmluiNodeRenderer
+            context={context}
+            node={child}
+            scope={scope}
+            textPrefix={needsBoundarySpace ? " " : undefined}
+            textSuffix={needsTrailingBoundarySpace ? " " : undefined}
+          />
+        );
+    const wrappedChild =
+      layoutContext?.wrapChild && child.kind === "element"
+        ? layoutContext.wrapChild({ node: child, scope }, renderedChild)
+        : renderedChild;
+
+    return (
+      <React.Fragment key={index}>
+        {wrappedChild}
+      </React.Fragment>
+    );
+  });
 }
 
-function XmluiTextRenderer({ node, scope }: { node: XmluiText; scope: RuntimeScope }) {
+function XmluiTextRenderer({
+  node,
+  scope,
+  prefix = "",
+  suffix = "",
+}: {
+  node: XmluiText;
+  scope: RuntimeScope;
+  prefix?: string;
+  suffix?: string;
+}) {
   useBindingRevision(node.segments, scope);
-  return <>{renderMixedText(node.segments, node.value, scope, `text:${node.range.start}:${node.range.end}`)}</>;
+  return <>{prefix + renderMixedText(node.segments, node.value, scope, `text:${node.range.start}:${node.range.end}`) + suffix}</>;
 }
 
 const responsiveWhenPropNames = [

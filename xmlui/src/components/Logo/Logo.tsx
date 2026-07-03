@@ -6,6 +6,8 @@ import { defaultProps } from "./Logo.defaults";
 
 const COMP = "Logo";
 
+export { Logo as ThemedLogo };
+
 export const LogoMd = createMetadata({
   status: "stable",
   description:

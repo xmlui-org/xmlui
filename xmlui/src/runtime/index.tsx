@@ -11,7 +11,7 @@ import {
   useRuntimeStateStore,
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
-import { XmluiAppContextProvider } from "./appContext";
+import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
 import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
@@ -22,6 +22,7 @@ import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./ty
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
+import { responsiveBreakpoints } from "../styling/contracts";
 
 ensureXmluiDebugBridge();
 
@@ -146,6 +147,10 @@ export function XmluiRoot({
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const [loggedInUser, setLoggedInUser] = useState<unknown>(undefined);
+  const updateLoggedInUser = useCallback((user: unknown) => {
+    setLoggedInUser((current) => areContextValuesEqual(current, user) ? current : user);
+  }, []);
   const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
@@ -198,7 +203,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals },
+      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -231,7 +236,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals },
+      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -241,7 +246,7 @@ export function XmluiRoot({
         ...normalizedExtensions.functions,
       },
     }),
-    [module.extensionFunctions, normalizedExtensions.functions, store],
+    [appGlobals, loggedInUser, module.extensionFunctions, normalizedExtensions.functions, store],
   );
   const context = useMemo(
     () => createRenderContext(module.components, {
@@ -250,10 +255,11 @@ export function XmluiRoot({
     }),
     [module.components, module.extensionRenderers, normalizedExtensions.renderers],
   );
+  const mediaSize = useRuntimeMediaSize();
 
   return (
     <StyleProvider>
-      <XmluiAppContextProvider value={{ appGlobals, mediaSize: { sizeIndex: 4 } }}>
+      <XmluiAppContextProvider value={{ appGlobals, loggedInUser, setLoggedInUser: updateLoggedInUser, mediaSize }}>
         <IconProvider icons={{}}>
           <XmluiThemeRoot tone={defaultTone}>
             <LegacyThemeProvider resources={resources}>
@@ -267,6 +273,82 @@ export function XmluiRoot({
       </XmluiAppContextProvider>
     </StyleProvider>
   );
+}
+
+type RuntimeMediaSize = XmluiAppContextValue["mediaSize"];
+
+function useRuntimeMediaSize(): RuntimeMediaSize {
+  const [mediaSize, setMediaSize] = useState<RuntimeMediaSize>(() => runtimeMediaSizeFromWidth(
+    typeof window === "undefined" ? responsiveBreakpoints.xl : window.innerWidth,
+  ));
+
+  useEffect(() => {
+    const update = () => setMediaSize(runtimeMediaSizeFromWidth(window.innerWidth));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return mediaSize;
+}
+
+function runtimeMediaSizeFromWidth(width: number): RuntimeMediaSize {
+  if (width >= responsiveBreakpoints.xxl) {
+    return mediaSizeValue("xxl", 5);
+  }
+  if (width >= responsiveBreakpoints.xl) {
+    return mediaSizeValue("xl", 4);
+  }
+  if (width >= responsiveBreakpoints.lg) {
+    return mediaSizeValue("lg", 3);
+  }
+  if (width >= responsiveBreakpoints.md) {
+    return mediaSizeValue("md", 2);
+  }
+  if (width >= responsiveBreakpoints.sm) {
+    return mediaSizeValue("sm", 1);
+  }
+  return mediaSizeValue("xs", 0);
+}
+
+function mediaSizeValue(size: RuntimeMediaSize["size"], sizeIndex: number): RuntimeMediaSize {
+  return {
+    size,
+    sizeIndex,
+    phone: size === "xs",
+    landscapePhone: size === "sm",
+    tablet: size === "md",
+    desktop: size === "lg",
+    largeDesktop: size === "xl",
+    xlDesktop: size === "xxl",
+    smallScreen: sizeIndex <= 2,
+    largeScreen: sizeIndex >= 3,
+  };
+}
+
+function areContextValuesEqual(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) {
+    return true;
+  }
+  if (!isPlainRecord(left) || !isPlainRecord(right)) {
+    return false;
+  }
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+  return leftKeys.every((key) =>
+    Object.prototype.hasOwnProperty.call(right, key) && Object.is(left[key], right[key])
+  );
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function renderConfirmDialog(

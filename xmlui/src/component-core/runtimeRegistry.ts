@@ -1,7 +1,7 @@
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
-import { appRenderer } from "../components/App/App";
-import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
+import { appRuntimeRenderer } from "../components/App/App";
+import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { appStateRenderer } from "../components/AppState/AppState.renderer";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
@@ -35,7 +35,7 @@ import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
-import { footerRenderer } from "../components/Footer/Footer.renderer";
+import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
@@ -66,15 +66,15 @@ import { logoRenderer } from "../components/Logo/Logo";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener.renderer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
-import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
-import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
-import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
+import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
+import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
+import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
 import { optionRenderer } from "../components/Option/Option";
-import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
+import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { partRenderer } from "../components/Part/Part";
@@ -141,8 +141,8 @@ export type RuntimeRendererEntry = {
 export const coreRuntimeRendererEntries = [
   { name: "Accordion", renderer: accordionRenderer },
   { name: "AccordionItem", renderer: accordionItemRenderer },
-  { name: "App", renderer: appRenderer },
-  { name: "AppHeader", renderer: appHeaderRenderer },
+  { name: "App", renderer: appRuntimeRenderer },
+  { name: "AppHeader", renderer: appHeaderRuntimeRenderer },
   { name: "Avatar", renderer: avatarRenderer },
   { name: "Badge", renderer: badgeRenderer },
   { name: "br", renderer: brRenderer },
@@ -214,7 +214,7 @@ export const coreRuntimeRendererEntries = [
   { name: "FileInput", renderer: fileInputRenderer },
   { name: "FileUploadDropZone", renderer: fileUploadDropZoneRenderer },
   { name: "FocusScope", renderer: focusScopeRenderer },
-  { name: "Footer", renderer: footerRenderer },
+  { name: "Footer", renderer: footerRuntimeRenderer },
   { name: "Form", renderer: formRenderer },
   { name: "FormItem", renderer: formItemRenderer },
   { name: "FormSegment", renderer: formSegmentRenderer },
@@ -235,10 +235,10 @@ export const coreRuntimeRendererEntries = [
   { name: "Items", renderer: itemsRenderer },
   { name: "TimeInput", renderer: timeInputRenderer },
   { name: "ValidationSummary", renderer: validationSummaryRenderer },
-  { name: "NavGroup", renderer: navGroupRenderer },
-  { name: "NavLink", renderer: navLinkRenderer },
+  { name: "NavGroup", renderer: navGroupRuntimeRenderer },
+  { name: "NavLink", renderer: navLinkRuntimeRenderer },
   { name: "NavPanelCollapseButton", renderer: navPanelCollapseButtonRenderer },
-  { name: "NavPanel", renderer: navPanelRenderer },
+  { name: "NavPanel", renderer: navPanelRuntimeRenderer },
   { name: "DataSource", renderer: dataSourceRenderer },
   { name: "APICall", renderer: apiCallRenderer },
   { name: "AppState", renderer: appStateRenderer },
@@ -258,8 +258,8 @@ export const coreRuntimeRendererEntries = [
   { name: "Part", renderer: partRenderer },
   { name: "ToneSwitch", renderer: toneSwitchRenderer },
   { name: "ToneChangerButton", renderer: toneChangerButtonRenderer },
-  { name: "Pages", renderer: pagesRenderer },
-  { name: "Page", renderer: pageRenderer },
+  { name: "Pages", renderer: pagesRuntimeRenderer },
+  { name: "Page", renderer: pageRuntimeRenderer },
   { name: "Redirect", renderer: redirectRenderer },
   { name: "NestedApp", renderer: nestedAppRenderer },
   { name: "IncludeMarkup", renderer: includeMarkupRenderer },

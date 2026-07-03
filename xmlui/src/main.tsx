@@ -1,3 +1,5 @@
+import "./global.css";
+
 import { createElement } from "react";
 import type { Root } from "react-dom/client";
 import {
@@ -11,7 +13,6 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import type { Extension } from "./extensions";
-import "./global.css";
 import "./components/Inspector/Inspector.scss";
 import "./components/InspectButton/InspectButton.scss";
 

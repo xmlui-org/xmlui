@@ -2,8 +2,8 @@ import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
-import { appRenderer } from "../components/App/App";
-import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
+import { appRuntimeRenderer } from "../components/App/App";
+import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
 import { badgeRenderer } from "../components/Badge/Badge.renderer";
 import { buttonRenderer } from "../components/Button/Button";
@@ -83,7 +83,7 @@ import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
-import { footerRenderer } from "../components/Footer/Footer.renderer";
+import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
@@ -103,10 +103,10 @@ import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
-import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
-import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
+import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
+import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
-import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
+import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
 import { appStateRenderer } from "../components/AppState/AppState.renderer";
@@ -126,7 +126,7 @@ import { slotRenderer } from "../components/Slot/Slot.renderer";
 import { partRenderer } from "../components/Part/Part";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
-import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
+import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
 import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
@@ -277,8 +277,8 @@ const legacyRuntimeRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = le
 const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Accordion: accordionRenderer,
   AccordionItem: accordionItemRenderer,
-  App: appRenderer,
-  AppHeader: appHeaderRenderer,
+  App: appRuntimeRenderer,
+  AppHeader: appHeaderRuntimeRenderer,
   Avatar: avatarRenderer,
   Badge: badgeRenderer,
   br: brRenderer,
@@ -350,7 +350,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   FileInput: fileInputRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
   FocusScope: focusScopeRenderer,
-  Footer: footerRenderer,
+  Footer: footerRuntimeRenderer,
   Form: formRenderer,
   FormItem: formItemRenderer,
   FormSegment: formSegmentRenderer,
@@ -371,10 +371,10 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
   ValidationSummary: validationSummaryRenderer,
-  NavGroup: navGroupRenderer,
-  NavLink: navLinkRenderer,
+  NavGroup: navGroupRuntimeRenderer,
+  NavLink: navLinkRuntimeRenderer,
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
-  NavPanel: navPanelRenderer,
+  NavPanel: navPanelRuntimeRenderer,
   DataSource: dataSourceRenderer,
   APICall: apiCallRenderer,
   AppState: appStateRenderer,
@@ -394,8 +394,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Part: partRenderer,
   ToneSwitch: toneSwitchRenderer,
   ToneChangerButton: toneChangerButtonRenderer,
-  Pages: pagesRenderer,
-  Page: pageRenderer,
+  Pages: pagesRuntimeRenderer,
+  Page: pageRuntimeRenderer,
   Redirect: redirectRenderer,
   NestedApp: nestedAppRenderer,
   IncludeMarkup: includeMarkupRenderer,

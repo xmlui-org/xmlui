@@ -1,111 +1,177 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import styles from "./NavGroup.module.scss";
+import navLinkStyles from "../NavLink/NavLink.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { ThemedIcon } from "../Icon/Icon";
+import { createMetadata, dEnabled, dLabel } from "../metadata-helpers";
+import { defaultProps } from "./NavGroup.defaults";
+import { NavGroup } from "./NavGroupReact";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "NavGroup";
 
-export const defaultNavGroupProps = {
-  initiallyExpanded: false,
-  enabled: true,
-  noIndicator: false,
-  iconHorizontalExpanded: "chevronright",
-  iconHorizontalCollapsed: "chevronright",
-  iconVerticalExpanded: "chevrondown",
-  iconVerticalCollapsed: "chevronright",
-  iconAlignment: "center",
-  expandIconAlignment: "start",
-};
-
 export const NavGroupMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
-    "`NavGroup` creates collapsible containers for organizing related navigation items.",
+    "`NavGroup` creates collapsible containers for organizing related navigation " +
+    "items into hierarchical menu structures. It groups `NavLink` components and " +
+    "other `NavGroup` components, providing expandable submenus with customizable " +
+    "icons and states.",
   props: {
-    label: {
-      description: "The group label.",
-      valueType: "string",
-    },
+    label: dLabel(),
     initiallyExpanded: {
-      description: "Whether the group is initially expanded.",
+      description:
+        "This property defines whether the group is initially expanded or collapsed. If not " +
+        "defined, the group is collapsed by default.",
       valueType: "boolean",
-      defaultValue: defaultNavGroupProps.initiallyExpanded,
     },
-    enabled: {
-      description: "Whether the group can be toggled.",
-      valueType: "boolean",
-      defaultValue: defaultNavGroupProps.enabled,
-    },
+    enabled: dEnabled(),
     to: {
-      description: "Optional navigation target for the group header.",
+      description: `This property defines an optional navigation link.`,
       valueType: "string",
     },
     icon: {
-      description: "Optional icon name.",
+      description: `This property defines an optional icon to display along with the \`${COMP}\` label.`,
       valueType: "string",
     },
     iconHorizontalExpanded: {
-      description: "Horizontal expanded icon.",
+      description:
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
-      defaultValue: defaultNavGroupProps.iconHorizontalExpanded,
+      defaultValue: defaultProps.iconHorizontalExpanded,
     },
     iconVerticalExpanded: {
-      description: "Vertical expanded icon.",
+      description:
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
       valueType: "string",
-      defaultValue: defaultNavGroupProps.iconVerticalExpanded,
+      defaultValue: defaultProps.iconVerticalExpanded,
     },
     iconHorizontalCollapsed: {
-      description: "Horizontal collapsed icon.",
+      description:
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
-      defaultValue: defaultNavGroupProps.iconHorizontalCollapsed,
+      defaultValue: defaultProps.iconHorizontalCollapsed,
     },
     iconVerticalCollapsed: {
-      description: "Vertical collapsed icon.",
+      description:
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
       valueType: "string",
-      defaultValue: defaultNavGroupProps.iconVerticalCollapsed,
+      defaultValue: defaultProps.iconVerticalCollapsed,
     },
     noIndicator: {
-      description: "Hides the visual active indicator on the group header.",
+      description:
+        `This Boolean property controls whether to hide the visual indicator for active and ` +
+        `hovered states. When set to \`true\`, the indicator line will not be displayed on the ` +
+        `\`${COMP}\` toggle button.`,
       valueType: "boolean",
-      defaultValue: defaultNavGroupProps.noIndicator,
+      defaultValue: defaultProps.noIndicator,
     },
     iconAlignment: {
-      description: "Controls icon alignment.",
+      description:
+        `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
+        `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
       valueType: "string",
-      availableValues: ["baseline", "start", "center", "end"],
-      defaultValue: defaultNavGroupProps.iconAlignment,
+      availableValues: [
+        { value: "baseline", description: "Align icon with the first line of text" },
+        { value: "start", description: "Align icon to the top" },
+        { value: "center", description: "Align icon to the center (default)" },
+        { value: "end", description: "Align icon to the bottom" },
+      ],
+      defaultValue: defaultProps.iconAlignment,
     },
     expandIconAlignment: {
-      description: "Controls expand/collapse icon alignment.",
+      description:
+        `This property controls the horizontal alignment of the expand/collapse arrow icon. ` +
+        `Set to \`start\` to display the arrow immediately after the label, or \`end\` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).`,
       valueType: "string",
-      availableValues: ["start", "end"],
-      defaultValue: defaultNavGroupProps.expandIconAlignment,
+      availableValues: [
+        { value: "start", description: "Display arrow immediately after the label (default)" },
+        { value: "end", description: "Push arrow to the right edge of the NavGroup" },
+      ],
+      defaultValue: defaultProps.expandIconAlignment,
     },
   },
-  themeVars: {
-    [`paddingVertical-${COMP}`]: "NavGroup vertical padding.",
-    [`paddingHorizontal-${COMP}`]: "NavGroup horizontal padding.",
-    [`marginTop-items-${COMP}`]: "Margin above child items.",
-    [`marginBottom-items-${COMP}`]: "Margin below child items.",
-    [`backgroundColor-${COMP}`]: "NavGroup header background.",
-    [`backgroundColor-${COMP}--hover`]: "NavGroup header hover background.",
-    [`textColor-${COMP}`]: "NavGroup header text color.",
-    [`textColor-${COMP}--hover`]: "NavGroup header hover text color.",
-    [`fontFamily-${COMP}`]: "NavGroup font family.",
-    [`fontSize-${COMP}`]: "NavGroup font size.",
-    [`borderRadius-${COMP}`]: "NavGroup border radius.",
-    [`gap-${COMP}`]: "NavGroup header gap.",
+  themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`marginTop-items-${COMP}`]:
+      "Sets the margin between the NavGroup header and the first child item. Does not affect margins between child items.",
+    [`marginBottom-items-${COMP}`]: "Sets the margin after the last child item in the NavGroup.",
   },
-  limitThemeVarsToComponent: true,
   defaultThemeVars: {
-    [`paddingVertical-${COMP}`]: "$space-2",
-    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`backgroundColor-dropdown-${COMP}`]: "$backgroundColor-primary",
+    [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
+    [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
+    [`minWidth-dropdown-${COMP}`]: "11em",
     [`marginTop-items-${COMP}`]: "0",
     [`marginBottom-items-${COMP}`]: "0",
-    [`backgroundColor-${COMP}`]: "transparent",
-    [`backgroundColor-${COMP}--hover`]: "$color-surface-100",
-    [`textColor-${COMP}`]: "$textColor-primary",
-    [`textColor-${COMP}--hover`]: "$textColor-primary",
-    [`fontFamily-${COMP}`]: "$fontFamily",
-    [`fontSize-${COMP}`]: "$fontSize",
-    [`borderRadius-${COMP}`]: "$borderRadius",
-    [`gap-${COMP}`]: "$space-2",
+    [`expandIconAlignment-${COMP}`]: "start",
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingVertical-${COMP}`]: "$space-2",
+  },
+});
+
+export const navGroupComponentRenderer = wrapComponent(COMP, NavGroup, NavGroupMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes }) => (
+    <NavGroup
+      label={extractValue.asDisplayText(node.props.label)}
+      disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
+      to={extractValue.asOptionalString(node.props.to)}
+      icon={
+        <ThemedIcon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />
+      }
+      node={node}
+      initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
+      noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
+      renderChild={renderChild}
+      iconHorizontalExpanded={extractValue.asOptionalString(node.props.iconHorizontalExpanded)}
+      iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
+      iconHorizontalCollapsed={extractValue.asOptionalString(node.props.iconHorizontalCollapsed)}
+      iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
+      iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
+      expandIconAlignment={extractValue(node.props.expandIconAlignment)}
+      classes={classes}
+    />
+  ),
+});
+
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+
+export const navGroupRuntimeRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: NavGroupMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const iconName = adapter.stringProp("icon");
+    return (
+      <NavGroup
+        {...adapter.rootAttrs()}
+        label={adapter.stringProp("label", "") ?? ""}
+        disabled={!adapter.booleanProp("enabled", true)}
+        to={adapter.stringProp("to")}
+        icon={iconName ? <ThemedIcon name={iconName} className={navLinkStyles.icon} /> : undefined}
+        node={adapter.node as any}
+        initiallyExpanded={adapter.booleanProp("initiallyExpanded", false)}
+        noIndicator={adapter.booleanProp("noIndicator", defaultProps.noIndicator)}
+        renderChild={(child: any, layoutContext?: any) =>
+          Array.isArray(child)
+            ? adapter.renderChildren(child, layoutContext)
+            : child?.type
+              ? adapter.context.renderChildren([child], adapter.scope, child.range?.end, layoutContext)
+              : undefined
+        }
+        iconHorizontalExpanded={adapter.stringProp("iconHorizontalExpanded")}
+        iconVerticalExpanded={adapter.stringProp("iconVerticalExpanded")}
+        iconHorizontalCollapsed={adapter.stringProp("iconHorizontalCollapsed")}
+        iconVerticalCollapsed={adapter.stringProp("iconVerticalCollapsed")}
+        iconAlignment={adapter.stringProp("iconAlignment", defaultProps.iconAlignment) as any}
+        expandIconAlignment={adapter.stringProp("expandIconAlignment") as any}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+      />
+    );
   },
 });

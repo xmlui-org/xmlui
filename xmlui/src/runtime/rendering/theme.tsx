@@ -38,6 +38,18 @@ const ThemeContext = createContext<ThemeRuntimeContext>({
   tone: "light",
   setTone: noopSetTone,
 });
+const themeRootBaseStyles: CSSProperties = {
+  direction: "var(--xmlui-direction)" as CSSProperties["direction"],
+  backgroundColor: "var(--xmlui-backgroundColor)",
+  color: "var(--xmlui-textColor-primary)",
+  fontFamily: "var(--xmlui-fontFamily)",
+  fontSize: "var(--xmlui-fontSize)",
+  fontFeatureSettings: "var(--xmlui-font-feature-settings)",
+  fontWeight: "var(--xmlui-fontWeight-normal)",
+  lineHeight: "var(--xmlui-lineHeight)",
+  letterSpacing: "var(--xmlui-letterSpacing)",
+  "--stack-gap-default": "var(--xmlui-space-4)",
+} as CSSProperties;
 
 export function StyleProvider({ children }: { children: ReactNode }) {
   const [registry] = useState(() => new StyleRegistry());
@@ -62,7 +74,10 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     [tone, variables],
   );
   const rootClassName = useDynamicStyle(
-    themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+    {
+      ...themeVariablesToCssProperties(resolveThemeVariablesWithCssVars(variables)),
+      ...themeRootBaseStyles,
+    },
     "themes",
   );
   useRootStyleClass(rootClassName);

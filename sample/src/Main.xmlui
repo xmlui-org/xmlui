@@ -1,14 +1,13 @@
 <App>
-  <NumberBox
-    id="numberbox"
-    readOnly="true"
-  />
-  <HStack>
-    <Button
-      label="Set to 100"
-      onClick="numberbox.setValue(100)" />
-    <Button
-      label="Set to 0"
-      onClick="numberbox.setValue(0)" />
+  <HStack verticalAlignment="center">
+    <NavGroup icon="email" label="Send To" >
+      <NavLink icon="arrowup" label="Boss" />
+      <NavGroup icon="users" label="Team">
+        <NavLink label="Jane" />
+        <NavLink label="Will" />
+        <NavLink label="Sandra" />
+      </NavGroup>
+      <NavLink icon="cube" label="Support" />
+    </NavGroup>
   </HStack>
 </App>
