@@ -2,7 +2,7 @@ import { accordionItemRenderer, accordionRenderer } from "../components/Accordio
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
-import { appStateRenderer } from "../components/AppState/AppState.renderer";
+import { appStateRenderer } from "../components/AppState/AppState";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
 import { badgeRenderer } from "../components/Badge/Badge.renderer";

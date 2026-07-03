@@ -109,7 +109,7 @@ import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseBu
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
-import { appStateRenderer } from "../components/AppState/AppState.renderer";
+import { appStateRenderer } from "../components/AppState/AppState";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
 import { timerRenderer } from "../components/Timer/Timer.renderer";
@@ -945,7 +945,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (apiCallTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.renderer.tsx`);
     } else if (appStateTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.tsx`);
     } else if (changeListenerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.renderer.tsx`);
     } else if (lifecycleTransferred) {

@@ -20,6 +20,7 @@ export type XmluiScope = {
   locals: Map<string, XmluiBinding>;
   globals: Map<string, XmluiBinding>;
   specials: Map<string, XmluiBinding>;
+  references: Map<string, XmluiBinding>;
 };
 
 export type CreateXmluiScopeOptions = {
@@ -334,6 +335,7 @@ export function createXmluiScope(
     locals: new Map(),
     globals: new Map(options.parent?.globals),
     specials: new Map(options.parent?.specials),
+    references: new Map(options.parent?.references),
   };
 
   if (!scope.specials.has("$props")) {
@@ -413,6 +415,8 @@ export function createXmluiScope(
     });
   }
 
+  collectStaticReferenceBindings(element, sourceId, scope.references);
+
   return scope;
 }
 
@@ -438,6 +442,9 @@ export function resolveXmluiIdentifier(scope: XmluiScope, name: string): XmluiBi
   }
   if (scope.specials.has(name)) {
     return scope.specials.get(name);
+  }
+  if (scope.references.has(name)) {
+    return scope.references.get(name);
   }
   if (isBuiltInReferenceName(name)) {
     return {
@@ -1619,6 +1626,10 @@ function isAllowedMethodName(name: string): boolean {
     "now",
     "log",
     "callApi",
+    "update",
+    "appendToList",
+    "removeFromList",
+    "listIncludes",
     "getFields",
     "getData",
     "getValue",
@@ -1681,6 +1692,35 @@ function resolveParentLocal(scope: XmluiScope, name: string): XmluiBinding | und
   return scope.parent ? resolveParentLocal(scope.parent, name) : undefined;
 }
 
+function collectStaticReferenceBindings(
+  element: XmluiElement,
+  sourceId: string,
+  references: Map<string, XmluiBinding>,
+): void {
+  const id = staticReferenceName(element, "id") ?? staticReferenceName(element, "ref");
+  if (id && !references.has(id)) {
+    references.set(id, {
+      kind: "reference",
+      name: id,
+      mutable: false,
+      span: propSpan(sourceId, element, Object.prototype.hasOwnProperty.call(element.props, "id") ? "id" : "ref"),
+    });
+  }
+  for (const child of element.children) {
+    if (child.kind === "element") {
+      collectStaticReferenceBindings(child, sourceId, references);
+    }
+  }
+}
+
+function staticReferenceName(element: XmluiElement, propName: "id" | "ref"): string | undefined {
+  const value = element.props[propName];
+  if (typeof value !== "string" || value.trim() === "" || value.trim().startsWith("{")) {
+    return undefined;
+  }
+  return value;
+}
+
 function isImplicitGlobalCandidate(name: string): boolean {
   return name.length > 0 && !name.startsWith("$");
 }
@@ -1741,6 +1781,11 @@ function declarationSpan(
   name: string,
 ): SourceSpan {
   const parsed = element.parsed?.[bucket]?.[name];
+  return spanFromRange(sourceId, parsed && !Array.isArray(parsed) ? parsed.range : element.range);
+}
+
+function propSpan(sourceId: string, element: XmluiElement, name: string): SourceSpan {
+  const parsed = element.parsed?.props?.[name];
   return spanFromRange(sourceId, parsed && !Array.isArray(parsed) ? parsed.range : element.range);
 }
 

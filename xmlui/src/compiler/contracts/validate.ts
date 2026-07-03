@@ -15,6 +15,9 @@ import type {
 } from "./types";
 
 const universalFrameworkProps = new Set([
+  "id",
+  "ref",
+  "testId",
   "when",
   "when-xs",
   "when-sm",

@@ -67,7 +67,12 @@ function propsFromMetadata(
   props: ComponentMetadata["props"],
   includeLayoutProps = true,
 ): XmluiComponentContract["props"] {
-  const names = new Set(Object.keys(props ?? {}));
+  const names = new Set([
+    "id",
+    "ref",
+    "testId",
+    ...Object.keys(props ?? {}),
+  ]);
   if (includeLayoutProps) {
     for (const name of supportedLayoutPropNames) {
       names.add(name);
