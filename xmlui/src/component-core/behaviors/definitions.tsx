@@ -1,4 +1,4 @@
-import { Fragment, cloneElement, isValidElement, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, cloneElement, isValidElement, useId, useState, type CSSProperties, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -8,6 +8,7 @@ import {
   parseAnimationOptions,
 } from "../../components/Animation/AnimationReact";
 import { useFormContext } from "../../components/Form/FormContext";
+import formItemStyles from "../../components/FormItem/FormItem.module.scss";
 
 const responsiveWhenProps = {
   "when-xs": {
@@ -349,8 +350,15 @@ function simpleWrapperBehavior(metadata: BehaviorMetadata): Behavior {
     canAttach: (context: BehaviorAttachContext) =>
       canBehaviorAttachToComponent(behaviorMetadata, context.metadata, context.componentName) &&
       hasTriggeredBehaviorProp(behaviorMetadata, context.props),
-    attach: (_context, node) => (
-      <span data-xmlui-behavior={metadata.name}>
+    attach: (context, node) => (
+      <span
+        data-xmlui-behavior={metadata.name}
+        style={
+          metadata.name === "validation" && context.componentName === "ColorPicker"
+            ? { display: "contents" }
+            : undefined
+        }
+      >
         {node}
       </span>
     ),
@@ -381,22 +389,34 @@ function LabelBehavior({
   context: BehaviorAttachContext;
 }) {
   const form = useFormContext();
-  const child = isValidElement(children)
-    ? cloneElement(children, {
-        "data-testid": undefined,
-        "data-xmlui-id": undefined,
-        style: undefined,
-      } as Record<string, unknown>)
-    : children;
+  const generatedInputId = useId();
+  const inputId = stringValue(context.props.id) ?? generatedInputId;
   const childStyle = isValidElement(children)
     ? (children.props as { style?: CSSProperties }).style
     : undefined;
-  const position = normalizedLabelPosition(context.props.labelPosition);
+  const childStyleBelongsToValidationWrapper =
+    context.componentName === "ColorPicker" && childStyle?.display === "contents";
+  const outerStyle = childStyleBelongsToValidationWrapper ? undefined : childStyle;
+  const child = isValidElement(children)
+    ? cloneElement(children, {
+        id: (children.props as { id?: unknown }).id ?? inputId,
+        "data-testid": undefined,
+        "data-xmlui-id": undefined,
+        style: childStyleBelongsToValidationWrapper ? childStyle : undefined,
+      } as Record<string, unknown>)
+    : children;
+  const position = normalizedLabelPosition(
+    context.props.labelPosition,
+    context.metadata.compactInlineLabel === true,
+  );
   const required = isTruthyWhenValue(context.props.required);
   const requireLabelMode =
     stringValue(context.props.requireLabelMode) ??
     form?.itemRequireLabelMode ??
     "markRequired";
+  const enabled = context.props.enabled === undefined
+    ? true
+    : isTruthyWhenValue(context.props.enabled);
   const marker =
     (required && (requireLabelMode === "markRequired" || requireLabelMode === "markBoth"))
       ? "*"
@@ -404,63 +424,83 @@ function LabelBehavior({
         ? "(Optional)"
         : undefined;
   const labelWidth = stringValue(context.props.labelWidth);
-  const selectAuthoredWidth = stringValue(context.props.width);
-  const selectRuntimeWidth = normalizeSelectLabelWidth(selectAuthoredWidth) ?? childStyle?.width;
-  const shrinkSelectLabelToControl =
-    context.componentName === "Select" &&
+  const labelBreak = isTruthyWhenValue(context.props.labelBreak);
+  const resolvedLabelWidth =
+    labelWidth ??
+    (context.metadata.compactInlineLabel === true && (position === "before" || position === "after")
+      ? "fit-content"
+      : undefined);
+  const authoredWidth = stringValue(context.props.width);
+  const runtimeWidth = normalizeLabelControlWidth(authoredWidth) ?? outerStyle?.width;
+  const shrinkLabelToControl =
+    (context.componentName === "Select" || (context.componentName === "ColorPicker" && runtimeWidth)) &&
     !labelWidth;
-  const selectControlWidth = shrinkSelectLabelToControl
-    ? selectRuntimeWidth ?? "var(--xmlui-minWidth-Select, 4rem)"
+  const controlWidth = shrinkLabelToControl
+    ? runtimeWidth ?? (context.componentName === "Select" ? "var(--xmlui-minWidth-Select, 4rem)" : undefined)
     : undefined;
-  const label = (
-    <span
-      key="label"
-      data-xmlui-part="label"
-      data-part-id="label"
-      style={{
-        display: selectControlWidth ? "inline-block" : undefined,
-        flex: labelWidth ? `0 0 ${labelWidth}` : undefined,
-        width: labelWidth ?? selectControlWidth,
-        whiteSpace: context.props.labelBreak === true ? "normal" : "nowrap",
-      }}
-    >
-      {stringValue(context.props.label)}
-      {marker ? <span>{marker}</span> : null}
-    </span>
-  );
-  const orderedChildren = position === "end" || position === "bottom"
-    ? [<Fragment key="control">{child}</Fragment>, label]
-    : [label, <Fragment key="control">{child}</Fragment>];
   return (
     <label
+      htmlFor={inputId}
       data-xmlui-behavior="label"
       data-xmlui-component={context.componentName}
       data-xmlui-id={stringValue(context.props.id)}
       data-xmlui-label-position={position}
       data-xmlui-label-width={labelWidth}
       data-testid={stringValue(context.props.testId)}
+      className={classes(formItemStyles.itemWithLabel, "xmlui-container")}
+      style={{
+        ...outerStyle,
+        alignItems: context.componentName === "ColorPicker" ? "flex-start" : outerStyle?.alignItems,
+      }}
     >
       <span
         data-xmlui-part="labeledItem"
         data-part-id="labeledItem"
-        style={{
-          ...(childStyle ?? {}),
-          width: childStyle?.width ?? selectControlWidth,
-          display: "flex",
-          flexDirection: position === "top" || position === "bottom" ? "column" : "row",
-          alignItems: shrinkSelectLabelToControl
-            ? "flex-start"
-            : position === "top" || position === "bottom" ? "stretch" : "center",
-          gap: "var(--xmlui-gap-label-TextBox, var(--xmlui-space-2, 0.5rem))",
-        }}
+        className={classes(
+          formItemStyles.container,
+          formItemStyles[position],
+          shrinkLabelToControl ? formItemStyles.shrinkToLabel : undefined,
+        )}
+        style={{ width: controlWidth }}
       >
-        {orderedChildren}
+        <span
+          className={formItemStyles.labelWrapper}
+          style={{
+            width: resolvedLabelWidth ?? controlWidth,
+            flex: resolvedLabelWidth ? `0 0 ${resolvedLabelWidth}` : undefined,
+          }}
+        >
+          <span
+            data-xmlui-part="label"
+            data-part-id="label"
+            className={classes(
+              formItemStyles.inputLabel,
+              labelBreak ? formItemStyles.labelBreak : undefined,
+              required ? formItemStyles.required : undefined,
+              !enabled ? formItemStyles.disabled : undefined,
+            )}
+            style={{
+              width: labelWidth !== undefined ? "100%" : undefined,
+              flexShrink: labelWidth !== undefined ? 0 : undefined,
+            }}
+          >
+            {stringValue(context.props.label)}
+            {marker ? (
+              <span className={required ? formItemStyles.requiredMark : formItemStyles.optionalTag}>
+                {marker}
+              </span>
+            ) : null}
+          </span>
+        </span>
+        <span className={formItemStyles.wrapper}>
+          <Fragment key="control">{child}</Fragment>
+        </span>
       </span>
     </label>
   );
 }
 
-function normalizeSelectLabelWidth(width: string | undefined) {
+function normalizeLabelControlWidth(width: string | undefined) {
   if (!width) {
     return undefined;
   }
@@ -468,18 +508,34 @@ function normalizeSelectLabelWidth(width: string | undefined) {
   return trimmed.endsWith("%") ? `${trimmed.slice(0, -1)}vw` : width;
 }
 
-function normalizedLabelPosition(value: unknown): "start" | "end" | "top" | "bottom" {
+function normalizedLabelPosition(
+  value: unknown,
+  compactInlineLabel = false,
+): "start" | "end" | "top" | "bottom" | "before" | "after" {
   const position = stringValue(value);
-  if (position === "end" || position === "after") {
-    return "end";
+  if (compactInlineLabel && position === "start") {
+    return "before";
+  }
+  if (compactInlineLabel && position === "end") {
+    return "after";
+  }
+  if (position === "before") {
+    return "before";
+  }
+  if (position === "after") {
+    return "after";
   }
   if (position === "bottom") {
     return "bottom";
   }
-  if (position === "top") {
-    return "top";
+  if (position === "start" || position === "end") {
+    return position;
   }
-  return "start";
+  return "top";
+}
+
+function classes(...names: Array<string | undefined | false>) {
+  return names.filter(Boolean).join(" ");
 }
 
 function TooltipBehavior({

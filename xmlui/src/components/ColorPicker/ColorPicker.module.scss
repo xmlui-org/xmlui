@@ -1,165 +1,130 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: (
+);
 
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$borderRadius-ColorPicker: createThemeVar("borderRadius-ColorPicker");
-$borderColor-ColorPicker: createThemeVar("borderColor-ColorPicker");
-$borderWidth-ColorPicker: createThemeVar("borderWidth-ColorPicker");
-$borderStyle-ColorPicker: createThemeVar("borderStyle-ColorPicker");
-$boxShadow-ColorPicker: createThemeVar("boxShadow-ColorPicker");
-$borderColor-ColorPicker--hover: createThemeVar("borderColor-ColorPicker--hover");
-$boxShadow-ColorPicker--hover: createThemeVar("boxShadow-ColorPicker--hover");
-$borderColor-ColorPicker--focus: createThemeVar("borderColor-ColorPicker--focus");
-$boxShadow-ColorPicker--focus: createThemeVar("boxShadow-ColorPicker--focus");
-$borderRadius-ColorPicker--error: createThemeVar("borderRadius-ColorPicker--error");
-$borderColor-ColorPicker--error: createThemeVar("borderColor-ColorPicker--error");
-$borderWidth-ColorPicker--error: createThemeVar("borderWidth-ColorPicker--error");
-$borderStyle-ColorPicker--error: createThemeVar("borderStyle-ColorPicker--error");
-$boxShadow-ColorPicker--error: createThemeVar("boxShadow-ColorPicker--error");
-$borderColor-ColorPicker--error--hover: createThemeVar("borderColor-ColorPicker--error--hover");
-$boxShadow-ColorPicker--error--hover: createThemeVar("boxShadow-ColorPicker--error--hover");
-$borderColor-ColorPicker--error--focus: createThemeVar("borderColor-ColorPicker--error--focus");
-$boxShadow-ColorPicker--error--focus: createThemeVar("boxShadow-ColorPicker--error--focus");
-$borderRadius-ColorPicker--warning: createThemeVar("borderRadius-ColorPicker--warning");
-$borderColor-ColorPicker--warning: createThemeVar("borderColor-ColorPicker--warning");
-$borderWidth-ColorPicker--warning: createThemeVar("borderWidth-ColorPicker--warning");
-$borderStyle-ColorPicker--warning: createThemeVar("borderStyle-ColorPicker--warning");
-$boxShadow-ColorPicker--warning: createThemeVar("boxShadow-ColorPicker--warning");
-$borderColor-ColorPicker--warning--hover: createThemeVar("borderColor-ColorPicker--warning--hover");
-$boxShadow-ColorPicker--warning--hover: createThemeVar("boxShadow-ColorPicker--warning--hover");
-$borderColor-ColorPicker--warning--focus: createThemeVar("borderColor-ColorPicker--warning--focus");
-$boxShadow-ColorPicker--warning--focus: createThemeVar("boxShadow-ColorPicker--warning--focus");
-$borderRadius-ColorPicker--success: createThemeVar("borderRadius-ColorPicker--success");
-$borderColor-ColorPicker--success: createThemeVar("borderColor-ColorPicker--success");
-$borderWidth-ColorPicker--success: createThemeVar("borderWidth-ColorPicker--success");
-$borderStyle-ColorPicker--success: createThemeVar("borderStyle-ColorPicker--success");
-$boxShadow-ColorPicker--success: createThemeVar("boxShadow-ColorPicker--success");
-$borderColor-ColorPicker--success--hover: createThemeVar("borderColor-ColorPicker--success--hover");
-$boxShadow-ColorPicker--success--hover: createThemeVar("boxShadow-ColorPicker--success--hover");
-$borderColor-ColorPicker--success--focus: createThemeVar("borderColor-ColorPicker--success--focus");
-$boxShadow-ColorPicker--success--focus: createThemeVar("boxShadow-ColorPicker--success--focus");
-$backgroundColor-ColorPicker: createThemeVar("backgroundColor-ColorPicker");
-$width-ColorPicker: createThemeVar("width-ColorPicker");
-$height-ColorPicker: createThemeVar("height-ColorPicker");
+$componentName: "ColorPicker";
 
-:export {
-  themeVars: "";
+// Variables for default variant
+$borderRadius-ColorPicker: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-ColorPicker: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-ColorPicker: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-ColorPicker: createThemeVar("Input:borderStyle-#{$componentName}");
+$boxShadow-ColorPicker: createThemeVar("Input:boxShadow-#{$componentName}");
+$borderColor-ColorPicker--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$boxShadow-ColorPicker--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$borderColor-ColorPicker--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-ColorPicker--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
+
+// Variables for error variant
+$borderRadius-ColorPicker--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-ColorPicker--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-ColorPicker--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-ColorPicker--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$boxShadow-ColorPicker--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$borderColor-ColorPicker--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$boxShadow-ColorPicker--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$borderColor-ColorPicker--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$boxShadow-ColorPicker--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
+
+// Variables for warning variant
+$borderRadius-ColorPicker--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-ColorPicker--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-ColorPicker--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-ColorPicker--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$boxShadow-ColorPicker--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$borderColor-ColorPicker--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$boxShadow-ColorPicker--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$borderColor-ColorPicker--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$boxShadow-ColorPicker--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
+
+// Variables for success variant
+$borderRadius-ColorPicker--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-ColorPicker--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-ColorPicker--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-ColorPicker--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$boxShadow-ColorPicker--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$borderColor-ColorPicker--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$boxShadow-ColorPicker--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$borderColor-ColorPicker--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$boxShadow-ColorPicker--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
+
+// Variables for @layer section
+$backgroundColor-ColorPicker: createThemeVar("Input:backgroundColor-#{$componentName}");
+$width-ColorPicker: createThemeVar("Input:width-#{$componentName}");
+$height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
+
+@mixin variant($variantName) {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+
+  &:not([disabled]):not([readonly]):hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+  }
+
+  &:not([readonly]):focus {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
+  }
 }
 
 @layer components {
-  .colorPickerInput {
-    box-sizing: border-box;
-    width: var(--xmlui-width-ColorPicker);
-    height: var(--xmlui-height-ColorPicker);
-    min-width: 0;
-    padding: 4px;
-    border-radius: var(--xmlui-borderRadius-ColorPicker);
-    border-color: var(--xmlui-borderColor-ColorPicker);
-    border-width: var(--xmlui-borderWidth-ColorPicker);
-    border-style: var(--xmlui-borderStyle-ColorPicker);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker);
-    background-color: var(--xmlui-backgroundColor-ColorPicker);
+  .colorInput {
+    width: $width-ColorPicker;
+    height: $height-ColorPicker;
+    background-color: $backgroundColor-ColorPicker;
     outline: none;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-  }
+    padding: 4px;
+    
+    &:not([disabled]):not([readonly]) {
+      cursor: pointer;
+    }
 
-  .colorPickerInput:not([disabled]):not([readonly]) {
-    cursor: pointer;
-  }
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
 
-  .colorPickerInput:not([disabled]):not([readonly]):hover {
-    border-color: var(--xmlui-borderColor-ColorPicker--hover);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--hover);
-  }
+    &::-webkit-color-swatch {
+      border: none;
+      border-radius: 2px;
+    }
 
-  .colorPickerInput:not([readonly]):focus {
-    border-color: var(--xmlui-borderColor-ColorPicker--focus);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--focus);
-  }
+    @include variant("");
 
-  .colorPickerError {
-    border-radius: var(--xmlui-borderRadius-ColorPicker--error);
-    border-color: var(--xmlui-borderColor-ColorPicker--error);
-    border-width: var(--xmlui-borderWidth-ColorPicker--error);
-    border-style: var(--xmlui-borderStyle-ColorPicker--error);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--error);
-  }
+    &.error {
+      @include variant("error");
+    }
 
-  .colorPickerError:not([disabled]):not([readonly]):hover {
-    border-color: var(--xmlui-borderColor-ColorPicker--error--hover);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--error--hover);
-  }
+    &.warning {
+      @include variant("warning");
+    }
 
-  .colorPickerError:not([readonly]):focus {
-    border-color: var(--xmlui-borderColor-ColorPicker--error--focus);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--error--focus);
-  }
+    &.valid {
+      @include variant("success");
+    }
 
-  .colorPickerWarning {
-    border-radius: var(--xmlui-borderRadius-ColorPicker--warning);
-    border-color: var(--xmlui-borderColor-ColorPicker--warning);
-    border-width: var(--xmlui-borderWidth-ColorPicker--warning);
-    border-style: var(--xmlui-borderStyle-ColorPicker--warning);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--warning);
+    &:before,
+    &:after {
+      display: none;
+    }
   }
+}
 
-  .colorPickerWarning:not([disabled]):not([readonly]):hover {
-    border-color: var(--xmlui-borderColor-ColorPicker--warning--hover);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--warning--hover);
-  }
-
-  .colorPickerWarning:not([readonly]):focus {
-    border-color: var(--xmlui-borderColor-ColorPicker--warning--focus);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--warning--focus);
-  }
-
-  .colorPickerSuccess {
-    border-radius: var(--xmlui-borderRadius-ColorPicker--success);
-    border-color: var(--xmlui-borderColor-ColorPicker--success);
-    border-width: var(--xmlui-borderWidth-ColorPicker--success);
-    border-style: var(--xmlui-borderStyle-ColorPicker--success);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--success);
-  }
-
-  .colorPickerSuccess:not([disabled]):not([readonly]):hover {
-    border-color: var(--xmlui-borderColor-ColorPicker--success--hover);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--success--hover);
-  }
-
-  .colorPickerSuccess:not([readonly]):focus {
-    border-color: var(--xmlui-borderColor-ColorPicker--success--focus);
-    box-shadow: var(--xmlui-boxShadow-ColorPicker--success--focus);
-  }
-
-  .colorPickerInput::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
-
-  .colorPickerInput::-webkit-color-swatch {
-    border: none;
-    border-radius: 2px;
-  }
-
-  .colorPickerLabeledItem {
-    display: flex;
-    align-items: center;
-    gap: var(--xmlui-gap-label-ColorPicker, var(--xmlui-gap-normal, 0.5rem));
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .colorPickerLabel {
-    flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-ColorPicker, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-ColorPicker, inherit);
-  }
-
-  .colorPickerLabelRequired,
-  .colorPickerLabelOptional {
-    margin-left: 0.25em;
-  }
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -17,6 +17,7 @@ import {
   responsiveBreakpoints,
   supportedLayoutPropNames,
   supportedResponsiveLayoutPropNames,
+  type LayoutOrientation,
 } from "../../styling";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
@@ -36,6 +37,7 @@ export type XmluiComponentAdapterOptions = {
   themeContributors?: readonly ComponentMetadata[];
   renderer: XmluiAdapterRenderer;
   defaultPart?: string;
+  layoutOrientation?: LayoutOrientation;
 };
 
 export type XmluiWrappedRenderer = (props: {
@@ -96,6 +98,7 @@ export function useXmluiComponentAdapter({
   name,
   metadata,
   themeContributors = [],
+  layoutOrientation,
   context,
   node,
   scope,
@@ -138,12 +141,12 @@ export function useXmluiComponentAdapter({
   const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
-    () => resolveActiveLayoutStyle(props, viewportWidth),
-    [props, viewportWidth],
+    () => resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
+    [layoutOrientation, props, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => resolveResponsiveLayoutStyles(props),
-    [props],
+    () => resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
+    [layoutOrientation, props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
@@ -274,9 +277,10 @@ export function useXmluiComponentAdapter({
 function resolveActiveLayoutStyle(
   props: Record<string, unknown>,
   viewportWidth: number | undefined,
+  orientation?: LayoutOrientation,
 ): CSSProperties {
-  const style: CSSProperties = resolveLayoutStyle(props);
-  const responsive = resolveResponsiveLayoutStyles(props);
+  const style: CSSProperties = resolveLayoutStyle(props, { orientation });
+  const responsive = resolveResponsiveLayoutStyles(props, { orientation });
   const componentStyle = responsive[COMPONENT_PART_KEY];
   if (!componentStyle) {
     return style;

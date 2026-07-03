@@ -60,11 +60,21 @@ export function dEndIcon() {
   };
 }
 
-export function dValidationStatus() {
+export function dValidationStatus(defaultValue?: string) {
   return {
     description: "The validation status of the input.",
     valueType: "string" as const,
     availableValues: ["valid", "warning", "error", "none"],
+    defaultValue,
+  };
+}
+
+export function dIndeterminate(defaultValue?: boolean) {
+  return {
+    description:
+      "The `true` value of this property signals that the component is in an _indeterminate state_.",
+    valueType: "boolean" as const,
+    defaultValue,
   };
 }
 

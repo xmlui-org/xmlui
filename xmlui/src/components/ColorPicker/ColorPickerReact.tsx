@@ -1,206 +1,140 @@
-import type { ChangeEvent, CSSProperties, FocusEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
-
-import { defaultProps } from "./ColorPicker.defaults";
+import type { ChangeEvent, CSSProperties, ForwardedRef } from "react";
+import { memo, useEffect } from "react";
+import { forwardRef, useCallback, useRef } from "react";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import type { ValidationStatus } from "../abstractions";
+import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
-import { useFormContext } from "../Form/FormContext";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { Part } from "../Part/Part";
+import { PART_INPUT } from "../../components-core/parts";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { defaultProps } from "./ColorPicker.defaults";
 
-export type ColorPickerApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: string;
-};
-
-export type ColorPickerProps = {
+type Props = {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
-  enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
+  value?: string;
+  initialValue?: string;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  onDidChange?: (newValue: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  updateState?: UpdateStateFn;
+  registerComponentApi?: RegisterComponentApiFn;
   autoFocus?: boolean;
   tabIndex?: number;
-  label?: unknown;
-  requireLabelMode?: string;
-  validationStatus?: string;
-  className?: string;
-  style?: CSSProperties;
-  onDidChange?: (value: string) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  required?: boolean;
+  readOnly?: boolean;
+  enabled?: boolean;
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
 };
 
-export const ColorPickerNative = memo(forwardRef<ColorPickerApi, ColorPickerProps>(function ColorPickerNative(
-  {
-    id,
-    bindTo,
-    value,
-    initialValue = defaultProps.initialValue,
-    enabled = defaultProps.enabled,
-    readOnly,
-    required,
-    autoFocus,
-    tabIndex = 0,
-    label,
-    requireLabelMode,
-    validationStatus = defaultProps.validationStatus,
-    className,
-    style,
-    onDidChange,
-    onFocus,
-    onBlur,
-    "data-testid": dataTestId,
-    ...rest
-  },
-  ref,
-) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const generatedInputId = useId();
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const effectiveValue = formValue ?? value;
-  const inputId = id ?? generatedInputId;
-  const controlled = effectiveValue !== undefined;
-  const [localValue, setLocalValue] = useState(() =>
-    normalizeColor(controlled ? effectiveValue : initialValue),
-  );
-  const currentValue = controlled ? normalizeColor(effectiveValue) : localValue;
-
-  useEffect(() => {
-    if (!controlled) {
-      const normalizedInitialValue = normalizeColor(initialValue);
-      setLocalValue((previousValue) => previousValue === normalizedInitialValue ? previousValue : normalizedInitialValue);
-    }
-  }, [controlled, initialValue]);
-
-  const updateValue = useCallback((nextValue: unknown) => {
-    const color = normalizeColor(nextValue);
-    setLocalValue((previousValue) => previousValue === color ? previousValue : color);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, color);
-    }
-    void onDidChange?.(color);
-  }, [fieldName, onDidChange, setFormValue]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => inputRef.current?.focus(),
-    setValue: updateValue,
-    get value() {
-      return currentValue;
-    },
-  }), [currentValue, updateValue]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, normalizeColor(initialValue));
-  }, [fieldName, getFormValue, initialValue, setFormValue]);
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label: stringifyLabel(label),
+export const ColorPicker = memo(forwardRef(
+  (
+    {
+      id: idProp,
+      style,
+      className,
+      classes,
+      updateState,
+      onDidChange = noop,
+      onFocus = noop,
+      onBlur = noop,
+      registerComponentApi,
+      enabled = defaultProps.enabled,
+      readOnly,
+      value = defaultProps.value,
+      autoFocus,
+      tabIndex = 0,
       required,
+      validationStatus = defaultProps.validationStatus,
+      invalidMessages: _invalidMessages,
+      initialValue = defaultProps.initialValue,
+      ...rest
+    }: Props,
+    forwardedRef: ForwardedRef<HTMLInputElement>,
+  ) => {
+    const id = useFormItemInputId(idProp);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const composedRef = useComposedRefs(forwardedRef, inputRef);
+
+    const updateValue = useCallback(
+      (value: string) => {
+        updateState?.({ value });
+        onDidChange(value);
+      },
+      [onDidChange, updateState],
+    );
+
+    const onInputChange = useCallback(
+      (event: ChangeEvent<HTMLInputElement>) => {
+        // Controlled input: must update synchronously, otherwise the displayed
+        // swatch lags one selection behind. See React useTransition caveats —
+        // calls that update inputs should not be inside startTransition.
+        updateValue(event.target.value);
+      },
+      [updateValue],
+    );
+
+    useEffect(() => {
+      updateState?.({ value: initialValue }, { initial: true });
+    }, [initialValue, updateState]);
+
+    // --- Manage obtaining and losing the focus
+    const handleOnFocus = useCallback(() => {
+      onFocus?.();
+    }, [onFocus]);
+
+    const handleOnBlur = useCallback(() => {
+      onBlur?.();
+    }, [onBlur]);
+
+    const focus = useCallback(() => {
+      inputRef.current?.focus();
+    }, []);
+
+    const setValue = useEvent((newValue) => {
+      updateValue(newValue);
     });
-  }, [fieldName, label, registerFormItem, required]);
 
-  const labelText = stringifyLabel(label);
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        setValue,
+      });
+    }, [focus, registerComponentApi, setValue]);
 
-  const input = (
-    <input
-      {...rest}
-      id={inputId}
-      ref={inputRef}
-      data-part-id="input"
-      data-xmlui-part="input"
-      data-testid={!label ? dataTestId ?? id : undefined}
-      className={cx(
-        styles.colorPickerInput,
-        validationStatus === "error" ? styles.colorPickerError : undefined,
-        validationStatus === "warning" ? styles.colorPickerWarning : undefined,
-        validationStatus === "valid" ? styles.colorPickerSuccess : undefined,
-        !label ? className : undefined,
-      )}
-      style={!label ? style : undefined}
-      disabled={!enabled || readOnly}
-      readOnly={readOnly}
-      required={required}
-      autoFocus={autoFocus}
-      tabIndex={enabled ? tabIndex : -1}
-      type="color"
-      inputMode="text"
-      value={currentValue}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => updateValue(event.currentTarget.value)}
-      onFocus={(_event: FocusEvent<HTMLInputElement>) => void onFocus?.()}
-      onBlur={(_event: FocusEvent<HTMLInputElement>) => void onBlur?.()}
-    />
-  );
-
-  if (!labelText) {
-    return input;
-  }
-
-  return (
-    <div
-      data-xmlui-component="ColorPicker"
-      data-xmlui-part="input"
-      data-xmlui-id={id}
-      data-testid={dataTestId ?? id}
-      className={className}
-      style={style}
-    >
-      <div data-part-id="labeledItem" data-xmlui-part="labeledItem" className={styles.colorPickerLabeledItem}>
-        <label htmlFor={inputId} className={styles.colorPickerLabel}>
-          {labelText}
-          {showRequiredIndicator ? <span className={styles.colorPickerLabelRequired}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.colorPickerLabelOptional}>(Optional)</span> : null}
-        </label>
-        {input}
-      </div>
-    </div>
-  );
-}));
-
-function normalizeColor(value: unknown): string {
-  if (typeof value !== "string") {
-    return defaultProps.value;
-  }
-  const normalized = value.trim().toLowerCase();
-  return /^#[0-9a-f]{6}$/i.test(normalized) ? normalized : defaultProps.value;
-}
-
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function cx(...values: Array<string | undefined | false>): string {
-  return values.filter(Boolean).join(" ");
-}
+    return (
+      <Part partId={PART_INPUT}>
+        <input
+          {...rest}
+          id={id}
+          className={classnames(className, classes?.[COMPONENT_PART_KEY], styles.colorInput, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          style={style}
+          disabled={!enabled || readOnly}
+          onFocus={handleOnFocus}
+          onChange={onInputChange}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          tabIndex={tabIndex}
+          onBlur={handleOnBlur}
+          required={required}
+          type="color"
+          inputMode="text"
+          ref={composedRef}
+          value={value}
+        />
+      </Part>
+    );
+  },
+));

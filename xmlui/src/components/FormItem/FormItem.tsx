@@ -14,11 +14,17 @@ $gap-label-FormItem: createThemeVar("gap-label-FormItem");
 $width-label-FormItem: createThemeVar("width-label-FormItem");
 $textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
 $textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontFamily-label-formItem: createThemeVar("fontFamily-label-formItem");
 $fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
+$fontSize-label-formItem--required: createThemeVar("fontSize-label-formItem--required");
 $fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
 $fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
+$fontWeight-label-formItem--required: createThemeVar("fontWeight-label-formItem--required");
 $fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
+$fontStyle-label-formItem--required: createThemeVar("fontStyle-label-formItem--required");
 $textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
+$textTransform-label-formItem--required: createThemeVar("textTransform-label-formItem--required");
+$textColor-label-formItem--required: createThemeVar("textColor-label-formItem--required");
 $textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
 $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
 $textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
@@ -140,12 +146,17 @@ export const FormItemMd = createMetadata({
     [`width-label-${COMP}`]: "12rem",
     [`textColor-label-${COMP}`]: "$textColor",
     "textColor-label-formItem": "$textColor",
-    "fontSize-label-formItem": "$fontSize-base",
+    "textColor-label-formItem--required": "$textColor",
+    "fontSize-label-formItem": "$fontSize-sm",
+    "fontSize-label-formItem--required": "$fontSize-sm",
     [`fontWeight-label-${COMP}`]: "$fontWeight-semibold",
-    "fontWeight-label-formItem": "$fontWeight-semibold",
+    "fontWeight-label-formItem": "$fontWeight-medium",
+    "fontWeight-label-formItem--required": "$fontWeight-medium",
     "fontStyle-label-formItem": "normal",
+    "fontStyle-label-formItem--required": "normal",
     "textTransform-label-formItem": "none",
-    "textColor-requiredMark-formItem": "$color-danger-500",
+    "textTransform-label-formItem--required": "none",
+    "textColor-requiredMark-formItem": "$color-danger-400",
     "textColor-optionalTag-formItem": "$textColor-secondary",
     [`textColor-error-${COMP}`]: "$color-danger-500",
     [`fontSize-error-${COMP}`]: "$fontSize-sm",

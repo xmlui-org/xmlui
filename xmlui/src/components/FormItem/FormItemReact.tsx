@@ -16,7 +16,7 @@ import { Select } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
 import { NumberBox as NumberBoxNative } from "../NumberBox/NumberBoxReact";
-import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
+import { ColorPicker } from "../ColorPicker/ColorPickerReact";
 import { DateInputNative } from "../DateInput/DateInputReact";
 import { DatePickerNative } from "../DatePicker/DatePickerReact";
 import { TimeInputNative } from "../TimeInput/TimeInputReact";
@@ -493,9 +493,9 @@ function renderControl({
   }
   if (type === "colorpicker" || type === "colorPicker" || type === "color") {
     return (
-      <ColorPickerNative
+      <ColorPicker
         id={inputId}
-        value={value}
+        value={stringify(value)}
         enabled={enabled}
         required={required}
         autoFocus={autoFocus}

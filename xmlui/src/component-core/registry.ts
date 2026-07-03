@@ -61,11 +61,11 @@ import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer"
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
-import { checkboxRenderer } from "../components/Checkbox/Checkbox.renderer";
-import { switchRenderer } from "../components/Switch/Switch.renderer";
+import { checkboxRenderer } from "../components/Checkbox/Checkbox";
+import { switchRenderer } from "../components/Switch/Switch";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";
 import { sliderRenderer } from "../components/Slider/Slider.renderer";
-import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker.renderer";
+import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";

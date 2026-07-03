@@ -8,11 +8,17 @@ $gap-label-FormItem: createThemeVar("gap-label-FormItem");
 $width-label-FormItem: createThemeVar("width-label-FormItem");
 $textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
 $textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontFamily-label-formItem: createThemeVar("fontFamily-label-formItem");
 $fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
 $fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
 $fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
 $fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
 $textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
+$textColor-label-formItem--required: createThemeVar("textColor-label-formItem--required");
+$fontSize-label-formItem--required: createThemeVar("fontSize-label-formItem--required");
+$fontWeight-label-formItem--required: createThemeVar("fontWeight-label-formItem--required");
+$fontStyle-label-formItem--required: createThemeVar("fontStyle-label-formItem--required");
+$textTransform-label-formItem--required: createThemeVar("textTransform-label-formItem--required");
 $textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
 $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
 $textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
@@ -23,6 +29,131 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
   display: flex;
   flex-direction: column;
   gap: $gap-FormItem;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.5em;
+}
+
+.top {
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+}
+
+.end {
+  flex-direction: row-reverse;
+  justify-content: start;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+
+.bottom {
+  flex-direction: column-reverse;
+  align-items: start;
+  justify-content: center;
+}
+
+.start {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: start;
+  gap: 0.5em;
+}
+
+.before {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: start;
+  gap: 0.5em;
+  width: fit-content;
+  align-self: flex-start;
+}
+
+.after {
+  flex-direction: row-reverse;
+  justify-content: start;
+  align-items: flex-start;
+  gap: 0.5em;
+  width: fit-content;
+  align-self: flex-start;
+}
+
+.shrinkToLabel {
+  width: fit-content;
+}
+
+.inputLabel {
+  color: var(--xmlui-textColor-label-formItem, var(--xmlui-textColor, #{$textColor-label-formItem}));
+  font-family: $fontFamily-label-formItem;
+  font-size: var(--xmlui-fontSize-label-formItem, 0.875em);
+  font-weight: var(--xmlui-fontWeight-label-formItem, 500);
+  font-style: var(--xmlui-fontStyle-label-formItem, normal);
+  text-transform: var(--xmlui-textTransform-label-formItem, none);
+  user-select: none;
+  cursor: pointer;
+  word-break: normal;
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.inputLabel.labelBreak {
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.inputLabel.required {
+  color: var(--xmlui-textColor-label-formItem--required, var(--xmlui-textColor, #{$textColor-label-formItem--required}));
+  font-size: var(--xmlui-fontSize-label-formItem--required, 0.875em);
+  font-weight: var(--xmlui-fontWeight-label-formItem--required, 500);
+  font-style: var(--xmlui-fontStyle-label-formItem--required, normal);
+  text-transform: var(--xmlui-textTransform-label-formItem--required, none);
+}
+
+.inputLabel.disabled {
+  cursor: not-allowed;
+  color: var(--xmlui-textColor--disabled);
+}
+
+.requiredMark {
+  margin-inline-start: 0.2em;
+  color: $textColor-requiredMark-formItem;
+}
+
+.optionalTag {
+  margin-inline-start: 0.2em;
+  color: $textColor-optionalTag-formItem;
+}
+
+.itemWithLabel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.itemWithLabel.noLabel {
+  width: fit-content;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  flex: 1;
+}
+
+.labelWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .noLabel {

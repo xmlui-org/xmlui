@@ -1,11 +1,19 @@
 <App>
-  <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
-  <VStack gap="$space-4" padding="$space-4">
-    <Checkbox
-      label="Enhanced mode"
-      initialValue="{appState.value.enhancedMode}"
-      onDidChange="v => appState.update({ enhancedMode: v})" />
-    <Component1 />
-    <Component2 />
-  </VStack>
+  <App>
+    <ColorPicker 
+      id="colorPicker" 
+      label="Select your favorite color" 
+      initialValue="#808080" />
+    <HStack>
+      <Button
+        label="Set to red"
+        onClick="colorPicker.setValue('#ff0000')" />
+      <Button
+        label="Set to green"
+        onClick="colorPicker.setValue('#00c000')" />
+      <Button
+        label="Set to blue"
+        onClick="colorPicker.setValue('#0000ff')" />
+    </HStack>
+  </App>
 </App>

@@ -446,7 +446,7 @@ export const appRenderer = wrapComponent(COMP, AppNode, AppMd, {
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useInRouterContext } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
 import { FooterMd } from "../Footer/Footer";
@@ -456,6 +456,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: AppMd as ComponentMetadata,
   themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
+  layoutOrientation: "vertical",
   renderer: ({ adapter }) => {
     const directChildren = adapter.node.children.filter(
       (child): child is XmluiElement => child.kind === "element",
@@ -490,8 +491,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
     };
 
     return (
-      <BrowserRouter>
-      <HelmetProvider>
+      <RuntimeAppProviders>
       <AppComponent
         {...adapter.rootAttrs()}
         scrollWholePage={scrollWholePage}
@@ -534,11 +534,16 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
       >
         {renderChild(restChildren, contentLayoutContext)}
       </AppComponent>
-      </HelmetProvider>
-      </BrowserRouter>
+      </RuntimeAppProviders>
     );
   },
 });
+
+function RuntimeAppProviders({ children }: { children: React.ReactNode }) {
+  const isInRouterContext = useInRouterContext();
+  const app = <HelmetProvider>{children}</HelmetProvider>;
+  return isInRouterContext ? app : <BrowserRouter>{app}</BrowserRouter>;
+}
 
 function applyRuntimeLayoutContext(
   child: XmluiNode | XmluiNode[],
