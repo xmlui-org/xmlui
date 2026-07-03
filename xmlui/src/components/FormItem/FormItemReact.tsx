@@ -12,7 +12,7 @@ import {
 } from "react";
 
 import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
-import { SelectNative } from "../Select/SelectReact";
+import { Select } from "../Select/SelectReact";
 import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
 import { NumberBox as NumberBoxNative } from "../NumberBox/NumberBoxReact";
@@ -20,7 +20,7 @@ import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
 import { DateInputNative } from "../DateInput/DateInputReact";
 import { DatePickerNative } from "../DatePicker/DatePickerReact";
 import { TimeInputNative } from "../TimeInput/TimeInputReact";
-import type { XmluiOption } from "../Option/OptionReact";
+import type { Option as XmluiOption } from "../abstractions";
 import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./FormItem.module.scss";
@@ -422,17 +422,17 @@ function renderControl({
   }
   if (type === "select") {
     return (
-      <SelectNative
+      <Select
         id={inputId}
         value={value as any}
         enabled={enabled}
         required={required}
         autoFocus={autoFocus}
-        options={options ?? optionsFromChildren(children)}
+        data={options ?? optionsFromChildren(children)}
         searchable={searchable}
         groupBy={groupBy}
-        groupHeaderTemplateRenderer={groupHeaderTemplateRenderer}
-        ungroupedHeaderTemplateRenderer={ungroupedHeaderTemplateRenderer}
+        groupHeaderRenderer={groupHeaderTemplateRenderer}
+        ungroupedHeaderRenderer={() => ungroupedHeaderTemplateRenderer?.({})}
         onDidChange={(nextValue) => {
           form?.setValue(fieldName, nextValue);
           scheduleChangedValidation(nextValue);

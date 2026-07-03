@@ -45,6 +45,7 @@ export function useAppContext(): {
       setAuditPolicy: noop,
       setAppDirection: noop,
       isRtlLocale: () => false,
+      translate: (key: string) => key,
       setScheduler: noop,
     },
   };

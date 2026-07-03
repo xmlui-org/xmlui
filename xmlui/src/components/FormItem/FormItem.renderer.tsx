@@ -1,7 +1,9 @@
 import { wrapComponent, nonPropertyChildren, templateChildren } from "../../runtime/rendering/adapter";
+import type { XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { createRuntimeScope } from "../../runtime/state";
 import { radioOptions } from "../RadioGroup/RadioGroup";
-import { selectOptions } from "../Select/Select";
+import type { Option as XmluiOption } from "../abstractions";
 import { FormItemMd } from "./FormItem";
 import { FormItem } from "./FormItemReact";
 
@@ -112,6 +114,52 @@ export const formItemRenderer = wrapComponent({
     );
   },
 });
+
+function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
+  const data = adapter.prop<unknown>("data");
+  if (Array.isArray(data)) {
+    const valueField = adapter.stringProp("valueField", "value") ?? "value";
+    const labelField = adapter.stringProp("labelField", "label") ?? "label";
+    return data.map((item) => dataOption(item, valueField, labelField));
+  }
+  return adapter.node.children.flatMap((child) => {
+    if (child.kind !== "element" || child.type !== "Option") {
+      return [];
+    }
+    const hasValue = Object.prototype.hasOwnProperty.call(child.props, "value");
+    const hasLabel = Object.prototype.hasOwnProperty.call(child.props, "label");
+    const value = hasValue
+      ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, adapter.scope, "Option:value")
+      : undefined;
+    const label = hasLabel
+      ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "Option:label")
+      : child.children.every((optionChild) => optionChild.kind === "text")
+        ? child.children.map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join("")
+        : undefined;
+    if (value === undefined && label === undefined) {
+      return [];
+    }
+    const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
+      ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "Option:enabled"))
+      : true;
+    return [{
+      value: value ?? label ?? "",
+      label: label ?? value ?? "",
+      enabled,
+      testId: child.props.testId,
+    }];
+  });
+}
+
+function dataOption(item: unknown, valueField: string, labelField: string): XmluiOption {
+  if (item !== null && typeof item === "object") {
+    const record = item as Record<string, unknown>;
+    const value = record[valueField];
+    const label = record[labelField] ?? value;
+    return { ...record, value, label: String(label ?? ""), enabled: true };
+  }
+  return { value: item, label: String(item ?? ""), enabled: true };
+}
 
 function createScopedTemplateRenderer(
   adapter: Parameters<Parameters<typeof wrapComponent>[0]["renderer"]>[0]["adapter"],

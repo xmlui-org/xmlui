@@ -1004,6 +1004,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       valueField: { name: "valueField" },
       labelField: { name: "labelField" },
       multiSelect: { name: "multiSelect" },
+      multmultiSelect: { name: "multmultiSelect" },
       modal: { name: "modal" },
       clearable: { name: "clearable" },
       searchable: { name: "searchable" },

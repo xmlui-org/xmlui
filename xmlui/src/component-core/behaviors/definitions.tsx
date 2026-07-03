@@ -404,14 +404,23 @@ function LabelBehavior({
         ? "(Optional)"
         : undefined;
   const labelWidth = stringValue(context.props.labelWidth);
+  const selectAuthoredWidth = stringValue(context.props.width);
+  const selectRuntimeWidth = normalizeSelectLabelWidth(selectAuthoredWidth) ?? childStyle?.width;
+  const shrinkSelectLabelToControl =
+    context.componentName === "Select" &&
+    !labelWidth;
+  const selectControlWidth = shrinkSelectLabelToControl
+    ? selectRuntimeWidth ?? "var(--xmlui-minWidth-Select, 4rem)"
+    : undefined;
   const label = (
     <span
       key="label"
       data-xmlui-part="label"
       data-part-id="label"
       style={{
+        display: selectControlWidth ? "inline-block" : undefined,
         flex: labelWidth ? `0 0 ${labelWidth}` : undefined,
-        width: labelWidth,
+        width: labelWidth ?? selectControlWidth,
         whiteSpace: context.props.labelBreak === true ? "normal" : "nowrap",
       }}
     >
@@ -436,9 +445,12 @@ function LabelBehavior({
         data-part-id="labeledItem"
         style={{
           ...(childStyle ?? {}),
+          width: childStyle?.width ?? selectControlWidth,
           display: "flex",
           flexDirection: position === "top" || position === "bottom" ? "column" : "row",
-          alignItems: position === "top" || position === "bottom" ? "stretch" : "center",
+          alignItems: shrinkSelectLabelToControl
+            ? "flex-start"
+            : position === "top" || position === "bottom" ? "stretch" : "center",
           gap: "var(--xmlui-gap-label-TextBox, var(--xmlui-space-2, 0.5rem))",
         }}
       >
@@ -446,6 +458,14 @@ function LabelBehavior({
       </span>
     </label>
   );
+}
+
+function normalizeSelectLabelWidth(width: string | undefined) {
+  if (!width) {
+    return undefined;
+  }
+  const trimmed = width.trim();
+  return trimmed.endsWith("%") ? `${trimmed.slice(0, -1)}vw` : width;
 }
 
 function normalizedLabelPosition(value: unknown): "start" | "end" | "top" | "bottom" {

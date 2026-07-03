@@ -68,6 +68,13 @@ export function dValidationStatus() {
   };
 }
 
+export function dMulti() {
+  return {
+    description: "This property enables selecting multiple values.",
+    valueType: "boolean" as const,
+  };
+}
+
 export function dSetValueApi() {
   return {
     description:

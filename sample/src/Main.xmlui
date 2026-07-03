@@ -1,23 +1,15 @@
-<App layout="condensed-sticky" scrollWholePage="false">
-  <AppHeader>
-    <HStack>
-      <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
-      <Button onClick="myList.scrollToTop()">Scroll to Top</Button>
-      <Button onClick="myList.scrollToIndex(25)">Scroll to #25</Button>
-      <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
-    </HStack>
-  </AppHeader>
-  <List 
-    id="myList" 
-    height="*"
-    data="{
-      Array.from({ length: 100 })
-      .map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))
-    }">
-    <property name="itemTemplate">
-      <Card>
-        <Text value="{$item.value}" />
-      </Card>
-    </property>
-  </List>
+<App>
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+  <HStack>
+    <Button
+      label="Select 2nd Item"
+      onClick="inputControl.setValue('opt2')" />
+    <Button
+      label="Remove Selection"
+      onClick="inputControl.setValue('')" />
+  </HStack>
 </App>

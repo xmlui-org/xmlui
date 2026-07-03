@@ -1,316 +1,708 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+$animDuration: 0.1s;
 
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-Select: createThemeVar("backgroundColor-Select");
-$textColor-Select: createThemeVar("textColor-Select");
-$borderColor-Select: createThemeVar("borderColor-Select");
-$borderWidth-Select: createThemeVar("borderWidth-Select");
-$borderStyle-Select: createThemeVar("borderStyle-Select");
-$borderRadius-Select: createThemeVar("borderRadius-Select");
-$fontSize-Select: createThemeVar("fontSize-Select");
-$boxShadow-Select: createThemeVar("boxShadow-Select");
+$componentName: "Select";
+$themeVars: t.composeBorderVars($themeVars, $componentName);
+$themeVars: t.composePaddingVars($themeVars, $componentName);
+$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 
-:export {
-  themeVars: "";
+// Variables for default variant
+$borderRadius-Select: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-Select: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-Select: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-Select: createThemeVar("Input:borderStyle-#{$componentName}");
+$fontSize-Select: createThemeVar("Input:fontSize-#{$componentName}");
+$backgroundColor-Select: createThemeVar("Input:backgroundColor-#{$componentName}");
+$boxShadow-Select: createThemeVar("Input:boxShadow-#{$componentName}");
+$textColor-Select: createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-Select--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-Select--hover: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$boxShadow-Select--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$textColor-Select--hover: createThemeVar("Input:textColor-#{$componentName}--hover");
+$outlineWidth-Select--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-Select--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-Select--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-Select--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-Select: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-Select: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
+
+// Variables for error variant
+$borderRadius-Select--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-Select--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-Select--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-Select--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$fontSize-Select--error: createThemeVar("Input:fontSize-#{$componentName}--error");
+$backgroundColor-Select--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
+$boxShadow-Select--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$textColor-Select--error: createThemeVar("Input:textColor-#{$componentName}--error");
+$borderColor-Select--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$backgroundColor-Select--error--hover: createThemeVar("Input:backgroundColor-#{$componentName}--error--hover");
+$boxShadow-Select--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$textColor-Select--error--hover: createThemeVar("Input:textColor-#{$componentName}--error--hover");
+$outlineWidth-Select--error--focus: createThemeVar("Input:outlineWidth-#{$componentName}--error--focus");
+$outlineColor-Select--error--focus: createThemeVar("Input:outlineColor-#{$componentName}--error--focus");
+$outlineStyle-Select--error--focus: createThemeVar("Input:outlineStyle-#{$componentName}--error--focus");
+$outlineOffset-Select--error--focus: createThemeVar("Input:outlineOffset-#{$componentName}--error--focus");
+$textColor-placeholder-Select--error: createThemeVar("Input:textColor-placeholder-#{$componentName}--error");
+$fontSize-placeholder-Select--error: createThemeVar("Input:fontSize-placeholder-#{$componentName}--error");
+
+// Variables for warning variant
+$borderRadius-Select--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-Select--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-Select--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-Select--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$fontSize-Select--warning: createThemeVar("Input:fontSize-#{$componentName}--warning");
+$backgroundColor-Select--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
+$boxShadow-Select--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$textColor-Select--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
+$borderColor-Select--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$backgroundColor-Select--warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}--warning--hover");
+$boxShadow-Select--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$textColor-Select--warning--hover: createThemeVar("Input:textColor-#{$componentName}--warning--hover");
+$outlineWidth-Select--warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}--warning--focus");
+$outlineColor-Select--warning--focus: createThemeVar("Input:outlineColor-#{$componentName}--warning--focus");
+$outlineStyle-Select--warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}--warning--focus");
+$outlineOffset-Select--warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}--warning--focus");
+$textColor-placeholder-Select--warning: createThemeVar("Input:textColor-placeholder-#{$componentName}--warning");
+$fontSize-placeholder-Select--warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}--warning");
+
+// Variables for success variant
+$borderRadius-Select--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-Select--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-Select--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-Select--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$fontSize-Select--success: createThemeVar("Input:fontSize-#{$componentName}--success");
+$backgroundColor-Select--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
+$boxShadow-Select--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$textColor-Select--success: createThemeVar("Input:textColor-#{$componentName}--success");
+$borderColor-Select--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$backgroundColor-Select--success--hover: createThemeVar("Input:backgroundColor-#{$componentName}--success--hover");
+$boxShadow-Select--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$textColor-Select--success--hover: createThemeVar("Input:textColor-#{$componentName}--success--hover");
+$outlineWidth-Select--success--focus: createThemeVar("Input:outlineWidth-#{$componentName}--success--focus");
+$outlineColor-Select--success--focus: createThemeVar("Input:outlineColor-#{$componentName}--success--focus");
+$outlineStyle-Select--success--focus: createThemeVar("Input:outlineStyle-#{$componentName}--success--focus");
+$outlineOffset-Select--success--focus: createThemeVar("Input:outlineOffset-#{$componentName}--success--focus");
+$textColor-placeholder-Select--success: createThemeVar("Input:textColor-placeholder-#{$componentName}--success");
+$fontSize-placeholder-Select--success: createThemeVar("Input:fontSize-placeholder-#{$componentName}--success");
+
+// Variables for @layer section
+$backgroundColor-Select--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-Select--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-Select--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+$outlineWidth-Select--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-Select--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-Select--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-Select--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-Select: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$paddingVertical-Select-badge: createThemeVar("paddingVertical-#{$componentName}-badge");
+$paddingHorizontal-Select-badge: createThemeVar("paddingHorizontal-#{$componentName}-badge");
+$borderRadius-Select-badge: createThemeVar("borderRadius-#{$componentName}-badge");
+$fontSize-Select-badge: createThemeVar("Input:fontSize-#{$componentName}-badge");
+$backgroundColor-Select-badge: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
+$textColor-Select-badge: createThemeVar("Input:textColor-#{$componentName}-badge");
+$backgroundColor-Select-badge--hover: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
+$textColor-Select-badge--hover: createThemeVar("Input:textColor-#{$componentName}-badge--hover");
+$backgroundColor-Select-badge--active: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
+$textColor-Select-badge--active: createThemeVar("Input:textColor-#{$componentName}-badge--active");
+$backgroundColor-menu-Select: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
+$borderRadius-menu-Select: createThemeVar("Input:borderRadius-menu-#{$componentName}");
+$boxShadow-menu-Select: createThemeVar("Input:boxShadow-menu-#{$componentName}");
+$borderWidth-menu-Select: createThemeVar("Input:borderWidth-menu-#{$componentName}");
+$borderColor-menu-Select: createThemeVar("Input:borderColor-menu-#{$componentName}");
+$backgroundColor-item-Select: createThemeVar("backgroundColor-item-#{$componentName}");
+$backgroundColor-item-Select--active: createThemeVar("backgroundColor-item-#{$componentName}--active");
+$backgroundColor-item-Select--hover: createThemeVar("backgroundColor-item-#{$componentName}--hover");
+$textColor-item-Select--disabled: createThemeVar("textColor-item-#{$componentName}--disabled");
+$opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-#{$componentName}--disabled");
+$textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentName}");
+$minHeight-Select: createThemeVar("minHeight-#{$componentName}");
+$minWidth-Select: createThemeVar("minWidth-#{$componentName}");
+$minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
+
+// --- CSS properties of a particular Select variant
+@mixin variant($variantName) {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}#{$suffix}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}");
+
+  &:not(:disabled) {
+    &:hover {
+      border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover");
+      box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+      color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
+    }
+
+    &:focus-visible {
+      outline-width: createThemeVar('Input:outlineWidth-#{$componentName}#{$suffix}--focus');
+      outline-color: createThemeVar('Input:outlineColor-#{$componentName}#{$suffix}--focus');
+      outline-style: createThemeVar('Input:outlineStyle-#{$componentName}#{$suffix}--focus');
+      outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}#{$suffix}--focus');
+    }
+  }
+
+  &::placeholder {
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}#{$suffix}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}#{$suffix}");
+  }
 }
 
 @layer components {
-  .selectRoot {
-    box-sizing: border-box;
-    display: inline-flex;
-    flex-direction: column;
-    gap: var(--xmlui-gap-Select, var(--xmlui-space-1));
-    max-width: 100%;
-    position: relative;
-    border-color: var(--xmlui-borderColor-Select);
-    border-width: var(--xmlui-borderWidth-Select);
-    border-style: var(--xmlui-borderStyle-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    color: var(--xmlui-textColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
-    font-size: var(--xmlui-fontSize-Select);
-  }
+  // =============================================================================
+  // SHARED COMPONENTS (used by both SimpleSelect and MultiSelect)
+  // =============================================================================
 
-  .selectRoot:hover {
-    border-color: var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select));
-    background-color: var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select));
-  }
-
-  .selectRoot:hover .selectTrigger {
-    border-color: var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select));
-    background-color: var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select));
-  }
-
-  .selectRootWithLabel {
-    align-items: stretch;
-  }
-
-  .selectLabel {
-    box-sizing: border-box;
-    color: var(--xmlui-textColor-label-Select, var(--xmlui-textColor-primary));
-    font: inherit;
-  }
-
-  .selectRequiredIndicator {
-    color: var(--xmlui-textColor-requiredMark-formItem, var(--xmlui-color-danger-500));
-    margin-left: 0.125rem;
-  }
-
-  .selectOptionalIndicator {
-    color: var(--xmlui-textColor-optionalTag-formItem, var(--xmlui-textColor-secondary));
-    margin-left: 0.25rem;
-  }
-
-  .selectLabelTop {
-    flex-direction: column;
-  }
-
-  .selectLabelBottom {
-    flex-direction: column-reverse;
-  }
-
-  .selectLabelStart,
-  .selectLabelEnd {
-    display: inline-grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-  }
-
-  .selectLabelEnd {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .selectLabelEnd .selectLabel {
-    order: 2;
-  }
-
-  .selectLabelBreak .selectLabel {
-    white-space: normal;
-  }
-
+  /**
+   * Common trigger styles for both SimpleSelect and searchable/multiSelect
+   */
   .selectTrigger {
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
+    outline: none;
     width: 100%;
-    min-height: var(--xmlui-height-Select, 2rem);
-    padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
-    border-color: var(--xmlui-borderColor-Select);
-    border-width: var(--xmlui-borderWidth-Select);
-    border-style: var(--xmlui-borderStyle-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    color: var(--xmlui-textColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
-    font: inherit;
-    font-size: var(--xmlui-fontSize-Select);
-    text-align: left;
+    height: max-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: $minHeight-Select;
+    min-width: $minWidth-Select;
+    line-height: normal;
+    @include t.paddingVars($themeVars, $componentName);
+
+    @include variant("");
+
+    &.error {
+      @include variant("error");
+    }
+
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
+
+    // `variant="outlined"` is intentionally narrow: it rebinds only the border color
+    // (and its hover/focus states) so the input visually composes with an outlined
+    // Button. Padding, background, typography and validation styling are unchanged.
+    // Validation classes (`.error` / `.warning` / `.valid`) take precedence over
+    // `.outlined` because they appear later in the rule list.
+    &.outlined {
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--outlined");
+
+      &:not(:disabled) {
+        &:hover {
+          border-color: createThemeVar(
+            "Input:borderColor-#{$componentName}--outlined--hover"
+          );
+        }
+
+        &:focus-visible {
+          border-color: createThemeVar(
+            "Input:borderColor-#{$componentName}--outlined--focus"
+          );
+        }
+      }
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      background-color: $backgroundColor-Select--disabled;
+      color: $textColor-Select--disabled;
+      border-color: $borderColor-Select--disabled;
+    }
+
+    &:focus {
+      outline-width: $outlineWidth-Select--focus;
+      outline-color: $outlineColor-Select--focus;
+      outline-style: $outlineStyle-Select--focus;
+      outline-offset: $outlineOffset-Select--focus;
+    }
+
+    .placeholder {
+      flex:1;
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      color: $textColor-placeholder-Select;
+    }
+  }
+
+  .selectTrigger>span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+  }
+
+  /**
+   * Common trigger value and actions
+   */
+
+  .actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: t.$space-1_5;
+  }
+
+  .action {
     cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
   }
 
-  .selectValidationWarning .selectTrigger {
-    border-color: var(--xmlui-borderColor-Select--warning, var(--xmlui-borderColor-Select));
-    border-width: var(--xmlui-borderWidth-Select--warning, var(--xmlui-borderWidth-Select));
-    border-style: var(--xmlui-borderStyle-Select--warning, var(--xmlui-borderStyle-Select));
-    border-radius: var(--xmlui-borderRadius-Select--warning, var(--xmlui-borderRadius-Select));
-    background-color: var(--xmlui-backgroundColor-Select--warning, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--warning, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--warning, var(--xmlui-boxShadow-Select));
-    font-size: var(--xmlui-fontSize-Select--warning, var(--xmlui-fontSize-Select));
-  }
+  // =============================================================================
+  // MULTI-SELECT SPECIFIC (searchable + multiSelect)
+  // =============================================================================
 
-  .selectValidationError .selectTrigger {
-    border-color: var(--xmlui-borderColor-Select--error, var(--xmlui-borderColor-Select));
-    border-width: var(--xmlui-borderWidth-Select--error, var(--xmlui-borderWidth-Select));
-    border-style: var(--xmlui-borderStyle-Select--error, var(--xmlui-borderStyle-Select));
-    border-radius: var(--xmlui-borderRadius-Select--error, var(--xmlui-borderRadius-Select));
-    background-color: var(--xmlui-backgroundColor-Select--error, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--error, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--error, var(--xmlui-boxShadow-Select));
-    font-size: var(--xmlui-fontSize-Select--error, var(--xmlui-fontSize-Select));
-  }
-
-  .selectValidationSuccess .selectTrigger {
-    border-color: var(--xmlui-borderColor-Select--success, var(--xmlui-borderColor-Select));
-    border-width: var(--xmlui-borderWidth-Select--success, var(--xmlui-borderWidth-Select));
-    border-style: var(--xmlui-borderStyle-Select--success, var(--xmlui-borderStyle-Select));
-    border-radius: var(--xmlui-borderRadius-Select--success, var(--xmlui-borderRadius-Select));
-    background-color: var(--xmlui-backgroundColor-Select--success, var(--xmlui-backgroundColor-Select));
-    color: var(--xmlui-textColor-Select--success, var(--xmlui-textColor-Select));
-    box-shadow: var(--xmlui-boxShadow-Select--success, var(--xmlui-boxShadow-Select));
-    font-size: var(--xmlui-fontSize-Select--success, var(--xmlui-fontSize-Select));
-  }
-
-  .selectValidationWarning .selectTrigger:hover {
-    border-color: var(--xmlui-borderColor-Select--warning--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--warning, var(--xmlui-borderColor-Select))));
-    background-color: var(--xmlui-backgroundColor-Select--warning--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--warning, var(--xmlui-backgroundColor-Select))));
-    color: var(--xmlui-textColor-Select--warning--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--warning, var(--xmlui-textColor-Select))));
-    box-shadow: var(--xmlui-boxShadow-Select--warning--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--warning, var(--xmlui-boxShadow-Select))));
-  }
-
-  .selectValidationError .selectTrigger:hover {
-    border-color: var(--xmlui-borderColor-Select--error--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--error, var(--xmlui-borderColor-Select))));
-    background-color: var(--xmlui-backgroundColor-Select--error--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--error, var(--xmlui-backgroundColor-Select))));
-    color: var(--xmlui-textColor-Select--error--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--error, var(--xmlui-textColor-Select))));
-    box-shadow: var(--xmlui-boxShadow-Select--error--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--error, var(--xmlui-boxShadow-Select))));
-  }
-
-  .selectValidationSuccess .selectTrigger:hover {
-    border-color: var(--xmlui-borderColor-Select--success--hover, var(--xmlui-borderColor-Select--hover, var(--xmlui-borderColor-Select--success, var(--xmlui-borderColor-Select))));
-    background-color: var(--xmlui-backgroundColor-Select--success--hover, var(--xmlui-backgroundColor-Select--hover, var(--xmlui-backgroundColor-Select--success, var(--xmlui-backgroundColor-Select))));
-    color: var(--xmlui-textColor-Select--success--hover, var(--xmlui-textColor-Select--hover, var(--xmlui-textColor-Select--success, var(--xmlui-textColor-Select))));
-    box-shadow: var(--xmlui-boxShadow-Select--success--hover, var(--xmlui-boxShadow-Select--hover, var(--xmlui-boxShadow-Select--success, var(--xmlui-boxShadow-Select))));
-  }
-
-  .selectValueTemplate {
-    display: inline-flex;
+  /**
+   * Badge display for multi-select values
+   */
+  .badgeListContainer {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
     align-items: center;
   }
 
-  .selectClearButton {
-    position: absolute;
-    right: var(--xmlui-space-1, 0.25rem);
-    top: 50%;
-    transform: translateY(-50%);
-    border: 0;
-    background: transparent;
-    color: var(--xmlui-textColor-Select);
-    cursor: pointer;
-    font: inherit;
-    line-height: 1;
-    padding: 0 var(--xmlui-space-1, 0.25rem);
-    z-index: calc(var(--xmlui-zIndex-Select, 10) + 1);
-  }
-
-  .selectConciseValidationFeedback {
-    position: absolute;
-    right: var(--xmlui-space-1, 0.25rem);
-    top: 50%;
-    transform: translateY(-50%);
-    display: inline-flex;
-    width: 1rem;
-    height: 1rem;
-    align-items: center;
-    justify-content: center;
-    color: var(--xmlui-color-danger-500);
-  }
-
-  .selectConciseValidationFeedback [data-icon-name="error"]::before {
-    content: "!";
-  }
-
-  .selectConciseValidationFeedback [data-icon-name="checkmark"]::before {
-    content: "✓";
-    color: var(--xmlui-color-success-500);
-  }
-
-  .selectValidationTooltip {
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    right: 0;
-    z-index: calc(var(--xmlui-zIndex-Select, 10) + 2);
-    white-space: nowrap;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--xmlui-borderRadius);
-    background: var(--xmlui-color-surface-900);
-    color: var(--xmlui-color-surface-0);
-  }
-
-  .selectValidationMessage {
-    color: var(--xmlui-textColor-error-FormItem, var(--xmlui-color-danger-500));
-    font-size: var(--xmlui-fontSize-error-FormItem, var(--xmlui-fontSize-sm));
-  }
-
-  .selectTrigger:disabled {
-    cursor: not-allowed;
-    opacity: var(--xmlui-opacity-Select--disabled, 0.65);
-  }
-
-  .selectPopover {
+  .badgeList {
     position: relative;
-    min-width: 100%;
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
 
-  .selectOptions {
-    box-sizing: border-box;
+  .inputWrapper {
+    display: flex;
+    align-items: center;
+    min-width: fit-content;
+    flex: 1;
+    gap: t.$space-1;
+  }
+
+  .badge {
+    width: fit-content;
+    height: fit-content;
+    min-width: 0;
+    padding: $paddingVertical-Select-badge $paddingHorizontal-Select-badge;
+    transition: color 0.2s, background-color 0.2s;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: t.$space-1;
+    justify-content: center;
+    align-items: center;
+    border-radius: $borderRadius-Select-badge;
+    font-size: $fontSize-Select-badge;
+    background-color: $backgroundColor-Select-badge;
+    color: $textColor-Select-badge;
+
+    &:hover {
+      background-color: $backgroundColor-Select-badge--hover;
+      color: $textColor-Select-badge--hover;
+    }
+
+    &:active {
+      background-color: $backgroundColor-Select-badge--active;
+      color: $textColor-Select-badge--active;
+    }
+  }
+
+  /**
+   * Search input and dropdown for searchable/multi-select
+   */
+
+  .selectContent {
+    outline: none;
+    overflow: auto;
+    max-height: 280px;
+    background-color: $backgroundColor-menu-Select;
+    border-radius: $borderRadius-menu-Select;
+    box-shadow: $boxShadow-menu-Select;
+    border: $borderWidth-menu-Select solid $borderColor-menu-Select;
+    // Apply default variant fontSize (dropdown is portaled so needs explicit fontSize)
+    font-size: $fontSize-Select;
+    
+    // Apply variant-specific fontSize for dropdown
+    &.error {
+      font-size: $fontSize-Select--error;
+    }
+    
+    &.warning {
+      font-size: $fontSize-Select--warning;
+    }
+    
+    &.valid {
+      font-size: $fontSize-Select--success;
+    }
+  }
+
+  .command {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    min-width: 100%;
-    max-height: var(--xmlui-dropdownHeight-Select, 16rem);
+    overflow: hidden;
+  }
+
+  .commandInputContainer {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid t.$borderColor;
+    flex-shrink: 0;
+  }
+
+  .commandInput {
+    width: 100%;
+    background-color: transparent;
+    outline: none;
+    padding: t.$space-2;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+    &:focus-within {
+      outline: none;
+    }
+  }
+
+  .commandList {
+    width: 100%;
+    flex: 1;
     overflow: auto;
-    border: var(--xmlui-borderWidth-Select) var(--xmlui-borderStyle-Select) var(--xmlui-borderColor-Select);
-    border-radius: var(--xmlui-borderRadius-Select);
-    background-color: var(--xmlui-backgroundColor-Select);
-    box-shadow: var(--xmlui-boxShadow-Select);
-    z-index: var(--xmlui-zIndex-Select, 10);
   }
 
-  .selectSearch {
-    box-sizing: border-box;
-    width: 100%;
-    padding: var(--xmlui-paddingVertical-Select, 0.25rem) var(--xmlui-paddingHorizontal-Select, 0.5rem);
-    border: 0;
-    border-bottom: var(--xmlui-borderWidth-Select) var(--xmlui-borderStyle-Select) var(--xmlui-borderColor-Select);
-    font: inherit;
+  /**
+   * Group header for grouped options
+   */
+  .groupHeader {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    font-weight: t.$fontWeight-bold;
+    opacity: 0.7;
   }
 
-  .selectStatus,
-  .selectEmpty,
-  .selectGroupHeader {
-    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
-    color: var(--xmlui-textColor-Select);
-  }
-
-  .selectGroupHeader {
-    font-weight: var(--xmlui-fontWeight-groupHeader-Select, 600);
-    background-color: var(--xmlui-backgroundColor-groupHeader-Select, var(--xmlui-color-surface-100));
-  }
-
-  .selectScrollUpButton,
-  .selectScrollDownButton {
-    flex: 0 0 0.5rem;
-    min-height: 0.5rem;
-    background-color: var(--xmlui-backgroundColor-scrollIndicator-Select, transparent);
-    pointer-events: none;
-  }
-
-  .selectOption {
-    box-sizing: border-box;
-    width: 100%;
-    padding: var(--xmlui-paddingVertical-option-Select, 0.35rem) var(--xmlui-paddingHorizontal-option-Select, 0.5rem);
-    border: 0;
-    background-color: var(--xmlui-backgroundColor-option-Select, transparent);
-    color: var(--xmlui-textColor-Select);
-    font: inherit;
-    text-align: left;
+  /**
+   * MultiSelectOption component (used in searchable/multi-select dropdown)
+   */
+  .multiSelectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    display: flex;
+    gap: t.$space-1;
+    align-items: center;
+    justify-content: space-between;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: $backgroundColor-item-Select;
+    min-height: $minHeight-item-Select;
+
+    .multiSelectOptionContent {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &[aria-selected="true"] {
+      background-color: $backgroundColor-item-Select--active;
+    }
+
+    &:hover,
+    &.highlighted {
+      background-color: $backgroundColor-item-Select--hover;
+    }
+
+    &[data-selected=true] {
+      background-color: $backgroundColor-item-Select--active;
+    }
+
+    &[aria-disabled="true"],
+    &.disabledOption {
+      pointer-events: none;
+      cursor: not-allowed;
+      color: $textColor-item-Select--disabled;
+      font-style: italic;
+    }
+
+    &[data-disabled=true] {
+      pointer-events: none;
+      opacity: $opacity-text-item-Select--disabled;
+      cursor: not-allowed;
+      font-style: italic;
+    }
   }
 
-  .selectOption:hover,
-  .selectOption:focus,
-  .selectOptionActive {
-    background-color: var(--xmlui-backgroundColor-option-Select--hover, var(--xmlui-color-surface-100));
+  // =============================================================================
+  // SIMPLE SELECT (non-searchable, single select using Radix UI)
+  // =============================================================================
+
+  /**
+   * Trigger value display for SimpleSelect
+   */
+  .selectValue {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    outline: none;
+    background-color: transparent;
+    // Inherit font-size from parent .selectTrigger which has variant-specific fontSize
   }
 
-  .selectOption:disabled {
-    cursor: not-allowed;
-    opacity: var(--xmlui-opacity-option-Select--disabled, 0.65);
+  /**
+   * Dropdown content container
+   */
+  .selectDropdownContent {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: $backgroundColor-menu-Select;
+    border-radius: $borderRadius-menu-Select;
+    box-shadow: $boxShadow-menu-Select;
+    border: $borderWidth-menu-Select solid $borderColor-menu-Select;
+
+    &[data-state='open'] {
+      animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
+    }
+
+    &[data-state='closed'] {
+      animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
+    }
+
+    &[data-side='bottom'] {
+      animation: slideInFromTop 0.08s ease-in-out;
+      transform: translateY(0.15rem);
+    }
+
+    &[data-side='left'] {
+      animation: slideInFromRight $animDuration ease-in-out;
+      transform: translateX(-0.15rem);
+    }
+
+    &[data-side='right'] {
+      animation: slideInFromLeft $animDuration ease-in-out;
+      transform: translateX(0.15rem);
+    }
+
+    &[data-side='top'] {
+      animation: slideInFromBottom $animDuration ease-in-out;
+      transform: translateY(-0.15rem);
+    }
   }
 
-  .selectOptionSelected {
-    background-color: var(--xmlui-backgroundColor-option-Select--selected, var(--xmlui-color-primary-100));
+  .selectViewport {
+    width: 100%;
+    min-height: 0;
   }
 
-  .nativeMirror {
-    display: none;
+  .selectScrollUpButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    flex-shrink: 0;
   }
+
+  .selectScrollDownButton {
+    display: flex;
+    cursor: default;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .selectEmpty {
+    display: flex;
+    height: 100%;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    font-size: t.$fontSize;
+    gap: t.$space-4;
+    width: 100%;
+  }
+
+  /**
+   * SelectOption component (used in SimpleSelect dropdown)
+   */
+  .selectOption {
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+    transition: background-color 0.2s ease;
+    background-color: $backgroundColor-item-Select;
+    gap: t.$space-1;
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    outline: none;
+    justify-content: space-between;
+    min-height: $minHeight-item-Select;
+
+    &[data-state=checked] {
+      background-color: $backgroundColor-item-Select--active;
+    }
+
+    &[data-highlighted] {
+      background-color: $backgroundColor-item-Select--hover;
+    }
+
+    .selectOptionContent {
+      display: flex;
+      flex: 1;
+      cursor: pointer;
+      user-select: none;
+      align-items: center;
+      outline: none;
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: $opacity-text-item-Select--disabled;
+      cursor: not-allowed;
+      font-style: italic;
+    }
+  }
+
+  .selectOptionIndicator {
+    display: flex;
+    margin-inline-end: 0.5rem;
+    flex-shrink: 0;
+    height: 0.875rem;
+    width: 0.875rem;
+    align-items: center;
+    justify-content: center;
+    color: $textColor-indicator-Select;
+  }
+
+  // =============================================================================
+  // UTILITY CLASSES
+  // =============================================================================
+
+  .loading {
+    padding: 0.5rem 1rem;
+  }
+
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes zoomIn {
+    from {
+      transform: scale(0.95);
+    }
+
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes zoomOut {
+    from {
+      transform: scale(1);
+    }
+
+    to {
+      transform: scale(0.95);
+    }
+  }
+
+  @keyframes slideInFromTop {
+    from {
+      transform: translateY(-0.75rem);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(0.75rem);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -741,7 +741,13 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async toggleOptionsVisibility(): Promise<void> {
-    await this.component.getByRole("combobox").or(this.component.locator("button")).first().click({ force: true });
+    await this.component
+      .getByRole("combobox")
+      .or(this.component.locator("button"))
+      .or(this.component.locator(":scope[role='combobox']"))
+      .or(this.component.locator(":scope button"))
+      .first()
+      .click({ force: true });
   }
 
   async selectLabel(value: string): Promise<void> {

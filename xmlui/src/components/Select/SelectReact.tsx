@@ -3,754 +3,1110 @@ import {
   memo,
   useCallback,
   useEffect,
-  useImperativeHandle,
-  useId,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
-  isValidElement,
   type ReactNode,
 } from "react";
-
-import { defaultProps } from "./Select.defaults";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import classnames from "classnames";
 import styles from "./Select.module.scss";
-import type { XmluiOption } from "../Option/OptionReact";
-import { useFormContext } from "../Form/FormContext";
-import { isTopLayer, registerLayer } from "../layerStack";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
-export type SelectValue = string | number | Array<string | number> | undefined | null;
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useEvent } from "../../components-core/utils/misc";
+import type { Option, ValidationStatus } from "../abstractions";
+import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { ThemedIcon } from "../Icon/Icon";
+import { SelectContext, useSelect } from "./SelectContext";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { HiddenOption } from "./HiddenOption";
+import { SimpleSelect } from "./SimpleSelect";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { Part } from "../Part/Part";
+import { defaultProps, type SelectVariant } from "./Select.defaults";
+import { OptionContext } from "./OptionContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { useAppContext } from "../../components-core/AppContext";
 
-export type SelectApi = {
-  focus: () => void;
-  reset: () => void;
-  setValue: (value: SelectValue) => void;
-  value: SelectValue;
-};
+import {
+  PART_LIST_WRAPPER,
+  PART_CLEAR_BUTTON,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+} from "../../components-core/parts";
 
-export type SelectProps = {
+const INTRINSIC_HEIGHT_KEYWORDS = new Set([
+  "fit-content",
+  "auto",
+  "min-content",
+  "max-content",
+  "none",
+]);
+
+export function isIntrinsicHeightKeyword(value?: CSSProperties["height"]): boolean {
+  return typeof value === "string" && INTRINSIC_HEIGHT_KEYWORDS.has(value);
+}
+
+export type { SelectVariant } from "./Select.defaults";
+
+export type SingleValueType = string | number;
+export type ValueType = SingleValueType | SingleValueType[];
+
+// Core Select component props
+interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBlur"> {
+  // Basic props
   id?: string;
-  bindTo?: string;
-  label?: string;
-  labelPosition?: string;
-  labelBreak?: boolean;
-  labelWidth?: string | number;
-  validationStatus?: string;
-  requireLabelMode?: string;
-  verboseValidationFeedback?: boolean;
-  validationMode?: string;
-  initialValue?: SelectValue;
-  value?: SelectValue;
+  initialValue?: ValueType;
+  value?: ValueType;
   enabled?: boolean;
   placeholder?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
+
+  // Styling
+  contentClassName?: string;
+  classes?: Record<string, string>;
+  dropdownHeight?: CSSProperties["height"];
+  scrollIndicators?: boolean;
+
+  // Validation
+  validationStatus?: ValidationStatus;
+
+  // Visual variant — `outlined` swaps the default border color for the shared
+  // `borderColor-outlined` token so the input matches an outlined Button.
+  variant?: SelectVariant;
+
+  // Event handlers
+  onDidChange?: (newValue: ValueType) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+
+  // Multi-select and search
+  searchable?: boolean;
   multiSelect?: boolean;
   clearable?: boolean;
-  searchable?: boolean;
+
+  // Templates and renderers (legacy - kept for compatibility)
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
+  emptyListTemplate?: ReactNode;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
+
+  // Progress state
   inProgress?: boolean;
   inProgressNotificationMessage?: string;
-  dropdownHeight?: string | number;
+
+  // Grouping
   groupBy?: string;
-  scrollIndicators?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  options?: XmluiOption[];
-  popupChildren?: ReactNode;
-  emptyListTemplate?: ReactNode;
-  valueTemplateRenderer?: (contextValues: Record<string, unknown>, key?: string | number) => ReactNode;
-  groupHeaderTemplateRenderer?: (contextValues: Record<string, unknown>, key?: string | number) => ReactNode;
-  ungroupedHeaderTemplateRenderer?: (contextValues: Record<string, unknown>, key?: string | number) => ReactNode;
-  onDidChange?: (value: SelectValue) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  groupHeaderRenderer?: (contextVars: Record<string, any>) => ReactNode;
+  ungroupedHeaderRenderer?: () => ReactNode;
+
+  // Data-driven options (alternative to Option children)
+  data?: any[];
+  valueField?: string;
+  labelField?: string;
+
+  // Internal
+  updateState?: UpdateStateFn;
+  registerComponentApi?: RegisterComponentApiFn;
+  children?: ReactNode;
+  modal?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
+}
+
+// Common trigger value display props
+interface SelectTriggerValueProps {
+  placeholder: string;
+  readOnly: boolean;
+  multiSelect: boolean;
+  selectedOptions: Option[];
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
+  toggleOption: (value: SingleValueType) => void;
+}
+
+// Common trigger value display component
+const SelectTriggerValue = ({
+  placeholder,
+  readOnly,
+  multiSelect,
+  selectedOptions,
+  valueRenderer,
+  toggleOption,
+}: SelectTriggerValueProps) => {
+  if (selectedOptions.length) {
+    if (multiSelect) {
+      return (
+        <div className={styles.badgeListContainer}>
+          <div className={styles.badgeList}>
+            {selectedOptions.map((option) =>
+              valueRenderer ? (
+                valueRenderer(option, () => {
+                  if (!readOnly) toggleOption(option.value);
+                })
+              ) : (
+                <span key={option.value} className={styles.badge}>
+                  {option.label}
+                  <ThemedIcon
+                    name="close"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (!readOnly) toggleOption(option.value);
+                    }}
+                  />
+                </span>
+              ),
+            )}
+          </div>
+        </div>
+      );
+    } else {
+      // Single-select mode: use valueRenderer if provided, otherwise use default label display
+      if (valueRenderer) {
+        return valueRenderer(selectedOptions[0], () => {
+          if (!readOnly) toggleOption(selectedOptions[0].value);
+        });
+      }
+      return <div className={styles.selectValue}>{selectedOptions[0]?.label}</div>;
+    }
+  }
+
+  return (
+    <span placeholder={placeholder} className={styles.placeholder}>
+      {placeholder}
+    </span>
+  );
 };
 
-export const SelectNative = memo(forwardRef<SelectApi, SelectProps>(function SelectNative(
+// Common trigger actions (clear button + chevron)
+interface SelectTriggerActionsProps {
+  value: ValueType;
+  multiSelect: boolean;
+  enabled: boolean;
+  readOnly: boolean;
+  clearValue: () => void;
+  showChevron?: boolean;
+  clearable: boolean;
+  validationIcon?: string | null;
+  validationStatus: ValidationStatus;
+  invalidMessages: string[];
+  finalValidationIconSuccess: string;
+  finalValidationIconError: string;
+  finalVerboseValidationFeedback: boolean;
+}
+
+const SelectTriggerActions = ({
+  value,
+  multiSelect,
+  enabled,
+  readOnly,
+  clearable,
+  clearValue,
+  showChevron = true,
+  validationStatus,
+  invalidMessages,
+  finalValidationIconSuccess,
+  finalValidationIconError,
+  finalVerboseValidationFeedback,
+}: SelectTriggerActionsProps) => {
+  const hasValue = multiSelect
+    ? Array.isArray(value) && value.length > 0
+    : value !== undefined && value !== null && value !== "";
+
+  return (
+    <div className={styles.actions}>
+      {hasValue && enabled && !readOnly && clearable && (
+        <Part partId={PART_CLEAR_BUTTON}>
+          <span
+            className={styles.action}
+            onClick={(event) => {
+              event.stopPropagation();
+              clearValue();
+            }}
+          >
+            <ThemedIcon name="close" />
+          </span>
+        </Part>
+      )}
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </Part>
+      )}
+      {showChevron && (
+        <span
+          className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
+          aria-disabled={!enabled || readOnly}
+        >
+          <ThemedIcon name="chevrondown" />
+        </span>
+      )}
+    </div>
+  );
+};
+
+export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
-    id,
-    bindTo,
-    label,
-    labelPosition = "top",
-    labelBreak = defaultProps.labelBreak,
-    labelWidth,
-    validationStatus,
-    requireLabelMode,
-    verboseValidationFeedback,
-    validationMode,
+    // Basic props
+    id: idProp,
     initialValue,
-    value: controlledValue,
+    value,
     enabled = defaultProps.enabled,
     placeholder = defaultProps.placeholder,
     autoFocus = defaultProps.autoFocus,
-    readOnly = defaultProps.readOnly,
+    readOnly = false,
     required = defaultProps.required,
+
+    // Styling
+    style,
+    className,
+    contentClassName,
+    classes,
+    dropdownHeight,
+    scrollIndicators,
+
+    // Validation
+    validationStatus = defaultProps.validationStatus,
+
+    // Visual variant
+    variant = defaultProps.variant,
+
+    // Event handlers
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+
+    // Multi-select and search
+    searchable = defaultProps.searchable,
     multiSelect = defaultProps.multiSelect,
     clearable = defaultProps.clearable,
-    searchable = defaultProps.searchable,
+
+    emptyListTemplate,
+    valueRenderer,
+    optionRenderer,
+
+    // Progress state
     inProgress = defaultProps.inProgress,
     inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
-    dropdownHeight,
+
+    // Grouping
     groupBy,
-    scrollIndicators = true,
-    className,
-    style,
-    options = [],
-    popupChildren,
-    emptyListTemplate,
-    valueTemplateRenderer,
-    groupHeaderTemplateRenderer,
-    ungroupedHeaderTemplateRenderer,
-    onDidChange,
-    onFocus,
-    onBlur,
-    "data-testid": dataTestId,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
+
+    // Data-driven options
+    data,
+    valueField = "value",
+    labelField = "label",
+
+    // Internal
+    updateState = noop,
+    registerComponentApi,
+    children,
+    modal = defaultProps.modal,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
+
     ...rest
   },
-  ref,
+  forwardedRef,
 ) {
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const generatedId = useId();
-  const triggerId = id ?? generatedId;
-  const fieldName = useMemo(() => {
-    if (!bindTo) {
-      return undefined;
-    }
-    return form?.fieldPrefix ? `${form.fieldPrefix}.${bindTo}` : bindTo;
-  }, [bindTo, form?.fieldPrefix]);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const layerIdRef = useRef<symbol>(Symbol("Select"));
-  const normalizedInitialValue = useMemo(
-    () => normalizeValue(initialValue, multiSelect),
-    [initialValue, multiSelect],
+  const id = useFormItemInputId(idProp);
+  const appContext = useAppContext();
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const composedTriggerRef = useComposedRefs(
+    setReferenceElement as React.RefCallback<HTMLElement>,
+    forwardedRef,
   );
-  const normalizedInitialValueKey = stableValueKey(normalizedInitialValue);
-  const optionsKey = useMemo(
-    () => options.map((option) => `${String(option.value ?? "")}:${option.enabled === false ? "0" : "1"}`).join("\u0000"),
-    [options],
-  );
-  const [internalValue, setInternalValue] = useState<SelectValue>(normalizedInitialValue);
+  const ariaLabelRef = useRef("");
+  if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+    ariaLabelRef.current = (rest as any)["aria-label"] || "";
+  }
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [panelWidth, setPanelWidth] = useState(0);
+  const observer = useRef<ResizeObserver>();
+  const { root } = useTheme();
+  const [options, setOptions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [validationTooltipVisible, setValidationTooltipVisible] = useState(false);
-  const formValue = fieldName !== undefined ? getFormValue?.(fieldName) as SelectValue : undefined;
-  const currentValue = formValue !== undefined
-    ? normalizeValue(formValue, multiSelect)
-    : controlledValue === undefined
-    ? internalValue
-    : normalizeValue(controlledValue, multiSelect);
-  const currentValueRef = useRef<SelectValue>(currentValue);
-  currentValueRef.current = currentValue;
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  useEffect(() => {
-    setInternalValue(normalizedInitialValue);
-  }, [normalizedInitialValueKey]);
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      required,
-      sanitizeSubmitValue: (submittedValue) => sanitizeSelectSubmitValue(
-        submittedValue as SelectValue,
-        options,
-        multiSelect,
-      ),
+  // When `data` is provided, derive options directly from the array — bypassing the
+  // Option-children registration cycle entirely. `useMemo` ensures the derived array
+  // is only recomputed when `data`, `valueField`, or `labelField` changes, so unrelated
+  // parent state updates (e.g. typing in another form field) never trigger option work.
+  const dataOptions = useMemo<Option[] | null>(() => {
+    if (!data) return null;
+    const items = Array.isArray(data) ? data : Object.values(data);
+    return items.map((item) => {
+      if (item === null || typeof item !== "object") {
+        return { value: String(item), label: String(item) };
+      }
+      return { value: item[valueField], label: item[labelField] };
     });
-  }, [fieldName, multiSelect, optionsKey, registerFormItem, required]);
+  }, [data, valueField, labelField]);
 
-  useEffect(() => {
-    if (!setFormValue || fieldName === undefined) {
-      return;
+  // effectiveOptions is the single source of truth for option lookups.
+  // Uses data-derived options when available, falling back to child-registered options.
+  const effectiveOptions: Option[] = dataOptions ?? options;
+
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
     }
-    const validOptionValues = new Set(options.map((option) => String(option.value ?? "")));
-    const sourceValue = formValue !== undefined ? formValue : normalizedInitialValue;
-    if (multiSelect) {
-      const filtered = normalizeArrayValue(sourceValue).filter((item) => validOptionValues.has(String(item)));
-      const hadValues = normalizeArrayValue(sourceValue).length > 0;
-      if (filtered.length > 0 || hadValues) {
-        const nextValue = filtered.length > 0 ? filtered : undefined;
-        if (stableValueKey(formValue) !== stableValueKey(nextValue as SelectValue)) {
-          setFormValue(fieldName, nextValue);
-        }
+  }
+
+  const selectedOptions = useMemo(() => {
+    if (!multiSelect) {
+      return effectiveOptions.filter((option) => `${option.value}` === `${value}`);
+    } else {
+      return Array.isArray(value)
+        ? effectiveOptions.filter((option) => value.map((v) => String(v)).includes(String(option.value)))
+        : [];
+    }
+  }, [multiSelect, effectiveOptions, value]);
+
+  const popoverContentStyle = useMemo(
+    // Intrinsic keywords like "fit-content" / "auto" / "min-content" / "max-content"
+    // collapse to 0 inside a fixed-position flex Portal when applied as max-height.
+    // Apply them to `height` instead so the popover sizes to its content.
+    () => isIntrinsicHeightKeyword(dropdownHeight)
+      ? { minWidth: panelWidth, height: dropdownHeight }
+      : { minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" as const },
+    [panelWidth, dropdownHeight],
+  );
+
+  // Use initialValue as fallback when value is undefined
+  // This ensures the component displays the initial value immediately on first render
+  const currentValue = value !== undefined ? value : initialValue;
+
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return Array.from(effectiveOptions);
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    return Array.from(effectiveOptions).filter((option) => {
+      const extendedValue =
+        option.value + " " + option.label + " " + (option.keywords || []).join(" ");
+      return extendedValue.toLowerCase().includes(searchLower);
+    });
+  }, [effectiveOptions, searchTerm]);
+
+  // Group options if groupBy is provided
+  const groupedOptions = useMemo(() => {
+    if (!groupBy) return null;
+
+    const optionsToGroup = searchTerm ? filteredOptions : Array.from(effectiveOptions);
+
+    // Early return if no options to group - prevents empty dropdown issue
+    if (optionsToGroup.length === 0) return null;
+
+    const groups: Record<string, Option[]> = {};
+
+    optionsToGroup.forEach((option) => {
+      // Use nullish coalescing to properly handle falsy values like 0, "", or false
+      const groupKey = (option as any)[groupBy] ?? "Ungrouped";
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
       }
-      return;
-    }
-    if (sourceValue === undefined || sourceValue === null || sourceValue === "") {
-      return;
-    }
-    if (validOptionValues.has(String(sourceValue))) {
-      if (formValue === undefined) {
-        setFormValue(fieldName, sourceValue);
-      }
-      return;
-    }
-    if (formValue !== null) {
-      setFormValue(fieldName, null);
-    }
-  }, [
-    fieldName,
-    formValue,
-    multiSelect,
-    normalizedInitialValue,
-    optionsKey,
-    options,
-    setFormValue,
-  ]);
+      groups[groupKey].push(option);
+    });
 
-  const updateValue = useCallback((nextValue: SelectValue) => {
-    currentValueRef.current = nextValue;
-    setInternalValue(nextValue);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextValue);
-      void validateFormField?.(fieldName, nextValue);
+    // Sort groups to put "Ungrouped" first
+    const sortedGroups: Record<string, Option[]> = {};
+    if (groups["Ungrouped"]) {
+      sortedGroups["Ungrouped"] = groups["Ungrouped"];
     }
-    void onDidChange?.(nextValue);
-  }, [fieldName, onDidChange, setFormValue, validateFormField]);
+    Object.keys(groups)
+      .filter((key) => key !== "Ungrouped")
+      .sort()
+      .forEach((key) => {
+        sortedGroups[key] = groups[key];
+      });
 
-  useImperativeHandle(ref, () => ({
-    focus: () => triggerRef.current?.focus(),
-    reset: () => {
-      setOpen(false);
-      updateValue(normalizedInitialValue);
-    },
-    setValue: (nextValue) => {
-      updateValue(normalizeValue(nextValue, multiSelect));
-    },
-    get value() {
-      return currentValue;
-    },
-  }), [currentValue, multiSelect, normalizedInitialValue, updateValue]);
+    // Return null if no groups have any options
+    return Object.keys(sortedGroups).length > 0 ? sortedGroups : null;
+  }, [groupBy, effectiveOptions, filteredOptions, searchTerm]);
 
+  // Create a flat list from grouped options for keyboard navigation
+  const flattenedGroupedOptions = useMemo(() => {
+    if (!groupedOptions) return null;
+
+    const flattened: Option[] = [];
+    Object.entries(groupedOptions).forEach(([_, groupOptions]) => {
+      flattened.push(...groupOptions);
+    });
+    return flattened;
+  }, [groupedOptions]);
+
+  // Reset selected index when options change or dropdown closes
   useEffect(() => {
     if (!open) {
-      return;
+      setSelectedIndex(-1);
+      setSearchTerm("");
     }
-    const unregisterLayer = registerLayer(layerIdRef.current);
-    const onPointerDown = (event: PointerEvent) => {
-      if (!isTopLayer(layerIdRef.current)) {
-        return;
-      }
-      if ((event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
-        return;
-      }
-      if ((event.target as Element | null)?.closest("[data-xmlui-confirm-layer]")) {
-        return;
-      }
-      if (rootRef.current?.contains(event.target as Node)) {
-        return;
-      }
-      (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
-      window.setTimeout(() => setOpen(false), 0);
-    };
-    window.addEventListener("pointerdown", onPointerDown, true);
-    return () => {
-      unregisterLayer();
-      window.removeEventListener("pointerdown", onPointerDown, true);
-    };
   }, [open]);
 
-  const selectedValues = useMemo(
-    () => multiSelect
-      ? normalizeArrayValue(currentValue).map(String)
-      : [String(currentValue ?? "")],
-    [currentValue, multiSelect],
-  );
-  const selectedOptions = useMemo(
-    () => options.filter((option) => selectedValues.includes(String(option.value ?? ""))),
-    [options, selectedValues],
-  );
-  const filteredOptions = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!searchable || !term) {
-      return options;
+  // Set initial state based on the initialValue prop
+  useEffect(() => {
+    if (initialValue !== undefined) {
+      updateState({ value: initialValue }, { initial: true });
     }
-    return options.filter((option) => {
-      const haystack = [
-        String(option.value ?? ""),
-        option.searchText ?? optionText(option),
-        ...(option.keywords ?? []),
-      ].join(" ").toLowerCase();
-      return haystack.includes(term);
-    });
-  }, [options, searchable, searchTerm]);
-  const visibleOptions = readOnly ? selectedOptions : filteredOptions;
-  const groupedVisibleItems = useMemo(
-    () => groupedItems(visibleOptions, groupBy, groupHeaderTemplateRenderer, ungroupedHeaderTemplateRenderer),
-    [groupBy, groupHeaderTemplateRenderer, ungroupedHeaderTemplateRenderer, visibleOptions],
-  );
-  const displayText = selectedOptions.length > 0
-    ? selectedOptions.map((option) => optionText(option)).join(", ")
-    : placeholder;
-  const hasSelection = multiSelect ? selectedValues.length > 0 : selectedValues[0] !== "";
-  const showClearButton = clearable && hasSelection && enabled && !readOnly;
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    required && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-  const validationMessage = fieldName ? form?.errors[fieldName] : undefined;
-  const effectiveVerboseValidation = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const validAfterChange =
-    validationMode === "onChanged" &&
-    !validationMessage &&
-    required &&
-    (multiSelect ? selectedValues.length > 0 : selectedValues[0] !== "");
-  const showConciseValidation = !effectiveVerboseValidation && (Boolean(validationMessage) || validAfterChange);
+  }, [initialValue, updateState]);
 
-  const selectOption = useCallback((option: XmluiOption) => {
-    if (readOnly || !enabled || !option.enabled) {
-      return;
-    }
-    const optionValue = String(option.value ?? "");
-    if (multiSelect) {
-      const current = new Set(normalizeArrayValue(currentValueRef.current).map(String));
-      if (current.has(optionValue)) {
-        current.delete(optionValue);
-      } else {
-        current.add(optionValue);
+  // When inside a form, clear the value if it does not match any loaded option.
+  // This aligns with native <select> semantics: an invalid value becomes no selection.
+  // The check runs once — after both options are non-empty AND the value is set — so
+  // option-list changes or delayed form initialization cannot cause spurious clears.
+  const isInsideForm = useIsInsideForm();
+  const hasValidatedInitialValueRef = useRef(false);
+  useEffect(() => {
+    if (!isInsideForm) return;
+    if (hasValidatedInitialValueRef.current) return;
+    if (effectiveOptions.length === 0) return;
+    // Wait until the form has actually provided a concrete value (not just "not yet set")
+    if (value === undefined || value === null) return;
+
+    hasValidatedInitialValueRef.current = true;
+
+    if (!multiSelect) {
+      if (value !== "") {
+        const isValid = effectiveOptions.some((opt) => `${opt.value}` === `${value}`);
+        if (!isValid) {
+          // Use formOnly:true so the form field is cleared without updating the
+          // component's own display state. Updating to undefined would cause
+          // SimpleSelect (Radix) to transition to uncontrolled mode and fire
+          // onValueChange("") which would immediately overwrite the cleared value.
+          updateState({ value: undefined }, { formOnly: true });
+        }
       }
-      updateValue([...current]);
-      return;
+    } else {
+      if (Array.isArray(value) && value.length > 0) {
+        const validValues = value.filter((v) =>
+          effectiveOptions.some((opt) => String(opt.value) === String(v)),
+        );
+        if (validValues.length !== value.length) {
+          updateState({ value: validValues });
+        }
+      }
     }
-    updateValue(selectValueForOption(option));
-    setOpen(false);
-  }, [enabled, multiSelect, readOnly, updateValue]);
+  }, [isInsideForm, effectiveOptions, value, multiSelect, updateState]);
 
-  const clearSelection = useCallback(() => {
-    updateValue(multiSelect ? [] : null);
-    setOpen(false);
-    setActiveIndex(-1);
-    setSearchTerm("");
-  }, [multiSelect, updateValue]);
+  // Observe the size of the reference element
+  useEffect(() => {
+    const current = referenceElement;
+    const currentObserver = observer.current;
+    currentObserver?.disconnect();
 
-  const moveActive = useCallback((offset: number) => {
-    if (!open) {
-      setOpen(true);
+    if (current) {
+      const newObserver = new ResizeObserver(() => setPanelWidth(current.clientWidth));
+      observer.current = newObserver;
+      newObserver.observe(current);
+
+      return () => {
+        newObserver.disconnect();
+      };
     }
-    const enabledIndexes = visibleOptions
-      .map((option, index) => option.enabled ? index : -1)
-      .filter((index) => index >= 0);
-    if (enabledIndexes.length === 0) {
-      return;
+
+    return () => {
+      currentObserver?.disconnect();
+    };
+  }, [referenceElement]);
+
+  // Handle option selection
+  const toggleOption = useCallback(
+    (selectedValue: SingleValueType) => {
+      const newSelectedValue = multiSelect
+        ? Array.isArray(currentValue)
+          ? currentValue.map((v) => String(v)).includes(String(selectedValue))
+            ? currentValue.filter((v) => String(v) !== String(selectedValue))
+            : [...currentValue, selectedValue]
+          : [selectedValue]
+        : String(selectedValue) === String(currentValue)
+          ? null
+          : selectedValue;
+      updateState({ value: newSelectedValue });
+      onDidChange(newSelectedValue);
+      // Emit interaction + native trace events for option selection.
+      // The interaction event is needed because Radix Select handles selection
+      // internally without firing a DOM click that AppContent can capture.
+      // Gated on _xsLogs existence (proxy for xsVerbose) to avoid work when tracing is off.
+      if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+        const selectedOption = effectiveOptions.find((o) => String(o.value) === String(selectedValue));
+        const optionLabel = selectedOption?.label || String(selectedValue);
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: (window as any)._xsCurrentTrace,
+          kind: "interaction",
+          interaction: "click",
+          componentType: "Select",
+          componentLabel: optionLabel,
+          ariaRole: "option",
+          selectAriaLabel: ariaLabelRef.current,
+          ariaName: optionLabel,
+        });
+        pushXsLog(
+          createLogEntry("native:selection:change", {
+            component: "Select",
+            ariaName: ariaLabelRef.current || undefined,
+            displayLabel: optionLabel,
+            value: newSelectedValue,
+          }),
+        );
+      }
+      if (!multiSelect) {
+        setOpen(false);
+      }
+    },
+    [multiSelect, currentValue, updateState, onDidChange, effectiveOptions],
+  );
+
+  // Clear selected value
+  const clearValue = useCallback(() => {
+    const newValue = multiSelect ? [] : "";
+    updateState({ value: newValue });
+    onDidChange(newValue);
+  }, [multiSelect, updateState, onDidChange]);
+
+  // Helper functions to find next/previous enabled option
+  const findNextEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      // Use the appropriate options list based on grouping and search state
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+
+      if (optionsList.length === 0) return -1;
+
+      for (let i = currentIndex + 1; i < optionsList.length; i++) {
+        const item = optionsList[i];
+        if (item && item.enabled !== false) {
+          return i;
+        }
+      }
+      // Wrap around to beginning
+      for (let i = 0; i <= currentIndex; i++) {
+        const item = optionsList[i];
+        if (item && item.enabled !== false) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    [filteredOptions, flattenedGroupedOptions],
+  );
+
+  const findPreviousEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      // Use the appropriate options list based on grouping and search state
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+
+      if (optionsList.length === 0) return -1;
+
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        const item = optionsList[i];
+        if (item && item.enabled !== false) {
+          return i;
+        }
+      }
+      // Wrap around to end
+      for (let i = optionsList.length - 1; i >= currentIndex; i--) {
+        const item = optionsList[i];
+        if (item && item.enabled !== false) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    [filteredOptions, flattenedGroupedOptions],
+  );
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!open) return;
+
+      // Use the appropriate options list based on grouping and search state
+      // When groupBy is set, always use flattenedGroupedOptions to maintain correct order
+      const optionsList = flattenedGroupedOptions ? flattenedGroupedOptions : filteredOptions;
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const nextIndex = findNextEnabledIndex(prev);
+            return nextIndex !== -1 ? nextIndex : prev;
+          });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const prevIndex = findPreviousEnabledIndex(prev);
+            return prevIndex !== -1 ? prevIndex : prev;
+          });
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < optionsList.length) {
+            const selectedItem = optionsList[selectedIndex];
+            if (selectedItem && selectedItem.enabled !== false) {
+              toggleOption(selectedItem.value);
+              // Close dropdown after selecting in single-select mode
+              if (!multiSelect) {
+                setOpen(false);
+              }
+            }
+          }
+          break;
+        case "Escape":
+          event.preventDefault();
+          setOpen(false);
+          break;
+      }
+    },
+    [
+      open,
+      selectedIndex,
+      filteredOptions,
+      flattenedGroupedOptions,
+      toggleOption,
+      multiSelect,
+      findNextEnabledIndex,
+      findPreviousEnabledIndex,
+    ],
+  );
+
+  // Register component API for external interactions
+  const focus = useCallback(() => {
+    referenceElement?.focus();
+  }, [referenceElement]);
+
+  const setValue = useEvent((newValue: string) => {
+    toggleOption(newValue);
+  });
+
+  const reset = useEvent(() => {
+    if (initialValue !== undefined) {
+      updateState({ value: initialValue });
+      onDidChange(initialValue);
+    } else {
+      clearValue();
     }
-    const currentEnabledPosition = enabledIndexes.indexOf(activeIndex);
-    const nextPosition = currentEnabledPosition < 0
-      ? 0
-      : Math.max(0, Math.min(enabledIndexes.length - 1, currentEnabledPosition + offset));
-    setActiveIndex(enabledIndexes[nextPosition]);
-  }, [activeIndex, open, visibleOptions]);
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+      reset,
+    });
+  }, [focus, registerComponentApi, setValue, reset]);
+
+  // Render the "empty list" message
+  const emptyListNode = useMemo(
+    () =>
+      emptyListTemplate ?? (
+        <div className={styles.selectEmpty}>
+          <ThemedIcon name="noresult" />
+          <span>List is empty</span>
+        </div>
+      ),
+    [emptyListTemplate],
+  );
+
+  const onOptionAdd = useCallback((option: Option) => {
+    setOptions((prev) => [...prev, option]);
+  }, []);
+
+  const onOptionRemove = useCallback((option: Option) => {
+    setOptions((prev) => prev.filter((opt) => opt.value !== option.value));
+  }, []);
+
+  const selectContextValue = useMemo(
+    () => ({
+      multiSelect,
+      readOnly,
+      value: currentValue,
+      onChange: toggleOption,
+      setOpen,
+      setSelectedIndex,
+      highlightedValue:
+        selectedIndex >= 0 &&
+        selectedIndex < filteredOptions.length &&
+        filteredOptions[selectedIndex]
+          ? filteredOptions[selectedIndex].value
+          : undefined,
+      optionRenderer,
+    }),
+    [
+      multiSelect,
+      readOnly,
+      currentValue,
+      toggleOption,
+      selectedIndex,
+      filteredOptions,
+      optionRenderer,
+    ],
+  );
+
+  const optionContextValue = useMemo(
+    () => ({
+      onOptionAdd,
+      onOptionRemove,
+    }),
+    [onOptionAdd, onOptionRemove],
+  );
+
+  // Use SimpleSelect for non-searchable, single-select mode
+  const useSimpleSelect = !searchable && !multiSelect;
 
   return (
-    <div
-      {...rest}
-      ref={rootRef}
-      id={id}
-      data-xmlui-component="Select"
-      data-testid={dataTestId}
-      data-value={multiSelect ? selectedValues.join(",") : selectedValues[0] ?? ""}
-      className={cx(
-        styles.selectRoot,
-        label ? styles.selectRootWithLabel : undefined,
-        label ? labelPositionClass(labelPosition, (rest as { dir?: unknown }).dir) : undefined,
-        labelBreak ? styles.selectLabelBreak : undefined,
-        validationStatusClass(validationStatus),
-        className,
-      )}
-      style={style}
-      tabIndex={autoFocus ? -1 : undefined}
-    >
-      {label ? (
-        <label
-          className={styles.selectLabel}
-          htmlFor={triggerId}
-          style={labelWidth !== undefined ? { width: cssLength(labelWidth) } : undefined}
-        >
-          {label}
-          {showRequiredIndicator ? <span className={styles.selectRequiredIndicator}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.selectOptionalIndicator}>(Optional)</span> : null}
-        </label>
-      ) : null}
-      <button
-        ref={triggerRef}
-        id={triggerId}
-        type="button"
-        role="combobox"
-        aria-expanded={open}
-        aria-controls={id ? `${id}__options` : undefined}
-        aria-readonly={readOnly || undefined}
-        disabled={!enabled}
-        autoFocus={autoFocus}
-        className={styles.selectTrigger}
-        onClick={() => {
-          if (enabled) {
-            setOpen((visible) => {
-              const nextVisible = readOnly ? true : !visible;
-              if (nextVisible && activeIndex < 0) {
-                setActiveIndex(visibleOptions.findIndex((option) => option.enabled));
-              }
-              return nextVisible;
-            });
-          }
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            moveActive(1);
-            return;
-          }
-          if (event.key === "ArrowUp") {
-            event.preventDefault();
-            moveActive(-1);
-            return;
-          }
-          if (event.key === "Enter" && activeIndex >= 0) {
-            event.preventDefault();
-            selectOption(visibleOptions[activeIndex]);
-            return;
-          }
-          if (event.key === "Escape") {
-            event.preventDefault();
-            setOpen(false);
-          }
-        }}
-        onFocus={() => void onFocus?.()}
-        onBlur={() => void onBlur?.()}
-      >
-        {selectedOptions.length > 0 && valueTemplateRenderer
-          ? selectedOptions.map((option, index) => (
-            <span key={`${String(option.value ?? "")}:${index}`} className={styles.selectValueTemplate}>
-              {valueTemplateRenderer({
-                $item: option,
-                $itemIndex: index,
-                $itemContext: {
-                  removeItem: () => {
-                    if (multiSelect) {
-                      const next = normalizeArrayValue(currentValueRef.current)
-                        .map(String)
-                        .filter((value) => value !== String(option.value ?? ""));
-                      updateValue(next);
-                    } else {
-                      updateValue(null);
-                    }
-                  },
-                },
-              }, index)}
-            </span>
-          ))
-          : displayText}
-      </button>
-      {showClearButton ? (
-        <button
-          type="button"
-          className={styles.selectClearButton}
-          data-xmlui-part="clearButton"
-          data-part-id="clearButton"
-          aria-label="Clear selection"
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={clearSelection}
-        >
-          ×
-        </button>
-      ) : null}
-      {showConciseValidation ? (
-        <span
-          className={styles.selectConciseValidationFeedback}
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          onMouseEnter={() => setValidationTooltipVisible(true)}
-          onMouseLeave={() => setValidationTooltipVisible(false)}
-        >
-          <span data-icon-name={validationMessage ? "error" : "checkmark"} />
-          {validationTooltipVisible && validationMessage ? (
-            <span className={styles.selectValidationTooltip} data-tooltip-container="">
-              {validationMessage}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-      <select
-        aria-hidden="true"
-        tabIndex={-1}
-        className={styles.nativeMirror}
-        value={multiSelect ? selectedValues : selectedValues[0] ?? ""}
-        multiple={multiSelect}
-        disabled={!enabled}
-        required={required}
-        onChange={(event) => {
-          const nextValue = multiSelect
-            ? Array.from(event.currentTarget.selectedOptions).map((option) => option.value)
-            : event.currentTarget.value;
-          updateValue(nextValue);
-        }}
-      >
-        {!multiSelect && placeholder ? <option value="">{placeholder}</option> : null}
-        {options.map((option, index) => (
-          <option key={`${String(option.value ?? "")}:${index}`} value={String(option.value ?? "")} disabled={!option.enabled}>
-            {nativeMirrorText(option, open)}
-          </option>
-        ))}
-      </select>
-      {open ? (
-        <div
-          data-radix-popper-content-wrapper=""
-          className={styles.selectPopover}
-        >
-        <div
-          id={id ? `${id}__options` : undefined}
-          role="listbox"
-          data-state="open"
-          data-part-id="listWrapper"
-          data-xmlui-part="listWrapper"
-          data-radix-select-viewport=""
-          aria-multiselectable={multiSelect || undefined}
-          className={styles.selectOptions}
-          style={dropdownHeight !== undefined ? { maxHeight: cssLength(dropdownHeight) } : undefined}
-        >
-          {searchable ? (
-            <input
-              className={styles.selectSearch}
-              role="searchbox"
-              value={searchTerm}
-              autoFocus
-              onChange={(event) => {
-                setSearchTerm(event.currentTarget.value);
-                setActiveIndex(-1);
+    <SelectContext.Provider value={selectContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
+        {useSimpleSelect ? (
+          // SimpleSelect mode (Radix UI Select)
+          <SimpleSelect
+            ref={forwardedRef}
+            value={currentValue as SingleValueType}
+            onValueChange={(val) => toggleOption(val)}
+            id={id}
+            options={effectiveOptions}
+            style={style}
+            className={classnames(className, classes?.[COMPONENT_PART_KEY])}
+            contentClassName={contentClassName}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            enabled={enabled}
+            triggerRef={setReferenceElement}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
+            height={dropdownHeight}
+            panelWidth={panelWidth}
+            readOnly={readOnly}
+            emptyListNode={emptyListNode}
+            modal={modal}
+            groupBy={groupBy}
+            groupHeaderRenderer={groupHeaderRenderer}
+            ungroupedHeaderRenderer={ungroupedHeaderRenderer}
+            clearable={clearable}
+            onClear={clearValue}
+            valueRenderer={valueRenderer}
+            scrollIndicators={scrollIndicators}
+            validationStatus={validationStatus}
+            variant={variant}
+            invalidMessages={invalidMessages}
+            finalValidationIconSuccess={finalValidationIconSuccess}
+            finalValidationIconError={finalValidationIconError}
+            finalVerboseValidationFeedback={finalVerboseValidationFeedback}
+            {...rest}
+          >
+            {children}
+          </SimpleSelect>
+        ) : (
+          // Popover mode (searchable or multi-select)
+          <>
+            <Popover
+              open={open}
+              onOpenChange={(isOpen) => {
+                if (!enabled || readOnly) return;
+                setOpen(isOpen);
               }}
-            />
-          ) : null}
-          {searchable && inProgress && inProgressNotificationMessage ? (
-            <div className={styles.selectStatus}>{inProgressNotificationMessage}</div>
-          ) : null}
-          {visibleOptions.length === 0 ? (
-            emptyListTemplate ? <div className={styles.selectEmpty}>{emptyListTemplate}</div> : null
-          ) : null}
-          {scrollIndicators && visibleOptions.length > 5 ? (
-            <div className={styles.selectScrollUpButton} aria-hidden="true" />
-          ) : null}
-          {groupedVisibleItems.map((item, index) => {
-            if (item.kind === "header") {
-              return (
-                <div key={`header:${item.key}:${index}`} className={styles.selectGroupHeader}>
-                  {item.content}
-                </div>
-              );
-            }
-            const option = item.option;
-            const optionValue = String(option.value ?? "");
-            const selected = selectedValues.includes(optionValue);
-            return (
-              <button
-                key={`${optionValue}:${index}`}
-                data-testid={option.testId}
-                data-value={optionValue}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                aria-disabled={!option.enabled || undefined}
-                disabled={!option.enabled}
-                className={cx(
-                  styles.selectOption,
-                  selected ? styles.selectOptionSelected : undefined,
-                  index === activeIndex ? styles.selectOptionActive : undefined,
-                )}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => selectOption(option)}
-              >
-                {renderOptionLabel(option)}
-              </button>
-            );
-          })}
-          {popupChildren}
-          {scrollIndicators && visibleOptions.length > 5 ? (
-            <div className={styles.selectScrollDownButton} aria-hidden="true" />
-          ) : null}
+              modal={modal}
+            >
+              <Part partId={PART_LIST_WRAPPER}>
+                <PopoverTrigger
+                  {...(rest as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+                  ref={composedTriggerRef as React.Ref<HTMLButtonElement>}
+                  id={id}
+                  aria-haspopup="listbox"
+                  style={style}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  disabled={!enabled}
+                  aria-expanded={open}
+                  className={classnames(
+                    styles.selectTrigger,
+                    classes?.[COMPONENT_PART_KEY],
+                    className,
+                    styles[validationStatus],
+                    {
+                      [styles.outlined]: variant === "outlined",
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multiSelect,
+                    },
+                  )}
+                  role="combobox"
+                  onClick={(event) => {
+                    if (!enabled || readOnly) return;
+                    event.stopPropagation();
+                    setOpen((prev) => !prev);
+                  }}
+                  onKeyDown={(event) => {
+                    if (!enabled || readOnly) return;
+
+                    // Handle opening dropdown with keyboard
+                    if (
+                      !open &&
+                      (event.key === "ArrowDown" ||
+                        event.key === "ArrowUp" ||
+                        event.key === " " ||
+                        event.key === "Enter")
+                    ) {
+                      event.preventDefault();
+                      setOpen(true);
+                      // Set initial selectedIndex to first enabled option if options exist
+                      if (filteredOptions.length > 0) {
+                        const firstEnabledIndex = findNextEnabledIndex(-1);
+                        setSelectedIndex(firstEnabledIndex !== -1 ? firstEnabledIndex : 0);
+                      }
+                      return;
+                    }
+
+                    // Handle keyboard navigation when dropdown is open
+                    if (open) {
+                      handleKeyDown(event);
+                    }
+                  }}
+                  autoFocus={autoFocus}
+                >
+                  <SelectTriggerValue
+                    readOnly={readOnly}
+                    placeholder={placeholder}
+                    multiSelect={multiSelect}
+                    selectedOptions={selectedOptions}
+                    valueRenderer={valueRenderer}
+                    toggleOption={toggleOption}
+                  />
+                  <SelectTriggerActions
+                    value={currentValue}
+                    multiSelect={multiSelect}
+                    enabled={enabled}
+                    readOnly={readOnly}
+                    clearable={clearable}
+                    clearValue={clearValue}
+                    validationIcon={validationIcon}
+                    validationStatus={validationStatus}
+                    invalidMessages={invalidMessages}
+                    finalValidationIconSuccess={finalValidationIconSuccess}
+                    finalValidationIconError={finalValidationIconError}
+                    finalVerboseValidationFeedback={finalVerboseValidationFeedback}
+                  />
+                </PopoverTrigger>
+              </Part>
+              <Portal container={root}>
+                <PopoverContent
+                  style={popoverContentStyle}
+                  className={classnames(
+                    contentClassName,
+                    styles.selectContent,
+                    styles[validationStatus],
+                  )}
+                  onKeyDown={handleKeyDown}
+                >
+                  <div className={styles.command}>
+                    {searchable ? (
+                      <div className={styles.commandInputContainer}>
+                        <ThemedIcon name="search" />
+                        <input
+                          role="searchbox"
+                          className={classnames(styles.commandInput)}
+                          placeholder={appContext.App.translate("xmlui.select.searchPlaceholder")}
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                    ) : (
+                      <button aria-hidden="true" className={styles.srOnly} />
+                    )}
+                    <div role="listbox" className={styles.commandList}>
+                      {inProgress ? (
+                        <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                      ) : // When searching, show filtered options (with or without grouping)
+                      groupBy && groupedOptions ? (
+                        // Render grouped filtered options
+                        Object.entries(groupedOptions).map(([groupName, groupOptions]) => (
+                          <div key={groupName}>
+                            {groupName === "Ungrouped" ? (
+                              ungroupedHeaderRenderer && (
+                                <div className={styles.groupHeader}>
+                                  {ungroupedHeaderRenderer()}
+                                </div>
+                              )
+                            ) : groupHeaderRenderer ? (
+                              <div className={styles.groupHeader}>
+                                {groupHeaderRenderer({ $group: groupName })}
+                              </div>
+                            ) : (
+                              <div className={styles.groupHeader}>{groupName}</div>
+                            )}
+                            {groupOptions.map(({ value, label, enabled, keywords }, groupIndex) => {
+                              // Use flattenedGroupedOptions for correct index when groupBy is set
+                              const optionsList = flattenedGroupedOptions || filteredOptions;
+                              const globalIndex = optionsList.findIndex(
+                                (opt) => opt.value === value,
+                              );
+                              return (
+                                <SelectOptionItem
+                                  key={value}
+                                  readOnly={readOnly}
+                                  value={value}
+                                  label={label}
+                                  enabled={enabled}
+                                  keywords={keywords}
+                                  isHighlighted={selectedIndex === globalIndex}
+                                  itemIndex={globalIndex}
+                                />
+                              );
+                            })}
+                          </div>
+                        ))
+                      ) : (
+                        // Render flat filtered options
+                        filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                          <SelectOptionItem
+                            key={value}
+                            readOnly={readOnly}
+                            value={value}
+                            label={label}
+                            enabled={enabled}
+                            keywords={keywords}
+                            isHighlighted={selectedIndex === index}
+                            itemIndex={index}
+                          />
+                        ))
+                      )}
+                      {filteredOptions.length === 0 && emptyListNode}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Portal>
+            </Popover>
+          </>
+        )}
+        <div style={{ display: "none" }}>
+          {/* Only render Option children when data prop is not used.
+              When data is provided, options are derived directly in JS and no
+              XMLUI Option traversal is needed. */}
+          {!data && (
+            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+          )}
         </div>
-        </div>
-      ) : null}
-      {effectiveVerboseValidation && validationMessage ? (
-        <div className={styles.selectValidationMessage} data-xmlui-part="validationMessage">
-          {validationMessage}
-        </div>
-      ) : null}
-    </div>
+      </OptionContext.Provider>
+    </SelectContext.Provider>
   );
 }));
 
-function optionText(option: XmluiOption): string {
-  return option.selectionLabel ?? labelText(option.label, option.value);
-}
+// Internal option component for rendering items in the dropdown
+function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {
+  const {
+    value,
+    label,
+    enabled = true,
+    readOnly,
+    children,
+    isHighlighted = false,
+    itemIndex,
+  } = option;
+  const {
+    value: selectedValue,
+    onChange,
+    multiSelect,
+    setOpen,
+    setSelectedIndex,
+    optionRenderer,
+  } = useSelect();
 
-function nativeMirrorText(option: XmluiOption, open: boolean): string {
-  const text = optionText(option);
-  return open && /^Option \d+$/.test(text) ? "" : text;
-}
+  const optionRef = useRef<HTMLDivElement>(null);
 
-function renderOptionLabel(option: XmluiOption) {
-  const label = option.label;
-  if (label === undefined || label === null || label === "") {
-    return optionText(option);
-  }
-  if (isValidElement(label) || Array.isArray(label)) {
-    return label;
-  }
-  return String(label);
-}
+  const selected = useMemo(() => {
+    return Array.isArray(selectedValue) && multiSelect
+      ? selectedValue.map((v) => String(v)).includes(value)
+      : String(selectedValue) === String(value);
+  }, [selectedValue, value, multiSelect]);
 
-function selectValueForOption(option: XmluiOption): SelectValue {
-  if (option.__xmluiRawValue === "{null}" || option.__xmluiParsedValueSource === "null") {
-    return null;
-  }
-  return (option.value === "" ? optionText(option) : option.value) as SelectValue;
-}
-
-function sanitizeSelectSubmitValue(
-  value: SelectValue,
-  options: XmluiOption[],
-  multiSelect: boolean,
-): SelectValue {
-  const validOptionValues = new Set(options.map((option) => String(option.value ?? "")));
-  if (multiSelect) {
-    const filtered = normalizeArrayValue(value).filter((item) => validOptionValues.has(String(item)));
-    return filtered.length > 0 ? filtered : undefined;
-  }
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  return validOptionValues.has(String(value)) ? value : null;
-}
-
-type GroupedVisibleItem =
-  | { kind: "header"; key: string; content: ReactNode }
-  | { kind: "option"; option: XmluiOption };
-
-function groupedItems(
-  options: XmluiOption[],
-  groupBy?: string,
-  groupHeaderTemplateRenderer?: (contextValues: Record<string, unknown>, key?: string | number) => ReactNode,
-  ungroupedHeaderTemplateRenderer?: (contextValues: Record<string, unknown>, key?: string | number) => ReactNode,
-): GroupedVisibleItem[] {
-  if (!groupBy) {
-    return options.map((option) => ({ kind: "option", option }));
-  }
-  const ungrouped: XmluiOption[] = [];
-  const groups = new Map<string, XmluiOption[]>();
-  for (const option of options) {
-    const rawGroup = option[groupBy];
-    if (rawGroup === undefined || rawGroup === null || rawGroup === "") {
-      ungrouped.push(option);
-      continue;
+  // Scroll into view when highlighted
+  useEffect(() => {
+    if (isHighlighted && optionRef.current) {
+      optionRef.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
-    const group = String(rawGroup);
-    const groupOptions = groups.get(group) ?? [];
-    groupOptions.push(option);
-    groups.set(group, groupOptions);
-  }
-  const result: GroupedVisibleItem[] = [];
-  if (ungrouped.length > 0) {
-    if (ungroupedHeaderTemplateRenderer) {
-      result.push({
-        kind: "header",
-        key: "__ungrouped",
-        content: ungroupedHeaderTemplateRenderer({ $group: undefined }),
-      });
+  }, [isHighlighted]);
+
+  const handleClick = () => {
+    if (readOnly) {
+      setOpen(false);
+      return;
     }
-    result.push(...ungrouped.map((option) => ({ kind: "option" as const, option })));
-  }
-  for (const [group, groupOptions] of groups) {
-    result.push({
-      kind: "header",
-      key: group,
-      content: groupHeaderTemplateRenderer
-        ? groupHeaderTemplateRenderer({ $group: group }, group)
-        : group,
-    });
-    result.push(...groupOptions.map((option) => ({ kind: "option" as const, option })));
-  }
-  return result;
-}
+    if (enabled) {
+      onChange(value);
+    }
+  };
 
-function labelText(label: unknown, value: unknown): string {
-  if (Array.isArray(label)) {
-    return label.map((item) => labelText(item, undefined)).join("");
-  }
-  if (isValidElement(label)) {
-    return "";
-  }
-  if (label !== undefined && label !== null && label !== "") {
-    return String(label);
-  }
-  if (value !== undefined && value !== null) {
-    return String(value);
-  }
-  return "";
-}
-
-function normalizeValue(value: SelectValue, multiSelect: boolean): SelectValue {
-  if (multiSelect) {
-    return normalizeArrayValue(value);
-  }
-  if (Array.isArray(value)) {
-    return value[0] ?? "";
-  }
-  return value ?? "";
-}
-
-function normalizeArrayValue(value: SelectValue): Array<string | number> {
-  if (Array.isArray(value)) {
-    return value;
-  }
-  if (value === undefined || value === null || value === "") {
-    return [];
-  }
-  return [value];
-}
-
-function cx(...parts: Array<string | undefined | false>): string {
-  return parts.filter(Boolean).join(" ");
-}
-
-function stableValueKey(value: SelectValue): string {
-  return Array.isArray(value) ? `array:${value.map(String).join("\u0000")}` : `value:${String(value ?? "")}`;
-}
-
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
-}
-
-function labelPositionClass(position: string, direction?: unknown): string {
-  const normalized = position || "top";
-  if (normalized === "start") {
-    return direction === "rtl" ? styles.selectLabelEnd : styles.selectLabelStart;
-  }
-  if (normalized === "end") {
-    return direction === "rtl" ? styles.selectLabelStart : styles.selectLabelEnd;
-  }
-  if (normalized === "bottom") {
-    return styles.selectLabelBottom;
-  }
-  return styles.selectLabelTop;
-}
-
-function validationStatusClass(status?: string): string | undefined {
-  if (status === "warning") {
-    return styles.selectValidationWarning;
-  }
-  if (status === "error") {
-    return styles.selectValidationError;
-  }
-  if (status === "valid" || status === "success") {
-    return styles.selectValidationSuccess;
-  }
-  return undefined;
+  return (
+    <div
+      ref={optionRef}
+      role="option"
+      aria-label={label || value}
+      data-component-type="Option"
+      aria-disabled={!enabled}
+      aria-selected={selected}
+      className={classnames(styles.multiSelectOption, {
+        [styles.disabledOption]: !enabled,
+        [styles.highlighted]: isHighlighted,
+      })}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseEnter={() => {
+        if (itemIndex !== undefined && setSelectedIndex && enabled) {
+          setSelectedIndex(itemIndex);
+        }
+      }}
+      onClick={handleClick}
+      data-state={selected ? "checked" : undefined}
+    >
+      <div className={styles.multiSelectOptionContent}>
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+        ) : (
+          <>
+            {children || label}
+            {selected && <ThemedIcon name="checkmark" />}
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

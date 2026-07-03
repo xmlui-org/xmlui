@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 86 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 85 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 1 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 17 |
+| Complete | User approved after audit and verification. | 18 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -410,7 +410,7 @@ it.
 | ResponsiveBar | `ResponsiveBarReact.tsx`, module SCSS | layout measurement | Audit required | overflow/collapse behavior |
 | RetryPolicy | original implementation file | APICall/DataSource | Audit required | retry timing and cancellation |
 | ScrollViewer | `ScrollViewerReact.tsx`, module SCSS | layout, Bookmark | Audit required | scroll container behavior |
-| Select | `SelectReact.tsx`, module SCSS | Option, popover, Input | Audit required | keyboard, label, clear |
+| Select | `SelectReact.tsx`, `Select.module.scss`, `Select.defaults.ts`, `Select.md`, `Select.spec.ts`, copied helper files `HiddenOption.tsx`, `MultiSelectOption.tsx`, `OptionContext.ts`, `SelectContext.tsx`, `SelectOption.tsx`, `SimpleSelect.tsx`; added `Select.runtime.spec.ts` | Option, Radix Select, FormItem, label behavior, theme variables | Complete | User approved after protected-file audit, metadata verification, live DOM comparison against original/rewrite dev servers, and focused E2E coverage. Strict copy migrated from original; copied Select React/SCSS/defaults/docs/spec/helper files remain identical and `Select.tsx` is entry-adapted. Runtime adapter fixes preserved copied source while restoring original behavior for direct-root DOM identity, Option child registration, self-closing Option labels, default and custom empty-list templates, hover/active dropdown item colors, FormItem select option wiring, Select label/labeledItem widths, authored percentage width parity, and metadata aliases. Verification passed: `node xmlui/scripts/verify-protected-component-copy.mjs Select`, `node xmlui/scripts/verify-protected-component-copy.mjs Option`, `npm --prefix xmlui run check:metadata`, focused Select/Option E2E smoke for option rendering/dynamic Items/form selection/width variants, Select label-break and width checks, hover DOM checks, and empty-list template regressions in `Select.runtime.spec.ts`. |
 | SelectionStore | `SelectionStoreReact.tsx` | Table/List/Tree | Audit required | shared selection state |
 | SkipLink | module SCSS and implementation | accessibility | Audit required | focus/skip behavior |
 | Slider | `SliderReact.tsx`, module SCSS | input/form | Audit required | value, range, disabled |
