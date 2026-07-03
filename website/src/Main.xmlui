@@ -1126,6 +1126,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Pass arguments to a component method"
+                            to="/docs/howto/pass-arguments-to-a-component-method"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Delegate a method"
                             to="/docs/howto/delegate-a-method"
                         />
@@ -1904,6 +1909,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/expose-a-method-from-a-component.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/pass-arguments-to-a-component-method"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/pass-arguments-to-a-component-method.md']}"
                 />
             </Page>
             <Page
