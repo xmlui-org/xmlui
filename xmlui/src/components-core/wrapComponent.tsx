@@ -15,6 +15,7 @@ type ExtractValueCompat = ((value: unknown) => any) & {
 };
 
 type WrapComponentOptions = {
+  stateful?: boolean;
   booleans?: readonly string[];
   numbers?: readonly string[];
   strings?: readonly string[];
@@ -30,6 +31,7 @@ type WrapComponentOptions = {
       classes: Record<string, string>;
       node: any;
       extractValue: ExtractValueCompat;
+      extractResourceUrl: (url?: string) => string | undefined;
       state?: Record<string, any>;
       updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
       lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
@@ -93,6 +95,8 @@ export function wrapComponent(
           classes: { [COMPONENT_PART_KEY]: themeClass.className },
           node: { ...runtimeProps.node, props: runtimeProps.props },
           extractValue,
+          extractResourceUrl: (url) =>
+            url === undefined || url === null || /^https?:\/\//.test(url) ? url : `/${url}`,
           state,
           updateState: (nextState) => setState((prevState) => ({ ...prevState, ...nextState })),
           lookupEventHandler: (eventName) => runtimeProps.events[eventName],

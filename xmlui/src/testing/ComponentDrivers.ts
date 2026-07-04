@@ -610,6 +610,61 @@ export class FileUploadDropZoneDriver extends ComponentDriver {
   }
 }
 
+export class FileInputDriver extends ComponentDriver {
+  getTextBox() {
+    return this.component.locator("input[readonly]");
+  }
+
+  getHiddenInput() {
+    return this.component.locator('input[type="file"]');
+  }
+
+  getBrowseButton() {
+    return this.component.locator('[class*="_button_"]');
+  }
+
+  getContainer() {
+    return this.component;
+  }
+
+  async isEnabled() {
+    return !(await this.getBrowseButton().isDisabled());
+  }
+
+  async getSelectedFiles() {
+    const value = await this.getTextBox().inputValue();
+    return value || "";
+  }
+
+  async openFileDialog() {
+    await this.getBrowseButton().click();
+  }
+
+  async getPlaceholder() {
+    return (await this.getTextBox().getAttribute("placeholder")) || "";
+  }
+
+  async focusButton() {
+    await this.getBrowseButton().focus();
+  }
+
+  async hasReadOnlyAttribute() {
+    return (await this.getTextBox().getAttribute("readonly")) !== null;
+  }
+
+  async getAcceptedFileTypes() {
+    return (await this.getHiddenInput().getAttribute("accept")) || "";
+  }
+
+  async isMultiple() {
+    return (await this.getHiddenInput().getAttribute("multiple")) !== null;
+  }
+
+  async isDirectory() {
+    return (await this.getHiddenInput().getAttribute("webkitdirectory")) !== null;
+  }
+}
+
 export class NumberBoxDriver extends InputComponentDriver {
   get input(): Locator {
     return this.component.getByRole("spinbutton").first();

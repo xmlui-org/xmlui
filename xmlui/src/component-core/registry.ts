@@ -4,8 +4,8 @@ import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
-import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
-import { badgeRenderer } from "../components/Badge/Badge.renderer";
+import { avatarRenderer } from "../components/Avatar/Avatar";
+import { badgeRenderer } from "../components/Badge/Badge";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
@@ -63,11 +63,11 @@ import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox";
 import { switchRenderer } from "../components/Switch/Switch";
-import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";
+import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
 import { sliderRenderer } from "../components/Slider/Slider.renderer";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
-import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
-import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
+import { dateInputRenderer } from "../components/DateInput/DateInput";
+import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
@@ -79,7 +79,7 @@ import {
   subMenuItemRenderer,
 } from "../components/DropdownMenu/DropdownMenu.renderer";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
-import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
+import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
@@ -91,7 +91,8 @@ import { stepperFormRenderer } from "../components/StepperForm/StepperForm.rende
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
-import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
+import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
+import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
@@ -347,7 +348,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   MenuSeparator: menuSeparatorRenderer,
   SubMenuItem: subMenuItemRenderer,
   AutoComplete: autoCompleteRenderer,
-  FileInput: fileInputRenderer,
+  FileInput: fileInputRuntimeRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
   FocusScope: focusScopeRenderer,
   Footer: footerRuntimeRenderer,
@@ -364,7 +365,8 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Tree: treeRenderer,
   TreeDisplay: treeDisplayRenderer,
   TableOfContents: tableOfContentsRenderer,
-  RadioGroup: radioGroupRenderer,
+  RadioGroup: radioGroupRuntimeRenderer,
+  RadioItem: radioItemRenderer,
   ScrollViewer: scrollViewerRenderer,
   Select: selectRenderer,
   SelectionStore: selectionStoreRenderer,

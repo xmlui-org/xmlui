@@ -1,19 +1,5 @@
 <App>
-  <App>
-    <ColorPicker 
-      id="colorPicker" 
-      label="Select your favorite color" 
-      initialValue="#808080" />
-    <HStack>
-      <Button
-        label="Set to red"
-        onClick="colorPicker.setValue('#ff0000')" />
-      <Button
-        label="Set to green"
-        onClick="colorPicker.setValue('#00c000')" />
-      <Button
-        label="Set to blue"
-        onClick="colorPicker.setValue('#0000ff')" />
-    </HStack>
-  </App>
+  Hello
+  <Br />
+  World
 </App>

@@ -1,40 +1,71 @@
-import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
+// TODO: PropsTrasform is a typo in the source — rename to PropsTransform upstream
+import { PropsTrasform } from "../../components-core/utils/extractParam";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-import { createMetadata } from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { wrapComponent } from "../../runtime/rendering/adapter";
+const COMP = "br";
+const BR = "Br";
 
-export const BrMd = createBrMetadata("br");
-export const BrCapitalizedMd = createBrMetadata("Br");
+export const BrMd = createMetadata({
+  status: "deprecated",
+  description: "This component renders an HTML `br` tag for line breaks.",
+  isHtmlTag: true,
+});
 
-export const brRenderer = createBrRenderer("br", BrMd);
-export const BrRenderer = createBrRenderer("Br", BrCapitalizedMd);
+export const BrCapitalizedMd = createMetadata({
+  status: "deprecated",
+  description: "This component renders an HTML `br` tag for line breaks.",
+  isHtmlTag: true,
+});
 
-function createBrMetadata(name: string): ComponentMetadata {
-  return createMetadata({
-    status: "deprecated",
-    description: "This component renders an HTML `br` tag for line breaks.",
-    isHtmlTag: true,
-    allowArbitraryProps: true,
-    props: {
-      testId: {
-        description: "Adds a test identifier to the rendered line break.",
-        valueType: "string",
-      },
+// Placeholder — customRender in the renderer overrides this entirely
+function BrPlaceholder(_props: Record<string, never>) { return null; }
+
+export const brComponentRenderer = wrapComponent(
+  COMP,
+  BrPlaceholder,
+  BrMd,
+  {
+    customRender: (_props, { node, extractValue, extractResourceUrl, classes }) => {
+      const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
+      const props = p.asRest();
+      // <br> is a void element — it cannot have children
+      return <br className={classes?.[COMPONENT_PART_KEY]} {...props} />;
     },
-  });
-}
+  },
+);
 
-function createBrRenderer(name: string, metadata: ComponentMetadata) {
-  return wrapComponent({
+export const BrComponentRenderer = wrapComponent(
+  BR,
+  BrPlaceholder,
+  BrCapitalizedMd,
+  {
+    customRender: (_props, { node, extractValue, extractResourceUrl, classes }) => {
+      const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
+      const props = p.asRest();
+      // <br> is a void element — it cannot have children
+      return <br className={classes?.[COMPONENT_PART_KEY]} {...props} />;
+    },
+  },
+);
+
+export const brRenderer = createBrRenderer(COMP, BrMd);
+export const BrRenderer = createBrRenderer(BR, BrCapitalizedMd);
+
+function createBrRenderer(name: string, metadata: typeof BrMd) {
+  return wrapRuntimeComponent({
     name,
     metadata,
-    renderer: ({ adapter }) => React.createElement("br", {
-      ...nativeProps(adapter.props),
-      ...adapter.rootAttrs(),
-      className: adapter.className,
-      style: adapter.style,
-    }),
+    renderer: ({ adapter }) => (
+      <br
+        {...nativeProps(adapter.props)}
+        {...adapter.rootAttrs()}
+        className={adapter.className}
+        style={adapter.style}
+      />
+    ),
   });
 }
 

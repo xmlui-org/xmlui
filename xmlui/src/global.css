@@ -58,4 +58,42 @@
     background-color: transparent;
     background-image: none;
   }
+
+  input::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af;
+  }
+
+  input::placeholder {
+    opacity: 1;
+    color: #9ca3af;
+  }
+
+  textarea::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af;
+  }
+
+  textarea::placeholder {
+    opacity: 1;
+    color: #9ca3af;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+    vertical-align: middle;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
 }

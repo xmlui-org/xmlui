@@ -1,60 +1,51 @@
-import type {
-  CSSProperties,
-  ForwardedRef,
-  HTMLAttributes,
-  KeyboardEvent,
-  MouseEvent,
-  Ref,
-} from "react";
+import type { ForwardedRef, HTMLAttributes, KeyboardEvent, MouseEvent, Ref } from "react";
 import { forwardRef, memo, useCallback, useMemo } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./Avatar.defaults";
 import styles from "./Avatar.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Avatar.defaults";
 
-export type AvatarProps = HTMLAttributes<HTMLElement> & {
+type Props = HTMLAttributes<HTMLElement> & {
   size?: string;
   url?: string;
   name?: string;
-  className?: string;
-  style?: CSSProperties;
+  classes?: Record<string, string>;
 };
 
-const predefinedSizes = new Set(["xs", "sm", "md", "lg"]);
+// Size tokens that map to predefined SCSS classes; anything else is treated as a
+// raw CSS length value (e.g. "60px", "3rem").
+const PREDEFINED_SIZES = new Set(["xs", "sm", "md", "lg"]);
+
+// Calculates the font-size for a custom CSS length so that initials scale
+// proportionally (~33% of the avatar width, matching the predefined size ratios).
+function calculateFontSize(sizeValue: string): string {
+  const match = sizeValue.match(/^([\d.]+)(.*)$/);
+  if (match) {
+    const [, num, unit] = match;
+    return `${parseFloat(num) * 0.33}${unit || "px"}`;
+  }
+  return "1em";
+}
+
+// Returns up to three uppercase initials from a display name, or null when the
+// name is empty or whitespace-only.
+function abbreviateName(name: string | null): string | null {
+  if (!name) return null;
+  return name
+    .trim()
+    .split(" ")
+    .filter((word) => word.trim().length > 0)
+    .map((word) => word[0].toUpperCase())
+    .slice(0, 3)
+    .join("") || null;
+}
 
 export const Avatar = memo(forwardRef(function Avatar(
-  {
-    size = defaultProps.size,
-    url,
-    name,
-    style,
-    className,
-    onClick,
-    onContextMenu,
-    ...rest
-  }: AvatarProps,
+  { size = defaultProps.size, url, name, style, classes, className, onClick, onContextMenu, ...rest }: Props,
   ref: ForwardedRef<HTMLImageElement | HTMLDivElement>,
 ) {
   const abbreviatedName = useMemo(() => abbreviateName(name ?? null), [name]);
-  const isCustomSize = Boolean(size) && !predefinedSizes.has(size);
-  const classNames = [
-    styles.container,
-    !isCustomSize ? styles[size as keyof typeof styles] ?? styles.sm : undefined,
-    onClick ? styles.clickable : undefined,
-    className,
-  ].filter(Boolean).join(" ");
-  const mergedStyle = useMemo<CSSProperties>(() => {
-    if (!isCustomSize) {
-      return { ...style, flexShrink: 0 };
-    }
-    return {
-      ...style,
-      width: size,
-      height: size,
-      fontSize: calculateFontSize(size),
-      flexShrink: 0,
-    };
-  }, [isCustomSize, size, style]);
-  const altText = name ? `Avatar of ${name}` : "Avatar";
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLElement>) => {
     if (onClick && (event.key === "Enter" || event.key === " ")) {
@@ -63,9 +54,35 @@ export const Avatar = memo(forwardRef(function Avatar(
     }
   }, [onClick]);
 
+  const isCustomSize = !!size && !PREDEFINED_SIZES.has(size);
+
+  const commonClassNames = classnames(
+    classes?.[COMPONENT_PART_KEY],
+    className,
+    styles.container,
+    !isCustomSize && (styles[size as keyof typeof styles] || styles.sm),
+    { [styles.clickable]: !!onClick },
+  );
+
+  const mergedStyle = useMemo(
+    () =>
+      // flexShrink: 0 keeps the avatar at its declared 1:1 aspect ratio when it
+      // lives inside a horizontally constrained flex parent (e.g. a Table cell
+      // or a Link). Without it, runtime layout behaviors can apply
+      // `flex-shrink: 1` to the Avatar via emotion classes that override the
+      // SCSS rule, collapsing the avatar to a sliver while leaving its height
+      // intact.
+      isCustomSize
+        ? { ...style, width: size, height: size, fontSize: calculateFontSize(size!), flexShrink: 0 }
+        : { ...style, flexShrink: 0 },
+    [isCustomSize, size, style],
+  );
+
+  const altTxt = name ? `Avatar of ${name}` : "Avatar";
+
   const sharedProps = {
     ...rest,
-    className: classNames,
+    className: commonClassNames,
     style: mergedStyle,
     onClick,
     onContextMenu,
@@ -79,7 +96,7 @@ export const Avatar = memo(forwardRef(function Avatar(
         {...sharedProps}
         ref={ref as Ref<HTMLImageElement>}
         src={url}
-        alt={altText}
+        alt={altTxt}
       />
     );
   }
@@ -89,31 +106,9 @@ export const Avatar = memo(forwardRef(function Avatar(
       {...sharedProps}
       ref={ref as Ref<HTMLDivElement>}
       role="img"
-      aria-label={altText}
+      aria-label={altTxt}
     >
       {abbreviatedName || <span aria-hidden="true" />}
     </div>
   );
 }));
-
-function calculateFontSize(sizeValue: string | undefined): string {
-  const match = String(sizeValue ?? "").match(/^([\d.]+)(.*)$/);
-  if (!match) {
-    return "1em";
-  }
-  const [, numberPart, unit] = match;
-  return `${Number.parseFloat(numberPart) * 0.33}${unit || "px"}`;
-}
-
-function abbreviateName(name: string | null): string | null {
-  if (!name) {
-    return null;
-  }
-  return name
-    .trim()
-    .split(" ")
-    .filter((word) => word.trim().length > 0)
-    .map((word) => word[0].toUpperCase())
-    .slice(0, 3)
-    .join("") || null;
-}

@@ -38,6 +38,26 @@ export function usePrevious<T>(value: T): ReturnType<typeof useRef<T>>["current"
   return ref.current;
 }
 
+export function useMediaQuery(query: string) {
+  const getMatch = () => (typeof window !== "undefined" ? window.matchMedia(query).matches : false);
+  const [matches, setMatches] = useState(getMatch);
+
+  useIsomorphicLayoutEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const onChange = () => setMatches(mql.matches);
+    mql.addEventListener("change", onChange);
+
+    return () => mql.removeEventListener("change", onChange);
+  }, [query]);
+
+  return matches;
+}
+
 export function useDocumentKeydown(onDocumentKeydown: (event: KeyboardEvent) => void) {
   const onKeyDown = useEvent(onDocumentKeydown);
   useEffect(() => {

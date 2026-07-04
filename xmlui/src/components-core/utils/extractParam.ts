@@ -41,3 +41,17 @@ export function removeStylesFromProps(nodeProps: Record<string, any>) {
   delete nodeProps.class;
   return nodeProps;
 }
+
+export class PropsTrasform {
+  constructor(
+    private readonly extractValue: ValueExtractor,
+    private readonly extractResourceUrl: (url?: string) => string | undefined,
+    private readonly props: Record<string, any> = {},
+  ) {}
+
+  asRest(): Record<string, any> {
+    return resolveAndCleanProps(this.props, this.extractValue, {
+      extractResourceUrl: this.extractResourceUrl,
+    });
+  }
+}

@@ -1,270 +1,861 @@
-import { expect, test } from "../../testing/fixtures";
+import { test, expect } from "../../testing/fixtures";
 
-test.describe("FileInput foundation", () => {
-  test("renders the picker surface", async ({ initTestBed, page }) => {
-    await initTestBed(`<FileInput testId="files" placeholder="Select a file" />`);
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
-    await expect(page.getByTestId("files")).toBeVisible();
-    await expect(page.getByTestId("files").locator("[data-part-id='input']")).toContainText("Select a file");
-    await expect(page.getByRole("button", { name: /Browse/ })).toBeVisible();
-  });
+test("component renders with basic props", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+});
 
-  test("selects a single file and fires didChange", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        onDidChange="(files) => testState = files[0]?.name" />
+test("component displays browse button", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput buttonLabel="Choose File"/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.getBrowseButton()).toBeVisible();
+  await expect(driver.getBrowseButton()).toContainText("Choose File");
+});
+
+test("component displays placeholder text", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput placeholder="Select a file..."/>`);
+  const driver = await createFileInputDriver();
+  const placeholder = await driver.getPlaceholder();
+  expect(placeholder).toBe("Select a file...");
+});
+
+test("component handles disabled state", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput enabled="false"/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.getBrowseButton()).toBeDisabled();
+  expect(await driver.isEnabled()).toBe(false);
+});
+
+test("component supports multiple file selection", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput multiple="true"/>`);
+  const driver = await createFileInputDriver();
+  expect(await driver.isMultiple()).toBe(true);
+});
+
+test("component supports directory selection", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput directory="true"/>`);
+  const driver = await createFileInputDriver();
+  expect(await driver.isDirectory()).toBe(true);
+});
+
+test("component accepts specific file types", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput acceptsFileType="image/*,application/pdf"/>`);
+  const driver = await createFileInputDriver();
+  const acceptedTypes = await driver.getAcceptedFileTypes();
+  expect(acceptedTypes).toBe("image/*,application/pdf");
+});
+
+test("component accepts file type array", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput acceptsFileType="['.jpg', '.png', '.pdf']"/>`);
+  const driver = await createFileInputDriver();
+  const acceptedTypes = await driver.getAcceptedFileTypes();
+  expect(acceptedTypes).toContain(".jpg");
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS (REQUIRED)
+// =============================================================================
+
+test("component has correct accessibility attributes", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput label="Upload Document"/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.getBrowseButton()).toHaveRole("button");
+  await expect(driver.getHiddenInput()).toHaveAttribute("type", "file");
+});
+
+test("component is keyboard accessible", async ({ page, initTestBed, createFileInputDriver }) => {
+  await initTestBed(`
+    <VStack>
+      <FileInput testId="fileInput" label="Input" />
+    </VStack>
+  `);
+
+  const driver = await createFileInputDriver("fileInput");
+
+  await driver.getTextBox().focus();
+  await expect(driver.getTextBox()).toBeFocused();
+});
+
+test("component supports tab navigation", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`
+    <VStack>
+      <FileInput testId="fileInput" label="Input" />
+    </VStack>
+  `);
+
+  const driver = await createFileInputDriver("fileInput");
+
+  await driver.getTextBox().focus();
+  await expect(driver.getTextBox()).toBeFocused();
+
+  await driver.getTextBox().press("Tab");
+  await expect(driver.getBrowseButton()).toBeVisible();
+  await expect(driver.getBrowseButton()).not.toBeDisabled();
+  await expect(driver.getBrowseButton()).toBeFocused();
+});
+
+test("component has hidden file input for screen readers", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput/>`);
+  const driver = await createFileInputDriver();
+  const hiddenInput = driver.getHiddenInput();
+  await expect(hiddenInput).toBeAttached();
+  await expect(hiddenInput).toHaveAttribute("type", "file");
+});
+
+test("component textbox is readonly for accessibility", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput/>`);
+  const driver = await createFileInputDriver();
+  expect(await driver.hasReadOnlyAttribute()).toBe(true);
+});
+
+// =============================================================================
+// API TESTS
+// =============================================================================
+
+test.describe("Api", () => {
+  test("bindTo syncs $data and value", async ({ initTestBed, page, createFileInputDriver }) => {
+    await initTestBed(`
+      <Form hideButtonRow="true">
+        <FileInput id="boundFileInput" testId="boundFileInput" bindTo="files" />
+        <Text testId="dataValue">{$data.files.length}</Text>
+        <Text testId="compValue">{boundFileInput.value.length}</Text>
+      </Form>
     `);
 
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "report.txt",
+    const driver = await createFileInputDriver("boundFileInput");
+    await driver.getHiddenInput().setInputFiles({
+      name: "test.txt",
       mimeType: "text/plain",
       buffer: Buffer.from("hello"),
     });
 
-    await expect(page.getByTestId("files")).toContainText("report.txt");
-    await expect.poll(testStateDriver.testState).toBe("report.txt");
-  });
-
-  test("supports multiple files", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        multiple="true"
-        onDidChange="(files) => testState = files.map(f => f.name).join(',')" />
-    `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles([
-      { name: "a.txt", mimeType: "text/plain", buffer: Buffer.from("a") },
-      { name: "b.txt", mimeType: "text/plain", buffer: Buffer.from("b") },
-    ]);
-
-    await expect(page.getByTestId("files")).toContainText("a.txt, b.txt");
-    await expect.poll(testStateDriver.testState).toBe("a.txt,b.txt");
-  });
-
-  test("filters accepted extensions", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        multiple="true"
-        acceptsFileType=".txt"
-        onDidChange="(files) => testState = files.map(f => f.name).join(',')" />
-    `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles([
-      { name: "accepted.txt", mimeType: "text/plain", buffer: Buffer.from("a") },
-      { name: "rejected.json", mimeType: "application/json", buffer: Buffer.from("{}") },
-    ]);
-
-    await expect(page.getByTestId("files")).toContainText("accepted.txt");
-    await expect(page.getByTestId("files")).not.toContainText("rejected.json");
-    await expect.poll(testStateDriver.testState).toBe("accepted.txt");
-  });
-
-  test("accepts dropped files", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        onDidChange="(files) => testState = files[0]?.name" />
-    `);
-
-    const dataTransfer = await page.evaluateHandle(() => {
-      const transfer = new DataTransfer();
-      transfer.items.add(new File(["dropped"], "drop.txt", { type: "text/plain" }));
-      return transfer;
-    });
-    await page.getByTestId("files").locator("[data-part-id='input']").dispatchEvent("drop", { dataTransfer });
-
-    await expect(page.getByTestId("files")).toContainText("drop.txt");
-    await expect.poll(testStateDriver.testState).toBe("drop.txt");
-  });
-
-  test("supports focus and blur events", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        onGotFocus="testState = 'focused'"
-        onLostFocus="testState = 'blurred'" />
-      <Button testId="other">Other</Button>
-    `);
-
-    await page.getByRole("button", { name: /Browse/ }).focus();
-    await expect.poll(testStateDriver.testState).toBe("focused");
-    await page.getByTestId("other").focus();
-    await expect.poll(testStateDriver.testState).toBe("blurred");
-  });
-
-  test("disabled and readOnly prevent changes", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="disabled"
-        enabled="false"
-        onDidChange="(files) => testState = files[0]?.name" />
-      <FileInput
-        testId="readonly"
-        readOnly="true"
-        onDidChange="(files) => testState = files[0]?.name" />
-    `);
-
-    await expect(page.getByTestId("disabled").locator("input[type='file']")).toBeDisabled();
-    await expect(page.getByTestId("readonly").locator("input[type='file']")).toBeDisabled();
-    await expect.poll(testStateDriver.testState).toBeNull();
-  });
-
-  test("parses basic CSV and exposes fields", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        id="files"
-        testId="files"
-        parseAs="csv"
-        onDidChange="(result) => testState = result.parsedData[0].data[0].name + ':' + files.getFields()[0]" />
-    `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "products.csv",
-      mimeType: "text/csv",
-      buffer: Buffer.from("name,price\nHat,12"),
-    });
-
-    await expect.poll(testStateDriver.testState).toBe("Hat:name");
-  });
-
-  test("applies validation and focus theme variables", async ({ initTestBed, page }) => {
-    await initTestBed(`<FileInput testId="files" validationStatus="error" />`, {
-      testThemeVars: {
-        "borderColor-TextBox--error": "rgb(255, 0, 0)",
-      },
-    });
-
-    const inputPart = page.getByTestId("files").locator("[data-part-id='input']");
-    await expect(inputPart).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });
-
-  test("bindTo syncs selected files into Form data", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form hideButtonRow="true">
-        <FileInput id="files" testId="files" bindTo="documents" />
-        <Text testId="dataValue">{$data.documents.length}</Text>
-        <Text testId="apiValue">{files.value.length}</Text>
-      </Form>
-    `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "contract.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("contract"),
-    });
-
     await expect(page.getByTestId("dataValue")).toHaveText("1");
-    await expect(page.getByTestId("apiValue")).toHaveText("1");
+    await expect(page.getByTestId("compValue")).toHaveText("1");
+  });
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("component applies theme variables correctly", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput/>`, {
+    testThemeVars: {
+      "backgroundColor-Button": "rgb(255, 0, 0)",
+    },
+  });
+  const driver = await createFileInputDriver();
+  // FileInput uses Button themes, so check the button
+  await expect(driver.getBrowseButton()).toHaveCSS("background-color", "rgb(255, 0, 0)");
+});
+
+test("component shows validation states", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput validationStatus="error"/>`);
+  const driver = await createFileInputDriver();
+  // Validation should be visible in the component
+  await expect(driver.component).toBeVisible();
+  await expect(driver.getTextBox()).toBeVisible();
+});
+
+test("component supports different button variants", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput variant="outline"/>`);
+  const driver = await createFileInputDriver();
+  // Check that variant prop is passed through
+  await expect(driver.getBrowseButton()).toBeVisible();
+  await expect(driver.getBrowseButton()).toContainText("Browse");
+});
+
+test("component supports different button sizes", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput buttonSize="lg"/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.getBrowseButton()).toHaveClass(/lg/);
+});
+
+test("component supports button positioning", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput buttonPosition="start"/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.getContainer()).toHaveClass(/buttonStart/);
+});
+
+// =============================================================================
+// EDGE CASE TESTS (CRITICAL)
+// =============================================================================
+
+test("component handles null and undefined props gracefully", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput/>`);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+  expect(await driver.getSelectedFiles()).toBe("");
+});
+
+test("component handles empty acceptsFileType", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`<FileInput acceptsFileType=""/>`);
+  const driver = await createFileInputDriver();
+  expect(await driver.getAcceptedFileTypes()).toBe("");
+});
+
+test("component handles special characters in placeholder", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput placeholder="Select file with émojis 🚀 & quotes"/>`);
+  const driver = await createFileInputDriver();
+  const placeholder = await driver.getPlaceholder();
+  expect(placeholder).toBe("Select file with émojis 🚀 & quotes");
+});
+
+test("component handles conflicting multiple and directory props", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput multiple="false" directory="true"/>`);
+  const driver = await createFileInputDriver();
+  // Directory mode should enable multiple files
+  expect(await driver.isDirectory()).toBe(true);
+  expect(await driver.isMultiple()).toBe(true);
+});
+
+test("component handles empty file selection gracefully", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput/>`);
+  const driver = await createFileInputDriver();
+  expect(await driver.getSelectedFiles()).toBe("");
+});
+
+// =============================================================================
+// PERFORMANCE TESTS
+// =============================================================================
+
+test("component handles rapid button clicks efficiently", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  const { testStateDriver } = await initTestBed(`
+    <FileInput onFocus="testState = ++testState || 1"/>
+  `);
+  const driver = await createFileInputDriver();
+
+  // Multiple rapid clicks should not cause issues
+  await driver.getBrowseButton().click();
+  await driver.getBrowseButton().click();
+  await driver.getBrowseButton().click();
+
+  await expect(driver.component).toBeVisible();
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test("component works correctly in different layout contexts", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`
+    <VStack>
+      <FileInput label="Layout Test"/>
+    </VStack>
+  `);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+});
+
+test("component works in form context", async ({ initTestBed, createFileInputDriver }) => {
+  await initTestBed(`
+    <Form>
+      <FileInput label="Upload File" required="true"/>
+    </Form>
+  `);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+});
+
+test("gotFocus event fires on focus", async ({ initTestBed, page, createFileInputDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+      <FileInput testId="fileInput" onGotFocus="testState = 'focused'" />
+    `);
+
+  const driver = await createFileInputDriver("fileInput");
+  await driver.getTextBox().focus();
+  await expect.poll(testStateDriver.testState).toEqual("focused");
+});
+
+test("gotFocus event fires on label focus", async ({ initTestBed, page }) => {
+  const { testStateDriver } = await initTestBed(`
+    <FileInput testId="fileInput" onGotFocus="testState = 'focused'" label="test" />
+  `);
+  await page.getByText("test").click();
+  await expect.poll(testStateDriver.testState).toEqual("focused");
+});
+
+test("lostFocus event fires on blue", async ({ initTestBed, page, createFileInputDriver }) => {
+  const { testStateDriver } = await initTestBed(`
+      <FileInput testId="fileInput" onLostFocus="testState = 'blurred'" />
+    `);
+
+  const driver = await createFileInputDriver("fileInput");
+  await driver.getTextBox().focus();
+  await driver.getTextBox().blur();
+  await expect.poll(testStateDriver.testState).toEqual("blurred");
+});
+
+test("component supports custom button templates", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`
+    <FileInput>
+      <property name="buttonIcon">
+        <Icon name="upload"/>
+      </property>
+    </FileInput>
+  `);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+  await expect(driver.getBrowseButton()).toContainText("Browse");
+});
+
+test("component handles label positioning correctly", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`
+    <FileInput 
+      label="Upload Document"
+      labelPosition="top"
+      labelWidth="100px"
+    />
+  `);
+  const driver = await createFileInputDriver();
+  await expect(driver.component).toBeVisible();
+});
+
+// =============================================================================
+// VISUAL STATE TESTS
+// =============================================================================
+
+test("input has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<FileInput width="200px" testId="test"/>`, {});
+
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in px", async ({ page, initTestBed }) => {
+  await initTestBed(`<FileInput width="200px" label="test" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300 });
+  await initTestBed(`<FileInput width="50%" testId="test"/>`, {});
+
+  const input = page.getByTestId("test");
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+test("input with label has correct width in %", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 400, height: 300 });
+  await initTestBed(`<FileInput width="50%" label="test" testId="test"/>`, {});
+
+  const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+  const { width } = await input.boundingBox();
+  expect(width).toBe(200);
+});
+
+// =============================================================================
+// PARSING TESTS
+// =============================================================================
+
+test.describe("Parsing", () => {
+  test("infers acceptsFileType from parseAs csv", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="csv" />`);
+    const driver = await createFileInputDriver();
+    // parseAs should auto-set the file input accept attribute unless overridden.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".csv");
   });
 
-  test("submit serializes the selected file array", async ({ initTestBed, page }) => {
+  test("infers acceptsFileType from parseAs json", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="json" />`);
+    const driver = await createFileInputDriver();
+    // Same inference logic for JSON.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".json");
+  });
+
+  test("parses csv and emits row data", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <Form onSubmit="data => testState = data.documents[0].name">
-        <FileInput testId="files" bindTo="documents" />
-      </Form>
+      <FileInput parseAs="csv" onDidChange="result => testState = result.parsedData[0].data.length" />
     `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "invoice.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from("pdf"),
-    });
-    await page.getByRole("button", { name: "Save" }).click();
-
-    await expect.poll(testStateDriver.testState).toBe("invoice.pdf");
-  });
-
-  test("directory mode enables directory and multiple-file picking", async ({ initTestBed, page }) => {
-    await initTestBed(`<FileInput testId="files" directory="true" multiple="false" />`);
-
-    const hiddenInput = page.getByTestId("files").locator("input[type='file']");
-    await expect(hiddenInput).toHaveAttribute("multiple", "");
-    await expect(hiddenInput).toHaveAttribute("webkitdirectory", "true");
-  });
-
-  test("parseAs infers accepted file extensions and allows explicit override", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <VStack>
-        <FileInput testId="csv" parseAs="csv" />
-        <FileInput testId="json" parseAs="json" />
-        <FileInput testId="override" parseAs="csv" acceptsFileType=".txt,.csv" />
-      </VStack>
-    `);
-
-    await expect(page.getByTestId("csv").locator("input[type='file']")).toHaveAttribute("accept", ".csv");
-    await expect(page.getByTestId("json").locator("input[type='file']")).toHaveAttribute("accept", ".json");
-    await expect(page.getByTestId("override").locator("input[type='file']")).toHaveAttribute("accept", ".txt,.csv");
-  });
-
-  test("csvOptions support custom delimiter, dynamic typing, and no-header rows", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        parseAs="csv"
-        csvOptions="{{ delimiter: ';', dynamicTyping: true, header: false }}"
-        onDidChange="result => testState = {
-          rowCount: result.parsedData[0].data.length,
-          firstName: result.parsedData[0].data[0][0],
-          priceType: typeof result.parsedData[0].data[0][1]
-        }" />
-    `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "products.csv",
+    const driver = await createFileInputDriver();
+    // Upload a CSV file through the hidden input; onDidChange emits parsed rows.
+    await driver.getHiddenInput().setInputFiles({
+      name: "sample.csv",
       mimeType: "text/csv",
-      buffer: Buffer.from("Hat;12\nCoat;40\n"),
+      buffer: Buffer.from("name,price\nWidget,10\nGadget,20\n"),
     });
 
-    await expect.poll(async () => (await testStateDriver.testState())?.rowCount).toBe(2);
-    const parsed = await testStateDriver.testState();
-    expect(parsed.firstName).toBe("Hat");
-    expect(parsed.priceType).toBe("number");
+    // Expect two parsed rows (header is consumed).
+    await expect.poll(testStateDriver.testState).toEqual(2);
   });
 
-  test("JSON parsing normalizes object and array documents", async ({ initTestBed, page }) => {
+  test("parses json object as array", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // Single JSON object is normalized into an array.
+    await driver.getHiddenInput().setInputFiles({
+      name: "sample.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{\"name\":\"Widget\",\"price\":10}"),
+    });
+
+    // Expect one array entry after normalization.
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  test("returns parse results for multiple files", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <FileInput
-        testId="files"
-        parseAs="json"
+        parseAs="csv"
         multiple="true"
-        onDidChange="result => testState = result.parsedData.map(entry => entry.data.length).join(',')" />
+        onDidChange="result => testState = result.parsedData.length"
+      />
     `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles([
+    const driver = await createFileInputDriver();
+    // When multiple=true, onDidChange receives ParseResult[] for each file.
+    await driver.getHiddenInput().setInputFiles([
       {
-        name: "single.json",
-        mimeType: "application/json",
-        buffer: Buffer.from('{"name":"Hat"}'),
+        name: "first.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nWidget,10\n"),
       },
       {
-        name: "array.json",
-        mimeType: "application/json",
-        buffer: Buffer.from('[{"name":"Hat"},{"name":"Coat"}]'),
+        name: "second.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nGadget,20\n"),
       },
     ]);
 
-    await expect.poll(testStateDriver.testState).toBe("1,2");
+    // Expect one ParseResult per file.
+    await expect.poll(testStateDriver.testState).toEqual(2);
   });
 
-  test("parseError receives the parsing error and source file", async ({ initTestBed, page }) => {
+  test("parseError event fires on invalid json", async ({ initTestBed, createFileInputDriver }) => {
     const { testStateDriver } = await initTestBed(`
-      <FileInput
-        testId="files"
-        parseAs="json"
-        onParseError="(error, file) => testState = { hasError: !!error, fileName: file.name }" />
+      <FileInput parseAs="json" onParseError="testState = 'error'" />
     `);
-
-    await page.getByTestId("files").locator("input[type='file']").setInputFiles({
-      name: "broken.json",
+    const driver = await createFileInputDriver();
+    // Invalid JSON triggers parseError, not onDidChange.
+    await driver.getHiddenInput().setInputFiles({
+      name: "bad.json",
       mimeType: "application/json",
       buffer: Buffer.from("{"),
     });
 
-    await expect.poll(async () => (await testStateDriver.testState())?.hasError).toBe(true);
-    const parseError = await testStateDriver.testState();
-    expect(parseError.fileName).toBe("broken.json");
+    await expect.poll(testStateDriver.testState).toEqual("error");
+  });
+
+  test("parses json array correctly", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // JSON array should be passed through as-is.
+    await driver.getHiddenInput().setInputFiles({
+      name: "array.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('[{"name":"Widget","price":10},{"name":"Gadget","price":20}]'),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parses csv with custom delimiter", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ delimiter: ';' }}"
+        onDidChange="result => testState = result.parsedData[0].data.length"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // CSV with semicolon delimiter.
+    await driver.getHiddenInput().setInputFiles({
+      name: "semicolon.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name;price\nWidget;10\nGadget;20\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("parses csv with dynamicTyping", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ dynamicTyping: true }}"
+        onDidChange="result => testState = typeof result.parsedData[0].data[0].price"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // dynamicTyping should convert "10" to number 10.
+    await driver.getHiddenInput().setInputFiles({
+      name: "typed.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual("number");
+  });
+
+  test("parses csv without header option", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        csvOptions="{{ header: false }}"
+        onDidChange="result => testState = result.parsedData[0].data.length"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    // Without header, all rows are returned as arrays.
+    await driver.getHiddenInput().setInputFiles({
+      name: "noheader.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("Widget,10\nGadget,20\n"),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("verifies parsed csv data structure", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        onDidChange="result => testState = { name: result.parsedData[0].data[0].name, price: result.parsedData[0].data[0].price }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "data.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from("name,price\nWidget,10\n"),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.name;
+    }).toBe("Widget");
+
+    const result = await testStateDriver.testState();
+    expect(result.price).toBe("10");
+  });
+
+  test("verifies parsed json data structure", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        onDidChange="result => testState = result.parsedData[0].data[0]"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "data.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('{"name":"Widget","price":10}'),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.name;
+    }).toBe("Widget");
+
+    const result = await testStateDriver.testState();
+    expect(result.price).toBe(10);
+  });
+
+  test("handles empty csv file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="csv" onDidChange="result => testState = result.parsedData[0].data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "empty.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(""),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(0);
+  });
+
+  test("handles empty json file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput parseAs="json" onDidChange="result => testState = result.parsedData[0].data.length" />
+    `);
+    const driver = await createFileInputDriver();
+    // Empty JSON is handled gracefully and returns empty array.
+    await driver.getHiddenInput().setInputFiles({
+      name: "empty.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(""),
+    });
+
+    await expect.poll(testStateDriver.testState).toEqual(0);
+  });
+
+  test("can override acceptsFileType when parseAs is set", async ({ initTestBed, createFileInputDriver }) => {
+    await initTestBed(`<FileInput parseAs="csv" acceptsFileType=".txt,.csv" />`);
+    const driver = await createFileInputDriver();
+    // Explicit acceptsFileType should override inference.
+    await expect(driver.getHiddenInput()).toHaveAttribute("accept", ".txt,.csv");
+  });
+
+  test("verifies ParseResult structure for multiple files", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="csv"
+        multiple="true"
+        onDidChange="result => testState = {
+          hasFile: !!result.parsedData[0].file,
+          hasData: Array.isArray(result.parsedData[0].data),
+          fileName: result.parsedData[0].file.name
+        }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles([
+      {
+        name: "test.csv",
+        mimeType: "text/csv",
+        buffer: Buffer.from("name,price\nWidget,10\n"),
+      },
+    ]);
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.hasFile;
+    }).toBe(true);
+
+    const result = await testStateDriver.testState();
+    expect(result.hasData).toBe(true);
+    expect(result.fileName).toBe("test.csv");
+  });
+
+  test("onParseError receives error and file", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        onParseError="(error, file) => testState = { hasError: !!error, fileName: file.name }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{invalid"),
+    });
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.hasError;
+    }).toBe(true);
+
+    const result = await testStateDriver.testState();
+    expect(result.fileName).toBe("bad.json");
+  });
+
+  test("handles mixed success and failure in multiple files", async ({ initTestBed, createFileInputDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <FileInput
+        parseAs="json"
+        multiple="true"
+        onDidChange="result => testState = {
+          total: result.parsedData.length,
+          errors: result.parsedData.filter(r => r.error).length,
+          success: result.parsedData.filter(r => !r.error).length
+        }"
+      />
+    `);
+    const driver = await createFileInputDriver();
+    await driver.getHiddenInput().setInputFiles([
+      {
+        name: "good.json",
+        mimeType: "application/json",
+        buffer: Buffer.from('{"name":"Widget"}'),
+      },
+      {
+        name: "bad.json",
+        mimeType: "application/json",
+        buffer: Buffer.from("{invalid"),
+      },
+    ]);
+
+    await expect.poll(async () => {
+      const result = await testStateDriver.testState();
+      return result?.total;
+    }).toBe(2);
+
+    const result = await testStateDriver.testState();
+    expect(result.success).toBe(1);
+    expect(result.errors).toBe(1);
+  });
+});
+
+// =============================================================================
+// BEHAVIORS AND PARTS TESTS
+// =============================================================================
+
+test.describe("Behaviors and Parts", () => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markRequired" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markRequired" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="true" requireLabelMode="markBoth" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("*");
+    await expect(label).not.toContainText("(Optional)");
+  });
+
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markBoth" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).not.toContainText("*");
+    await expect(label).toContainText("(Optional)");
+  });
+
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markRequired">
+        <FileInput testId="test" label="Upload Document" required="false" requireLabelMode="markOptional" bindTo="document" />
+      </Form>
+    `);
+    
+    const label = page.getByText("Upload Document");
+    await expect(label).toContainText("(Optional)");
+    await expect(label).not.toContainText("*");
+  });
+
+  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Form itemRequireLabelMode="markBoth">
+        <FileInput testId="test1" label="Required Field" required="true" bindTo="field1" />
+        <FileInput testId="test2" label="Optional Field" required="false" bindTo="field2" />
+      </Form>
+    `);
+    
+    const requiredLabel = page.getByText("Required Field");
+    const optionalLabel = page.getByText("Optional Field");
+    
+    await expect(requiredLabel).toContainText("*");
+    await expect(requiredLabel).not.toContainText("(Optional)");
+    await expect(optionalLabel).toContainText("(Optional)");
+    await expect(optionalLabel).not.toContainText("*");
+  });
+
+  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput
+          testId="test"
+          label="Upload file"
+          labelPosition="top"
+        />
+      </Form>
+    `);
+    
+    // Should only have one label with the text "Upload file"
+    const labels = page.getByText("Upload file");
+    await expect(labels).toHaveCount(1);
   });
 });

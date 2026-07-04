@@ -121,6 +121,12 @@ async function collectAssets(outDir: string): Promise<string[]> {
 
 export default defineConfig({
   base: "./",
+  resolve: {
+    alias: {
+      "attr-accept": path.resolve("src/compat/attrAccept.ts"),
+      papaparse: path.resolve("src/compat/papaParse.ts"),
+    },
+  },
   plugins: [
     rawScssModulePlugin(),
     svgReactPlugin(),

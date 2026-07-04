@@ -4,8 +4,8 @@ import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { appStateRenderer } from "../components/AppState/AppState";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
-import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
-import { badgeRenderer } from "../components/Badge/Badge.renderer";
+import { avatarRenderer } from "../components/Avatar/Avatar";
+import { badgeRenderer } from "../components/Badge/Badge";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { buttonRenderer } from "../components/Button/Button";
@@ -19,8 +19,8 @@ import { conciseValidationFeedbackRenderer } from "../components/ConciseValidati
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu.renderer";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
-import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
-import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
+import { dateInputRenderer } from "../components/DateInput/DateInput";
+import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
 import {
   dropdownMenuRenderer,
@@ -31,7 +31,7 @@ import {
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
-import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
+import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
@@ -82,8 +82,9 @@ import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/Te
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
 import { queueRenderer } from "../components/Queue/Queue.renderer";
-import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
-import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";
+import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
+import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
+import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
 import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
 import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
@@ -211,7 +212,7 @@ export const coreRuntimeRendererEntries = [
   { name: "MenuSeparator", renderer: menuSeparatorRenderer },
   { name: "SubMenuItem", renderer: subMenuItemRenderer },
   { name: "AutoComplete", renderer: autoCompleteRenderer },
-  { name: "FileInput", renderer: fileInputRenderer },
+  { name: "FileInput", renderer: fileInputRuntimeRenderer },
   { name: "FileUploadDropZone", renderer: fileUploadDropZoneRenderer },
   { name: "FocusScope", renderer: focusScopeRenderer },
   { name: "Footer", renderer: footerRuntimeRenderer },
@@ -228,7 +229,8 @@ export const coreRuntimeRendererEntries = [
   { name: "Tree", renderer: treeRenderer },
   { name: "TreeDisplay", renderer: treeDisplayRenderer },
   { name: "TableOfContents", renderer: tableOfContentsRenderer },
-  { name: "RadioGroup", renderer: radioGroupRenderer },
+  { name: "RadioGroup", renderer: radioGroupRuntimeRenderer },
+  { name: "RadioItem", renderer: radioItemRenderer },
   { name: "ScrollViewer", renderer: scrollViewerRenderer },
   { name: "Select", renderer: selectRenderer },
   { name: "SelectionStore", renderer: selectionStoreRenderer },

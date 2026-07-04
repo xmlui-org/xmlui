@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 80 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 71 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 1 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 23 |
+| Complete | User approved after audit and verification. | 32 |
 
 The `Audit required` count is a starting estimate from the current rewrite
 component inventory. Update it whenever a component changes state.
@@ -338,10 +338,10 @@ it.
 | AppHeader | `AppHeaderReact.tsx`, `AppHeader.module.scss` | Logo, NavPanel context | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs AppHeader` passed (`AppHeader.tsx` entry-adapted; `AppHeaderReact.tsx` import-only; copied SCSS/docs/defaults/spec identical). Runtime adapter appended below copied entry and root-attribute bridge added outside copied React implementation. `npm --prefix xmlui run check:metadata` passed. Focused copied smoke `XMLUI_REUSE_DEV_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/AppHeader/AppHeader.spec.ts --grep "renders with basic props" --workers=1` passed 1/1. |
 | AppState | `AppState.tsx`, `AppStateReact.tsx`, `AppState.defaults.ts`, `AppState.md`, `AppState.spec.ts` | runtime state registry, framework-level `id`/`ref`/`testId` props, compiled reference API calls, static component-id binding | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs AppState` passed (`AppState.tsx` entry-adapted; copied React/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Host contract generation now admits framework-level `id`, `ref`, and `testId` outside copied metadata, and the runtime adapter exposes AppState references through `id` or legacy `ref`. Script codegen now allows AppState API method calls (`update`, `appendToList`, `removeFromList`, `listIncludes`) so compiled markup such as `appState.update({ enhancedMode: v })` works. Script scope creation now binds static component `id`/`ref` values as references, preventing child component markup such as `<AppState id="state" />` plus `enabled="{state.value.enhancedMode}"` from compiling `state` as an implicit global. `npm --prefix xmlui run check:metadata` passed. Protected-file audit passed. Full copied suite plus added foundation regression `XMLUI_E2E_DEV_PORT=5227 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/AppState/AppState.spec.ts xmlui/src/components/AppState/AppState.foundation.spec.ts --workers=1` passed 17/17. Focused compiler regression `npx vitest run xmlui/tests/compiler/compileXmluiModule.test.ts --testNamePattern "AppState API|static component ids"` passed 2/2. Sample Vite plugin verification passed by starting `npm run dev` in `sample/` and fetching `/src/Main.xmlui?import`, which compiled the posted `appState.update` sample without the unsupported-method error; a Playwright probe confirmed the `Set enhanced options` button is disabled when unchecked, enabled when checked, and disabled again when unchecked. |
 | AutoComplete | `AutoCompleteReact.tsx`, `AutoComplete.module.scss`, `AutoComplete.defaults.ts`, `AutoComplete.md`, `AutoComplete.spec.ts`, `AutoCompleteContext.tsx` | Input, Option, popover, event mutation invalidation | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs AutoComplete` passed (`AutoComplete.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec/context identical). Runtime adapter appended below copied entry; host fixes stayed outside copied protected files. `npm --prefix xmlui run check:metadata` passed. Focused compiler/runtime coverage passed for `item => newItems.push(item)` compilation and in-place mutation invalidation. Focused AutoComplete E2E `XMLUI_E2E_DEV_PORT=5224 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/AutoComplete/AutoComplete.spec.ts --grep "creates new option" --workers=1` passed 1/1. Manual Playwright probe against the sample confirmed typing `Peter Parker` and pressing Enter renders `New items: Peter Parker`. |
-| Avatar | `AvatarReact.tsx`, `Avatar.module.scss` | image/icon fallback | Audit required | visual variants and initials |
-| Badge | `BadgeReact.tsx`, `Badge.module.scss` | theme variants | Audit required | font, color, size computed styles |
+| Avatar | `Avatar.tsx`, `AvatarReact.tsx`, `Avatar.module.scss`, `Avatar.defaults.ts`, `Avatar.md`, `Avatar.spec.ts` | image/icon fallback, border theme precedence | Complete | User approved after protected-file audit, metadata verification, and copied E2E coverage. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Avatar` passed (`Avatar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; runtime and inventory registries import the provider-style entry. Host fixes stayed outside copied React/SCSS: adapter-tail border precedence now prevents generated side longhands from `border-Avatar` from overriding explicit aggregate `borderColor-Avatar` or `borderStyle-Avatar`, while preserving side-specific overrides. `npm --prefix xmlui run check:metadata` passed. Full copied suite passed with `XMLUI_E2E_DEV_PORT=5293 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Avatar/Avatar.spec.ts xmlui/src/components/Badge/Badge.spec.ts xmlui/src/components/Br/Br.spec.ts --workers=1` (125/125 across the batch). |
+| Badge | `Badge.tsx`, `BadgeReact.tsx`, `Badge.module.scss`, `Badge.defaults.ts`, `Badge.md`, `Badge.spec.ts` | theme variants | Complete | User approved after protected-file audit, metadata verification, and copied E2E coverage. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Badge` passed (`Badge.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; runtime and inventory registries import the provider-style entry. `npm --prefix xmlui run check:metadata` passed. Full copied suite passed in the Avatar/Badge/Br batch: `XMLUI_E2E_DEV_PORT=5293 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Avatar/Avatar.spec.ts xmlui/src/components/Badge/Badge.spec.ts xmlui/src/components/Br/Br.spec.ts --workers=1` (125/125). |
 | Bookmark | `Bookmark.module.scss` if original has it | router/hash scroll container | Audit required | hash navigation in page and nested scroll |
-| Br | no protected React file expected | renderer text flow | Audit required | line break rendering |
+| Br | `Br.tsx`, `Br.spec.ts` | renderer text flow, original `PropsTrasform` helper typo shim | Complete | User approved after protected-file audit, metadata verification, and copied E2E coverage. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Br` passed (`Br.tsx` entry-adapted; copied spec identical). Runtime adapters for `br` and `Br` appended below copied entry; shared host shims added outside the copied body for the original misspelled `PropsTrasform` import and custom-render `extractResourceUrl` argument. `npm --prefix xmlui run check:metadata` passed. Full copied suite passed in the Avatar/Badge/Br batch: `XMLUI_E2E_DEV_PORT=5293 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Avatar/Avatar.spec.ts xmlui/src/components/Badge/Badge.spec.ts xmlui/src/components/Br/Br.spec.ts --workers=1` (125/125). |
 | Button | `Button.tsx`, `ButtonReact.tsx`, `Button.module.scss`, `Button.defaults.ts`, `Button.md`, `Button.spec.ts`, `Button-style.spec.ts`; added `Button.compat.spec.ts` | Icon, event handler, theme, test resources | Complete | User approved after protected-file audit and verification. `node xmlui/scripts/verify-protected-component-copy.mjs Button` passed (`Button.tsx` entry-adapted; copied React/SCSS/defaults/docs/specs identical); `npm --prefix xmlui run check:metadata` passed; `XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Button/Button.spec.ts xmlui/src/components/Button/Button-style.spec.ts xmlui/src/components/Button/Button.compat.spec.ts --workers=1` passed 154/160 with 6 original skips. Added compatibility spec asserts original secondary solid hover colors: border `rgb(226, 229, 234)` and background `rgb(140, 151, 169)`. |
 | Card | `Card.tsx`, `CardReact.tsx`, `Card.module.scss`, `Card.defaults.ts`, `Card.md`, `Card.spec.ts`; added `Card.foundation.spec.ts` | layout props, Avatar/Link/Part host shims | Complete | User approved after protected-file audit, metadata verification, copied E2E suite, added foundation regression, and live DOM parity check for title/subtitle typography. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Card` passed (`Card.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry and registries now import the provider-style entry renderer; obsolete `Card.renderer.tsx` removed. Host compatibility restored outside copied Card source with `ThemedAvatar`, `ThemedLinkNative`, `capitalizeFirstLetter`, Card child shrink normalization for scrollable fixed-size children, stale foundation selector alignment to original `data-part-id`, and generic Heading theme emission for level-specific title variables used by copied Card internals. Live DOM comparison for `<Card avatarUrl="https://i.pravatar.cc/100" title="Example Title" subtitle="Predefined subtitle" maxWidth="300px">...` matched original title `20px/25px/600` and subtitle `14px/23.8px/400` geometry. `npm --prefix xmlui run check:metadata` passed. Full copied suite `XMLUI_E2E_DEV_PORT=5179 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Card/Card.spec.ts --workers=1` passed 27/27. Added foundation regression `XMLUI_E2E_DEV_PORT=5180 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Card/Card.foundation.spec.ts --workers=1` passed 1/1. Focused Heading sizing check `XMLUI_E2E_DEV_PORT=5179 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Heading/Heading.spec.ts --grep "component supports different heading levels with different font sizes" --workers=1` passed 1/1. |
 | ChangeListener | original implementation file | reactive state graph | Audit required | change event trigger tests |
@@ -353,14 +353,14 @@ it.
 | ContentSeparator | `ContentSeparatorReact.tsx`, module SCSS | theme | Audit required | orientation and spacing |
 | ContextMenu | `ContextMenuReact.tsx`, module SCSS | menu, portal, focus | Audit required | open/close, nested menu |
 | DataSource | original implementation file | APICall, cache, data state | Audit required | load, transform, error, refetch |
-| DateInput | `DateInputReact.tsx`, module SCSS | Input, date utils | Audit required | parsing, formatting, disabled |
-| DatePicker | `DatePickerReact.tsx`, module SCSS | DateInput, popover/calendar | Audit required | calendar and keyboard tests |
+| DateInput | `DateInputReact.tsx`, module SCSS; added `DateInput.compat.spec.ts` | Input, date utils | Complete | User approved after protected-file audit, metadata verification, focused copied-suite checks, compatibility regressions, and DOM parity probes. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs DateInput` passed (`DateInput.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Follow-up fixes restored original-style border, padding, disabled surface colors, placeholder color, validation border colors, clear button height, and `clearToInitialValue="false"` controlled-clear behavior while keeping copied React/SCSS protected. Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_E2E_DEV_PORT=5286 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/DateInput/DateInput.compat.spec.ts --workers=1` passed 4/4. |
+| DatePicker | `DatePickerReact.tsx`, module SCSS; added `DatePicker.compat.spec.ts` | DateInput, popover/calendar | Complete | User approved after protected-file audit, metadata verification, copied E2E suite, compatibility regressions, and DOM parity probes. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs DatePicker` passed (`DatePicker.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below the copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Added original Ark UI dependency `@ark-ui/react@5.36.2`, restored `useMediaQuery` in the shared hooks shim, bridged runtime root attributes/test ids/state onto the copied root, supplied standalone DatePicker theme defaults, wired direct `bindTo`/Form registration/value API/validation feedback, preserved copied range default month behavior by not forcing `numOfMonths`, normalized the quoted custom preset array expression expected by the copied suite, fixed the adapter's disabled border/text aliases to point at the original-style global disabled tokens, mapped the disabled DatePicker background alias to the emitted root background token used by the original runtime, and pinned DatePicker validation-border aliases to the original emitted colors. Local DOM probes matched original disabled input colors (background `rgb(248, 250, 251)`, border `rgb(199, 214, 225)`, text `rgb(96, 140, 170)`) and validation borders for none/valid/warning/error (`rgb(199, 214, 225)`, `rgb(86, 211, 106)`, `rgb(218, 127, 0)`, `rgb(245, 0, 16)`). Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_E2E_DEV_PORT=5321 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/DatePicker/DatePicker.compat.spec.ts --workers=1` passed 2/2; `XMLUI_E2E_DEV_PORT=5322 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/DatePicker/DatePicker.spec.ts --workers=1` passed 97/100 with 3 original skips. A DatePicker-filtered `tsc` grep still reports strictness diagnostics inside copied protected `DatePickerReact.tsx`; left untouched per protected-file rule. |
 | Drawer | `DrawerReact.tsx`, module SCSS | portal, layer stack, focus | Audit required | backdrop, close, position |
 | DropdownMenu | `DropdownMenuReact.tsx`, module SCSS | menu, portal, focus | Audit required | menu item and submenu tests |
 | EventSource | original implementation file | stream service, data ops | Audit required | open/message/error lifecycle |
 | ExpandableItem | `ExpandableItemReact.tsx`, module SCSS | Icon, layout | Audit required | original tests and summary DOM measurements |
 | Fallback | `FallbackReact.tsx` | APICall/DataSource loading contract | Audit required | loading/error fallback tests |
-| FileInput | `FileInputReact.tsx`, module SCSS | input, form | Audit required | file selection tests |
+| FileInput | `FileInputReact.tsx`, module SCSS; added `FileInput.compat.spec.ts` and `FileInput.compat.module.scss` | input, form | Complete | User approved after protected-file audit, metadata verification, focused smoke/CSV parsing checks, and Browse button polish. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs FileInput` passed (`FileInput.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Vite aliases preserve copied imports for `attr-accept` and `papaparse` default-export compatibility. The Browse button intentionally improves on an original visual issue by hiding an empty default icon slot in the runtime adapter path, centering the label without modifying copied source. Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_E2E_DEV_PORT=5287 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/FileInput/FileInput.compat.spec.ts --workers=1` passed 1/1. |
 | FileUploadDropZone | `FileUploadDropZoneReact.tsx`, module SCSS | drag/drop, FileInput | Audit required | drag states and file events |
 | FlowLayout | `FlowLayoutReact.tsx`, module SCSS | layout props | Audit required | responsive placement tests |
 | FocusScope | `FocusScopeReact.tsx`, module SCSS | focus manager | Audit required | tab trapping and restore |
@@ -376,7 +376,7 @@ it.
 | Icon | `Icon.tsx`, `IconReact.tsx`, `Icon.module.scss`, `Icon.md`, `Icon.spec.ts`, original helper icon TSX files, icon module SCSS files, `Icon/svg/*`, `IconProvider.tsx`, `IconRegistryContext.tsx`, `icons-abstractions.ts` | original icon provider/registry, SVG React transform, theme resource lookup | Complete | User approved after protected-file audit and verification. Original Icon folder, docs, copied spec, SVG assets, registry provider, registry context, and icon-name abstractions copied from the original. `Icon.tsx` is entry-adapted with rewrite runtime renderer appended; copied `IconReact.tsx`, `Icon.module.scss`, `Icon.md`, and `Icon.spec.ts` are identical under verifier. Added host shims for old `ThemeContext`, `useIsomorphicLayoutEffect`, and `toCssVar`; added `svgReactPlugin` so original `*.svg?react` imports work without editing icon helpers. `node xmlui/scripts/verify-protected-component-copy.mjs Icon` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/Icon/Icon.spec.ts --workers=1` passed 44/44; `npm --prefix xmlui run check:metadata` passed. |
 | Image | `ImageReact.tsx`, module SCSS | resource URLs | Audit required | fit/fallback/loading tests |
 | IncludeMarkup | `IncludeMarkupReact.tsx` | markup loader/compiler | Audit required | include loading/error |
-| Input helpers | `InputAdornment.tsx`, `InputDivider.tsx`, `InputLabel.tsx`, `PartialInput.tsx`, module SCSS | TextBox, NumberBox, ColorPicker | Audit required | shared label/adornment measurements |
+| Input helpers | `InputAdornment.tsx`, `InputDivider.tsx`, `InputLabel.tsx`, `PartialInput.tsx`, module SCSS | TextBox, NumberBox, ColorPicker | Complete | User approved after protected-helper audit and metadata verification. Helper modules were copied as shared prerequisites for the input-family remigration. `node xmlui/scripts/verify-protected-component-copy.mjs Input` passed for copied SCSS modules (`InputAdornment.module.scss`, `InputDivider.module.scss`, `InputLabel.module.scss`, `PartialInput.module.scss` identical). `npm --prefix xmlui run check:metadata` passed. Runtime consumers including TextBox, DateInput, FileInput, RadioGroup, NumberBox, and TextArea carry the component-specific parity evidence in their rows and follow-up notes. |
 | InspectButton / Inspector | original React files and SCSS | dev tools state | Audit required | inspect mode tests |
 | Items | `ItemsReact.tsx` | renderer collection | Audit required | repeated item rendering |
 | Lifecycle | original implementation file | renderer lifecycle | Audit required | mount/unmount events |
@@ -404,8 +404,8 @@ it.
 | ProgressBar | `ProgressBar.tsx`, `ProgressBarReact.tsx`, `ProgressBar.module.scss`, `ProgressBar.defaults.ts`, `ProgressBar.md`, `ProgressBar.spec.ts` | theme variants, single-file metadata/renderer entry | Complete | User approved after protected-file audit and verification. `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar` passed (`ProgressBar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical); `npm --prefix xmlui run check:metadata` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts --workers=1` passed 22/22. |
 | QRCode | `QRCodeReact.tsx`, module SCSS | QR library/runtime | Audit required | generated code output |
 | Queue | original implementation file | async orchestration | Audit required | queue lifecycle tests |
-| RadioGroup | `RadioGroupReact.tsx`, module SCSS | Option, FormItem | Audit required | selection and keyboard |
-| RatingInput | `RatingInputReact.tsx`, module SCSS | input/form | Audit required | value and hover tests |
+| RadioGroup | `RadioGroupReact.tsx`, `RadioItemReact.tsx`, module SCSS; added `RadioGroup.compat.spec.ts` | Option, FormItem | Complete | User approved after protected-file audit, metadata verification, focused smoke checks, disabled border parity, and validation border parity. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs RadioGroup` passed (`RadioGroup.tsx` entry-adapted; copied React/RadioItemReact/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Adapter-tail aliases now bridge copied RadioGroup option border variables for default, hover, active, disabled, and validation states. Live DOM probes matched original for disabled option borders (`rgb(199, 214, 225)`) and selected validation borders (`rgb(245, 0, 16)`, `rgb(218, 127, 0)`, `rgb(86, 211, 106)`) while unselected options remain `rgb(199, 214, 225)`. Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_E2E_DEV_PORT=5289 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/RadioGroup/RadioGroup.compat.spec.ts --workers=1` passed 2/2. |
+| RatingInput | `RatingInputReact.tsx`, module SCSS | input/form | Complete | User approved after protected-file audit and metadata verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs RatingInput` passed (`RatingInput.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Focused smoke E2E from the remigration batch passed for `renders`; `npm --prefix xmlui run check:metadata` passed. |
 | Redirect | renderer only unless original has protected file | router | Audit required | immediate and conditional redirect |
 | ResponsiveBar | `ResponsiveBarReact.tsx`, module SCSS | layout measurement | Audit required | overflow/collapse behavior |
 | RetryPolicy | original implementation file | APICall/DataSource | Audit required | retry timing and cancellation |
@@ -599,6 +599,179 @@ completed only after APICall/DataSource behavior is available.
   `http://127.0.0.1:5173/src/Main.xmlui?import` returned HTTP 200 after the
   compile fix, and a Playwright probe of the sample rendered
   `New items: Peter Parker` after typing a new item and pressing Enter.
+
+## Handoff: DateInput, FileInput, Input Helpers, RadioGroup, RatingInput
+
+- Strict protected-source copy was performed for `DateInput`, `FileInput`,
+  `Input` helpers, `RadioGroup` plus `RadioItem`, and `RatingInput` from
+  `/Users/dotneteer/source/xmlui/xmlui/src/components`.
+- Runtime registration was moved to provider-style component entries for
+  `DateInput`, `FileInput`, `RadioGroup`, `RadioItem`, and `RatingInput`;
+  stale rewrite sidecar renderers for DateInput/FileInput/RatingInput were
+  removed.
+- Shared host/harness prerequisites added outside protected component bodies:
+  original dependency packages (`date-fns`, `papaparse`, `react-dropzone`,
+  `@radix-ui/react-radio-group`, `@types/papaparse`), the original
+  `LoggerService` shim needed by copied FileInput, `stateful` tolerance in the
+  compatibility `wrapComponent`, `FileInputDriver` fixture support, and
+  FormItem host imports updated to the copied DateInput/RadioGroup exports.
+- Vite runtime compatibility shims were added for copied FileInput dependency
+  imports whose browser package files do not expose native ESM default exports:
+  `attr-accept` aliases to `xmlui/src/compat/attrAccept.ts`, and `papaparse`
+  aliases to `xmlui/src/compat/papaParse.ts` in the xmlui, production, SSR,
+  standalone, and sample Vite configs. These shims keep
+  `FileInputReact.tsx` protected and identical.
+- Protected-copy audit passed:
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`,
+  `FileInput`, `RadioGroup`, and `RatingInput` all reported copied protected
+  files as `identical` with main entries `entry-adapted`.
+- Metadata verification passed:
+  `npm --prefix xmlui run check:metadata` generated
+  `dist-metadata/xmlui-metadata.json` with 234 components and 3 examples.
+- Focused smoke E2E passed:
+  DateInput `renders with basic props`; FileInput `component renders with basic
+  props`; RadioGroup `RadioGroup with Option elements as children` plus
+  `Providing non-Option elements as children still renders`; RatingInput
+  `renders`.
+- Focused FileInput CSV parsing E2E passed after the PapaParse shim:
+  `parses csv and emits row data`, custom delimiter, dynamic typing, headerless
+  parsing, and parsed CSV data structure.
+- Full FileInput E2E currently has 57 passing and 6 failing tests. The failures
+  are remaining host-contract gaps (`bindTo`, theme variable propagation,
+  unsupported `focus` event alias, percentage width normalization, and
+  unsupported `Array.isArray` script method), not the dependency import shims.
+- Full copied batch was started with DateInput/FileInput/RadioGroup/RatingInput
+  specs and interrupted after DateInput exposed remaining host-contract
+  failures. At interruption: 135 passed, 13 failed, 1 interrupted, 1 skipped,
+  158 not run. The failures cluster around DateInput invalid initial-value
+  parsing, `borderWidth-DateInput*` theme emission, `bindTo`/API value
+  propagation, label behavior, percentage width normalization, and validation
+  feedback/concise feedback rendering. Do not edit copied DateInput protected
+  files to fix these; continue in shared label/form/theme/runtime adapter
+  contracts.
+- DateInput border regression follow-up: the copied SCSS references input-style
+  theme variables that were not emitted by the rewrite adapter, causing the
+  browser to compute no visible border. Added DateInput input theme aliases
+  below the copied entry body in `DateInput.tsx`. Browser probe for
+  `<DateInput initialValue="05/25/2024" />` now reports `1px solid
+  rgb(199, 214, 225)`, `4px` radius, `40px` min-height, and `8px` padding.
+  Verification passed: `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  focused DateInput E2E grep `applies correct border` passed 20/20.
+- DateInput clearable height follow-up: the second DateInput was taller in the
+  rewrite because copied clear-button icons rendered as inline SVGs. Original
+  XMLUI's global reset sets media elements, including `svg`, to `display:
+  block` and `vertical-align: middle`; added that reset to `xmlui/src/global.css`.
+  This matched the original at `45px`, but the original still had a product
+  issue where clearable DateInput was taller than non-clearable DateInput.
+  Adjusted the DateInput adapter theme alias `padding-button-DateInput` to
+  `1.5px 6px`, keeping copied React and SCSS files protected. Direct Playwright
+  probe now reports both controls at `40px`; the clearable control has wrapper
+  `153.84375 x 40` and clear button `31 x 22`. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  focused DateInput E2E grep `clear button` passed 7/7.
+- DateInput `clearToInitialValue="false"` follow-up: the copied component
+  correctly emits `null` when clearing, but the rewrite runtime adapter was
+  coercing `null` to `undefined` in both `updateState` and `onDidChange`; that
+  made the copied component re-enter its uncontrolled `initialValue` path and
+  restore the initial date in adjacent clearable instances. Updated the
+  DateInput adapter shell to preserve `null` as an explicit controlled clear
+  value while still treating `undefined` as uncontrolled. Added
+  `DateInput.compat.spec.ts` for the side-by-side clear regression. Browser
+  probe for two clearable DateInputs now keeps the first at `05/25/2024` after
+  clear and clears the second to empty fields. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  focused DateInput E2E grep `clearToInitialValue stays independent|clear
+  button` passed 8/8.
+- DateInput `emptyCharacter` placeholder color follow-up: copied
+  `PartialInput` only sets placeholder opacity and relies on original XMLUI's
+  global placeholder reset for color. Added the missing `input::placeholder`
+  and `textarea::placeholder` color reset to `xmlui/src/global.css`, matching
+  original `#9ca3af`. Added coverage in `DateInput.compat.spec.ts`; direct
+  browser probe for `emptyCharacter="."`, `"*"`, and `"abc"` reports
+  placeholder color `rgb(156, 163, 175)` and opacity `0.6`. Verification
+  passed: `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  `XMLUI_E2E_DEV_PORT=5284 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/DateInput/DateInput.compat.spec.ts
+  --workers=1` passed 2/2.
+- DateInput disabled surface follow-up: the adapter aliases still pointed at
+  legacy disabled tokens (`$backgroundColor-disabled`, `$textColor-disabled`,
+  `$borderColor-disabled`) and forced disabled opacity to `0.5`. Aligned them
+  with original-compatible disabled tokens used by DatePicker/TextBox:
+  background `$backgroundColor`, text `$textColor--disabled`, border
+  `$borderColor--disabled`, opacity `1`. Direct rewrite/original browser probes
+  now match for `<DateInput enabled="false" initialValue="05/25/2024" />`:
+  border `rgb(199, 214, 225)`, background `rgb(248, 250, 251)`, text
+  `rgb(96, 140, 170)`, opacity `1`. Added disabled coverage to
+  `DateInput.compat.spec.ts`. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  `XMLUI_E2E_DEV_PORT=5285 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/DateInput/DateInput.compat.spec.ts
+  --workers=1` passed 3/3.
+- DateInput validation border follow-up: the adapter aliases used lighter
+  `$color-danger-500`, `$color-warn-500`, and `$color-success-500` values,
+  while original XMLUI emits the darker validation border colors already pinned
+  for DatePicker. Updated only the DateInput adapter aliases to
+  `hsl(356, 100%, 48%)`, `hsl(35, 100%, 42.8%)`, and
+  `hsl(129.5, 58.4%, 58.1%)`. Added `DateInput.compat.spec.ts` coverage for
+  `validationStatus="valid"`, `"warning"`, and `"error"` expecting
+  `rgb(86, 211, 106)`, `rgb(218, 127, 0)`, and `rgb(245, 0, 16)`. Direct
+  original/rewrite browser probes for the validation snippet now match those
+  three border colors. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs DateInput`;
+  `XMLUI_E2E_DEV_PORT=5286 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/DateInput/DateInput.compat.spec.ts
+  --workers=1` passed 4/4.
+- FileInput Browse button polish follow-up: the original and rewrite both
+  rendered an empty leading icon slot before the default `Browse` label when no
+  browse icon glyph was available; the slot had zero width, but Button's flex
+  gap shifted the label so the left visual padding looked larger than the
+  right. This is an intentional new-project polish fix rather than strict
+  original parity. Added a non-protected `FileInput.compat.module.scss` rule
+  and applied its root class from the runtime adapter so an empty first icon
+  span inside the FileInput Browse button is `display: none`; copied
+  `FileInputReact.tsx` and `FileInput.module.scss` remain identical. Live DOM
+  probe now reports the Browse text inset as `15px` from both left and right,
+  with CSS padding still `14px` on both sides. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs FileInput`;
+  `XMLUI_E2E_DEV_PORT=5287 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/FileInput/FileInput.compat.spec.ts
+  --workers=1` passed 1/1.
+- RadioGroup disabled option border follow-up: copied `RadioGroup.module.scss`
+  consumes `Input:borderColor-RadioGroupOption`,
+  `Input:borderColor-RadioGroupOption--hover`,
+  `Input:borderColor-RadioGroupOption--active`, and
+  `Input:borderColor-RadioGroupOption--disabled`, but the migrated entry only
+  supplied the legacy `--default` aliases. Added adapter-tail theme aliases for
+  those tokens, with disabled border pointing at `$borderColor--disabled`.
+  Direct original/rewrite browser probes for the disabled RadioGroup/HStack
+  sample now match for all three options at `rgb(199, 214, 225)`. Added
+  `RadioGroup.compat.spec.ts` coverage for the wrapped disabled options.
+  Verification passed: `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs RadioGroup`;
+  `XMLUI_E2E_DEV_PORT=5288 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/RadioGroup/RadioGroup.compat.spec.ts
+  --workers=1` passed 1/1.
+- RadioGroup validation border follow-up: copied RadioGroup correctly applies
+  `error`, `warning`, and `valid` classes only to the selected option, but the
+  rewrite was not emitting `borderColor-RadioGroupOption--error`,
+  `--warning`, or `--success` values that resolved in the copied stylesheet.
+  Added adapter-tail aliases matching the original emitted validation colors:
+  `rgb(245, 0, 16)`, `rgb(218, 127, 0)`, and `rgb(86, 211, 106)`. Direct
+  original/rewrite browser probes for the three validation RadioGroups now
+  match: selected options use colored `2px` borders and unselected options
+  remain `rgb(199, 214, 225)` at `1px`. Extended `RadioGroup.compat.spec.ts`.
+  Verification passed: `npm --prefix xmlui run check:metadata`;
+  `node xmlui/scripts/verify-protected-component-copy.mjs RadioGroup`;
+  `XMLUI_E2E_DEV_PORT=5289 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/RadioGroup/RadioGroup.compat.spec.ts
+  --workers=1` passed 2/2.
 
 ## New Session Bootstrap
 

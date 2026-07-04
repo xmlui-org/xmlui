@@ -1,15 +1,18 @@
-.inputLabel {
-  cursor: pointer;
-  color: var(--xmlui-textColor-subtitle, var(--xmlui-color-surface-700));
-  padding-bottom: var(--xmlui-space-1, 0.25rem);
-}
+@use "../../components-core/theming/themes" as t;
 
-.disabled {
-  cursor: not-allowed;
-  color: var(--xmlui-textColor--disabled, var(--xmlui-color-surface-500));
-}
+@layer components {
+  .inputLabel {
+    cursor: pointer;
+    color: t.$textColor-subtitle;
+    padding-bottom: t.$space-1;
 
-.required {
-  color: var(--xmlui-textColor-InputLabel-required, var(--xmlui-color-danger-500));
-}
+    &.disabled {
+      cursor: not-allowed;
+      color: t.$textColor--disabled;
+    }
+  }
 
+  .required {
+    color: t.$textColor-InputLabel-required;
+  }
+}

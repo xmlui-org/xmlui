@@ -8,6 +8,12 @@ import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "attr-accept": path.resolve("src/compat/attrAccept.ts"),
+      papaparse: path.resolve("src/compat/papaParse.ts"),
+    },
+  },
   plugins: [
     rawScssModulePlugin(),
     svgReactPlugin(),

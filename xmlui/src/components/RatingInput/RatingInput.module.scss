@@ -1,36 +1,48 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: (
+);
 
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$textColor-placeholder-RatingInput: createThemeVar("textColor-placeholder-RatingInput");
-$fontSize-placeholder-RatingInput: createThemeVar("fontSize-placeholder-RatingInput");
-$color-star-RatingInput: createThemeVar("color-star-RatingInput");
-$color-star-RatingInput--active: createThemeVar("color-star-RatingInput--active");
-$fontSize-star-RatingInput: createThemeVar("fontSize-star-RatingInput");
-$gap-RatingInput: createThemeVar("gap-RatingInput");
-$outlineColor-RatingInput--error: createThemeVar("outlineColor-RatingInput--error");
-$outlineWidth-RatingInput--error: createThemeVar("outlineWidth-RatingInput--error");
-$outlineStyle-RatingInput--error: createThemeVar("outlineStyle-RatingInput--error");
-$borderRadius-RatingInput--error: createThemeVar("borderRadius-RatingInput--error");
-$outlineColor-RatingInput--warning: createThemeVar("outlineColor-RatingInput--warning");
-$outlineWidth-RatingInput--warning: createThemeVar("outlineWidth-RatingInput--warning");
-$outlineStyle-RatingInput--warning: createThemeVar("outlineStyle-RatingInput--warning");
-$borderRadius-RatingInput--warning: createThemeVar("borderRadius-RatingInput--warning");
-$outlineColor-RatingInput--valid: createThemeVar("outlineColor-RatingInput--valid");
-$outlineWidth-RatingInput--valid: createThemeVar("outlineWidth-RatingInput--valid");
-$outlineStyle-RatingInput--valid: createThemeVar("outlineStyle-RatingInput--valid");
-$borderRadius-RatingInput--valid: createThemeVar("borderRadius-RatingInput--valid");
-$opacity-RatingInput--disabled: createThemeVar("opacity-RatingInput--disabled");
-$opacity-RatingInput--readOnly: createThemeVar("opacity-RatingInput--readOnly");
+$componentName: "RatingInput";
 
-:export {
-  themeVars: "";
-}
+// Placeholder
+$textColor-placeholder-RatingInput: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-RatingInput: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
+
+// Star (inactive) and star active
+$color-star-RatingInput: createThemeVar("Input:color-star-#{$componentName}");
+$color-star-RatingInput--active: createThemeVar("Input:color-star-#{$componentName}--active");
+$fontSize-star-RatingInput: createThemeVar("Input:fontSize-star-#{$componentName}");
+$gap-RatingInput: createThemeVar("Input:gap-#{$componentName}");
+
+// Validation states (outline)
+$outlineColor-RatingInput--error: createThemeVar("Input:outlineColor-#{$componentName}--error");
+$outlineWidth-RatingInput--error: createThemeVar("Input:outlineWidth-#{$componentName}--error");
+$outlineStyle-RatingInput--error: createThemeVar("Input:outlineStyle-#{$componentName}--error");
+$borderRadius-RatingInput--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+
+$outlineColor-RatingInput--warning: createThemeVar("Input:outlineColor-#{$componentName}--warning");
+$outlineWidth-RatingInput--warning: createThemeVar("Input:outlineWidth-#{$componentName}--warning");
+$outlineStyle-RatingInput--warning: createThemeVar("Input:outlineStyle-#{$componentName}--warning");
+$borderRadius-RatingInput--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+
+$outlineColor-RatingInput--valid: createThemeVar("Input:outlineColor-#{$componentName}--valid");
+$outlineWidth-RatingInput--valid: createThemeVar("Input:outlineWidth-#{$componentName}--valid");
+$outlineStyle-RatingInput--valid: createThemeVar("Input:outlineStyle-#{$componentName}--valid");
+$borderRadius-RatingInput--valid: createThemeVar("Input:borderRadius-#{$componentName}--valid");
+
+// Disabled / readOnly
+$opacity-RatingInput--disabled: createThemeVar("Input:opacity-#{$componentName}--disabled");
+$opacity-RatingInput--readOnly: createThemeVar("Input:opacity-#{$componentName}--readOnly");
 
 @layer components {
-  .ratingInputRoot {
+  .container {
     display: inline-flex;
     align-items: center;
     gap: $gap-RatingInput;
@@ -38,52 +50,56 @@ $opacity-RatingInput--readOnly: createThemeVar("opacity-RatingInput--readOnly");
     max-width: 100%;
   }
 
-  .ratingInputPlaceholder {
+  .placeholder {
     color: $textColor-placeholder-RatingInput;
     font-size: $fontSize-placeholder-RatingInput;
     margin-inline-end: 4px;
   }
 
-  .ratingInputStar {
-    border: 0;
+  .star {
+    border: none;
     background: transparent;
     padding: 0;
     margin: 0;
-    color: $color-star-RatingInput;
-    cursor: pointer;
-    font: inherit;
     font-size: $fontSize-star-RatingInput;
     line-height: 1;
+    cursor: pointer;
+    color: $color-star-RatingInput;
   }
 
-  .ratingInputStarActive {
+  .starActive {
     color: $color-star-RatingInput--active;
   }
 
-  .ratingInputDisabled {
+  .disabled {
     cursor: default;
     opacity: $opacity-RatingInput--disabled;
   }
 
-  .ratingInputReadOnly {
+  .readOnly {
     opacity: $opacity-RatingInput--readOnly;
   }
 
-  .ratingInputError {
+  .error {
     outline: $outlineWidth-RatingInput--error $outlineStyle-RatingInput--error $outlineColor-RatingInput--error;
     border-radius: $borderRadius-RatingInput--error;
     padding: 2px;
   }
 
-  .ratingInputWarning {
+  .warning {
     outline: $outlineWidth-RatingInput--warning $outlineStyle-RatingInput--warning $outlineColor-RatingInput--warning;
     border-radius: $borderRadius-RatingInput--warning;
     padding: 2px;
   }
 
-  .ratingInputValid {
+  .valid {
     outline: $outlineWidth-RatingInput--valid $outlineStyle-RatingInput--valid $outlineColor-RatingInput--valid;
     border-radius: $borderRadius-RatingInput--valid;
     padding: 2px;
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

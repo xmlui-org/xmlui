@@ -44,7 +44,9 @@ export default defineConfig({
   plugins: [rawScssModulePlugin(), svgReactPlugin(), sampleXmluiPlugin(), react()],
   resolve: {
     alias: {
+      "attr-accept": fileURLToPath(new URL("../xmlui/src/compat/attrAccept.ts", import.meta.url)),
       invariant: fileURLToPath(new URL("../xmlui/src/compat/invariant.ts", import.meta.url)),
+      papaparse: fileURLToPath(new URL("../xmlui/src/compat/papaParse.ts", import.meta.url)),
     },
     extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui"],
   },

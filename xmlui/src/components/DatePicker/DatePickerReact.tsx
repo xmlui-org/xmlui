@@ -1,30 +1,109 @@
-import type { CSSProperties, FocusEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+  DatePicker as ArkDatePicker,
+  parseDate,
+  type DatePickerDateRangePreset,
+  type DateValue,
+} from "@ark-ui/react/date-picker";
+import { Portal } from "@ark-ui/react/portal";
+import { EnvironmentProvider } from "@ark-ui/react/environment";
+import {
+  Fragment,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FocusEvent,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
-import { dateFormats, type DateFormat } from "./DatePicker.constants";
-import { defaultProps } from "./DatePicker.defaults";
 import styles from "./DatePicker.module.scss";
-import { useFormContext } from "../Form/FormContext";
+import { useMediaQuery } from "../../components-core/utils/hooks";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId, useIsInsideFormItem } from "../FormItem/FormItemContext";
+import { Adornment } from "../Input/InputAdornment";
+import { ThemedIcon } from "../Icon/Icon";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { defaultProps } from "./DatePicker.defaults";
+
+// On mobile the calendar is a fixed full-screen sheet, so it does not need
+// Ark's body portal — and portaling it out of the trigger's DOM subtree breaks
+// touch scrolling when the picker is opened inside another overlay (e.g. an
+// xmlui Drawer, whose react-remove-scroll lock blocks wheel/touch on anything
+// rendered outside the drawer). Rendering inline keeps the sheet within the
+// drawer's scroll-allowed subtree. Desktop still portals so Ark can anchor the
+// popover to the trigger. No ancestor uses transform/filter, so the fixed sheet
+// still covers the viewport when rendered inline.
+function MaybePortal({
+  disabled,
+  container,
+  children,
+}: {
+  disabled: boolean;
+  container?: RefObject<HTMLElement | null>;
+  children: ReactNode;
+}) {
+  return disabled ? <>{children}</> : <Portal container={container}>{children}</Portal>;
+}
+
 type Mode = "single" | "range";
 type ValidationStatus = "none" | "error" | "warning" | "valid";
-type DateParts = { year: number; month: number; day: number };
+type UpdateStateFn = (componentState: Record<string, unknown>, options?: any) => void;
+type RegisterApiFn = (
+  apis: Record<string, (...args: unknown[]) => unknown>,
+) => void;
 type RangePayload = { from?: string; to?: string };
-type DatePickerValue = string | RangePayload | undefined;
+type DatePickerPayload = string | RangePayload | undefined;
 
-export type DatePickerApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  getValue: () => DatePickerValue;
-  value: DatePickerValue;
+// Mirrors the core DatePicker's `disabledDates` matcher shapes so the same
+// markup works against either component. Dates accept either a `Date` or a
+// string in the component's `dateFormat` (ISO is always accepted too).
+type DisabledDateMatcher =
+  | boolean
+  | string
+  | Date
+  | ((date: Date) => boolean)
+  | { from: string | Date; to?: string | Date }
+  | { before: string | Date }
+  | { after: string | Date }
+  | { before: string | Date; after: string | Date }
+  | { dayOfWeek: number | number[] };
+type DisabledDates = DisabledDateMatcher | DisabledDateMatcher[];
+type PresetValue = DatePickerDateRangePreset;
+
+// A resolved preset: either a built-in Ark preset key or an explicit
+// [start, end] range (both forms are accepted by Ark's PresetTrigger `value`).
+type PresetItem = {
+  key: string;
+  label: string;
+  value: PresetValue | DateValue[];
 };
+
+type RawPreset =
+  | PresetValue
+  | string
+  | {
+      // Relabel/reorder a built-in preset key.
+      value?: string;
+      label?: string;
+      // Or a fully custom range with explicit dates (parsed with `dateFormat`).
+      from?: string | Date;
+      to?: string | Date;
+    };
 
 export type DatePickerProps = {
   id?: string;
-  bindTo?: string;
   value?: unknown;
   initialValue?: unknown;
   mode?: Mode | string;
-  label?: unknown;
+  label?: string;
   placeholder?: string;
   dateFormat?: string;
   enabled?: boolean;
@@ -33,694 +112,156 @@ export type DatePickerProps = {
   autoFocus?: boolean;
   inline?: boolean;
   clearable?: boolean;
-  validationStatus?: ValidationStatus | string;
+  validationStatus?: ValidationStatus;
   weekStartsOn?: number | string;
   showWeekNumber?: boolean;
   showWeekNumbers?: boolean;
   startDate?: unknown;
   endDate?: unknown;
-  minValue?: unknown;
-  maxValue?: unknown;
-  startIcon?: unknown;
-  endIcon?: unknown;
-  startText?: unknown;
-  endText?: unknown;
+  startIcon?: string;
+  endIcon?: string;
+  startText?: string;
+  endText?: string;
   width?: string;
   locale?: string;
   timeZone?: string;
   numOfMonths?: number | string;
-  presets?: unknown;
+  presets?: RawPreset[] | string | boolean;
   showPresets?: boolean;
-  disabledDates?: unknown;
+  disabledDates?: DisabledDates;
   confirmRangeSelection?: boolean;
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
-  className?: string;
   style?: CSSProperties;
-  onDidChange?: (value: DatePickerValue) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  className?: string;
+  // Applied to the (often portaled) calendar popup so the component theme-var
+  // class reaches the popup subtree even when Ark renders it outside the root.
+  contentClassName?: string;
+  onDidChange?: (newValue: DatePickerPayload) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  updateState?: UpdateStateFn;
+  registerComponentApi?: RegisterApiFn;
 };
 
-type DisabledMatcher =
-  | boolean
-  | string
-  | Date
-  | ((date: Date) => boolean)
-  | { from?: string | Date; to?: string | Date; before?: string | Date; after?: string | Date; dayOfWeek?: number | number[] };
+const DEFAULT_LOCALE = "en-US";
 
-const dayMs = 86_400_000;
+// On mobile the calendar is a scrollable stack of months around the focused
+// month, navigated by scrolling instead of prev/next buttons. Presets cover
+// longer spans, so a half-year window each way is plenty for manual scrolling.
+const MOBILE_MONTHS_BEFORE = 6;
+const MOBILE_MONTHS_AFTER = 6;
+// How many months to append/prepend each time the mobile sheet scrolls near an
+// edge, so any past/future date stays reachable by continuing to scroll.
+const MOBILE_SCROLL_CHUNK = 12;
 
-export const DatePickerNative = memo(forwardRef<DatePickerApi, DatePickerProps>(function DatePickerNative(
-  {
-    id,
-    bindTo,
-    value,
-    initialValue,
-    mode: rawMode = defaultProps.mode,
-    label,
-    placeholder,
-    dateFormat = defaultProps.dateFormat,
-    enabled = defaultProps.enabled,
-    readOnly = defaultProps.readOnly,
-    required = defaultProps.required,
-    autoFocus = defaultProps.autoFocus,
-    inline = defaultProps.inline,
-    clearable = defaultProps.clearable,
-    validationStatus = defaultProps.validationStatus,
-    weekStartsOn = defaultProps.weekStartsOn,
-    showWeekNumber,
-    showWeekNumbers,
-    startDate,
-    endDate,
-    minValue,
-    maxValue,
-    startIcon,
-    endIcon,
-    startText,
-    endText,
-    width,
-    locale = defaultProps.locale,
-    timeZone: _timeZone = defaultProps.timeZone,
-    numOfMonths = defaultProps.numOfMonths,
-    presets,
-    showPresets = defaultProps.showPresets,
-    disabledDates,
-    confirmRangeSelection = defaultProps.confirmRangeSelection,
-    verboseValidationFeedback = true,
-    validationIconSuccess = "checkmark",
-    validationIconError = "error",
-    invalidMessages,
-    className,
-    style,
-    onDidChange,
-    onFocus,
-    onBlur,
-    "data-testid": dataTestId,
-    ...rest
-  },
-  ref,
-) {
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
-  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const effectiveValidationStatus = formError ? "error" : validationStatus;
-  const effectiveValue = formValue ?? value;
-  const mode = normalizeMode(rawMode);
-  const normalizedFormat = normalizeDateFormat(dateFormat);
-  const controlled = effectiveValue !== undefined;
-  const initialValues = useMemo(
-    () => toDateParts(controlled ? effectiveValue : initialValue, mode, normalizedFormat),
-    [controlled, effectiveValue, initialValue, mode, normalizedFormat],
-  );
-  const [selected, setSelected] = useState<DateParts[]>(initialValues);
-  const [draftRange, setDraftRange] = useState<DateParts[]>([]);
-  const [isOpen, setIsOpen] = useState(inline);
-  const [visibleMonth, setVisibleMonth] = useState<DateParts>(() => monthStart(initialValues[0] ?? todayParts()));
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const firstInputRef = useRef<HTMLInputElement | null>(null);
-  const hasFocusInsideRef = useRef(false);
-  const pendingRangeRef = useRef<DateParts[]>([]);
+const PRESET_LABELS: Record<PresetValue, string> = {
+  thisWeek: "This week",
+  lastWeek: "Last week",
+  thisMonth: "This month",
+  lastMonth: "Last month",
+  thisQuarter: "This quarter",
+  lastQuarter: "Last quarter",
+  thisYear: "This year",
+  lastYear: "Last year",
+  last3Days: "Last 3 days",
+  last7Days: "Last 7 days",
+  last14Days: "Last 14 days",
+  last30Days: "Last 30 days",
+  last90Days: "Last 90 days",
+};
 
-  useEffect(() => {
-    if (controlled) {
-      const next = toDateParts(effectiveValue, mode, normalizedFormat);
-      setSelected(next);
-      if (next[0]) {
-        setVisibleMonth(monthStart(next[0]));
-      }
-    }
-  }, [controlled, effectiveValue, mode, normalizedFormat]);
+const DEFAULT_PRESETS: PresetItem[] = [
+  { key: "last7Days", value: "last7Days", label: PRESET_LABELS.last7Days },
+  { key: "last30Days", value: "last30Days", label: PRESET_LABELS.last30Days },
+  { key: "thisMonth", value: "thisMonth", label: PRESET_LABELS.thisMonth },
+  { key: "lastMonth", value: "lastMonth", label: PRESET_LABELS.lastMonth },
+];
 
-  useEffect(() => {
-    if (!controlled) {
-      setSelected(initialValues);
-      if (initialValues[0]) {
-        setVisibleMonth(monthStart(initialValues[0]));
-      }
-    }
-  }, [controlled, initialValues]);
+const PRESET_ALIASES: Record<string, PresetValue> = {
+  "this week": "thisWeek",
+  thisweek: "thisWeek",
+  "last week": "lastWeek",
+  lastweek: "lastWeek",
+  "this month": "thisMonth",
+  thismonth: "thisMonth",
+  "last month": "lastMonth",
+  lastmonth: "lastMonth",
+  "this quarter": "thisQuarter",
+  thisquarter: "thisQuarter",
+  "last quarter": "lastQuarter",
+  lastquarter: "lastQuarter",
+  "this year": "thisYear",
+  thisyear: "thisYear",
+  "last year": "lastYear",
+  lastyear: "lastYear",
+  "last 3 days": "last3Days",
+  last3days: "last3Days",
+  "last 7 days": "last7Days",
+  last7days: "last7Days",
+  "last 14 days": "last14Days",
+  last14days: "last14Days",
+  "last 30 days": "last30Days",
+  last30days: "last30Days",
+  "last 90 days": "last90Days",
+  last90days: "last90Days",
+};
 
-  useEffect(() => {
-    if (autoFocus && enabled) {
-      const timeoutId = setTimeout(() => firstInputRef.current?.focus(), 0);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [autoFocus, enabled]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, toPayload(toDateParts(initialValue, mode, normalizedFormat), mode, normalizedFormat));
-  }, [fieldName, getFormValue, initialValue, mode, normalizedFormat, setFormValue]);
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label: stringifyLabel(label),
-      required,
-    });
-  }, [fieldName, label, registerFormItem, required]);
-
-  const currentValue = useMemo(
-    () => toPayload(selected, mode, normalizedFormat),
-    [mode, normalizedFormat, selected],
-  );
-  const inputValues = useMemo(() => {
-    if (mode === "range") {
-      return [
-        selected[0] ? formatDateParts(selected[0], normalizedFormat) : "",
-        selected[1] ? formatDateParts(selected[1], normalizedFormat) : "",
-      ];
-    }
-    return [selected[0] ? formatDateParts(selected[0], normalizedFormat) : ""];
-  }, [mode, normalizedFormat, selected]);
-
-  const minDate = useMemo(() => parseDateValue(minValue ?? startDate, normalizedFormat), [minValue, normalizedFormat, startDate]);
-  const maxDate = useMemo(() => parseDateValue(maxValue ?? endDate, normalizedFormat), [endDate, maxValue, normalizedFormat]);
-  const weekStart = clampWeekStart(weekStartsOn);
-  const visibleMonthCount = Math.max(1, Number(numOfMonths) || defaultProps.numOfMonths);
-  const presetItems = useMemo(
-    () => resolvePresets(presets, showPresets, mode, normalizedFormat),
-    [mode, normalizedFormat, presets, showPresets],
-  );
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const interactive = enabled && !readOnly;
-  const renderedSelected = draftRange.length ? draftRange : selected;
-
-  const publish = useCallback((nextSelected: DateParts[], keepOpen = false) => {
-    pendingRangeRef.current = [];
-    setDraftRange([]);
-    setSelected(nextSelected);
-    const nextPayload = toPayload(nextSelected, mode, normalizedFormat);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextPayload);
-    }
-    void onDidChange?.(nextPayload);
-    if (!inline && !keepOpen) {
-      setIsOpen(false);
-    }
-  }, [fieldName, inline, mode, normalizedFormat, onDidChange, setFormValue]);
-
-  const setValue = useCallback((nextValue: unknown) => {
-    const nextSelected = toDateParts(nextValue, mode, normalizedFormat);
-    publish(nextSelected, true);
-    if (nextSelected[0]) {
-      setVisibleMonth(monthStart(nextSelected[0]));
-    }
-  }, [mode, normalizedFormat, publish]);
-
-  const focus = useCallback(() => {
-    firstInputRef.current?.focus();
-  }, []);
-
-  useImperativeHandle(ref, () => ({
-    focus,
-    setValue,
-    getValue: () => currentValue,
-    get value() {
-      return currentValue;
-    },
-  }), [currentValue, focus, setValue]);
-
-  const handleFocusCapture = useCallback(() => {
-    if (!hasFocusInsideRef.current) {
-      hasFocusInsideRef.current = true;
-      void onFocus?.();
-    }
-  }, [onFocus]);
-
-  const handleBlurCapture = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const relatedTarget = event.relatedTarget as Node | null;
-    if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-      hasFocusInsideRef.current = false;
-      void onBlur?.();
-    }
-  }, [onBlur]);
-
-  const commitInput = useCallback((index: number, raw: string) => {
-    if (!interactive) {
-      return;
-    }
-    const parsed = parseDateValue(raw, normalizedFormat);
-    if (!parsed || isUnavailable(parsed, minDate, maxDate, disabledDates, normalizedFormat)) {
-      if (raw === "") {
-        const next = [...selected];
-        next[index] = undefined as unknown as DateParts;
-        publish(next.filter(Boolean), true);
-      }
-      return;
-    }
-    const next = mode === "range" ? [...selected] : [parsed];
-    next[index] = parsed;
-    publish(next.filter(Boolean).sort(compareParts), true);
-    setVisibleMonth(monthStart(parsed));
-  }, [disabledDates, interactive, maxDate, minDate, mode, normalizedFormat, publish, selected]);
-
-  const selectDay = useCallback((day: DateParts) => {
-    if (!interactive || isUnavailable(day, minDate, maxDate, disabledDates, normalizedFormat)) {
-      return;
-    }
-    if (mode !== "range") {
-      publish([day]);
-      return;
-    }
-    const pending = pendingRangeRef.current;
-    if (pending.length !== 1) {
-      pendingRangeRef.current = [day];
-      setDraftRange([day]);
-      return;
-    }
-    const next = [pending[0], day].sort(compareParts);
-    if (confirmRangeSelection) {
-      pendingRangeRef.current = next;
-      setDraftRange(next);
-      return;
-    }
-    publish(next);
-  }, [confirmRangeSelection, disabledDates, interactive, maxDate, minDate, mode, normalizedFormat, publish]);
-
-  const clear = useCallback(() => {
-    publish([], true);
-    firstInputRef.current?.focus();
-  }, [publish]);
-
-  const cancelRange = useCallback(() => {
-    pendingRangeRef.current = [];
-    setDraftRange([]);
-    if (!inline) {
-      setIsOpen(false);
-    }
-  }, [inline]);
-
-  const proceedRange = useCallback(() => {
-    publish(pendingRangeRef.current, false);
-  }, [publish]);
-
-  const rootStyle = useMemo<CSSProperties>(() => ({
-    ...style,
-    ...(width && !widthClass(width) ? { width } : undefined),
-  }), [style, width]);
-
+const isDateValue = (value: unknown): value is DateValue => {
   return (
-    <div
-      {...rest}
-      ref={rootRef}
-      data-xmlui-component="DatePicker"
-      data-mode={mode}
-      data-validation-status={effectiveValidationStatus}
-      data-inline={inline ? "" : undefined}
-      data-disabled={!enabled ? "" : undefined}
-      data-open={isOpen ? "" : undefined}
-      data-state={isOpen ? "open" : undefined}
-      data-testid={dataTestId}
-      className={cx(styles.datePickerRoot, widthClass(width), className)}
-      style={rootStyle}
-      onFocusCapture={handleFocusCapture}
-      onBlurCapture={handleBlurCapture}
-    >
-      {!inline && hasLabel ? (
-        <label className={styles.datePickerLabel} onClick={focus}>
-          {String(label)}
-        </label>
-      ) : null}
-
-      {!inline ? (
-        <div className={styles.datePickerControl} data-part="control" data-part-id="input" data-xmlui-part="input">
-          <Adornment text={startText} icon={startIcon} />
-          <input
-            ref={firstInputRef}
-            id={id}
-            className={styles.datePickerInput}
-            value={inputValues[0]}
-            placeholder={placeholder ?? placeholderFor(normalizedFormat)}
-            aria-label={hasLabel ? String(label) : "Date"}
-            disabled={!enabled}
-            readOnly={readOnly}
-            required={required}
-            onChange={(event) => commitInput(0, event.currentTarget.value)}
-            onFocus={() => {
-              if (interactive) {
-                setIsOpen(true);
-              }
-            }}
-          />
-          {mode === "range" ? (
-            <>
-              <span className={styles.datePickerRangeSeparator}>-</span>
-              <input
-                className={styles.datePickerInput}
-                value={inputValues[1] ?? ""}
-                placeholder={placeholderFor(normalizedFormat)}
-                aria-label="End date"
-                disabled={!enabled}
-                readOnly={readOnly}
-                required={required}
-                onChange={(event) => commitInput(1, event.currentTarget.value)}
-                onFocus={() => {
-                  if (interactive) {
-                    setIsOpen(true);
-                  }
-                }}
-              />
-            </>
-          ) : null}
-          <div className={styles.datePickerTrailing}>
-            {!effectiveVerboseValidationFeedback && effectiveValidationStatus !== "none" ? (
-              <span
-                data-part-id="conciseValidationFeedback"
-                data-xmlui-part="conciseValidationFeedback"
-                title={effectiveInvalidMessages?.join("\n")}
-              >
-                {effectiveValidationStatus === "valid" ? validationIconSuccess : validationIconError}
-              </span>
-            ) : null}
-            {clearable ? (
-              <button
-                type="button"
-                className={styles.datePickerClear}
-                data-part-id="clearButton"
-                data-xmlui-part="clearButton"
-                aria-label="Clear date"
-                disabled={!enabled}
-                onClick={clear}
-              >
-                x
-              </button>
-            ) : null}
-            <Adornment text={endText} icon={endIcon} />
-          </div>
-        </div>
-      ) : null}
-
-      {(inline || isOpen) ? (
-        <div className={styles.datePickerPositioner}>
-          <div className={styles.datePickerContent} data-part="content" data-part-id="calendar" data-xmlui-part="calendar">
-            {presetItems.length > 0 ? (
-              <div className={styles.datePickerQuickPresets}>
-                {presetItems.map((preset) => (
-                  <button
-                    key={preset.key}
-                    type="button"
-                    className={styles.datePickerPreset}
-                    onClick={() => {
-                      publish(preset.range, !inline);
-                      setVisibleMonth(monthStart(preset.range[0]));
-                    }}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            <div className={styles.datePickerCalendarArea}>
-              {Array.from({ length: visibleMonthCount }, (_, offset) => addMonths(visibleMonth, offset)).map((month, index) => (
-                <CalendarMonth
-                  key={`${month.year}-${month.month}`}
-                  month={month}
-                  locale={locale}
-                  weekStartsOn={weekStart}
-                  showWeekNumbers={showWeekNumber ?? showWeekNumbers ?? false}
-                  selected={renderedSelected}
-                  minDate={minDate}
-                  maxDate={maxDate}
-                  disabledDates={disabledDates}
-                  dateFormat={normalizedFormat}
-                  showNav={index === 0}
-                  onPrevious={() => setVisibleMonth(addMonths(visibleMonth, -1))}
-                  onNext={() => setVisibleMonth(addMonths(visibleMonth, 1))}
-                  onSelect={selectDay}
-                />
-              ))}
-              {confirmRangeSelection && draftRange.length ? (
-                <div className={styles.datePickerPopupFooter}>
-                  <button type="button" className={styles.datePickerFooterButton} onClick={cancelRange}>
-                    Cancel
-                  </button>
-                  <button type="button" className={cx(styles.datePickerFooterButton, styles.datePickerFooterButtonPrimary)} onClick={proceedRange}>
-                    Proceed
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </div>
+    typeof value === "object" &&
+    value !== null &&
+    "year" in value &&
+    "month" in value &&
+    "day" in value
   );
-}));
+};
 
-function CalendarMonth({
-  month,
-  locale,
-  weekStartsOn,
-  showWeekNumbers,
-  selected,
-  minDate,
-  maxDate,
-  disabledDates,
-  dateFormat,
-  showNav,
-  onPrevious,
-  onNext,
-  onSelect,
-}: {
-  month: DateParts;
-  locale: string;
-  weekStartsOn: number;
-  showWeekNumbers: boolean;
-  selected: DateParts[];
-  minDate?: DateParts;
-  maxDate?: DateParts;
-  disabledDates?: unknown;
-  dateFormat: DateFormat;
-  showNav: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
-  onSelect: (day: DateParts) => void;
-}) {
-  const weeks = useMemo(() => buildWeeks(month, weekStartsOn), [month, weekStartsOn]);
-  const weekdays = useMemo(() => weekdayLabels(weekStartsOn, locale), [locale, weekStartsOn]);
-  const today = todayParts();
-  return (
-    <div>
-      <div className={styles.datePickerViewControl}>
-        {showNav ? (
-          <button type="button" className={styles.datePickerNav} aria-label="Previous month" onClick={onPrevious}>
-            {"<"}
-          </button>
-        ) : <span />}
-        <div className={styles.datePickerViewTrigger} data-part="view-trigger">{monthLabel(month, locale)}</div>
-        {showNav ? (
-          <button type="button" className={styles.datePickerNav} aria-label="Next month" onClick={onNext}>
-            {">"}
-          </button>
-        ) : <span />}
-      </div>
-      <table className={styles.datePickerTable} data-part="table">
-        <thead>
-          <tr>
-            {showWeekNumbers ? <th className={styles.datePickerWeekNumber}>#</th> : null}
-            {weekdays.map((day) => <th key={day} className={styles.datePickerWeekday}>{day}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week, weekIndex) => (
-            <tr key={weekIndex}>
-              {showWeekNumbers ? <td className={styles.datePickerWeekNumber}>{weekNumber(week[0])}</td> : null}
-              {week.map((day) => {
-                const disabled = day.month !== month.month || isUnavailable(day, minDate, maxDate, disabledDates, dateFormat);
-                const selectedIndex = selected.findIndex((item) => isSameDay(item, day));
-                const inRange = selected.length > 1 && compareParts(selected[0], day) < 0 && compareParts(day, selected[1]) < 0;
-                return (
-                  <td key={toIso(day)} className={styles.datePickerCell}>
-                    <button
-                      type="button"
-                      className={styles.datePickerCellTrigger}
-                      data-part="table-cell-trigger"
-                      disabled={disabled}
-                      data-selected={selected.length === 1 && selectedIndex === 0 ? "" : undefined}
-                      data-range-start={selected.length > 1 && selectedIndex === 0 ? "" : undefined}
-                      data-range-end={selected.length > 1 && selectedIndex === 1 ? "" : undefined}
-                      data-in-range={inRange ? "" : undefined}
-                      data-today={isSameDay(day, today) ? "" : undefined}
-                      onClick={() => onSelect(day)}
-                    >
-                      {day.day}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+const toMode = (mode: unknown): Mode => {
+  return String(mode || "single").toLowerCase() === "range" ? "range" : "single";
+};
 
-function Adornment({ text, icon }: { text?: unknown; icon?: unknown }) {
-  if (text === undefined && icon === undefined) {
-    return null;
-  }
-  return (
-    <span className={styles.datePickerAdornment}>
-      {icon !== undefined ? <span role="img" aria-label={String(icon)} data-icon={String(icon)}>{String(icon)}</span> : null}
-      {text !== undefined ? <span>{String(text)}</span> : null}
-    </span>
-  );
-}
+const toBoolean = (value: unknown, fallback = false): boolean => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value.toLowerCase() === "true";
+  return fallback;
+};
 
-function normalizeMode(value: unknown): Mode {
-  return String(value ?? "").toLowerCase() === "range" ? "range" : "single";
-}
+const toNumber = (value: unknown, fallback: number): number => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+};
 
-function normalizeDateFormat(format: unknown): DateFormat {
-  return dateFormats.includes(format as DateFormat) ? format as DateFormat : defaultProps.dateFormat as DateFormat;
-}
+const cx = (...classes: Array<string | undefined | false>) => {
+  return classes.filter(Boolean).join(" ");
+};
 
-function placeholderFor(format: DateFormat) {
-  return format.replace(/[A-Za-z]/g, (char) => char.toLowerCase());
-}
-
-function widthClass(value: unknown): string | undefined {
+const widthClass = (value: unknown): string | undefined => {
   const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return undefined;
   if (normalized === "100%" || normalized === "*" || normalized === "full") {
-    return styles.datePickerFullWidth;
+    return styles.fullWidth;
   }
-  if (normalized === "auto") {
-    return styles.datePickerAutoWidth;
-  }
+  if (normalized === "auto") return styles.autoWidth;
   return undefined;
-}
+};
 
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
+const pad = (value: number) => String(value).padStart(2, "0");
 
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
+const dateValueToIso = (value: DateValue): string => {
+  return `${value.year}-${pad(value.month)}-${pad(value.day)}`;
+};
 
-function toDateParts(raw: unknown, mode: Mode, format: DateFormat): DateParts[] {
-  if (raw === undefined || raw === null || raw === "") {
-    return [];
-  }
-  if (mode === "range") {
-    if (Array.isArray(raw)) {
-      return raw.slice(0, 2).map((item) => parseDateValue(item, format)).filter(Boolean) as DateParts[];
-    }
-    if (typeof raw === "object") {
-      const record = raw as Record<string, unknown>;
-      return [record.from ?? record.start, record.to ?? record.end]
-        .map((item) => parseDateValue(item, format))
-        .filter(Boolean) as DateParts[];
-    }
-  }
-  if (Array.isArray(raw)) {
-    const first = parseDateValue(raw[0], format);
-    return first ? [first] : [];
-  }
-  const single = parseDateValue(raw, format);
-  return single ? [single] : [];
-}
+const formatDateValue = (value: DateValue, dateFormat: string): string => {
+  const yyyy = String(value.year).padStart(4, "0");
+  const MM = pad(value.month);
+  const dd = pad(value.day);
 
-function toPayload(values: DateParts[], mode: Mode, format: DateFormat): DatePickerValue {
-  if (mode === "range") {
-    const from = values[0] ? formatDateParts(values[0], format) : undefined;
-    const to = values[1] ? formatDateParts(values[1], format) : undefined;
-    return from || to ? { from, to } : undefined;
-  }
-  return values[0] ? formatDateParts(values[0], format) : undefined;
-}
-
-function parseDateValue(raw: unknown, format: DateFormat): DateParts | undefined {
-  if (raw instanceof Date) {
-    return realDateParts(raw.getFullYear(), raw.getMonth() + 1, raw.getDate());
-  }
-  if (typeof raw === "object" && raw !== null && "year" in raw && "month" in raw && "day" in raw) {
-    const record = raw as Record<string, unknown>;
-    return realDateParts(Number(record.year), Number(record.month), Number(record.day));
-  }
-  if (typeof raw !== "string") {
-    return undefined;
-  }
-  const value = raw.trim();
-  if (!value) {
-    return undefined;
-  }
-  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(value);
-  if (iso) {
-    return realDateParts(Number(iso[1]), Number(iso[2]), Number(iso[3]));
-  }
-  const split = (separator: string, order: Array<"year" | "month" | "day">) => {
-    const pieces = value.split(separator);
-    if (pieces.length !== 3) {
-      return undefined;
-    }
-    const parts = { year: 0, month: 0, day: 0 };
-    order.forEach((part, index) => {
-      parts[part] = Number(pieces[index]);
-    });
-    return realDateParts(parts.year, parts.month, parts.day);
-  };
-  switch (format) {
+  switch (dateFormat) {
     case "MM/dd/yyyy":
-      return split("/", ["month", "day", "year"]);
-    case "MM-dd-yyyy":
-      return split("-", ["month", "day", "year"]);
-    case "yyyy/MM/dd":
-      return split("/", ["year", "month", "day"]);
-    case "yyyy-MM-dd":
-      return split("-", ["year", "month", "day"]);
-    case "dd/MM/yyyy":
-      return split("/", ["day", "month", "year"]);
-    case "dd-MM-yyyy":
-      return split("-", ["day", "month", "year"]);
-    case "yyyyMMdd":
-      return /^\d{8}$/.test(value) ? realDateParts(Number(value.slice(0, 4)), Number(value.slice(4, 6)), Number(value.slice(6, 8))) : undefined;
-    case "MMddyyyy":
-      return /^\d{8}$/.test(value) ? realDateParts(Number(value.slice(4, 8)), Number(value.slice(0, 2)), Number(value.slice(2, 4))) : undefined;
-  }
-}
-
-function realDateParts(year: number, month: number, day: number): DateParts | undefined {
-  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
-    return undefined;
-  }
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
-    ? { year, month, day }
-    : undefined;
-}
-
-function formatDateParts(parts: DateParts, format: DateFormat): string {
-  const yyyy = String(parts.year).padStart(4, "0");
-  const MM = String(parts.month).padStart(2, "0");
-  const dd = String(parts.day).padStart(2, "0");
-  switch (format) {
+      return `${MM}/${dd}/${yyyy}`;
     case "MM-dd-yyyy":
       return `${MM}-${dd}-${yyyy}`;
     case "yyyy/MM/dd":
@@ -736,171 +277,1689 @@ function formatDateParts(parts: DateParts, format: DateFormat): string {
     case "MMddyyyy":
       return `${MM}${dd}${yyyy}`;
     default:
-      return `${MM}/${dd}/${yyyy}`;
+      return dateValueToIso(value);
   }
-}
+};
 
-function monthStart(parts: DateParts): DateParts {
-  return { year: parts.year, month: parts.month, day: 1 };
-}
+const toIsoFromDate = (value: Date): string => {
+  return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+};
 
-function todayParts(): DateParts {
-  const today = new Date();
-  return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
-}
+// Human-friendly label for the mobile sheet header, e.g. "May 25, 2026".
+const friendlyDate = (value: DateValue, locale: string): string => {
+  try {
+    const date = new Date(Date.UTC(value.year, value.month - 1, value.day));
+    return new Intl.DateTimeFormat(locale || DEFAULT_LOCALE, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date);
+  } catch {
+    return dateValueToIso(value);
+  }
+};
 
-function addMonths(parts: DateParts, count: number): DateParts {
-  const date = new Date(Date.UTC(parts.year, parts.month - 1 + count, 1));
-  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: 1 };
-}
+const monthLabel = (value: DateValue, locale: string): string => {
+  try {
+    const date = new Date(Date.UTC(value.year, value.month - 1, 1));
+    return new Intl.DateTimeFormat(locale || DEFAULT_LOCALE, {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date);
+  } catch {
+    return `${value.year}-${pad(value.month)}`;
+  }
+};
 
-function buildWeeks(month: DateParts, weekStartsOn: number): DateParts[][] {
-  const first = new Date(Date.UTC(month.year, month.month - 1, 1));
-  const leading = (first.getUTCDay() - weekStartsOn + 7) % 7;
-  const start = new Date(first.getTime() - leading * dayMs);
-  return Array.from({ length: 6 }, (_, weekIndex) =>
-    Array.from({ length: 7 }, (_, dayIndex) => {
-      const date = new Date(start.getTime() + (weekIndex * 7 + dayIndex) * dayMs);
-      return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
-    }),
-  );
-}
+// Inclusive day count between two dates (e.g. Mon–Sun = 7).
+const daysInclusive = (a: DateValue, b: DateValue): number => {
+  const start = Date.UTC(a.year, a.month - 1, a.day);
+  const end = Date.UTC(b.year, b.month - 1, b.day);
+  return Math.round(Math.abs(end - start) / 86_400_000) + 1;
+};
 
-function weekdayLabels(weekStartsOn: number, locale: string) {
-  const base = new Date(Date.UTC(2024, 0, 7 + weekStartsOn));
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(base.getTime() + index * dayMs);
-    return new Intl.DateTimeFormat(locale || defaultProps.locale, { weekday: "short", timeZone: "UTC" }).format(date);
+const datePartsFromString = (
+  raw: string,
+  dateFormat: string,
+): { year: number; month: number; day: number } | undefined => {
+  const value = raw.trim();
+  if (!value) return undefined;
+
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(value);
+  if (iso) {
+    return {
+      year: Number(iso[1]),
+      month: Number(iso[2]),
+      day: Number(iso[3]),
+    };
+  }
+
+  const readSplit = (separator: string, order: Array<"year" | "month" | "day">) => {
+    const pieces = value.split(separator);
+    if (pieces.length !== 3) return undefined;
+    const result = { year: 0, month: 0, day: 0 };
+    order.forEach((part, index) => {
+      result[part] = Number(pieces[index]);
+    });
+    return result;
+  };
+
+  switch (dateFormat) {
+    case "MM/dd/yyyy":
+      return readSplit("/", ["month", "day", "year"]);
+    case "MM-dd-yyyy":
+      return readSplit("-", ["month", "day", "year"]);
+    case "yyyy/MM/dd":
+      return readSplit("/", ["year", "month", "day"]);
+    case "yyyy-MM-dd":
+      return readSplit("-", ["year", "month", "day"]);
+    case "dd/MM/yyyy":
+      return readSplit("/", ["day", "month", "year"]);
+    case "dd-MM-yyyy":
+      return readSplit("-", ["day", "month", "year"]);
+    case "yyyyMMdd":
+      if (!/^\d{8}$/.test(value)) return undefined;
+      return {
+        year: Number(value.slice(0, 4)),
+        month: Number(value.slice(4, 6)),
+        day: Number(value.slice(6, 8)),
+      };
+    case "MMddyyyy":
+      if (!/^\d{8}$/.test(value)) return undefined;
+      return {
+        month: Number(value.slice(0, 2)),
+        day: Number(value.slice(2, 4)),
+        year: Number(value.slice(4, 8)),
+      };
+    default:
+      return undefined;
+  }
+};
+
+const fieldForLetter = (letter: string): "year" | "month" | "day" | "other" => {
+  if (letter === "y" || letter === "Y") return "year";
+  if (letter === "M") return "month";
+  if (letter === "d" || letter === "D") return "day";
+  return "other";
+};
+
+// Real number of days in a month. The year is used so February respects leap
+// years; when the year isn't known yet (formats where the day precedes it) we
+// fall back to a leap year so the 29th stays reachable.
+const daysInMonth = (year: number | undefined, month: number | undefined): number => {
+  if (!month || month < 1 || month > 12) return 31;
+  const safeYear = year && year > 0 ? year : 2000;
+  return new Date(Date.UTC(safeYear, month, 0)).getUTCDate();
+};
+
+type DateSegment = {
+  field: "year" | "month" | "day" | "other";
+  start: number;
+  end: number;
+  capacity: number;
+};
+
+// Splits the format into its fixed-position segments, e.g. "yyyy-MM-dd" ->
+// year[0,4) month[5,7) day[8,10). The masked value uses the same positions.
+const buildDateSegments = (dateFormat: string): DateSegment[] => {
+  const segments: DateSegment[] = [];
+  let i = 0;
+  while (i < dateFormat.length) {
+    const ch = dateFormat[i];
+    if (/[A-Za-z]/.test(ch)) {
+      let j = i;
+      while (j < dateFormat.length && dateFormat[j] === ch) j += 1;
+      segments.push({ field: fieldForLetter(ch), start: i, end: j, capacity: j - i });
+      i = j;
+    } else {
+      i += 1;
+    }
+  }
+  return segments;
+};
+
+// Per-segment digit strings read out of a value, e.g. "2026-06-07" ->
+// ["2026","06","07"]. Placeholder letters (an in-progress template) count as 0.
+const readSegmentDigits = (value: string, segments: DateSegment[]): string[] =>
+  segments.map((seg) => value.slice(seg.start, seg.end).replace(/\D/g, ""));
+
+// Renders the editing value: a segment with typed digits shows just those
+// digits (no placeholder filler for the part being typed), an untyped segment
+// shows its lowercase placeholder letters, and the separators are always there.
+// Segments are therefore variable-width, so the [start, end] character range of
+// each one in the produced string is returned alongside it.
+// e.g. ["2","06",""] -> "2-06-dd".
+const buildDisplay = (
+  segDigits: string[],
+  segments: DateSegment[],
+  dateFormat: string,
+): { value: string; positions: Array<[number, number]> } => {
+  let value = "";
+  const positions: Array<[number, number]> = [];
+  let cursor = 0;
+  segments.forEach((seg, k) => {
+    value += dateFormat.slice(cursor, seg.start); // separators / literals before
+    const start = value.length;
+    const digits = segDigits[k] || "";
+    value +=
+      digits.length > 0
+        ? digits
+        : dateFormat.slice(seg.start, seg.end).toLowerCase();
+    positions.push([start, value.length]);
+    cursor = seg.end;
   });
-}
+  value += dateFormat.slice(cursor);
+  return { value, positions };
+};
 
-function monthLabel(parts: DateParts, locale: string) {
-  return new Intl.DateTimeFormat(locale || defaultProps.locale, {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(parts.year, parts.month - 1, 1)));
-}
-
-function weekNumber(parts: DateParts) {
-  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil((((date.getTime() - yearStart.getTime()) / dayMs) + yearStart.getUTCDay() + 1) / 7);
-}
-
-function compareParts(left: DateParts, right: DateParts): number {
-  return Date.UTC(left.year, left.month - 1, left.day) - Date.UTC(right.year, right.month - 1, right.day);
-}
-
-function isSameDay(left: DateParts, right: DateParts): boolean {
-  return left.year === right.year && left.month === right.month && left.day === right.day;
-}
-
-function toIso(parts: DateParts): string {
-  return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
-}
-
-function isUnavailable(parts: DateParts, minDate: DateParts | undefined, maxDate: DateParts | undefined, matcher: unknown, format: DateFormat): boolean {
-  if (minDate && compareParts(parts, minDate) < 0) {
-    return true;
+// Adds one digit to a single segment's running value, validating as it goes.
+// Returns the new digit string + whether the segment is now complete, or null
+// when the digit is impossible (month > 12, day past the month's length). A
+// leading digit too big to begin a two-digit value is auto-padded ("9" -> "09").
+const addDigitToSegment = (
+  field: DateSegment["field"],
+  capacity: number,
+  current: string,
+  digit: string,
+  year: number | undefined,
+  month: number | undefined,
+): { digits: string; complete: boolean } | null => {
+  if (field === "month") {
+    if (current.length === 0) {
+      if (Number(digit) > 1) return { digits: `0${digit}`, complete: true };
+      return { digits: digit, complete: false };
+    }
+    const value = Number(current + digit);
+    if (value < 1 || value > 12) return null;
+    return { digits: current + digit, complete: true };
   }
-  if (maxDate && compareParts(parts, maxDate) > 0) {
-    return true;
+  if (field === "day") {
+    const maxDay = daysInMonth(year, month);
+    if (current.length === 0) {
+      if (Number(digit) > Math.floor(maxDay / 10)) {
+        return { digits: `0${digit}`, complete: true };
+      }
+      return { digits: digit, complete: false };
+    }
+    const value = Number(current + digit);
+    if (value < 1 || value > maxDay) return null;
+    return { digits: current + digit, complete: true };
   }
-  return matchesDisabledDate(parts, matcher as DisabledMatcher | DisabledMatcher[] | undefined, format);
-}
+  const next = current + digit;
+  return { digits: next, complete: next.length >= capacity };
+};
 
-function matchesDisabledDate(parts: DateParts, matcher: DisabledMatcher | DisabledMatcher[] | undefined, format: DateFormat): boolean {
-  if (matcher === undefined || matcher === null) {
-    return false;
+const parseDateValue = (
+  raw: unknown,
+  dateFormat: string,
+): DateValue | undefined => {
+  if (isDateValue(raw)) return raw;
+  if (raw instanceof Date) {
+    try {
+      return parseDate(toIsoFromDate(raw));
+    } catch {
+      return undefined;
+    }
   }
-  if (typeof matcher === "boolean") {
-    return matcher;
+  if (typeof raw !== "string") return undefined;
+
+  const parts = datePartsFromString(raw, dateFormat);
+  if (!parts) return undefined;
+  if (!parts.year || !parts.month || !parts.day) return undefined;
+
+  try {
+    return parseDate(`${parts.year}-${pad(parts.month)}-${pad(parts.day)}`);
+  } catch {
+    return undefined;
   }
-  if (Array.isArray(matcher)) {
-    return matcher.some((item) => matchesDisabledDate(parts, item, format));
+};
+
+const toDateValues = (
+  raw: unknown,
+  mode: Mode,
+  dateFormat: string,
+): DateValue[] => {
+  if (raw === undefined || raw === null || raw === "") return [];
+
+  if (mode === "range") {
+    if (Array.isArray(raw)) {
+      return raw
+        .slice(0, 2)
+        .map((item) => parseDateValue(item, dateFormat))
+        .filter((item): item is DateValue => !!item);
+    }
+
+    if (typeof raw === "object") {
+      const candidate = raw as Record<string, unknown>;
+      return [candidate.from ?? candidate.start, candidate.to ?? candidate.end]
+        .map((item) => parseDateValue(item, dateFormat))
+        .filter((item): item is DateValue => !!item);
+    }
   }
+
+  if (Array.isArray(raw)) {
+    const first = parseDateValue(raw[0], dateFormat);
+    return first ? [first] : [];
+  }
+
+  const single = parseDateValue(raw, dateFormat);
+  return single ? [single] : [];
+};
+
+const toPayload = (
+  values: DateValue[],
+  mode: Mode,
+  dateFormat: string,
+): DatePickerPayload => {
+  if (mode === "range") {
+    const from = values[0] ? formatDateValue(values[0], dateFormat) : undefined;
+    const to = values[1] ? formatDateValue(values[1], dateFormat) : undefined;
+    if (!from && !to) return undefined;
+    return { from, to };
+  }
+
+  return values[0] ? formatDateValue(values[0], dateFormat) : undefined;
+};
+
+const shouldPublishValue = (
+  values: DateValue[],
+  mode: Mode,
+  initial: boolean | undefined,
+): boolean => {
+  if (initial || mode !== "range") return true;
+  if (values.length === 0) return true;
+  return !!values[0] && !!values[1];
+};
+
+const resolvePresetValue = (raw: string): PresetValue | undefined => {
+  const compact = raw.trim().replace(/[-_]+/g, " ");
+  const key = compact.replace(/\s+/g, "").toLowerCase();
+  const spacedKey = compact.replace(/\s+/g, " ").toLowerCase();
+  if (compact in PRESET_LABELS) return compact as PresetValue;
+  return PRESET_ALIASES[spacedKey] ?? PRESET_ALIASES[key];
+};
+
+const resolvePresets = (
+  rawPresets: DatePickerProps["presets"],
+  showPresets: boolean | undefined,
+  mode: Mode,
+  dateFormat: string,
+): PresetItem[] => {
+  if (mode !== "range") return [];
+
+  // Presets are OFF by default. They show when explicitly enabled via
+  // `showPresets`, or implicitly when a custom `presets` list is supplied
+  // (customizing them turns them on). An explicit `showPresets={false}` — or
+  // `presets={false}` — always wins and hides them.
+  const hasCustomList =
+    Array.isArray(rawPresets) || (typeof rawPresets === "string" && rawPresets.trim() !== "");
+  if (showPresets === false || rawPresets === false) return [];
+  if (showPresets !== true && !hasCustomList) return [];
+
+  const source = hasCustomList
+    ? Array.isArray(rawPresets)
+      ? rawPresets
+      : String(rawPresets)
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+    : DEFAULT_PRESETS;
+
+  const resolved = source
+    .map((preset): PresetItem | undefined => {
+      if (typeof preset === "object") {
+        // Fully custom range: explicit from/to parsed with the active dateFormat.
+        if (preset.from !== undefined && preset.to !== undefined) {
+          const from = parseDateValue(preset.from, dateFormat);
+          const to = parseDateValue(preset.to, dateFormat);
+          if (!from || !to) return undefined;
+          const label =
+            preset.label ||
+            `${formatDateValue(from, dateFormat)} – ${formatDateValue(to, dateFormat)}`;
+          return { key: label, label, value: [from, to] };
+        }
+        // Relabel/reorder a built-in preset key.
+        if ("value" in preset) {
+          const value = preset.value ? resolvePresetValue(preset.value) : undefined;
+          return value ? { key: value, value, label: preset.label || PRESET_LABELS[value] } : undefined;
+        }
+        return undefined;
+      }
+      const value = resolvePresetValue(String(preset));
+      return value ? { key: value, value, label: PRESET_LABELS[value] } : undefined;
+    })
+    .filter((item): item is PresetItem => !!item);
+
+  return resolved.length ? resolved : DEFAULT_PRESETS;
+};
+
+// Day-granular ordinal (UTC) so matcher comparisons ignore the time component.
+const dayOrdinal = (value: { year: number; month: number; day: number }): number =>
+  Date.UTC(value.year, value.month - 1, value.day);
+
+// Converts a matcher date (Date | string in `dateFormat` or ISO) to day parts.
+const matcherDateParts = (
+  value: string | Date,
+  dateFormat: string,
+): { year: number; month: number; day: number } | undefined => {
+  if (value instanceof Date) {
+    return { year: value.getFullYear(), month: value.getMonth() + 1, day: value.getDate() };
+  }
+  if (typeof value === "string") {
+    return datePartsFromString(value, dateFormat);
+  }
+  return undefined;
+};
+
+// Evaluates one matcher (or an array of matchers, combined with OR) against a
+// calendar day. Mirrors the core DatePicker's `disabledDates` semantics:
+// single date, {from,to} range, {before}, {after}, {before,after} interval,
+// {dayOfWeek}, predicate function, and arrays thereof.
+const matchesDisabledDate = (
+  parts: { year: number; month: number; day: number },
+  matcher: DisabledDates | undefined,
+  dateFormat: string,
+): boolean => {
+  if (matcher === undefined || matcher === null) return false;
+  if (typeof matcher === "boolean") return matcher;
   if (typeof matcher === "function") {
-    return Boolean(matcher(new Date(Date.UTC(parts.year, parts.month - 1, parts.day))));
+    return !!matcher(new Date(dayOrdinal(parts)));
   }
   if (matcher instanceof Date || typeof matcher === "string") {
-    const target = parseDateValue(matcher, format);
-    return Boolean(target && isSameDay(parts, target));
+    const target = matcherDateParts(matcher, dateFormat);
+    return !!target && dayOrdinal(parts) === dayOrdinal(target);
+  }
+  if (Array.isArray(matcher)) {
+    return matcher.some((item) => matchesDisabledDate(parts, item, dateFormat));
   }
   if (typeof matcher === "object") {
+    const ord = dayOrdinal(parts);
     if ("dayOfWeek" in matcher) {
-      const days = Array.isArray(matcher.dayOfWeek) ? matcher.dayOfWeek : [matcher.dayOfWeek];
-      return days.includes(new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay());
+      const dow = matcher.dayOfWeek;
+      const days = Array.isArray(dow) ? dow : [dow];
+      return days.includes(new Date(ord).getUTCDay());
     }
-    const from = matcher.from ? parseDateValue(matcher.from, format) : undefined;
-    const to = matcher.to ? parseDateValue(matcher.to, format) : undefined;
-    const before = matcher.before ? parseDateValue(matcher.before, format) : undefined;
-    const after = matcher.after ? parseDateValue(matcher.after, format) : undefined;
-    if (from && compareParts(parts, from) < 0) {
-      return false;
-    }
-    if (to && compareParts(parts, to) > 0) {
-      return false;
-    }
-    if (from || to) {
-      return true;
-    }
+    const before = "before" in matcher ? matcherDateParts(matcher.before, dateFormat) : undefined;
+    const after = "after" in matcher ? matcherDateParts(matcher.after, dateFormat) : undefined;
     if (before && after) {
-      return compareParts(parts, after) > 0 && compareParts(parts, before) < 0;
+      // Interval: the open span strictly between `after` and `before`.
+      return ord > dayOrdinal(after) && ord < dayOrdinal(before);
     }
-    if (before) {
-      return compareParts(parts, before) < 0;
-    }
-    if (after) {
-      return compareParts(parts, after) > 0;
+    if (before) return ord < dayOrdinal(before);
+    if (after) return ord > dayOrdinal(after);
+    if ("from" in matcher) {
+      const from = matcherDateParts(matcher.from, dateFormat);
+      const to = matcher.to ? matcherDateParts(matcher.to, dateFormat) : undefined;
+      if (!from) return false;
+      if (to) return ord >= dayOrdinal(from) && ord <= dayOrdinal(to);
+      return ord === dayOrdinal(from);
     }
   }
   return false;
-}
+};
 
-function resolvePresets(raw: unknown, showPresets: boolean | undefined, mode: Mode, format: DateFormat) {
-  if (mode !== "range" || raw === false || (showPresets !== true && raw === undefined)) {
-    return [];
-  }
-  const today = todayParts();
-  const lastDays = (days: number) => ({
-    from: addDays(today, -(days - 1)),
-    to: today,
-  });
-  const monthStartToday = { year: today.year, month: today.month, day: 1 };
-  const defaultPresets = [
-    { key: "last7Days", label: "Last 7 days", range: [lastDays(7).from, lastDays(7).to] },
-    { key: "last30Days", label: "Last 30 days", range: [lastDays(30).from, lastDays(30).to] },
-    { key: "thisMonth", label: "This month", range: [monthStartToday, today] },
-    { key: "lastMonth", label: "Last month", range: [addMonths(monthStartToday, -1), addDays(monthStartToday, -1)] },
-  ];
-  if (Array.isArray(raw)) {
-    const custom = raw.map((item, index) => {
-      if (typeof item === "object" && item !== null) {
-        const record = item as Record<string, unknown>;
-        const from = parseDateValue(record.from, format);
-        const to = parseDateValue(record.to, format);
-        if (from && to) {
-          return { key: String(record.label ?? index), label: String(record.label ?? `${formatDateParts(from, format)} - ${formatDateParts(to, format)}`), range: [from, to] };
+type DateFieldProps = {
+  value: DateValue | undefined;
+  dateFormat: string;
+  placeholder: string;
+  id?: string;
+  className?: string;
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
+  fieldRef?: RefObject<HTMLInputElement | null>;
+  onCommit: (value: DateValue | null) => void;
+};
+
+// A self-owned segmented date input. Ark never controls this element — we only
+// push complete, valid dates back into Ark's value via `onCommit`, and mirror
+// Ark's value here when not mid-edit. Typing fills the year/month/day part the
+// caret is on, that part is highlighted (selected) so it's clear which one
+// you're entering, and completing a part auto-advances to the next. Month is
+// clamped to 01-12 and day to the real length of the month (see maskToFormat).
+function DateField({
+  value,
+  dateFormat,
+  placeholder,
+  id,
+  className,
+  ariaLabel,
+  autoFocus,
+  readOnly,
+  disabled,
+  fieldRef,
+  onCommit,
+}: DateFieldProps) {
+  const ownRef = useRef<HTMLInputElement>(null);
+  const segments = useMemo(() => buildDateSegments(dateFormat), [dateFormat]);
+  const editingRef = useRef(false);
+  const activeRef = useRef(0);
+  const freshRef = useRef(true);
+  // Per-segment digits typed so far while editing (the rest render as the
+  // placeholder template), and each segment's character range in the current
+  // (variable-width) display string.
+  const segDigitsRef = useRef<string[]>([]);
+  const segPositionsRef = useRef<Array<[number, number]>>([]);
+
+  const display = value ? formatDateValue(value, dateFormat) : "";
+  // Refs keep the native handlers fresh without re-attaching every render.
+  const displayRef = useRef(display);
+  displayRef.current = display;
+  const commitRef = useRef(onCommit);
+  commitRef.current = onCommit;
+
+  // Mirror the committed value (clean date, no template) whenever we aren't
+  // actively editing (calendar selection, clear, or post-blur normalization).
+  useEffect(() => {
+    const el = fieldRef?.current ?? ownRef.current;
+    if (el && !editingRef.current) el.value = display;
+  }, [display, fieldRef]);
+
+  // All editing runs through native listeners (React's synthetic onBeforeInput
+  // isn't reliable for programmatic input, and this element is ours to drive).
+  // The value always carries the full template — typed digits + placeholder
+  // letters + separators — so the structure never disappears while typing.
+  useEffect(() => {
+    const el = fieldRef?.current ?? ownRef.current;
+    if (!el || readOnly || disabled) return;
+
+    const render = () => {
+      const { value, positions } = buildDisplay(
+        segDigitsRef.current,
+        segments,
+        dateFormat,
+      );
+      el.value = value;
+      segPositionsRef.current = positions;
+    };
+    // Highlight the active segment (its typed digits, or its placeholder when
+    // empty), so it's clear which part you're entering and the caret sits on it.
+    const select = () => {
+      const pos = segPositionsRef.current[activeRef.current];
+      if (!pos) return;
+      try {
+        el.setSelectionRange(pos[0], pos[1]);
+      } catch {
+        /* setSelectionRange can throw for some input states; ignore */
+      }
+    };
+    const allComplete = () =>
+      segments.every(
+        (seg, i) => (segDigitsRef.current[i] || "").length === seg.capacity,
+      );
+    const firstIncomplete = () => {
+      const idx = segments.findIndex(
+        (seg, i) => (segDigitsRef.current[i] || "").length < seg.capacity,
+      );
+      return idx < 0 ? 0 : idx;
+    };
+    // Map a caret position in the (variable-width) display to a segment.
+    const segmentAtCaret = (caret: number) => {
+      const positions = segPositionsRef.current;
+      let best = 0;
+      positions.forEach((range, k) => {
+        if (caret >= range[0] && caret <= range[1]) best = k;
+        else if (range[0] <= caret) best = k;
+      });
+      return best;
+    };
+    const knownYearMonth = () => ({
+      year:
+        (segDigitsRef.current[0] || "").length === 4
+          ? Number(segDigitsRef.current[0])
+          : undefined,
+      month:
+        (segDigitsRef.current[1] || "").length === 2
+          ? Number(segDigitsRef.current[1])
+          : undefined,
+    });
+    const onBeforeInput = (event: Event) => {
+      const e = event as InputEvent;
+      e.preventDefault();
+      editingRef.current = true;
+      const type = e.inputType || "";
+      if (type.startsWith("history")) return;
+
+      if (type.startsWith("delete")) {
+        const current = segDigitsRef.current[activeRef.current] || "";
+        if (current.length > 0) {
+          segDigitsRef.current[activeRef.current] = current.slice(0, -1);
+        } else if (activeRef.current > 0) {
+          activeRef.current -= 1;
+          const prev = segDigitsRef.current[activeRef.current] || "";
+          segDigitsRef.current[activeRef.current] = prev.slice(0, -1);
+        }
+        freshRef.current = false;
+        render();
+        select();
+        return;
+      }
+
+      const data = (e.data ?? "").replace(/\D/g, "");
+      if (!data) {
+        select(); // non-digit — blocked, structure stays
+        return;
+      }
+      for (const digit of data) {
+        // Re-entering a segment clears just that segment (its placeholders come
+        // back); the other segments keep their digits.
+        if (freshRef.current) {
+          segDigitsRef.current[activeRef.current] = "";
+          freshRef.current = false;
+        }
+        const seg = segments[activeRef.current];
+        const { year, month } = knownYearMonth();
+        const res = addDigitToSegment(
+          seg.field,
+          seg.capacity,
+          segDigitsRef.current[activeRef.current] || "",
+          digit,
+          year,
+          month,
+        );
+        if (!res) continue; // impossible value — ignore the keystroke
+        segDigitsRef.current[activeRef.current] = res.digits;
+        if (res.complete && activeRef.current < segments.length - 1) {
+          activeRef.current += 1;
+          freshRef.current = true;
         }
       }
+      render();
+      select();
+    };
+
+    const onPointerUp = () => {
+      const caret = el.selectionStart ?? 0;
+      requestAnimationFrame(() => {
+        activeRef.current = segmentAtCaret(caret);
+        freshRef.current = true;
+        select();
+      });
+    };
+
+    const onFocus = () => {
+      editingRef.current = true;
+      // el.value here is the committed (fixed-width) date or empty, so reading
+      // by the format's fixed positions is correct.
+      segDigitsRef.current = readSegmentDigits(el.value, segments);
+      activeRef.current = allComplete() ? 0 : firstIncomplete();
+      freshRef.current = true;
+      render();
+      requestAnimationFrame(() => select());
+    };
+
+    const onKeyDown = (event: Event) => {
+      const e = event as KeyboardEvent;
+      // Enter applies the typed date (commit happens on blur).
+      if (e.key === "Enter") {
+        e.preventDefault();
+        el.blur();
+        return;
+      }
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      const delta = e.key === "ArrowLeft" ? -1 : 1;
+      activeRef.current = Math.max(
+        0,
+        Math.min(segments.length - 1, activeRef.current + delta),
+      );
+      freshRef.current = true;
+      select();
+    };
+
+    const onBlur = () => {
+      editingRef.current = false;
+      if (allComplete()) {
+        const parsed = parseDateValue(el.value, dateFormat);
+        if (parsed) {
+          commitRef.current(parsed);
+          el.value = formatDateValue(parsed, dateFormat);
+          return;
+        }
+      }
+      // Incomplete: drop the template and fall back to the committed value.
+      el.value = displayRef.current;
+      if (displayRef.current === "") commitRef.current(null);
+    };
+
+    el.addEventListener("beforeinput", onBeforeInput);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("focus", onFocus);
+    el.addEventListener("keydown", onKeyDown);
+    el.addEventListener("blur", onBlur);
+    return () => {
+      el.removeEventListener("beforeinput", onBeforeInput);
+      el.removeEventListener("pointerup", onPointerUp);
+      el.removeEventListener("focus", onFocus);
+      el.removeEventListener("keydown", onKeyDown);
+      el.removeEventListener("blur", onBlur);
+    };
+  }, [segments, dateFormat, readOnly, disabled, fieldRef]);
+
+  return (
+    <input
+      ref={fieldRef ?? ownRef}
+      id={id}
+      className={className}
+      placeholder={placeholder}
+      aria-label={ariaLabel}
+      defaultValue={display}
+      autoFocus={autoFocus}
+      readOnly={readOnly}
+      disabled={disabled}
+      inputMode="numeric"
+      autoComplete="off"
+      spellCheck={false}
+    />
+  );
+}
+
+export const DatePicker = memo(
+  forwardRef<HTMLDivElement, DatePickerProps>(function DatePicker(props, ref) {
+  const {
+    id,
+    value: controlledValue,
+    initialValue,
+    mode: rawMode,
+    label,
+    placeholder,
+    dateFormat = defaultProps.dateFormat,
+    enabled = defaultProps.enabled,
+    readOnly = defaultProps.readOnly,
+    required = defaultProps.required,
+    autoFocus = defaultProps.autoFocus,
+    inline = defaultProps.inline,
+    clearable = defaultProps.clearable,
+    validationStatus = defaultProps.validationStatus,
+    weekStartsOn,
+    showWeekNumber,
+    showWeekNumbers,
+    startDate,
+    endDate,
+    startIcon,
+    endIcon,
+    startText,
+    endText,
+    width,
+    locale = defaultProps.locale,
+    timeZone = defaultProps.timeZone,
+    numOfMonths,
+    presets,
+    showPresets,
+    disabledDates,
+    confirmRangeSelection = defaultProps.confirmRangeSelection,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
+    style,
+    className,
+    contentClassName,
+    onDidChange,
+    onFocus,
+    onBlur,
+    updateState,
+    registerComponentApi,
+  } = props;
+
+  // When a bound DatePicker sits inside a <Form>, FormBindingWrapper wraps it
+  // in an ItemWithLabel that already renders the (requireLabelMode-decorated)
+  // label. In that case we must NOT render our own label too, or the field shows
+  // a duplicate label. Standalone (and bindTo-less) pickers render their own.
+  const isInsideFormItem = useIsInsideFormItem();
+  // DOM id the editable input should carry so the FormItem label's `htmlFor`
+  // connects to the actual input (label-click focus + accessible name). Falls back
+  // to a generated id when not inside a FormItem. (Kept off the explicit `id`
+  // prop, which stays on the Ark root, to avoid a duplicate DOM id.)
+  const fieldInputId = useFormItemInputId();
+
+  const mode = toMode(rawMode);
+  const isControlled = controlledValue !== undefined;
+  // Switch to the bottom-sheet at the app's phone breakpoint (≤640px), using the
+  // shared xmlui media-query hook instead of a bespoke listener.
+  const isViewportMobile = useMediaQuery("(max-width: 640px)");
+  // The mobile bottom-sheet only applies to popover (non-inline) pickers. An
+  // inline calendar is always rendered in the page flow on every viewport, so
+  // it must never engage the sheet (which would otherwise show a drawer on
+  // load). Everything sheet-related keys off this flag.
+  const isMobile = isViewportMobile && !inline;
+  const [isOpen, setIsOpen] = useState(false);
+  const [insideDialog, setInsideDialog] = useState(false);
+  const [mobileFocusedValue, setMobileFocusedValue] = useState<DateValue | undefined>();
+  const [desktopFocusedValue, setDesktopFocusedValue] = useState<DateValue | undefined>();
+  // Mobile sheet renders a vertical, infinitely-scrollable window of months
+  // around the focused month. The window grows as the user scrolls toward either
+  // edge so any past/future date is reachable.
+  const [monthsBefore, setMonthsBefore] = useState(MOBILE_MONTHS_BEFORE);
+  const [monthsAfter, setMonthsAfter] = useState(MOBILE_MONTHS_AFTER);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const positionerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // Captured from Ark's context so a click on the control's non-value area can
+  // open the calendar programmatically (desktop).
+  const apiRef = useRef<{ setOpen: (open: boolean) => void } | null>(null);
+  const dayViewRef = useRef<HTMLDivElement>(null);
+  const monthZeroRef = useRef<HTMLDivElement>(null);
+  const pendingMobileScrollTopRef = useRef<number | null>(null);
+  // Infinite-scroll bookkeeping: a guard so a burst of scroll events only extends
+  // once per render, and the pre-prepend scrollHeight used to keep the viewport
+  // anchored when months are added above the current position.
+  const monthWindowExtendingRef = useRef(false);
+  const prependPrevHeightRef = useRef<number | null>(null);
+  // Set when a mobile month/year pick re-anchors the sheet, so a layout effect
+  // can scroll the newly focused month to the top.
+  const mobileJumpPendingRef = useRef(false);
+  const focusedWithinRef = useRef(false);
+
+  // Stable composed ref for the root (forwarded ref + internal rootRef).
+  const composedRootRef = useComposedRefs(ref, rootRef);
+
+  // Portal the calendar popup into the XMLUI theme root (not document.body) so it
+  // stays inside the themed, scoped subtree and positions correctly — e.g. within
+  // the docs playground container. Ark's Portal expects a ref-shaped container;
+  // the core DatePicker portals into the same theme root.
+  const { root: themeRoot } = useTheme();
+  const portalContainer = useMemo<RefObject<HTMLElement | null>>(
+    () => ({ current: themeRoot ?? null }),
+    [themeRoot],
+  );
+  // Ark resolves window/document and computes popup positioning from the root
+  // node. Inside a Shadow DOM (e.g. the docs playground), default `document`
+  // measurements break and the popup snaps to the corner — point Ark at the
+  // actual root node so positioning works in any host.
+  const getRootNode = useCallback(
+    () => (rootRef.current?.getRootNode() as Document | ShadowRoot) ?? document,
+    [],
+  );
+
+  const [internalValue, setInternalValue] = useState<DateValue[]>(() =>
+    toDateValues(controlledValue ?? initialValue, mode, dateFormat),
+  );
+
+  const controlledDateValues = useMemo(
+    () => toDateValues(controlledValue, mode, dateFormat),
+    [controlledValue, dateFormat, mode],
+  );
+
+  const values = isControlled ? controlledDateValues : internalValue;
+  const latestPayloadRef = useRef<DatePickerPayload>(
+    toPayload(values, mode, dateFormat),
+  );
+  latestPayloadRef.current = toPayload(values, mode, dateFormat);
+
+  const presetItems = useMemo(
+    () => resolvePresets(presets, showPresets, mode, dateFormat),
+    [mode, presets, showPresets, dateFormat],
+  );
+
+  const minDate = useMemo(
+    () => parseDateValue(startDate, dateFormat),
+    [dateFormat, startDate],
+  );
+  const maxDate = useMemo(
+    () => parseDateValue(endDate, dateFormat),
+    [dateFormat, endDate],
+  );
+
+  // --- Concise validation feedback (inline icon), resolved against the Form
+  // context like the core DatePicker. Verbose feedback (the default) hides the
+  // inline icon; the icon shows only when verbose is explicitly disabled.
+  const ctxVerbose = useFormContextPart((ctx: any) => ctx?.verboseValidationFeedback);
+  const ctxIconSuccess = useFormContextPart((ctx: any) => ctx?.validationIconSuccess);
+  const ctxIconError = useFormContextPart((ctx: any) => ctx?.validationIconError);
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? ctxVerbose ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? ctxIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? ctxIconError ?? "close";
+
+  // --- disabledDates → Ark's `isDateUnavailable` predicate.
+  const isDateUnavailable = useMemo(() => {
+    if (disabledDates === undefined || disabledDates === null) return undefined;
+    return (date: DateValue) =>
+      matchesDisabledDate(
+        { year: date.year, month: date.month, day: date.day },
+        disabledDates,
+        dateFormat,
+      );
+  }, [disabledDates, dateFormat]);
+
+  // --- confirmRangeSelection: in desktop range mode defer the commit until the
+  // user clicks Proceed. The pending selection drives the calendar while open;
+  // the committed value keeps driving the typed inputs until confirmed.
+  const isConfirmRange = confirmRangeSelection && mode === "range" && !inline && !isMobile;
+  const [pendingValues, setPendingValues] = useState<DateValue[] | null>(null);
+
+  const emitValue = useCallback(
+    (next: DateValue[], options?: { initial?: boolean }) => {
+      if (!isControlled) setInternalValue(next);
+      const payload = toPayload(next, mode, dateFormat);
+      latestPayloadRef.current = payload;
+      if (!shouldPublishValue(next, mode, options?.initial)) return;
+      updateState?.({ value: payload }, options?.initial ? { initial: true } : undefined);
+      if (!options?.initial) onDidChange?.(payload);
+    },
+    [dateFormat, isControlled, mode, onDidChange, updateState],
+  );
+
+  const setValue = useCallback(
+    (next: unknown) => {
+      emitValue(toDateValues(next, mode, dateFormat));
+    },
+    [dateFormat, emitValue, mode],
+  );
+
+  // A single typed field (start/end) committed a value. Merge it into the value
+  // array by position and push it back through Ark's state. Range keeps both
+  // slots so the other field is preserved.
+  const commitField = useCallback(
+    (index: number, date: DateValue | null) => {
+      if (mode === "range") {
+        const slots: (DateValue | undefined)[] = [values[0], values[1]];
+        slots[index] = date ?? undefined;
+        emitValue(slots as DateValue[]);
+      } else {
+        emitValue(date ? [date] : []);
+      }
+    },
+    [emitValue, mode, values],
+  );
+
+  // While confirming a range, the calendar reflects the pending (uncommitted)
+  // selection; otherwise it reflects the committed value.
+  const displayValues =
+    isConfirmRange && isOpen && pendingValues !== null ? pendingValues : values;
+
+  // Ark's value must be a dense array (no holes); the typed fields read the
+  // positional `values` instead.
+  const arkValue = useMemo(
+    () => displayValues.filter((item): item is DateValue => !!item),
+    [displayValues],
+  );
+
+  // User confirmed the pending range — commit it and close.
+  const handleProceed = useCallback(() => {
+    emitValue(pendingValues ?? []);
+    apiRef.current?.setOpen(false);
+  }, [emitValue, pendingValues]);
+
+  // User dismissed — drop the pending range without touching the committed value.
+  const handleCancel = useCallback(() => {
+    setPendingValues(null);
+    apiRef.current?.setOpen(false);
+  }, []);
+
+  const createFallbackFocusedValue = useCallback(() => {
+    try {
+      return parseDate(toIsoFromDate(new Date()));
+    } catch {
       return undefined;
-    }).filter(Boolean) as Array<{ key: string; label: string; range: DateParts[] }>;
-    return custom.length ? custom : defaultPresets;
-  }
-  return defaultPresets;
-}
+    }
+  }, []);
 
-function addDays(parts: DateParts, count: number): DateParts {
-  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day) + count * dayMs);
-  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
-}
+  const handleOpenChange = useCallback(
+    (details: { open: boolean }) => {
+      setIsOpen(details.open);
+      // Re-center the infinite-scroll month window on every open/close so it
+      // starts fresh around the focused month rather than wherever it was left.
+      setMonthsBefore(MOBILE_MONTHS_BEFORE);
+      setMonthsAfter(MOBILE_MONTHS_AFTER);
+      monthWindowExtendingRef.current = false;
+      prependPrevHeightRef.current = null;
+      if (!details.open) {
+        setMobileFocusedValue(undefined);
+        setDesktopFocusedValue(undefined);
+        pendingMobileScrollTopRef.current = null;
+        // Dropping the pending range reverts an unconfirmed selection (Cancel or
+        // dismiss); Proceed commits first, so the revert is a no-op there.
+        setPendingValues(null);
+        return;
+      }
+      if (isConfirmRange) {
+        setPendingValues(values);
+      }
+      if (isMobile) {
+        setMobileFocusedValue(values[0] ?? createFallbackFocusedValue());
+      } else {
+        setDesktopFocusedValue(values[0] ?? createFallbackFocusedValue());
+      }
+    },
+    [createFallbackFocusedValue, isConfirmRange, isMobile, values],
+  );
 
-function clampWeekStart(value: unknown) {
-  const numberValue = Number(value);
-  return Number.isInteger(numberValue) && numberValue >= 0 && numberValue <= 6 ? numberValue : 0;
-}
+  const rememberMobileScrollTop = useCallback(() => {
+    if (!isMobile || !isOpen) return;
+    if (pendingMobileScrollTopRef.current != null) return;
+    pendingMobileScrollTopRef.current = dayViewRef.current?.scrollTop ?? null;
+  }, [isMobile, isOpen]);
 
-function cx(...classes: Array<string | undefined | false>) {
-  return classes.filter(Boolean).join(" ");
-}
+  // Infinite scroll for the mobile sheet: when the user scrolls within a viewport
+  // of either edge, grow the month window so they can keep scrolling into the
+  // past or future. The guard ref ensures a burst of scroll events only triggers
+  // one extension per render.
+  const handleMobileScroll = useCallback(() => {
+    const el = dayViewRef.current;
+    if (!el || monthWindowExtendingRef.current) return;
+    const threshold = Math.max(el.clientHeight, 1);
+    if (el.scrollTop < threshold) {
+      monthWindowExtendingRef.current = true;
+      // Remember the height so the layout effect can keep the viewport anchored
+      // after months are prepended above the current scroll position.
+      prependPrevHeightRef.current = el.scrollHeight;
+      setMonthsBefore((before) => before + MOBILE_SCROLL_CHUNK);
+    } else if (el.scrollHeight - el.scrollTop - el.clientHeight < threshold) {
+      monthWindowExtendingRef.current = true;
+      setMonthsAfter((after) => after + MOBILE_SCROLL_CHUNK);
+    }
+  }, []);
+
+  // After the window grows, release the guard. When months were *prepended*, add
+  // their height to scrollTop so the visible month stays put (no jump upward).
+  useLayoutEffect(() => {
+    if (!monthWindowExtendingRef.current) return;
+    const el = dayViewRef.current;
+    if (el && prependPrevHeightRef.current != null) {
+      el.scrollTop += el.scrollHeight - prependPrevHeightRef.current;
+    }
+    prependPrevHeightRef.current = null;
+    monthWindowExtendingRef.current = false;
+  }, [monthsBefore, monthsAfter]);
+
+  // When the picker lives inside another overlay that locks scroll (an xmlui
+  // Drawer / Radix Dialog), Ark's body portal would place the mobile sheet
+  // outside that overlay's react-remove-scroll subtree, which blocks touch/wheel
+  // scrolling in the calendar. Detect that case so the sheet can render inline
+  // (within the scroll-allowed subtree). Top-level pickers keep the body portal
+  // because the page may have a transformed ancestor that breaks fixed layout.
+  useLayoutEffect(() => {
+    if (!isMobile || !isOpen) return;
+    setInsideDialog(!!rootRef.current?.closest('[role="dialog"]'));
+  }, [isMobile, isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isMobile || !isOpen || pendingMobileScrollTopRef.current == null) return;
+    const scrollTop = pendingMobileScrollTopRef.current;
+    pendingMobileScrollTopRef.current = null;
+    const restore = () => {
+      if (dayViewRef.current) {
+        dayViewRef.current.scrollTop = scrollTop;
+      }
+    };
+    restore();
+    let secondFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      restore();
+      secondFrame = requestAnimationFrame(restore);
+    });
+    const timeouts = [80, 180, 320].map((delay) =>
+      window.setTimeout(restore, delay),
+    );
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+      timeouts.forEach((timeout) => window.clearTimeout(timeout));
+    };
+  }, [isMobile, isOpen, values]);
+
+  useEffect(() => {
+    updateState?.({ value: latestPayloadRef.current }, { initial: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus: () => {
+        inputRef.current?.focus();
+      },
+      setValue,
+      getValue: () => latestPayloadRef.current,
+    });
+  }, [registerComponentApi, setValue]);
+
+  const handleFocusCapture = useCallback(() => {
+    if (focusedWithinRef.current) return;
+    focusedWithinRef.current = true;
+    onFocus?.();
+  }, [onFocus]);
+
+  const handleBlurCapture = useCallback(
+    (event: FocusEvent<HTMLDivElement>) => {
+      const next = event.relatedTarget as Node | null;
+      if (next && rootRef.current?.contains(next)) return;
+      if (next && positionerRef.current?.contains(next)) return;
+      focusedWithinRef.current = false;
+      onBlur?.();
+    },
+    [onBlur],
+  );
+
+
+  const hasAdornment = !!startText || !!endText || !!startIcon || !!endIcon;
+  const visibleMonthCount = toNumber(numOfMonths, mode === "range" ? 2 : 1);
+
+  // Day-view month offsets: a single side-by-side desktop row, or a vertical
+  // scrollable window centered on the focused month on mobile.
+  const dayMonthOffsets = isMobile
+    ? Array.from(
+        { length: monthsBefore + monthsAfter + 1 },
+        (_, i) => i - monthsBefore,
+      )
+    : Array.from({ length: visibleMonthCount }, (_, i) => i);
+
+  // When the mobile sheet opens, bring the focused month to the top of the
+  // scroll area so past months are reachable by scrolling up.
+  useEffect(() => {
+    if (!isMobile || !isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      monthZeroRef.current?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isMobile, isOpen]);
+
+  // After a mobile month/year pick re-anchors the window, scroll the newly
+  // focused month to the top so the jump is visible.
+  useLayoutEffect(() => {
+    if (!isMobile || !mobileJumpPendingRef.current) return;
+    mobileJumpPendingRef.current = false;
+    const frame = requestAnimationFrame(() => {
+      monthZeroRef.current?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isMobile, mobileFocusedValue]);
+
+  // Lock background page scroll while the mobile sheet is open so the page
+  // behind the backdrop doesn't move under the user's finger.
+  useEffect(() => {
+    if (!isMobile || !isOpen || typeof document === "undefined") return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isMobile, isOpen]);
+
+  // Mobile drawer header: live title, selection summary, and day count.
+  const sheetTitle = mode === "range" ? "Select date range" : "Select date";
+  const sheetSummaryEmpty = !values[0];
+  const sheetSummary = (() => {
+    if (mode === "range") {
+      const from = values[0] ? friendlyDate(values[0], locale) : undefined;
+      const to = values[1] ? friendlyDate(values[1], locale) : undefined;
+      if (from && to) return `${from} – ${to}`;
+      if (from) return `${from} – …`;
+      return placeholder || "Select dates";
+    }
+    return values[0] ? friendlyDate(values[0], locale) : placeholder || "Select a date";
+  })();
+  const rangeDays =
+    mode === "range" && values[0] && values[1]
+      ? daysInclusive(values[0], values[1])
+      : undefined;
+
+  // On desktop the calendars + confirm footer are wrapped in a column sized to
+  // the calendars (so the footer can't widen the popup). On mobile the sheet
+  // lays its children out with `order`, so we render them flat (no wrapper) —
+  // a wrapper there breaks the header/view stacking.
+  const CalendarArea = isMobile ? Fragment : "div";
+  const calendarAreaProps = isMobile ? {} : { className: styles.calendarArea };
+
+  return (
+    <EnvironmentProvider value={getRootNode}>
+    <ArkDatePicker.Root
+      id={id}
+      value={arkValue}
+      // Focus stays uncontrolled on every viewport. Controlling it on mobile
+      // vetoed the month/year picker (Ark couldn't move focus, so picking a month
+      // or year did nothing). The day-view anchor is our own `mobileFocusedValue`
+      // state, kept in sync through `onFocusChange` below.
+      focusedValue={undefined}
+      onValueChange={(details) => {
+        // Read-only never changes the value, no matter how the change was
+        // triggered (calendar selection, presets, etc.) — matches DatePicker.
+        if (readOnly) return;
+        rememberMobileScrollTop();
+        if (isConfirmRange) {
+          setPendingValues(details.value);
+        } else {
+          emitValue(details.value);
+        }
+      }}
+      onOpenChange={handleOpenChange}
+      onFocusChange={(details: { focusedValue?: DateValue }) => {
+        // The day view is rendered from our own focused-value anchor (for the
+        // multi-month desktop layout / mobile scroll sheet). Ark's month & year
+        // pickers (and keyboard navigation) move Ark's internal focus, so mirror
+        // focus changes back into that anchor — but only when focus leaves the
+        // currently visible window, otherwise normal in-view navigation (range
+        // hover, scrolling) would shift the view and make the target jump away.
+        const next = details?.focusedValue;
+        if (!next) return;
+        const monthOrdinal = (d: DateValue) => d.year * 12 + (d.month - 1);
+        const nextOrd = monthOrdinal(next);
+
+        if (isMobile) {
+          // The mobile sheet is an infinite vertical scroll anchored at
+          // mobileFocusedValue. A day tap / nav within the visible (scrolled)
+          // window must not move the anchor; only a month/year pick that lands
+          // outside the window re-anchors, re-centers the window, and scrolls
+          // the picked month to the top.
+          const anchor = mobileFocusedValue;
+          if (anchor) {
+            const anchorOrd = monthOrdinal(anchor);
+            if (nextOrd >= anchorOrd - monthsBefore && nextOrd <= anchorOrd + monthsAfter) {
+              return;
+            }
+          }
+          setMobileFocusedValue(next);
+          setMonthsBefore(MOBILE_MONTHS_BEFORE);
+          setMonthsAfter(MOBILE_MONTHS_AFTER);
+          mobileJumpPendingRef.current = true;
+          return;
+        }
+
+        const anchor = desktopFocusedValue;
+        if (anchor) {
+          const anchorOrd = monthOrdinal(anchor);
+          if (nextOrd >= anchorOrd && nextOrd <= anchorOrd + visibleMonthCount - 1) {
+            return;
+          }
+        }
+        setDesktopFocusedValue(next);
+      }}
+      selectionMode={mode}
+      disabled={!enabled}
+      readOnly={readOnly}
+      required={required}
+      invalid={validationStatus === "error"}
+      inline={inline}
+      locale={locale}
+      timeZone={timeZone}
+      startOfWeek={toNumber(weekStartsOn, 0)}
+      showWeekNumbers={showWeekNumber ?? showWeekNumbers ?? false}
+      isDateUnavailable={isDateUnavailable}
+      min={minDate}
+      max={maxDate}
+      numOfMonths={isMobile ? 1 : visibleMonthCount}
+      openOnClick={false}
+      closeOnSelect={mode !== "range"}
+      placeholder={placeholder}
+      format={(date) => formatDateValue(date, dateFormat)}
+      parse={(value) => parseDateValue(value, dateFormat)}
+      // `strategy: "fixed"` anchors the popup to the trigger via viewport
+      // coordinates (like the core DatePicker's Radix popover). Absolute strategy
+      // mis-positions to the corner when the popup is portaled into a scoped
+      // container (e.g. the docs playground's Shadow DOM root).
+      positioning={{ placement: "bottom-start", sameWidth: false, strategy: "fixed" }}
+    >
+      <div
+        ref={composedRootRef}
+        className={cx(styles.root, widthClass(width), className)}
+        style={style}
+        data-mode={mode}
+        data-validation-status={validationStatus}
+        data-inline={inline ? "" : undefined}
+        data-mobile={isMobile ? "" : undefined}
+        data-disabled={!enabled ? "" : undefined}
+        data-open={isOpen ? "" : undefined}
+        onFocusCapture={handleFocusCapture}
+        onBlurCapture={handleBlurCapture}
+      >
+        {!inline && label && !isInsideFormItem && (
+          // Clicking the label focuses the editable input (Ark's label targets
+          // its own hidden input, not our custom segment field, so wire it here).
+          <ArkDatePicker.Label
+            className={styles.label}
+            onClick={() => inputRef.current?.focus()}
+          >
+            {label}
+          </ArkDatePicker.Label>
+        )}
+
+        {/* Inline mode mirrors the core DatePicker: only the calendar (the
+            content that would otherwise live in the dropdown) is rendered — no
+            input control, no label, and never a portal/drawer. */}
+        {!inline && (
+        <div className={styles.pickerRow}>
+          {/* Capture Ark's api so a click on the control's non-value area can
+              open the calendar (desktop). */}
+          <ArkDatePicker.Context>
+            {(api) => {
+              apiRef.current = api;
+              return null;
+            }}
+          </ArkDatePicker.Context>
+          <ArkDatePicker.Control
+            className={styles.control}
+            data-has-adornment={hasAdornment ? "" : undefined}
+            onClick={(event) => {
+              // Disabled pickers never open (matches the core DatePicker).
+              if (!enabled) return;
+              // Mobile: tapping anywhere in the field opens the sheet (the
+              // inputs are read-only there). Desktop: clicking the value is for
+              // typing and the calendar/clear buttons handle their own clicks;
+              // a click anywhere else in the control opens the calendar.
+              if (isMobile) {
+                apiRef.current?.setOpen(true);
+                return;
+              }
+              // Desktop: the non-input chrome (adornments, separator, padding) is
+              // the open trigger. Clicking an editable input lets the user type
+              // instead of opening the calendar; clicking a read-only input (which
+              // can't be typed into) still opens. The clear/footer buttons keep
+              // their own handlers.
+              const target = event.target as HTMLElement;
+              if (target.closest("button")) return;
+              const clickedInput = target.closest("input") as HTMLInputElement | null;
+              if (clickedInput && !clickedInput.readOnly) return;
+              apiRef.current?.setOpen(true);
+            }}
+          >
+            <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+
+            <DateField
+              fieldRef={inputRef}
+              id={fieldInputId}
+              value={values[0]}
+              dateFormat={dateFormat}
+              placeholder={dateFormat.replace(/[A-Za-z]/g, (ch) => ch.toLowerCase())}
+              className={styles.input}
+              ariaLabel={label || "Date"}
+              autoFocus={autoFocus}
+              readOnly={isMobile || readOnly}
+              disabled={!enabled}
+              onCommit={(date) => commitField(0, date)}
+            />
+
+            {mode === "range" && (
+              <>
+                <span className={styles.rangeSeparator}>-</span>
+                <DateField
+                  value={values[1]}
+                  dateFormat={dateFormat}
+                  placeholder={dateFormat.replace(/[A-Za-z]/g, (ch) => ch.toLowerCase())}
+                  className={styles.input}
+                  ariaLabel="End date"
+                  readOnly={isMobile || readOnly}
+                  disabled={!enabled}
+                  onCommit={(date) => commitField(1, date)}
+                />
+              </>
+            )}
+
+            {/* Trailing chrome pinned to the right edge (the validation icon,
+                clear button and end adornment). `margin-left: auto` on this group
+                opens up a clickable gap between the typed value and the right
+                edge — clicking that gap opens the calendar, the numbers stay
+                editable, and the end text/adornment hugs the right edge. */}
+            <div className={styles.trailing}>
+              {!finalVerboseValidationFeedback && (
+                <span className={styles.conciseValidation}>
+                  <ConciseValidationFeedback
+                    validationStatus={validationStatus}
+                    invalidMessages={invalidMessages}
+                    successIcon={finalValidationIconSuccess}
+                    errorIcon={finalValidationIconError}
+                  />
+                </span>
+              )}
+
+              {clearable && !isMobile && (
+                <ArkDatePicker.ClearTrigger
+                  className={styles.clear}
+                  aria-label="Clear date"
+                >
+                  <ThemedIcon name="close" size="sm" />
+                </ArkDatePicker.ClearTrigger>
+              )}
+
+              <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+            </div>
+          </ArkDatePicker.Control>
+        </div>
+        )}
+
+        <MaybePortal disabled={(isMobile && insideDialog) || inline} container={portalContainer}>
+          <ArkDatePicker.Positioner
+            ref={positionerRef}
+            className={cx(styles.positioner, contentClassName)}
+            data-sheet={isMobile ? "" : undefined}
+          >
+            <ArkDatePicker.Content
+              className={styles.content}
+              data-sheet={isMobile ? "" : undefined}
+              data-testid={isMobile ? "datepicker-sheet" : undefined}
+            >
+              {isMobile && (
+                <div className={styles.sheetHeader}>
+                  <div className={styles.sheetHeaderText}>
+                    <span className={styles.sheetTitle}>{sheetTitle}</span>
+                    <span
+                      className={styles.sheetSummary}
+                      data-testid="datepicker-summary"
+                      data-empty={sheetSummaryEmpty ? "" : undefined}
+                    >
+                      {sheetSummary}
+                    </span>
+                    {mode === "range" && (
+                      <span
+                        className={styles.sheetCount}
+                        data-empty={rangeDays == null ? "" : undefined}
+                      >
+                        {rangeDays != null
+                          ? `${rangeDays} ${rangeDays === 1 ? "day" : "days"}`
+                          : "\u00a0"}
+                      </span>
+                    )}
+                  </div>
+                  <ArkDatePicker.Context>
+                    {(api) => (
+                      <button
+                        type="button"
+                        className={styles.sheetClose}
+                        aria-label="close"
+                        onClick={() => api.setOpen(false)}
+                      >
+                        <ThemedIcon name="close" size="sm" />
+                      </button>
+                    )}
+                  </ArkDatePicker.Context>
+                </div>
+              )}
+
+              {presetItems.length > 0 && (
+                <div className={styles.quickPresets}>
+                  {presetItems.map((preset) => (
+                    <ArkDatePicker.PresetTrigger
+                      key={preset.key}
+                      value={preset.value}
+                      className={styles.preset}
+                    >
+                      {preset.label}
+                    </ArkDatePicker.PresetTrigger>
+                  ))}
+                </div>
+              )}
+
+              {/* Desktop only: a column sized to the calendars so the confirm
+                  footer never widens the popup past them. On mobile this is a
+                  Fragment (no wrapper) so the sheet's order-based layout works. */}
+              <CalendarArea {...calendarAreaProps}>
+              <ArkDatePicker.View
+                ref={dayViewRef}
+                view="day"
+                className={styles.view}
+                onScroll={isMobile ? handleMobileScroll : undefined}
+                onPointerDownCapture={rememberMobileScrollTop}
+                onTouchStartCapture={rememberMobileScrollTop}
+              >
+                <ArkDatePicker.Context>
+                  {(api) => (
+                    <div className={styles.calendarMonths}>
+                      {dayMonthOffsets.map((offset, monthIndex) => {
+                        const anchoredMonthStart =
+                          isMobile && mobileFocusedValue
+                            ? mobileFocusedValue.set({ day: 1 }).add({ months: offset })
+                            : !isMobile && desktopFocusedValue
+                              ? desktopFocusedValue.set({ day: 1 }).add({ months: offset })
+                              : undefined;
+                        const shiftDesktopMonth = (months: number) => {
+                          if (isMobile) return;
+                          const base = desktopFocusedValue ?? api.visibleRange.start;
+                          const next = base.set({ day: 1 }).add({ months });
+                          setDesktopFocusedValue(next);
+                          api.setFocusedValue(next);
+                        };
+                        const month = anchoredMonthStart
+                          ? {
+                              weeks: api.getMonthWeeks(anchoredMonthStart),
+                              visibleRange: {
+                                start: anchoredMonthStart,
+                                end: anchoredMonthStart
+                                  .add({ months: 1 })
+                                  .subtract({ days: 1 }),
+                              },
+                              visibleRangeText: {
+                                start: monthLabel(anchoredMonthStart, locale),
+                                end: monthLabel(anchoredMonthStart, locale),
+                              },
+                            }
+                          : offset === 0
+                            ? {
+                                weeks: api.weeks,
+                                visibleRange: api.visibleRange,
+                                visibleRangeText: api.visibleRangeText,
+                              }
+                            : api.getOffset({ months: offset });
+                        const monthKey = anchoredMonthStart
+                          ? `${anchoredMonthStart.year}-${anchoredMonthStart.month}`
+                          : offset;
+
+                        return (
+                          <div
+                            className={styles.calendarMonth}
+                            key={monthKey}
+                            ref={offset === 0 ? monthZeroRef : undefined}
+                          >
+                            <ArkDatePicker.ViewControl className={styles.viewControl}>
+                              {!isMobile &&
+                                (monthIndex === 0 ? (
+                                  <button
+                                    type="button"
+                                    className={styles.nav}
+                                    aria-label="Previous month"
+                                    onClick={() => shiftDesktopMonth(-1)}
+                                  >
+                                    <ThemedIcon name="chevronleft" size="sm" />
+                                  </button>
+                                ) : (
+                                  <span className={styles.navSpacer} />
+                                ))}
+                              <ArkDatePicker.ViewTrigger className={styles.viewTrigger}>
+                                {month.visibleRangeText.start}
+                              </ArkDatePicker.ViewTrigger>
+                              {!isMobile &&
+                                (monthIndex === dayMonthOffsets.length - 1 ? (
+                                  <button
+                                    type="button"
+                                    className={styles.nav}
+                                    aria-label="Next month"
+                                    onClick={() => shiftDesktopMonth(1)}
+                                  >
+                                    <ThemedIcon name="chevronright" size="sm" />
+                                  </button>
+                                ) : (
+                                  <span className={styles.navSpacer} />
+                                ))}
+                            </ArkDatePicker.ViewControl>
+
+                            <ArkDatePicker.Table
+                              className={styles.table}
+                              id={`month-${monthIndex}`}
+                            >
+                              <ArkDatePicker.TableHead>
+                                <ArkDatePicker.TableRow>
+                                  {api.showWeekNumbers && (
+                                    <ArkDatePicker.WeekNumberHeaderCell
+                                      className={cx(styles.weekday, styles.weekNumber)}
+                                    />
+                                  )}
+                                  {api.weekDays.map((day) => (
+                                    <ArkDatePicker.TableHeader
+                                      key={day.value.toString()}
+                                      className={styles.weekday}
+                                    >
+                                      {day.short}
+                                    </ArkDatePicker.TableHeader>
+                                  ))}
+                                </ArkDatePicker.TableRow>
+                              </ArkDatePicker.TableHead>
+                              <ArkDatePicker.TableBody>
+                                {month.weeks.map((week, weekIndex) => (
+                                  <ArkDatePicker.TableRow key={weekIndex}>
+                                    {api.showWeekNumbers && (
+                                      <ArkDatePicker.WeekNumberCell
+                                        week={week}
+                                        weekIndex={weekIndex}
+                                        className={styles.weekNumber}
+                                      >
+                                        {api.getWeekNumber(week)}
+                                      </ArkDatePicker.WeekNumberCell>
+                                    )}
+                                    {week.map((day) => (
+                                      <ArkDatePicker.TableCell
+                                        key={day.toString()}
+                                        value={day}
+                                        visibleRange={month.visibleRange}
+                                        className={styles.cell}
+                                      >
+                                        <ArkDatePicker.TableCellTrigger
+                                          className={styles.cellTrigger}
+                                        >
+                                          {day.day}
+                                        </ArkDatePicker.TableCellTrigger>
+                                      </ArkDatePicker.TableCell>
+                                    ))}
+                                  </ArkDatePicker.TableRow>
+                                ))}
+                              </ArkDatePicker.TableBody>
+                            </ArkDatePicker.Table>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </ArkDatePicker.Context>
+              </ArkDatePicker.View>
+
+              <ArkDatePicker.View view="month" className={styles.view}>
+                <ArkDatePicker.ViewControl className={styles.viewControl}>
+                  <ArkDatePicker.PrevTrigger className={styles.nav}>
+                    <ThemedIcon name="chevronleft" size="sm" />
+                  </ArkDatePicker.PrevTrigger>
+                  <ArkDatePicker.ViewTrigger className={styles.viewTrigger}>
+                    <ArkDatePicker.RangeText />
+                  </ArkDatePicker.ViewTrigger>
+                  <ArkDatePicker.NextTrigger className={styles.nav}>
+                    <ThemedIcon name="chevronright" size="sm" />
+                  </ArkDatePicker.NextTrigger>
+                </ArkDatePicker.ViewControl>
+
+                <ArkDatePicker.Context>
+                  {(api) => (
+                    <ArkDatePicker.Table columns={4} className={styles.table}>
+                      <ArkDatePicker.TableBody>
+                        {api.getMonthsGrid({ columns: 4, format: "short" }).map((months, rowIndex) => (
+                          <ArkDatePicker.TableRow key={rowIndex}>
+                            {months.map((month) => (
+                              <ArkDatePicker.TableCell
+                                key={month.value}
+                                value={month.value}
+                                className={styles.cell}
+                              >
+                                <ArkDatePicker.TableCellTrigger className={styles.cellTrigger}>
+                                  {month.label}
+                                </ArkDatePicker.TableCellTrigger>
+                              </ArkDatePicker.TableCell>
+                            ))}
+                          </ArkDatePicker.TableRow>
+                        ))}
+                      </ArkDatePicker.TableBody>
+                    </ArkDatePicker.Table>
+                  )}
+                </ArkDatePicker.Context>
+              </ArkDatePicker.View>
+
+              <ArkDatePicker.View view="year" className={styles.view}>
+                <ArkDatePicker.ViewControl className={styles.viewControl}>
+                  <ArkDatePicker.PrevTrigger className={styles.nav}>
+                    <ThemedIcon name="chevronleft" size="sm" />
+                  </ArkDatePicker.PrevTrigger>
+                  <ArkDatePicker.ViewTrigger className={styles.viewTrigger}>
+                    <ArkDatePicker.RangeText />
+                  </ArkDatePicker.ViewTrigger>
+                  <ArkDatePicker.NextTrigger className={styles.nav}>
+                    <ThemedIcon name="chevronright" size="sm" />
+                  </ArkDatePicker.NextTrigger>
+                </ArkDatePicker.ViewControl>
+
+                <ArkDatePicker.Context>
+                  {(api) => (
+                    <ArkDatePicker.Table columns={4} className={styles.table}>
+                      <ArkDatePicker.TableBody>
+                        {api.getYearsGrid({ columns: 4 }).map((years, rowIndex) => (
+                          <ArkDatePicker.TableRow key={rowIndex}>
+                            {years.map((year) => (
+                              <ArkDatePicker.TableCell
+                                key={year.value}
+                                value={year.value}
+                                className={styles.cell}
+                              >
+                                <ArkDatePicker.TableCellTrigger className={styles.cellTrigger}>
+                                  {year.label}
+                                </ArkDatePicker.TableCellTrigger>
+                              </ArkDatePicker.TableCell>
+                            ))}
+                          </ArkDatePicker.TableRow>
+                        ))}
+                      </ArkDatePicker.TableBody>
+                    </ArkDatePicker.Table>
+                  )}
+                </ArkDatePicker.Context>
+              </ArkDatePicker.View>
+
+              {isMobile && (
+                <ArkDatePicker.Context>
+                  {(api) => (
+                    <div className={styles.sheetFooter}>
+                      {clearable && (
+                        <button
+                          type="button"
+                          className={styles.sheetClear}
+                          onClick={() => api.clearValue()}
+                        >
+                          Clear
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.sheetApply}
+                        onClick={() => api.setOpen(false)}
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  )}
+                </ArkDatePicker.Context>
+              )}
+
+              {isConfirmRange && (
+                <div className={styles.popupFooter}>
+                  <button
+                    type="button"
+                    className={cx(styles.footerButton, styles.footerButtonSecondary)}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={cx(styles.footerButton, styles.footerButtonPrimary)}
+                    onClick={handleProceed}
+                  >
+                    Proceed
+                  </button>
+                </div>
+              )}
+              </CalendarArea>
+            </ArkDatePicker.Content>
+          </ArkDatePicker.Positioner>
+        </MaybePortal>
+      </div>
+    </ArkDatePicker.Root>
+    </EnvironmentProvider>
+  );
+  }),
+);
+
+export default DatePicker;

@@ -1,0 +1,5 @@
+@layer components {
+  .fileInputRoot > button[type="button"]:last-child > span:empty:first-child {
+    display: none;
+  }
+}

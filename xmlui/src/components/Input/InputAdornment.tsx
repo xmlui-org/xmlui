@@ -29,7 +29,7 @@ export function Adornment({ iconName, text, className, onClick, tabIndex, ...res
           <ThemedIcon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>
-              <Text variant="inherit">{text}</Text>
+              <Text style={{ fontSize: "inherit" }}>{text}</Text>
             </div>
           )}
         </div>

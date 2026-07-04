@@ -13,12 +13,12 @@ import {
 
 import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
 import { Select } from "../Select/SelectReact";
-import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
+import { RadioGroup, RadioGroupOption } from "../RadioGroup/RadioGroupReact";
 import { SliderNative } from "../Slider/SliderReact";
 import { NumberBox as NumberBoxNative } from "../NumberBox/NumberBoxReact";
 import { ColorPicker } from "../ColorPicker/ColorPickerReact";
-import { DateInputNative } from "../DateInput/DateInputReact";
-import { DatePickerNative } from "../DatePicker/DatePickerReact";
+import { DateInput } from "../DateInput/DateInputReact";
+import { DatePicker } from "../DatePicker/DatePickerReact";
 import { TimeInputNative } from "../TimeInput/TimeInputReact";
 import type { Option as XmluiOption } from "../abstractions";
 import { useThemeVariables } from "../../runtime/rendering/theme";
@@ -442,19 +442,30 @@ function renderControl({
   }
   if (type === "radioGroup") {
     return (
-      <RadioGroupNative
+      <RadioGroup
         id={inputId}
-        value={value}
+        value={stringify(value)}
         enabled={enabled}
         required={required}
-        autoFocus={autoFocus}
+        autofocus={autoFocus}
         validationStatus={error ? "error" : undefined}
-        options={(options ?? optionsFromChildren(children)) as RadioGroupOption[]}
         onDidChange={(nextValue) => {
           form?.setValue(fieldName, nextValue);
           scheduleChangedValidation(nextValue);
         }}
-      />
+      >
+        {(options ?? optionsFromChildren(children)).map((option, index) => (
+          <RadioGroupOption
+            key={`${option.value}:${index}`}
+            value={stringify(option.value) ?? ""}
+            label={option.label}
+            enabled={option.enabled}
+            optionRenderer={option.optionRenderer}
+            style={option.style}
+            className={option.className}
+          />
+        ))}
+      </RadioGroup>
     );
   }
   if (type === "slider") {
@@ -510,9 +521,9 @@ function renderControl({
   }
   if (type === "dateinput" || type === "dateInput" || type === "date") {
     return (
-      <DateInputNative
+      <DateInput
         id={inputId}
-        value={value}
+        value={stringify(value)}
         enabled={enabled}
         required={required}
         autoFocus={autoFocus}
@@ -528,7 +539,7 @@ function renderControl({
   }
   if (type === "datepicker" || type === "datePicker") {
     return (
-      <DatePickerNative
+      <DatePicker
         id={inputId}
         value={value}
         enabled={enabled}

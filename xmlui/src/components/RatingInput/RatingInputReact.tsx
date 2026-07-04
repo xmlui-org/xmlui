@@ -1,179 +1,199 @@
-import type { CSSProperties, FocusEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-
-import { defaultProps } from "./RatingInput.defaults";
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import styles from "./RatingInput.module.scss";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import { PART_INPUT } from "../../components-core/parts";
+import type { ValidationStatus } from "../abstractions";
+import { noop } from "../../components-core/constants";
+import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./RatingInput.defaults";
 
-export type RatingInputApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: number | undefined;
-};
-
-export type RatingInputProps = {
-  id?: string;
-  value?: unknown;
-  initialValue?: unknown;
-  maxRating?: unknown;
+type Props = {
+  validationStatus?: ValidationStatus;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  verboseValidationFeedback?: boolean;
+  invalidMessages?: string[];
+  autoFocus?: boolean;
+  required?: boolean;
   placeholder?: string;
+  initialValue?: number;
+  id?: string;
+  value?: number;
+  maxRating?: number;
   enabled?: boolean;
   readOnly?: boolean;
-  required?: boolean;
-  autoFocus?: boolean;
-  tabIndex?: number;
-  validationStatus?: string;
+  classes?: Record<string, string>;
   className?: string;
-  style?: CSSProperties;
-  onDidChange?: (value: number | undefined) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  onDidChange?: (value: number) => void;
+  updateState?: UpdateStateFn;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const RatingInputNative = memo(forwardRef<RatingInputApi, RatingInputProps>(function RatingInputNative(
-  {
-    id,
-    value,
-    initialValue = defaultProps.initialValue,
-    maxRating = defaultProps.maxRating,
-    placeholder,
-    enabled = defaultProps.enabled,
-    readOnly = defaultProps.readOnly,
-    autoFocus,
-    tabIndex,
-    validationStatus = defaultProps.validationStatus,
-    className,
-    style,
-    onDidChange,
-    onFocus,
-    onBlur,
-    "data-testid": dataTestId,
-    ...rest
-  },
-  ref,
-) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const firstButtonRef = useRef<HTMLButtonElement | null>(null);
-  const controlled = value !== undefined;
-  const max = useMemo(() => normalizeMaxRating(maxRating), [maxRating]);
-  const [localValue, setLocalValue] = useState<number | undefined>(() =>
-    normalizeRatingValue(controlled ? value : initialValue, max),
-  );
-  const visibleValue = controlled ? normalizeRatingValue(value, max) : localValue;
-  const interactive = enabled && !readOnly;
+const DEFAULT_MAX_RATING = 5;
+const DEFAULT_VALIDATION_ICON_SUCCESS = "checkmark";
+const DEFAULT_VALIDATION_ICON_ERROR = "error";
+
+export const RatingInput = memo(forwardRef<HTMLDivElement, Props>(function RatingInput({
+  id,
+  value,
+  maxRating = defaultProps.maxRating,
+  enabled = defaultProps.enabled,
+  readOnly = defaultProps.readOnly,
+  classes,
+  className,
+  updateState = noop,
+  onFocus = noop,
+  onBlur = noop,
+  onDidChange = noop,
+  initialValue = defaultProps.initialValue,
+  validationStatus = defaultProps.validationStatus,
+  invalidMessages = defaultProps.invalidMessages,
+  placeholder,
+  autoFocus,
+  validationIconSuccess,
+  validationIconError,
+  verboseValidationFeedback,
+  registerComponentApi,
+  ...rest
+}: Props, ref: React.ForwardedRef<HTMLDivElement>) {
+  const innerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useComposedRefs(ref, innerRef);
+  const max = useMemo(() => {
+    const numericMax = typeof maxRating === "number" ? maxRating : DEFAULT_MAX_RATING;
+    const safeMax = Number.isFinite(numericMax) ? numericMax : DEFAULT_MAX_RATING;
+    const result = Math.max(1, Math.min(Math.round(safeMax), 10));
+    return Number.isFinite(result) ? result : DEFAULT_MAX_RATING;
+  }, [maxRating]);
+
+  const currentValue = Number(value ?? 0);
+  const isInteractive = enabled && !readOnly;
 
   useEffect(() => {
-    if (controlled) {
-      setLocalValue(normalizeRatingValue(value, max));
-    }
-  }, [controlled, max, value]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setLocalValue(normalizeRatingValue(initialValue, max));
-    }
-  }, [controlled, initialValue, max]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
+    if (initialValue === undefined || initialValue === null) {
       return;
     }
-    const timeoutId = setTimeout(() => firstButtonRef.current?.focus(), 0);
+    updateState({ value: initialValue }, { initial: true });
+  }, [initialValue, updateState]);
+
+  const [localValue, setLocalValue] = useState<number | undefined>(value);
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const updateValue = useCallback(
+    (nextValue: number) => {
+      setLocalValue(nextValue);
+      updateState({ value: nextValue });
+      onDidChange(nextValue);
+    },
+    [onDidChange, updateState],
+  );
+
+  const handleSelect = useCallback((nextValue: number) => {
+    if (!isInteractive) return;
+    updateValue(nextValue);
+  }, [isInteractive, updateValue]);
+
+  const focus = useCallback(() => {
+    innerRef.current?.focus();
+  }, []);
+
+  const setValue = useEvent((newValue: number | string) => {
+    if (!isInteractive) return;
+    const numericValue =
+      typeof newValue === "number"
+        ? newValue
+        : typeof newValue === "string" && newValue.trim() !== ""
+          ? Number(newValue)
+          : undefined;
+    if (numericValue === undefined || Number.isNaN(numericValue)) {
+      return;
+    }
+    updateValue(numericValue);
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+      value: localValue,
+    });
+  }, [focus, localValue, registerComponentApi, setValue]);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    const timeoutId = setTimeout(() => {
+      focus();
+    }, 0);
     return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
+  }, [autoFocus, focus]);
 
-  const updateValue = useCallback((nextValue: number | undefined) => {
-    setLocalValue(nextValue);
-    void onDidChange?.(nextValue);
-  }, [onDidChange]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        firstButtonRef.current?.focus();
-      }
-    },
-    setValue: (nextValue) => {
-      if (!interactive) {
-        return;
-      }
-      updateValue(normalizeRatingValue(nextValue, max));
-    },
-    get value() {
-      return visibleValue;
-    },
-  }), [enabled, interactive, max, updateValue, visibleValue]);
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? DEFAULT_VALIDATION_ICON_SUCCESS;
+  const finalValidationIconError = validationIconError ?? DEFAULT_VALIDATION_ICON_ERROR;
 
   return (
-    <div
-      {...rest}
-      id={id}
-      ref={rootRef}
-      data-part-id="input"
-      data-xmlui-part="input"
-      data-testid={dataTestId ?? id}
-      className={cx(
-        styles.ratingInputRoot,
-        validationStatus === "error" ? styles.ratingInputError : undefined,
-        validationStatus === "warning" ? styles.ratingInputWarning : undefined,
-        validationStatus === "valid" ? styles.ratingInputValid : undefined,
-        !enabled ? styles.ratingInputDisabled : undefined,
-        readOnly ? styles.ratingInputReadOnly : undefined,
-        className,
-      )}
-      style={style}
-      aria-disabled={!interactive}
-      onFocus={(_event: FocusEvent<HTMLDivElement>) => void onFocus?.()}
-      onBlur={(_event: FocusEvent<HTMLDivElement>) => void onBlur?.()}
-    >
-      {visibleValue === undefined && placeholder ? (
-        <span className={styles.ratingInputPlaceholder}>{placeholder}</span>
-      ) : null}
-      {Array.from({ length: max }, (_, index) => {
-        const ratingValue = index + 1;
-        const active = visibleValue !== undefined && ratingValue <= visibleValue;
-        return (
-          <button
-            key={ratingValue}
-            ref={ratingValue === 1 ? firstButtonRef : undefined}
-            type="button"
-            className={cx(styles.ratingInputStar, active ? styles.ratingInputStarActive : undefined)}
-            disabled={!interactive}
-            tabIndex={enabled ? tabIndex : -1}
-            aria-label={`Set rating to ${ratingValue}`}
-            onClick={() => {
-              if (interactive) {
-                updateValue(ratingValue);
-              }
-            }}
-          >
-            {active ? "★" : "☆"}
-          </button>
-        );
-      })}
-    </div>
+    <Part partId={PART_INPUT}>
+      <div
+        id={id}
+        ref={containerRef}
+        className={[
+          styles.container,
+          classes?.[COMPONENT_PART_KEY],
+          classes?.[PART_INPUT],
+          className,
+          !enabled ? styles.disabled : "",
+          readOnly ? styles.readOnly : "",
+          validationStatus === "error" ? styles.error : "",
+          validationStatus === "warning" ? styles.warning : "",
+          validationStatus === "valid" ? styles.valid : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        {...rest}
+        onFocus={isInteractive ? onFocus : undefined}
+        onBlur={isInteractive ? onBlur : undefined}
+        aria-disabled={!isInteractive}
+        tabIndex={-1}
+      >
+        {(localValue === undefined || localValue === null) && placeholder && (
+          <span className={styles.placeholder}>{placeholder}</span>
+        )}
+        {Array.from({ length: max }, (_, index) => {
+          const ratingValue = index + 1;
+          const isActive = ratingValue <= currentValue;
+          const label = `Set rating to ${ratingValue}`;
+
+          return (
+            <button
+              role="button"
+              key={ratingValue}
+              type="button"
+              className={[
+                styles.star,
+                isActive ? styles.starActive : "",
+                !isInteractive ? styles.disabled : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => handleSelect(ratingValue)}
+              disabled={!isInteractive}
+              aria-label={label}
+            >
+              {isActive ? "★" : "☆"}
+            </button>
+          );
+        })}
+        {!finalVerboseValidationFeedback &&
+          (finalValidationIconSuccess || finalValidationIconError || invalidMessages?.length) && (
+            <span aria-hidden="true" />
+          )}
+      </div>
+    </Part>
   );
 }));
-
-function normalizeMaxRating(value: unknown): number {
-  const parsed = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(parsed)) {
-    return defaultProps.maxRating;
-  }
-  return Math.max(1, Math.min(10, Math.round(parsed)));
-}
-
-function normalizeRatingValue(value: unknown, max: number): number | undefined {
-  if (value === undefined || value === null || value === "") {
-    return undefined;
-  }
-  const parsed = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(parsed)) {
-    return undefined;
-  }
-  return Math.max(1, Math.min(max, Math.round(parsed)));
-}
-
-function cx(...values: Array<string | undefined | false>): string {
-  return values.filter(Boolean).join(" ");
-}

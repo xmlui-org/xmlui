@@ -1,498 +1,441 @@
-import type { ChangeEvent, CSSProperties, DragEvent, FocusEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import type React from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+import type { Accept, DropzoneRootProps } from "react-dropzone";
+import * as dropzone from "react-dropzone";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import Papa from "papaparse";
 
-import { defaultProps } from "./FileInput.defaults";
-import { useFormContext } from "../Form/FormContext";
 import styles from "./FileInput.module.scss";
+import { loggerService } from "../../logging/LoggerService";
 
-export type FileParseResult = {
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
+import { defaultProps } from "./FileInput.defaults";
+
+// https://github.com/react-dropzone/react-dropzone/issues/1259
+const { useDropzone } = dropzone;
+
+/**
+ * Convert a file type string (e.g., ".csv" or ".txt,.jpg") to react-dropzone's Accept format
+ */
+function toDropzoneAccept(acceptsFileType: string | undefined): Accept | undefined {
+  if (!acceptsFileType) return undefined;
+
+  const extensions = acceptsFileType.split(",").map(ext => ext.trim());
+  // Use a wildcard MIME type to accept any file with the specified extensions
+  return { "application/octet-stream": extensions };
+}
+
+// ============================================================================
+// React FileInput component implementation
+
+// Parse result type for individual files
+export type ParseResult = {
   file: File;
-  data: unknown[];
+  data: any[];
   error?: Error;
 };
 
-export type FileParseAsResult = {
+// Result type when parseAs is set
+export type ParseAsResult = {
   files: File[];
-  parsedData: FileParseResult[];
+  parsedData: ParseResult[];
 };
 
-export type FileInputValue = File[] | FileParseAsResult | undefined;
-
-export type FileInputApi = {
-  focus: () => void;
-  open: () => void;
-  setValue: (files: unknown) => void;
-  getFields: () => string[] | undefined;
-  inProgress: boolean;
-  value: FileInputValue;
-};
-
-export type FileInputProps = {
+type Props = {
+  // General
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
+  enabled?: boolean;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  // Button styles
+  buttonLabel?: string;
+  variant?: ButtonVariant;
+  buttonThemeColor?: ButtonThemeColor;
+  buttonSize?: SizeType;
+  buttonIcon?: React.ReactNode;
+  buttonIconPosition?: IconPosition;
+  // Input props
+  updateState?: UpdateStateFn;
+  onDidChange?: (newValue: File[] | ParseAsResult) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
+  validationResult?: unknown;
+  validationInProgress?: boolean;
+  formItemId?: string;
+  autoFocus?: boolean;
+  // Component-specific props
+  value?: any;
+  initialValue?: any;
   acceptsFileType?: string | string[];
   multiple?: boolean;
   directory?: boolean;
-  placeholder?: string;
-  buttonLabel?: string;
-  buttonIcon?: string;
-  buttonIconPosition?: string;
-  buttonPosition?: "start" | "end" | string;
-  buttonSize?: string;
-  buttonThemeColor?: string;
-  buttonVariant?: string;
-  enabled?: boolean;
-  readOnly?: boolean;
   required?: boolean;
-  autoFocus?: boolean;
-  validationStatus?: string;
-  parseAs?: "csv" | "json" | string;
-  csvOptions?: unknown;
-  className?: string;
-  style?: CSSProperties;
-  onDidChange?: (value: FileInputValue) => void | Promise<void>;
-  onParseError?: (error: Error, file: File) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
+  readOnly?: boolean;
+  placeholder?: string;
+  buttonPosition?: "start" | "end";
+  // Parsing props
+  parseAs?: "csv" | "json";
+  csvOptions?: Papa.ParseConfig;
+  onParseError?: (error: Error, file: File) => void;
 };
 
-export const FileInputNative = memo(forwardRef<FileInputApi, FileInputProps>(function FileInputNative(
+export const FileInput = memo(forwardRef(function FileInput(
   {
-    id,
-    bindTo,
+    id: idProp,
+    enabled = defaultProps.enabled,
+    style,
+    className,
+    classes,
+    placeholder,
+    buttonPosition = defaultProps.buttonPosition,
+    buttonLabel = defaultProps.buttonLabel,
+    buttonIcon,
+    buttonIconPosition,
+    variant,
+    buttonThemeColor,
+    buttonSize,
+
+    autoFocus,
+    validationStatus,
+    invalidMessages: _invalidMessages,
+    validationResult: _validationResult,
+    validationInProgress: _validationInProgress,
+    formItemId: _formItemId,
+    updateState,
+    onDidChange,
+    onFocus,
+    onBlur,
+    registerComponentApi,
     value,
-    initialValue = defaultProps.initialValue,
+    initialValue,
     acceptsFileType,
     multiple = defaultProps.multiple,
     directory = defaultProps.directory,
-    placeholder,
-    buttonLabel = defaultProps.buttonLabel,
-    buttonIcon = "browse:FileInput",
-    buttonIconPosition = defaultProps.buttonIconPosition,
-    buttonPosition = defaultProps.buttonPosition,
-    buttonSize = defaultProps.buttonSize,
-    buttonThemeColor = defaultProps.buttonThemeColor,
-    buttonVariant = defaultProps.buttonVariant,
-    enabled = defaultProps.enabled,
-    readOnly = defaultProps.readOnly,
     required,
-    autoFocus,
-    validationStatus = defaultProps.validationStatus,
     parseAs,
     csvOptions,
-    className,
-    style,
-    onDidChange,
     onParseError,
-    onFocus,
-    onBlur,
     ...rest
-  },
-  ref,
+  }: Props,
+  ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const fieldButtonRef = useRef<HTMLButtonElement | null>(null);
-  const browseButtonRef = useRef<HTMLButtonElement | null>(null);
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectivePropValue = formValue ?? value;
-  const controlled = effectivePropValue !== undefined;
-  const [localValue, setLocalValue] = useState<FileInputValue>(() => normalizeValue(effectivePropValue ?? initialValue));
-  const [fields, setFields] = useState<string[] | undefined>();
-  const fieldsRef = useRef<string[] | undefined>();
-  const [inProgress, setInProgress] = useState(false);
-  const effectiveValue = controlled ? normalizeValue(effectivePropValue) : localValue;
-  const displayedFiles = filesFromValue(effectiveValue);
-  const interactive = enabled && !readOnly;
-  const accept = normalizeAcceptsFileType(acceptsFileType, parseAs);
-  const effectiveValidationStatus = formError ? "error" : validationStatus;
+  const id = useFormItemInputId(idProp);
+  const displayTextBoxId = useId();
+  // Don't accept any (initial) value if it is not a File array explicitly
+  const _initialValue: File[] | undefined = isFileArray(initialValue) ? initialValue : undefined;
+  const _value: File[] | undefined = isFileArray(value) ? value : undefined;
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [displayedFiles, setDisplayedFiles] = useState<File[]>([]);
+  const [parseFields, setParseFields] = useState<string[] | undefined>(undefined);
+
+  // Auto-infer file types based on parseAs
+  const inferredFileType = parseAs === "csv" ? ".csv" : parseAs === "json" ? ".json" : undefined;
+  const _acceptsFileType = acceptsFileType
+    ? (typeof acceptsFileType === "string" ? acceptsFileType : acceptsFileType?.join(","))
+    : inferredFileType;
+  const dropzoneAccept = useMemo(() => toDropzoneAccept(_acceptsFileType), [_acceptsFileType]);
 
   useEffect(() => {
-    if (controlled) {
-      setLocalValue(normalizeValue(effectivePropValue));
+    if (autoFocus) {
+      setTimeout(() => {
+        buttonRef.current?.focus();
+      }, 0);
     }
-  }, [controlled, effectivePropValue]);
+  }, [autoFocus]);
 
+  // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    if (!controlled) {
-      setLocalValue(normalizeValue(initialValue));
-    }
-  }, [controlled, initialValue]);
+    updateState({ value: _initialValue }, { initial: true });
+  }, [_initialValue, updateState]);
 
-  useEffect(() => {
-    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
-      return;
-    }
-    setFormValue(fieldName, normalizeValue(initialValue));
-  }, [fieldName, getFormValue, initialValue, setFormValue]);
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      required,
-    });
-  }, [fieldName, registerFormItem, required]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => browseButtonRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  const commitValue = useCallback((nextValue: FileInputValue) => {
-    setLocalValue(nextValue);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextValue);
-      void validateFormField?.(fieldName, nextValue);
-    }
-    void onDidChange?.(nextValue);
-  }, [fieldName, onDidChange, setFormValue, validateFormField]);
-
-  const commitFiles = useCallback(async (incomingFiles: File[]) => {
-    if (!interactive) {
-      return;
-    }
-    const acceptedFiles = filterAcceptedFiles(incomingFiles, accept);
-    const nextFiles = multiple || directory ? acceptedFiles : acceptedFiles.slice(0, 1);
-    if (nextFiles.length === 0) {
-      return;
-    }
-
-    if (parseAs === "csv" || parseAs === "json") {
-      setInProgress(true);
-      try {
-        const parsedData = await Promise.all(nextFiles.map((file) => parseFile(file, parseAs, csvOptions)));
-        const firstFields = parsedData.find((result) => result.data.length > 0)?.data[0];
-        const nextFields = isPlainObject(firstFields) ? Object.keys(firstFields) : undefined;
-        fieldsRef.current = nextFields;
-        setFields(nextFields);
-        for (const result of parsedData) {
-          if (result.error) {
-            void onParseError?.(result.error, result.file);
-          }
-        }
-        const nextValue = { files: nextFiles, parsedData };
-        commitValue(nextValue);
-      } finally {
-        setInProgress(false);
-      }
-      return;
-    }
-
-    setFields(undefined);
-    fieldsRef.current = undefined;
-    commitValue(nextFiles);
-  }, [accept, commitValue, csvOptions, directory, interactive, multiple, onParseError, parseAs]);
-
-  const open = useCallback(() => {
-    if (interactive) {
-      inputRef.current?.click();
-    }
-  }, [interactive]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        browseButtonRef.current?.focus();
-      }
-    },
-    open,
-    setValue: (files) => {
-      const nextFiles = normalizeFileArray(files);
-      const nextValue = multiple || directory ? nextFiles : nextFiles.slice(0, 1);
-      fieldsRef.current = undefined;
-      setFields(undefined);
-      commitValue(nextValue);
-    },
-    getFields: () => fieldsRef.current ?? fields,
-    get inProgress() {
-      return inProgress;
-    },
-    get value() {
-      return effectiveValue;
-    },
-  }), [commitValue, directory, effectiveValue, enabled, fields, inProgress, multiple, open]);
-
-  const onInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    void commitFiles(Array.from(event.currentTarget.files ?? []));
-    event.currentTarget.value = "";
-  }, [commitFiles]);
-
-  const onDrop = useCallback((event: DragEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    void commitFiles(Array.from(event.dataTransfer.files ?? []));
-  }, [commitFiles]);
-
-  const onDragOver = useCallback((event: DragEvent<HTMLButtonElement>) => {
-    if (interactive) {
-      event.preventDefault();
-    }
-  }, [interactive]);
-
-  const handleFocus = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-      void onFocus?.();
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback((e: React.FocusEvent) => {
+    // Only fire onFocus if focus is coming from outside the component
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onFocus?.();
     }
   }, [onFocus]);
 
-  const handleBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-      void onBlur?.();
+  const handleOnBlur = useCallback((e: React.FocusEvent) => {
+    // Only fire onBlur if focus is leaving the component entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      onBlur?.();
     }
   }, [onBlur]);
 
-  const displayText = displayedFiles.map((file) => file.name).join(", ");
-  const hasDisplayText = displayText.length > 0;
-  const normalizedButtonPosition = buttonPosition === "start" ? "start" : "end";
-  const normalizedIconPosition = buttonIconPosition === "end" ? "end" : "start";
-  const buttonContent = (
-    <>
-      {buttonIcon && normalizedIconPosition === "start" ? <span aria-hidden="true" data-icon={buttonIcon} className={styles.fileInputIcon} /> : null}
-      {buttonLabel}
-      {buttonIcon && normalizedIconPosition === "end" ? <span aria-hidden="true" data-icon={buttonIcon} className={styles.fileInputIcon} /> : null}
-    </>
+  const focus = useCallback(() => {
+    buttonRef.current?.focus();
+  }, []);
+
+  // --- Handle the value change events for this input
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      loggerService.log(["[FileInput] onDrop called", { parseAs, fileCount: acceptedFiles.length, files: acceptedFiles.map(f => f.name) }]);
+
+      if (!acceptedFiles.length) {
+        loggerService.log(["[FileInput] No files accepted, returning"]);
+        return;
+      }
+
+      // Store files for display purposes (file names in TextBox)
+      setDisplayedFiles(acceptedFiles);
+
+      // If no parsing is needed, just pass the files through
+      if (!parseAs) {
+        loggerService.log(["[FileInput] No parseAs specified, passing files through"]);
+        updateState({ value: acceptedFiles });
+        onDidChange?.(acceptedFiles);
+        return;
+      }
+
+      // Start loading spinner
+      setIsLoading(true);
+      loggerService.log(["[FileInput] parseAs =", parseAs, "- starting file parsing"]);
+
+      // Helper function to parse a single file
+      const parseFile = async (file: File): Promise<ParseResult> => {
+        loggerService.log(["[FileInput] parseFile called for:", file.name]);
+
+        try {
+          switch (parseAs) {
+            case "csv": {
+              loggerService.log(["[FileInput] Entering CSV parse branch for:", file.name]);
+
+              // Check for empty file before parsing
+              const text = await file.text();
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty CSV file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
+
+              const defaultCsvOptions: Papa.ParseConfig = {
+                header: true,
+                skipEmptyLines: true,
+                ...csvOptions,
+              };
+
+              loggerService.log(["[FileInput] CSV parse options:", defaultCsvOptions]);
+
+              return new Promise<ParseResult>((resolve) => {
+                Papa.parse(text, {
+                  ...defaultCsvOptions,
+                  complete: (results: Papa.ParseResult<any>) => {
+                    loggerService.log(["[FileInput] Papa.parse complete callback called for:", file.name]);
+                    loggerService.log(["[FileInput] results.data.length:", results.data.length]);
+                    loggerService.log(["[FileInput] results.errors.length:", results.errors.length]);
+
+                    // Log sample row structure
+                    if (results.data.length > 0) {
+                      const sampleRow = results.data[0];
+                      loggerService.log(["[FileInput] Sample row keys:", Object.keys(sampleRow)]);
+                      loggerService.log(["[FileInput] Sample row:", sampleRow]);
+                    }
+
+                    if (results.errors && results.errors.length > 0) {
+                      loggerService.log(["[FileInput] First 3 errors:", results.errors.slice(0, 3)]);
+                      const firstFewErrors = results.errors.slice(0, 3).map(e => e.message).join(", ");
+                      const errorSummary = results.errors.length > 3
+                        ? `${firstFewErrors} (and ${results.errors.length - 3} more)`
+                        : firstFewErrors;
+                      const error = new Error(errorSummary);
+                      loggerService.error(["[FileInput] CSV parse errors detected:", errorSummary]);
+                      resolve({ file, data: [], error });
+                    } else {
+                      loggerService.log(["[FileInput] CSV parse successful, row count:", results.data.length]);
+                      loggerService.log(["[FileInput] CSV meta fields:", results.meta.fields]);
+                      setParseFields(results.meta.fields);
+                      resolve({ file, data: results.data, error: undefined });
+                    }
+                  },
+                  error: (error: Error) => {
+                    loggerService.error(["[FileInput] Papa.parse error callback called:", error.message]);
+                    resolve({ file, data: [], error });
+                  },
+                });
+              });
+            }
+
+            case "json": {
+              loggerService.log(["[FileInput] Entering JSON parse branch for:", file.name]);
+
+              const text = await file.text();
+              loggerService.log(["[FileInput] Read file text, length:", text.length]);
+
+              // Handle empty files gracefully
+              if (text.trim() === "") {
+                loggerService.log(["[FileInput] Empty JSON file, returning empty array"]);
+                return { file, data: [], error: undefined };
+              }
+
+              const data = JSON.parse(text);
+              const arrayData = Array.isArray(data) ? data : [data];
+              loggerService.log(["[FileInput] JSON.parse successful, array length:", arrayData.length]);
+
+              return { file, data: arrayData, error: undefined };
+            }
+
+            default:
+              loggerService.error(["[FileInput] Unknown parseAs value:", parseAs]);
+              return { file, data: [], error: undefined };
+          }
+        } catch (error) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          loggerService.error(["[FileInput] Exception during file parsing:", err.message, "for file:", file.name]);
+          return { file, data: [], error: err };
+        }
+      };
+
+      // Parse all files
+      loggerService.log(["[FileInput] Starting to parse", acceptedFiles.length, "file(s)"]);
+      const results = await Promise.all(acceptedFiles.map(parseFile));
+      loggerService.log(["[FileInput] All files parsed, total rows:", results.reduce((sum, r) => sum + r.data.length, 0)]);
+
+      // Handle errors
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) {
+        loggerService.log(["[FileInput] Found", errors.length, "error(s) during parsing"]);
+        errors.forEach(({ file, error }) => {
+          if (error) {
+            loggerService.error(["[FileInput] Parse error for", file.name + ":", error.message]);
+            if (onParseError) {
+              loggerService.log(["[FileInput] Calling onParseError for:", file.name]);
+              onParseError(error, file);
+            } else {
+              loggerService.error(["[FileInput] No onParseError handler, logging to console:", error]);
+              console.error(`Failed to parse ${file.name}:`, error);
+            }
+          }
+        });
+      }
+
+      // Return { files, parsedData } when parseAs is set for consistent access to both
+      const parseAsResult: ParseAsResult = {
+        files: acceptedFiles,
+        parsedData: results,
+      };
+      loggerService.log(["[FileInput] Returning ParseAsResult with", results.length, "parsed file(s)"]);
+      loggerService.log(["[FileInput] Calling updateState with parseAsResult"]);
+      updateState({ value: parseAsResult });
+      loggerService.log(["[FileInput] Calling onDidChange with parseAsResult"]);
+      onDidChange?.(parseAsResult);
+
+      loggerService.log(["[FileInput] onDrop completed"]);
+
+      // Stop loading spinner and restore focus
+      setIsLoading(false);
+      buttonRef.current?.focus();
+    },
+    [updateState, onDidChange, parseAs, csvOptions, onParseError],
   );
 
-  const directoryProps = directory ? { webkitdirectory: "true" } as Record<string, string> : undefined;
+  const { getRootProps, getInputProps, open } = useDropzone({
+    accept: dropzoneAccept,
+    disabled: !enabled,
+    multiple: multiple || directory,
+    onDrop,
+    noClick: true,
+    noKeyboard: true,
+    noDragEventsBubbling: true,
+    useFsAccessApi: directory === false,
+  });
 
+  const doOpen = useEvent(() => {
+    open();
+  });
+
+  const getFields = useCallback(() => parseFields, [parseFields]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      open: doOpen,
+      get inProgress() {
+        return isLoading;
+      },
+      getFields,
+    });
+  }, [focus, doOpen, registerComponentApi, isLoading, getFields]);
+
+  // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
-    <div
-      {...rest}
-      id={id}
-      className={cx(
-        styles.fileInputRoot,
-        normalizedButtonPosition === "start" ? styles.fileInputButtonStart : styles.fileInputButtonEnd,
-        !enabled ? styles.fileInputDisabled : undefined,
-        readOnly ? styles.fileInputReadOnly : undefined,
-        className,
-      )}
-      style={style}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-    >
-      <button
-        ref={fieldButtonRef}
-        type="button"
-        data-part-id="input"
-        data-xmlui-part="input"
-        className={cx(
-          styles.fileInputFieldButton,
-          effectiveValidationStatus === "error" ? styles.fileInputError : undefined,
-          effectiveValidationStatus === "warning" ? styles.fileInputWarning : undefined,
-          effectiveValidationStatus === "valid" ? styles.fileInputValid : undefined,
-        )}
-        disabled={!enabled}
-        aria-readonly={readOnly || undefined}
-        onClick={open}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
+      <div
+        className={classnames(styles.container, classes?.[COMPONENT_PART_KEY], className, {
+          [styles.buttonStart]: buttonPosition === "start",
+          [styles.buttonEnd]: buttonPosition === "end",
+        })}
+        style={style}
+        onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
+        tabIndex={-1}
+        {...rest}
       >
-        <input
-          ref={inputRef}
-          className={styles.fileInputHiddenInput}
-          type="file"
-          accept={accept}
-          multiple={multiple || directory}
-          required={required}
-          disabled={!interactive}
-          onChange={onInputChange}
-          {...directoryProps}
-        />
-        <span className={cx(styles.fileInputText, !hasDisplayText ? styles.fileInputPlaceholder : undefined)}>
-          {hasDisplayText ? displayText : placeholder ?? ""}
-        </span>
-      </button>
-      <button
-        ref={browseButtonRef}
-        type="button"
-        className={styles.fileInputBrowseButton}
-        disabled={!interactive}
-        data-variant={buttonVariant || defaultProps.buttonVariant}
-        data-theme-color={buttonThemeColor || defaultProps.buttonThemeColor}
-        data-size={buttonSize || defaultProps.buttonSize}
-        onClick={open}
-      >
-        {buttonContent}
-      </button>
-    </div>
+        <button
+          id={id}
+          {...getRootProps({
+            tabIndex: 0,
+            disabled: !enabled,
+            className: styles.textBoxWrapper,
+            onClick: open,
+            ref: buttonRef,
+            type: "button",
+          })}
+        >
+          <VisuallyHidden.Root>
+            <input
+              {...getInputProps({
+                webkitdirectory: directory ? "true" : undefined,
+              } as DropzoneRootProps)}
+              accept={_acceptsFileType}
+            />
+          </VisuallyHidden.Root>
+
+          <TextBox
+            id={displayTextBoxId}
+            placeholder={placeholder}
+            enabled={enabled}
+            value={displayedFiles?.map((v) => v.name).join(", ") || ""}
+            validationStatus={validationStatus}
+            readOnly
+            tabIndex={-1}
+          />
+        </button>
+        <Button
+          disabled={!enabled}
+          type="button"
+          onClick={open}
+          icon={buttonIcon}
+          iconPosition={buttonIconPosition}
+          variant={variant}
+          themeColor={buttonThemeColor}
+          size={buttonSize}
+          className={styles.button}
+          autoFocus={autoFocus}
+        >
+          {buttonLabel}
+        </Button>
+      </div>
   );
 }));
 
-export function isFile(value: unknown): value is File {
-  return typeof File !== "undefined" && value instanceof File;
+export function isFile(value: any): value is File {
+  return value instanceof File;
 }
 
-export function isFileArray(value: unknown): value is File[] {
+export function isFileArray(value: any): value is File[] {
   return Array.isArray(value) && value.every(isFile);
-}
-
-function normalizeValue(value: unknown): FileInputValue {
-  if (isFileArray(value)) {
-    return value;
-  }
-  if (isParseAsResult(value)) {
-    return value;
-  }
-  return undefined;
-}
-
-function normalizeFileArray(value: unknown): File[] {
-  return isFileArray(value) ? value : [];
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function filesFromValue(value: FileInputValue): File[] {
-  if (isFileArray(value)) {
-    return value;
-  }
-  if (isParseAsResult(value)) {
-    return value.files;
-  }
-  return [];
-}
-
-function isParseAsResult(value: unknown): value is FileParseAsResult {
-  return isPlainObject(value) &&
-    isFileArray((value as FileParseAsResult).files) &&
-    Array.isArray((value as FileParseAsResult).parsedData);
-}
-
-function normalizeAcceptsFileType(acceptsFileType: string | string[] | undefined, parseAs: unknown): string | undefined {
-  if (Array.isArray(acceptsFileType)) {
-    return acceptsFileType.join(",");
-  }
-  if (typeof acceptsFileType === "string" && acceptsFileType.trim() !== "") {
-    return acceptsFileType;
-  }
-  if (parseAs === "csv") {
-    return ".csv";
-  }
-  if (parseAs === "json") {
-    return ".json";
-  }
-  return undefined;
-}
-
-function filterAcceptedFiles(files: File[], accept: string | undefined): File[] {
-  const accepted = parseAcceptList(accept);
-  if (accepted.length === 0) {
-    return files;
-  }
-  return files.filter((file) =>
-    accepted.some((entry) =>
-      entry.endsWith("/*")
-        ? file.type.startsWith(entry.slice(0, -1))
-        : entry.startsWith(".")
-          ? file.name.toLowerCase().endsWith(entry.toLowerCase())
-          : file.type === entry,
-    ),
-  );
-}
-
-function parseAcceptList(value: string | undefined): string[] {
-  return value?.split(",").map((entry) => entry.trim()).filter(Boolean) ?? [];
-}
-
-async function parseFile(file: File, parseAs: "csv" | "json", csvOptions: unknown): Promise<FileParseResult> {
-  try {
-    const text = await file.text();
-    if (text.trim() === "") {
-      return { file, data: [] };
-    }
-    if (parseAs === "json") {
-      const parsed = JSON.parse(text);
-      return { file, data: Array.isArray(parsed) ? parsed : [parsed] };
-    }
-    return { file, data: parseCsv(text, csvOptions) };
-  } catch (error) {
-    return { file, data: [], error: error instanceof Error ? error : new Error(String(error)) };
-  }
-}
-
-function parseCsv(text: string, csvOptions: unknown): unknown[] {
-  const options = isPlainObject(csvOptions) ? csvOptions as Record<string, unknown> : {};
-  const delimiter = typeof options.delimiter === "string" && options.delimiter.length > 0 ? options.delimiter : ",";
-  const hasHeader = options.header !== false;
-  const dynamicTyping = options.dynamicTyping === true;
-  const rows = text
-    .split(/\r?\n/)
-    .map((line) => splitCsvLine(line, delimiter))
-    .filter((row) => options.skipEmptyLines === false || row.some((cell) => cell.trim() !== ""));
-  if (rows.length === 0) {
-    return [];
-  }
-  if (!hasHeader) {
-    return rows.map((row) => row.map((cell) => normalizeCsvCell(cell, dynamicTyping)));
-  }
-  const headers = rows[0].map((header) => header.trim());
-  return rows.slice(1).map((row) =>
-    Object.fromEntries(headers.map((header, index) => [header, normalizeCsvCell(row[index] ?? "", dynamicTyping)])),
-  );
-}
-
-function splitCsvLine(line: string, delimiter: string): string[] {
-  const cells: string[] = [];
-  let cell = "";
-  let quoted = false;
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index];
-    if (char === '"' && line[index + 1] === '"') {
-      cell += '"';
-      index += 1;
-    } else if (char === '"') {
-      quoted = !quoted;
-    } else if (char === delimiter && !quoted) {
-      cells.push(cell);
-      cell = "";
-    } else {
-      cell += char;
-    }
-  }
-  cells.push(cell);
-  return cells;
-}
-
-function normalizeCsvCell(value: string, dynamicTyping: boolean): unknown {
-  const trimmed = value.trim();
-  if (!dynamicTyping) {
-    return trimmed;
-  }
-  if (trimmed === "true") {
-    return true;
-  }
-  if (trimmed === "false") {
-    return false;
-  }
-  if (trimmed !== "" && Number.isFinite(Number(trimmed))) {
-    return Number(trimmed);
-  }
-  return trimmed;
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
 }

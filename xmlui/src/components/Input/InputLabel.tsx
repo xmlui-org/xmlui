@@ -1,8 +1,11 @@
-import type { HTMLAttributes } from "react";
+import classnames from "classnames";
 
 import styles from "./InputLabel.module.scss";
 
-type InputLabelProps = Omit<HTMLAttributes<HTMLLabelElement>, "children"> & {
+// =====================================================================================================================
+// React component definition
+
+type Props = {
   text: string;
   forFieldId?: string;
   required?: boolean;
@@ -10,26 +13,14 @@ type InputLabelProps = Omit<HTMLAttributes<HTMLLabelElement>, "children"> & {
   focused?: boolean;
 };
 
-export function InputLabel({
-  text,
-  required,
-  forFieldId,
-  disabled,
-  className,
-  ...rest
-}: InputLabelProps) {
+export const InputLabel = ({ text, required, forFieldId, disabled, ...rest }: Props) => {
   return (
     <label
       {...rest}
-      className={cx(styles.inputLabel, disabled && styles.disabled, className)}
+      className={classnames(styles.inputLabel, { [styles.disabled]: disabled })}
       htmlFor={forFieldId}
     >
       {text} {required && <span className={styles.required}>*</span>}
     </label>
   );
-}
-
-function cx(...classes: Array<string | false | undefined>): string {
-  return classes.filter(Boolean).join(" ");
-}
-
+};

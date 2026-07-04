@@ -1,0 +1,46 @@
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata, dDidChange } from "../metadata-helpers";
+import { RadioItem, defaultProps } from "./RadioItemReact";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+
+const COMP = "RadioItem";
+
+export const RadioItemMd = createMetadata({
+  status: "experimental",
+  description: `The \`${COMP}\` component is a radio button that is part of a group of radio buttons.`,
+  props: {
+    checked: {
+      description: "This property specifies whether the radio button is checked.",
+      valueType: "boolean",
+      defaultValue: defaultProps.checked,
+    },
+    value: {
+      description: "This property specifies the value of the radio button.",
+      valueType: "string",
+      defaultValue: defaultProps.value,
+    },
+  },
+  events: {
+    didChange: dDidChange(COMP),
+  },
+});
+
+export const radioItemComponentRenderer = wrapComponent(COMP, RadioItem, RadioItemMd, {
+  stateful: false,
+  booleans: ["checked"],
+});
+
+export const radioItemRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: RadioItemMd,
+  renderer: ({ adapter }) => (
+    <RadioItem
+      checked={adapter.booleanProp("checked", defaultProps.checked)}
+      value={adapter.stringProp("value", defaultProps.value)}
+      style={adapter.style}
+      onDidChange={(value) => {
+        void adapter.event("didChange")(value);
+      }}
+    />
+  ),
+});

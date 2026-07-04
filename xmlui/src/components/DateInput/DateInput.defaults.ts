@@ -1,8 +1,8 @@
 export const defaultProps = {
   enabled: true,
-  validationStatus: "none",
-  mode: "single",
-  dateFormat: "MM/dd/yyyy",
+  validationStatus: "none" as const,
+  mode: "single" as const,
+  dateFormat: "MM/dd/yyyy" as const,
   showWeekNumber: false,
   weekStartsOn: 0,
   inline: true,
