@@ -560,16 +560,31 @@ function emitTargetRead(target: BoundWriteTarget): string {
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
-    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+    return `((${emitWriteTargetObject(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
   }
   if (target.kind === "index" && target.object && target.index) {
-    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
+    return `((${emitWriteTargetObject(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot generate invalid XMLUI event write target '${target.name}'.`);
   }
   const write = target.kind === "local" ? "writeLocal" : "writeGlobal";
   return `ctx.${write}(${JSON.stringify(target.name)}, ${valueSource})`;
+}
+
+function emitWriteTargetObject(object: XmluiScriptIr): string {
+  if (object.kind === "IdentifierRead" && !object.dependency) {
+    return `(ctx.readLocal(${JSON.stringify(object.name)}) ?? ctx.readGlobal(${JSON.stringify(object.name)}))`;
+  }
+  if (object.kind === "MemberRead") {
+    const objectSource = emitWriteTargetObject(object.object);
+    return `(${objectSource} == null ? undefined : ${objectSource}[${JSON.stringify(object.member)}])`;
+  }
+  if (object.kind === "IndexRead") {
+    const objectSource = emitWriteTargetObject(object.object);
+    return `(${objectSource} == null ? undefined : ${objectSource}[${emitExpression(object.index)}])`;
+  }
+  return emitExpression(object);
 }
 
 function compoundOperator(operator: XmluiAssignmentExpressionIr["operator"]): string {

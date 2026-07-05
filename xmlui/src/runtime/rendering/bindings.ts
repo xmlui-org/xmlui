@@ -8,8 +8,10 @@ import {
   compileXmluiEventHandler,
   compileXmluiExpression,
   type BoundDependency,
+  type BoundWriteTarget,
   type CompiledEventHandler,
   type CompiledExpression,
+  type XmluiScriptIr,
 } from "../../compiler/scriptSemantics";
 import {
   createEventContext,
@@ -161,15 +163,24 @@ export function renderMixedText(
 ): string {
   recordBindingEvaluation(counterKey ? `${counterKey}:mixed` : undefined);
   if (!segments) {
-    return fallback;
+    return decodeXmlEntities(fallback);
   }
   return segments
     .map((segment, index) =>
       segment.kind === "literal"
-        ? segment.value
+        ? decodeXmlEntities(segment.value)
         : stringify(executeExpression(segment, scope, counterKey ? `${counterKey}:${index}` : undefined)),
     )
     .join("");
+}
+
+function decodeXmlEntities(value: string): string {
+  return value
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, "\"")
+    .replace(/&apos;/g, "'");
 }
 
 export function executeExpression(
@@ -218,7 +229,7 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]):
       return completeEvent(Promise.resolve(fn(...args)));
     }
   }
-  if (event.execute) {
+  if (event.execute && !hasNestedWrites(event)) {
     return completeEvent(event.execute(context));
   }
   if (!event.ir) {
@@ -232,12 +243,23 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]):
   return completeEvent(compiled.execute(context));
 }
 
+function hasNestedWrites(event: ParsedEvent): boolean {
+  return (event.writes ?? []).some((write) => write.kind === "member" || write.kind === "index");
+}
+
 function invalidateMutatedState(event: ParsedEvent, scope: RuntimeScope): void {
   for (const write of event.writes ?? []) {
-    if (write.operator !== "mutate") {
+    const invalidatedRoot = invalidationRoot(write);
+    if (invalidatedRoot?.kind === "global" || (invalidatedRoot?.kind === "unknown" && scope.store.hasGlobal(invalidatedRoot.name))) {
+      scope.store.invalidateGlobal(invalidatedRoot.name);
+    } else if (invalidatedRoot?.kind === "local" || invalidatedRoot?.kind === "unknown") {
+      const ownerId = resolveLocalOwner(scope, invalidatedRoot.name);
+      if (ownerId) {
+        scope.store.invalidateLocal(ownerId, invalidatedRoot.name);
+      }
+    } else if (write.operator !== "mutate") {
       continue;
-    }
-    if (write.kind === "global") {
+    } else if (write.kind === "global") {
       scope.store.invalidateGlobal(write.name);
     } else if (write.kind === "local") {
       const ownerId = resolveLocalOwner(scope, write.name);
@@ -246,6 +268,40 @@ function invalidateMutatedState(event: ParsedEvent, scope: RuntimeScope): void {
       }
     }
   }
+}
+
+type InvalidationRoot =
+  | BoundDependency
+  | {
+      kind: "unknown";
+      name: string;
+    };
+
+function invalidationRoot(write: BoundWriteTarget): InvalidationRoot | undefined {
+  if ((write.kind === "member" || write.kind === "index") && write.object) {
+    return rootDependency(write.object) ?? rootIdentifier(write.object);
+  }
+  return undefined;
+}
+
+function rootDependency(expression: XmluiScriptIr): BoundDependency | undefined {
+  if (expression.kind === "IdentifierRead") {
+    return expression.dependency;
+  }
+  if (expression.kind === "MemberRead" || expression.kind === "IndexRead") {
+    return rootDependency(expression.object);
+  }
+  return undefined;
+}
+
+function rootIdentifier(expression: XmluiScriptIr): InvalidationRoot | undefined {
+  if (expression.kind === "IdentifierRead") {
+    return { kind: "unknown", name: expression.name };
+  }
+  if (expression.kind === "MemberRead" || expression.kind === "IndexRead") {
+    return rootIdentifier(expression.object);
+  }
+  return undefined;
 }
 
 function scheduleEvent(event: ParsedEvent, execute: () => Promise<unknown>): Promise<unknown> {

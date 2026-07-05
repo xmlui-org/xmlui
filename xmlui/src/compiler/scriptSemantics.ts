@@ -2186,16 +2186,31 @@ function emitTargetRead(target: BoundWriteTarget): string {
 
 function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string {
   if (target.kind === "member" && target.object) {
-    return `((${emitExpression(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
+    return `((${emitWriteTargetObject(target.object)})[${JSON.stringify(target.name)}] = ${valueSource})`;
   }
   if (target.kind === "index" && target.object && target.index) {
-    return `((${emitExpression(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
+    return `((${emitWriteTargetObject(target.object)})[${emitExpression(target.index)}] = ${valueSource})`;
   }
   if (target.kind !== "local" && target.kind !== "global") {
     throw new Error(`Cannot compile invalid XMLUI event write target '${target.name}'.`);
   }
   const write = target.kind === "local" ? "writeLocal" : "writeGlobal";
   return `ctx.${write}(${JSON.stringify(target.name)}, ${valueSource})`;
+}
+
+function emitWriteTargetObject(object: XmluiScriptIr): string {
+  if (object.kind === "IdentifierRead" && !object.dependency) {
+    return `(ctx.readLocal(${JSON.stringify(object.name)}) ?? ctx.readGlobal(${JSON.stringify(object.name)}))`;
+  }
+  if (object.kind === "MemberRead") {
+    const objectSource = emitWriteTargetObject(object.object);
+    return `(${objectSource} == null ? undefined : ${objectSource}[${JSON.stringify(object.member)}])`;
+  }
+  if (object.kind === "IndexRead") {
+    const objectSource = emitWriteTargetObject(object.object);
+    return `(${objectSource} == null ? undefined : ${objectSource}[${emitExpression(object.index)}])`;
+  }
+  return emitExpression(object);
 }
 
 function compoundOperator(operator: XmluiAssignmentExpressionIr["operator"]): string {
@@ -2780,11 +2795,11 @@ function executeTargetRead(
     return lexical[target.name];
   }
   if (target.kind === "member" && target.object) {
-    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    const object = executeWriteTargetObject(target.object, context, lexical) as Record<string, unknown> | null | undefined;
     return object == null ? undefined : object[target.name];
   }
   if (target.kind === "index" && target.object && target.index) {
-    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const object = executeWriteTargetObject(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
     const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
     return object == null ? undefined : object[index];
   }
@@ -2808,7 +2823,7 @@ function executeTargetWrite(
     return;
   }
   if (target.kind === "member" && target.object) {
-    const object = executeExpressionIr(target.object, context, lexical) as Record<string, unknown> | null | undefined;
+    const object = executeWriteTargetObject(target.object, context, lexical) as Record<string, unknown> | null | undefined;
     if (object == null) {
       throw new Error(`Cannot write XMLUI script member '${target.name}' on null or undefined.`);
     }
@@ -2816,7 +2831,7 @@ function executeTargetWrite(
     return;
   }
   if (target.kind === "index" && target.object && target.index) {
-    const object = executeExpressionIr(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const object = executeWriteTargetObject(target.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
     const index = executeExpressionIr(target.index, context, lexical) as PropertyKey;
     if (object == null) {
       throw new Error("Cannot write XMLUI script index on null or undefined.");
@@ -2833,6 +2848,27 @@ function executeTargetWrite(
     return;
   }
   throw new Error(`Cannot execute invalid XMLUI event write target '${target.name}'.`);
+}
+
+function executeWriteTargetObject(
+  object: XmluiScriptIr,
+  context: CompiledEventContext,
+  lexical: Record<string, unknown>,
+): unknown {
+  if (object.kind === "IdentifierRead" && !object.dependency) {
+    const localValue = context.readLocal(object.name);
+    return localValue === undefined ? context.readGlobal(object.name) : localValue;
+  }
+  if (object.kind === "MemberRead") {
+    const parent = executeWriteTargetObject(object.object, context, lexical) as Record<string, unknown> | null | undefined;
+    return parent == null ? undefined : parent[object.member];
+  }
+  if (object.kind === "IndexRead") {
+    const parent = executeWriteTargetObject(object.object, context, lexical) as Record<PropertyKey, unknown> | null | undefined;
+    const index = executeExpressionIr(object.index, context, lexical) as PropertyKey;
+    return parent == null ? undefined : parent[index];
+  }
+  return executeExpressionIr(object, context, lexical);
 }
 
 function writeLexical(lexical: Record<string, unknown>, name: string, value: unknown): void {

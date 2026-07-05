@@ -71,13 +71,13 @@ import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
-import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu.renderer";
+import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import {
   dropdownMenuRenderer,
-  menuItemRenderer,
-  menuSeparatorRenderer,
-  subMenuItemRenderer,
-} from "../components/DropdownMenu/DropdownMenu.renderer";
+  menuItemRuntimeRenderer as menuItemRenderer,
+  menuSeparatorRuntimeRenderer as menuSeparatorRenderer,
+  subMenuItemRuntimeRenderer as subMenuItemRenderer,
+} from "../components/DropdownMenu/DropdownMenu";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
@@ -111,7 +111,7 @@ import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
 import { appStateRenderer } from "../components/AppState/AppState";
-import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
+import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
 import { timerRenderer } from "../components/Timer/Timer.renderer";
 import { queueRenderer } from "../components/Queue/Queue.renderer";
@@ -119,7 +119,7 @@ import { messageListenerRenderer } from "../components/MessageListener/MessageLi
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
-import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
+import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { themeRenderer } from "../components/Theme/Theme.renderer";
@@ -845,11 +845,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (tooltipTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TooltipReact.tsx`);
     } else if (contextMenuTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContextMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContextMenu.tsx`);
     } else if (dropdownMenuTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenu.tsx`);
     } else if (menuPrimitiveTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenu.tsx`);
     } else if (fileInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
@@ -949,7 +949,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (appStateTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.tsx`);
     } else if (changeListenerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.tsx`);
     } else if (lifecycleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
     } else if (timerTransferred) {
@@ -965,7 +965,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (liveRegionTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LiveRegion.renderer.tsx`);
     } else if (bookmarkTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Bookmark.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Bookmark.tsx`);
     } else if (skipLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
     } else if (toastTransferred) {

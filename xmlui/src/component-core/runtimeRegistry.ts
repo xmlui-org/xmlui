@@ -6,28 +6,28 @@ import { appStateRenderer } from "../components/AppState/AppState";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { avatarRenderer } from "../components/Avatar/Avatar";
 import { badgeRenderer } from "../components/Badge/Badge";
-import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
+import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card";
-import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
+import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { columnRenderer } from "../components/Column/Column";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
-import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu.renderer";
+import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
 import {
   dropdownMenuRenderer,
-  menuItemRenderer,
-  menuSeparatorRenderer,
-  subMenuItemRenderer,
-} from "../components/DropdownMenu/DropdownMenu.renderer";
+  menuItemRuntimeRenderer as menuItemRenderer,
+  menuSeparatorRuntimeRenderer as menuSeparatorRenderer,
+  subMenuItemRuntimeRenderer as subMenuItemRenderer,
+} from "../components/DropdownMenu/DropdownMenu";
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
 import { fallbackRenderer } from "../components/Fallback/Fallback";

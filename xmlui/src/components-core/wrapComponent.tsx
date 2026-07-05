@@ -21,7 +21,11 @@ type WrapComponentOptions = {
   strings?: readonly string[];
   rename?: Record<string, string>;
   exclude?: readonly string[];
+  passUid?: boolean;
   exposeRegisterApi?: boolean;
+  contentClassName?: boolean;
+  childrenLayoutContext?: unknown;
+  renderers?: Record<string, unknown>;
   events?: readonly string[] | Record<string, string>;
   deriveAriaLabel?: (props: Record<string, unknown>) => unknown;
   customRender?: (
@@ -35,7 +39,7 @@ type WrapComponentOptions = {
       state?: Record<string, any>;
       updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
       lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
-      lookupAction: (expression: string, options?: Record<string, unknown>) => (() => unknown) | undefined;
+      lookupAction: (expression: string, options?: Record<string, unknown>) => ((...args: unknown[]) => unknown) | undefined;
       lookupSyncCallback: (expression: unknown) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
       renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
@@ -116,6 +120,7 @@ export function wrapComponent(
       return (
         <Component
           {...props}
+          uid={options.passUid ? runtimeProps.props.id : undefined}
           className={themeClass.className}
           style={themeClass.style}
         >

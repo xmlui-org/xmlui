@@ -335,8 +335,8 @@ export const App = memo(function App({
   // Refs for scroll containers - naming clarified for better understanding
   // pageScrollRef: used when scrollWholePage=true (entire page scrolls)
   // contentScrollRef: used when scrollWholePage=false (only content area scrolls)
-  const pageScrollRef = useRef(null);
-  const contentScrollRef = useRef(null);
+  const pageScrollRef = useRef<HTMLDivElement | null>(null);
+  const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
   const scrollContainerRef = scrollWholePage ? pageScrollRef : contentScrollRef;
   const scrollbarWidth = useScrollbarWidth();
@@ -436,6 +436,21 @@ export const App = memo(function App({
       });
     }
   }, [location.key, scrollRestorationEnabled, navigationType]);
+
+  useEffect(() => {
+    const hash = location.hash ? location.hash.slice(1) : "";
+    if (!hash) {
+      return;
+    }
+    const targetId = safeDecodeHash(hash);
+    requestAnimationFrame(() => {
+      const target = document.getElementById(targetId);
+      if (!target) {
+        return;
+      }
+      scrollElementIntoContainer(target, scrollContainerRef.current);
+    });
+  }, [location.hash, scrollContainerRef]);
 
   useEffect(() => {
     if (!scrollRestorationEnabled) return;
@@ -702,6 +717,28 @@ function stableLocaleBundlesSignature(localeBundles: unknown): string | undefine
   } catch {
     return String(localeBundles);
   }
+}
+
+function safeDecodeHash(hash: string): string {
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return hash;
+  }
+}
+
+function scrollElementIntoContainer(target: HTMLElement, container: HTMLElement | null) {
+  if (!container) {
+    target.scrollIntoView({ behavior: "auto", block: "start" });
+    return;
+  }
+
+  const targetRect = target.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  container.scrollTo({
+    top: targetRect.top - containerRect.top + container.scrollTop,
+    behavior: "auto",
+  });
 }
 
 export function getAppLayoutOrientation(appLayout?: AppLayoutType) {

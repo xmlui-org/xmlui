@@ -91,3 +91,10 @@ export function dSetValueApi() {
       "You can use this method to set the component's current value programmatically.",
   };
 }
+
+export function dTriggerTemplate(component: string) {
+  return {
+    description: `This property defines a custom trigger template for the ${component}.`,
+    valueType: "ComponentDef" as const,
+  };
+}

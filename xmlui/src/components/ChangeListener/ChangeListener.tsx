@@ -1,34 +1,98 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { createMetadata, dDidChange } from "../metadata-helpers";
+import { defaultProps } from "./ChangeListener.defaults";
+import { ChangeListener } from "./ChangeListenerReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+
+const COMP = "ChangeListener";
 
 export const ChangeListenerMd = createMetadata({
   status: "stable",
   nonVisual: true,
   description:
-    "`ChangeListener` is a non-visual component that fires an event when a watched value changes.",
+    "`ChangeListener` is an invisible component that watches for changes in values " +
+    "and triggers actions in response. It's essential for creating reactive behavior " +
+    "when you need to respond to data changes, state updates, or component property " +
+    "modifications outside of normal event handlers.",
   props: {
     listenTo: {
-      description: "The value to watch for changes.",
+      description:
+        "Value to the changes of which this component listens. If this property is not set, " +
+        "the `ChangeListener` is inactive.",
       valueType: "any",
     },
     listenToSources: {
-      description: "Named or indexed values to watch as independent change sources.",
+      description:
+        "Named values to watch as independent change sources. Use an object whose property names " +
+        "identify the sources. When this property is set, it takes precedence over `listenTo` and " +
+        "the `didChange` event receives source-level change details.",
       valueType: "any",
     },
     throttleWaitInMs: {
-      description: "Throttle delay for the didChange event.",
+      description:
+        `This property sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
+        `event handler. All changes within that throttling time will only fire the \`didChange\` event once.`,
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.throttleWaitInMs,
     },
     debounceWaitInMs: {
-      description: "Debounce delay for the didChange event. Takes precedence over throttling.",
+      description:
+        `This property sets a debounce wait time (in milliseconds) to apply when executing the \`didChange\` ` +
+        `event handler. The \`didChange\` event will only fire after the listened value has been stable for ` +
+        `the specified duration. This is useful for search-as-you-type scenarios where you want to wait ` +
+        `until the user stops typing before firing the event. When both \`debounceWaitInMs\` and ` +
+        `\`throttleWaitInMs\` are set, debounce takes precedence.`,
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.debounceWaitInMs,
     },
   },
   events: {
     didChange: {
-      description: "This event fires when the watched value changes.",
-      signature: "didChange(change: { prevValue: any; newValue: any }): void",
+      description:
+        "This event is triggered when the value specified in `listenTo` changes, or when any value " +
+        "specified in `listenToSources` changes.",
+      signature: "(change: ChangeListenerChange) => void",
+      parameters: {
+        change:
+          "An object with `prevValue` and `newValue`. When `listenToSources` is used, it also " +
+          "contains `changedSources` and `changes` with source-level details.",
+      },
     },
   },
 });
+
+export const changeListenerComponentRenderer = wrapComponent(
+  COMP,
+  ChangeListener,
+  ChangeListenerMd,
+  {
+    stateful: false,
+    events: { didChange: "onChange" },
+  },
+);
+
+export const changeListenerRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: ChangeListenerMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <ChangeListener
+      listenTo={cloneChangeListenerValue(adapter.prop("listenTo"))}
+      listenToSources={cloneChangeListenerValue(adapter.prop("listenToSources"))}
+      throttleWaitInMs={adapter.numberProp("throttleWaitInMs", defaultProps.throttleWaitInMs)}
+      debounceWaitInMs={adapter.numberProp("debounceWaitInMs", defaultProps.debounceWaitInMs)}
+      onChange={(change) => void adapter.event("didChange")(change)}
+    />
+  ),
+});
+
+function cloneChangeListenerValue(value: unknown): unknown {
+  if (value === undefined || value === null || typeof value !== "object") {
+    return value;
+  }
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return value;
+  }
+}
