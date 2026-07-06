@@ -2,6 +2,8 @@ import { createMetadata, dComponent } from "../../component-core/metadata/helper
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./ModalDialog.defaults";
 
+export { ModalDialogComponent as ThemedModalDialog } from "./ModalDialogReact";
+
 const COMP = "ModalDialog";
 const modalDialogStylesSource = `
   createThemeVar("padding-ModalDialog");

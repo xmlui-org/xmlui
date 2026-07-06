@@ -115,6 +115,16 @@ describe("ScriptParser expression mode", () => {
       shorthand: true,
     });
 
+    const dollarKeyObject = parseScriptExpression("{ name: 'Joe', $update: 123 }");
+    expect(dollarKeyObject.diagnostics).toEqual([]);
+    expect((dollarKeyObject.node as ObjectExpressionNode).properties[1]).toMatchObject({
+      kind: "ObjectProperty",
+      key: {
+        kind: "Identifier",
+        name: "$update",
+      },
+    });
+
     expect(indexed.diagnostics).toEqual([]);
     expect(indexed.node.kind).toBe("MemberExpression");
     const indexedObject = (indexed.node as MemberExpressionNode).object as IndexExpressionNode;

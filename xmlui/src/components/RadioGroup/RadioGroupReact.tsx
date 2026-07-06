@@ -311,6 +311,7 @@ export const RadioGroupOption = ({
   optionRenderer,
   style,
   className,
+  testId,
 }: Option) => {
   const id = useId();
   const radioGroupContext = useContext(RadioGroupStatusContext);
@@ -363,6 +364,7 @@ export const RadioGroupOption = ({
       className={classnames(styles.radioOptionContainer, className)}
       style={style}
       data-radio-item
+      data-testid={testId}
     >
       {!!optionRenderer ? (
         <label htmlFor={id} className={styles.optionLabel}>

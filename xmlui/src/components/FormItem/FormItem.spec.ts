@@ -453,6 +453,20 @@ test.describe("Validation Properties", () => {
     await expect(driver.component).toBeVisible();
   });
 
+  test("translates built-in pattern validation messages", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form
+        data="{{ userEmail: 'mailto' }}">
+        <FormItem pattern="email" bindTo="userEmail" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Not a valid email address")).toBeVisible();
+    await expect(page.getByText("xmlui.validation.email")).toHaveCount(0);
+  });
+
   test("renders with regex property", async ({ initTestBed, createFormItemDriver }) => {
     await initTestBed(`
       <Form>
@@ -500,6 +514,55 @@ test.describe("Validation Properties", () => {
     `);
     const driver = await createFormItemDriver("formItem");
     await expect(driver.component).toBeVisible();
+  });
+
+  test("animates validation helper messages when they appear", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}">
+        <FormItem maxLength="4" bindTo="firstname" />
+        <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Input should be up to 4 characters")).toHaveCount(2);
+    const animatedHelperCount = await page
+      .locator('[data-validation-status="error"], [data-validation-status="warning"]')
+      .evaluateAll((nodes) =>
+        nodes.filter((node) => {
+          if (!node.textContent?.includes("Input should be up to 4 characters")) {
+            return false;
+          }
+          return node.parentElement?.getAnimations().some((animation) => {
+            const duration = animation.effect?.getTiming().duration;
+            return animation.playState === "running" && typeof duration === "number" && duration > 0;
+          });
+        }).length,
+      );
+    const helperRows = await page
+      .locator('[data-validation-status="error"], [data-validation-status="warning"]')
+      .evaluateAll((nodes) =>
+        nodes
+          .filter((node) => node.textContent?.includes("Input should be up to 4 characters"))
+          .map((node) => {
+            const style = getComputedStyle(node);
+            return {
+              animationName: style.animationName,
+              animationDuration: style.animationDuration,
+            };
+          }),
+      );
+
+    expect(animatedHelperCount).toBeGreaterThanOrEqual(2);
+    expect(
+      helperRows.filter((row) => row.animationName !== "none" && row.animationDuration !== "0s")
+        .length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   test("renders with validationMode property", async ({ initTestBed, createFormItemDriver }) => {
@@ -770,6 +833,30 @@ test.describe("Event Handling", () => {
 
     // Should validate after debounce delay
     await expect.poll(testStateDriver.testState, { timeout: 1000 }).toEqual("validated");
+  });
+
+  test("onValidate can update component state without causing a validation loop", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form
+        var.validations="Validations: "
+        data="{{ name: 'Joe' }}">
+        <FormItem
+          customValidationsDebounce="300"
+          onValidate="(value) => {
+            validations += '| ';
+            return value === value.toUpperCase();
+          }"
+          bindTo="name" />
+        <Text value="{validations}" />
+      </Form>
+    `);
+
+    await expect(page.getByText(/^Validations: /)).toBeVisible();
+    await expect.poll(async () => page.getByText(/^Validations: /).textContent()).toContain("|");
+    await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
   });
 
   test("onValidate runs on value change", async ({

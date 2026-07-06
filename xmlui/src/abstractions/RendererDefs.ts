@@ -1,6 +1,7 @@
 import type { ForwardedRef, ReactNode, RefObject } from "react";
 
 import type { ComponentDef, ParentRenderContext } from "./ComponentDefs";
+import type { ComponentMetadata } from "../component-core/metadata";
 
 export type ValueExtractor = {
   (expression?: any, strict?: boolean): any;
@@ -33,11 +34,22 @@ export type UpdateStateFn = (
   options?: { initial?: boolean },
 ) => void;
 
+export type LookupActionOptions = {
+  context?: Record<string, any>;
+  defaultHandler?: string;
+  [key: string]: any;
+};
+
+export type LookupEventHandlerFn<TMd extends ComponentMetadata = ComponentMetadata> = (
+  eventName: keyof NonNullable<TMd["events"]> | string,
+  actionOptions?: LookupActionOptions,
+) => ((...args: any[]) => any) | undefined;
+
 export type RendererContext = {
   extractValue: ValueExtractor;
   node: ComponentDef;
   renderChild: RenderChildFn;
-  lookupEventHandler: (name: string) => ((...args: any[]) => any) | undefined;
+  lookupEventHandler: LookupEventHandlerFn;
   lookupAction: (expression: string, options?: Record<string, any>) => (() => any) | undefined;
   lookupSyncCallback: (expression: unknown) => ((...args: any[]) => any) | undefined;
   classes: Record<string, string>;

@@ -3,6 +3,22 @@ import { useEffect, useState } from "react";
 import { responsiveBreakpoints } from "../styling";
 
 const noop = () => {};
+const defaultTranslations: Record<string, string> = {
+  "xmlui.form.cancel": "Cancel",
+  "xmlui.form.save": "Save",
+  "xmlui.form.saving": "Saving...",
+  "xmlui.form.validating": "Validating...",
+  "xmlui.validation.email": "Not a valid email address",
+  "xmlui.validation.url": "Not a valid URL",
+  "xmlui.validation.phone": "Not a valid phone number",
+  "xmlui.validation.isoDate": "Not a valid ISO 8601 date",
+  "xmlui.validation.length": "Invalid length",
+  "xmlui.validation.iban": "Not a valid IBAN",
+  "xmlui.validation.creditCard": "Not a valid credit card number",
+  "xmlui.validation.strongPassword":
+    "Password must be at least 12 characters and include upper, lower, digit, and symbol",
+  "xmlui.validation.noLeadingTrailingWhitespace": "Value must not start or end with whitespace",
+};
 
 export function useAppContext(): {
   appGlobals: Record<string, any>;
@@ -47,7 +63,7 @@ export function useAppContext(): {
       setAuditPolicy: noop,
       setAppDirection: noop,
       isRtlLocale: () => false,
-      translate: (key: string) => key,
+      translate: (key: string) => defaultTranslations[key] ?? key,
       setScheduler: noop,
     },
   };

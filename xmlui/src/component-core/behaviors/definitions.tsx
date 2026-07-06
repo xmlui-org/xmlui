@@ -1,4 +1,4 @@
-import { Fragment, cloneElement, isValidElement, useId, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
+import { Children, Fragment, cloneElement, isValidElement, useId, useState, type CSSProperties, type MouseEvent, type ReactElement, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -401,15 +401,10 @@ function LabelBehavior({
     context.componentName === "ColorPicker" && childStyle?.display === "contents";
   const outerStyle = childStyleBelongsToValidationWrapper ? undefined : childStyle;
   const child = isValidElement(children)
-    ? cloneElement(children, {
-        id: (children.props as { id?: unknown }).id ?? inputId,
-        "data-testid": undefined,
-        "data-xmlui-id": undefined,
-        style: childStyleBelongsToValidationWrapper ? childStyle : undefined,
-      } as Record<string, unknown>)
+    ? cloneLabeledControl(children, inputId, childStyleBelongsToValidationWrapper, context.componentName)
     : children;
   const position = normalizedLabelPosition(
-    context.props.labelPosition,
+    context.props.labelPosition ?? form?.itemLabelPosition,
     context.metadata.compactInlineLabel === true,
   );
   const required = isTruthyWhenValue(context.props.required);
@@ -426,8 +421,11 @@ function LabelBehavior({
       : (!required && (requireLabelMode === "markOptional" || requireLabelMode === "markBoth"))
         ? "(Optional)"
         : undefined;
-  const labelWidth = stringValue(context.props.labelWidth);
-  const labelBreak = isTruthyWhenValue(context.props.labelBreak);
+  const labelWidth = stringValue(context.props.labelWidth) ?? form?.itemLabelWidth;
+  const labelBreak =
+    context.props.labelBreak === undefined
+      ? !!form?.itemLabelBreak
+      : isTruthyWhenValue(context.props.labelBreak);
   const resolvedLabelWidth =
     labelWidth ??
     (context.metadata.compactInlineLabel === true && (position === "before" || position === "after")
@@ -527,6 +525,48 @@ function LabelBehavior({
       </span>
     </label>
   );
+}
+
+function cloneLabeledControl(
+  element: ReactElement,
+  inputId: string,
+  preserveStyle: boolean,
+  componentName: string,
+): ReactElement {
+  const props = element.props as Record<string, unknown>;
+  const behaviorChild = props["data-xmlui-behavior"]
+    ? singleElementChild(props.children)
+    : undefined;
+  const compositeControlChild =
+    (componentName === "Select" || componentName === "AutoComplete")
+      ? singleElementChild(props.children)
+      : undefined;
+
+  if (behaviorChild) {
+    return cloneElement(element, {
+      children: cloneLabeledControl(behaviorChild, inputId, preserveStyle, componentName),
+    } as Record<string, unknown>);
+  }
+
+  if (compositeControlChild) {
+    return cloneElement(element, {
+      children: cloneLabeledControl(compositeControlChild, inputId, preserveStyle, componentName),
+    } as Record<string, unknown>);
+  }
+
+  return cloneElement(element, {
+    id: props.id ?? inputId,
+    "data-testid": undefined,
+    "data-xmlui-id": undefined,
+    style: preserveStyle ? props.style : undefined,
+  } as Record<string, unknown>);
+}
+
+function singleElementChild(children: unknown): ReactElement | undefined {
+  const childArray = Children.toArray(children);
+  return childArray.length === 1 && isValidElement(childArray[0])
+    ? childArray[0]
+    : undefined;
 }
 
 function normalizeLabelControlWidth(width: string | undefined) {

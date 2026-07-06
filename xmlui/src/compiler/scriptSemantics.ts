@@ -1933,9 +1933,10 @@ function emitExpression(ir: XmluiScriptIr): string {
       return emitCallExpression(ir);
     case "ArrowFunctionExpression":
       if (ir.body.kind === "BlockStatement") {
-        return `async (${ir.params.join(", ")}) => {\nlet __xmluiResult;\n${emitBlockStatement(ir.body, createArrowBlockCodegenContext())}\nreturn __xmluiResult;\n}`;
+        const body = markArrowParameterReads(ir.body, new Set(ir.params));
+        return `async (${ir.params.join(", ")}) => {\nlet __xmluiResult;\n${emitArrowBlockStatement(body as XmluiBlockStatementIr)}\nreturn __xmluiResult;\n}`;
       }
-      return `(${ir.params.join(", ")}) => (${emitExpression(ir.body)})`;
+      return `(${ir.params.join(", ")}) => (${emitExpression(markArrowParameterReads(ir.body, new Set(ir.params)))})`;
     case "AssignmentExpression":
       return emitAssignmentExpression(ir);
     case "PrefixUpdate":
@@ -1943,6 +1944,112 @@ function emitExpression(ir: XmluiScriptIr): string {
       return emitUpdateExpression(ir);
     default:
       throw new Error(`Cannot compile ${ir.kind} as an XMLUI expression.`);
+  }
+}
+
+function emitArrowBlockStatement(statement: XmluiBlockStatementIr): string {
+  const context = createArrowBlockCodegenContext();
+  const body = statement.body;
+  const emitted = body.map((child, index) => {
+    const isLast = index === body.length - 1;
+    if (isLast && child.kind === "ExpressionStatement" && !isDebugBreakCall(child.expression)) {
+      return `__xmluiResult = ${emitEventExpression(child.expression)};`;
+    }
+    return emitEventStatement(child, context);
+  }).join("\n");
+  return `{\n${emitted}\n}`;
+}
+
+function markArrowParameterReads(ir: XmluiScriptIr, params: Set<string>): XmluiScriptIr {
+  switch (ir.kind) {
+    case "IdentifierRead":
+      return params.has(ir.name)
+        ? { ...ir, dependency: { kind: "special", name: ir.name } as BoundDependency }
+        : ir;
+    case "ScopedMemberRead":
+    case "LiteralExpression":
+    case "Unsupported":
+      return ir;
+    case "MemberRead":
+      return { ...ir, object: markArrowParameterReads(ir.object, params) };
+    case "IndexRead":
+      return {
+        ...ir,
+        object: markArrowParameterReads(ir.object, params),
+        index: markArrowParameterReads(ir.index, params),
+      };
+    case "LogicalExpression":
+    case "BinaryExpression":
+      return {
+        ...ir,
+        left: markArrowParameterReads(ir.left, params),
+        right: markArrowParameterReads(ir.right, params),
+      };
+    case "UnaryExpression":
+      return { ...ir, argument: markArrowParameterReads(ir.argument, params) };
+    case "ConditionalExpression":
+      return {
+        ...ir,
+        test: markArrowParameterReads(ir.test, params),
+        consequent: markArrowParameterReads(ir.consequent, params),
+        alternate: markArrowParameterReads(ir.alternate, params),
+      };
+    case "ArrayExpression":
+      return { ...ir, elements: ir.elements.map((element) => markArrowParameterReads(element, params)) };
+    case "ObjectExpression":
+      return {
+        ...ir,
+        properties: ir.properties.map((property) =>
+          property.kind === "spread"
+            ? { ...property, argument: markArrowParameterReads(property.argument, params) }
+            : { ...property, value: markArrowParameterReads(property.value, params) },
+        ),
+      };
+    case "CallExpression":
+      return {
+        ...ir,
+        callee: markArrowParameterReads(ir.callee, params) as XmluiCallExpressionIr["callee"],
+        args: ir.args.map((arg) => markArrowParameterReads(arg, params)),
+      };
+    case "ArrowFunctionExpression": {
+      const nestedParams = new Set(params);
+      ir.params.forEach((param) => nestedParams.delete(param));
+      return { ...ir, body: markArrowParameterReads(ir.body, nestedParams) };
+    }
+    case "AssignmentExpression":
+      return { ...ir, right: markArrowParameterReads(ir.right, params) };
+    case "PrefixUpdate":
+    case "PostfixUpdate":
+      return ir;
+    case "EventHandler":
+      return { ...ir, body: ir.body.map((statement) => markArrowParameterReads(statement, params) as XmluiHandlerStatementIr) };
+    case "ExpressionStatement":
+      return { ...ir, expression: markArrowParameterReads(ir.expression, params) };
+    case "VariableDeclaration":
+      return {
+        ...ir,
+        declarations: ir.declarations.map((declaration) => ({
+          ...declaration,
+          ...(declaration.init ? { init: markArrowParameterReads(declaration.init, params) } : {}),
+        })),
+      };
+    case "BlockStatement":
+      return { ...ir, body: ir.body.map((statement) => markArrowParameterReads(statement, params) as XmluiHandlerStatementIr) };
+    case "IfStatement":
+      return {
+        ...ir,
+        test: markArrowParameterReads(ir.test, params),
+        consequent: markArrowParameterReads(ir.consequent, params) as XmluiHandlerStatementIr,
+        ...(ir.alternate
+          ? { alternate: markArrowParameterReads(ir.alternate, params) as XmluiHandlerStatementIr }
+          : {}),
+      };
+    case "WhileStatement":
+      return {
+        ...ir,
+        test: markArrowParameterReads(ir.test, params),
+        body: markArrowParameterReads(ir.body, params) as XmluiHandlerStatementIr,
+      };
   }
 }
 
@@ -2202,7 +2309,7 @@ function emitTargetWrite(target: BoundWriteTarget, valueSource: string): string 
 
 function emitWriteTargetObject(object: XmluiScriptIr): string {
   if (object.kind === "IdentifierRead" && !object.dependency) {
-    return `(ctx.readLocal(${JSON.stringify(object.name)}) ?? ctx.readGlobal(${JSON.stringify(object.name)}))`;
+    return `(ctx.readLocal(${JSON.stringify(object.name)}) ?? ctx.readGlobal(${JSON.stringify(object.name)}) ?? ctx.readReference?.(${JSON.stringify(object.name)}))`;
   }
   if (object.kind === "MemberRead") {
     const objectSource = emitWriteTargetObject(object.object);
@@ -2224,7 +2331,7 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
     case "local":
       return `ctx.readLocal(${JSON.stringify(name)})`;
     case "global":
-      return `ctx.readGlobal(${JSON.stringify(name)})`;
+      return `(ctx.readGlobal(${JSON.stringify(name)}) ?? ctx.readReference?.(${JSON.stringify(name)}))`;
     case "context":
       return `ctx.readContext?.(${JSON.stringify(name)})`;
     case "reference":
@@ -2232,7 +2339,7 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
     case "special":
       return name;
     case undefined:
-      return name;
+      return `(ctx.readLocal(${JSON.stringify(name)}) ?? ctx.readGlobal(${JSON.stringify(name)}) ?? ctx.readReference?.(${JSON.stringify(name)}))`;
     default:
       throw new Error(`Cannot compile unresolved XMLUI identifier '${name}'.`);
   }
@@ -2858,8 +2965,16 @@ function executeWriteTargetObject(
   lexical: Record<string, unknown>,
 ): unknown {
   if (object.kind === "IdentifierRead" && !object.dependency) {
+    const lexicalValue = readLexical(lexical, object.name);
+    if (lexicalValue.found) {
+      return lexicalValue.value;
+    }
     const localValue = context.readLocal(object.name);
-    return localValue === undefined ? context.readGlobal(object.name) : localValue;
+    if (localValue != null) {
+      return localValue;
+    }
+    const globalValue = context.readGlobal(object.name);
+    return globalValue == null ? context.readReference?.(object.name) : globalValue;
   }
   if (object.kind === "MemberRead") {
     const parent = executeWriteTargetObject(object.object, context, lexical) as Record<string, unknown> | null | undefined;
@@ -2883,6 +2998,20 @@ function writeLexical(lexical: Record<string, unknown>, name: string, value: unk
     current = Object.getPrototypeOf(current) as Record<string, unknown> | null;
   }
   lexical[name] = value;
+}
+
+function readLexical(
+  lexical: Record<string, unknown>,
+  name: string,
+): { found: true; value: unknown } | { found: false } {
+  let current: Record<string, unknown> | null = lexical;
+  while (current) {
+    if (Object.prototype.hasOwnProperty.call(current, name)) {
+      return { found: true, value: current[name] };
+    }
+    current = Object.getPrototypeOf(current) as Record<string, unknown> | null;
+  }
+  return { found: false };
 }
 
 function executeCompoundAssignment(
@@ -2914,10 +3043,28 @@ function executeRead(
 ): unknown {
   switch (dependency?.kind) {
     case "local":
+      {
+        const lexicalValue = readLexical(lexical, name);
+        if (lexicalValue.found) {
+          return lexicalValue.value;
+        }
+      }
       return context.readLocal(name);
     case "global":
-      return context.readGlobal(name);
+      {
+        const lexicalValue = readLexical(lexical, name);
+        if (lexicalValue.found) {
+          return lexicalValue.value;
+        }
+      }
+      return context.readGlobal(name) ?? context.readReference?.(name);
     case "context":
+      {
+        const lexicalValue = readLexical(lexical, name);
+        if (lexicalValue.found) {
+          return lexicalValue.value;
+        }
+      }
       return context.readContext?.(name);
     case "reference":
       return context.readReference?.(name);
@@ -2930,7 +3077,20 @@ function executeRead(
       }
       return lexical[name];
     case undefined:
-      return lexical[name];
+      {
+        const lexicalValue = readLexical(lexical, name);
+        if (lexicalValue.found) {
+          return lexicalValue.value;
+        }
+      }
+      {
+        const localValue = context.readLocal(name);
+        if (localValue != null) {
+          return localValue;
+        }
+        const globalValue = context.readGlobal(name);
+        return globalValue == null ? context.readReference?.(name) : globalValue;
+      }
     default:
       throw new Error(`Cannot execute unresolved XMLUI identifier '${name}'.`);
   }

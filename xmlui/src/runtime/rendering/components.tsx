@@ -82,6 +82,19 @@ export function ScopedElement({
     [ownerId, parentScope, props],
   );
 
+  useEffect(() => {
+    for (const [name, value] of Object.entries(node.vars)) {
+      const parsedValue = node.parsed?.vars?.[name];
+      if ((parsedValue?.dependencies?.length ?? 0) === 0) {
+        continue;
+      }
+      const nextValue = evaluateExpressionOrText(value, parsedValue, scope);
+      if (parentScope.store.readLocal(ownerId, name) !== nextValue) {
+        parentScope.store.writeLocal(ownerId, name, nextValue);
+      }
+    }
+  });
+
   return <>{context.renderElement(node, scope)}</>;
 }
 
@@ -129,6 +142,7 @@ export function ComponentInstance({
     const initialScope = createRuntimeScope({
       store: scope.store,
       localOwnerId: ownerId,
+      parent: scope,
       props,
       references: componentReferences,
       i18n: scope.i18n,
@@ -149,6 +163,7 @@ export function ComponentInstance({
     const latestScope = createRuntimeScope({
       store: scope.store,
       localOwnerId: ownerId,
+      parent: scope,
       props,
       references: componentReferences,
       i18n: scope.i18n,
@@ -177,6 +192,7 @@ export function ComponentInstance({
       createRuntimeScope({
         store: scope.store,
         localOwnerId: ownerId,
+        parent: scope,
         props,
         references: componentReferences,
         slots: createSlots(node, scope),

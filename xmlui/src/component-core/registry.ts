@@ -85,8 +85,10 @@ import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
+import { formValidatorRenderer } from "../components/Form/FormValidator";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
+import { formSectionRenderer } from "../components/FormSection/FormSection.renderer";
 import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
@@ -231,8 +233,10 @@ const implementedRuntimeNames = [
   "FocusScope",
   "Footer",
   "Form",
+  "FormValidator",
   "FormItem",
   "FormSegment",
+  "FormSection",
   "StepperForm",
   "TabsForm",
   "TimeInput",
@@ -353,8 +357,10 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   FocusScope: focusScopeRenderer,
   Footer: footerRuntimeRenderer,
   Form: formRenderer,
+  FormValidator: formValidatorRenderer,
   FormItem: formItemRenderer,
   FormSegment: formSegmentRenderer,
+  FormSection: formSectionRenderer,
   StepperForm: stepperFormRenderer,
   TabsForm: tabsFormRenderer,
   Option: optionRenderer,

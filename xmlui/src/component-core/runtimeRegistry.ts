@@ -37,8 +37,10 @@ import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
+import { formValidatorRenderer } from "../components/Form/FormValidator";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
+import { formSectionRenderer } from "../components/FormSection/FormSection.renderer";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import {
   headingRenderer,
@@ -217,8 +219,10 @@ export const coreRuntimeRendererEntries = [
   { name: "FocusScope", renderer: focusScopeRenderer },
   { name: "Footer", renderer: footerRuntimeRenderer },
   { name: "Form", renderer: formRenderer },
+  { name: "FormValidator", renderer: formValidatorRenderer },
   { name: "FormItem", renderer: formItemRenderer },
   { name: "FormSegment", renderer: formSegmentRenderer },
+  { name: "FormSection", renderer: formSectionRenderer },
   { name: "StepperForm", renderer: stepperFormRenderer },
   { name: "TabsForm", renderer: tabsFormRenderer },
   { name: "Option", renderer: optionRenderer },

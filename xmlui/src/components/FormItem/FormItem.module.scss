@@ -1,16 +1,18 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: (
+);
+
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$gap-FormItem: createThemeVar("gap-FormItem");
-$gap-label-FormItem: createThemeVar("gap-label-FormItem");
-$width-label-FormItem: createThemeVar("width-label-FormItem");
-$textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
+// Variables for @layer section
 $textColor-label-formItem: createThemeVar("textColor-label-formItem");
 $fontFamily-label-formItem: createThemeVar("fontFamily-label-formItem");
 $fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
-$fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
 $fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
 $fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
 $textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
@@ -21,233 +23,183 @@ $fontStyle-label-formItem--required: createThemeVar("fontStyle-label-formItem--r
 $textTransform-label-formItem--required: createThemeVar("textTransform-label-formItem--required");
 $textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
 $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
-$textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
-$fontSize-error-FormItem: createThemeVar("fontSize-error-FormItem");
-$borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--error");
 
-.formItem {
-  display: flex;
-  flex-direction: column;
-  gap: $gap-FormItem;
+// TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
+
+@layer components {
+  .container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.5em;
+
+    &.top {
+      flex-direction: column;
+      align-items: start;
+      justify-content: center;
+    }
+
+    &.end {
+      flex-direction: row-reverse;
+      justify-content: start;
+      align-items: flex-start;
+      gap: 0.5em;
+    }
+
+    &.bottom {
+      flex-direction: column-reverse;
+      align-items: start;
+      justify-content: center;
+    }
+
+    &.start {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: start;
+      gap: 0.5em;
+    }
+
+    &.before {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: start;
+      gap: 0.5em;
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    &.after {
+      flex-direction: row-reverse;
+      justify-content: start;
+      align-items: flex-start;
+      gap: 0.5em;
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    &.shrinkToLabel {
+      width: fit-content;
+    }
+
+    &.noLabel {
+      width: fit-content;
+    }
+
+    .inputLabel {
+      color: $textColor-label-formItem;
+      font-family: $fontFamily-label-formItem;
+      font-size: $fontSize-label-formItem;
+      font-weight: $fontWeight-label-formItem;
+      font-style: $fontStyle-label-formItem;
+      text-transform: $textTransform-label-formItem;
+      user-select: none;
+      cursor: pointer;
+      word-break: normal;
+      white-space: nowrap;
+      height: fit-content;
+
+      &.labelBreak {
+        white-space: normal;
+        word-break: normal;
+        overflow-wrap: break-word;
+      }
+
+      &.required {
+        color: $textColor-label-formItem--required;
+        font-size: $fontSize-label-formItem--required;
+        font-weight: $fontWeight-label-formItem--required;
+        font-style: $fontStyle-label-formItem--required;
+        text-transform: $textTransform-label-formItem--required;
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+        color: t.$textColor--disabled;
+      }
+
+      .requiredMark {
+        margin-inline-start: 0.2em;
+        color: $textColor-requiredMark-formItem;
+      }
+
+      .optionalTag {
+        margin-inline-start: 0.2em;
+        color: $textColor-optionalTag-formItem;
+      }
+    }
+  }
+
+  .itemWithLabel {
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+   width: 100%;
+
+   &.noLabel {
+     width: fit-content;
+   }
+  }
+
+  // Stack wrapper for FormItem type="items" children. Reuses the Form's own
+  // row gap so rows inside an items loop get the same vertical spacing as
+  // plain sibling FormItems rendered directly inside the Form.
+  .itemsStack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--xmlui-gap-Form);
+    width: 100%;
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    flex: 1;
+  }
+
+  .validationResultWrapper {
+    width: 100%;
+  }
+
+  // Outer wrapper around a form-bound input. Use display:contents so the
+  // wrapper does not generate a box and the inner ItemWithLabel becomes the
+  // direct flex child of the surrounding Stack — preserving any width/flex
+  // resolved on the input (e.g. width="*" vs width="$space-40") instead of
+  // the wrapper getting flex-distributed equally with its siblings.
+  .validationWrapper {
+    display: contents;
+  }
+
+  // When a FormItem is inside a horizontal Stack, the validation message must not
+  // push sibling inputs out of alignment. We anchor the wrapper and float the
+  // message absolutely below the input so it overlaps rather than reflows.
+  .validationAnchor {
+    position: relative;
+  }
+
+  .validationMessageAbsolute {
+    position: static;
+    top: auto;
+    inset-inline-start: auto;
+    white-space: normal;
+    z-index: auto;
+  }
+
+  .helperTextContainer {
+    width: 100%;
+  }
+
+  .labelWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
-.container {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: start;
-  gap: 0.5em;
-}
-
-.top {
-  flex-direction: column;
-  align-items: start;
-  justify-content: center;
-}
-
-.end {
-  flex-direction: row-reverse;
-  justify-content: start;
-  align-items: flex-start;
-  gap: 0.5em;
-}
-
-.bottom {
-  flex-direction: column-reverse;
-  align-items: start;
-  justify-content: center;
-}
-
-.start {
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: start;
-  gap: 0.5em;
-}
-
-.before {
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: start;
-  gap: 0.5em;
-  width: fit-content;
-  align-self: flex-start;
-}
-
-.after {
-  flex-direction: row-reverse;
-  justify-content: start;
-  align-items: flex-start;
-  gap: 0.5em;
-  width: fit-content;
-  align-self: flex-start;
-}
-
-.shrinkToLabel {
-  width: fit-content;
-}
-
-.inputLabel {
-  color: var(--xmlui-textColor-label-formItem, var(--xmlui-textColor, #{$textColor-label-formItem}));
-  font-family: $fontFamily-label-formItem;
-  font-size: var(--xmlui-fontSize-label-formItem, 0.875em);
-  font-weight: var(--xmlui-fontWeight-label-formItem, 500);
-  font-style: var(--xmlui-fontStyle-label-formItem, normal);
-  text-transform: var(--xmlui-textTransform-label-formItem, none);
-  user-select: none;
-  cursor: pointer;
-  word-break: normal;
-  white-space: nowrap;
-  height: fit-content;
-}
-
-.inputLabel.labelBreak {
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: break-word;
-}
-
-[data-xmlui-component="Select"] .inputLabel {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.inputLabel.required {
-  color: var(--xmlui-textColor-label-formItem--required, var(--xmlui-textColor, #{$textColor-label-formItem--required}));
-  font-size: var(--xmlui-fontSize-label-formItem--required, 0.875em);
-  font-weight: var(--xmlui-fontWeight-label-formItem--required, 500);
-  font-style: var(--xmlui-fontStyle-label-formItem--required, normal);
-  text-transform: var(--xmlui-textTransform-label-formItem--required, none);
-}
-
-.inputLabel.disabled {
-  cursor: not-allowed;
-  color: var(--xmlui-textColor--disabled);
-}
-
-.requiredMark {
-  margin-inline-start: 0.2em;
-  color: $textColor-requiredMark-formItem;
-}
-
-.optionalTag {
-  margin-inline-start: 0.2em;
-  color: $textColor-optionalTag-formItem;
-}
-
-.itemWithLabel {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-}
-
-.itemWithLabel.noLabel {
-  width: fit-content;
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  width: 100%;
-  flex: 1;
-}
-
-.labelWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.noLabel {
-  width: fit-content;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: $gap-label-FormItem;
-}
-
-.labelTop {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.labelStart,
-.labelBefore {
-  flex-direction: row;
-}
-
-.labelEnd,
-.labelAfter {
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-}
-
-.label {
-  flex-shrink: 0;
-  color: var(--xmlui-textColor-label-formItem, #{$textColor-label-FormItem});
-  font-size: $fontSize-label-formItem;
-  font-weight: var(--xmlui-fontWeight-label-formItem, #{$fontWeight-label-FormItem});
-  font-style: $fontStyle-label-formItem;
-  text-transform: $textTransform-label-formItem;
-  white-space: nowrap;
-}
-
-.labelBreak {
-  white-space: normal;
-}
-
-.labelStart .label,
-.labelBefore .label,
-.labelEnd .label,
-.labelAfter .label {
-  width: $width-label-FormItem;
-}
-
-.requiredIndicator {
-  margin-left: 0.125rem;
-  color: $textColor-requiredMark-formItem;
-}
-
-.optionalIndicator {
-  margin-left: 0.25rem;
-  color: $textColor-optionalTag-formItem;
-}
-
-.control {
-  min-width: 0;
-}
-
-.itemsStack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--xmlui-gap-Form);
-  width: 100%;
-}
-
-.validationStatusIndicator {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: currentColor;
-}
-
-.input {
-  box-sizing: border-box;
-  min-width: 16rem;
-}
-
-.errorInput {
-  border-color: $borderColor-input-FormItem--error;
-}
-
-.error {
-  color: $textColor-error-FormItem;
-  font-size: $fontSize-error-FormItem;
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

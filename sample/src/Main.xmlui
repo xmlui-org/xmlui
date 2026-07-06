@@ -1,3 +1,9 @@
 <App>
-  <Spinner fullScreen="true" />
+  <Form
+    data="{{ name: 'James' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem
+      bindTo="name"
+      onValidate="(value) => value === value.toUpperCase()" />
+  </Form>
 </App>

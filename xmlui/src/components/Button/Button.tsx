@@ -353,12 +353,12 @@ export const buttonRenderer = wrapRuntimeComponent({
   },
 });
 
-function stringifyButtonLabel(value: unknown): string {
+function stringifyButtonLabel(value: unknown): string | undefined {
   if (value === null) {
     return "null";
   }
   if (value === undefined) {
-    return "undefined";
+    return undefined;
   }
   if (typeof value === "function") {
     return "[object Object]";

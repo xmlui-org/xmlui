@@ -27,7 +27,12 @@ import { defaultProps } from "./TextBox.defaults";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { readContext } from "../../runtime/state";
 import { useFormContext } from "../Form/FormContext";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
+import type { FormItemValidations } from "../Form/FormContext";
 
 const COMP = "TextBox";
 
@@ -285,15 +290,29 @@ function RuntimeTextBoxShell({
   invalidMessages,
   required,
   validationStatus,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   verboseValidationFeedback,
   onDidChange,
   forcedType,
   ...props
 }: RuntimeTextBoxProps) {
   const form = useFormContext();
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
   const formRef = React.useRef(form);
   const adapterRef = React.useRef(adapter);
-  const fieldName = bindTo;
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? readContext(adapter.scope, "$itemIndex") as number
+      : undefined;
+  const fieldName = React.useMemo(
+    () =>
+      bindTo !== undefined || parentFormItemId
+        ? resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex })
+        : undefined,
+    [bindTo, defaultId, itemIndex, parentFormItemId],
+  );
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
   const controlledValue = value === undefined || value === null ? undefined : String(value);
@@ -411,6 +430,7 @@ function runtimeTextBoxProps(adapter: XmluiComponentAdapter) {
     maxLength: adapter.prop("maxLength") as number | undefined,
     enabled: adapter.booleanProp("enabled", defaultProps.enabled),
     placeholder: adapter.stringProp("placeholder"),
+    "aria-label": adapter.stringProp("label"),
     validationStatus: adapter.stringProp(
       "validationStatus",
       defaultProps.validationStatus,
@@ -526,20 +546,45 @@ export const textBoxRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: TextBoxMd as ComponentMetadata,
   defaultPart: "input",
-  renderer: ({ adapter }) => (
-    <RuntimeTextBoxShell adapter={adapter} {...runtimeTextBoxProps(adapter)} />
-  ),
+  renderer: ({ adapter }) => renderRuntimeTextBox(adapter),
 });
 
 export const passwordInputRenderer = wrapRuntimeComponent({
   name: "PasswordInput",
   metadata: PasswordMd as ComponentMetadata,
   defaultPart: "input",
-  renderer: ({ adapter }) => (
+  renderer: ({ adapter }) => renderRuntimeTextBox(adapter, "password"),
+});
+
+function renderRuntimeTextBox(adapter: XmluiComponentAdapter, forcedType?: "password") {
+  const props = runtimeTextBoxProps(adapter);
+  const validations: FormItemValidations = {
+    required: adapter.booleanProp("required", false),
+    requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    matchValue: adapter.prop("matchValue"),
+    matchInvalidMessage: adapter.stringProp("matchInvalidMessage"),
+  };
+  const shell = (
     <RuntimeTextBoxShell
       adapter={adapter}
-      {...runtimeTextBoxProps(adapter)}
-      forcedType="password"
+      {...props}
+      forcedType={forcedType}
     />
-  ),
-});
+  );
+  const hasValidationProps =
+    validations.required ||
+    Object.prototype.hasOwnProperty.call(adapter.props, "matchValue");
+  if (!hasValidationProps) {
+    return shell;
+  }
+  return (
+    <ValidationWrapper
+      bindTo={props.bindTo}
+      validations={validations}
+      validationMode={adapter.stringProp("validationMode") as any}
+      componentType={forcedType === "password" ? "PasswordInput" : "TextBox"}
+    >
+      {shell}
+    </ValidationWrapper>
+  );
+}

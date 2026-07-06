@@ -16,8 +16,10 @@ import { LinkMd } from "../../components/Link/Link";
 import { ItemsMd } from "../../components/Items/Items";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { FormMd } from "../../components/Form/Form";
+import { FormValidatorMd } from "../../components/Form/FormValidator";
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { FormSegmentMd } from "../../components/FormSegment/FormSegment";
+import { FormSectionMd } from "../../components/FormSection/FormSection";
 import { StepperFormMd } from "../../components/StepperForm/StepperForm";
 import { TabsFormMd } from "../../components/TabsForm/TabsForm";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
@@ -539,8 +541,24 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
     eventAttributes: {
+      willSubmit: "onWillSubmit",
       submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
       cancel: "onCancel",
+      reset: "onReset",
+      success: "onSuccess",
+      saved: "onSaved",
+      submitError: "onSubmitError",
+      submitDropped: "onSubmitDropped",
+    },
+  }),
+  contractFromMetadata(FormValidatorMd, {
+    name: "FormValidator",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      validate: "onValidate",
     },
   }),
   contractFromMetadata(FormItemMd, {
@@ -551,6 +569,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   }),
   contractFromMetadata(FormSegmentMd, {
     name: "FormSegment",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FormSectionMd, {
+    name: "FormSection",
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,

@@ -323,7 +323,7 @@ export const TextArea = memo(
     if (resize === "both" || resize === "horizontal" || resize === "vertical") {
       return (
         <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
-          <Part partId={PART_INPUT}>
+          <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
             <TextAreaResizable
               ref={ref}
               {...textareaProps}
@@ -333,7 +333,7 @@ export const TextArea = memo(
               minRows={minRows}
               rows={rows}
             />
-          </Part>
+          </div>
           {renderConciseFeedback()}
         </div>
       );
@@ -341,7 +341,7 @@ export const TextArea = memo(
     if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
       return (
         <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
-          <Part partId={PART_INPUT}>
+          <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
             <TextareaAutosize
               ref={ref}
               {...textareaProps}
@@ -351,7 +351,7 @@ export const TextArea = memo(
               minRows={minRows}
               rows={rows}
             />
-          </Part>
+          </div>
           {renderConciseFeedback()}
         </div>
       );
@@ -359,14 +359,14 @@ export const TextArea = memo(
 
     return (
       <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
-        <Part partId={PART_INPUT}>
+        <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
           <textarea
             ref={ref}
             {...textareaProps}
             rows={rows}
             className={classnames(textareaClasses)}
           />
-        </Part>
+        </div>
         {renderConciseFeedback()}
       </div>
     );

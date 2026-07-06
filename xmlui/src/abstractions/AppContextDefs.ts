@@ -81,3 +81,6 @@ export type AppContextObject = Record<keyof typeof appContextObjectContract, unk
 export function isAppContextObjectProperty(name: string): name is keyof typeof appContextObjectContract {
   return Object.prototype.hasOwnProperty.call(appContextObjectContract, name);
 }
+
+export const MediaBreakpointKeys = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
+export type MediaBreakpointType = (typeof MediaBreakpointKeys)[number];

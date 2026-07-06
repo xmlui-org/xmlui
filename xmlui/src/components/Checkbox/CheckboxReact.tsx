@@ -35,6 +35,8 @@ export type CheckboxProps = {
   validationStatus?: CheckboxValidationStatus;
   variant?: string;
   inputRenderer?: (contextVars: { $checked: boolean; $setChecked: (value: unknown) => void }, input: ReactNode) => ReactNode;
+  updateState?: (state: { value: boolean }, options?: { initial?: boolean }) => void;
+  registerComponentApi?: (api: CheckboxApi) => void;
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => void | Promise<void>;
   onDidChange?: (value: boolean) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
@@ -65,6 +67,8 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     validationStatus = defaultProps.validationStatus,
     variant,
     inputRenderer,
+    updateState,
+    registerComponentApi,
     onClick,
     onDidChange,
     onFocus,
@@ -91,7 +95,9 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     autoFocus,
     indeterminate: Boolean(indeterminate),
     onDidChange: (nextValue) => {
-      if (formSetValue && fieldName !== undefined) {
+      if (updateState) {
+        updateState({ value: nextValue });
+      } else if (formSetValue && fieldName !== undefined) {
         formSetValue(fieldName, nextValue);
       }
       void onDidChange?.(nextValue);
@@ -99,6 +105,8 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
   });
 
   useImperativeHandle(ref, () => api, [api]);
+
+  void registerComponentApi;
 
   useEffect(() => {
     if (

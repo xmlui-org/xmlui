@@ -70,6 +70,34 @@ export function dValidationStatus(defaultValue?: string) {
   };
 }
 
+export function dLabelPosition(defaultValue?: string) {
+  return {
+    description: "Places the label at the given position of the component.",
+    valueType: "string" as const,
+    availableValues: ["top", "start", "end"],
+    defaultValue: defaultValue ?? "top",
+  };
+}
+
+export function dLabelWidth(component: string) {
+  return {
+    description:
+      `This property sets the width of the \`${component}\` component's label. ` +
+      "If not defined, the label's width will be determined by its content and the available space.",
+    valueType: "length" as const,
+  };
+}
+
+export function dLabelBreak(component: string) {
+  return {
+    description:
+      `This boolean value indicates whether the \`${component}\` label can be split into multiple ` +
+      "lines if it would overflow the available label width.",
+    valueType: "boolean" as const,
+    defaultValue: false,
+  };
+}
+
 export function dIndeterminate(defaultValue?: boolean) {
   return {
     description:

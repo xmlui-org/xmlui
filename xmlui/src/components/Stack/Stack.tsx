@@ -14,6 +14,8 @@ import { defaultProps } from "./Stack.defaults";
 
 const COMP = "Stack";
 
+export const ThemedStack = Stack;
+
 const stackProps = {
   desktopOnly: {
     description: "Optional boolean property to hide the Stack on desktop devices.",

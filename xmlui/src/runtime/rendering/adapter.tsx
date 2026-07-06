@@ -159,7 +159,7 @@ export function useXmluiComponentAdapter({
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
     const changed = Object.entries(api).some(([key, value]) =>
-      typeof value !== "function" && apiRef.current[key] !== value
+      apiRef.current[key] !== value
     );
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;

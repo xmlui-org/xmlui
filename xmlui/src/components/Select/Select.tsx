@@ -557,7 +557,7 @@ function RuntimeSelectShell({
       setLocalValue(nextValue);
     }
     const currentForm = formRef.current;
-    if (currentForm && fieldName && !options?.initial) {
+    if (currentForm && fieldName && (!options?.initial || currentForm.getValue(fieldName) === undefined)) {
       currentForm.setValue(fieldName, nextValue);
       void currentForm.validateField(fieldName, nextValue);
     }

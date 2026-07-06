@@ -3,25 +3,68 @@ import type { XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
 import { createRuntimeScope } from "../../runtime/state";
 import { radioOptions } from "../RadioGroup/RadioGroup";
-import type { Option as XmluiOption } from "../abstractions";
+import type { LabelPosition, Option as XmluiOption, RequireLabelMode } from "../abstractions";
+import type {
+  FormControlType,
+  FormItemValidations,
+  ValidateEventHandler,
+  ValidationMode,
+  ValidationSeverity,
+} from "../Form/FormContext";
 import { FormItemMd } from "./FormItem";
-import { FormItem } from "./FormItemReact";
+import { CustomFormItem, FormItem } from "./FormItemReact";
+import { ValidationWrapper } from "./ValidationWrapper";
 
 export const formItemRenderer = wrapComponent({
   name: "FormItem",
   metadata: FormItemMd,
   renderer({ adapter }) {
-    const type = adapter.stringProp("type", "text");
+    const rootAttrs = adapter.rootAttrs();
+    const explicitType = adapter.stringProp("type");
+    const bindTo = adapter.stringProp("bindTo");
+    const required = adapter.booleanProp("required", false);
     const inputTemplate = templateChildren(adapter.node, "inputTemplate") ?? [];
     const itemTemplate = nonPropertyChildren(adapter.node.children);
-    return (
+    const isCustomFormItem =
+      (explicitType === undefined || explicitType === "custom") && itemTemplate.length > 0;
+    const normalizedType = explicitType === "radio" ? "radioGroup" : explicitType;
+    const type = (isCustomFormItem ? "custom" : normalizedType ?? "text") as FormControlType;
+    const effectiveInputTemplate =
+      type === "items" && inputTemplate.length === 0 ? itemTemplate : inputTemplate;
+    const scopedItemIndex = adapter.scope.contextValues.$itemIndex;
+    const validations: FormItemValidations = {
+      required,
+      requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+      minLength: optionalNumberProp(adapter, "minLength"),
+      maxLength: optionalNumberProp(adapter, "maxLength"),
+      lengthInvalidMessage: adapter.stringProp("lengthInvalidMessage"),
+      lengthInvalidSeverity: optionalSeverityProp(adapter, "lengthInvalidSeverity"),
+      minValue: optionalNumberProp(adapter, "minValue"),
+      maxValue: optionalNumberProp(adapter, "maxValue"),
+      rangeInvalidMessage: adapter.stringProp("rangeInvalidMessage"),
+      rangeInvalidSeverity: optionalSeverityProp(adapter, "rangeInvalidSeverity"),
+      validator: adapter.prop("validator") as string | string[] | undefined,
+      validatorParams: adapter.prop("validatorParams"),
+      validatorInvalidMessage: adapter.stringProp("validatorInvalidMessage"),
+      validatorInvalidSeverity: optionalSeverityProp(adapter, "validatorInvalidSeverity"),
+      pattern: adapter.stringProp("pattern"),
+      patternInvalidMessage: adapter.stringProp("patternInvalidMessage"),
+      patternInvalidSeverity: optionalSeverityProp(adapter, "patternInvalidSeverity"),
+      regex: adapter.stringProp("regex"),
+      regexInvalidMessage: adapter.stringProp("regexInvalidMessage"),
+      regexInvalidSeverity: optionalSeverityProp(adapter, "regexInvalidSeverity"),
+      matchValue: adapter.prop("matchValue"),
+      matchInvalidMessage: adapter.stringProp("matchInvalidMessage"),
+    };
+    const onValidate = (
+      adapter.node.events.validate ? (value: unknown) => adapter.event("validate")(value) : undefined
+    ) as ValidateEventHandler;
+    const formItem = (
       <FormItem
-        {...adapter.rootAttrs()}
-        id={adapter.stringProp("id")}
-        bindTo={adapter.stringProp("bindTo")}
+        bindTo={bindTo ?? ""}
         label={adapter.stringProp("label")}
-        labelPosition={adapter.stringProp("labelPosition")}
-        labelWidth={adapter.prop("labelWidth") as string | number | undefined}
+        labelPosition={adapter.stringProp("labelPosition") as LabelPosition | undefined}
+        labelWidth={adapter.stringProp("labelWidth")}
         labelBreak={
           Object.prototype.hasOwnProperty.call(adapter.props, "labelBreak")
             ? adapter.booleanProp("labelBreak", false)
@@ -31,45 +74,53 @@ export const formItemRenderer = wrapComponent({
         autoFocus={adapter.booleanProp("autoFocus", false)}
         type={type}
         initialValue={adapter.prop("initialValue")}
-        required={adapter.booleanProp("required", false)}
-        requireLabelMode={adapter.stringProp("requireLabelMode")}
+        required={required}
+        requireLabelMode={adapter.stringProp("requireLabelMode") as RequireLabelMode | undefined}
         requiredInvalidMessage={adapter.stringProp("requiredInvalidMessage")}
-        minLength={adapter.numberProp("minLength")}
+        minLength={optionalNumberProp(adapter, "minLength")}
+        maxLength={optionalNumberProp(adapter, "maxLength")}
         lengthInvalidMessage={adapter.stringProp("lengthInvalidMessage")}
+        lengthInvalidSeverity={optionalSeverityProp(adapter, "lengthInvalidSeverity")}
+        minValue={optionalNumberProp(adapter, "minValue")}
+        maxValue={optionalNumberProp(adapter, "maxValue")}
+        rangeInvalidMessage={adapter.stringProp("rangeInvalidMessage")}
+        rangeInvalidSeverity={optionalSeverityProp(adapter, "rangeInvalidSeverity")}
+        validator={adapter.prop("validator") as string | string[] | undefined}
+        validatorParams={adapter.prop("validatorParams")}
+        validatorInvalidMessage={adapter.stringProp("validatorInvalidMessage")}
+        validatorInvalidSeverity={optionalSeverityProp(adapter, "validatorInvalidSeverity")}
         pattern={adapter.stringProp("pattern")}
         patternInvalidMessage={adapter.stringProp("patternInvalidMessage")}
-        patternInvalidSeverity={adapter.stringProp("patternInvalidSeverity")}
+        patternInvalidSeverity={optionalSeverityProp(adapter, "patternInvalidSeverity")}
         regex={adapter.stringProp("regex")}
         regexInvalidMessage={adapter.stringProp("regexInvalidMessage")}
-        regexInvalidSeverity={adapter.stringProp("regexInvalidSeverity")}
+        regexInvalidSeverity={optionalSeverityProp(adapter, "regexInvalidSeverity")}
         matchValue={adapter.prop("matchValue")}
         matchInvalidMessage={adapter.stringProp("matchInvalidMessage")}
         noSubmit={adapter.booleanProp("noSubmit", false)}
-        validationMode={adapter.stringProp("validationMode")}
+        validationMode={adapter.stringProp("validationMode") as ValidationMode | undefined}
         customValidationsDebounce={adapter.numberProp("customValidationsDebounce", 0)}
-        onValidate={adapter.node.events.validate ? (value) => adapter.event("validate")(value) : undefined}
-        options={
-          type === "select"
-            ? selectOptions(adapter)
-            : type === "radioGroup"
-              ? radioOptions(adapter)
-              : undefined
-        }
-        groupBy={type === "select" ? adapter.stringProp("groupBy") : undefined}
-        searchable={type === "select" ? adapter.booleanProp("searchable", false) : undefined}
-        groupHeaderTemplateRenderer={
-          type === "select" && templateChildren(adapter.node, "groupHeaderTemplate")
-            ? createScopedTemplateRenderer(adapter, "groupHeaderTemplate")
-            : undefined
-        }
-        ungroupedHeaderTemplateRenderer={
-          type === "select" && templateChildren(adapter.node, "ungroupedHeaderTemplate")
-            ? createScopedTemplateRenderer(adapter, "ungroupedHeaderTemplate")
-            : undefined
-        }
+        onValidate={onValidate}
+        {...(Object.prototype.hasOwnProperty.call(adapter.props, "zeroOrPositive")
+          ? { zeroOrPositive: adapter.booleanProp("zeroOrPositive", false) }
+          : {})}
+        {...(type === "select"
+          ? {
+              options: selectOptions(adapter),
+              groupBy: adapter.stringProp("groupBy"),
+              searchable: adapter.booleanProp("searchable", false),
+              ...(templateChildren(adapter.node, "groupHeaderTemplate")
+                ? { groupHeaderRenderer: createScopedTemplateRenderer(adapter, "groupHeaderTemplate") }
+                : {}),
+              ...(templateChildren(adapter.node, "ungroupedHeaderTemplate")
+                ? { ungroupedHeaderRenderer: createScopedTemplateRenderer(adapter, "ungroupedHeaderTemplate") }
+                : {}),
+            }
+          : {})}
+        {...(type === "radioGroup" ? { options: radioOptions(adapter) } : {})}
         inputRenderer={
-          inputTemplate.length > 0
-            ? (contextVars) => {
+          effectiveInputTemplate.length > 0
+            ? (contextVars: Record<string, unknown>) => {
                 const inputScope = createRuntimeScope({
                   store: adapter.scope.store,
                   parent: adapter.scope,
@@ -82,38 +133,92 @@ export const formItemRenderer = wrapComponent({
                   emitEvent: adapter.scope.emitEvent,
                   extensionFunctions: adapter.scope.extensionFunctions,
                 });
-                return adapter.context.renderChildren(inputTemplate, inputScope);
+                return adapter.context.renderChildren(effectiveInputTemplate, inputScope);
               }
             : undefined
         }
         registerComponentApi={adapter.registerApi}
-        renderItemTemplate={
-          type === "items"
-            ? (contextVars) => {
-                const itemScope = createRuntimeScope({
-                  store: adapter.scope.store,
-                  parent: adapter.scope,
-                  props: adapter.scope.props,
-                  contextValues: contextVars,
-                  references: adapter.scope.references,
-                  slots: adapter.scope.slots,
-                  routing: adapter.scope.routing,
-                  toast: adapter.scope.toast,
-                  emitEvent: adapter.scope.emitEvent,
-                  extensionFunctions: adapter.scope.extensionFunctions,
-                });
-                return adapter.context.renderChildren(itemTemplate, itemScope);
-              }
-            : undefined
-        }
+        itemIndex={typeof scopedItemIndex === "number" ? scopedItemIndex : undefined}
         className={adapter.className}
         style={adapter.style}
       >
-        {type !== "items" && itemTemplate.length > 0 ? adapter.context.renderChildren(itemTemplate, adapter.scope) : undefined}
+        {isCustomFormItem ? (
+          <CustomFormItem
+            renderChild={(child: any, layoutContext: any) =>
+              renderScopedChild(adapter, child, layoutContext)
+            }
+            node={adapter.node as any}
+            bindTo={bindTo ?? ""}
+          />
+        ) : type !== "items" && itemTemplate.length > 0 ? (
+          adapter.context.renderChildren(itemTemplate, adapter.scope)
+        ) : undefined}
       </FormItem>
+    );
+    return (
+      <div {...rootAttrs}>
+        <ValidationWrapper
+          bindTo={bindTo}
+          validations={validations}
+          onValidate={onValidate}
+          customValidationsDebounce={adapter.numberProp("customValidationsDebounce", 0)}
+          validationMode={adapter.stringProp("validationMode") as ValidationMode | undefined}
+          formItemType={type}
+          componentType="FormItem"
+          inline={adapter.booleanProp("inline", false)}
+          itemIndex={typeof scopedItemIndex === "number" ? scopedItemIndex : undefined}
+          isFormItem
+        >
+          {formItem}
+        </ValidationWrapper>
+      </div>
     );
   },
 });
+
+function optionalNumberProp(adapter: XmluiComponentAdapter, name: string): number | undefined {
+  return Object.prototype.hasOwnProperty.call(adapter.props, name)
+    ? adapter.numberProp(name)
+    : undefined;
+}
+
+function renderScopedChild(adapter: XmluiComponentAdapter, child: any, layoutContext: any) {
+  if (
+    child &&
+    typeof child === "object" &&
+    (child.type === "Container" || child.type === "Fragment") &&
+    child.contextVars
+  ) {
+    const scoped = createRuntimeScope({
+      store: adapter.scope.store,
+      parent: adapter.scope,
+      props: adapter.scope.props,
+      contextValues: child.contextVars,
+      references: adapter.scope.references,
+      slots: adapter.scope.slots,
+      routing: adapter.scope.routing,
+      toast: adapter.scope.toast,
+      emitEvent: adapter.scope.emitEvent,
+      extensionFunctions: adapter.scope.extensionFunctions,
+    });
+    return adapter.context.renderChildren(
+      nonPropertyChildren(child.children ?? []),
+      scoped,
+      adapter.node.range.end,
+      layoutContext,
+    );
+  }
+  return adapter.context.renderChildren(
+    Array.isArray(child) ? child : [child],
+    adapter.scope,
+    adapter.node.range.end,
+    layoutContext,
+  );
+}
+
+function optionalSeverityProp(adapter: XmluiComponentAdapter, name: string): ValidationSeverity | undefined {
+  return adapter.stringProp(name) as ValidationSeverity | undefined;
+}
 
 function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
   const data = adapter.prop<unknown>("data");
@@ -143,10 +248,10 @@ function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
       ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "Option:enabled"))
       : true;
     return [{
-      value: value ?? label ?? "",
-      label: label ?? value ?? "",
+      value: String(value ?? label ?? ""),
+      label: String(label ?? value ?? ""),
       enabled,
-      testId: child.props.testId,
+      testId: child.props.testId as string | undefined,
     }];
   });
 }
@@ -156,9 +261,9 @@ function dataOption(item: unknown, valueField: string, labelField: string): Xmlu
     const record = item as Record<string, unknown>;
     const value = record[valueField];
     const label = record[labelField] ?? value;
-    return { ...record, value, label: String(label ?? ""), enabled: true };
+    return { ...record, value: String(value ?? ""), label: String(label ?? ""), enabled: true };
   }
-  return { value: item, label: String(item ?? ""), enabled: true };
+  return { value: String(item ?? ""), label: String(item ?? ""), enabled: true };
 }
 
 function createScopedTemplateRenderer(

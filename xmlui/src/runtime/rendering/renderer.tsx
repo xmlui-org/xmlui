@@ -176,7 +176,10 @@ const breakpointOrder = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 type BreakpointName = (typeof breakpointOrder)[number];
 type ResponsiveWhenPropName = (typeof responsiveWhenPropNames)[number];
 
-function hasConditionalProps(props: Record<string, string>): boolean {
+function hasConditionalProps(props?: Record<string, string>): boolean {
+  if (!props) {
+    return false;
+  }
   return Object.prototype.hasOwnProperty.call(props, "when") ||
     responsiveWhenPropNames.some((name) => Object.prototype.hasOwnProperty.call(props, name));
 }

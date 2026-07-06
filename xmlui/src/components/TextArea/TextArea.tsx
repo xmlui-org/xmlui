@@ -379,17 +379,25 @@ function RuntimeTextAreaShell({
   if (formError && effectiveVerboseValidationFeedback) {
     return (
       <div {...rootAttrs}>
-        {renderedTextArea}
+        <div data-part-id="input" data-xmlui-part="input">
+          {renderedTextArea}
+        </div>
         <div data-validation-display-severity="error">{formError}</div>
       </div>
     );
   }
 
-  return <div {...rootAttrs}>{renderedTextArea}</div>;
+  return (
+    <div {...rootAttrs}>
+      <div data-part-id="input" data-xmlui-part="input">
+        {renderedTextArea}
+      </div>
+    </div>
+  );
 }
 
 function runtimeTextAreaProps(adapter: XmluiComponentAdapter) {
-  const rootAttrs = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;
+  const rootAttrs = adapter.rootAttrs() as React.HTMLAttributes<HTMLDivElement>;
   const { onFocus, onBlur, onChange, ...safeRootAttrs } = rootAttrs;
   return {
     id: adapter.stringProp("id"),
