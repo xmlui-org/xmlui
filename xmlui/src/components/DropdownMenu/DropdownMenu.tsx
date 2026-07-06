@@ -375,6 +375,21 @@ export const menuSeparatorRenderer = wrapComponent(MSEP, MenuSeparator, MenuSepa
   customRender: () => <MenuSeparator />,
 });
 
+Object.assign(DropdownMenuMd.defaultThemeVars ??= {}, {
+  "backgroundColor-dropdown-item": "transparent",
+  "backgroundColor-dropdown-item--hover": "hsl(204, 30.3%, 98%)",
+  "backgroundColor-dropdown-item--active": "hsl(204, 30.3%, 95%)",
+});
+
+Object.assign(MenuItemMd.defaultThemeVars ??= {}, {
+  "backgroundColor-dropdown-item": "transparent",
+  "backgroundColor-dropdown-item--hover": "hsl(204, 30.3%, 98%)",
+  "backgroundColor-dropdown-item--active": "hsl(204, 30.3%, 95%)",
+  "backgroundColor-MenuItem--hover": "hsl(204, 30.3%, 98%)",
+  "backgroundColor-MenuItem--active": "hsl(204, 30.3%, 95%)",
+  "backgroundColor-MenuItem--active--hover": "hsl(204, 30.3%, 98%)",
+});
+
 function hasPropertyChild(node: XmluiComponentAdapter["node"], name: string): boolean {
   return node.children.some(
     (child) => child.kind === "element" && child.type === "property" && child.props.name === name,
@@ -434,6 +449,37 @@ function stampPortalContent(className: string, componentName: string) {
   return () => observer.disconnect();
 }
 
+const menuCompatibilityCss = `
+    .${styles.DropdownMenuItem} > div,
+    .${styles.subMenuItemTrigger} > div,
+    .xmlui-DropdownMenuContent [role="menuitem"] > div,
+    .xmlui-DropdownMenuContent [role="menuitem"] > div > div,
+    .xmlui-SubMenuContent [role="menuitem"] > div,
+    .xmlui-SubMenuContent [role="menuitem"] > div > div {
+      flex: 1;
+    }
+    .${styles.subMenuItemTrigger} {
+      --xmlui-backgroundColor-MenuItem: var(--xmlui-backgroundColor-dropdown-item, transparent);
+      --xmlui-backgroundColor-MenuItem--hover: hsl(204, 30.3%, 98%);
+      --xmlui-backgroundColor-MenuItem--active: hsl(204, 30.3%, 95%);
+      --xmlui-backgroundColor-MenuItem--active--hover: hsl(204, 30.3%, 98%);
+      --xmlui-color-MenuItem: var(--xmlui-textColor-primary);
+      --xmlui-color-MenuItem--hover: inherit;
+      --xmlui-color-MenuItem--active: var(--xmlui-color-primary);
+      --xmlui-color-MenuItem--active--hover: var(--xmlui-color-primary);
+      --xmlui-color-MenuItem--disabled: var(--xmlui-textColor--disabled);
+      --xmlui-fontFamily-MenuItem: var(--xmlui-fontFamily);
+      --xmlui-fontSize-MenuItem: var(--xmlui-fontSize-sm);
+      --xmlui-gap-MenuItem: var(--xmlui-space-2);
+      --xmlui-paddingVertical-MenuItem: var(--xmlui-space-2);
+      --xmlui-paddingHorizontal-MenuItem: var(--xmlui-space-3);
+    }
+  `;
+
+function RuntimeDropdownMenuCompatibility() {
+  return <style>{menuCompatibilityCss}</style>;
+}
+
 function RuntimeDropdownMenuContentAttrs({
   className,
   componentName,
@@ -467,16 +513,22 @@ function renderSingleTemplate(adapter: XmluiComponentAdapter, name: string) {
 
 function renderTriggerTemplate(adapter: XmluiComponentAdapter, name: string) {
   const rendered = renderSingleTemplate(adapter, name);
-  return (
-    <span>
-      {rendered}
-    </span>
-  );
+  return <span>{rendered}</span>;
 }
 
 type RuntimeMenuItemProps = React.ComponentProps<typeof MenuItem>;
 
-function RuntimeMenuItem({ children, className, enabled = true, active, icon, iconPosition, label, onClick, ...rest }: RuntimeMenuItemProps) {
+function RuntimeMenuItem({
+  children,
+  className,
+  enabled = true,
+  active,
+  icon,
+  iconPosition,
+  label,
+  onClick,
+  ...rest
+}: RuntimeMenuItemProps) {
   const menuContext = useDropdownMenuContext();
   if (menuContext) {
     return (
@@ -521,40 +573,43 @@ export const dropdownMenuRenderer = wrapRuntimeComponent({
       : undefined;
 
     return (
-      <DropdownMenu
-        {...rootAttrs}
-        alignment={adapter.stringProp("alignment", defaultDropdownMenuProps.alignment) as any}
-        contentClassName={`${adapter.className} xmlui-DropdownMenuContent`}
-        disabled={!adapter.booleanProp("enabled", true)}
-        label={adapter.stringProp("label")}
-        modal={adapter.booleanProp("modal", false)}
-        onWillOpen={async () => {
-          const result = await adapter.event("willOpen")();
-          return typeof result === "boolean" ? result : undefined;
-        }}
-        registerComponentApi={adapter.registerApi}
-        triggerButtonIcon={adapter.stringProp("triggerButtonIcon", defaultDropdownMenuProps.triggerButtonIcon)}
-        triggerButtonIconPosition={adapter.stringProp(
-          "triggerButtonIconPosition",
-          defaultDropdownMenuProps.triggerButtonIconPosition,
-        ) as any}
-        triggerButtonThemeColor={adapter.stringProp(
-          "triggerButtonThemeColor",
-          defaultDropdownMenuProps.triggerButtonThemeColor,
-        )}
-        triggerButtonVariant={adapter.stringProp(
-          "triggerButtonVariant",
-          defaultDropdownMenuProps.triggerButtonVariant,
-        )}
-        triggerTemplate={triggerTemplate}
-      >
-        <RuntimeDropdownMenuContentAttrs
-          className="xmlui-DropdownMenuContent"
-          close={adapter.api.close as (() => void) | undefined}
-          componentName="DropdownMenuContent"
-        />
-        {adapter.renderChildren(filterMenuSeparators(adapter.node.children))}
-      </DropdownMenu>
+      <>
+        <RuntimeDropdownMenuCompatibility />
+        <DropdownMenu
+          {...rootAttrs}
+          alignment={adapter.stringProp("alignment", defaultDropdownMenuProps.alignment) as any}
+          contentClassName={`${adapter.className} xmlui-DropdownMenuContent`}
+          disabled={!adapter.booleanProp("enabled", true)}
+          label={adapter.stringProp("label")}
+          modal={adapter.booleanProp("modal", false)}
+          onWillOpen={async () => {
+            const result = await adapter.event("willOpen")();
+            return typeof result === "boolean" ? result : undefined;
+          }}
+          registerComponentApi={adapter.registerApi}
+          triggerButtonIcon={adapter.stringProp("triggerButtonIcon", defaultDropdownMenuProps.triggerButtonIcon)}
+          triggerButtonIconPosition={adapter.stringProp(
+            "triggerButtonIconPosition",
+            defaultDropdownMenuProps.triggerButtonIconPosition,
+          ) as any}
+          triggerButtonThemeColor={adapter.stringProp(
+            "triggerButtonThemeColor",
+            defaultDropdownMenuProps.triggerButtonThemeColor,
+          )}
+          triggerButtonVariant={adapter.stringProp(
+            "triggerButtonVariant",
+            defaultDropdownMenuProps.triggerButtonVariant,
+          )}
+          triggerTemplate={triggerTemplate}
+        >
+          <RuntimeDropdownMenuContentAttrs
+            className="xmlui-DropdownMenuContent"
+            close={adapter.api.close as (() => void) | undefined}
+            componentName="DropdownMenuContent"
+          />
+          {adapter.renderChildren(filterMenuSeparators(adapter.node.children))}
+        </DropdownMenu>
+      </>
     );
   },
 });

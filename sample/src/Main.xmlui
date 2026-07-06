@@ -1,9 +1,20 @@
 <App>
-  <Form
-    data="{{ name: 'James' }}"
-    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem
-      bindTo="name"
-      onValidate="(value) => value === value.toUpperCase()" />
-  </Form>
+  <Items data="{['Main.xmlui', 'MyComp.xmlui', 'AnotherComp.xmlui']}">
+    <Card
+      title="File: {$item}"
+      onContextMenu="ev => contextMenu.openAt(ev, { file: $item })"
+    />
+  </Items>
+  <ContextMenu id="contextMenu" menuWidth="200px">
+    <MenuItem onClick="toast.success('Renamed ' + $context.file)">
+      Rename {$context.file}
+    </MenuItem>
+    <MenuItem onClick="toast.success('Copied ' + $context.file)">
+      Copy {$context.file}
+    </MenuItem>
+    <MenuSeparator />
+    <MenuItem onClick="toast.success('Deleted ' + $context.file)">
+      Delete {$context.file}
+    </MenuItem>
+  </ContextMenu>
 </App>

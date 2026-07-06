@@ -154,6 +154,10 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "backgroundColor-attention": "$color-attention",
   "backgroundColor--disabled": "$color-surface-50",
   "backgroundColor--selected": "$color-primary-50",
+  "backgroundColor-dropdown-item": "transparent",
+  "backgroundColor-dropdown-item--hover": "$color-surface-50",
+  "backgroundColor-dropdown-item--active": "$color-surface-100",
+  "backgroundColor-dropdown-item--active-hover": "$color-surface-50",
   backgroundColor: "hsl(204, 30.3%, 98%)",
 
   "color-info": "$color-info-500",
@@ -254,6 +258,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "outlineStyle--focus": "solid",
   "outlineOffset--focus": "0",
   borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
+  "borderColor-dropdown-item": "$borderColor",
   "borderColor--disabled": "$color-surface-200",
   "borderColor-Input-default": "$color-surface-200",
   "borderColor-Input-default--hover": "$color-surface-600",
@@ -928,9 +933,9 @@ export function generateButtonTones(themeVariables: ThemeVariableMap | undefined
 
       [`backgroundColor-Button-${themeColor}-ghost--hover`]: tone.alphaHover,
       [`backgroundColor-Button-${themeColor}-ghost--active`]: tone.alphaActive,
-      [`textColor-Button-${themeColor}-ghost`]: tone.base,
-      [`textColor-Button-${themeColor}-ghost--hover`]: tone.hover,
-      [`textColor-Button-${themeColor}-ghost--active`]: tone.active,
+      [`textColor-Button-${themeColor}-ghost`]: tone.ghostText,
+      [`textColor-Button-${themeColor}-ghost--hover`]: tone.ghostTextHover,
+      [`textColor-Button-${themeColor}-ghost--active`]: tone.ghostTextActive,
     });
   }
   return generated;
@@ -941,6 +946,9 @@ function buttonToneReferences(themeColor: string, themeVariables: ThemeVariableM
   hover: string;
   active: string;
   contrast: string;
+  ghostText: string;
+  ghostTextHover: string;
+  ghostTextActive: string;
   alphaHover: string;
   alphaActive: string;
 } {
@@ -968,11 +976,27 @@ function buttonToneReferences(themeColor: string, themeVariables: ThemeVariableM
     `textColor-Button-${themeColor}-solid`,
     "textColor-Button-solid",
   ]) ?? "$const-color-surface-50";
+  const ghostText = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost`,
+    `textColor-Button-${themeColor}`,
+    "textColor-Button",
+  ]) ?? base;
+  const ghostTextHover = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost--hover`,
+    `textColor-Button-${themeColor}--hover`,
+  ]) ?? ghostText;
+  const ghostTextActive = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost--active`,
+    `textColor-Button-${themeColor}--active`,
+  ]) ?? ghostText;
   return {
     base,
     hover,
     active,
     contrast,
+    ghostText,
+    ghostTextHover,
+    ghostTextActive,
     alphaHover: alphaThemeColor(base, 0.1),
     alphaActive: alphaThemeColor(base, 0.2),
   };

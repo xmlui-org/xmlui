@@ -170,7 +170,7 @@ function RuntimeContextMenu({ adapter }: { adapter: XmluiComponentAdapter }) {
     <ContextMenu
       {...rootAttrs}
       classes={{ [COMPONENT_PART_KEY]: adapter.className }}
-      menuWidth={adapter.stringProp("menuWidth")}
+      menuWidth={adapter.stringProp("menuWidth") ?? "var(--xmlui-minWidth-ContextMenu)"}
       registerComponentApi={adapter.registerApi}
       updateState={(state) => {
         if (Object.prototype.hasOwnProperty.call(state, "$context")) {
