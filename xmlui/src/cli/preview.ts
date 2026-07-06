@@ -6,8 +6,11 @@ import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
 import { rawPackageXmluiSourcePlugin } from "../vite-plugin/rawXmluiSourcePlugin";
 import type { XmluiPluginOptions } from "../vite-plugin/xmluiPlugin";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
 import type { XmluiComponentContract } from "../compiler/contracts";
+
+const reactQrCodeCompatPath = fileURLToPath(new URL("../compat/reactQrCode.tsx", import.meta.url));
 
 export type PreviewOptions = {
   port?: number;
@@ -111,6 +114,9 @@ export async function preview({ port, proxy }: PreviewOptions): Promise<void> {
     const server = await vitePreview({
       plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
       resolve: {
+        alias: {
+          "react-qr-code": reactQrCodeCompatPath,
+        },
         extensions: [
           ".js",
           ".ts",
@@ -123,6 +129,7 @@ export async function preview({ port, proxy }: PreviewOptions): Promise<void> {
         ],
       },
       optimizeDeps: {
+        include: ["react-qr-code"],
         extensions: [".xmlui", ".xmlui.xs", ".xs"],
         rolldownOptions: {
           plugins: [rawPackageXmluiSourcePlugin(), xmlui],

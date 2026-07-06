@@ -9,6 +9,7 @@ export {
   dInternal,
   dGotFocus,
   dInitialValue,
+  dInit,
   dLabel,
   dLostFocus,
   dPlaceholder,

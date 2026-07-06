@@ -12,6 +12,7 @@ export default defineConfig({
     alias: {
       "attr-accept": path.resolve("src/compat/attrAccept.ts"),
       papaparse: path.resolve("src/compat/papaParse.ts"),
+      "react-qr-code": path.resolve("src/compat/reactQrCode.tsx"),
     },
   },
   css: xmluiCssOptions,

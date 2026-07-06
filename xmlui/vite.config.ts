@@ -16,6 +16,7 @@ export default defineConfig({
       "attr-accept": fileURLToPath(new URL("./src/compat/attrAccept.ts", import.meta.url)),
       invariant: fileURLToPath(new URL("./src/compat/invariant.ts", import.meta.url)),
       papaparse: fileURLToPath(new URL("./src/compat/papaParse.ts", import.meta.url)),
+      "react-qr-code": fileURLToPath(new URL("./src/compat/reactQrCode.tsx", import.meta.url)),
     },
   },
   css: xmluiCssOptions,

@@ -23,6 +23,9 @@ import { readFile, writeFile, rm, mkdir, cp, stat } from "node:fs/promises";
 import { Worker } from "node:worker_threads";
 import { availableParallelism } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const reactQrCodeCompatPath = fileURLToPath(new URL("../compat/reactQrCode.tsx", import.meta.url));
 
 export type SsgOptions = {
   outDir?: string;
@@ -198,6 +201,9 @@ export const ssg = async ({
     await viteBuild({
       plugins: [rawPackageXmluiSourcePlugin(), rawScssModulePlugin(), svgReactPlugin(), xmlui, react()],
       resolve: {
+        alias: {
+          "react-qr-code": reactQrCodeCompatPath,
+        },
         extensions: [
           ".js",
           ".ts",

@@ -10,7 +10,7 @@ import { buttonRenderer } from "../components/Button/Button";
 import { cardRenderer } from "../components/Card/Card";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
-import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
+import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import {
@@ -35,10 +35,10 @@ import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
 import { linkRenderer } from "../components/Link/Link.renderer";
 import { logoRenderer } from "../components/Logo/Logo";
-import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
+import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
-import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
+import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
 import {
@@ -115,7 +115,7 @@ import { changeListenerRenderer } from "../components/ChangeListener/ChangeListe
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
 import { timerRenderer } from "../components/Timer/Timer.renderer";
 import { queueRenderer } from "../components/Queue/Queue.renderer";
-import { messageListenerRenderer } from "../components/MessageListener/MessageListener.renderer";
+import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
@@ -959,7 +959,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (eventSourceTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/EventSource.renderer.tsx`);
     } else if (messageListenerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListener.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListenerReact.tsx`);
     } else if (webSocketTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocket.renderer.tsx`);
     } else if (liveRegionTransferred) {

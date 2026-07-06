@@ -6,8 +6,8 @@ import { COMPONENT_PART_KEY } from "../styling/layout";
 import { useComponentThemeClass } from "../runtime/rendering/theme";
 
 type ExtractValueCompat = ((value: unknown) => any) & {
-  asString(value: unknown, fallback?: string): string | undefined;
-  asDisplayText(value: unknown): string | undefined;
+  asString(value: unknown, fallback?: string): string;
+  asDisplayText(value: unknown): string;
   asOptionalBoolean(value: unknown, fallback?: boolean): boolean;
   asOptionalNumber(value: unknown, fallback?: number): number | undefined;
   asOptionalString(value: unknown, fallback?: string): string | undefined;
@@ -70,10 +70,10 @@ export function wrapComponent(
       }
       if (options.customRender) {
         const extractValue = ((value: unknown) => value) as ExtractValueCompat;
-        extractValue.asString = (value, fallback) =>
+        extractValue.asString = (value, fallback = "") =>
           value === undefined || value === null ? fallback : String(value);
         extractValue.asDisplayText = (value) =>
-          value === undefined ? undefined : String(value);
+          value === undefined || value === null ? "" : String(value);
         extractValue.asOptionalBoolean = (value, fallback = false) => {
           if (typeof value === "boolean") {
             return value;

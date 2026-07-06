@@ -1,9 +1,3 @@
-<App var.counter="{0}">
-  <Button label="Increment counter" onClick="{counter++}" />
-  <ChangeListener
-    listenTo="{counter}"
-    onDidChange="(change) => 
-      changeLog.setValue('prev: ' + change.prevValue + ' new: ' + change.newValue)"
-  />
-  <TextArea id="changeLog" />
+<App>
+  <QRCode value="https://xmlui.com" />
 </App>
