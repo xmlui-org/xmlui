@@ -68,6 +68,10 @@ interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onFocu
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string | number;
+  labelBreak?: boolean;
 
   // Styling
   contentClassName?: string;
@@ -269,6 +273,10 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
     autoFocus = defaultProps.autoFocus,
     readOnly = false,
     required = defaultProps.required,
+    label,
+    labelPosition = "top",
+    labelWidth,
+    labelBreak = false,
 
     // Styling
     style,
@@ -329,8 +337,16 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   const id = useFormItemInputId(idProp);
   const appContext = useAppContext();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const referenceElementRef = useRef<HTMLElement | null>(null);
+  const setReferenceElementRef = useCallback((node: HTMLElement | null) => {
+    if (referenceElementRef.current === node) {
+      return;
+    }
+    referenceElementRef.current = node;
+    setReferenceElement(node);
+  }, []);
   const composedTriggerRef = useComposedRefs(
-    setReferenceElement as React.RefCallback<HTMLElement>,
+    setReferenceElementRef as React.RefCallback<HTMLElement>,
     forwardedRef,
   );
   const ariaLabelRef = useRef("");
@@ -809,7 +825,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
-            triggerRef={setReferenceElement}
+            triggerRef={setReferenceElementRef}
             autoFocus={autoFocus}
             placeholder={placeholder}
             height={dropdownHeight}
@@ -841,6 +857,14 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
               open={open}
               onOpenChange={(isOpen) => {
                 if (!enabled || readOnly) return;
+                if (!isOpen && document.querySelector("[data-xmlui-component='DropdownMenuContent']")) {
+                  const suppressionWindow = window as Window & {
+                    __xmluiSuppressNextDropdownClose?: boolean;
+                    __xmluiSuppressDropdownCloseUntil?: number;
+                  };
+                  suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+                  suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+                }
                 setOpen(isOpen);
               }}
               modal={modal}

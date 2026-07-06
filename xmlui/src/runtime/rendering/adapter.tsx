@@ -158,11 +158,21 @@ export function useXmluiComponentAdapter({
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
+    const changed = Object.entries(api).some(([key, value]) =>
+      typeof value !== "function" && apiRef.current[key] !== value
+    );
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
     if (id) {
+      const alreadyRegistered = scope.references[id] === apiRef.current;
       scope.references[id] = apiRef.current;
-      scope.store.invalidateReference(id);
+      if (!alreadyRegistered || changed) {
+        setTimeout(() => {
+          if (scope.references[id] === apiRef.current) {
+            scope.store.invalidateReference(id);
+          }
+        }, 0);
+      }
     }
   }, [props.id, scope.references, scope.store]);
 
@@ -170,19 +180,32 @@ export function useXmluiComponentAdapter({
     const id = typeof props.id === "string" ? props.id : undefined;
     if (registeredIdRef.current && registeredIdRef.current !== id) {
       delete scope.references[registeredIdRef.current];
-      scope.store.invalidateReference(registeredIdRef.current);
+      const previousId = registeredIdRef.current;
+      setTimeout(() => {
+        if (scope.references[previousId] === undefined) {
+          scope.store.invalidateReference(previousId);
+        }
+      }, 0);
       registeredIdRef.current = undefined;
     }
     if (!id) {
       return;
     }
     scope.references[id] = apiRef.current;
-    scope.store.invalidateReference(id);
+    setTimeout(() => {
+      if (scope.references[id] === apiRef.current) {
+        scope.store.invalidateReference(id);
+      }
+    }, 0);
     registeredIdRef.current = id;
     return () => {
       if (scope.references[id] === apiRef.current) {
         delete scope.references[id];
-        scope.store.invalidateReference(id);
+        setTimeout(() => {
+          if (scope.references[id] === undefined) {
+            scope.store.invalidateReference(id);
+          }
+        }, 0);
       }
     };
   }, [props.id, scope.references, scope.store]);

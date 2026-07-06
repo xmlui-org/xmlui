@@ -13,12 +13,12 @@ $gap-Pages: createThemeVar("gap-Pages");
 
 @layer components {
   .pageWrapper{
-    --page-wrapper-padding-top: #{$paddingVertical-Pages};
-    --page-wrapper-padding-bottom: #{$paddingVertical-Pages};
-    padding-top: $paddingVertical-Pages;
-    padding-bottom: $paddingVertical-Pages;
-    padding-inline-end: $paddingHorizontal-Pages;
-    padding-inline-start: $paddingHorizontal-Pages;
+    --page-wrapper-padding-top: var(--xmlui-paddingVertical-Pages, #{$paddingVertical-Pages});
+    --page-wrapper-padding-bottom: var(--xmlui-paddingVertical-Pages, #{$paddingVertical-Pages});
+    padding-top: var(--xmlui-paddingVertical-Pages, #{$paddingVertical-Pages});
+    padding-bottom: var(--xmlui-paddingVertical-Pages, #{$paddingVertical-Pages});
+    padding-inline-end: var(--xmlui-paddingHorizontal-Pages, var(--xmlui-paddingHorizontal-layout, #{$paddingHorizontal-Pages}));
+    padding-inline-start: var(--xmlui-paddingHorizontal-Pages, var(--xmlui-paddingHorizontal-layout, #{$paddingHorizontal-Pages}));
     gap: $gap-Pages;
     display: flex;
     flex-direction: column;

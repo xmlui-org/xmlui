@@ -1,4 +1,6 @@
 import { useXmluiAppContext } from "../runtime/appContext";
+import { useEffect, useState } from "react";
+import { responsiveBreakpoints } from "../styling";
 
 const noop = () => {};
 
@@ -21,7 +23,7 @@ export function useAppContext(): {
   App: Record<string, (...args: any[]) => any>;
 } {
   const appContext = useXmluiAppContext();
-  const sizeIndex = appContext.mediaSize?.sizeIndex ?? 4;
+  const sizeIndex = useViewportSizeIndex();
   return {
     ...appContext,
     appGlobals: appContext.appGlobals as Record<string, any>,
@@ -49,4 +51,31 @@ export function useAppContext(): {
       setScheduler: noop,
     },
   };
+}
+
+function useViewportSizeIndex(): number {
+  const [sizeIndex, setSizeIndex] = useState(() =>
+    typeof window === "undefined" ? 4 : sizeIndexFromWidth(window.innerWidth),
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const update = () => setSizeIndex(sizeIndexFromWidth(window.innerWidth));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return sizeIndex;
+}
+
+function sizeIndexFromWidth(width: number): number {
+  if (width >= responsiveBreakpoints.xxl) return 5;
+  if (width >= responsiveBreakpoints.xl) return 4;
+  if (width >= responsiveBreakpoints.lg) return 3;
+  if (width >= responsiveBreakpoints.md) return 2;
+  if (width >= responsiveBreakpoints.sm) return 1;
+  return 0;
 }

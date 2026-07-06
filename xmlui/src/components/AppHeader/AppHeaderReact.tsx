@@ -107,13 +107,15 @@ export const AppHeader = memo(forwardRef<HTMLDivElement, Props>(function AppHead
           {(showLogo || !effectiveNavPanelVisible) &&
             (logoContent ? (
               <>
-                <div className={styles.customLogoContainer}>{logoContent}</div>
+                <div className={styles.customLogoContainer} data-part-id="logo">
+                  {logoContent}
+                </div>
                 {safeLogoTitle}
               </>
             ) : (
               <>
                 {!!logoUrl && (
-                  <div className={styles.logoContainer}>
+                  <div className={styles.logoContainer} data-part-id="logo">
                     <ThemedNavLink to={"/"} displayActive={false} className={styles.logoLink}>
                       <Logo />
                     </ThemedNavLink>
@@ -124,8 +126,8 @@ export const AppHeader = memo(forwardRef<HTMLDivElement, Props>(function AppHead
             ))}
         </div>
         <div ref={subNavPanelSlot} className={styles.subNavPanelSlot} />
-        <div className={styles.childrenWrapper}>{children}</div>
-        {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
+        <div className={styles.childrenWrapper} data-part-id="content">{children}</div>
+        {profileMenu && <div className={styles.rightItems} data-part-id="profileMenu">{profileMenu}</div>}
       </div>
     </div>
   );

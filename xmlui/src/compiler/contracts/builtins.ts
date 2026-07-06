@@ -852,7 +852,6 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     name: "Button",
     allowsChildren: true,
     includeLayoutProps: true,
-    acceptsArbitraryProps: true,
     declarations: { local: true },
   }),
   contractFromMetadata(CardMd, {
@@ -1468,6 +1467,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: false,
     acceptsArbitraryProps: true,
+    contextVariables: {
+      $routeParams: { name: "$routeParams" },
+      $queryParams: { name: "$queryParams" },
+    },
   }),
   contractFromMetadata(RedirectMd, {
     name: "Redirect",

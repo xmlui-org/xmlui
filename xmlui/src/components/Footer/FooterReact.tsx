@@ -34,14 +34,15 @@ export const Footer = memo(forwardRef(function Footer(
   return (
     <div 
       {...rest} 
-      className={styles.outerWrapper} 
+      className={classnames(styles.outerWrapper, classes?.[COMPONENT_PART_KEY], className)}
       ref={forwardedRef} 
       style={style} 
       role="contentinfo"
       data-sticky={sticky}
     >
       <div
-        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+        data-part-id="content"
+        className={classnames(styles.wrapper, {
           [styles.full]: !canRestrictContentWidth,
         })}
       >

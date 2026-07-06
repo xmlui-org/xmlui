@@ -1,4 +1,4 @@
-import { Fragment, cloneElement, isValidElement, useId, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, cloneElement, isValidElement, useId, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -140,8 +140,11 @@ export const labelBehavior: Behavior = {
       ],
     },
   },
-  canAttach: canAttachWhenTriggered("label"),
   attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
+  canAttach: (context) =>
+    context.componentName !== "Switch" &&
+    context.componentName !== "RadioGroup" &&
+    canAttachWhenTriggered("label")(context),
 };
 
 export const variantBehavior: Behavior = {
@@ -430,6 +433,8 @@ function LabelBehavior({
     (context.metadata.compactInlineLabel === true && (position === "before" || position === "after")
       ? "fit-content"
       : undefined);
+  const shrinkOuterToCompactLabel =
+    context.metadata.compactInlineLabel === true && (position === "before" || position === "after");
   const authoredWidth = stringValue(context.props.width);
   const runtimeWidth = normalizeLabelControlWidth(authoredWidth) ?? outerStyle?.width;
   const shrinkLabelToControl =
@@ -438,16 +443,37 @@ function LabelBehavior({
   const controlWidth = shrinkLabelToControl
     ? runtimeWidth ?? (context.componentName === "Select" ? "var(--xmlui-minWidth-Select, 4rem)" : undefined)
     : undefined;
+  const focusWrappedControl = (event: MouseEvent<HTMLLabelElement>) => {
+    if (context.componentName === "AutoComplete") {
+      const input = event.currentTarget.querySelector<HTMLInputElement>('input[role="combobox"]');
+      input?.focus({ preventScroll: true });
+      return;
+    }
+    if (context.componentName === "Select") {
+      const input = event.currentTarget.querySelector<HTMLElement>('[role="combobox"]');
+      input?.focus({ preventScroll: true });
+      return;
+    }
+    if (context.componentName === "RadioGroup") {
+      const input = event.currentTarget.querySelector<HTMLElement>('[role="radio"]');
+      input?.focus({ preventScroll: true });
+    }
+  };
   return (
     <label
       htmlFor={inputId}
+      onClick={focusWrappedControl}
       data-xmlui-behavior="label"
       data-xmlui-component={context.componentName}
       data-xmlui-id={stringValue(context.props.id)}
       data-xmlui-label-position={position}
       data-xmlui-label-width={labelWidth}
       data-testid={stringValue(context.props.testId)}
-      className={classes(formItemStyles.itemWithLabel, "xmlui-container")}
+      className={classes(
+        formItemStyles.itemWithLabel,
+        shrinkOuterToCompactLabel ? formItemStyles.noLabel : undefined,
+        "xmlui-container",
+      )}
       style={{
         ...outerStyle,
         alignItems: context.componentName === "ColorPicker" ? "flex-start" : outerStyle?.alignItems,
@@ -486,7 +512,10 @@ function LabelBehavior({
           >
             {stringValue(context.props.label)}
             {marker ? (
-              <span className={required ? formItemStyles.requiredMark : formItemStyles.optionalTag}>
+              <span
+                aria-hidden="true"
+                className={required ? formItemStyles.requiredMark : formItemStyles.optionalTag}
+              >
                 {marker}
               </span>
             ) : null}

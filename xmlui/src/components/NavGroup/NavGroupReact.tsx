@@ -15,7 +15,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -24,6 +23,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 
 import styles from "./NavGroup.module.scss";
+import navLinkStyles from "../NavLink/NavLink.module.scss";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -36,7 +36,6 @@ import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelReact";
 import type { NavGroupMd } from "./NavGroup";
-import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
@@ -216,16 +215,14 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   const { mediaSize } = useAppContext();
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const groupContentInnerRef = useRef<HTMLDivElement>(null);
-  const { pathname } = useLocation();
-
   useEffect(() => {
     if (!groupContentInnerRef.current) return;
     const hasActiveNavLink =
       groupContentInnerRef.current.querySelector(".xmlui-navlink-active") !== null;
-    if (hasActiveNavLink) {
+    if (hasActiveNavLink && !expanded) {
       setExpanded(true);
     }
-  }, [pathname]);
+  });
 
   const toggleStyle = useMemo(() => ({
     ...style,
@@ -263,11 +260,12 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <div
+      {...rest}
+      ref={ref}
       className={classnames(styles.groupWrapper, classes?.[COMPONENT_PART_KEY], className)}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >
       <NavLink
-        {...rest}
         className={classnames(styles.navLinkPadding, {
           [styles.navLinkPaddingLevel1]: level === 0,
           [styles.navLinkPaddingLevel2]: level === 1,
@@ -288,6 +286,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
+        data-part-id="content"
         aria-hidden={!expanded}
         className={classnames(styles.groupContent, {
           [styles.expanded]: expanded,
@@ -353,6 +352,11 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   }
   const [expanded, setExpanded] = useState(false);
   const [renderCount, setRenderCount] = useState(false);
+  const triggerStyle = useMemo(() => ({
+    ...style,
+    "--nav-link-level": 0,
+    flexShrink: 0,
+  }), [style]);
 
   useEffect(() => {
     setRenderCount(true);
@@ -364,52 +368,121 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     }
   }, [initiallyExpanded]);
 
+  const handleOpenChange = (open: boolean) => {
+    if (renderCount) {
+      setExpanded(open);
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "focus:change",
+        component: "NavGroup",
+        ariaName: label,
+        displayLabel: label,
+        label,
+        expanded: open,
+      });
+    }
+  };
+
+  const triggerContent = (
+    <>
+      {label}
+      {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
+      {level === 0 && (
+        <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
+      )}
+      {level >= 1 && (
+        <ThemedIcon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+      )}
+    </>
+  );
+
+  const triggerClasses = classnames(
+    classes?.[COMPONENT_PART_KEY],
+    className,
+    styles.navLinkPadding,
+    {
+      [styles.navLinkPaddingLevel1]: level === 0,
+      [styles.navLinkPaddingLevel2]: level === 1,
+      [styles.navLinkPaddingLevel3]: level === 2,
+      [styles.navLinkPaddingLevel4]: level === 3,
+    },
+  );
+
   return (
     <Wrapper
-      {...rest}
       open={expanded}
-      onOpenChange={(open) => {
-        if (renderCount) {
-          setExpanded(open);
-          pushXsLog({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
-            kind: "focus:change",
-            component: "NavGroup",
-            ariaName: label,
-            displayLabel: label,
-            label,
-            expanded: open,
-          });
-        }
-      }}
+      onOpenChange={handleOpenChange}
     >
-      <Trigger asChild disabled={disabled}>
-        <NavLink
+      {to && !disabled && level === 0 ? (
+        <Trigger asChild disabled={disabled}>
+          <a
+            {...rest}
+            ref={ref as ForwardedRef<HTMLAnchorElement>}
+            href={to}
+            aria-expanded={expanded}
+            onClick={(event) => event.preventDefault()}
+            className={classnames(
+              navLinkStyles.content,
+              navLinkStyles.base,
+              triggerClasses,
+              {
+                [navLinkStyles.includeHoverIndicator]: !noIndicator,
+                [navLinkStyles.level1]: level === 0,
+                [navLinkStyles.level2]: level === 1,
+                [navLinkStyles.level3]: level === 2,
+                [navLinkStyles.level4]: level === 3,
+              },
+            )}
+            style={triggerStyle as CSSProperties}
+          >
+            <div
+              className={classnames(navLinkStyles.innerContent, {
+                [navLinkStyles.iconAlignBaseline]: iconAlignment === "baseline",
+                [navLinkStyles.iconAlignStart]: iconAlignment === "start",
+                [navLinkStyles.iconAlignCenter]: iconAlignment === "center",
+                [navLinkStyles.iconAlignEnd]: iconAlignment === "end",
+              })}
+            >
+              {icon}
+              {triggerContent}
+            </div>
+          </a>
+        </Trigger>
+      ) : (
+        <Trigger
           {...rest}
-          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.navLinkPadding, {
-            [styles.navLinkPaddingLevel1]: level === 0,
-            [styles.navLinkPaddingLevel2]: level === 1,
-            [styles.navLinkPaddingLevel3]: level === 2,
-            [styles.navLinkPaddingLevel4]: level === 3,
-          })}
-          icon={icon}
-          style={{ ...style, flexShrink: 0 }}
-          vertical={level >= 1}
-          to={to}
+          ref={ref as ForwardedRef<HTMLButtonElement>}
           disabled={disabled}
-          noIndicator={noIndicator}
-          iconAlignment={iconAlignment}
-        >
-          {label}
-          {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-          {level === 0 && <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
-          {level >= 1 && (
-            <ThemedIcon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+          aria-expanded={expanded}
+          className={classnames(
+            navLinkStyles.content,
+            navLinkStyles.base,
+            triggerClasses,
+            {
+              [navLinkStyles.includeHoverIndicator]: !noIndicator,
+              [navLinkStyles.level1]: level === 0,
+              [navLinkStyles.level2]: level === 1,
+              [navLinkStyles.level3]: level === 2,
+              [navLinkStyles.level4]: level === 3,
+            },
           )}
-        </NavLink>
-      </Trigger>
+          style={triggerStyle as CSSProperties}
+        >
+          <div
+            className={classnames(navLinkStyles.innerContent, {
+              [navLinkStyles.iconAlignBaseline]: iconAlignment === "baseline",
+              [navLinkStyles.iconAlignStart]: iconAlignment === "start",
+              [navLinkStyles.iconAlignCenter]: iconAlignment === "center",
+              [navLinkStyles.iconAlignEnd]: iconAlignment === "end",
+            })}
+          >
+            {icon}
+            {triggerContent}
+          </div>
+        </Trigger>
+      )}
       <DropdownMenuPortal container={root}>
         <Content
           className={classnames(classes?.[COMPONENT_PART_KEY], styles.dropdownList)}
@@ -428,15 +501,17 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
               if (node.type === "NavGroup") {
                 return renderedChild;
               }
-              let child = renderedChild;
-              if (node.type === "NavLink") {
-                child = cloneElement(renderedChild as ReactElement, {
-                  ...mergeProps((renderedChild as ReactElement).props, {
-                    vertical: true,
-                  }),
-                });
+              if (node.type !== "NavLink") {
+                return renderedChild;
               }
-              return <DropdownMenuItem asChild={true}>{child}</DropdownMenuItem>;
+              let child = renderedChild;
+              child = cloneElement(renderedChild as ReactElement, {
+                ...mergeProps((renderedChild as ReactElement).props, {
+                  role: "menuitem",
+                  vertical: true,
+                }),
+              });
+              return child;
             },
           })}
         </Content>

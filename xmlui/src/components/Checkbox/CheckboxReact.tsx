@@ -113,7 +113,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     formSetValue(fieldName, transformToLegitValue(initialValue));
   }, [fieldName, formGetValue, formSetValue, initialValue]);
 
-  const inputId = id ? `${id}__input` : generatedInputId;
+  const inputId = id ?? generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const effectiveTestId = dataTestId ?? id;
   const labelText = stringifyLabel(label);
@@ -162,6 +162,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       aria-required={required}
       aria-disabled={!enabled}
       aria-readonly={readOnly}
+      aria-label={hasLabel ? labelText : undefined}
       onClick={(event) => void onClick?.(event)}
       onChange={(event) => {
         if (readOnly) {

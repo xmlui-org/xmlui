@@ -49,6 +49,7 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [openParams, setOpenParams] = useState<unknown[]>([]);
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const lastPopupLayerRef = useRef<HTMLElement | null>(null);
 
   const open = useCallback((...params: unknown[]) => {
     setOpenParams(params);
@@ -74,6 +75,9 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if ((event as KeyboardEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
+        return;
+      }
       if (event.key === "Escape") {
         close();
       }
@@ -83,6 +87,57 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
     }
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [close, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || typeof document === "undefined") {
+      return;
+    }
+    const closeTopPopupLayer = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      if (!target || document.querySelector("[data-xmlui-confirm-layer]")) {
+        return;
+      }
+      const layers = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".xmlui-AutoCompleteContent, [role='listbox'], [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent']",
+        ),
+      ).filter(isVisibleLayer);
+      const containingLayers = layers.filter((layer) => layer.contains(target));
+      const containingLayer = containingLayers[containingLayers.length - 1];
+      if (containingLayer) {
+        lastPopupLayerRef.current = containingLayer;
+        if (containingLayer.matches(".xmlui-AutoCompleteContent, [role='listbox']")) {
+          (window as Window & { __xmluiSuppressNextDropdownClose?: boolean }).__xmluiSuppressNextDropdownClose = true;
+        }
+        return;
+      }
+      const previousLayer = lastPopupLayerRef.current;
+      const topLayer = previousLayer && layers.includes(previousLayer)
+        ? previousLayer
+        : layers[layers.length - 1];
+      if (!topLayer) {
+        return;
+      }
+      (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      const isAutoCompleteLayer = topLayer.matches(".xmlui-AutoCompleteContent, [role='listbox']");
+      const activeCombobox =
+        isAutoCompleteLayer &&
+        document.activeElement instanceof HTMLElement &&
+        document.activeElement.getAttribute("role") === "combobox"
+          ? document.activeElement
+          : undefined;
+      if (isAutoCompleteLayer) {
+        (window as Window & { __xmluiSuppressNextDropdownClose?: boolean }).__xmluiSuppressNextDropdownClose = true;
+      }
+      const escape = new KeyboardEvent("keydown", { key: "Escape", bubbles: !activeCombobox });
+      Object.defineProperty(escape, "__xmluiLayerHandled", { value: true });
+      (activeCombobox ?? topLayer).dispatchEvent(escape);
+    };
+    document.addEventListener("pointerdown", closeTopPopupLayer, true);
+    return () => document.removeEventListener("pointerdown", closeTopPopupLayer, true);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen || typeof document === "undefined") {
@@ -206,6 +261,11 @@ export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>
 
   return typeof document === "undefined" ? modal : createPortal(modal, document.body);
 });
+
+function isVisibleLayer(element: HTMLElement): boolean {
+  const style = window.getComputedStyle(element);
+  return style.visibility !== "hidden" && style.display !== "none";
+}
 
 function cx(...classes: Array<string | undefined | false>): string {
   return classes.filter(Boolean).join(" ");

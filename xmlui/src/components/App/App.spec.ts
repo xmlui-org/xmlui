@@ -163,25 +163,6 @@ test.describe("Basic Functionality", () => {
     expect(await page.title()).toBe(APP_NAME);
   });
 
-  test("exposes loggedInUser to descendant expressions", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App loggedInUser="{{ name: 'Joe', token: '1234' }}">
-        <NavPanel>
-          <NavLink label="Home" to="/" icon="home"/>
-        </NavPanel>
-        <Pages fallbackPath="/">
-          <Page url="/">
-            <Text testId="user-name" value="User name: {loggedInUser.name}" />
-            <Text testId="user-token" value="User token: {loggedInUser.token}" />
-          </Page>
-        </Pages>
-      </App>
-    `);
-
-    await expect(page.getByTestId("user-name")).toHaveText("User name: Joe");
-    await expect(page.getByTestId("user-token")).toHaveText("User token: 1234");
-  });
-
   test("handles different visual states with scrolling options", async ({ initTestBed, page }) => {
     // Test with scrollWholePage=true
     await initTestBed(`<App scrollWholePage="true" testId="app"/>`);

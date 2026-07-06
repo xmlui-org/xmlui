@@ -150,6 +150,13 @@ export function ThemeScope({
     }),
     [nextVariables, parent.setTone, parent.tone, tone],
   );
+  if (!hasHostLayoutStyle(style)) {
+    return (
+      <ThemeContext.Provider value={value}>
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
   return (
     <ThemeContext.Provider value={value}>
       <div
@@ -162,6 +169,15 @@ export function ThemeScope({
         {children}
       </div>
     </ThemeContext.Provider>
+  );
+}
+
+function hasHostLayoutStyle(style: CSSProperties | undefined): boolean {
+  if (!style) {
+    return false;
+  }
+  return Object.entries(style).some(([name, value]) =>
+    value !== undefined && value !== null && !(name === "display" && value === "contents")
   );
 }
 

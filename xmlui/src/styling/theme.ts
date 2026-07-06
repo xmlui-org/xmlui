@@ -678,7 +678,7 @@ function generateBorderSegments(themeVariables: ThemeVariableMap): ThemeVariable
       continue;
     }
     const [, prefix, prop, suffix] = longhand;
-    const priority = borderSegmentPriority(prefix);
+    const priority = borderSegmentPriority(prefix) + 3;
     for (const side of borderSegmentSides(prefix)) {
       setSegment(`border${side}${prop}-${suffix}`, value, priority);
     }

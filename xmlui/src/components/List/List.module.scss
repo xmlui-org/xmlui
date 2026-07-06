@@ -160,11 +160,6 @@ $outlineOffset-selectionCheckbox-List--focus: createThemeVarWithFallback("outlin
     }
   }
 
-  // --- We export the theme variables to add them to the component renderer
-  :export {
-    themeVars: t.json-stringify($themeVars);
-  }
-
   .borderCollapse {
     &:not(.sectioned) {
       .row {

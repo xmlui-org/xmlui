@@ -364,8 +364,13 @@ function renderConfirmDialog(
       style={{
         position: "fixed",
         inset: 0,
-        zIndex: 10000,
+        zIndex: 2147483647,
         background: "rgba(0, 0, 0, 0.2)",
+        pointerEvents: "auto",
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        close();
       }}
       onMouseDown={(event) => {
         event.stopPropagation();

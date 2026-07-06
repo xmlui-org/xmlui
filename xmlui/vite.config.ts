@@ -7,8 +7,10 @@ import { exampleApiMocksPlugin } from "./src/vite-plugin/exampleApiMocks";
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
+import { createXmluiLogger, xmluiCssOptions } from "./vite.shared";
 
 export default defineConfig({
+  customLogger: createXmluiLogger(),
   resolve: {
     alias: {
       "attr-accept": fileURLToPath(new URL("./src/compat/attrAccept.ts", import.meta.url)),
@@ -16,13 +18,7 @@ export default defineConfig({
       papaparse: fileURLToPath(new URL("./src/compat/papaParse.ts", import.meta.url)),
     },
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        silenceDeprecations: ["if-function"],
-      },
-    },
-  },
+  css: xmluiCssOptions,
   plugins: [
     rawScssModulePlugin(),
     svgReactPlugin(),

@@ -81,13 +81,11 @@ export function useToggleController({
 
   const updateValue = useCallback((nextValue: unknown) => {
     const normalized = transformToLegitValue(nextValue);
-    setChecked((current) => {
-      if (current !== normalized) {
-        void onDidChange?.(normalized);
-      }
-      return normalized;
-    });
-  }, [onDidChange]);
+    if (checked !== normalized) {
+      void onDidChange?.(normalized);
+    }
+    setChecked(normalized);
+  }, [checked, onDidChange]);
 
   const focus = useCallback(() => {
     if (enabled) {

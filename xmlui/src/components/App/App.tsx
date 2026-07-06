@@ -458,18 +458,11 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
   themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
   layoutOrientation: "vertical",
   renderer: ({ adapter }) => {
-    const directChildren = adapter.node.children.filter(
-      (child): child is XmluiElement => child.kind === "element",
-    );
-    const appHeader = directChildren.find((child) => child.type === "AppHeader");
-    const footer = directChildren.find((child) => child.type === "Footer");
-    const pages = directChildren.find((child) => child.type === "Pages");
-    const navPanel = directChildren.find((child) => child.type === "NavPanel") ??
+    const extracted = extractRuntimeAppComponents(adapter.node.children);
+    const { appHeader, footer, pages, restChildren } = extracted;
+    const navPanel = extracted.navPanel ??
       (pages ? findRuntimeNavPanelInPages(pages) : undefined);
     const logoContentDef = adapter.prop("logoTemplate");
-    const restChildren = adapter.node.children.filter((child) =>
-      !isRuntimeShellChild(child, appHeader, footer, navPanel),
-    );
     const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
     const contentLayoutContext = !scrollWholePage
       ? { type: "Stack" as const, orientation: "vertical" as const }
@@ -558,6 +551,14 @@ function applyRuntimeLayoutContext(
   if (child.kind !== "element") {
     return child;
   }
+  if (isTransparentLayoutWrapper(child)) {
+    return {
+      ...child,
+      children: child.children.map((item) =>
+        applyRuntimeLayoutContext(item, layoutContext) as XmluiNode,
+      ),
+    };
+  }
   return {
     ...child,
     props: {
@@ -574,6 +575,166 @@ function isRuntimeShellChild(
   navPanel: XmluiElement | undefined,
 ): boolean {
   return child === appHeader || child === footer || child === navPanel;
+}
+
+function isTransparentLayoutWrapper(child: XmluiElement): boolean {
+  return child.type === "Theme" || child.type === "Fragment";
+}
+
+function extractRuntimeAppComponents(children: XmluiNode[]): {
+  appHeader?: XmluiElement;
+  footer?: XmluiElement;
+  navPanel?: XmluiElement;
+  pages?: XmluiElement;
+  restChildren: XmluiNode[];
+} {
+  const result: {
+    appHeader?: XmluiElement;
+    footer?: XmluiElement;
+    navPanel?: XmluiElement;
+    pages?: XmluiElement;
+    restChildren: XmluiNode[];
+  } = { restChildren: [] };
+
+  for (const child of children) {
+    if (child.kind !== "element") {
+      result.restChildren.push(child);
+      continue;
+    }
+    if (child.type === "Theme") {
+      extractRuntimeFromThemeWrapper(child, result);
+      continue;
+    }
+    extractRuntimeDirectChild(child, result);
+  }
+
+  return result;
+}
+
+function extractRuntimeFromThemeWrapper(
+  themeNode: XmluiElement,
+  result: ReturnType<typeof extractRuntimeAppComponents>,
+) {
+  const otherChildren: XmluiNode[] = [];
+  for (const child of themeNode.children) {
+    if (child.kind === "element" && isTransparentRuntimeFragment(child)) {
+      for (const fragmentChild of child.children) {
+        extractRuntimeThemeChild(themeNode, fragmentChild, result, otherChildren);
+      }
+      continue;
+    }
+    extractRuntimeThemeChild(themeNode, child, result, otherChildren);
+  }
+  if (otherChildren.length > 0) {
+    result.restChildren.push({ ...themeNode, children: otherChildren });
+  }
+}
+
+function extractRuntimeThemeChild(
+  themeNode: XmluiElement,
+  child: XmluiNode,
+  result: ReturnType<typeof extractRuntimeAppComponents>,
+  otherChildren: XmluiNode[],
+) {
+  if (child.kind === "element" && child.type === "AppHeader") {
+    if (result.appHeader) {
+      otherChildren.push(child);
+    } else {
+      result.appHeader = createRuntimeShellThemeWrapper(themeNode, child);
+    }
+  } else if (child.kind === "element" && child.type === "Footer") {
+    if (result.footer) {
+      otherChildren.push(child);
+    } else {
+      result.footer = createRuntimeShellThemeWrapper(themeNode, child);
+    }
+  } else if (child.kind === "element" && child.type === "NavPanel") {
+    if (result.navPanel) {
+      otherChildren.push(child);
+    } else {
+      result.navPanel = createRuntimeShellThemeWrapper(themeNode, child);
+    }
+  } else if (child.kind === "element" && child.type === "Pages") {
+    const wrappedPages = createRuntimeShellThemeWrapper(themeNode, child);
+    result.pages ??= wrappedPages;
+    result.restChildren.push(wrappedPages);
+  } else {
+    otherChildren.push(child);
+  }
+}
+
+function createRuntimeShellThemeWrapper(themeNode: XmluiElement, child: XmluiElement): XmluiElement {
+  const props = { ...themeNode.props };
+  const parsedProps = themeNode.parsed?.props ? { ...themeNode.parsed.props } : undefined;
+  for (const key of Object.keys(props)) {
+    if (key.endsWith("-App")) {
+      delete props[key];
+      delete parsedProps?.[key];
+    }
+  }
+  return {
+    ...themeNode,
+    props,
+    parsed: themeNode.parsed ? { ...themeNode.parsed, props: parsedProps } : themeNode.parsed,
+    children: [child],
+  };
+}
+
+function extractRuntimeDirectChild(
+  child: XmluiElement,
+  result: ReturnType<typeof extractRuntimeAppComponents>,
+) {
+  if (isTransparentRuntimeFragment(child)) {
+    child.children.forEach((fragmentChild) => {
+      if (fragmentChild.kind === "element") {
+        extractRuntimeDirectChild(fragmentChild, result);
+      } else {
+        result.restChildren.push(fragmentChild);
+      }
+    });
+    return;
+  }
+
+  switch (child.type) {
+    case "AppHeader":
+      if (result.appHeader) {
+        result.restChildren.push(child);
+      } else {
+        result.appHeader = child;
+      }
+      break;
+    case "Footer":
+      if (result.footer) {
+        result.restChildren.push(child);
+      } else {
+        result.footer = child;
+      }
+      break;
+    case "NavPanel":
+      if (result.navPanel) {
+        result.restChildren.push(child);
+      } else {
+        result.navPanel = child;
+      }
+      break;
+    case "Pages":
+      result.pages = child;
+      result.restChildren.push(child);
+      break;
+    default:
+      result.restChildren.push(child);
+  }
+}
+
+function isTransparentRuntimeFragment(child: XmluiElement): boolean {
+  return (
+    child.type === "Fragment" &&
+    Object.keys(child.vars).length === 0 &&
+    Object.keys(child.globals).length === 0 &&
+    Object.keys(child.events).length === 0 &&
+    Object.keys(child.methods).length === 0 &&
+    child.props.when === undefined
+  );
 }
 
 function findRuntimeNavPanelInPages(pages: XmluiElement): XmluiElement | undefined {

@@ -16,6 +16,7 @@ export type MetadataContractOptions = {
   acceptsArbitraryProps?: boolean;
   includeLayoutProps?: boolean;
   eventAttributes?: Record<string, string>;
+  contextVariables?: Record<string, { name: string }>;
 };
 
 export function contractFromMetadata(
@@ -23,7 +24,12 @@ export function contractFromMetadata(
   options: MetadataContractOptions,
 ): XmluiComponentContract {
   const props = {
-    ...propsFromMetadata(metadata.props, options.includeLayoutProps),
+    ...propsFromMetadata(
+      metadata.props,
+      metadata.themeVars,
+      metadata.defaultThemeVars,
+      options.includeLayoutProps,
+    ),
     ...behaviorPropsForComponent({
       componentName: options.name,
       metadata,
@@ -39,10 +45,16 @@ export function contractFromMetadata(
     props,
     events: eventsFromMetadata(metadata.events, options.eventAttributes),
     templates: Object.keys(templates).length > 0 ? templates : undefined,
-    contextVariables: entriesFromMetadata(metadata.contextVars),
+    contextVariables: mergeEntries(
+      contextVariablesFromMetadata(metadata),
+      options.contextVariables,
+    ),
     apis: entriesFromMetadata(metadata.apis),
     parts: entriesFromMetadata(metadata.parts),
-    themeVars: entriesFromMetadata(metadata.themeVars),
+    themeVars: entriesFromNames([
+      ...entryNames(metadata.themeVars),
+      ...defaultThemeVarNames(metadata.defaultThemeVars),
+    ]),
     defaultThemeVars: flatDefaultThemeVars(metadata.defaultThemeVars),
     toneSpecificThemeVars: metadata.toneSpecificThemeVars,
   };
@@ -63,8 +75,18 @@ function flatDefaultThemeVars(
   return flatVars;
 }
 
+function defaultThemeVarNames(
+  defaultThemeVars: ComponentMetadata["defaultThemeVars"],
+): string[] {
+  return Object.entries(defaultThemeVars ?? {})
+    .filter(([, value]) => typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    .map(([name]) => name);
+}
+
 function propsFromMetadata(
   props: ComponentMetadata["props"],
+  themeVars: ComponentMetadata["themeVars"],
+  defaultThemeVars: ComponentMetadata["defaultThemeVars"],
   includeLayoutProps = true,
 ): XmluiComponentContract["props"] {
   const names = new Set([
@@ -72,6 +94,8 @@ function propsFromMetadata(
     "ref",
     "testId",
     ...Object.keys(props ?? {}),
+    ...entryNames(themeVars),
+    ...defaultThemeVarNames(defaultThemeVars),
   ]);
   if (includeLayoutProps) {
     for (const name of supportedLayoutPropNames) {
@@ -115,13 +139,52 @@ function eventsFromMetadata(
   );
 }
 
-function entriesFromMetadata<T extends Record<string, unknown> | undefined>(
+function contextVariablesFromMetadata(
+  metadata: ComponentMetadata,
+): Record<string, { name: string }> | undefined {
+  const names = new Set([
+    ...entryNames(metadata.contextVars),
+    ...(metadata.unstableChildInjectedVars ?? []),
+  ]);
+  return entriesFromNames([...names].sort());
+}
+
+function entriesFromMetadata<T extends Record<string, unknown> | readonly unknown[] | undefined>(
   entries: T,
 ): Record<string, { name: string }> | undefined {
-  if (!entries || Object.keys(entries).length === 0) {
+  return entriesFromNames(entryNames(entries));
+}
+
+function entriesFromNames(names: string[]): Record<string, { name: string }> | undefined {
+  if (names.length === 0) {
     return undefined;
   }
-  return Object.fromEntries(Object.keys(entries).sort().map((name) => [name, { name }]));
+  return Object.fromEntries(names.sort().map((name) => [name, { name }]));
+}
+
+function mergeEntries(
+  ...entries: Array<Record<string, { name: string }> | undefined>
+): Record<string, { name: string }> | undefined {
+  const merged = Object.assign({}, ...entries.filter(Boolean));
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function entryNames(entries: Record<string, unknown> | readonly unknown[] | undefined): string[] {
+  if (!entries) {
+    return [];
+  }
+  if (Array.isArray(entries)) {
+    return entries.flatMap((entry) => {
+      if (typeof entry === "string") {
+        return [entry];
+      }
+      if (entry && typeof entry === "object" && typeof (entry as { name?: unknown }).name === "string") {
+        return [(entry as { name: string }).name];
+      }
+      return [];
+    });
+  }
+  return Object.keys(entries);
 }
 
 function eventNameToAttributeName(name: string): string {

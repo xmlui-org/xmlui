@@ -57,10 +57,10 @@ export function createRuntimeScope({
     contextValues,
     references,
     slots,
-    routing,
+    routing: routing ?? parent?.routing,
     toast: toast ?? parent?.toast,
     i18n: i18n ?? parent?.i18n,
-    emitEvent,
+    emitEvent: emitEvent ?? parent?.emitEvent,
     extensionFunctions: extensionFunctions ?? parent?.extensionFunctions ?? {},
   };
 }

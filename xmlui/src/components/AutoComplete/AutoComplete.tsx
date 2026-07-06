@@ -315,7 +315,7 @@ function RuntimeAutoCompleteShell({
     if (form.getValue(fieldName) == null && initialValue !== undefined) {
       form.setValue(fieldName, initialValue);
     }
-  }, [fieldName, form, initialValue]);
+  }, [fieldName, initialValue]);
 
   React.useEffect(() => {
     if (!form || !fieldName) {
@@ -325,7 +325,7 @@ function RuntimeAutoCompleteShell({
       name: fieldName,
       required,
     });
-  }, [fieldName, form, required]);
+  }, [fieldName, required]);
 
   const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
     apiRef.current = api;
@@ -483,7 +483,7 @@ function runtimeAutoCompleteProps(adapter: XmluiComponentAdapter): RuntimeAutoCo
       : undefined,
     classes: { [COMPONENT_PART_KEY]: adapter.className },
     className: rootAttrs.className as string | undefined,
-    contentClassName: rootAttrs.className as string | undefined,
+    contentClassName: [rootAttrs.className, "xmlui-AutoCompleteContent"].filter(Boolean).join(" "),
     style: {
       width: normalizeAutoCompleteRuntimeWidth(adapter.stringProp("width") ?? rootStyle?.width),
     },
@@ -550,12 +550,29 @@ export const autoCompleteRenderer = wrapRuntimeComponent({
   defaultPart: COMPONENT_PART_KEY,
   renderer: ({ adapter }) => {
     const rootAttrs = adapter.rootAttrs(COMPONENT_PART_KEY);
+    const rootStyle = rootAttrs.style as React.CSSProperties | undefined;
+    const rootWidth = normalizeAutoCompleteRuntimeWidth(adapter.stringProp("width") ?? rootStyle?.width);
+    const rootValidationClass = autoCompleteRuntimeValidationClass(adapter);
+    const hasLabel = adapter.stringProp("label") !== undefined;
+    const runtimeRootAttrs = {
+      ...rootAttrs,
+      className: [
+        rootAttrs.className,
+        !hasLabel ? styles.badgeListWrapper : undefined,
+        !hasLabel ? rootValidationClass : undefined,
+        !hasLabel && adapter.booleanProp("enabled", defaultProps.enabled) === false ? styles.disabled : undefined,
+      ].filter(Boolean).join(" "),
+      style: {
+        ...rootStyle,
+        width: rootWidth,
+      },
+    };
     const focusCombobox = (event: React.PointerEvent<HTMLDivElement>) => {
       const input = event.currentTarget.querySelector<HTMLInputElement>('input[role="combobox"]');
       input?.focus({ preventScroll: true });
     };
     return (
-      <div {...rootAttrs} onPointerDownCapture={focusCombobox}>
+      <div {...runtimeRootAttrs} onPointerDownCapture={focusCombobox}>
         <RuntimeOptionClassContext.Provider value={adapter.className}>
           <RuntimeAutoCompleteShell adapter={adapter} {...runtimeAutoCompleteProps(adapter)} />
         </RuntimeOptionClassContext.Provider>
@@ -563,6 +580,20 @@ export const autoCompleteRenderer = wrapRuntimeComponent({
     );
   },
 });
+
+function autoCompleteRuntimeValidationClass(adapter: XmluiComponentAdapter) {
+  const validationStatus = adapter.stringProp("validationStatus", defaultProps.validationStatus);
+  if (validationStatus === "error") {
+    return styles.error;
+  }
+  if (validationStatus === "warning") {
+    return styles.warning;
+  }
+  if (validationStatus === "valid") {
+    return styles.valid;
+  }
+  return undefined;
+}
 
 function normalizeAutoCompleteRuntimeWidth(width: React.CSSProperties["width"]) {
   if (typeof width !== "string") {

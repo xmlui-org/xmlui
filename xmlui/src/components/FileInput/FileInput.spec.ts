@@ -161,7 +161,7 @@ test("component applies theme variables correctly", async ({
 }) => {
   await initTestBed(`<FileInput/>`, {
     testThemeVars: {
-      "backgroundColor-Button": "rgb(255, 0, 0)",
+      "backgroundColor-Button-primary-solid": "rgb(255, 0, 0)",
     },
   });
   const driver = await createFileInputDriver();

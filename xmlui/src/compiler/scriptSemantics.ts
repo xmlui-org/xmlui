@@ -1614,6 +1614,8 @@ function isAllowedMethodName(name: string): boolean {
     "filter",
     "find",
     "from",
+    "isArray",
+    "concat",
     "some",
     "every",
     "includes",
@@ -1664,7 +1666,7 @@ function isAllowedMethodName(name: string): boolean {
   ].includes(name);
 }
 
-const allowedMutatingMethodNames = ["push"];
+const allowedMutatingMethodNames = ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"];
 
 function isAllowedMutatingMethodName(name: string): boolean {
   return allowedMutatingMethodNames.includes(name);

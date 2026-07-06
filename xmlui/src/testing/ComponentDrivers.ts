@@ -295,12 +295,12 @@ export class ContextMenuDriver extends ComponentDriver {
 
 export class DropdownMenuDriver extends ComponentDriver {
   getTrigger(): Locator {
-    return this.component
+    const trigger = this.component
       .locator("xpath=self::*[@data-xmlui-component='DropdownMenuTrigger']")
       .or(this.component.locator("xpath=self::button | .//button"))
       .or(this.params.page.locator('[data-xmlui-component="DropdownMenuTrigger"]').getByRole("button"))
-      .or(this.params.page.getByRole("button"))
-      .first();
+      .or(this.params.page.getByRole("button"));
+    return trigger.filter({ visible: true }).first();
   }
 
   async open(): Promise<void> {
@@ -430,11 +430,11 @@ export class LinkDriver extends ComponentDriver {}
 
 export class NavGroupDriver extends ComponentDriver {
   getTrigger(): Locator {
-    return this.component.getByRole("button").first();
+    return this.component.getByRole("button").or(this.component).first();
   }
 
   getContent(): Locator {
-    return this.getByPartName("content");
+    return this.getByPartName("content").or(this.params.page.getByRole("menu")).first();
   }
 
   async toggle(): Promise<void> {

@@ -301,11 +301,16 @@ export const textRenderer = wrapRuntimeComponent({
       defaultProps.preserveLinebreaks,
     );
     const overflowMode = adapter.stringProp("overflowMode") as OverflowMode | undefined;
+    const textVariant = adapter.stringProp("variant") as any;
+    const textStyle = { ...(style as React.CSSProperties | undefined) };
+    if (textVariant === "strong" && textStyle.fontWeight === undefined) {
+      textStyle.fontWeight = "var(--xmlui-fontWeight-Text-strong)";
+    }
 
     return (
       <Text
         {...rootAttrs}
-        variant={adapter.stringProp("variant") as any}
+        variant={textVariant}
         maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
         classes={className ? { [COMPONENT_PART_KEY]: className as string } : undefined}
         preserveLinebreaks={preserveLinebreaks}
@@ -318,7 +323,7 @@ export const textRenderer = wrapRuntimeComponent({
             ? adapter.event("contextMenu")
             : undefined
         }
-        style={style as React.CSSProperties | undefined}
+        style={textStyle}
         {...variantSpecificProps}
       >
         {valueText || adapter.renderChildren()}

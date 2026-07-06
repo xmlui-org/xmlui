@@ -107,6 +107,11 @@ $borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--
   overflow-wrap: break-word;
 }
 
+[data-xmlui-component="Select"] .inputLabel {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .inputLabel.required {
   color: var(--xmlui-textColor-label-formItem--required, var(--xmlui-textColor, #{$textColor-label-formItem--required}));
   font-size: var(--xmlui-fontSize-label-formItem--required, 0.875em);

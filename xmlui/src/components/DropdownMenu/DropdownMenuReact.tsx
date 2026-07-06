@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   forwardRef,
+  type HTMLAttributes,
   memo,
   type ReactNode,
   createContext,
@@ -39,6 +40,44 @@ export const useDropdownMenuContext = () => {
   const context = useContext(DropdownMenuContext);
   return context;
 };
+
+function hasVisibleLayer(selector: string): boolean {
+  if (typeof document === "undefined") {
+    return false;
+  }
+  return Array.from(document.querySelectorAll<HTMLElement>(selector)).some((element) => {
+    const style = window.getComputedStyle(element);
+    return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+  });
+}
+
+type DropdownSuppressionWindow = Window & {
+  __xmluiSuppressNextDropdownClose?: boolean;
+  __xmluiSuppressDropdownCloseUntil?: number;
+};
+
+function markDropdownCloseSuppressed(durationMs = 80) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  const suppressionWindow = window as DropdownSuppressionWindow;
+  suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+  suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + durationMs;
+}
+
+function shouldSuppressDropdownClose() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  const suppressionWindow = window as DropdownSuppressionWindow;
+  if ((suppressionWindow.__xmluiSuppressDropdownCloseUntil ?? 0) > Date.now()) {
+    return true;
+  }
+  if (suppressionWindow.__xmluiSuppressNextDropdownClose) {
+    return true;
+  }
+  return false;
+}
 
 type DropdownMenuProps = {
   triggerTemplate?: ReactNode;
@@ -118,6 +157,23 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
     };
   }, []);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const markChildLayerClose = () => {
+      if (hasVisibleLayer(".xmlui-AutoCompleteContent, [role='listbox']")) {
+        markDropdownCloseSuppressed();
+      } else if (typeof window !== "undefined") {
+        const suppressionWindow = window as DropdownSuppressionWindow;
+        suppressionWindow.__xmluiSuppressNextDropdownClose = false;
+        suppressionWindow.__xmluiSuppressDropdownCloseUntil = 0;
+      }
+    };
+    document.addEventListener("pointerdown", markChildLayerClose, true);
+    return () => document.removeEventListener("pointerdown", markChildLayerClose, true);
+  }, [open]);
+
   const closeMenu = useCallback(() => {
     setOpen(false);
   }, []);
@@ -132,6 +188,9 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
           if (disabled) return;
 
           if (isOpen) {
+            if (typeof window !== "undefined") {
+              markDropdownCloseSuppressed(0);
+            }
             // Clear any pending close timeout when opening
             if (closeTimeoutRef.current) {
               clearTimeout(closeTimeoutRef.current);
@@ -144,9 +203,16 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
             }
             setOpen(isOpen);
           } else {
+            if (shouldSuppressDropdownClose()) {
+              return;
+            }
             // When closing, add a small delay to allow child components (like Select)
             // to handle their click-outside events first before the DropdownMenu closes
             closeTimeoutRef.current = setTimeout(() => {
+              if (shouldSuppressDropdownClose()) {
+                closeTimeoutRef.current = undefined;
+                return;
+              }
               setOpen(false);
               closeTimeoutRef.current = undefined;
             }, 0);
@@ -154,7 +220,16 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
         }}
         modal={modal}
       >
-        <DropdownMenuPrimitive.Trigger {...rest} asChild disabled={disabled} ref={ref}>
+        <DropdownMenuPrimitive.Trigger
+          {...rest}
+          asChild
+          disabled={disabled}
+          onPointerDown={(event) => {
+            markDropdownCloseSuppressed(0);
+            (rest as HTMLAttributes<HTMLElement>).onPointerDown?.(event);
+          }}
+          ref={ref}
+        >
           {triggerTemplate ? (
             triggerTemplate
           ) : (
@@ -175,6 +250,22 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
           <DropdownMenuPrimitive.Content
             ref={contentRef}
             align={alignment}
+            onClick={(event) => event.stopPropagation()}
+            onCloseAutoFocus={(event) => event.preventDefault()}
+            onInteractOutside={(event) => {
+              if (hasVisibleLayer(".xmlui-AutoCompleteContent, [role='listbox']")) {
+                markDropdownCloseSuppressed();
+                event.preventDefault();
+              }
+            }}
+            onPointerDownOutside={(event) => {
+              if (hasVisibleLayer(".xmlui-AutoCompleteContent, [role='listbox']")) {
+                markDropdownCloseSuppressed();
+                event.preventDefault();
+              }
+            }}
+            onOpenAutoFocus={(event) => event.preventDefault()}
+            onPointerDown={(event) => event.stopPropagation()}
             style={style}
             className={classnames(styles.DropdownMenuContent, contentClassName, classes?.[COMPONENT_PART_KEY], className, {
               [styles.compact]: compact,

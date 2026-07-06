@@ -146,13 +146,13 @@ describe("compileXmluiModule", () => {
     );
   });
 
-  it("surfaces parser diagnostics during compilation", () => {
+  it("accepts implicit boolean attributes during compilation", () => {
     expect(() =>
       compileXmluiModule({
         id: "/tmp/Main.xmlui",
         source: `<App><Button label /></App>`,
       }),
-    ).toThrow("Expected '=' after attribute name.");
+    ).not.toThrow();
   });
 
   it("surfaces semantic diagnostics during compilation", () => {

@@ -64,6 +64,43 @@ $outlineStyle-RadioGroupOption--focus: createThemeVar("Input:outlineStyle-RadioG
 $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-RadioGroupOption--focus");
 
 @layer components {
+  .fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-inline-size: 0;
+    position: relative;
+    width: fit-content;
+    display: inline-block;
+  }
+
+  .legendBefore {
+    padding-inline-start: 3rem;
+  }
+
+  .legendBefore .legend {
+    left: 0;
+  }
+
+  .legendAfter .legend {
+    left: calc(100% + 0.5em);
+  }
+
+  .legend {
+    padding: 0;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+  }
+
+  .requiredMark {
+    margin-inline-start: 0.25em;
+  }
+
+  .optionalMark {
+    margin-inline-start: 0.25em;
+  }
+
   .radioGroupContainer {
     display: flex;
     flex-direction: column;

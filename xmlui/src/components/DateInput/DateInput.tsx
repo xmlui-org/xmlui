@@ -28,6 +28,7 @@ import {
 } from "./DateInputReact";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { useFormContext } from "../Form/FormContext";
 
 const COMP = "DateInput";
 
@@ -252,43 +253,108 @@ export const dateInputComponentRenderer = wrapComponent(
 
 type RuntimeDateInputProps = React.ComponentProps<typeof DateInput> & {
   adapter: XmluiComponentAdapter;
+  bindTo?: string;
 };
 
 function RuntimeDateInputShell({
   adapter,
+  bindTo,
   value,
   initialValue,
+  invalidMessages,
+  required,
+  validationStatus,
+  verboseValidationFeedback,
   onDidChange,
   onFocus,
   onBlur,
   onInvalidChange,
   ...props
 }: RuntimeDateInputProps) {
-  const controlledValue = nullableStringValue(value);
+  const form = useFormContext();
+  const formRef = React.useRef(form);
+  const adapterRef = React.useRef(adapter);
+  const fieldName = bindTo;
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const controlledValue = nullableStringValue(formValue) ?? nullableStringValue(value);
   const initial = stringValue(initialValue);
   const [localValue, setLocalValue] = React.useState<string | null | undefined>(controlledValue ?? initial);
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  formRef.current = form;
+  adapterRef.current = adapter;
 
   React.useEffect(() => {
-    if (controlledValue !== undefined) {
-      setLocalValue(controlledValue);
+    const nextValue = nullableStringValue(formValue) ?? nullableStringValue(value);
+    if (nextValue !== undefined) {
+      setLocalValue(nextValue);
     }
-  }, [controlledValue]);
+  }, [formValue, value]);
+
+  React.useEffect(() => {
+    if (!form || !fieldName) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, required]);
+
+  const registerApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...api,
+      value: localValue,
+    });
+  }, [localValue]);
+
+  React.useEffect(() => {
+    if (lastRegisteredValueRef.current === localValue) {
+      return;
+    }
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...apiRef.current,
+      value: localValue,
+    });
+  }, [localValue]);
 
   const updateState = React.useCallback((state: Record<string, unknown>, options?: { initial?: boolean }) => {
     const nextValue = nullableStringValue(state.value);
     setLocalValue(nextValue);
-    if (!options?.initial) {
-      adapter.registerApi({ value: nextValue });
+    const currentForm = formRef.current;
+    if (currentForm && fieldName && !options?.initial) {
+      currentForm.setValue(fieldName, nextValue);
+      void currentForm.validateField(fieldName, nextValue);
     }
-  }, [adapter]);
+    if (!options?.initial) {
+      adapterRef.current.registerApi({ ...apiRef.current, value: nextValue });
+    }
+  }, [fieldName]);
 
-  return (
+  const effectiveValidationStatus = formError
+    ? "error"
+    : required && localValue
+      ? "valid"
+      : validationStatus;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveVerboseValidationFeedback =
+    verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
+
+  const renderedDateInput = (
     <DateInput
       {...props}
       value={(controlledValue !== undefined ? controlledValue : localValue) as string | undefined}
       initialValue={initial}
       updateState={updateState}
-      registerComponentApi={adapter.registerApi}
+      registerComponentApi={registerApi}
+      required={required}
+      validationStatus={effectiveValidationStatus}
+      invalidMessages={effectiveInvalidMessages}
+      verboseValidationFeedback={effectiveVerboseValidationFeedback}
       onDidChange={(nextValue) => {
         setLocalValue(nullableStringValue(nextValue));
         onDidChange?.(nextValue);
@@ -308,6 +374,17 @@ function RuntimeDateInputShell({
       }}
     />
   );
+
+  if (formError && effectiveVerboseValidationFeedback) {
+    return (
+      <>
+        {renderedDateInput}
+        <div data-validation-display-severity="error">{formError}</div>
+      </>
+    );
+  }
+
+  return renderedDateInput;
 }
 
 function runtimeDateInputProps(adapter: XmluiComponentAdapter) {
@@ -315,6 +392,7 @@ function runtimeDateInputProps(adapter: XmluiComponentAdapter) {
   return {
     ...rootAttrs,
     id: adapter.stringProp("id"),
+    bindTo: adapter.stringProp("bindTo"),
     value: adapter.prop("value"),
     initialValue: adapter.prop("initialValue"),
     enabled: adapter.booleanProp("enabled", defaultProps.enabled),

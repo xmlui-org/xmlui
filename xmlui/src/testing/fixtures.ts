@@ -69,6 +69,7 @@ export type InitTestBedOptions = {
 
 export type TestBedResult = {
   width: number;
+  height: number;
   clipboard: {
     write: (value: string) => Promise<void>;
     paste: (target: Locator) => Promise<void>;
@@ -76,6 +77,14 @@ export type TestBedResult = {
   };
   testStateDriver: {
     testState: () => Promise<unknown>;
+  };
+  testIcons: {
+    boxIcon: Locator;
+    docIcon: Locator;
+    sunIcon: Locator;
+    eyeIcon: Locator;
+    txtIcon: Locator;
+    bellIcon: Locator;
   };
 };
 
@@ -230,8 +239,10 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   initTestBed: async ({ page }, use) => {
     await use(async (markup, options = {}) => {
       await initTestBed(page, markup, options);
+      const viewport = page.viewportSize();
       return {
         width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
+        height: viewport?.height ?? 0,
         clipboard: createClipboardHelper(page),
         testStateDriver: {
           testState: async () => {
@@ -247,6 +258,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
             }
             return parseTestState(await page.getByTestId("__xmlui-test-state").textContent());
           },
+        },
+        testIcons: {
+          boxIcon: page.getByTestId("box-svg"),
+          docIcon: page.getByTestId("doc-svg"),
+          sunIcon: page.getByTestId("sun-svg"),
+          eyeIcon: page.getByTestId("eye-svg"),
+          txtIcon: page.getByTestId("txt-svg"),
+          bellIcon: page.getByTestId("bell-svg"),
         },
       };
     });
@@ -436,10 +455,9 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   createDropdownMenuDriver: async ({ page }, use) => {
     await use(async (testId) => new DropdownMenuDriver({
       locator: typeof testId === "string"
-        ? page.getByTestId(testId)
+        ? preferVisibleLocator(page.getByTestId(testId)
             .or(page.locator(`[data-xmlui-id="${testId}"]`))
-            .or(page.locator(`#${testId}`))
-            .first()
+            .or(page.locator(`#${testId}`)))
         : testId ?? page.locator('[data-xmlui-component="DropdownMenu"]').first(),
       page,
     }));
@@ -723,11 +741,22 @@ async function initTestBed(
   options: InitTestBedOptions,
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
+  const defaultTestResources = {
+    "icon.box": "/resources/box.svg",
+    "icon.doc": "/resources/doc.svg",
+    "icon.sun": "/resources/sun.svg",
+    "icon.eye": "/resources/eye.svg",
+    "icon.txt": "/resources/txt.svg",
+    "icon.bell": "/resources/bell.svg",
+  };
   const testBedPayload = {
     source,
     components: options.components ?? [],
     extensionIds: normalizeExtensionIds(options.extensionIds),
-    resources: options.resources ?? {},
+    resources: {
+      ...defaultTestResources,
+      ...(options.resources ?? {}),
+    },
   };
   await installApiInterceptor(page, options.apiInterceptor);
   const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
@@ -954,9 +983,16 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
   const mainXsDeclarations = normalizeLegacyMainXsDeclarations(options.mainXs);
   const trimmed = normalizedMarkup;
   const testBedAppAttributes = {
+    "padding": "0",
+    "noScrollbarGutters": "true",
+  };
+  const testBedThemeVars = {
     "paddingHorizontal-content-App": "0",
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
+    "maxWidth-content-App": "none",
+    "maxWidth-App": "none",
+    ...options.testThemeVars,
   };
   const appThemeAttributeEntries = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
@@ -967,13 +1003,13 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
       ...declarations,
       trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
     ].filter(Boolean);
-    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), options.testThemeVars);
+    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), testBedThemeVars);
   }
   const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
   const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
-  const themeAttributes = Object.entries(options.testThemeVars ?? {})
+  const themeAttributes = Object.entries(testBedThemeVars)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
@@ -1251,6 +1287,10 @@ function stripAppRoot(markup: string): string {
 
 function quoteAttribute(value: string): string {
   return `"${value.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}"`;
+}
+
+function preferVisibleLocator(locator: Locator): Locator {
+  return locator.filter({ visible: true }).first();
 }
 
 function parseTestState(value: string | null): unknown {

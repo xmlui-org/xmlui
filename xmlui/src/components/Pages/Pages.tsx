@@ -7,6 +7,7 @@ import { defaultProps, pageDefaultProps } from "./Pages.defaults";
 import { Pages, RouteWrapper } from "./PagesReact";
 import { extractPaddings } from "../../components-core/utils/css-utils";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const PAGE = "Page";
 
@@ -65,7 +66,14 @@ export const pageRenderer = wrapComponent(PAGE, RouteWrapper, PageMd, {
           guard={(node.props as any).__guard}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
-          classes={classes}
+          classes={{
+            ...(classes ?? {}),
+            [COMPONENT_PART_KEY]: classnames(
+              classes?.[COMPONENT_PART_KEY],
+              (node.props as any).__pagesClassName,
+            ),
+          }}
+          style={(node.props as any).__pagesStyle as CSSProperties | undefined}
           {...paddings}
         />
       </TableOfContentsProvider>
@@ -96,24 +104,27 @@ export const PagesMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingVertical-${COMP}`]: "$space-5",
-    [`paddingHorizontal-${COMP}`]: "$paddingHorizontal-layout",
+    [`paddingHorizontal-${COMP}`]: "var(--xmlui-paddingHorizontal-layout)",
     [`gap-${COMP}`]: "$space-5",
   },
 });
 
 export const pagesRenderer = wrapComponent(COMP, Pages, PagesMd, {
-  customRender: (_props, { node, extractValue, renderChild }) => (
+  customRender: (_props, { node, extractValue, renderChild, classes }) => (
     <Pages
       fallbackPath={extractValue(node.props.fallbackPath)}
       defaultScrollRestoration={extractValue.asOptionalBoolean(node.props.defaultScrollRestoration)}
       node={node}
       renderChild={renderChild}
       extractValue={extractValue}
+      pagesClassName={classnames(classes?.[COMPONENT_PART_KEY], (_props as any).className)}
+      pagesStyle={(_props as any).style}
     />
   ),
 });
 
 import { useEffect, useMemo, useSyncExternalStore } from "react";
+import type { CSSProperties } from "react";
 import classnames from "classnames";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiElement } from "../../compiler/ir";
@@ -184,11 +195,15 @@ export const pagesRuntimeRenderer = wrapRuntimeComponent({
       </div>
     ) : null;
 
+    const rootAttrs = adapter.rootAttrs();
     return (
-      <>
+      <div
+        className={classnames(adapter.className, rootAttrs.className)}
+        style={{ ...(rootAttrs.style as React.CSSProperties | undefined), display: "contents" }}
+      >
         {pageContent}
         {adapter.context.renderChildren(restChildren, adapter.scope)}
-      </>
+      </div>
     );
   },
 });

@@ -42,6 +42,8 @@ type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defau
   labelPosition?: string;
   labelWidth?: string;
   labelBreak?: boolean;
+  requireLabelMode?: string;
+  direction?: "ltr" | "rtl";
   required?: boolean;
   readOnly?: boolean;
   updateState?: UpdateStateFn;
@@ -74,6 +76,8 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
     labelPosition,
     labelWidth,
     labelBreak,
+    requireLabelMode,
+    direction = "ltr",
     required = defaultProps.required,
     readOnly = defaultProps.readOnly,
     updateState = noop,
@@ -93,9 +97,14 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
   const [focused, setFocused] = React.useState(false);
   const radioGroupRef = useRef<HTMLDivElement>(null);
   const composedRef = useComposedRefs(forwardedRef, radioGroupRef);
+  const lastInitialValueRef = useRef<unknown>(Symbol("initial"));
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
+    if (lastInitialValueRef.current === initialValue) {
+      return;
+    }
+    lastInitialValueRef.current = initialValue;
     updateState({ value: convertOptionValue(initialValue) }, { initial: true });
   }, [initialValue, updateState]);
 
@@ -172,7 +181,11 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
 
       if (radios.length === 0) return;
 
-      const focused = e.target as HTMLElement;
+      const focused =
+        (e.target as HTMLElement).closest?.('[role="radio"]') ??
+        (radioGroupRef.current?.contains(document.activeElement)
+          ? document.activeElement
+          : e.target);
       const currentIndex = radios.indexOf(focused);
       if (currentIndex === -1) return;
 
@@ -182,6 +195,7 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
 
       const nextValue = radios[nextIndex].getAttribute("value");
       if (nextValue != null) {
+        e.preventDefault();
         onInputChange(nextValue);
         // Radix's roving-focus does not reliably move focus to the next radio
         // when the value prop changes via our handler mid-event (same caveat as
@@ -227,7 +241,7 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
     return { value, setValue: updateValue, status: validationStatus, enabled };
   }, [value, updateValue, validationStatus, enabled]);
 
-  return (
+  const groupRoot = (
     <OptionTypeProvider Component={RadioGroupOption}>
       <RadioGroupStatusContext.Provider value={contextValue}>
         <InnerRadioGroup.Root
@@ -237,7 +251,7 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
           id={id}
           onBlur={handleOnBlur}
           onFocus={handleOnFocus}
-          onKeyDown={handleKeyDown}
+          onKeyDownCapture={handleKeyDown}
           onValueChange={onInputChange}
           value={value}
           disabled={!enabled}
@@ -253,6 +267,40 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
         </InnerRadioGroup.Root>
       </RadioGroupStatusContext.Provider>
     </OptionTypeProvider>
+  );
+
+  if (!label) {
+    return groupRoot;
+  }
+  const legendBefore =
+    (labelPosition === "start" && direction !== "rtl") ||
+    (labelPosition === "end" && direction === "rtl");
+  const effectiveRequireLabelMode = requireLabelMode ?? "markRequired";
+  const showRequiredMark =
+    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
+  const showOptionalMark =
+    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+
+  return (
+    <fieldset
+      className={classnames(styles.fieldset, {
+        [styles.legendBefore]: legendBefore,
+        [styles.legendAfter]: !legendBefore,
+      })}
+      dir="ltr"
+    >
+      <legend
+        data-part-id="label"
+        data-xmlui-part="label"
+        className={styles.legend}
+        onClick={focusActiveOption}
+      >
+        {label}
+        {showRequiredMark && <span className={styles.requiredMark}>*</span>}
+        {showOptionalMark && <span className={styles.optionalMark}>(Optional)</span>}
+      </legend>
+      {groupRoot}
+    </fieldset>
   );
 }));
 

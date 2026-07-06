@@ -59,7 +59,8 @@ export class RuntimeStateStore {
   }
 
   hasLocal(ownerId: StateOwnerId | undefined, name: string): boolean {
-    return Boolean(ownerId && Object.prototype.hasOwnProperty.call(this.locals.get(ownerId), name));
+    const localValues = ownerId ? this.locals.get(ownerId) : undefined;
+    return Boolean(localValues && Object.prototype.hasOwnProperty.call(localValues, name));
   }
 
   hasGlobal(name: string): boolean {

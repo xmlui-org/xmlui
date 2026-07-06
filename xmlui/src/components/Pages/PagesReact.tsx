@@ -196,6 +196,8 @@ type PagesProps = {
   extractValue: ValueExtractor;
   children?: ReactNode;
   className?: string;
+  pagesClassName?: string;
+  pagesStyle?: CSSProperties;
 };
 
 export const Pages = memo(function Pages({
@@ -204,6 +206,8 @@ export const Pages = memo(function Pages({
   extractValue,
   fallbackPath = defaultProps.fallbackPath,
   defaultScrollRestoration,
+  pagesClassName,
+  pagesStyle,
 }: PagesProps) {
   const context = useAppLayoutContext();
   const appContext = useAppContext();
@@ -288,7 +292,7 @@ export const Pages = memo(function Pages({
   }, [compiledRoutes]);
 
   return (
-    <>
+    <div className={pagesClassName} style={{ ...pagesStyle, display: "contents" }}>
       <Routes>
         {routes.map((child, i) => {
           const routeUrl = String(extractValue(child.props.url) ?? "");
@@ -305,6 +309,8 @@ export const Pages = memo(function Pages({
                   __fallbackPath: fallbackPath,
                   __pageUrl: routeUrl,
                   __guard: extractValue(child.props.guard),
+                  __pagesClassName: pagesClassName,
+                  __pagesStyle: pagesStyle,
                 },
               })}
             />
@@ -313,6 +319,6 @@ export const Pages = memo(function Pages({
         {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace />} />}
       </Routes>
       {renderChild(restChildren)}
-    </>
+    </div>
   );
 });

@@ -156,6 +156,7 @@ export const RatingInput = memo(forwardRef<HTMLDivElement, Props>(function Ratin
           .filter(Boolean)
           .join(" ")}
         {...rest}
+        data-part-id={PART_INPUT}
         onFocus={isInteractive ? onFocus : undefined}
         onBlur={isInteractive ? onBlur : undefined}
         aria-disabled={!isInteractive}

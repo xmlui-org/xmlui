@@ -523,7 +523,7 @@ function RuntimeSelectShell({
       name: fieldName,
       required,
     });
-  }, [fieldName, form, required]);
+  }, [fieldName, required]);
 
   const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
     apiRef.current = api;
@@ -649,6 +649,12 @@ function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps 
     autoFocus: adapter.booleanProp("autoFocus", defaultProps.autoFocus),
     enabled: adapter.booleanProp("enabled", defaultProps.enabled),
     placeholder: adapter.stringProp("placeholder", defaultProps.placeholder),
+    label: undefined,
+    labelPosition: typeof labelPosition === "string" ? labelPosition : adapter.stringProp("labelPosition"),
+    labelBreak: typeof labelBreak === "boolean" ? labelBreak : adapter.booleanProp("labelBreak", false),
+    labelWidth: typeof labelWidth === "string" || typeof labelWidth === "number"
+      ? labelWidth
+      : adapter.stringProp("labelWidth"),
     validationStatus: adapter.stringProp(
       "validationStatus",
       defaultProps.validationStatus,
@@ -696,7 +702,7 @@ function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps 
     className: rootAttrs.className as string | undefined,
     contentClassName: rootAttrs.className as string | undefined,
     style: { ...rootStyle, width: runtimeWidth ?? "100%" },
-    "aria-label": adapter.stringProp("aria-label"),
+    "aria-label": adapter.stringProp("aria-label") || (typeof label === "string" ? label : adapter.stringProp("label")),
     children: hasData ? undefined : adapter.renderChildren(nonPropertyChildren(adapter.node.children)),
   };
 }

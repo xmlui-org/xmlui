@@ -12,6 +12,7 @@ import {
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
+import { createXmluiLogger, xmluiCssOptions } from "./vite.shared";
 
 const productionFixtures: ProductionBuildFixture[] = [
   {
@@ -121,12 +122,14 @@ async function collectAssets(outDir: string): Promise<string[]> {
 
 export default defineConfig({
   base: "./",
+  customLogger: createXmluiLogger(),
   resolve: {
     alias: {
       "attr-accept": path.resolve("src/compat/attrAccept.ts"),
       papaparse: path.resolve("src/compat/papaParse.ts"),
     },
   },
+  css: xmluiCssOptions,
   plugins: [
     rawScssModulePlugin(),
     svgReactPlugin(),

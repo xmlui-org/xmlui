@@ -51,6 +51,8 @@ export type FormProps = {
   itemLabelBreak?: boolean;
   itemRequireLabelMode?: string;
   verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
   buttonRowTemplate?: ReactNode;
   children?: ReactNode;
   renderContent?: (dataContext: FormDataContext) => ReactNode;
@@ -95,6 +97,8 @@ export function Form({
   itemLabelBreak,
   itemRequireLabelMode,
   verboseValidationFeedback,
+  validationIconSuccess = "checkmark",
+  validationIconError = "error",
   buttonRowTemplate,
   children,
   renderContent,
@@ -422,6 +426,8 @@ export function Form({
     itemLabelBreak,
     itemRequireLabelMode,
     verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
     getValue,
     setValue,
     isFieldValid,
@@ -444,6 +450,8 @@ export function Form({
     validateField,
     validatingFields,
     values,
+    validationIconError,
+    validationIconSuccess,
     verboseValidationFeedback,
   ]);
 

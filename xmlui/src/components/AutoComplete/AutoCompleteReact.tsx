@@ -132,14 +132,12 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useFormItemInputId(idProp);
-  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const { root } = useTheme();
   const [width, setWidth] = useState(0);
-  const observer = useRef<ResizeObserver>();
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -213,21 +211,6 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
       updateState({ value: initialValue || [] }, { initial: true });
     }
   }, [initialValue, updateState]);
-
-  // Observe the size of the reference element
-  useEffect(() => {
-    const current = referenceElement;
-    observer.current?.disconnect();
-
-    if (current) {
-      observer.current = new ResizeObserver(() => setWidth(current.clientWidth));
-      observer.current.observe(current);
-    }
-
-    return () => {
-      observer.current?.disconnect();
-    };
-  }, [referenceElement]);
 
   const selectedValue = useMemo(() => {
     if (Array.isArray(value)) {
@@ -349,8 +332,10 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
     const ro = new ResizeObserver(() => {
+      setWidth(wrapper.clientWidth);
       setResizeKey((k) => k + 1);
     });
+    setWidth(wrapper.clientWidth);
     ro.observe(wrapper);
     return () => ro.disconnect();
   }, []);
@@ -604,6 +589,14 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
           open={open}
           onOpenChange={(isOpen) => {
             if (readOnly || !enabled) return;
+            if (!isOpen) {
+              const suppressionWindow = window as Window & {
+                __xmluiSuppressNextDropdownClose?: boolean;
+                __xmluiSuppressDropdownCloseUntil?: number;
+              };
+              suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+              suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+            }
             setOpen(isOpen);
             if (!isOpen) {
               // Reset highlighted option when dropdown closes
@@ -612,33 +605,33 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
           }}
           modal={modal}
         >
-          <Part partId={PART_LIST_WRAPPER}>
-            <PopoverTrigger asChild ref={setReferenceElement}>
-              <div
-                ref={composeRefs(wrapperRef, forwardedRef)}
-                style={style}
-                className={classnames(
-                  classes?.[COMPONENT_PART_KEY],
-                  className,
-                  styles.badgeListWrapper,
-                  styles[validationStatus],
-                  {
-                    [styles.disabled]: !enabled,
-                    [styles.focused]: isFocused,
-                  },
-                )}
-                aria-expanded={open}
-                onClick={(event) => {
-                  if (readOnly || !enabled) return;
-                  // In multi mode, only open the dropdown, don't toggle
-                  // In single mode, toggle as usual
-                  if (multi && open) {
-                    return; // Already open, don't close
-                  }
-                  event.stopPropagation();
-                  setOpen((prev) => !prev);
-                }}
-              >
+          <PopoverTrigger asChild>
+            <div
+              ref={composeRefs(wrapperRef, forwardedRef)}
+              data-part-id={PART_LIST_WRAPPER}
+              style={style}
+              className={classnames(
+                classes?.[COMPONENT_PART_KEY],
+                className,
+                styles.badgeListWrapper,
+                styles[validationStatus],
+                {
+                  [styles.disabled]: !enabled,
+                  [styles.focused]: isFocused,
+                },
+              )}
+              aria-expanded={open}
+              onClick={(event) => {
+                if (readOnly || !enabled) return;
+                // In multi mode, only open the dropdown, don't toggle
+                // In single mode, toggle as usual
+                if (multi && open) {
+                  return; // Already open, don't close
+                }
+                event.stopPropagation();
+                setOpen((prev) => !prev);
+              }}
+            >
                 {selectedArray.length > 0 && (
                   <div className={styles.badgeList}>
                     {selectedArray
@@ -803,15 +796,26 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
                     </span>
                   </div>
                 </div>
-              </div>
-            </PopoverTrigger>
-          </Part>
+            </div>
+          </PopoverTrigger>
           <Portal container={root}>
             <PopoverContent
               style={{ width, height: dropdownHeight }}
               className={classnames(contentClassName, styles.popoverContent)}
               align="start"
+              onClick={(event) => event.stopPropagation()}
+              onInteractOutside={(event) => {
+                const target = event.target instanceof Node ? event.target : null;
+                if (
+                  target &&
+                  document.querySelector("[data-xmlui-component='DropdownMenuContent']")?.contains(target)
+                ) {
+                  (window as Window & { __xmluiSuppressNextDropdownClose?: boolean }).__xmluiSuppressNextDropdownClose = true;
+                  event.preventDefault();
+                }
+              }}
               onOpenAutoFocus={(e) => e.preventDefault()}
+              onPointerDown={(event) => event.stopPropagation()}
             >
               <div role="listbox" className={styles.commandList} style={{ height: dropdownHeight }}>
                 {/* Always render through OptionTypeProvider so user-provided

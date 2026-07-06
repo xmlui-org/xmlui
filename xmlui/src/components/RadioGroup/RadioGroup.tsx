@@ -26,6 +26,7 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
+import { useFormContext } from "../Form/FormContext";
 
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;
@@ -167,20 +168,33 @@ export const radioGroupRenderer = wrapComponent(COMP, ThemedRadioGroup, RadioGro
 
 type RuntimeRadioGroupProps = React.ComponentProps<typeof ThemedRadioGroup> & {
   adapter: XmluiComponentAdapter;
+  bindTo?: string;
 };
 
 function RuntimeRadioGroupShell({
   adapter,
+  bindTo,
   value,
   initialValue,
+  required,
+  requireLabelMode,
+  validationStatus,
   onDidChange,
   onFocus,
   onBlur,
   ...props
 }: RuntimeRadioGroupProps) {
-  const controlledValue = stringValue(value);
-  const initial = stringValue(initialValue);
-  const [localValue, setLocalValue] = React.useState<string | undefined>(controlledValue ?? initial);
+  const form = useFormContext();
+  const formRef = React.useRef(form);
+  const fieldName = bindTo;
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const controlledValue = optionValue(formValue !== undefined ? formValue : value);
+  const initial = optionValue(initialValue);
+  const [localValue, setLocalValue] = React.useState<unknown>(controlledValue ?? initial);
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  formRef.current = form;
 
   React.useEffect(() => {
     if (controlledValue !== undefined) {
@@ -188,19 +202,64 @@ function RuntimeRadioGroupShell({
     }
   }, [controlledValue]);
 
+  React.useEffect(() => {
+    if (!form || !fieldName) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, required]);
+
   const updateState = React.useCallback((state: Record<string, unknown>) => {
-    const nextValue = stringValue(state.value);
+    const nextValue = optionValue(state.value);
     setLocalValue(nextValue);
-    adapter.registerApi({ value: nextValue });
-  }, [adapter]);
+    lastRegisteredValueRef.current = nextValue;
+    adapter.registerApi({
+      ...apiRef.current,
+      value: nextValue,
+    });
+    const currentForm = formRef.current;
+    if (currentForm && fieldName) {
+      currentForm.setValue(fieldName, nextValue);
+      void currentForm.validateField(fieldName, nextValue);
+    }
+  }, [adapter, fieldName]);
+
+  const effectiveValidationStatus = formError ? "error" : validationStatus;
+  const currentValue = controlledValue ?? localValue;
+
+  const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    lastRegisteredValueRef.current = currentValue;
+    adapter.registerApi({
+      ...api,
+      value: currentValue,
+    });
+  }, [adapter, currentValue]);
+
+  React.useEffect(() => {
+    if (lastRegisteredValueRef.current === currentValue) {
+      return;
+    }
+    lastRegisteredValueRef.current = currentValue;
+    adapter.registerApi({
+      ...apiRef.current,
+      value: currentValue,
+    });
+  }, [adapter, currentValue]);
 
   return (
     <ThemedRadioGroup
       {...props}
-      value={controlledValue ?? localValue}
+      value={currentValue}
       initialValue={initial}
       updateState={updateState}
-      registerComponentApi={adapter.registerApi}
+      registerComponentApi={registerComponentApi}
+      required={required}
+      requireLabelMode={requireLabelMode ?? form?.itemRequireLabelMode}
+      validationStatus={effectiveValidationStatus}
       onDidChange={(nextValue) => {
         setLocalValue(nextValue);
         onDidChange?.(nextValue);
@@ -223,12 +282,19 @@ function runtimeRadioGroupProps(adapter: XmluiComponentAdapter) {
   return {
     ...rootAttrs,
     id: adapter.stringProp("id"),
+    bindTo: adapter.stringProp("bindTo"),
     value: adapter.prop("value"),
     initialValue: adapter.prop("initialValue", defaultProps.initialValue),
     autofocus: adapter.booleanProp("autoFocus", false),
     enabled: adapter.booleanProp("enabled", defaultProps.enabled),
     orientation: adapter.stringProp("orientation", defaultProps.orientation) as React.ComponentProps<typeof ThemedRadioGroup>["orientation"],
     gap: adapter.stringProp("gap"),
+    label: adapter.stringProp("label"),
+    labelPosition: adapter.stringProp("labelPosition"),
+    labelWidth: adapter.stringProp("labelWidth"),
+    labelBreak: adapter.booleanProp("labelBreak", false),
+    requireLabelMode: adapter.stringProp("requireLabelMode"),
+    direction: adapter.stringProp("direction") as "ltr" | "rtl" | undefined,
     validationStatus: adapter.stringProp("validationStatus", defaultProps.validationStatus) as React.ComponentProps<typeof ThemedRadioGroup>["validationStatus"],
     required: adapter.booleanProp("required", defaultProps.required),
     readOnly: adapter.booleanProp("readOnly", defaultProps.readOnly),
@@ -237,8 +303,19 @@ function runtimeRadioGroupProps(adapter: XmluiComponentAdapter) {
   };
 }
 
-function stringValue(value: unknown): string | undefined {
-  return value === undefined || value === null ? undefined : String(value);
+function optionValue(value: unknown): unknown {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    value === null
+  ) {
+    return typeof value === "number" && Number.isNaN(value) ? undefined : value;
+  }
+  return undefined;
 }
 
 const radioGroupThemeAliases = {

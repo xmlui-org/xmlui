@@ -58,7 +58,7 @@ export const enum WeekDays {
 
 type Props = {
   id?: string;
-  initialValue?: string;
+  initialValue?: unknown;
   value?: string;
   enabled?: boolean;
   updateState?: UpdateStateFn;
@@ -1181,38 +1181,68 @@ function onFocus(event: React.FocusEvent<HTMLInputElement>) {
 }
 
 // Utility function to parse date string into components
-function parseDateString(dateString: string, dateFormat: DateFormat) {
+function parseDateString(dateString: unknown, dateFormat: DateFormat) {
   // Handle non-string values gracefully by returning null (empty fields)
   if (typeof dateString !== "string" || dateString === null || dateString === undefined) {
+    return null;
+  }
+  const trimmedDateString = dateString.trim();
+  if (!trimmedDateString) {
     return null;
   }
 
   try {
     // Try to parse the date using the specified format
-    const parsedDate = parse(dateString, dateFormat, new Date());
+    if (matchesDateFormat(trimmedDateString, dateFormat)) {
+      const parsedDate = parse(trimmedDateString, dateFormat, new Date());
 
-    if (isValid(parsedDate)) {
-      return {
-        day: parsedDate.getDate().toString().padStart(2, "0"),
-        month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
-        year: parsedDate.getFullYear().toString(),
-      };
+      if (isValid(parsedDate)) {
+        return {
+          day: parsedDate.getDate().toString().padStart(2, "0"),
+          month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
+          year: parsedDate.getFullYear().toString(),
+        };
+      }
     }
 
     // Fallback: Try to parse as ISO date string
-    const isoDate = new Date(dateString);
-    if (!isNaN(isoDate.getTime())) {
-      return {
-        day: isoDate.getDate().toString().padStart(2, "0"),
-        month: (isoDate.getMonth() + 1).toString().padStart(2, "0"),
-        year: isoDate.getFullYear().toString(),
-      };
+    if (isIsoDateLike(trimmedDateString)) {
+      const isoDate = new Date(trimmedDateString);
+      if (!isNaN(isoDate.getTime())) {
+        return {
+          day: isoDate.getDate().toString().padStart(2, "0"),
+          month: (isoDate.getMonth() + 1).toString().padStart(2, "0"),
+          year: isoDate.getFullYear().toString(),
+        };
+      }
     }
 
     return null;
   } catch (error) {
     return null;
   }
+}
+
+function matchesDateFormat(value: string, dateFormat: DateFormat) {
+  switch (dateFormat) {
+    case "MM/dd/yyyy":
+    case "dd/MM/yyyy":
+    case "yyyy/MM/dd":
+      return /^\d{2}\/\d{2}\/\d{4}$|^\d{4}\/\d{2}\/\d{2}$/.test(value);
+    case "MM-dd-yyyy":
+    case "dd-MM-yyyy":
+    case "yyyy-MM-dd":
+      return /^\d{2}-\d{2}-\d{4}$|^\d{4}-\d{2}-\d{2}$/.test(value);
+    case "yyyyMMdd":
+    case "MMddyyyy":
+      return /^\d{8}$/.test(value);
+    default:
+      return false;
+  }
+}
+
+function isIsoDateLike(value: string) {
+  return /^\d{4}-\d{2}-\d{2}(?:[T ][0-9:.+-Z]*)?$/.test(value);
 }
 
 // Normalize functions

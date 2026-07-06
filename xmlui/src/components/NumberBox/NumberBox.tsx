@@ -249,7 +249,7 @@ function RuntimeNumberBoxShell({
       name: fieldName,
       required,
     });
-  }, [fieldName, form, required]);
+  }, [fieldName, required]);
 
   const registerApi = React.useCallback((api: Record<string, unknown>) => {
     apiRef.current = api;
@@ -295,7 +295,7 @@ function RuntimeNumberBoxShell({
   const renderedNumberBox = (
     <NumberBox
       {...props}
-      value={controlledValue ?? localValue}
+      value={controlledValue ?? (localValue === null ? undefined : localValue)}
       initialValue={initial}
       updateState={updateState}
       registerComponentApi={registerApi}

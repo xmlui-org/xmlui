@@ -592,7 +592,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Fragment var.items="{Array.from({length: 100}).map((_, i) => ({ id: i + 1, name: 'Item ' + (i + 1) }))}">
         <Button testId="add" label="Add"
-          onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
+          onClick="items = items.concat([{ id: items.length + 1, name: 'Item ' + (items.length + 1) }])" />
         <List testId="testList" scrollAnchor="bottom" height="80px" data="{items}">
           <Text>{$item.name}</Text>
         </List>
@@ -627,7 +627,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Fragment var.items="{[{ id: 1, name: 'Item 1' }]}">
         <Button testId="add" label="Add"
-          onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
+          onClick="items = items.concat([{ id: items.length + 1, name: 'Item ' + (items.length + 1) }])" />
         <List testId="testList" scrollAnchor="bottom" maxHeight="80px" data="{items}">
           <Text>{$item.name}</Text>
         </List>

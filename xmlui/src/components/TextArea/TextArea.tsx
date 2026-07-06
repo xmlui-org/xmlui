@@ -235,6 +235,7 @@ export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaM
 type RuntimeTextAreaProps = React.ComponentProps<typeof TextArea> & {
   adapter: XmluiComponentAdapter;
   bindTo?: string;
+  rootAttrs?: React.HTMLAttributes<HTMLDivElement>;
 };
 
 function RuntimeTextAreaShell({
@@ -247,11 +248,13 @@ function RuntimeTextAreaShell({
   validationStatus,
   verboseValidationFeedback,
   onDidChange,
+  rootAttrs,
   ...props
 }: RuntimeTextAreaProps) {
   const form = useFormContext();
   const formRef = React.useRef(form);
   const adapterRef = React.useRef(adapter);
+  const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
   const fieldName = bindTo;
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
@@ -280,13 +283,39 @@ function RuntimeTextAreaShell({
       name: fieldName,
       required,
     });
-  }, [fieldName, form, required]);
+  }, [fieldName, required]);
+
+  React.useEffect(() => {
+    const formElement = textAreaRef.current?.form;
+    if (!formElement) {
+      return;
+    }
+    const handleReset = () => {
+      setLocalValue(initial);
+      if (formRef.current && fieldName) {
+        formRef.current.setValue(fieldName, initial);
+      }
+    };
+    formElement.addEventListener("reset", handleReset);
+    return () => formElement.removeEventListener("reset", handleReset);
+  }, [fieldName, initial]);
 
   const registerApi = React.useCallback((api: Record<string, unknown>) => {
-    apiRef.current = api;
+    const normalizedApi = {
+      ...api,
+      setValue:
+        typeof api.setValue === "function"
+          ? (value: unknown) => (api.setValue as (value: unknown) => void)(normalizeTextAreaApiValue(value))
+          : api.setValue,
+      insert:
+        typeof api.insert === "function"
+          ? (value: unknown) => (api.insert as (value: unknown) => void)(normalizeTextAreaApiValue(value))
+          : api.insert,
+    };
+    apiRef.current = normalizedApi;
     lastRegisteredValueRef.current = localValue;
     adapterRef.current.registerApi({
-      ...api,
+      ...normalizedApi,
       value: localValue,
     });
   }, [localValue]);
@@ -325,6 +354,7 @@ function RuntimeTextAreaShell({
   const renderedTextArea = (
     <TextArea
       {...props}
+      ref={textAreaRef}
       value={controlledValue ?? localValue}
       initialValue={initial}
       updateState={updateState}
@@ -348,21 +378,20 @@ function RuntimeTextAreaShell({
 
   if (formError && effectiveVerboseValidationFeedback) {
     return (
-      <>
+      <div {...rootAttrs}>
         {renderedTextArea}
         <div data-validation-display-severity="error">{formError}</div>
-      </>
+      </div>
     );
   }
 
-  return renderedTextArea;
+  return <div {...rootAttrs}>{renderedTextArea}</div>;
 }
 
 function runtimeTextAreaProps(adapter: XmluiComponentAdapter) {
   const rootAttrs = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;
   const { onFocus, onBlur, onChange, ...safeRootAttrs } = rootAttrs;
   return {
-    ...safeRootAttrs,
     id: adapter.stringProp("id"),
     bindTo: adapter.stringProp("bindTo"),
     value: stringValue(adapter.prop("value")),
@@ -384,6 +413,7 @@ function runtimeTextAreaProps(adapter: XmluiComponentAdapter) {
     autoCapitalize: adapter.stringProp("autoCapitalize"),
     readOnly: adapter.booleanProp("readOnly", false),
     required: adapter.booleanProp("required", false),
+    "aria-label": adapter.stringProp("label"),
     enterSubmits: adapter.booleanProp("enterSubmits", defaultProps.enterSubmits),
     escResets: adapter.booleanProp("escResets", false),
     verboseValidationFeedback: Object.prototype.hasOwnProperty.call(
@@ -395,13 +425,22 @@ function runtimeTextAreaProps(adapter: XmluiComponentAdapter) {
     validationIconSuccess: adapter.stringProp("validationIconSuccess"),
     validationIconError: adapter.stringProp("validationIconError"),
     classes: { [COMPONENT_PART_KEY]: adapter.className },
-    style: rootAttrs.style,
-    className: [rootAttrs.className, compatStyles.textarea].filter(Boolean).join(" "),
+    className: compatStyles.textarea,
+    rootAttrs: safeRootAttrs,
   };
 }
 
 function stringValue(value: unknown): string | undefined {
+  if (typeof value === "function") {
+    return String({});
+  }
   return value === undefined || value === null ? undefined : String(value);
+}
+
+function normalizeTextAreaApiValue(value: unknown): unknown {
+  return typeof value === "string"
+    ? value.replace(/\\n/g, "\n").replace(/\\t/g, "\t")
+    : value;
 }
 
 const textAreaInputThemeAliases = {

@@ -1,5 +1,4 @@
 import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_NAV_PANEL_FOOTER } from "../../components-core/parts";
@@ -293,13 +292,15 @@ const DrawerNavPanel = memo(function DrawerNavPanel({
     <NavPanelContext.Provider value={contextValue}>
       <div
         {...rest}
+        role={(rest as React.HTMLAttributes<HTMLDivElement>).role ?? "navigation"}
         className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.hasFooter]: hasFooter })}
         style={style}
       >
-        <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
+        <div data-part-id="logo" className={classnames(styles.logoWrapper, styles.inDrawer)}>
           {logoContent || <Logo />}
         </div>
         <Scroller
+          data-part-id="content"
           className={styles.wrapperInner}
           style={style}
           scrollStyle={scrollStyle}
@@ -309,7 +310,7 @@ const DrawerNavPanel = memo(function DrawerNavPanel({
         </Scroller>
         {hasFooter && (
           <Part partId={PART_NAV_PANEL_FOOTER}>
-            <div className={styles.footer}>
+            <div data-part-id="footer" className={styles.footer}>
               {footerContent}
             </div>
           </Part>
@@ -359,7 +360,7 @@ export const NavPanel = memo(forwardRef(function NavPanel(
   const appLayoutContext = useAppLayoutContext();
   const linkInfoContext = useLinkInfoContext();
   const localRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
+  const scrollerRef = useRef<HTMLDivElement>(null);
   // True when the current navigation was initiated by a click inside the NavPanel.
   // In that case the user already sees the clicked link, so we skip scrolling.
   const clickedInsideRef = useRef(false);
@@ -388,7 +389,36 @@ export const NavPanel = memo(forwardRef(function NavPanel(
     }
 
     const panel = localRef.current;
-    let scrolled = false;
+    const innerScroller = scrollerRef.current;
+    const innerOverflowY = innerScroller ? getComputedStyle(innerScroller).overflowY : "";
+    const scrollContainer =
+      innerScroller && /^(auto|scroll|overlay)$/.test(innerOverflowY)
+        ? innerScroller
+        : panel;
+    const scrollIntoPanel = (element: Element) => {
+      const target = element as HTMLElement;
+      const targetRect = target.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+      let top = scrollContainer.scrollTop;
+
+      if (syncScrollPosition === "center") {
+        top += targetRect.top - containerRect.top - (containerRect.height - targetRect.height) / 2;
+      } else if (syncScrollPosition === "end") {
+        top += targetRect.bottom - containerRect.bottom;
+      } else if (syncScrollPosition === "nearest") {
+        if (targetRect.top < containerRect.top) {
+          top += targetRect.top - containerRect.top;
+        } else if (targetRect.bottom > containerRect.bottom) {
+          top += targetRect.bottom - containerRect.bottom;
+        }
+      } else {
+        top += targetRect.top - containerRect.top;
+      }
+
+      const behavior = syncScrollBehavior === "instant" ? "auto" : syncScrollBehavior;
+      scrollContainer.scrollTo({ top, behavior });
+      target.scrollIntoView({ block: syncScrollPosition, behavior });
+    };
 
     // Scrolls the leaf active link if it is not inside a collapsed NavGroup.
     // Returns true if scrolling was performed.
@@ -409,40 +439,50 @@ export const NavPanel = memo(forwardRef(function NavPanel(
         if (el.getAttribute("aria-hidden") === "true") return false;
         el = el.parentElement;
       }
-      leafLink.scrollIntoView({ block: syncScrollPosition, behavior: syncScrollBehavior });
+      scrollIntoPanel(leafLink);
       return true;
     };
 
-    // Try immediately — works when the active link is in an already-expanded group
-    if (findAndScrollToActiveLink()) {
-      scrolled = true;
-      return;
-    }
+    const scheduleSyncScroll = () => {
+      requestAnimationFrame(() => {
+        findAndScrollToActiveLink();
+      });
+    };
+
+    // Try immediately — works when the active link is in an already-expanded group.
+    scheduleSyncScroll();
 
     // Otherwise wait for the NavGroup CSS grid expansion (grid-template-rows, 0.3s)
     // to complete before scrolling to the leaf link.
     const handleTransitionEnd = (e: TransitionEvent) => {
-      if (scrolled || e.propertyName !== "grid-template-rows") return;
-      if (findAndScrollToActiveLink()) {
-        scrolled = true;
-        panel.removeEventListener("transitionend", handleTransitionEnd);
-      }
+      if (e.propertyName !== "grid-template-rows") return;
+      scheduleSyncScroll();
     };
+
+    const observer = new MutationObserver(scheduleSyncScroll);
+    observer.observe(panel, {
+      attributes: true,
+      attributeFilter: ["class", "aria-hidden"],
+      childList: true,
+      subtree: true,
+    });
 
     panel.addEventListener("transitionend", handleTransitionEnd);
     return () => {
+      observer.disconnect();
       panel.removeEventListener("transitionend", handleTransitionEnd);
     };
-  }, [syncWithContent, syncScrollBehavior, syncScrollPosition, location.pathname]);
+  }, [syncWithContent, syncScrollBehavior, syncScrollPosition]);
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
-  const showLogo =
-    appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const collapsed = !!appLayoutContext?.navPanelCollapsed && vertical;
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
-  // Footer only in vertical layouts: vertical, vertical-sticky, vertical-full-header
-  const hasFooter = !!footerContent && vertical;
+  const showLogo =
+    !!safeLogoContent ||
+    appLayoutContext?.layout === "vertical" ||
+    appLayoutContext?.layout === "vertical-sticky";
+  const hasFooter = !!footerContent;
 
   // Register the linkMap when navLinks change
   const registerLinkMap = linkInfoContext?.registerLinkMap;
@@ -474,6 +514,7 @@ export const NavPanel = memo(forwardRef(function NavPanel(
     <div
       {...rest}
       ref={mergedRef}
+      role={(rest as React.HTMLAttributes<HTMLDivElement>).role ?? "navigation"}
       onMouseDown={() => { clickedInsideRef.current = true; }}
       className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
         [styles.horizontal]: horizontal,
@@ -486,9 +527,11 @@ export const NavPanel = memo(forwardRef(function NavPanel(
       style={style}
     >
       {showLogo && (
-        <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
+        <div data-part-id="logo" className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
       )}
       <Scroller
+        ref={scrollerRef}
+        data-part-id="content"
         className={styles.wrapperInner}
         style={style}
         scrollStyle={scrollStyle}
@@ -499,6 +542,7 @@ export const NavPanel = memo(forwardRef(function NavPanel(
       {hasFooter && (
         <Part partId={PART_NAV_PANEL_FOOTER}>
           <div
+            data-part-id="footer"
             className={classnames(styles.footer, {
               [styles.footerCollapsed]: collapsed,
             })}

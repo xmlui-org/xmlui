@@ -25,6 +25,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { useFormContext } from "../Form/FormContext";
 
 const COMP = "FileInput";
 const DEFAULT_ICON = "browse:FileInput";
@@ -129,6 +130,7 @@ export const FileInputMd = createMetadata({
   },
   events: {
     didChange: dDidChange(COMP),
+    focus: dGotFocus(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     parseError: {
@@ -226,38 +228,102 @@ export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
 
 type RuntimeFileInputProps = React.ComponentProps<typeof FileInput> & {
   adapter: XmluiComponentAdapter;
+  bindTo?: string;
 };
 
 function RuntimeFileInputShell({
   adapter,
+  bindTo,
   value,
   initialValue,
+  required,
+  validationStatus,
+  invalidMessages,
   onDidChange,
   onFocus,
   onBlur,
   onParseError,
   ...props
 }: RuntimeFileInputProps) {
-  const [localValue, setLocalValue] = React.useState(value ?? initialValue);
+  const form = useFormContext();
+  const formRef = React.useRef(form);
+  const adapterRef = React.useRef(adapter);
+  const fieldName = bindTo;
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const controlledValue = formValue ?? value;
+  const [localValue, setLocalValue] = React.useState(controlledValue ?? initialValue);
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  formRef.current = form;
+  adapterRef.current = adapter;
 
   React.useEffect(() => {
-    if (value !== undefined) {
-      setLocalValue(value);
+    const nextValue = formValue ?? value;
+    if (nextValue !== undefined) {
+      setLocalValue(nextValue);
     }
-  }, [value]);
+  }, [formValue, value]);
 
-  const updateState = React.useCallback((state: Record<string, unknown>) => {
+  React.useEffect(() => {
+    if (!form || !fieldName) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, required]);
+
+  const registerApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...api,
+      value: localValue,
+    });
+  }, [localValue]);
+
+  React.useEffect(() => {
+    if (lastRegisteredValueRef.current === localValue) {
+      return;
+    }
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...apiRef.current,
+      value: localValue,
+    });
+  }, [localValue]);
+
+  const updateState = React.useCallback((state: Record<string, unknown>, options?: { initial?: boolean }) => {
     setLocalValue(state.value);
-    adapter.registerApi({ value: state.value });
-  }, [adapter]);
+    const currentForm = formRef.current;
+    if (currentForm && fieldName && !options?.initial) {
+      currentForm.setValue(fieldName, state.value);
+      void currentForm.validateField(fieldName, state.value);
+    }
+    if (!options?.initial) {
+      adapterRef.current.registerApi({ ...apiRef.current, value: state.value });
+    }
+  }, [fieldName]);
+
+  const effectiveValidationStatus = formError
+    ? "error"
+    : required && Array.isArray(localValue) && localValue.length > 0
+      ? "valid"
+      : validationStatus;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
 
   return (
     <ThemedFileInput
       {...props}
-      value={value ?? localValue}
+      value={controlledValue ?? localValue}
       initialValue={initialValue}
       updateState={updateState}
-      registerComponentApi={adapter.registerApi}
+      registerComponentApi={registerApi}
+      required={required}
+      validationStatus={effectiveValidationStatus}
+      invalidMessages={effectiveInvalidMessages}
       onDidChange={(nextValue) => {
         setLocalValue(nextValue);
         onDidChange?.(nextValue);
@@ -266,6 +332,7 @@ function RuntimeFileInputShell({
       onFocus={() => {
         onFocus?.();
         void adapter.event("gotFocus")();
+        void adapter.event("focus")();
       }}
       onBlur={() => {
         onBlur?.();
@@ -289,6 +356,7 @@ function runtimeFileInputProps(adapter: XmluiComponentAdapter) {
     ...rootAttrs,
     className: [className, compatStyles.fileInputRoot].filter(Boolean).join(" "),
     id: adapter.stringProp("id"),
+    bindTo: adapter.stringProp("bindTo"),
     value: adapter.prop("value"),
     initialValue: adapter.prop("initialValue", defaultProps.initialValue),
     acceptsFileType: adapter.prop("acceptsFileType"),

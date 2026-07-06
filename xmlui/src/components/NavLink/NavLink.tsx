@@ -184,6 +184,14 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { normalizePathname } from "../../runtime/routing";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
+const FALLBACK_ROUTE_SNAPSHOT = {
+  pathname: "/",
+  search: "",
+  hash: "",
+  queryParams: {},
+  revision: 0,
+};
+
 export const navLinkRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: NavLinkMd as ComponentMetadata,
@@ -199,8 +207,8 @@ export const navLinkRuntimeRenderer = wrapRuntimeComponent({
     const routing = adapter.scope.routing;
     const snapshot = useSyncExternalStore(
       (listener) => routing?.subscribe(listener) ?? (() => undefined),
-      () => routing?.getSnapshot() ?? { pathname: "/", search: "", hash: "", queryParams: {}, revision: 0 },
-      () => ({ pathname: "/", search: "", hash: "", queryParams: {}, revision: 0 }),
+      () => routing?.getSnapshot() ?? FALLBACK_ROUTE_SNAPSHOT,
+      () => routing?.getSnapshot() ?? FALLBACK_ROUTE_SNAPSHOT,
     );
     const iconName = adapter.stringProp("icon");
     const label = adapter.prop("label");

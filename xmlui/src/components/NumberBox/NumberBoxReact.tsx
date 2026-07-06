@@ -168,8 +168,18 @@ export const NumberBox = memo(forwardRef(function NumberBox(
 
   // --- Convert to representable string value (from number | null | undefined)
   const [valueStrRep, setValueStrRep] = React.useState<string>(mapToRepresentation(value));
+  const rawInputValueRef = useRef<string>(mapToRepresentation(value));
+  const lastValidValueRep = useRef<string>(mapToRepresentation(value));
   useEffect(() => {
-    setValueStrRep(mapToRepresentation(value));
+    if (value === undefined) {
+      return;
+    }
+    const nextRep = mapToRepresentation(value);
+    rawInputValueRef.current = nextRep;
+    setValueStrRep(nextRep);
+    if (nextRep !== "") {
+      lastValidValueRep.current = nextRep;
+    }
   }, [value]);
 
   // --- Initialize the related field with the input's initial value
@@ -182,6 +192,7 @@ export const NumberBox = memo(forwardRef(function NumberBox(
   // --- Handle the value change events for this input
   const updateValue = useCallback(
     (newValue: string | number | null | undefined, rep: string) => {
+      rawInputValueRef.current = rep;
       setValueStrRep(rep);
       updateState({ value: newValue });
       onDidChange(newValue);
@@ -202,11 +213,17 @@ export const NumberBox = memo(forwardRef(function NumberBox(
       if (isUsableNumber(newValue, integersOnly)) {
         let usableNumber = toUsableNumber(newValue, integersOnly);
         usableNumber = clamp(usableNumber as number, min, max);
+        lastValidValueRep.current = repr;
         updateValue(usableNumber, repr);
         return;
       }
-      setValueStrRep(repr);
-      onDidChange(newValue);
+      const nextRep = newValue === EXPONENTIAL_SEPARATOR
+        ? repr
+        : rawInputValueRef.current === ""
+          ? ""
+          : repr;
+      rawInputValueRef.current = nextRep;
+      setValueStrRep(nextRep);
     },
     [updateValue, integersOnly, onDidChange, min, max],
   );
@@ -539,7 +556,7 @@ export const NumberBox = memo(forwardRef(function NumberBox(
 
   const handleOnBlur = useCallback(() => {
     // --- Get the current input value
-    const currentInputValue = inputRef.current?.value ?? "";
+    const currentInputValue = inputRef.current?.value || rawInputValueRef.current || "";
 
     // --- Check if we need to add a trailing zero
     let finalValue = currentInputValue;
@@ -553,14 +570,52 @@ export const NumberBox = memo(forwardRef(function NumberBox(
     if (!isEmptyLike(numericValue)) {
       const clampedValue = clamp(numericValue, min, max);
       if (clampedValue !== numericValue) {
-        const clampedString = clampedValue.toString();
-        finalValue = clampedString;
+        finalValue = clampedValue.toString();
+      }
+      lastValidValueRep.current = finalValue;
+      if (inputRef.current) {
+        inputRef.current.value = finalValue;
+      }
+      updateValue(clampedValue, finalValue);
+      onBlur?.();
+      return;
+    }
 
-        // --- Update the input field immediately
+    if (currentInputValue !== "") {
+      if (currentInputValue === "-") {
+        updateValue(null, "-");
+        onBlur?.();
+        return;
+      }
+      const recoveredValue = currentInputValue.replaceAll(EXPONENTIAL_SEPARATOR, "");
+      const recoveredNumber = toUsableNumber(recoveredValue, integersOnly);
+      if (recoveredValue !== currentInputValue && !isEmptyLike(recoveredNumber)) {
         if (inputRef.current) {
-          inputRef.current.value = clampedString;
+          inputRef.current.value = recoveredValue;
+        }
+        lastValidValueRep.current = recoveredValue;
+        updateValue(recoveredNumber, recoveredValue);
+        onBlur?.();
+        return;
+      }
+      const fallbackValue = lastValidValueRep.current;
+      if (fallbackValue !== "" && fallbackValue !== currentInputValue) {
+        const fallbackNumber = toUsableNumber(fallbackValue, integersOnly);
+        if (!isEmptyLike(fallbackNumber)) {
+          if (inputRef.current) {
+            inputRef.current.value = fallbackValue;
+          }
+          updateValue(fallbackNumber, fallbackValue);
+          onBlur?.();
+          return;
         }
       }
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+      updateValue(null, "");
+      onBlur?.();
+      return;
     }
 
     // --- Update the state if the final value is different from current input

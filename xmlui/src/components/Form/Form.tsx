@@ -111,6 +111,16 @@ export const FormMd = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation feedback is enabled.",
+      valueType: "string",
+      defaultValue: "checkmark",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation feedback is enabled.",
+      valueType: "string",
+      defaultValue: "error",
+    },
   },
   events: {
     willSubmit: {
