@@ -273,7 +273,7 @@ class ScriptParser {
         } else {
           this.consume();
         }
-        const alternate = this.parseExpression(1);
+        const alternate = this.parseExpression();
         left = this.createConditionalExpression(left, question, consequent, alternate);
         continue;
       }

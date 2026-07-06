@@ -228,32 +228,72 @@ function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
     return data.map((item) => dataOption(item, valueField, labelField));
   }
   return adapter.node.children.flatMap((child) => {
+    if (child.kind === "element" && child.type === "Items") {
+      const items = evaluateExpressionOrText(
+        child.props.items ?? child.props.data,
+        child.parsed?.props?.items ?? child.parsed?.props?.data,
+        adapter.scope,
+        "Items:items",
+      );
+      const itemTemplate = templateChildren(child, "itemTemplate") ?? nonPropertyChildren(child.children);
+      if (!Array.isArray(items)) {
+        return [];
+      }
+      return items.flatMap((item, index) => {
+        const itemScope = createRuntimeScope({
+          store: adapter.scope.store,
+          parent: adapter.scope,
+          props: adapter.scope.props,
+          contextValues: {
+            $item: item,
+            $itemIndex: index,
+            $isFirst: index === 0,
+            $isLast: index === items.length - 1,
+          },
+          references: adapter.scope.references,
+          slots: adapter.scope.slots,
+          routing: adapter.scope.routing,
+          toast: adapter.scope.toast,
+          emitEvent: adapter.scope.emitEvent,
+          extensionFunctions: adapter.scope.extensionFunctions,
+        });
+        return itemTemplate.flatMap((itemChild) =>
+          itemChild.kind === "element" && itemChild.type === "Option"
+            ? optionNodeToData(itemChild, itemScope)
+            : []
+        );
+      });
+    }
     if (child.kind !== "element" || child.type !== "Option") {
       return [];
     }
-    const hasValue = Object.prototype.hasOwnProperty.call(child.props, "value");
-    const hasLabel = Object.prototype.hasOwnProperty.call(child.props, "label");
-    const value = hasValue
-      ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, adapter.scope, "Option:value")
-      : undefined;
-    const label = hasLabel
-      ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, adapter.scope, "Option:label")
-      : child.children.every((optionChild) => optionChild.kind === "text")
-        ? child.children.map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join("")
-        : undefined;
-    if (value === undefined && label === undefined) {
-      return [];
-    }
-    const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
-      ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, adapter.scope, "Option:enabled"))
-      : true;
-    return [{
-      value: String(value ?? label ?? ""),
-      label: String(label ?? value ?? ""),
-      enabled,
-      testId: child.props.testId as string | undefined,
-    }];
+    return optionNodeToData(child, adapter.scope);
   });
+}
+
+function optionNodeToData(child: any, scope: any): XmluiOption[] {
+  const hasValue = Object.prototype.hasOwnProperty.call(child.props, "value");
+  const hasLabel = Object.prototype.hasOwnProperty.call(child.props, "label");
+  const value = hasValue
+    ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, scope, "Option:value")
+    : undefined;
+  const label = hasLabel
+    ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, scope, "Option:label")
+    : child.children.every((optionChild: any) => optionChild.kind === "text")
+      ? child.children.map((optionChild: any) => optionChild.kind === "text" ? optionChild.value : "").join("")
+      : undefined;
+  if (value === undefined && label === undefined) {
+    return [];
+  }
+  const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
+    ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, scope, "Option:enabled"))
+    : true;
+  return [{
+    value: String(value ?? label ?? ""),
+    label: String(label ?? value ?? ""),
+    enabled,
+    testId: child.props.testId as string | undefined,
+  }];
 }
 
 function dataOption(item: unknown, valueField: string, labelField: string): XmluiOption {

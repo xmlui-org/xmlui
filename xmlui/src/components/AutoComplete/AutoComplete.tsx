@@ -23,11 +23,15 @@ import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { createRuntimeScope } from "../../runtime/state";
+import { createRuntimeScope, readContext } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { useFormContext } from "../Form/FormContext";
 import { RuntimeOptionClassContext } from "../Option/Option";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
+import type { FormItemValidations } from "../Form/FormContext";
 
 const COMP = "AutoComplete";
 
@@ -278,19 +282,28 @@ function RuntimeAutoCompleteShell({
   required,
   validationStatus,
   invalidMessages,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   verboseValidationFeedback,
   onDidChange,
   ...props
 }: RuntimeAutoCompleteProps) {
   const form = useFormContext();
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
   const adapterRef = React.useRef(adapter);
   const formRef = React.useRef(form);
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? (readContext(adapter.scope, "$itemIndex") as number)
+      : undefined;
   const fieldName = React.useMemo(() => {
-    if (!bindTo) {
+    if (bindTo === undefined && !parentFormItemId) {
       return undefined;
     }
-    return form?.fieldPrefix ? `${form.fieldPrefix}.${bindTo}` : bindTo;
-  }, [bindTo, form?.fieldPrefix]);
+    const resolved = resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex });
+    return form?.fieldPrefix ? `${form.fieldPrefix}.${resolved}` : resolved;
+  }, [bindTo, defaultId, form?.fieldPrefix, itemIndex, parentFormItemId]);
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
   const controlledValue = formValue !== undefined ? formValue : value;
@@ -571,10 +584,27 @@ export const autoCompleteRenderer = wrapRuntimeComponent({
       const input = event.currentTarget.querySelector<HTMLInputElement>('input[role="combobox"]');
       input?.focus({ preventScroll: true });
     };
+    const props = runtimeAutoCompleteProps(adapter);
+    const validations: FormItemValidations = {
+      required: adapter.booleanProp("required", defaultProps.required),
+      requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    };
+    const input = validations.required ? (
+      <ValidationWrapper
+        bindTo={props.bindTo}
+        validations={validations}
+        validationMode={adapter.stringProp("validationMode") as any}
+        componentType={COMP}
+      >
+        <RuntimeAutoCompleteShell adapter={adapter} {...props} />
+      </ValidationWrapper>
+    ) : (
+      <RuntimeAutoCompleteShell adapter={adapter} {...props} />
+    );
     return (
       <div {...runtimeRootAttrs} onPointerDownCapture={focusCombobox}>
         <RuntimeOptionClassContext.Provider value={adapter.className}>
-          <RuntimeAutoCompleteShell adapter={adapter} {...runtimeAutoCompleteProps(adapter)} />
+          {input}
         </RuntimeOptionClassContext.Provider>
       </div>
     );

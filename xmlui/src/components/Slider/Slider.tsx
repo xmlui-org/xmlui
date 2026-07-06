@@ -20,6 +20,12 @@ import {
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 import { COMPONENT_PART_KEY } from "../../styling/layout";
+import { useFormContext, useFormContextPart } from "../Form/FormContext";
+import { fieldFocused, fieldInitialized, fieldLostFocus, fieldRemoved } from "../Form/formActions";
+import { getByPath } from "../Form/FormReact";
+import { readContext } from "../../runtime/state";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
 
 const COMP = "Slider";
 
@@ -228,18 +234,57 @@ export const sliderRenderer = wrapRuntimeComponent({
     const inverted = adapter.prop("inverted", false);
     const enabled = adapter.booleanProp("enabled", defaultProps.enabled);
     const readOnly = adapter.booleanProp("readOnly", false);
+    const form = useFormContext();
+    const dispatch = useFormContextPart((value) => value?.dispatch);
+    const bindTo = adapter.stringProp("bindTo");
+    const defaultId = React.useId();
+    const { parentFormItemId } = React.useContext(FormItemContext);
+    const itemIndex =
+      typeof readContext(adapter.scope, "$itemIndex") === "number"
+        ? (readContext(adapter.scope, "$itemIndex") as number)
+        : undefined;
+    const fieldName = React.useMemo(
+      () =>
+        bindTo !== undefined || parentFormItemId
+          ? resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex })
+          : undefined,
+      [bindTo, defaultId, itemIndex, parentFormItemId],
+    );
+    const initialSubjectValue = useFormContextPart((value) =>
+      fieldName ? getByPath(value?.originalSubject, fieldName) : undefined,
+    );
+    const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+    const initialFormValue = initialSubjectValue ?? adapter.prop("initialValue");
+    const noSubmit = adapter.booleanProp("noSubmit", false);
+    const formRef = React.useRef(form);
+    formRef.current = form;
+    React.useEffect(() => {
+      if (!fieldName) {
+        return;
+      }
+      dispatch?.(fieldInitialized(fieldName, initialFormValue, false, noSubmit));
+      return () => {
+        dispatch?.(fieldRemoved(fieldName));
+      };
+    }, [dispatch, fieldName, initialFormValue, noSubmit]);
     const updateState = React.useCallback((nextState: Record<string, any>) => {
       setState((previous) => ({ ...previous, ...nextState }));
       if (Object.prototype.hasOwnProperty.call(nextState, "value")) {
         adapterRef.current.registerApi({ value: nextState.value });
+        if (fieldName) {
+          formRef.current?.setValue(fieldName, nextState.value);
+        }
       }
-    }, []);
+    }, [fieldName]);
     const publishValue = React.useCallback((value: number | number[]) => {
       updateState({ value });
       adapterRef.current.registerApi({ value });
+      if (fieldName) {
+        formRef.current?.setValue(fieldName, value);
+      }
       void adapterRef.current.event("didChange")(value);
-    }, [updateState]);
-    const currentValue = adapter.prop("value", state.value);
+    }, [fieldName, updateState]);
+    const currentValue = formValue ?? adapter.prop("value", state.value);
     const updateThumb = React.useCallback((index: number, rawValue: number) => {
       if (readOnly || !enabled) {
         return;
@@ -298,8 +343,41 @@ export const sliderRenderer = wrapRuntimeComponent({
         updateThumb(activeThumbRef.current, min + clampRuntimeSliderValue(ratio, 0, 1) * (max - min));
       };
       const driverSet = (event: Event) => {
-        const detail = (event as CustomEvent<{ location?: string; thumbNumber?: number }>).detail ?? {};
+        const detail = (event as CustomEvent<{
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }>).detail ?? {};
         const thumbNumber = Number(detail.thumbNumber ?? 0) || 0;
+        const safeIndex = Math.max(
+          0,
+          Math.min(thumbNumber, normalizeRuntimeSliderValues(currentValue, min, max).length - 1),
+        );
+        if (detail.key) {
+          const values = normalizeRuntimeSliderValues(currentValue, min, max);
+          const repeat = Math.max(1, Number(detail.repeat ?? 1) || 1);
+          for (let i = 0; i < repeat; i += 1) {
+            const current = values[safeIndex] ?? min;
+            const rawValue =
+              detail.key === "Home"
+                ? min
+                : detail.key === "End"
+                  ? max
+                  : current + (detail.key === "ArrowRight" ? step : -step);
+            values[safeIndex] = snapRuntimeSliderValue(rawValue, min, max, step);
+            const nextValues = enforceRuntimeSliderGap(
+              values,
+              safeIndex,
+              min,
+              max,
+              Math.max(0, minStepsBetweenThumbs) * step,
+            );
+            values.splice(0, values.length, ...nextValues);
+          }
+          publishValue(values.length === 1 ? values[0] : values);
+          return;
+        }
         const value = detail.location === "start"
           ? min
           : detail.location === "end"
@@ -319,7 +397,7 @@ export const sliderRenderer = wrapRuntimeComponent({
         window.removeEventListener("pointerup", pointerEnd, true);
         outer.removeEventListener("xmlui-slider-driver-set", driverSet);
       };
-    }, [inverted, max, min, updateThumb]);
+    }, [currentValue, inverted, max, min, minStepsBetweenThumbs, publishValue, step, updateThumb]);
 
     return (
       <Slider
@@ -336,9 +414,15 @@ export const sliderRenderer = wrapRuntimeComponent({
           void adapterRef.current.event("didChange")(value);
         }}
         onFocus={(event) => {
+          if (fieldName) {
+            dispatch?.(fieldFocused(fieldName));
+          }
           void adapter.event("gotFocus")(event);
         }}
         onBlur={(event) => {
+          if (fieldName) {
+            dispatch?.(fieldLostFocus(fieldName));
+          }
           void adapter.event("lostFocus")(event);
         }}
         registerComponentApi={(api) => adapter.registerApi(api as Record<string, unknown>)}

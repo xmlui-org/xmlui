@@ -804,7 +804,6 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
     }),
     [onOptionAdd, onOptionRemove],
   );
-
   // Use SimpleSelect for non-searchable, single-select mode
   const useSimpleSelect = !searchable && !multiSelect;
 

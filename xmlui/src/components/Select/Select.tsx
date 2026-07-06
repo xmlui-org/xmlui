@@ -24,10 +24,14 @@ import { MemoizedItem } from "../container-helpers";
 import { defaultProps } from "./Select.defaults";
 import { Select } from "./SelectReact";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { createRuntimeScope } from "../../runtime/state";
+import { createRuntimeScope, readContext } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { useFormContext } from "../Form/FormContext";
 import { RuntimeOptionClassContext } from "../Option/Option";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
+import type { FormItemValidations } from "../Form/FormContext";
 
 const COMP = "Select";
 
@@ -485,19 +489,28 @@ function RuntimeSelectShell({
   required,
   validationStatus,
   invalidMessages,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   verboseValidationFeedback,
   onDidChange,
   ...props
 }: RuntimeSelectProps) {
   const form = useFormContext();
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
   const adapterRef = React.useRef(adapter);
   const formRef = React.useRef(form);
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? (readContext(adapter.scope, "$itemIndex") as number)
+      : undefined;
   const fieldName = React.useMemo(() => {
-    if (!bindTo) {
+    if (bindTo === undefined && !parentFormItemId) {
       return undefined;
     }
-    return form?.fieldPrefix ? `${form.fieldPrefix}.${bindTo}` : bindTo;
-  }, [bindTo, form?.fieldPrefix]);
+    const resolved = resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex });
+    return form?.fieldPrefix ? `${form.fieldPrefix}.${resolved}` : resolved;
+  }, [bindTo, defaultId, form?.fieldPrefix, itemIndex, parentFormItemId]);
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
   const controlledValue = formValue !== undefined ? formValue : value;
@@ -785,9 +798,26 @@ export const selectRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: SelectMd as ComponentMetadata,
   defaultPart: COMPONENT_PART_KEY,
-  renderer: ({ adapter }) => (
-    <RuntimeOptionClassContext.Provider value={adapter.className}>
-      <RuntimeSelectShell adapter={adapter} {...runtimeSelectProps(adapter)} />
-    </RuntimeOptionClassContext.Provider>
-  ),
+  renderer: ({ adapter }) => {
+    const props = runtimeSelectProps(adapter);
+    const validations: FormItemValidations = {
+      required: adapter.booleanProp("required", defaultProps.required),
+      requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    };
+    const shell = (
+      <RuntimeOptionClassContext.Provider value={adapter.className}>
+        <RuntimeSelectShell adapter={adapter} {...props} />
+      </RuntimeOptionClassContext.Provider>
+    );
+    return validations.required ? (
+      <ValidationWrapper
+        bindTo={props.bindTo}
+        validations={validations}
+        validationMode={adapter.stringProp("validationMode") as any}
+        componentType={COMP}
+      >
+        {shell}
+      </ValidationWrapper>
+    ) : shell;
+  },
 });

@@ -456,6 +456,10 @@ function LabelBehavior({
       const input = event.currentTarget.querySelector<HTMLElement>('[role="radio"]');
       input?.focus({ preventScroll: true });
     }
+    if (context.componentName === "Slider") {
+      const input = event.currentTarget.querySelector<HTMLElement>('[role="slider"]');
+      input?.focus({ preventScroll: true });
+    }
   };
   return (
     <label

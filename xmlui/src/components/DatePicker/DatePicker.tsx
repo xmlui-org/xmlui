@@ -26,7 +26,14 @@ import { DatePicker, type DatePickerProps } from "./DatePickerReact";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import React from "react";
-import { useFormContext } from "../Form/FormContext";
+import { useFormContext, useFormContextPart } from "../Form/FormContext";
+import { fieldFocused, fieldInitialized, fieldLostFocus, fieldRemoved } from "../Form/formActions";
+import { getByPath } from "../Form/FormReact";
+import { readContext } from "../../runtime/state";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
+import type { FormItemValidations } from "../Form/FormContext";
 
 const COMP = "DatePicker";
 
@@ -369,9 +376,25 @@ export const datePickerRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: DatePickerMd as ComponentMetadata,
   defaultPart: "input",
-  renderer: ({ adapter }) => (
-    <RuntimeDatePicker adapter={adapter} {...runtimeDatePickerProps(adapter)} />
-  ),
+  renderer: ({ adapter }) => {
+    const props = runtimeDatePickerProps(adapter);
+    const validations: FormItemValidations = {
+      required: adapter.booleanProp("required", defaultProps.required),
+      requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    };
+    const shell = <RuntimeDatePicker adapter={adapter} {...props} />;
+    return validations.required ? (
+      <ValidationWrapper
+        bindTo={adapter.stringProp("bindTo")}
+        validations={validations}
+        validationMode={adapter.stringProp("validationMode") as any}
+        componentType={COMP}
+        inline={props.inline}
+      >
+        {shell}
+      </ValidationWrapper>
+    ) : shell;
+  },
 });
 
 function RuntimeDatePicker({
@@ -380,18 +403,39 @@ function RuntimeDatePicker({
   onFocus,
   onBlur,
   className,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   ...props
-}: DatePickerProps & { adapter: XmluiComponentAdapter }) {
+}: DatePickerProps & { adapter: XmluiComponentAdapter; validationResult?: unknown; validationInProgress?: unknown }) {
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const themeClass = useComponentThemeClass(DatePickerMd);
   const rootAttrs = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;
   const form = useFormContext();
+  const dispatch = useFormContextPart((value) => value?.dispatch);
   const registerFormItem = form?.registerItem;
   const bindTo = adapter.stringProp("bindTo");
   const required = adapter.booleanProp("required", defaultProps.required);
-  const formValue = bindTo ? form?.getValue(bindTo) : undefined;
-  const formError = bindTo ? form?.errors[bindTo] : undefined;
-  const fieldIssue = bindTo ? form?.issues.find((issue) => issue.field === bindTo) : undefined;
+  const noSubmit = adapter.booleanProp("noSubmit", false);
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? (readContext(adapter.scope, "$itemIndex") as number)
+      : undefined;
+  const fieldName = React.useMemo(
+    () =>
+      bindTo !== undefined || parentFormItemId
+        ? resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex })
+        : undefined,
+    [bindTo, defaultId, itemIndex, parentFormItemId],
+  );
+  const initialSubjectValue = useFormContextPart((value) =>
+    fieldName ? getByPath(value?.originalSubject, fieldName) : undefined,
+  );
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const initialFormValue = initialSubjectValue ?? props.initialValue;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const fieldIssue = fieldName ? form?.issues.find((issue) => issue.field === fieldName) : undefined;
   const validationMessage = formError ?? fieldIssue?.message;
   const effectiveValidationStatus = fieldIssue?.severity ??
     (formError
@@ -407,15 +451,25 @@ function RuntimeDatePicker({
   );
 
   React.useEffect(() => {
-    if (!registerFormItem || !bindTo) {
+    if (!fieldName) {
+      return;
+    }
+    dispatch?.(fieldInitialized(fieldName, initialFormValue, false, noSubmit));
+    return () => {
+      dispatch?.(fieldRemoved(fieldName));
+    };
+  }, [dispatch, fieldName, initialFormValue, noSubmit]);
+
+  React.useEffect(() => {
+    if (!registerFormItem || !fieldName) {
       return;
     }
     return registerFormItem({
-      name: bindTo,
+      name: fieldName,
       label: typeof props.label === "string" ? props.label : undefined,
       required,
     });
-  }, [bindTo, props.label, registerFormItem, required]);
+  }, [fieldName, props.label, registerFormItem, required]);
 
   React.useEffect(() => {
     const root = rootRef.current;
@@ -446,9 +500,9 @@ function RuntimeDatePicker({
         contentClassName={themeClass}
         updateState={(state, options) => {
           const value = state.value;
-          if (bindTo && !options?.initial) {
-            form?.setValue(bindTo, value);
-            void form?.validateField(bindTo, value);
+          if (fieldName && !options?.initial) {
+            form?.setValue(fieldName, value);
+            void form?.validateField(fieldName, value);
           }
         }}
         registerComponentApi={(api) => {
@@ -462,21 +516,25 @@ function RuntimeDatePicker({
         }}
         onDidChange={(value) => {
           onDidChange?.(value);
-          if (bindTo) {
-            form?.setValue(bindTo, value);
-            void form?.validateField(bindTo, value);
+          if (fieldName) {
+            form?.setValue(fieldName, value);
+            void form?.validateField(fieldName, value);
           }
           void adapter.event("didChange")(value);
         }}
         onFocus={() => {
           onFocus?.();
+          if (fieldName) {
+            dispatch?.(fieldFocused(fieldName));
+          }
           void adapter.event("gotFocus")();
         }}
         onBlur={() => {
           onBlur?.();
           void adapter.event("lostFocus")();
-          if (bindTo) {
-            void form?.validateField(bindTo);
+          if (fieldName) {
+            dispatch?.(fieldLostFocus(fieldName));
+            void form?.validateField(fieldName);
           }
         }}
       />

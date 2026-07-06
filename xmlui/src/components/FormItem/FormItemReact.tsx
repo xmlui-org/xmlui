@@ -278,9 +278,11 @@ export const FormItem = memo(forwardRef(function FormItem({
 
   switch (type) {
     case "select": {
+      const { options: selectOptions, ...selectRest } = rest as any;
       formControl = (
         <Select
-          {...rest}
+          {...selectRest}
+          data={Array.isArray(selectOptions) && selectOptions.length > 0 ? selectOptions : selectRest.data}
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}

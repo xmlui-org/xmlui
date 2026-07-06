@@ -762,7 +762,10 @@ export class SelectDriver extends ComponentDriver {
       await nativeSelect.selectOption(value);
       return;
     }
-    if (!(await this.component.getByRole("option").count())) {
+    const visibleOptions = this.component
+      .locator('[role="option"]:visible')
+      .or(this.params.page.locator('[role="option"]:visible'));
+    if (!(await visibleOptions.count())) {
       await this.toggleOptionsVisibility();
     }
     const valueOption = this.component
@@ -1009,7 +1012,7 @@ export class SliderDriver extends ComponentDriver {
     const activeThumb = await this.getActiveThumb(thumbNumber);
     await activeThumb.focus();
     for (let i = 0; i < repeat; i += 1) {
-      await this.params.page.keyboard.press(key);
+      await activeThumb.press(key);
     }
   }
 }

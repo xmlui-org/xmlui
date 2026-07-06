@@ -28,6 +28,11 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 import { useFormContext } from "../Form/FormContext";
+import { readContext } from "../../runtime/state";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
+import type { FormItemValidations } from "../Form/FormContext";
 
 const COMP = "NumberBox";
 
@@ -214,14 +219,28 @@ function RuntimeNumberBoxShell({
   invalidMessages,
   required,
   validationStatus,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   verboseValidationFeedback,
   onDidChange,
   ...props
 }: RuntimeNumberBoxProps) {
   const form = useFormContext();
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
   const formRef = React.useRef(form);
   const adapterRef = React.useRef(adapter);
-  const fieldName = bindTo;
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? (readContext(adapter.scope, "$itemIndex") as number)
+      : undefined;
+  const fieldName = React.useMemo(
+    () =>
+      bindTo !== undefined || parentFormItemId
+        ? resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex })
+        : undefined,
+    [bindTo, defaultId, itemIndex, parentFormItemId],
+  );
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
   const controlledValue = numberBoxValue(formValue) ?? numberBoxValue(value);
@@ -484,7 +503,22 @@ export const numberBoxRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: NumberBoxMd as ComponentMetadata,
   defaultPart: "input",
-  renderer: ({ adapter }) => (
-    <RuntimeNumberBoxShell adapter={adapter} {...runtimeNumberBoxProps(adapter)} />
-  ),
+  renderer: ({ adapter }) => {
+    const props = runtimeNumberBoxProps(adapter);
+    const validations: FormItemValidations = {
+      required: adapter.booleanProp("required", false),
+      requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    };
+    const shell = <RuntimeNumberBoxShell adapter={adapter} {...props} />;
+    return validations.required ? (
+      <ValidationWrapper
+        bindTo={props.bindTo}
+        validations={validations}
+        validationMode={adapter.stringProp("validationMode") as any}
+        componentType={COMP}
+      >
+        {shell}
+      </ValidationWrapper>
+    ) : shell;
+  },
 });

@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import React, { memo, useCallback, useEffect, useRef } from "react";
+import React, { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
 import { forwardRef } from "react";
 import { Root, Range, Track, Thumb } from "@radix-ui/react-slider";
@@ -257,38 +257,155 @@ export const Slider = memo(forwardRef(
       thumbsRef.current = thumbsRef.current.slice(0, displayValue.length);
     }, [displayValue.length]);
 
-    // Radix UI uses String(step) to count decimal places for rounding.
-    // When step < 1e-7 JavaScript converts it to scientific notation (e.g. "1e-9"),
-    // causing Radix UI to count 0 decimal places and round incremented values back
-    // to the current value — so onValueChange never fires. We intercept keyboard
-    // events in the capture phase for these small steps and compute the value ourselves.
     const handleKeyDownCapture = useCallback(
       (e: React.KeyboardEvent) => {
-        const stepStr = String(step);
-        if (!stepStr.includes("e") && !stepStr.includes("E")) return;
         if (readOnly || !enabled) return;
 
-        let delta = 0;
-        if (e.key === "ArrowRight" || e.key === "ArrowUp") delta = step;
-        else if (e.key === "ArrowLeft" || e.key === "ArrowDown") delta = -step;
-        else return;
+        if (
+          e.key !== "ArrowRight" &&
+          e.key !== "ArrowUp" &&
+          e.key !== "ArrowLeft" &&
+          e.key !== "ArrowDown" &&
+          e.key !== "Home" &&
+          e.key !== "End"
+        ) {
+          return;
+        }
 
-        const focusedThumbIndex = thumbsRef.current.findIndex(
-          (thumb) => thumb === document.activeElement,
-        );
+        const eventThumb = (e.target as HTMLElement | null)?.closest?.("[data-thumb-index]") as HTMLElement | null;
+        const focusedThumbIndex =
+          eventThumb?.dataset.thumbIndex !== undefined
+            ? Number(eventThumb.dataset.thumbIndex)
+            : thumbsRef.current.findIndex((thumb) => thumb === document.activeElement);
         if (focusedThumbIndex === -1) return;
 
         e.preventDefault();
         e.stopPropagation();
 
         const currentThumbValue = displayValue[focusedThumbIndex];
-        const newThumbValue = Math.max(min, Math.min(max, currentThumbValue + delta));
+        const nextThumbValue =
+          e.key === "Home"
+            ? min
+            : e.key === "End"
+              ? max
+              : currentThumbValue + (e.key === "ArrowRight" || e.key === "ArrowUp" ? step : -step);
         const newValues = [...displayValue];
-        newValues[focusedThumbIndex] = newThumbValue;
+        newValues[focusedThumbIndex] = Math.max(min, Math.min(max, nextThumbValue));
+        const minimumGap = Math.max(0, minStepsBetweenThumbs) * step;
+        if (focusedThumbIndex > 0) {
+          newValues[focusedThumbIndex] = Math.max(
+            newValues[focusedThumbIndex],
+            newValues[focusedThumbIndex - 1] + minimumGap,
+          );
+        }
+        if (focusedThumbIndex < newValues.length - 1) {
+          newValues[focusedThumbIndex] = Math.min(
+            newValues[focusedThumbIndex],
+            newValues[focusedThumbIndex + 1] - minimumGap,
+          );
+        }
+        newValues[focusedThumbIndex] = Math.max(min, Math.min(max, newValues[focusedThumbIndex]));
         onInputChange(newValues);
       },
-      [step, readOnly, enabled, displayValue, min, max, onInputChange],
+      [step, readOnly, enabled, displayValue, min, max, minStepsBetweenThumbs, onInputChange],
     );
+
+    useLayoutEffect(() => {
+      const outer = outerDivRef.current;
+      if (!outer) {
+        return;
+      }
+      const applyThumbValue = (thumbNumber: number, rawValue: number, values = [...displayValue]) => {
+        const safeIndex = Math.max(0, Math.min(thumbNumber, values.length - 1));
+        values[safeIndex] = Math.max(min, Math.min(max, rawValue));
+        const minimumGap = Math.max(0, minStepsBetweenThumbs) * step;
+        if (safeIndex > 0) {
+          values[safeIndex] = Math.max(values[safeIndex], values[safeIndex - 1] + minimumGap);
+        }
+        if (safeIndex < values.length - 1) {
+          values[safeIndex] = Math.min(values[safeIndex], values[safeIndex + 1] - minimumGap);
+        }
+        values[safeIndex] = Math.max(min, Math.min(max, values[safeIndex]));
+        return values;
+      };
+      const driverSet = (event: Event) => {
+        if (readOnly || !enabled) {
+          return;
+        }
+        const detail = (event as CustomEvent<{
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }>).detail ?? {};
+        const thumbNumber = Number(detail.thumbNumber ?? 0) || 0;
+        let values = [...displayValue];
+        if (detail.key) {
+          const repeat = Math.max(1, Number(detail.repeat ?? 1) || 1);
+          for (let i = 0; i < repeat; i += 1) {
+            const safeIndex = Math.max(0, Math.min(thumbNumber, values.length - 1));
+            const current = values[safeIndex] ?? min;
+            const nextValue =
+              detail.key === "Home"
+                ? min
+                : detail.key === "End"
+                  ? max
+                  : current + (detail.key === "ArrowRight" ? step : -step);
+            values = applyThumbValue(thumbNumber, nextValue, values);
+          }
+        } else {
+          const nextValue =
+            detail.location === "start"
+              ? min
+              : detail.location === "end"
+                ? max
+                : min + (max - min) / 2;
+          values = applyThumbValue(thumbNumber, nextValue, values);
+        }
+        event.stopImmediatePropagation();
+        onInputChange(values);
+      };
+      const keyDown = (event: KeyboardEvent) => {
+        if (readOnly || !enabled) {
+          return;
+        }
+        if (
+          event.key !== "ArrowRight" &&
+          event.key !== "ArrowUp" &&
+          event.key !== "ArrowLeft" &&
+          event.key !== "ArrowDown" &&
+          event.key !== "Home" &&
+          event.key !== "End"
+        ) {
+          return;
+        }
+        const eventThumb = (event.target as HTMLElement | null)?.closest?.("[data-thumb-index]") as HTMLElement | null;
+        if (!eventThumb || !outer.contains(eventThumb)) {
+          return;
+        }
+        const thumbIndex = Number(eventThumb.dataset.thumbIndex);
+        if (!Number.isFinite(thumbIndex)) {
+          return;
+        }
+        const current = displayValue[thumbIndex] ?? min;
+        const nextValue =
+          event.key === "Home"
+            ? min
+            : event.key === "End"
+              ? max
+              : current + (event.key === "ArrowRight" || event.key === "ArrowUp" ? step : -step);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        onInputChange(applyThumbValue(thumbIndex, nextValue));
+      };
+      outer.addEventListener("xmlui-slider-driver-set", driverSet);
+      outer.addEventListener("keydown", keyDown, true);
+      return () => {
+        outer.removeEventListener("xmlui-slider-driver-set", driverSet);
+        outer.removeEventListener("keydown", keyDown, true);
+      };
+    }, [displayValue, enabled, max, min, minStepsBetweenThumbs, onInputChange, readOnly, step]);
 
       return (
           <div {...rest} ref={composedRef} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container onKeyDownCapture={handleKeyDownCapture}>
@@ -352,6 +469,7 @@ export const Slider = memo(forwardRef(
                   style={thumbStyle ? { ...thumbStyle } : undefined}
                   data-thumb-index={index}
                   autoFocus={autoFocus && index === 0}
+                  onKeyDownCapture={handleKeyDownCapture}
                 />
               </Tooltip>
             ))}
