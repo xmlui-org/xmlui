@@ -19,6 +19,39 @@ export function getMaxLinesStyle(maxLines: number | undefined) {
   return maxLinesStyles;
 }
 
+export function normalizeCssValueForCalc(cssValue: string | number) {
+  if (typeof cssValue === "number") {
+    return `${cssValue}px`;
+  }
+
+  const trimmed = cssValue.trim();
+  if (trimmed.startsWith("var(")) {
+    return trimmed;
+  }
+
+  const value = parseFloat(trimmed);
+  const valueString = value.toString();
+  const unit = trimmed.replace(valueString, "");
+
+  if (Number.isNaN(value)) {
+    return "0px";
+  }
+  if (unit === "") {
+    return `${valueString}px`;
+  }
+  return trimmed;
+}
+
+export function getSizeString(size: unknown): string {
+  if (typeof size === "number") {
+    return `${size}px`;
+  }
+  if (typeof size === "string" && /^\d+$/.test(size.trim())) {
+    return `${parseInt(size, 10)}px`;
+  }
+  return size?.toString() ?? "";
+}
+
 export function extractPaddings(extractValue: any, props: Record<string, unknown>) {
   const paddingHorizontal = extractValue.asSize?.(props.paddingHorizontal);
   const paddingVertical = extractValue.asSize?.(props.paddingVertical);

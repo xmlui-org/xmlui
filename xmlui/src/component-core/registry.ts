@@ -82,7 +82,7 @@ import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
-import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
+import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
 import { formValidatorRenderer } from "../components/Form/FormValidator";

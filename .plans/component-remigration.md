@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 59 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 58 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 53 |
+| Complete | User approved after audit and verification. | 54 |
 
 These counts are derived from the detailed component table below. Update them
 whenever a component changes state.
@@ -366,7 +366,7 @@ it.
 | Fallback | `FallbackReact.tsx` | APICall/DataSource loading contract | Audit required | loading/error fallback tests |
 | FileInput | `FileInputReact.tsx`, module SCSS; added `FileInput.compat.spec.ts` and `FileInput.compat.module.scss` | input, form | Complete | User approved after protected-file audit, metadata verification, focused smoke/CSV parsing checks, and Browse button polish. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs FileInput` passed (`FileInput.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry; obsolete sidecar renderer removed; registries import the provider-style entry. Vite aliases preserve copied imports for `attr-accept` and `papaparse` default-export compatibility. The Browse button intentionally improves on an original visual issue by hiding an empty default icon slot in the runtime adapter path, centering the label without modifying copied source. Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_E2E_DEV_PORT=5287 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/FileInput/FileInput.compat.spec.ts --workers=1` passed 1/1. |
 | FileUploadDropZone | `FileUploadDropZoneReact.tsx`, module SCSS | drag/drop, FileInput | Audit required | drag states and file events |
-| FlowLayout | `FlowLayoutReact.tsx`, module SCSS | layout props | Audit required | responsive placement tests |
+| FlowLayout | `FlowLayout.tsx`, `FlowLayoutReact.tsx`, `FlowLayout.module.scss`, `FlowLayout.defaults.ts`, `FlowLayout.md`, `FlowLayout.spec.ts`, `flow-layout-utils.ts`; added `FlowLayout.foundation.spec.ts` | layout props, ScrollViewer, dynamic style registry, non-visual/opaque child host contract | Complete | User approved after protected-file audit, metadata verification, copied E2E coverage, and the added `$space-8` column-gap regression. Protected files recopied from `/Users/dotneteer/source/xmlui/xmlui/src/components/FlowLayout`; manual drift audit reports copied defaults/docs/SCSS/spec/React/helper identical and `FlowLayout.tsx` entry-adapted with runtime adapter appended below the copied source. Obsolete `FlowLayout.renderer.tsx` removed and registries import the provider-style entry renderer. Host shims added outside protected source for original `EngineError`, `parse-layout-props`, CSS size helpers, `useStyles`/`StyleObjectType`, and legacy `wrapComponent` child wrapper typing. Runtime adapter preserves FlowLayout child width/min/max extraction, responsive width props, SpaceFiller breaks, API registration, theme class application, and non-visual/opaque children without wrapper divs; theme-token sizes are passed as CSS variable references so `columnGap="$space-8"` produces visible gaps. Verification passed: `npm --prefix xmlui run check:metadata`; `XMLUI_REUSE_DEV_SERVER=0 XMLUI_E2E_DEV_PORT=5188 npx playwright test src/components/FlowLayout/FlowLayout.foundation.spec.ts` passed 2/2; `XMLUI_REUSE_DEV_SERVER=0 XMLUI_E2E_DEV_PORT=5188 npx playwright test src/components/FlowLayout/FlowLayout.spec.ts` passed 79/79. A filtered `npm --prefix xmlui run build` diagnostic grep found no FlowLayout-related errors; full build still fails on unrelated branch-wide TypeScript errors. |
 | FocusScope | `FocusScopeReact.tsx`, module SCSS | focus manager | Audit required | tab trapping and restore |
 | Footer | `FooterReact.tsx`, module SCSS | App shell | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Footer` passed (`Footer.tsx` entry-adapted; copied React/SCSS/docs/defaults/spec identical). Runtime adapter appended below copied entry. `npm --prefix xmlui run check:metadata` passed. |
 | Form | `FormReact.tsx`, module SCSS; added `Form.defaults.ts`, `FormValidator.tsx`, `formActions.ts`, focused regressions in `Form.spec.ts` | FormItem, validation, data submit | Complete | User approved Form as complete. Migration restored original Form behavior for data binding, update APIs, custom button row templates, submit/cancel labels, required validation on submit, and no-submit fields. Verification during the Form/FormItem pass included `npm --prefix xmlui run check:metadata`, focused Form E2E coverage for required validation on submit, and live local-dev-server probes for custom button rows, form updates via `$data.update`/`myForm.update`, and account-create validation behavior. |
@@ -509,6 +509,29 @@ completed only after APICall/DataSource behavior is available.
   `AutoCompleteContext.tsx` was added to the protected-copy manifest, and
   rewrite runtime adapter code was appended below the copied `AutoComplete.tsx`
   entry.
+- FlowLayout is `Complete`. The user approved it after protected-file audit,
+  metadata verification, copied E2E coverage, and the added `$space-8`
+  column-gap regression. Protected files were recopied from the original
+  FlowLayout folder. Manual drift audit reports `FlowLayout.defaults.ts`,
+  `FlowLayout.md`, `FlowLayout.module.scss`, `FlowLayout.spec.ts`,
+  `FlowLayoutReact.tsx`, and `flow-layout-utils.ts` identical; `FlowLayout.tsx`
+  is entry-adapted with the rewrite runtime renderer appended below the copied
+  original source, and the obsolete `FlowLayout.renderer.tsx` sidecar was
+  removed. Host compatibility shims added outside protected FlowLayout source
+  cover original `EngineError`, layout-property parsing, CSS size helpers,
+  original-style dynamic `useStyles`, richer legacy `wrapComponent` child
+  wrapper typing, and non-visual/opaque child handling in the runtime adapter.
+  Follow-up fix keeps authored theme tokens such as `columnGap="$space-8"` as
+  CSS variable references so the copied FlowLayout gap normalizer preserves
+  them instead of collapsing them to `0px`. Verification passed:
+  `npm --prefix xmlui run check:metadata`;
+  `XMLUI_REUSE_DEV_SERVER=0 XMLUI_E2E_DEV_PORT=5188 npx playwright test src/components/FlowLayout/FlowLayout.foundation.spec.ts`
+  (2/2, including the `$space-8` column-gap regression);
+  and
+  `XMLUI_REUSE_DEV_SERVER=0 XMLUI_E2E_DEV_PORT=5188 npx playwright test src/components/FlowLayout/FlowLayout.spec.ts`
+  (79/79). A filtered build check found no FlowLayout-related diagnostics; full
+  `npm --prefix xmlui run build` still stops on unrelated branch-wide
+  TypeScript errors.
 - ProgressBar is `Complete`. The user approved it after protected-file audit,
   metadata check, copied E2E tests, and the added compatibility spec passed.
 - ProgressBar copied React, SCSS, defaults, docs, and E2E files are

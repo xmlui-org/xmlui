@@ -33,7 +33,7 @@ import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableI
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
 import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
-import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
+import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
 import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";

@@ -11,7 +11,7 @@ type ExtractValueCompat = ((value: unknown) => any) & {
   asOptionalBoolean(value: unknown, fallback?: boolean): boolean;
   asOptionalNumber(value: unknown, fallback?: number): number | undefined;
   asOptionalString(value: unknown, fallback?: string): string | undefined;
-  asSize(value: unknown, fallback?: string): string | undefined;
+  asSize(value: unknown, fallback?: string): any;
 };
 
 type WrapComponentOptions = {
@@ -42,7 +42,17 @@ type WrapComponentOptions = {
       lookupAction: (expression: string, options?: Record<string, unknown>) => ((...args: unknown[]) => unknown) | undefined;
       lookupSyncCallback: (expression: unknown) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
-      renderChild: (child: unknown, wrapper?: unknown) => ReactNode;
+      renderChild: (
+        child: unknown,
+        wrapper?: {
+          wrapChild?: (
+            context: { node: any; extractValue: ExtractValueCompat },
+            renderedChild: ReactNode,
+            hints?: { opaque?: boolean; nonVisual?: boolean },
+          ) => ReactNode;
+          [key: string]: unknown;
+        },
+      ) => ReactNode;
       layoutContext?: any;
     },
   ) => ReactNode;

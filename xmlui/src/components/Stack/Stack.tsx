@@ -240,7 +240,6 @@ function createStackRenderer(
               ) : (
                 <FlowItemWrapper
                   key={index}
-                  itemWidth={resolvedItemWidth}
                   width={child.kind === "element" ? resolveCssSize(child.props.width) : undefined}
                   minWidth={child.kind === "element" ? resolveCssSize(child.props.minWidth) : undefined}
                   maxWidth={child.kind === "element" ? resolveCssSize(child.props.maxWidth) : undefined}

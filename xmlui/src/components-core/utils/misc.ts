@@ -27,6 +27,10 @@ export function partitionObject<T extends Record<string, any>>(
   );
 }
 
+export function isComponentDefChildren(children?: unknown): boolean {
+  return typeof children !== "string";
+}
+
 export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
   func: F,
   wait?: number,
