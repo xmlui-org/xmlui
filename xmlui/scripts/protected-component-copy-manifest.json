@@ -2,6 +2,10 @@
   "AutoComplete": [
     "AutoCompleteContext.tsx"
   ],
+  "ModalDialog": [
+    "ConfirmationModalContextProvider.tsx",
+    "Dialog.tsx"
+  ],
   "Option": [
     "OptionTypeProvider.tsx"
   ],

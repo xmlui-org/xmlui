@@ -1,8 +1,9 @@
 import React, { useEffect, useId, useMemo, useRef } from "react";
+import { isEqual } from "lodash-es";
 
 import { initializeStateValuesIntoStore, createRuntimeOwnerId, createRuntimeScope, type RuntimeScope } from "../state";
 import type { XmluiComponentModule } from "../types";
-import { evaluateExpressionOrText, evaluateProps, runEvent } from "./bindings";
+import { evaluateExpressionOrText, evaluateProps, normalizeDependencies, runEvent } from "./bindings";
 import type { RenderContext } from "./types";
 import { useBindingRevision } from "./reactive";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
@@ -85,11 +86,18 @@ export function ScopedElement({
   useEffect(() => {
     for (const [name, value] of Object.entries(node.vars)) {
       const parsedValue = node.parsed?.vars?.[name];
-      if ((parsedValue?.dependencies?.length ?? 0) === 0) {
+      const hasReactiveDependencies = normalizeDependencies(parsedValue?.dependencies, scope).some(
+        (dependency) =>
+          dependency.kind === "local" ||
+          dependency.kind === "global" ||
+          dependency.kind === "props" ||
+          dependency.kind === "route",
+      );
+      if (!hasReactiveDependencies) {
         continue;
       }
       const nextValue = evaluateExpressionOrText(value, parsedValue, scope);
-      if (parentScope.store.readLocal(ownerId, name) !== nextValue) {
+      if (!isEqual(parentScope.store.readLocal(ownerId, name), nextValue)) {
         parentScope.store.writeLocal(ownerId, name, nextValue);
       }
     }

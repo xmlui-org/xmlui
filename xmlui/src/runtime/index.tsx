@@ -84,6 +84,7 @@ export type XmluiRuntimeTestProbe = {
   hasLocal(name: string): boolean;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
+  readReference(name: string): unknown;
 };
 
 export function mountXmluiApp(
@@ -193,6 +194,7 @@ export function XmluiRoot({
       hasLocal: (name) => store.hasLocal(rootOwnerId, name),
       readLocal: (name) => store.readLocal(rootOwnerId, name),
       readGlobal: (name) => store.readGlobal(name),
+      readReference: (name) => referencesRef.current[name],
     });
   }, [store, testProbe]);
 

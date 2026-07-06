@@ -13,7 +13,7 @@ import {
 import type { JSX } from "react/jsx-runtime";
 import { Helmet } from "react-helmet-async";
 import { useLocation, useNavigationType } from "react-router-dom";
-import { noop, debounce } from "lodash-es";
+import { noop } from "lodash-es";
 import classnames from "classnames";
 
 import styles from "./App.module.scss";
@@ -387,6 +387,7 @@ export const App = memo(function App({
 
   const location = useLocation();
   const navigationType = useNavigationType();
+  const [browserScrollRouteKey, setBrowserScrollRouteKey] = useState(readBrowserScrollRouteKey);
   const [scrollRestorationEnabled, setScrollRestorationEnabled] = useState(false);
   const { drawerVisible, toggleDrawer, handleOpenChange, showDrawer, hideDrawer } = useDrawerState(
     location,
@@ -402,14 +403,29 @@ export const App = memo(function App({
     setNavPanelCollapsedState((prev) => !prev);
   }, []);
 
+  useEffect(() => {
+    const updateRouteKey = () => {
+      setBrowserScrollRouteKey(readBrowserScrollRouteKey());
+    };
+    window.addEventListener("hashchange", updateRouteKey);
+    window.addEventListener("popstate", updateRouteKey);
+    return () => {
+      window.removeEventListener("hashchange", updateRouteKey);
+      window.removeEventListener("popstate", updateRouteKey);
+    };
+  }, []);
+
   useIsomorphicLayoutEffect(() => {
     if (window.history.scrollRestoration !== "manual") {
       window.history.scrollRestoration = "manual";
     }
 
-    if (scrollRestorationEnabled && navigationType === "POP") {
-      const key = `xmlui_scroll_${location.key}`;
-      const saved = sessionStorage.getItem(key);
+    const isHashRoute = browserScrollRouteKey !== location.pathname + location.search;
+    if (scrollRestorationEnabled && (navigationType === "POP" || isHashRoute)) {
+      const saved = isHashRoute
+        ? sessionStorage.getItem(scrollStorageKey(browserScrollRouteKey))
+        : sessionStorage.getItem(scrollStorageKey(location.key)) ??
+          sessionStorage.getItem(scrollStorageKey(browserScrollRouteKey));
 
       if (saved) {
         try {
@@ -428,14 +444,14 @@ export const App = memo(function App({
         }
       }
     }
-    if (navigationType !== "POP") {
+    if (navigationType !== "POP" || isHashRoute) {
       scrollContainerRef.current?.scrollTo({
         top: 0,
         left: 0,
         behavior: "instant", // Optional if you want to skip the scrolling animation
       });
     }
-  }, [location.key, scrollRestorationEnabled, navigationType]);
+  }, [browserScrollRouteKey, location.key, location.pathname, location.search, navigationType, scrollRestorationEnabled]);
 
   useEffect(() => {
     const hash = location.hash ? location.hash.slice(1) : "";
@@ -457,18 +473,20 @@ export const App = memo(function App({
     const el = scrollContainerRef.current;
     if (!el) return;
 
-    const saveScroll = debounce(() => {
-      const key = `xmlui_scroll_${location.key}`;
+    const saveScrollPosition = () => {
       const pos = { x: el.scrollLeft, y: el.scrollTop };
-      sessionStorage.setItem(key, JSON.stringify(pos));
-    }, 100);
-
-    el.addEventListener("scroll", saveScroll);
-    return () => {
-      el.removeEventListener("scroll", saveScroll);
-      saveScroll.cancel?.();
+      const serialized = JSON.stringify(pos);
+      sessionStorage.setItem(scrollStorageKey(browserScrollRouteKey), serialized);
+      if (browserScrollRouteKey === location.pathname + location.search) {
+        sessionStorage.setItem(scrollStorageKey(location.key), serialized);
+      }
     };
-  }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
+
+    el.addEventListener("scroll", saveScrollPosition);
+    return () => {
+      el.removeEventListener("scroll", saveScrollPosition);
+    };
+  }, [browserScrollRouteKey, scrollRestorationEnabled, location.key, scrollContainerRef]);
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -725,6 +743,21 @@ function safeDecodeHash(hash: string): string {
   } catch {
     return hash;
   }
+}
+
+function scrollStorageKey(key: string) {
+  return `xmlui_scroll_${key}`;
+}
+
+function readBrowserScrollRouteKey() {
+  if (typeof window === "undefined") {
+    return "/";
+  }
+  const hash = window.location.hash;
+  if (hash.startsWith("#/")) {
+    return hash.slice(1).split("#")[0] || "/";
+  }
+  return `${window.location.pathname}${window.location.search}`;
 }
 
 function scrollElementIntoContainer(target: HTMLElement, container: HTMLElement | null) {

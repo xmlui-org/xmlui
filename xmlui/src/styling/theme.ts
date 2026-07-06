@@ -1111,7 +1111,7 @@ function themeVariableLookupNames(sourceNames: Iterable<string>): string[] {
 }
 
 function stripLegacyThemeClassPrefix(name: string): string {
-  return name.replace("Input:", "").replace("Heading:", "");
+  return name.replace("Input:", "").replace("Heading:", "").replace("Dialog:", "");
 }
 
 function addBorderShorthandLonghands(

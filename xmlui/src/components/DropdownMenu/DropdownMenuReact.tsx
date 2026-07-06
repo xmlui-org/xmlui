@@ -144,6 +144,18 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
             }
             setOpen(isOpen);
           } else {
+            const suppressionWindow = window as Window & {
+              __xmluiSuppressNextDropdownClose?: boolean;
+              __xmluiSuppressDropdownCloseUntil?: number;
+            };
+            if (
+              suppressionWindow.__xmluiSuppressNextDropdownClose ||
+              (suppressionWindow.__xmluiSuppressDropdownCloseUntil ?? 0) > Date.now()
+            ) {
+              suppressionWindow.__xmluiSuppressNextDropdownClose = false;
+              suppressionWindow.__xmluiSuppressDropdownCloseUntil = 0;
+              return;
+            }
             // When closing, add a small delay to allow child components (like Select)
             // to handle their click-outside events first before the DropdownMenu closes
             closeTimeoutRef.current = setTimeout(() => {

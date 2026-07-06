@@ -131,12 +131,18 @@ import type { XmluiElement } from "../../compiler/ir";
 import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../../runtime/routing";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 import { createRuntimeScope } from "../../runtime/state";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 export const pagesRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: PagesMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const fallbackPath = adapter.stringProp("fallbackPath", defaultProps.fallbackPath);
+    const defaultScrollRestoration = adapter.booleanProp(
+      "defaultScrollRestoration",
+      defaultProps.defaultScrollRestoration,
+    );
+    const context = useAppLayoutContext();
     const snapshot = useRuntimeRouteSnapshot(adapter.scope);
     const pages = adapter.node.children.filter(
       (child): child is XmluiElement => child.kind === "element" && child.type === "Page",
@@ -160,6 +166,10 @@ export const pagesRuntimeRenderer = wrapRuntimeComponent({
         params: matchRoutePattern(descriptor.pattern, snapshot.pathname),
       }))
       .find((descriptor) => descriptor.params !== undefined);
+
+    useEffect(() => {
+      context?.setScrollRestorationEnabled?.(defaultScrollRestoration);
+    }, [context, defaultScrollRestoration]);
 
     useEffect(() => {
       if (!matched && fallbackPath && snapshot.pathname !== fallbackPath) {

@@ -1486,7 +1486,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(clearButton).not.toBeVisible();
   });
 
-  test("parts are present when tooltip is added", async ({ page, initTestBed }) => {
+  test("parts are present when tooltip is added", async ({ page, initTestBed, createSelectDriver }) => {
     await initTestBed(
       `<Select testId="test" tooltip="Tooltip text" clearable="true" initialValue="1"><Option value="1" label="Test" /></Select>`,
     );
@@ -1496,7 +1496,8 @@ test.describe("Behaviors and Parts", () => {
 
     await expect(clearButton).toBeVisible();
 
-    await component.click(); // Open dropdown
+    const driver = await createSelectDriver("test");
+    await driver.toggleOptionsVisibility(); // Open dropdown
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
 

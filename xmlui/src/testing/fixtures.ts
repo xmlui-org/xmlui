@@ -151,6 +151,7 @@ declare global {
       hasLocal(name: string): boolean;
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
+      readReference(name: string): unknown;
     };
     __xmluiTestBedReady?: boolean;
     __xmluiTestBedReinit?: (source: string) => Promise<void>;
@@ -1005,7 +1006,7 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
     ].filter(Boolean);
     return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), testBedThemeVars);
   }
-  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
+  const bodyMarkup = injectDefaultRootTestId(startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed);
   const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
@@ -1062,6 +1063,18 @@ function injectAppAttributes(markup: string, attributes: string[]): string {
     ? `<App${existing} ${filtered} />`
     : `<App${existing} ${filtered}>`;
   return `${rebuilt}${markup.slice(end + 1)}`;
+}
+
+function injectDefaultRootTestId(markup: string): string {
+  const openTagMatch = markup.match(/^\s*<([A-Z][\w.]*)\b([^>]*)>/);
+  if (!openTagMatch || /\stestId\s*=/.test(openTagMatch[2])) {
+    return markup;
+  }
+  const selfClosingOffset = /\/\s*>$/.test(openTagMatch[0])
+    ? openTagMatch[0].lastIndexOf("/")
+    : openTagMatch[0].length - 1;
+  const insertAt = openTagMatch.index! + selfClosingOffset;
+  return `${markup.slice(0, insertAt)} testId="test-id-component"${markup.slice(insertAt)}`;
 }
 
 function wrapRootAppTheme(markup: string, themeVars: Record<string, unknown> | undefined): string {

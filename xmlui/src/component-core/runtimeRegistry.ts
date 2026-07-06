@@ -67,7 +67,7 @@ import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer
 import { logoRenderer } from "../components/Logo/Logo";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
-import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
+import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";

@@ -585,9 +585,15 @@ function RuntimeSelectShell({
   const effectiveVerboseValidationFeedback =
     verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
 
+  const formFieldTestId =
+    form && fieldName && typeof (props as Record<string, unknown>)["data-testid"] === "string"
+      ? ((props as Record<string, unknown>)["data-testid"] as string)
+      : undefined;
+  const selectProps = formFieldTestId ? { ...props, "data-testid": undefined } : props;
+
   const renderedSelect = (
     <Select
-      {...props}
+      {...selectProps}
       value={controlledValue !== undefined ? controlledValue : localValue}
       initialValue={initialValue}
       updateState={updateState}
@@ -610,23 +616,34 @@ function RuntimeSelectShell({
     />
   );
 
-  if (formError && effectiveVerboseValidationFeedback) {
-    return (
+  const renderedWithValidation = formError && effectiveVerboseValidationFeedback
+    ? (
       <>
         {renderedSelect}
         <div data-validation-display-severity="error">{formError}</div>
       </>
-    );
-  }
+    )
+    : renderedSelect;
 
-  return renderedSelect;
+  return formFieldTestId ? (
+    <div data-testid={formFieldTestId}>
+      {renderedWithValidation}
+    </div>
+  ) : renderedWithValidation;
 }
 
 function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps {
   const rootAttrs = adapter.rootAttrs(COMPONENT_PART_KEY) as React.HTMLAttributes<HTMLDivElement>;
   const rootStyle = rootAttrs.style as React.CSSProperties | undefined;
   const authoredWidth = adapter.stringProp("width");
-  const runtimeWidth = normalizeSelectRuntimeWidth(authoredWidth ?? rootStyle?.width);
+  const hasAuthoredWidth = Object.prototype.hasOwnProperty.call(adapter.node.props, "width");
+  const runtimeWidth = hasAuthoredWidth
+    ? normalizeSelectRuntimeWidth(authoredWidth ?? rootStyle?.width)
+    : undefined;
+  const selectStyle = rootStyle ? { ...rootStyle } : undefined;
+  if (!hasAuthoredWidth && selectStyle) {
+    delete selectStyle.width;
+  }
   const {
     onFocus,
     onBlur,
@@ -713,8 +730,8 @@ function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps 
       : undefined,
     classes: { [COMPONENT_PART_KEY]: adapter.className },
     className: rootAttrs.className as string | undefined,
-    contentClassName: rootAttrs.className as string | undefined,
-    style: { ...rootStyle, width: runtimeWidth ?? "100%" },
+    contentClassName: [rootAttrs.className, "xmlui-SelectContent"].filter(Boolean).join(" "),
+    style: runtimeWidth !== undefined ? { ...selectStyle, width: runtimeWidth } : selectStyle,
     "aria-label": adapter.stringProp("aria-label") || (typeof label === "string" ? label : adapter.stringProp("label")),
     children: hasData ? undefined : adapter.renderChildren(nonPropertyChildren(adapter.node.children)),
   };

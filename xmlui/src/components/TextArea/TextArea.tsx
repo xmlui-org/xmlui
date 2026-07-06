@@ -26,7 +26,12 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
-import { useFormContext } from "../Form/FormContext";
+import { readContext } from "../../runtime/state";
+import { useFormContext, useFormContextPart } from "../Form/FormContext";
+import type { FormItemValidations } from "../Form/FormContext";
+import { FormItemContext } from "../FormItem/FormItemContext";
+import { resolveFormItemId } from "../FormItem/FormItemUtils";
+import { ValidationWrapper } from "../FormItem/ValidationWrapper";
 
 const COMP = "TextArea";
 
@@ -246,23 +251,41 @@ function RuntimeTextAreaShell({
   invalidMessages,
   required,
   validationStatus,
+  validationResult: _validationResult,
+  validationInProgress: _validationInProgress,
   verboseValidationFeedback,
   onDidChange,
   rootAttrs,
   ...props
 }: RuntimeTextAreaProps) {
   const form = useFormContext();
+  const defaultId = React.useId();
+  const { parentFormItemId } = React.useContext(FormItemContext);
   const formRef = React.useRef(form);
   const adapterRef = React.useRef(adapter);
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
-  const fieldName = bindTo;
+  const itemIndex =
+    typeof readContext(adapter.scope, "$itemIndex") === "number"
+      ? readContext(adapter.scope, "$itemIndex") as number
+      : undefined;
+  const fieldName = React.useMemo(
+    () =>
+      bindTo !== undefined || parentFormItemId
+        ? resolveFormItemId({ bindTo, defaultId, parentFormItemId, itemIndex })
+        : undefined,
+    [bindTo, defaultId, itemIndex, parentFormItemId],
+  );
   const formValue = fieldName ? form?.getValue(fieldName) : undefined;
   const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const interactionFlags = useFormContextPart((value) =>
+    fieldName ? value?.interactionFlags[fieldName] : undefined,
+  );
   const controlledValue = stringValue(value);
   const initial = stringValue(initialValue) ?? "";
   const [localValue, setLocalValue] = React.useState(
     stringValue(formValue) ?? controlledValue ?? initial,
   );
+  const [submitAttempted, setSubmitAttempted] = React.useState(false);
   const apiRef = React.useRef<Record<string, unknown>>({});
   const lastRegisteredValueRef = React.useRef<unknown>(undefined);
   formRef.current = form;
@@ -283,21 +306,29 @@ function RuntimeTextAreaShell({
       name: fieldName,
       required,
     });
-  }, [fieldName, required]);
+  }, [fieldName, form, required]);
 
   React.useEffect(() => {
     const formElement = textAreaRef.current?.form;
     if (!formElement) {
       return;
     }
+    const handleSubmit = () => {
+      setSubmitAttempted(true);
+    };
     const handleReset = () => {
+      setSubmitAttempted(false);
       setLocalValue(initial);
       if (formRef.current && fieldName) {
         formRef.current.setValue(fieldName, initial);
       }
     };
+    formElement.addEventListener("submit", handleSubmit, true);
     formElement.addEventListener("reset", handleReset);
-    return () => formElement.removeEventListener("reset", handleReset);
+    return () => {
+      formElement.removeEventListener("submit", handleSubmit, true);
+      formElement.removeEventListener("reset", handleReset);
+    };
   }, [fieldName, initial]);
 
   const registerApi = React.useCallback((api: Record<string, unknown>) => {
@@ -342,12 +373,19 @@ function RuntimeTextAreaShell({
     }
   }, [fieldName]);
 
-  const effectiveValidationStatus = formError
+  const requiredMessage =
+    required && !localValue && (submitAttempted || interactionFlags?.forceShowValidationResult)
+      ? "This field is required"
+      : undefined;
+  const effectiveFormError = formError ?? requiredMessage;
+  const effectiveValidationStatus = effectiveFormError
     ? "error"
     : required && localValue
       ? "valid"
       : validationStatus;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+  const effectiveInvalidMessages = effectiveFormError
+    ? effectiveFormError.split("\n")
+    : invalidMessages;
   const effectiveVerboseValidationFeedback =
     verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
 
@@ -376,22 +414,18 @@ function RuntimeTextAreaShell({
     />
   );
 
-  if (formError && effectiveVerboseValidationFeedback) {
+  if (effectiveFormError && effectiveVerboseValidationFeedback) {
     return (
       <div {...rootAttrs}>
-        <div data-part-id="input" data-xmlui-part="input">
-          {renderedTextArea}
-        </div>
-        <div data-validation-display-severity="error">{formError}</div>
+        {renderedTextArea}
+        <div data-validation-display-severity="error">{effectiveFormError}</div>
       </div>
     );
   }
 
   return (
     <div {...rootAttrs}>
-      <div data-part-id="input" data-xmlui-part="input">
-        {renderedTextArea}
-      </div>
+      {renderedTextArea}
     </div>
   );
 }
@@ -541,7 +575,32 @@ export const textAreaRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: TextAreaMd as ComponentMetadata,
   defaultPart: "input",
-  renderer: ({ adapter }) => (
-    <RuntimeTextAreaShell adapter={adapter} {...runtimeTextAreaProps(adapter)} />
-  ),
+  renderer: ({ adapter }) => renderRuntimeTextArea(adapter),
 });
+
+function renderRuntimeTextArea(adapter: XmluiComponentAdapter) {
+  const props = runtimeTextAreaProps(adapter);
+  const validations: FormItemValidations = {
+    required: adapter.booleanProp("required", false),
+    requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
+    minLength: adapter.prop("minLength") as number | undefined,
+    lengthInvalidMessage: adapter.stringProp("lengthInvalidMessage"),
+  };
+  const shell = <RuntimeTextAreaShell adapter={adapter} {...props} />;
+  const hasValidationProps =
+    validations.required ||
+    Object.prototype.hasOwnProperty.call(adapter.props, "minLength");
+  if (!hasValidationProps) {
+    return shell;
+  }
+  return (
+    <ValidationWrapper
+      bindTo={props.bindTo}
+      validations={validations}
+      validationMode={adapter.stringProp("validationMode") as any}
+      componentType="TextArea"
+    >
+      {shell}
+    </ValidationWrapper>
+  );
+}

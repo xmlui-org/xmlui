@@ -138,6 +138,7 @@ declare global {
       hasLocal(name: string): boolean;
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
+      readReference(name: string): unknown;
     };
     __xmluiTestBedReady?: boolean;
     __xmluiTestBedReinit?: (source: string) => Promise<void>;

@@ -355,6 +355,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   }
   const [open, setOpen] = useState(false);
   const [panelWidth, setPanelWidth] = useState(0);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState([]);
@@ -372,7 +373,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
       if (item === null || typeof item !== "object") {
         return { value: String(item), label: String(item) };
       }
-      return { value: item[valueField], label: item[labelField] };
+      return { ...item, value: item[valueField], label: item[labelField] };
     });
   }, [data, valueField, labelField]);
 
@@ -559,6 +560,41 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
       currentObserver?.disconnect();
     };
   }, [referenceElement]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const closeOnOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      const content = contentRef.current;
+      const trigger = referenceElementRef.current;
+      if (!target || !content || content.contains(target) || trigger?.contains(target)) {
+        return;
+      }
+      const layers = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".xmlui-AutoCompleteContent, .xmlui-SelectContent, [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent'], [role='dialog']",
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      if (layers[layers.length - 1] !== content) {
+        return;
+      }
+      const suppressionWindow = window as Window & {
+        __xmluiSuppressNextDropdownClose?: boolean;
+        __xmluiSuppressDropdownCloseUntil?: number;
+      };
+      suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+      suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+      setOpen(false);
+      setSelectedIndex(-1);
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    };
+    window.addEventListener("pointerdown", closeOnOutsidePointerDown, true);
+    return () => window.removeEventListener("pointerdown", closeOnOutsidePointerDown, true);
+  }, [open]);
 
   // Handle option selection
   const toggleOption = useCallback(
@@ -856,13 +892,25 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
               open={open}
               onOpenChange={(isOpen) => {
                 if (!enabled || readOnly) return;
-                if (!isOpen && document.querySelector("[data-xmlui-component='DropdownMenuContent']")) {
+                if (!isOpen) {
                   const suppressionWindow = window as Window & {
                     __xmluiSuppressNextDropdownClose?: boolean;
                     __xmluiSuppressDropdownCloseUntil?: number;
+                    __xmluiSuppressNextSelectClose?: boolean;
+                    __xmluiSuppressSelectCloseUntil?: number;
                   };
-                  suppressionWindow.__xmluiSuppressNextDropdownClose = true;
-                  suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+                  if (
+                    suppressionWindow.__xmluiSuppressNextSelectClose ||
+                    (suppressionWindow.__xmluiSuppressSelectCloseUntil ?? 0) > Date.now()
+                  ) {
+                    suppressionWindow.__xmluiSuppressNextSelectClose = false;
+                    suppressionWindow.__xmluiSuppressSelectCloseUntil = 0;
+                    return;
+                  }
+                  if (document.querySelector("[data-xmlui-component='DropdownMenuContent']")) {
+                    suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+                    suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+                  }
                 }
                 setOpen(isOpen);
               }}
@@ -873,6 +921,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                   {...(rest as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
                   ref={composedTriggerRef as React.Ref<HTMLButtonElement>}
                   id={id}
+                  data-value={multiSelect ? JSON.stringify(value ?? []) : (value ?? "")}
                   aria-haspopup="listbox"
                   style={style}
                   onFocus={onFocus}
@@ -950,6 +999,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
               </Part>
               <Portal container={root}>
                 <PopoverContent
+                  ref={contentRef}
                   style={popoverContentStyle}
                   className={classnames(
                     contentClassName,

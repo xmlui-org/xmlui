@@ -201,7 +201,8 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
    */
   .selectTrigger {
     outline: none;
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
     height: max-content;
     display: flex;
     flex-direction: row;
@@ -213,6 +214,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     @include t.paddingVars($themeVars, $componentName);
 
     @include variant("");
+    background-color: createThemeVar("backgroundColor-#{$componentName}");
 
     &.error {
       @include variant("error");

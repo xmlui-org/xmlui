@@ -116,6 +116,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 
   const [inputElement, setInputElement] = useState<HTMLElement | null>(null);
   const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
+  const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
 
   const refCallback = useCallback((node: unknown) => {
     setInputElement(node instanceof HTMLElement ? node : null);
@@ -126,10 +127,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 
     // Measure immediately
     setInputHeight(inputElement.offsetHeight);
+    setInputWidth(inputElement.offsetWidth);
 
     if (typeof ResizeObserver !== "undefined") {
       const observer = new ResizeObserver(() => {
         setInputHeight(inputElement.offsetHeight);
+        setInputWidth(inputElement.offsetWidth);
       });
       observer.observe(inputElement);
       return () => observer.disconnect();
@@ -145,6 +148,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const resolvedLabelWidth =
     resolvedLabelWidthProp !== undefined
       ? (numberRegex.test(resolvedLabelWidthProp) ? `${resolvedLabelWidthProp}px` : resolvedLabelWidthProp)
+      : !resolvedLabelBreak &&
+          (effectiveLabelPosition === "top" || effectiveLabelPosition === "bottom") &&
+          inputWidth !== undefined
+        ? `${inputWidth}px`
       : (compactInlineLabel && (effectiveLabelPosition === "before" || effectiveLabelPosition === "after"))
         ? "fit-content"
         : undefined;
@@ -275,7 +282,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       ref={ref}
       data-xmlui-form-field={formItemId}
       style={style}
-      className={classnames(className, styles.itemWithLabel, { [styles.noLabel]: !label && compactInlineLabel })}
+      className={classnames(className, styles.itemWithLabel, {
+        [styles.noLabel]: !label && compactInlineLabel,
+        [styles.shrinkToLabel]: shrinkToLabel,
+      })}
     >
       <div
         className={classnames(styles.container, {

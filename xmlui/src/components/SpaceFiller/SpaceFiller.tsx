@@ -43,10 +43,13 @@ export const spaceFillerComponentRenderer = wrapComponent(COMP, SpaceFiller, Spa
 export const spaceFillerRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: SpaceFillerMd as ComponentMetadata,
-  renderer: ({ adapter }) => (
-    <SpaceFiller
-      {...adapter.rootAttrs()}
-      classes={{ [COMPONENT_PART_KEY]: adapter.className }}
-    />
-  ),
+  renderer: ({ adapter }) => {
+    const { style, ...rootAttrs } = adapter.rootAttrs();
+    return (
+      <SpaceFiller
+        {...rootAttrs}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+      />
+    );
+  },
 });

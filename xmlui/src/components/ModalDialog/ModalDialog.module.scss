@@ -1,146 +1,156 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "ModalDialog";
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$padding-ModalDialog: createThemeVar("padding-ModalDialog");
-$paddingTop-ModalDialog: createThemeVar("paddingTop-ModalDialog");
-$paddingRight-ModalDialog: createThemeVar("paddingRight-ModalDialog");
-$paddingBottom-ModalDialog: createThemeVar("paddingBottom-ModalDialog");
-$paddingLeft-ModalDialog: createThemeVar("paddingLeft-ModalDialog");
-$backgroundColor-ModalDialog: createThemeVar("backgroundColor-ModalDialog");
-$backgroundColor-overlay-ModalDialog: createThemeVar("backgroundColor-overlay-ModalDialog");
-$border-ModalDialog: createThemeVar("border-ModalDialog");
-$borderRadius-ModalDialog: createThemeVar("borderRadius-ModalDialog");
-$borderColor-ModalDialog: createThemeVar("borderColor-ModalDialog");
-$borderWidth-ModalDialog: createThemeVar("borderWidth-ModalDialog");
-$borderStyle-ModalDialog: createThemeVar("borderStyle-ModalDialog");
-$boxShadow-ModalDialog: createThemeVar("boxShadow-ModalDialog");
-$fontFamily-ModalDialog: createThemeVar("fontFamily-ModalDialog");
-$textColor-ModalDialog: createThemeVar("textColor-ModalDialog");
-$minWidth-ModalDialog: createThemeVar("minWidth-ModalDialog");
-$maxWidth-ModalDialog: createThemeVar("maxWidth-ModalDialog");
-$maxHeight-ModalDialog: createThemeVar("maxHeight-ModalDialog");
-$gap-ModalDialog: createThemeVar("gap-ModalDialog");
-$marginBottom-title-ModalDialog: createThemeVar("marginBottom-title-ModalDialog");
-$fontFamily-title-ModalDialog: createThemeVar("fontFamily-title-ModalDialog");
-$fontSize-title-ModalDialog: createThemeVar("fontSize-title-ModalDialog");
-$fontWeight-title-ModalDialog: createThemeVar("fontWeight-title-ModalDialog");
-$textColor-title-ModalDialog: createThemeVar("textColor-title-ModalDialog");
-$top-closeButton-ModalDialog: createThemeVar("top-closeButton-ModalDialog");
-$right-closeButton-ModalDialog: createThemeVar("right-closeButton-ModalDialog");
-$zIndex-ModalDialog: createThemeVar("zIndex-ModalDialog");
-
-:export {
-  themeVars: "";
-}
+// --- Theme vars for paddings
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "overlay-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, "title-#{$component}");
+$padding-ModalDialog: createThemeVar("padding-#{$component}");
+$backgroundColor-ModalDialog: createThemeVar("Dialog:backgroundColor-#{$component}");
+$backgroundColor-overlay-ModalDialog: createThemeVar("Dialog:backgroundColor-overlay-#{$component}");
+$fontFamily-ModalDialog: createThemeVar("Dialog:fontFamily-#{$component}");
+$textColor-ModalDialog: createThemeVar("Dialog:textColor-#{$component}");
+$minWidth-ModalDialog: createThemeVar("Dialog:minWidth-#{$component}");
+$maxWidth-ModalDialog: createThemeVar("Dialog:maxWidth-#{$component}");
+$maxHeight-ModalDialog: createThemeVar("Dialog:maxHeight-#{$component}");
+$marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$component}");
 
 @layer components {
-  .portal {
-    position: fixed;
-    inset: 0;
-    z-index: var(--xmlui-zIndex-ModalDialog);
-  }
-
-  .overlayBackground {
-    position: fixed;
-    inset: 0;
-    background-color: var(--xmlui-backgroundColor-overlay-ModalDialog);
-  }
-
   .overlay {
     position: fixed;
-    inset: 0;
     display: grid;
     place-items: center;
-    overflow: auto;
-    padding: var(--xmlui-padding-overlay-ModalDialog, var(--xmlui-space-4, 16px));
+    overflow-y: auto;
+    inset: 0;
+    padding: t.$space-4;
+  }
+
+  .fullScreen {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    .content {
+      overflow: auto;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+    }
+  }
+
+  .overlayBg {
+    background-color: $backgroundColor-overlay-ModalDialog;
+    inset: 0;
+    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: fixed;
+
+    &.nested {
+      position: absolute;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      overflow: hidden;
+    }
   }
 
   .content {
+    background-color: $backgroundColor-ModalDialog;
+    @include t.borderVars($themeVars, $component);
+    font-family: $fontFamily-ModalDialog;
+    color: $textColor-ModalDialog;
+    @include t.paddingVars($themeVars, $component);
+    box-shadow: t.$boxShadow-spread;
+    transform: translate(0);
+    width: 90vw;
+    max-height: $maxHeight-ModalDialog;
+    max-width: $maxWidth-ModalDialog;
+    min-width: $minWidth-ModalDialog;
+    isolation: isolate;
     position: relative;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: var(--xmlui-gap-ModalDialog);
-    width: 90vw;
-    min-width: var(--xmlui-minWidth-ModalDialog);
-    max-width: var(--xmlui-maxWidth-ModalDialog);
-    max-height: var(--xmlui-maxHeight-ModalDialog);
-    overflow: hidden;
-    isolation: isolate;
-    transform: translate(0);
-    padding: var(--xmlui-padding-ModalDialog);
-    padding-top: var(--xmlui-paddingTop-ModalDialog, var(--xmlui-padding-ModalDialog));
-    padding-right: var(--xmlui-paddingRight-ModalDialog, var(--xmlui-padding-ModalDialog));
-    padding-bottom: var(--xmlui-paddingBottom-ModalDialog, var(--xmlui-padding-ModalDialog));
-    padding-left: var(--xmlui-paddingLeft-ModalDialog, var(--xmlui-padding-ModalDialog));
-    border: var(
-      --xmlui-border-ModalDialog,
-      var(--xmlui-borderWidth-ModalDialog) var(--xmlui-borderStyle-ModalDialog) var(--xmlui-borderColor-ModalDialog)
-    );
-    border-radius: var(--xmlui-borderRadius-ModalDialog);
-    background-color: var(--xmlui-backgroundColor-ModalDialog);
-    box-shadow: var(--xmlui-boxShadow-ModalDialog);
-    color: var(--xmlui-textColor-ModalDialog);
-    font-family: var(--xmlui-fontFamily-ModalDialog);
+    gap: t.$space-4;
+  }
+
+  .contentAnimation {
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .content:focus {
     outline: none;
   }
 
-  .fullScreenOverlay {
-    display: block;
-    padding: 0;
-  }
-
-  .fullScreenContent {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    max-height: 100%;
-    min-width: 0;
-    border: none;
-    border-radius: 0;
-  }
-
-  .title {
-    margin: 0 2rem var(--xmlui-marginBottom-title-ModalDialog) 0;
-    color: var(--xmlui-textColor-title-ModalDialog);
-    font-family: var(--xmlui-fontFamily-title-ModalDialog);
-    font-size: var(--xmlui-fontSize-title-ModalDialog);
-    font-weight: var(--xmlui-fontWeight-title-ModalDialog);
+  .dialogTitle {
+    flex: 1;
+    margin-bottom: $marginBottom-title-ModalDialog;
+    @include t.textVars($themeVars, "title-#{$component}");
   }
 
   .innerContent {
     display: flex;
-    flex: 1;
     flex-direction: column;
     min-height: 0;
-    overflow: auto;
-    gap: var(--xmlui-gap-ModalDialog);
+    gap: var(--stack-gap-default);
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  @keyframes overlayShow {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes contentShow {
+    from {
+      opacity: 0;
+      transform: translateY(2%) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .closeButton {
     position: absolute;
-    top: var(--xmlui-top-closeButton-ModalDialog);
-    right: var(--xmlui-right-closeButton-ModalDialog);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 0;
-    border-radius: 999px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    font: inherit;
+    inset-inline-end: 0.5rem;
+    top: 0.4rem;
   }
 
-  .closeButton:hover {
-    background-color: color-mix(in srgb, currentColor 10%, transparent);
+  @media (max-width: 70em) {
+    .dialog, .content {
+      max-width: 90%;
+    }
   }
+
+  @media (max-width: 50em) {
+    .dialog, .content {
+      width: 100%;
+      max-width: calc(100% - #{t.$space-6});
+      min-width: 0 !important;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -206,6 +206,7 @@ export function FormBindingWrapper({
         style={style}
         className={className}
         cloneStyle={true}
+        shrinkToLabel={!isInsideForm && !!label && labelBreakValue === false}
         compactInlineLabel={compactInlineLabel}
         validationResult={validationResult}
         requireLabelMode={requireLabelMode ?? formRequireLabelMode}

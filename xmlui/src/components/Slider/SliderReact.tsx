@@ -239,6 +239,7 @@ export const Slider = memo(forwardRef(
       }
       const formattedValue = formatValue(newValue, min, min, max);
       const valueToUpdate = formattedValue.length === 1 ? formattedValue[0] : formattedValue;
+      setLocalValue(formattedValue);
       updateValue(valueToUpdate);
     });
 
@@ -400,9 +401,20 @@ export const Slider = memo(forwardRef(
         onInputChange(applyThumbValue(thumbIndex, nextValue));
       };
       outer.addEventListener("xmlui-slider-driver-set", driverSet);
+      (outer as HTMLDivElement & {
+        __xmluiSliderDriverSet?: (detail: {
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }) => void;
+      }).__xmluiSliderDriverSet = (detail) => {
+        driverSet(new CustomEvent("xmlui-slider-driver-set", { detail }));
+      };
       outer.addEventListener("keydown", keyDown, true);
       return () => {
         outer.removeEventListener("xmlui-slider-driver-set", driverSet);
+        delete (outer as HTMLDivElement & { __xmluiSliderDriverSet?: unknown }).__xmluiSliderDriverSet;
         outer.removeEventListener("keydown", keyDown, true);
       };
     }, [displayValue, enabled, max, min, minStepsBetweenThumbs, onInputChange, readOnly, step]);

@@ -101,6 +101,7 @@ function currentVariantCssVariables(
     return {};
   }
   return {
+    borderColor: String(resolveThemeReferences(borderColor)),
     "--xmlui-current-borderColor-Spinner": String(resolveThemeReferences(borderColor)),
   } as CSSProperties;
 }

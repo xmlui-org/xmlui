@@ -1,4 +1,5 @@
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { isEqual } from "lodash-es";
 
 import { defaultProps } from "./SelectionStore.defaults";
 
@@ -36,13 +37,19 @@ export const SelectionStoreNative = memo(function SelectionStoreNative({
   const [selection, setSelection] = useState<unknown[]>(selectedItems);
   const currentItemsRef = useRef<unknown[]>(selectedItems);
   const selectionRef = useRef<unknown[]>(selectedItems);
+  const selectionInitializedRef = useRef(false);
 
   useEffect(() => {
     setSelection(selectedItems);
     selectionRef.current = selectedItems;
+    selectionInitializedRef.current = true;
   }, [selectedItems]);
 
   const publishSelection = useCallback((items: unknown[]) => {
+    if (selectionInitializedRef.current && isEqual(selectionRef.current, items)) {
+      return;
+    }
+    selectionInitializedRef.current = true;
     selectionRef.current = items;
     setSelection(items);
     void onSelectionChange?.(items);

@@ -474,10 +474,12 @@ function LabelBehavior({
       className={classes(
         formItemStyles.itemWithLabel,
         shrinkOuterToCompactLabel ? formItemStyles.noLabel : undefined,
+        shrinkLabelToControl ? formItemStyles.shrinkToLabel : undefined,
         "xmlui-container",
       )}
       style={{
         ...outerStyle,
+        width: shrinkLabelToControl ? controlWidth : outerStyle?.width,
         alignItems: context.componentName === "ColorPicker" ? "flex-start" : outerStyle?.alignItems,
       }}
     >
@@ -508,8 +510,8 @@ function LabelBehavior({
               !enabled ? formItemStyles.disabled : undefined,
             )}
             style={{
-              width: labelWidth !== undefined ? "100%" : undefined,
-              flexShrink: labelWidth !== undefined ? 0 : undefined,
+              width: labelWidth !== undefined || shrinkLabelToControl ? "100%" : undefined,
+              flexShrink: labelWidth !== undefined || shrinkLabelToControl ? 0 : undefined,
             }}
           >
             {stringValue(context.props.label)}

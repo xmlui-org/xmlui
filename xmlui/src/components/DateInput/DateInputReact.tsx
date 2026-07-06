@@ -174,6 +174,9 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
   const [day, setDay] = useState<string | null>(null);
   const [month, setMonth] = useState<string | null>(null);
   const [year, setYear] = useState<string | null>(null);
+  const rawDayRef = useRef<string | null>(null);
+  const rawMonthRef = useRef<string | null>(null);
+  const rawYearRef = useRef<string | null>(null);
 
   // Track whether the component currently has focus
   const [componentHasFocus, setComponentHasFocus] = useState(false);
@@ -182,6 +185,7 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
   const [isDayCurrentlyInvalid, setIsDayCurrentlyInvalid] = useState(false);
   const [isMonthCurrentlyInvalid, setIsMonthCurrentlyInvalid] = useState(false);
   const [isYearCurrentlyInvalid, setIsYearCurrentlyInvalid] = useState(false);
+  const invalidDateCombinationRef = useRef(false);
 
   const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
@@ -240,20 +244,30 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
         setDay(parsedValues.day);
         setMonth(parsedValues.month);
         setYear(parsedValues.year);
+        rawDayRef.current = parsedValues.day;
+        rawMonthRef.current = parsedValues.month;
+        rawYearRef.current = parsedValues.year;
       } else {
         setDay(null);
         setMonth(null);
         setYear(null);
+        rawDayRef.current = null;
+        rawMonthRef.current = null;
+        rawYearRef.current = null;
       }
     } else {
       setDay(null);
       setMonth(null);
       setYear(null);
+      rawDayRef.current = null;
+      rawMonthRef.current = null;
+      rawYearRef.current = null;
     }
   }, [localValue, dateFormat]);
 
   // Event handlers
   const handleChange = useEvent((newValue: string | null) => {
+    invalidDateCombinationRef.current = false;
     // Update local state immediately for immediate UI feedback
     setLocalValue(newValue);
 
@@ -312,6 +326,9 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
     ) =>
       (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
+        if (field === "day") rawDayRef.current = newValue || null;
+        if (field === "month") rawMonthRef.current = newValue || null;
+        if (field === "year") rawYearRef.current = newValue || null;
         setValue(newValue);
         // Update invalid state immediately for visual feedback
         const isInvalid = validateFn(newValue);
@@ -362,6 +379,7 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
             // Invalid date combination - mark the day as invalid if all fields are present
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
+              invalidDateCombinationRef.current = true;
               onInvalidChange?.();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
@@ -391,6 +409,7 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
             // Invalid date combination - mark the day as invalid if all fields are present
             if (dateValues.day && dateValues.month && dateValues.year) {
               setIsDayCurrentlyInvalid(true);
+              invalidDateCombinationRef.current = true;
               onInvalidChange?.();
               // Don't call handleChange with null to avoid clearing the fields
             } else {
@@ -507,16 +526,25 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
         setDay(parsedValues.day);
         setMonth(parsedValues.month);
         setYear(parsedValues.year);
+        rawDayRef.current = parsedValues.day;
+        rawMonthRef.current = parsedValues.month;
+        rawYearRef.current = parsedValues.year;
       } else {
         setDay(null);
         setMonth(null);
         setYear(null);
+        rawDayRef.current = null;
+        rawMonthRef.current = null;
+        rawYearRef.current = null;
       }
     } else {
       // Clear all fields
       setDay(null);
       setMonth(null);
       setYear(null);
+      rawDayRef.current = null;
+      rawMonthRef.current = null;
+      rawYearRef.current = null;
     }
 
     handleChange(valueToReset);
@@ -538,14 +566,31 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
 
   // Function to get ISO formatted date value (YYYY-MM-DD)
   const getIsoValue = useCallback((): string | null => {
-    if (!day || !month || !year) {
+    if (
+      invalidDateCombinationRef.current ||
+      isDayCurrentlyInvalid ||
+      isMonthCurrentlyInvalid ||
+      isYearCurrentlyInvalid
+    ) {
       return null;
     }
 
+    const liveDay = dayInputRef.current?.value || day;
+    const liveMonth = monthInputRef.current?.value || month;
+    const liveYear = yearInputRef.current?.value || year;
+
+    if (!liveDay || !liveMonth || !liveYear) {
+      return null;
+    }
+
+    const currentDay = rawDayRef.current || liveDay;
+    const currentMonth = rawMonthRef.current || liveMonth;
+    const currentYear = rawYearRef.current || liveYear;
+
     // Convert to numbers
-    const dayNum = parseInt(day, 10);
-    const monthNum = parseInt(month, 10);
-    const yearNum = parseInt(year, 10);
+    const dayNum = parseInt(currentDay, 10);
+    const monthNum = parseInt(currentMonth, 10);
+    const yearNum = parseInt(currentYear, 10);
 
     if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
       return null;
@@ -573,7 +618,7 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
     } catch (error) {
       return null;
     }
-  }, [day, month, year]);
+  }, [day, isDayCurrentlyInvalid, isMonthCurrentlyInvalid, isYearCurrentlyInvalid, month, year]);
 
   // Component API registration
   useEffect(() => {

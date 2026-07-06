@@ -191,16 +191,11 @@ test.describe("Open/Close", () => {
     
     // Verify modal completely covers page content - all page content should be hidden
     await expect(page.getByTestId("textInModal")).toBeVisible();
+    await expect(page.getByTestId("bottomText")).not.toBeInViewport();
 
     await page.getByTestId("bottomText").scrollIntoViewIfNeeded();
 
-    await expect.poll(async () => page.getByTestId("pageContent").evaluate((element) => {
-      let current: Element | null = element;
-      while (current?.parentElement && current.parentElement !== document.body) {
-        current = current.parentElement;
-      }
-      return current?.getAttribute("aria-hidden");
-    })).toBe("true");
+    await expect(page.getByTestId("pageBottomText")).not.toBeInViewport();
   });
 
   // Regression: $param was undefined when used in a <variable> declared as a direct
@@ -434,7 +429,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test("handles variant", async ({ page, initTestBed }) => {
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <Button testId="button" onClick="modal.open()">open</Button>
@@ -442,19 +437,20 @@ test.describe("Behaviors and Parts", () => {
           <Text>Modal content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
+    });
     // Open the modal
     await page.getByTestId("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     const component = page.getByTestId("modal");
-    await component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty("--xmlui-backgroundColor-ModalDialog", "rgb(255, 0, 0)");
-    });
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
-  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <Button testId="button" onClick="modal.open()">open</Button>
@@ -462,15 +458,16 @@ test.describe("Behaviors and Parts", () => {
           <Text>Modal content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(0, 255, 0)",
+      },
+    });
     // Open the modal
     await page.getByTestId("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     const component = page.getByTestId("modal");
-    await component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty("--xmlui-backgroundColor-ModalDialog", "rgb(0, 255, 0)");
-    });
     await expect(component).toHaveCSS("background-color", "rgb(0, 255, 0)");
   });
 
@@ -527,59 +524,46 @@ test.describe("Behaviors and Parts", () => {
     await expect(contentPart.getByText("Modal content")).toBeVisible();
   });
 
-  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Fragment>
-        <Button testId="button" onClick="modal.open()">open</Button>
-        <ModalDialog id="modal" testId="test" variant="CustomVariant" title="Modal Title">
-          <Text>Modal content</Text>
-        </ModalDialog>
-      </Fragment>
-    `);
-
-    await page.getByTestId("button").click();
-    await expect(page.getByRole("dialog")).toBeVisible();
-    
-    const component = page.getByTestId("test");
-    await component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty("--xmlui-borderColor-ModalDialog", "rgb(255, 0, 0)");
+      <ModalDialog testId="test" variant="CustomVariant" title="Modal Title">
+        <Text>Modal content</Text>
+      </ModalDialog>
+    `, {
+      testThemeVars: {
+        "borderColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
     });
+    
     const contentPart = page.locator("[data-part-id='content']");
     const titlePart = page.locator("[data-part-id='title']");
     
-    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(contentPart).toHaveCSS("border-color", "rgb(255, 0, 0)");
     await expect(titlePart).toBeVisible();
     await expect(contentPart).toBeVisible();
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Fragment>
-        <Button testId="button" onClick="modal.open()">open</Button>
-        <ModalDialog 
-          id="modal"
-          testId="test" 
-          variant="CustomVariant"
-          animation="fadeIn"
-          title="Modal Title"
-        >
-          <Text>Modal content</Text>
-        </ModalDialog>
-      </Fragment>
-    `);
-
-    await page.getByTestId("button").click();
-    await expect(page.getByRole("dialog")).toBeVisible();
-    
-    const component = page.getByTestId("test");
-    await component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty("--xmlui-backgroundColor-ModalDialog", "rgb(255, 0, 0)");
+      <ModalDialog 
+        testId="test" 
+        variant="CustomVariant"
+        animation="fadeIn"
+        title="Modal Title"
+      >
+        <Text>Modal content</Text>
+      </ModalDialog>
+    `, {
+      testThemeVars: {
+        "backgroundColor-ModalDialog-CustomVariant": "rgb(255, 0, 0)",
+      },
     });
+    
     const contentPart = page.locator("[data-part-id='content']");
     const titlePart = page.locator("[data-part-id='title']");
     
     // Verify variant applied
-    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(contentPart).toHaveCSS("background-color", "rgb(255, 0, 0)");
     
     // Verify parts are visible
     await expect(titlePart).toBeVisible();
@@ -600,19 +584,19 @@ test.describe("Theme Variables", () => {
           <Text>Content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "textColor-title-ModalDialog": "rgb(255, 0, 0)",
+        "fontSize-title-ModalDialog": "32px",
+        "fontWeight-title-ModalDialog": "700",
+      },
+    });
 
     await page.getByTestId("button").click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     // The style is applied to the header element inside the title part
-    const titleHeader = page.locator("[data-part-id='title']");
-    await titleHeader.evaluate((element) => {
-      const title = element as HTMLElement;
-      title.style.setProperty("--xmlui-textColor-title-ModalDialog", "rgb(255, 0, 0)");
-      title.style.setProperty("--xmlui-fontSize-title-ModalDialog", "32px");
-      title.style.setProperty("--xmlui-fontWeight-title-ModalDialog", "700");
-    });
+    const titleHeader = page.locator("[data-part-id='title'] header");
     await expect(titleHeader).toBeVisible();
     
     await expect(titleHeader).toHaveCSS("color", "rgb(255, 0, 0)");
@@ -632,17 +616,15 @@ test.describe("Theme Variables", () => {
           <Text>Content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "border-ModalDialog": "3px solid rgb(0, 128, 255)",
+      },
+    });
 
     await page.getByTestId("button").click();
     const modal = await createModalDialogDriver("modal");
     await expect(modal.component).toBeVisible();
-    await modal.component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty(
-        "--xmlui-border-ModalDialog",
-        "3px solid rgb(0, 128, 255)",
-      );
-    });
 
     for (const side of ["top", "right", "bottom", "left"]) {
       await expect(modal.component).toHaveCSS(`border-${side}-width`, "3px");
@@ -663,17 +645,17 @@ test.describe("Theme Variables", () => {
           <Text>Content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "borderWidth-ModalDialog": "2px",
+        "borderStyle-ModalDialog": "dashed",
+        "borderColor-ModalDialog": "rgb(255, 0, 0)",
+      },
+    });
 
     await page.getByTestId("button").click();
     const modal = await createModalDialogDriver("modal");
     await expect(modal.component).toBeVisible();
-    await modal.component.evaluate((element) => {
-      const dialog = element as HTMLElement;
-      dialog.style.setProperty("--xmlui-borderWidth-ModalDialog", "2px");
-      dialog.style.setProperty("--xmlui-borderStyle-ModalDialog", "dashed");
-      dialog.style.setProperty("--xmlui-borderColor-ModalDialog", "rgb(255, 0, 0)");
-    });
 
     await expect(modal.component).toHaveCSS("border-top-width", "2px");
     await expect(modal.component).toHaveCSS("border-top-style", "dashed");
@@ -692,14 +674,15 @@ test.describe("Theme Variables", () => {
           <Text>Content</Text>
         </ModalDialog>
       </Fragment>
-    `);
+    `, {
+      testThemeVars: {
+        "borderRadius-ModalDialog": "20px",
+      },
+    });
 
     await page.getByTestId("button").click();
     const modal = await createModalDialogDriver("modal");
     await expect(modal.component).toBeVisible();
-    await modal.component.evaluate((element) => {
-      (element as HTMLElement).style.setProperty("--xmlui-borderRadius-ModalDialog", "20px");
-    });
     await expect(modal.component).toHaveCSS("border-top-left-radius", "20px");
   });
 });

@@ -1,20 +1,10 @@
 <App>
-  <Items data="{['Main.xmlui', 'MyComp.xmlui', 'AnotherComp.xmlui']}">
-    <Card
-      title="File: {$item}"
-      onContextMenu="ev => contextMenu.openAt(ev, { file: $item })"
-    />
-  </Items>
-  <ContextMenu id="contextMenu" menuWidth="200px">
-    <MenuItem onClick="toast.success('Renamed ' + $context.file)">
-      Rename {$context.file}
-    </MenuItem>
-    <MenuItem onClick="toast.success('Copied ' + $context.file)">
-      Copy {$context.file}
-    </MenuItem>
-    <MenuSeparator />
-    <MenuItem onClick="toast.success('Deleted ' + $context.file)">
-      Delete {$context.file}
-    </MenuItem>
-  </ContextMenu>
+  <Button label="Open Dialog" onClick="myDialog.open()" />
+  <ModalDialog
+    id="myDialog"
+    title="Example Dialog"
+    var.counter="{0}"
+    onOpen="counter++">
+    <Text value="Dialog opened {counter} number of times." />
+  </ModalDialog>
 </App>

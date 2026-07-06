@@ -136,6 +136,10 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
    flex-direction: column;
    width: 100%;
 
+   &.shrinkToLabel {
+     width: fit-content;
+   }
+
    &.noLabel {
      width: fit-content;
    }

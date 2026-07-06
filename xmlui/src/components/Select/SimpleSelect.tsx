@@ -100,7 +100,10 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       ...rest
     } = props;
 
-    const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
+    const triggerElementRef = useRef<HTMLElement | null>(null);
+    const composedRef = forwardRef
+      ? composeRefs(triggerElementRef, triggerRef, forwardedRef)
+      : composeRefs(triggerElementRef, triggerRef);
     const [open, setOpen] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -114,6 +117,17 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
 
       const body = document.body;
       const LOCK_ATTR = "data-scroll-locked";
+      const previousMinHeight = body.style.minHeight;
+      const appContainer = triggerElementRef.current?.closest<HTMLElement>(
+        '[data-xmlui-component="App"]',
+      );
+      if (
+        appContainer &&
+        document.documentElement.scrollHeight <= window.innerHeight &&
+        appContainer.scrollHeight > window.innerHeight
+      ) {
+        body.style.minHeight = `${appContainer.scrollHeight}px`;
+      }
 
       // Decrement the lock counter that RemoveScroll set
       let didDecrement = false;
@@ -152,11 +166,46 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           const count = parseInt(body.getAttribute(LOCK_ATTR) || "0", 10);
           body.setAttribute(LOCK_ATTR, String(count + 1));
         }
+        body.style.minHeight = previousMinHeight;
 
         document.removeEventListener("wheel", handler, true);
         document.removeEventListener("touchmove", handler, true);
       };
     }, [open, modal]);
+
+    useEffect(() => {
+      if (!open) {
+        return;
+      }
+      const closeOnOutsidePointerDown = (event: PointerEvent) => {
+        const target = event.target instanceof Node ? event.target : null;
+        const content = contentRef.current;
+        const trigger = triggerElementRef.current;
+        if (!target || !content || content.contains(target) || trigger?.contains(target)) {
+          return;
+        }
+        const layers = Array.from(
+          document.querySelectorAll<HTMLElement>(
+            ".xmlui-AutoCompleteContent, .xmlui-SelectContent, [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent'], [role='dialog']",
+          ),
+        ).filter((element) => element.getClientRects().length > 0);
+        if (layers[layers.length - 1] !== content) {
+          return;
+        }
+        const suppressionWindow = window as Window & {
+          __xmluiSuppressNextDropdownClose?: boolean;
+          __xmluiSuppressDropdownCloseUntil?: number;
+        };
+        suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+        suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+        setOpen(false);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      };
+      window.addEventListener("pointerdown", closeOnOutsidePointerDown, true);
+      return () => window.removeEventListener("pointerdown", closeOnOutsidePointerDown, true);
+    }, [open]);
 
     // When the dropdown opens, pin Content to its initial clientHeight so that
     // scroll buttons mounting/unmounting cannot change the outer container size.
@@ -239,12 +288,39 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       <Root
         open={open}
         value={stringValue}
+        modal={modal}
         onValueChange={handleValueChange}
-        onOpenChange={() => enabled && !readOnly && setOpen(!open)}
+        onOpenChange={(isOpen) => {
+          if (!enabled || readOnly) {
+            return;
+          }
+          if (!isOpen) {
+            const suppressionWindow = window as Window & {
+              __xmluiSuppressNextSelectClose?: boolean;
+              __xmluiSuppressSelectCloseUntil?: number;
+              __xmluiSuppressNextDropdownClose?: boolean;
+              __xmluiSuppressDropdownCloseUntil?: number;
+            };
+            if (
+              suppressionWindow.__xmluiSuppressNextSelectClose ||
+              (suppressionWindow.__xmluiSuppressSelectCloseUntil ?? 0) > Date.now()
+            ) {
+              suppressionWindow.__xmluiSuppressNextSelectClose = false;
+              suppressionWindow.__xmluiSuppressSelectCloseUntil = 0;
+              return;
+            }
+            if (document.querySelector("[data-xmlui-component='DropdownMenuContent']")) {
+              suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+              suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+            }
+          }
+          setOpen(isOpen);
+        }}
       >
         <Trigger
           {...rest}
           id={id}
+          data-value={value ?? ""}
           ref={composedRef}
           aria-haspopup="listbox"
           style={style}
@@ -291,18 +367,16 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
           )}
           {clearable && value !== undefined && value !== null && value !== "" && !readOnly && enabled && (
             <Part partId="clearButton">
-              <button
-                type="button"
+              <span
                 className={styles.clearButton}
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   onClear?.();
                 }}
-                tabIndex={-1}
               >
                 <ThemedIcon name="close" />
-              </button>
+              </span>
             </Part>
           )}
           <span className={styles.action}>

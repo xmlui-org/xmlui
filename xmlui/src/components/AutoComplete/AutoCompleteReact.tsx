@@ -151,6 +151,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
   const inputWrapperRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const ghostRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const [visibleBadgeCount, setVisibleBadgeCount] = useState<number>(Number.POSITIVE_INFINITY);
   // Bumped by ResizeObserver so the measurement effect re-runs on width change.
   const [resizeKey, setResizeKey] = useState(0);
@@ -339,6 +340,41 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     ro.observe(wrapper);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const closeOnOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      const content = contentRef.current;
+      const wrapper = wrapperRef.current;
+      if (!target || !content || content.contains(target) || wrapper?.contains(target)) {
+        return;
+      }
+      const layers = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".xmlui-AutoCompleteContent, .xmlui-SelectContent, [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent'], [role='dialog']",
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      if (layers[layers.length - 1] !== content) {
+        return;
+      }
+      const suppressionWindow = window as Window & {
+        __xmluiSuppressNextDropdownClose?: boolean;
+        __xmluiSuppressDropdownCloseUntil?: number;
+      };
+      suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+      suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+      setOpen(false);
+      setSelectedIndex(-1);
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    };
+    window.addEventListener("pointerdown", closeOnOutsidePointerDown, true);
+    return () => window.removeEventListener("pointerdown", closeOnOutsidePointerDown, true);
+  }, [open]);
 
   // Clear selected value
   const clearValue = useCallback(() => {
@@ -593,7 +629,17 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
               const suppressionWindow = window as Window & {
                 __xmluiSuppressNextDropdownClose?: boolean;
                 __xmluiSuppressDropdownCloseUntil?: number;
+                __xmluiSuppressNextAutoCompleteClose?: boolean;
+                __xmluiSuppressAutoCompleteCloseUntil?: number;
               };
+              if (
+                suppressionWindow.__xmluiSuppressNextAutoCompleteClose ||
+                (suppressionWindow.__xmluiSuppressAutoCompleteCloseUntil ?? 0) > Date.now()
+              ) {
+                suppressionWindow.__xmluiSuppressNextAutoCompleteClose = false;
+                suppressionWindow.__xmluiSuppressAutoCompleteCloseUntil = 0;
+                return;
+              }
               suppressionWindow.__xmluiSuppressNextDropdownClose = true;
               suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
             }
@@ -800,6 +846,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
           </PopoverTrigger>
           <Portal container={root}>
             <PopoverContent
+              ref={contentRef}
               style={{ width, height: dropdownHeight }}
               className={classnames(contentClassName, styles.popoverContent)}
               align="start"

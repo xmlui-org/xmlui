@@ -1,7 +1,7 @@
 import { test, expect } from "../../testing/fixtures";
 
 test.describe("Select foundation", () => {
-  test("renders options and honors initialValue", async ({ initTestBed, createSelectDriver }) => {
+  test("renders options and honors initialValue", async ({ initTestBed, createSelectDriver, page }) => {
     await initTestBed(`
       <Select initialValue="2">
         <Option value="1" label="One" />
@@ -10,7 +10,8 @@ test.describe("Select foundation", () => {
     `);
     const driver = await createSelectDriver();
     await expect(driver.component).toBeVisible();
-    await expect(driver.component.locator("option")).toHaveCount(2);
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option")).toHaveCount(2);
     expect(await driver.value()).toBe("2");
   });
 
@@ -26,7 +27,7 @@ test.describe("Select foundation", () => {
     await expect.poll(testStateDriver.testState).toBe("b");
   });
 
-  test("renders options from data", async ({ initTestBed, createSelectDriver }) => {
+  test("renders options from data", async ({ initTestBed, createSelectDriver, page }) => {
     await initTestBed(`
       <App var.items="{[
         { id: 'a', name: 'Alpha' },
@@ -36,7 +37,8 @@ test.describe("Select foundation", () => {
       </App>
     `);
     const driver = await createSelectDriver();
-    await expect(driver.component.locator("option")).toHaveText(["Alpha", "Beta"]);
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option")).toHaveText(["Alpha", "Beta"]);
     expect(await driver.value()).toBe("b");
   });
 });

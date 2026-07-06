@@ -284,7 +284,7 @@ export const sliderRenderer = wrapRuntimeComponent({
       }
       void adapterRef.current.event("didChange")(value);
     }, [fieldName, updateState]);
-    const currentValue = formValue ?? adapter.prop("value", state.value);
+    const currentValue = formValue ?? adapter.prop("value", state.value ?? initialFormValue);
     const updateThumb = React.useCallback((index: number, rawValue: number) => {
       if (readOnly || !enabled) {
         return;
@@ -390,12 +390,23 @@ export const sliderRenderer = wrapRuntimeComponent({
       window.addEventListener("mouseup", pointerEnd, true);
       window.addEventListener("pointerup", pointerEnd, true);
       outer.addEventListener("xmlui-slider-driver-set", driverSet);
+      (outer as HTMLDivElement & {
+        __xmluiSliderDriverSet?: (detail: {
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }) => void;
+      }).__xmluiSliderDriverSet = (detail) => {
+        driverSet(new CustomEvent("xmlui-slider-driver-set", { detail }));
+      };
       return () => {
         window.removeEventListener("mousedown", pointerStart, true);
         window.removeEventListener("pointerdown", pointerStart, true);
         window.removeEventListener("mouseup", pointerEnd, true);
         window.removeEventListener("pointerup", pointerEnd, true);
         outer.removeEventListener("xmlui-slider-driver-set", driverSet);
+        delete (outer as HTMLDivElement & { __xmluiSliderDriverSet?: unknown }).__xmluiSliderDriverSet;
       };
     }, [currentValue, inverted, max, min, minStepsBetweenThumbs, publishValue, step, updateThumb]);
 

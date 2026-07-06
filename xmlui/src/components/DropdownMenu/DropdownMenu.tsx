@@ -494,14 +494,50 @@ function RuntimeDropdownMenuContentAttrs({
     if (!close || typeof document === "undefined") {
       return;
     }
+    const closeOnOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      if (!target) {
+        return;
+      }
+      const layers = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".xmlui-AutoCompleteContent, .xmlui-SelectContent, [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent'], [role='dialog']",
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      const topLayer = layers[layers.length - 1];
+      if (topLayer?.getAttribute("data-xmlui-component") !== componentName) {
+        return;
+      }
+      if (topLayer.contains(target)) {
+        return;
+      }
+      const suppressionWindow = window as Window & {
+        __xmluiSuppressNextAutoCompleteClose?: boolean;
+        __xmluiSuppressAutoCompleteCloseUntil?: number;
+        __xmluiSuppressNextSelectClose?: boolean;
+        __xmluiSuppressSelectCloseUntil?: number;
+      };
+      suppressionWindow.__xmluiSuppressNextAutoCompleteClose = true;
+      suppressionWindow.__xmluiSuppressAutoCompleteCloseUntil = Date.now() + 80;
+      suppressionWindow.__xmluiSuppressNextSelectClose = true;
+      suppressionWindow.__xmluiSuppressSelectCloseUntil = Date.now() + 80;
+      close();
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    };
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         close();
       }
     };
+    window.addEventListener("pointerdown", closeOnOutsidePointerDown, true);
     document.addEventListener("keydown", closeOnEscape, true);
-    return () => document.removeEventListener("keydown", closeOnEscape, true);
-  }, [close]);
+    return () => {
+      window.removeEventListener("pointerdown", closeOnOutsidePointerDown, true);
+      document.removeEventListener("keydown", closeOnEscape, true);
+    };
+  }, [close, componentName]);
   return null;
 }
 

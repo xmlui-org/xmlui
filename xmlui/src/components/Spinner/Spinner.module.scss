@@ -30,7 +30,7 @@ $borderColor-Spinner: createThemeVar("borderColor-Spinner");
     border-style: solid;
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: $borderColor-Spinner transparent transparent transparent;
+    border-color: var(--xmlui-current-borderColor-Spinner, #{$borderColor-Spinner}) transparent transparent transparent;
   }
 
   .lds-ring div:nth-child(1) {

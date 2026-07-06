@@ -1,10 +1,11 @@
+import { useCallback, useMemo, useRef } from "react";
 import type { Dispatch } from "react";
 import { createContext, useContextSelector } from "use-context-selector";
 import { get } from "lodash-es";
 
 import type { ContainerAction } from "../../components-core/rendering/containers";
 import type { FormAction } from "../Form/formActions";
-import { fieldChanged } from "../Form/formActions";
+import { fieldChanged, fieldInitialized, fieldRemoved } from "../Form/formActions";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
@@ -178,7 +179,36 @@ export type FormContextValue = {
 };
 
 export function useFormContext(): FormContextValue | undefined {
-  return useFormContextPart((value): FormContextValue | undefined => {
+  const value = useFormContextPart((value) => value);
+  const latestValueRef = useRef(value);
+  latestValueRef.current = value;
+
+  const getValue = useCallback((name: string) => get(latestValueRef.current?.subject, name), []);
+  const setValue = useCallback((name: string, fieldValue: unknown) => {
+    latestValueRef.current?.dispatch?.(fieldChanged(name, fieldValue));
+  }, []);
+  const isFieldValid = useCallback(
+    (name: string) => latestValueRef.current?.validationResults?.[name]?.isValid ?? true,
+    [],
+  );
+  const validateField = useCallback(async () => undefined, []);
+  const registerItem = useCallback(({ name, noSubmit }: FormItemRegistration) => {
+    const currentValue = get(latestValueRef.current?.subject, name);
+    const originalValue = get(latestValueRef.current?.originalSubject, name);
+    latestValueRef.current?.dispatch?.(
+      fieldInitialized(
+        name,
+        currentValue === undefined ? originalValue : currentValue,
+        false,
+        noSubmit,
+      ),
+    );
+    return () => {
+      latestValueRef.current?.dispatch?.(fieldRemoved(name));
+    };
+  }, []);
+
+  return useMemo((): FormContextValue | undefined => {
     if (!value) {
       return undefined;
     }
@@ -218,15 +248,16 @@ export function useFormContext(): FormContextValue | undefined {
       itemLabelBreak: value.itemLabelBreak,
       itemRequireLabelMode: value.itemRequireLabelMode,
       verboseValidationFeedback: value.verboseValidationFeedback,
-      getValue: (name) => get(value.subject, name),
-      setValue: (name, fieldValue) => value.dispatch?.(fieldChanged(name, fieldValue)),
-      isFieldValid: (name) => value.validationResults?.[name]?.isValid ?? true,
-      validateField: async () => undefined,
-      registerItem: () => () => undefined,
+      fieldPrefix: undefined,
+      getValue,
+      setValue,
+      isFieldValid,
+      validateField,
+      registerItem,
       validationIconSuccess: value.validationIconSuccess,
       validationIconError: value.validationIconError,
     };
-  });
+  }, [getValue, isFieldValid, registerItem, setValue, validateField, value]);
 }
 
 export function useIsInsideForm(){

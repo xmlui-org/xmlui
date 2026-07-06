@@ -272,13 +272,22 @@ function selectOptions(adapter: XmluiComponentAdapter): XmluiOption[] {
 }
 
 function optionNodeToData(child: any, scope: any): XmluiOption[] {
+  const resolvedProps = Object.fromEntries(
+    Object.entries(child.props ?? {}).map(([name, propValue]) => [
+      name,
+      evaluateExpressionOrText(
+        propValue,
+        child.parsed?.props?.[name],
+        scope,
+        `Option:${name}`,
+      ),
+    ]),
+  );
   const hasValue = Object.prototype.hasOwnProperty.call(child.props, "value");
   const hasLabel = Object.prototype.hasOwnProperty.call(child.props, "label");
-  const value = hasValue
-    ? evaluateExpressionOrText(child.props.value, child.parsed?.props?.value, scope, "Option:value")
-    : undefined;
+  const value = hasValue ? resolvedProps.value : undefined;
   const label = hasLabel
-    ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, scope, "Option:label")
+    ? resolvedProps.label
     : child.children.every((optionChild: any) => optionChild.kind === "text")
       ? child.children.map((optionChild: any) => optionChild.kind === "text" ? optionChild.value : "").join("")
       : undefined;
@@ -286,9 +295,10 @@ function optionNodeToData(child: any, scope: any): XmluiOption[] {
     return [];
   }
   const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
-    ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, scope, "Option:enabled"))
+    ? Boolean(resolvedProps.enabled)
     : true;
   return [{
+    ...resolvedProps,
     value: String(value ?? label ?? ""),
     label: String(label ?? value ?? ""),
     enabled,

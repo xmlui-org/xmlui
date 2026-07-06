@@ -69,7 +69,7 @@ import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
-import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
+import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import {

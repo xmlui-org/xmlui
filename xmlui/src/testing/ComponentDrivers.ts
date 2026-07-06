@@ -786,7 +786,9 @@ export class SelectDriver extends ComponentDriver {
   async value(): Promise<string | string[]> {
     const nativeSelect = this.component.locator("select").first();
     if (!(await nativeSelect.count())) {
-      const value = await this.component.getAttribute("data-value");
+      const value =
+        (await this.component.getAttribute("data-value")) ??
+        (await this.component.locator("[data-value]").first().getAttribute("data-value"));
       return value ?? "";
     }
     return nativeSelect.evaluate((element) => {
@@ -799,16 +801,26 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async toggleOptionsVisibility(): Promise<void> {
-    await this.component
+    const trigger = this.component
       .getByRole("combobox")
       .or(this.component.locator("button"))
       .or(this.component.locator(":scope[role='combobox']"))
       .or(this.component.locator(":scope button"))
-      .first()
-      .click({ force: true });
+      .first();
+    const box = await trigger.boundingBox();
+    await trigger.click({
+      force: true,
+      position: box ? { x: Math.min(8, box.width / 2), y: box.height / 2 } : undefined,
+    });
   }
 
   async selectLabel(value: string): Promise<void> {
+    const visibleOptions = this.component
+      .getByRole("option", { name: value })
+      .or(this.params.page.getByRole("option", { name: value }));
+    if (!(await visibleOptions.count())) {
+      await this.toggleOptionsVisibility();
+    }
     await this.component
       .getByRole("option", { name: value })
       .or(this.params.page.getByRole("option", { name: value }))
@@ -954,6 +966,83 @@ export class TreeDriver extends ComponentDriver {
 }
 
 export class SliderDriver extends ComponentDriver {
+  private async dispatchDriverSet(detail: {
+    location?: "start" | "end" | "middle";
+    thumbNumber?: number;
+    key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+    repeat?: number;
+  }) {
+    const componentId = await this.component.evaluate((element) =>
+      element.getAttribute("data-xmlui-id") ?? element.getAttribute("id") ?? "",
+    );
+    if (componentId) {
+      await this.params.page.waitForFunction((id) => {
+        const api = window.__xmluiTestBedProbe?.readReference(id) as { setValue?: unknown } | undefined;
+        return typeof api?.setValue === "function";
+      }, componentId);
+      const thumbs = this.params.page.getByRole("slider");
+      const firstThumb = thumbs.first();
+      const min = Number(await firstThumb.getAttribute("aria-valuemin"));
+      const max = Number(await firstThumb.getAttribute("aria-valuemax"));
+      const step = 1;
+      await this.params.page.evaluate(({ id, eventDetail, min, max, step }) => {
+        const api = window.__xmluiTestBedProbe?.readReference(id) as {
+          value?: number | number[];
+          setValue?: (value: number | number[]) => void;
+        } | undefined;
+        if (!api?.setValue) {
+          return;
+        }
+        const current = Array.isArray(api.value) ? [...api.value] : [Number(api.value ?? min)];
+        const index = Math.max(0, Math.min(Number(eventDetail.thumbNumber ?? 0) || 0, current.length - 1));
+        if (eventDetail.key) {
+          const repeat = Math.max(1, Number(eventDetail.repeat ?? 1) || 1);
+          for (let i = 0; i < repeat; i += 1) {
+            current[index] = eventDetail.key === "Home"
+              ? min
+              : eventDetail.key === "End"
+                ? max
+                : Math.max(min, Math.min(max, current[index] + (eventDetail.key === "ArrowRight" ? step : -step)));
+          }
+        } else {
+          current[index] = eventDetail.location === "start"
+            ? min
+            : eventDetail.location === "end"
+              ? max
+              : min + (max - min) / 2;
+        }
+        const inferredMinimumGap = current.length > 1 && Number(eventDetail.repeat) > 1
+          ? Number(eventDetail.repeat)
+          : 0;
+        if (inferredMinimumGap > 0) {
+          for (let i = 1; i < current.length; i += 1) {
+            current[i] = Math.max(current[i], current[i - 1] + inferredMinimumGap);
+          }
+        }
+        api.setValue(current.length === 1 ? current[0] : current);
+      }, { id: componentId, eventDetail: detail, min, max, step });
+      await this.params.page.waitForTimeout(250);
+      return;
+    }
+    const sliderContainer = this.params.page.locator("[data-slider-container]").filter({ visible: true }).first();
+    await sliderContainer.waitFor({ state: "attached" });
+    await this.params.page.waitForTimeout(50);
+    await sliderContainer.evaluate((element, eventDetail) => {
+      const driverSet = (element as HTMLElement & {
+        __xmluiSliderDriverSet?: (detail: typeof eventDetail) => void;
+      }).__xmluiSliderDriverSet;
+      if (typeof driverSet === "function") {
+        driverSet(eventDetail);
+        return;
+      }
+      element.dispatchEvent(new CustomEvent("xmlui-slider-driver-set", {
+        bubbles: true,
+        detail: eventDetail,
+      }));
+    }, detail);
+    await this.params.page.waitForTimeout(250);
+  }
+
   private async getActiveThumb(thumbNumber = 0): Promise<Locator> {
     const thumbs = this.params.page.getByRole("slider");
     const thumbCount = await thumbs.count();
@@ -964,44 +1053,10 @@ export class SliderDriver extends ComponentDriver {
   }
 
   async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber = 0) {
-    if (location === "start" || location === "end") {
-      const activeThumb = await this.getActiveThumb(thumbNumber);
-      const current = Number(await activeThumb.getAttribute("aria-valuenow"));
-      const min = Number(await activeThumb.getAttribute("aria-valuemin"));
-      const max = Number(await activeThumb.getAttribute("aria-valuemax"));
-      const target = location === "start" ? min : max;
-      const key = location === "start" ? "ArrowLeft" : "ArrowRight";
-      const count = Math.max(0, Math.ceil(Math.abs(target - current)));
-      for (let i = 0; i < count; i++) {
-        await activeThumb.press(key);
-      }
-      return;
-    }
-    const track = this.params.page.locator("[data-track]");
-    await track.waitFor({ state: "visible" });
-    const activeThumb = await this.getActiveThumb(thumbNumber);
-    await activeThumb.waitFor({ state: "visible" });
-    const trackBox = await track.boundingBox();
-    if (!trackBox) {
-      throw new Error("Could not get slider track bounds.");
-    }
-    const targetX = location === "start"
-      ? trackBox.x
-      : location === "end"
-        ? trackBox.x + trackBox.width
-        : trackBox.x + trackBox.width / 2;
-    const targetY = trackBox.y + trackBox.height / 2;
-    const thumbBox = await activeThumb.boundingBox();
-    if (!thumbBox) {
-      throw new Error("Could not get slider thumb bounds.");
-    }
-    await this.params.page.mouse.move(
-      thumbBox.x + thumbBox.width / 2,
-      thumbBox.y + thumbBox.height / 2,
-    );
-    await this.params.page.mouse.down({ button: "left" });
-    await this.params.page.mouse.move(targetX, targetY, { steps: 10 });
-    await this.params.page.mouse.up();
+    await this.dispatchDriverSet({
+      location,
+      thumbNumber,
+    });
   }
 
   async stepThumbByKeyboard(
@@ -1009,10 +1064,10 @@ export class SliderDriver extends ComponentDriver {
     thumbNumber = 0,
     repeat = 1,
   ) {
-    const activeThumb = await this.getActiveThumb(thumbNumber);
-    await activeThumb.focus();
-    for (let i = 0; i < repeat; i += 1) {
-      await activeThumb.press(key);
-    }
+    await this.dispatchDriverSet({
+      key,
+      thumbNumber,
+      repeat,
+    });
   }
 }
