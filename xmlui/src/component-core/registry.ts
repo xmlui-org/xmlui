@@ -40,7 +40,7 @@ import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
-import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
+import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import {
   hSplitterRenderer,
   splitterRenderer,
@@ -48,7 +48,7 @@ import {
 } from "../components/Splitter/Splitter.renderer";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
-import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
+import { spinnerRenderer } from "../components/Spinner/Spinner";
 import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
 import {
   chStackRenderer,
@@ -64,7 +64,7 @@ import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
 import { checkboxRenderer } from "../components/Checkbox/Checkbox";
 import { switchRenderer } from "../components/Switch/Switch";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
-import { sliderRenderer } from "../components/Slider/Slider.renderer";
+import { sliderRenderer } from "../components/Slider/Slider";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
@@ -128,7 +128,7 @@ import { partRenderer } from "../components/Part/Part";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
 import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
-import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
+import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
@@ -398,7 +398,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   ToneChangerButton: toneChangerButtonRenderer,
   Pages: pagesRuntimeRenderer,
   Page: pageRuntimeRenderer,
-  Redirect: redirectRenderer,
+  Redirect: redirectRuntimeRenderer,
   NestedApp: nestedAppRenderer,
   IncludeMarkup: includeMarkupRenderer,
   Markdown: markdownRenderer,
@@ -981,7 +981,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (pagesTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
     } else if (redirectTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.tsx`);
     } else if (nestedAppTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NestedAppReact.tsx`);
     }

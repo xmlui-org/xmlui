@@ -1,97 +1,80 @@
-import {
-  forwardRef,
-  memo,
-  useEffect,
-  useState,
-  type CSSProperties,
-  type ForwardedRef,
-  type HTMLAttributes,
-} from "react";
+import type { ForwardedRef } from "react";
+import { forwardRef, memo, useEffect, useState } from "react";
 
-import { defaultProps } from "./Spinner.defaults";
 import styles from "./Spinner.module.scss";
+import classnames from "classnames";
+import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_RING } from "../../components-core/parts";
+import { defaultProps } from "./Spinner.defaults";
 
-export type SpinnerProps = HTMLAttributes<HTMLDivElement> & {
-  delay?: unknown;
+type SpinnerProps = React.HTMLAttributes<HTMLDivElement> & {
+  delay?: number;
   fullScreen?: boolean;
-  className?: string;
-  style?: CSSProperties;
+  classes?: Record<string, string>;
 };
 
+// source https://loading.io/css/
 export const Spinner = memo(forwardRef(function Spinner(
   {
     delay = defaultProps.delay,
     fullScreen = defaultProps.fullScreen,
-    className,
     style,
+    classes,
+    className,
     ...rest
   }: SpinnerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const normalizedDelay = normalizeDelay(delay);
-  const [pastDelay, setPastDelay] = useState(normalizedDelay === 0);
+  const [pastDelay, setPastDelay] = useState(delay === 0);
 
   useEffect(() => {
-    if (normalizedDelay === 0) {
-      setPastDelay(true);
-      return;
-    }
-    setPastDelay(false);
     const timeout = setTimeout(() => {
       setPastDelay(true);
-    }, normalizedDelay);
+    }, delay);
     return () => {
       clearTimeout(timeout);
     };
-  }, [normalizedDelay]);
+  }, [delay]);
 
   if (!pastDelay) {
     return null;
+  } else {
+    if (fullScreen) {
+      return (
+        <div
+          {...rest}
+          role="status"
+          aria-label="Loading"
+          className={styles.fullScreenSpinnerWrapper}
+        >
+          <div
+            className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
+            style={style}
+            ref={forwardedRef}
+          >
+            <Part partId={PART_RING}><div></div></Part>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div
+        {...rest}
+        className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
+        role="status"
+        aria-label="Loading"
+        style={style}
+        ref={forwardedRef}
+      >
+        <Part partId={PART_RING}><div></div></Part>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    );
   }
-
-  const spinner = (
-    <div
-      className={[styles.spinner, className].filter(Boolean).join(" ")}
-      role={fullScreen ? undefined : "status"}
-      aria-label={fullScreen ? undefined : "Loading"}
-      style={style}
-      ref={fullScreen ? undefined : forwardedRef}
-      {...(!fullScreen ? rest : {})}
-    >
-      <div className={styles.spinnerSegment} data-part-id="ring" data-xmlui-part="ring" />
-      <div className={styles.spinnerSegment} />
-      <div className={styles.spinnerSegment} />
-      <div className={styles.spinnerSegment} />
-    </div>
-  );
-
-  if (!fullScreen) {
-    return spinner;
-  }
-
-  return (
-    <div
-      {...rest}
-      className={styles.fullScreenSpinnerWrapper}
-      role="status"
-      aria-label="Loading"
-      ref={forwardedRef}
-    >
-      {spinner}
-    </div>
-  );
 }));
-
-function normalizeDelay(delay: unknown): number {
-  if (delay === undefined || delay === null) {
-    return 0;
-  }
-  if (typeof delay === "number") {
-    return Number.isFinite(delay) ? Math.max(0, delay) : defaultProps.delay;
-  }
-  if (typeof delay === "string" && delay.trim() !== "") {
-    const parsed = Number(delay);
-    return Number.isFinite(parsed) ? Math.max(0, parsed) : defaultProps.delay;
-  }
-  return defaultProps.delay;
-}

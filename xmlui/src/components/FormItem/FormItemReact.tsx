@@ -14,7 +14,7 @@ import {
 import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
 import { Select } from "../Select/SelectReact";
 import { RadioGroup, RadioGroupOption } from "../RadioGroup/RadioGroupReact";
-import { SliderNative } from "../Slider/SliderReact";
+import { Slider as SliderNative } from "../Slider/SliderReact";
 import { NumberBox as NumberBoxNative } from "../NumberBox/NumberBoxReact";
 import { ColorPicker } from "../ColorPicker/ColorPickerReact";
 import { DateInput } from "../DateInput/DateInputReact";

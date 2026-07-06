@@ -85,17 +85,17 @@ import { queueRenderer } from "../components/Queue/Queue.renderer";
 import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
-import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
+import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
 import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
 import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
-import { sliderRenderer } from "../components/Slider/Slider.renderer";
+import { sliderRenderer } from "../components/Slider/Slider";
 import { slotRenderer } from "../components/Slot/Slot.renderer";
-import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
-import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
+import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
+import { spinnerRenderer } from "../components/Spinner/Spinner";
 import {
   hSplitterRenderer,
   splitterRenderer,
@@ -262,7 +262,7 @@ export const coreRuntimeRendererEntries = [
   { name: "ToneChangerButton", renderer: toneChangerButtonRenderer },
   { name: "Pages", renderer: pagesRuntimeRenderer },
   { name: "Page", renderer: pageRuntimeRenderer },
-  { name: "Redirect", renderer: redirectRenderer },
+  { name: "Redirect", renderer: redirectRuntimeRenderer },
   { name: "NestedApp", renderer: nestedAppRenderer },
   { name: "IncludeMarkup", renderer: includeMarkupRenderer },
   { name: "Markdown", renderer: markdownRenderer },

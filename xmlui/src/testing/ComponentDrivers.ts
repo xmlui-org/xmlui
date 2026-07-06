@@ -961,6 +961,19 @@ export class SliderDriver extends ComponentDriver {
   }
 
   async dragThumbByMouse(location: "start" | "end" | "middle", thumbNumber = 0) {
+    if (location === "start" || location === "end") {
+      const activeThumb = await this.getActiveThumb(thumbNumber);
+      const current = Number(await activeThumb.getAttribute("aria-valuenow"));
+      const min = Number(await activeThumb.getAttribute("aria-valuemin"));
+      const max = Number(await activeThumb.getAttribute("aria-valuemax"));
+      const target = location === "start" ? min : max;
+      const key = location === "start" ? "ArrowLeft" : "ArrowRight";
+      const count = Math.max(0, Math.ceil(Math.abs(target - current)));
+      for (let i = 0; i < count; i++) {
+        await activeThumb.press(key);
+      }
+      return;
+    }
     const track = this.params.page.locator("[data-track]");
     await track.waitFor({ state: "visible" });
     const activeThumb = await this.getActiveThumb(thumbNumber);
@@ -975,9 +988,16 @@ export class SliderDriver extends ComponentDriver {
         ? trackBox.x + trackBox.width
         : trackBox.x + trackBox.width / 2;
     const targetY = trackBox.y + trackBox.height / 2;
-    await activeThumb.hover();
+    const thumbBox = await activeThumb.boundingBox();
+    if (!thumbBox) {
+      throw new Error("Could not get slider thumb bounds.");
+    }
+    await this.params.page.mouse.move(
+      thumbBox.x + thumbBox.width / 2,
+      thumbBox.y + thumbBox.height / 2,
+    );
     await this.params.page.mouse.down({ button: "left" });
-    await this.params.page.mouse.move(targetX, targetY);
+    await this.params.page.mouse.move(targetX, targetY, { steps: 10 });
     await this.params.page.mouse.up();
   }
 

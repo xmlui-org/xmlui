@@ -445,7 +445,7 @@ if (params.has("__xmluiTestBed")) {
         await waitForTestBedRender();
       }
       const module = await compileTestBedModule(source);
-      history.replaceState(null, "", "/?__xmluiTestBed=1");
+      history.replaceState(null, "", "/");
       window.scrollTo(0, 0);
       await renderTestBedModule(module);
       await waitForTestBedRender();

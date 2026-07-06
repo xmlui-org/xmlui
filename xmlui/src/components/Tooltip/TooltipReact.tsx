@@ -1,6 +1,8 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import type { CSSProperties, HTMLAttributes, ReactElement, ReactNode, Ref } from "react";
+import { Children, cloneElement, forwardRef, isValidElement, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
+import { useTheme } from "../../components-core/theming/ThemeContext";
 import { defaultProps } from "./Tooltip.defaults";
 import styles from "./Tooltip.module.scss";
 
@@ -49,12 +51,61 @@ export const TooltipComponent = forwardRef<HTMLDivElement, TooltipProps>(functio
   },
   ref,
 ) {
+  const { root } = useTheme();
   const triggerRef = useRef<HTMLElement | null>(null);
   const [hoverOpen, setHoverOpen] = useState(defaultOpen);
   const [coords, setCoords] = useState({ left: 0, top: 0 });
   const visible = open ?? hoverOpen;
   const content = tooltipTemplate ?? (markdown ? renderTinyMarkdown(markdown) : text);
   const hasTooltip = content !== undefined && content !== null && content !== "";
+  const child = Children.count(children) === 1 && isValidElement(children)
+    ? children as ReactElement<Record<string, unknown>>
+    : null;
+
+  const triggerHandlers = {
+    onBlur: composeEventHandlers(child?.props.onBlur, () => setHoverOpen(false)),
+    onFocus: composeEventHandlers(child?.props.onFocus, () => setHoverOpen(true)),
+    onMouseEnter: composeEventHandlers(child?.props.onMouseEnter, () => {
+      window.setTimeout(() => setHoverOpen(true), Number(delayDuration) || 0);
+    }),
+    onMouseLeave: composeEventHandlers(child?.props.onMouseLeave, () => setHoverOpen(false)),
+  };
+
+  const trigger = child ? (
+    cloneElement(child, {
+      ...triggerHandlers,
+      ref: composeRefs((child as ReactElement & { ref?: Ref<HTMLElement> }).ref, triggerRef),
+    })
+  ) : (
+    <span
+      className={styles.trigger}
+      {...triggerHandlers}
+      ref={triggerRef}
+    >
+      {children}
+    </span>
+  );
+
+  const tooltip = visible && hasTooltip ? (
+    <div
+      {...rest}
+      ref={ref}
+      className={[styles.content, className].filter(Boolean).join(" ")}
+      data-side={side}
+      data-tooltip-container
+      role="tooltip"
+      style={{
+        ...(style as CSSProperties),
+        left: coords.left,
+        top: coords.top,
+        "--xmlui-tooltip-side-offset": `${Number(sideOffset) || 0}px`,
+      } as CSSProperties}
+    >
+      {content}
+      {showArrow ? <span aria-hidden="true" className={styles.arrow} /> : null}
+    </div>
+  ) : null;
+  const portalRoot = root ?? (typeof document === "undefined" ? null : document.body);
 
   useEffect(() => {
     if (!visible || !triggerRef.current) {
@@ -77,38 +128,35 @@ export const TooltipComponent = forwardRef<HTMLDivElement, TooltipProps>(functio
 
   return (
     <span className={styles.root} data-xmlui-component="TooltipTrigger">
-      <span
-        className={styles.trigger}
-        onBlur={() => setHoverOpen(false)}
-        onFocus={() => setHoverOpen(true)}
-        onMouseEnter={() => window.setTimeout(() => setHoverOpen(true), Number(delayDuration) || 0)}
-        onMouseLeave={() => setHoverOpen(false)}
-        ref={triggerRef}
-      >
-        {children}
-      </span>
-      {visible && hasTooltip ? (
-        <div
-          {...rest}
-          ref={ref}
-          className={[styles.content, className].filter(Boolean).join(" ")}
-          data-side={side}
-          data-tooltip-container
-          role="tooltip"
-          style={{
-            ...(style as CSSProperties),
-            left: coords.left,
-            top: coords.top,
-            "--xmlui-tooltip-side-offset": `${Number(sideOffset) || 0}px`,
-          } as CSSProperties}
-        >
-          {content}
-          {showArrow ? <span aria-hidden="true" className={styles.arrow} /> : null}
-        </div>
-      ) : null}
+      {trigger}
+      {portalRoot && tooltip ? createPortal(tooltip, portalRoot) : tooltip}
     </span>
   );
 });
+
+function composeRefs<T>(...refs: Array<Ref<T> | undefined>) {
+  return (node: T | null) => {
+    for (const ref of refs) {
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref && typeof ref === "object") {
+        (ref as { current: T | null }).current = node;
+      }
+    }
+  };
+}
+
+function composeEventHandlers(
+  originalHandler: unknown,
+  ourHandler: () => void,
+) {
+  return (event: unknown) => {
+    if (typeof originalHandler === "function") {
+      originalHandler(event);
+    }
+    ourHandler();
+  };
+}
 
 export function parseTooltipOptions(input: unknown): Partial<TooltipOptions> {
   if (input && typeof input === "object" && !Array.isArray(input)) {

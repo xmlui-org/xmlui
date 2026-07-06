@@ -1,11 +1,52 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./SpaceFiller.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { SpaceFiller } from "./SpaceFillerReact";
+import { createMetadata } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { COMPONENT_PART_KEY } from "../../styling/layout";
 
 const COMP = "SpaceFiller";
 
 export const SpaceFillerMd = createMetadata({
   status: "stable",
   description:
-    "`SpaceFiller` works well in layout containers to fill remaining unused space.",
-  themeVars: extractScssThemeVars(""),
+    "`SpaceFiller` works well in layout containers to fill remaining (unused) " +
+    "space. Its behavior depends on the layout container in which it is used.",
+  themeVars: parseScssVar(styles.themeVars),
+});
+
+type ThemedSpaceFillerProps = React.ComponentPropsWithoutRef<typeof SpaceFiller>;
+
+export const ThemedSpaceFiller = React.forwardRef<React.ElementRef<typeof SpaceFiller>, ThemedSpaceFillerProps>(
+  function ThemedSpaceFiller({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(SpaceFillerMd);
+    return (
+      <SpaceFiller
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const spaceFillerComponentRenderer = wrapComponent(COMP, SpaceFiller, SpaceFillerMd, {
+  // Explicitly render with no props to ignore layout properties (width, height, etc.)
+  customRender: () => <SpaceFiller />,
+});
+
+export const spaceFillerRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: SpaceFillerMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <SpaceFiller
+      {...adapter.rootAttrs()}
+      classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+    />
+  ),
 });

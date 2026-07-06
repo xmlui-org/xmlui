@@ -1,282 +1,221 @@
-$themeVars: "";
 
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$borderRadius-Slider: createThemeVar("borderRadius-Slider");
-$borderColor-Slider: createThemeVar("borderColor-Slider");
-$borderWidth-Slider: createThemeVar("borderWidth-Slider");
-$borderStyle-Slider: createThemeVar("borderStyle-Slider");
-$boxShadow-Slider: createThemeVar("boxShadow-Slider");
-$borderColor-Slider--hover: createThemeVar("borderColor-Slider--hover");
-$boxShadow-Slider--hover: createThemeVar("boxShadow-Slider--hover");
-$borderColor-Slider--focus: createThemeVar("borderColor-Slider--focus");
-$boxShadow-Slider--focus: createThemeVar("boxShadow-Slider--focus");
-$borderRadius-Slider--error: createThemeVar("borderRadius-Slider--error");
-$borderColor-Slider--error: createThemeVar("borderColor-Slider--error");
-$borderWidth-Slider--error: createThemeVar("borderWidth-Slider--error");
-$borderStyle-Slider--error: createThemeVar("borderStyle-Slider--error");
-$boxShadow-Slider--error: createThemeVar("boxShadow-Slider--error");
-$borderColor-Slider--error--hover: createThemeVar("borderColor-Slider--error--hover");
-$boxShadow-Slider--error--hover: createThemeVar("boxShadow-Slider--error--hover");
-$borderColor-Slider--error--focus: createThemeVar("borderColor-Slider--error--focus");
-$boxShadow-Slider--error--focus: createThemeVar("boxShadow-Slider--error--focus");
-$borderRadius-Slider--warning: createThemeVar("borderRadius-Slider--warning");
-$borderColor-Slider--warning: createThemeVar("borderColor-Slider--warning");
-$borderWidth-Slider--warning: createThemeVar("borderWidth-Slider--warning");
-$borderStyle-Slider--warning: createThemeVar("borderStyle-Slider--warning");
-$boxShadow-Slider--warning: createThemeVar("boxShadow-Slider--warning");
-$borderColor-Slider--warning--hover: createThemeVar("borderColor-Slider--warning--hover");
-$boxShadow-Slider--warning--hover: createThemeVar("boxShadow-Slider--warning--hover");
-$borderColor-Slider--warning--focus: createThemeVar("borderColor-Slider--warning--focus");
-$boxShadow-Slider--warning--focus: createThemeVar("boxShadow-Slider--warning--focus");
-$borderRadius-Slider--success: createThemeVar("borderRadius-Slider--success");
-$borderColor-Slider--success: createThemeVar("borderColor-Slider--success");
-$borderWidth-Slider--success: createThemeVar("borderWidth-Slider--success");
-$borderStyle-Slider--success: createThemeVar("borderStyle-Slider--success");
-$boxShadow-Slider--success: createThemeVar("boxShadow-Slider--success");
-$borderColor-Slider--success--hover: createThemeVar("borderColor-Slider--success--hover");
-$boxShadow-Slider--success--hover: createThemeVar("boxShadow-Slider--success--hover");
-$borderColor-Slider--success--focus: createThemeVar("borderColor-Slider--success--focus");
-$boxShadow-Slider--success--focus: createThemeVar("boxShadow-Slider--success--focus");
-$backgroundColor-track-Slider: createThemeVar("backgroundColor-track-Slider");
-$backgroundColor-track-Slider--disabled: createThemeVar("backgroundColor-track-Slider--disabled");
-$backgroundColor-range-Slider: createThemeVar("backgroundColor-range-Slider");
-$backgroundColor-range-Slider--disabled: createThemeVar("backgroundColor-range-Slider--disabled");
-$borderWidth-thumb-Slider: createThemeVar("borderWidth-thumb-Slider");
-$borderStyle-thumb-Slider: createThemeVar("borderStyle-thumb-Slider");
-$borderColor-thumb-Slider: createThemeVar("borderColor-thumb-Slider");
-$backgroundColor-thumb-Slider: createThemeVar("backgroundColor-thumb-Slider");
-$boxShadow-thumb-Slider: createThemeVar("boxShadow-thumb-Slider");
-$backgroundColor-thumb-Slider--focus: createThemeVar("backgroundColor-thumb-Slider--focus");
-$boxShadow-thumb-Slider--focus: createThemeVar("boxShadow-thumb-Slider--focus");
-$backgroundColor-thumb-Slider--hover: createThemeVar("backgroundColor-thumb-Slider--hover");
-$boxShadow-thumb-Slider--hover: createThemeVar("boxShadow-thumb-Slider--hover");
-$backgroundColor-thumb-Slider--active: createThemeVar("backgroundColor-thumb-Slider--active");
-$boxShadow-thumb-Slider--active: createThemeVar("boxShadow-thumb-Slider--active");
+$componentName: "Slider";
 
-:export {
-  themeVars: "";
+// Variables for default variant
+$borderRadius-Slider: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-Slider: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-Slider: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-Slider: createThemeVar("Input:borderStyle-#{$componentName}");
+$boxShadow-Slider: createThemeVar("Input:boxShadow-#{$componentName}");
+$borderColor-Slider--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$boxShadow-Slider--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$borderColor-Slider--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-Slider--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
+
+// Variables for error variant
+$borderRadius-Slider--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderColor-Slider--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-Slider--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-Slider--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$boxShadow-Slider--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$borderColor-Slider--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$boxShadow-Slider--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$borderColor-Slider--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$boxShadow-Slider--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
+
+// Variables for warning variant
+$borderRadius-Slider--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderColor-Slider--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-Slider--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-Slider--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$boxShadow-Slider--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$borderColor-Slider--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$boxShadow-Slider--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$borderColor-Slider--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$boxShadow-Slider--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
+
+// Variables for success variant
+$borderRadius-Slider--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+$borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-Slider--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-Slider--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$boxShadow-Slider--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$borderColor-Slider--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$boxShadow-Slider--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$borderColor-Slider--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$boxShadow-Slider--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
+
+// Variables for @layer section
+$backgroundColor-track-Slider: createThemeVar("Input:backgroundColor-track-#{$componentName}");
+$backgroundColor-track-Slider--disabled: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
+$backgroundColor-range-Slider: createThemeVar("Input:backgroundColor-range-#{$componentName}");
+$backgroundColor-range-Slider--disabled: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
+$borderWidth-thumb-Slider: createThemeVar("Input:borderWidth-thumb-#{$componentName}");
+$borderStyle-thumb-Slider: createThemeVar("Input:borderStyle-thumb-#{$componentName}");
+$borderColor-thumb-Slider: createThemeVar("Input:borderColor-thumb-#{$componentName}");
+$backgroundColor-thumb-Slider: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
+$boxShadow-thumb-Slider: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
+$backgroundColor-thumb-Slider--focus: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--focus");
+$boxShadow-thumb-Slider--focus: createThemeVar("Input:boxShadow-thumb-#{$componentName}--focus");
+$backgroundColor-thumb-Slider--hover: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--hover");
+$boxShadow-thumb-Slider--hover: createThemeVar("Input:boxShadow-thumb-#{$componentName}--hover");
+$backgroundColor-thumb-Slider--active: createThemeVar("Input:backgroundColor-thumb-#{$componentName}--active");
+$boxShadow-thumb-Slider--active: createThemeVar("Input:boxShadow-thumb-#{$componentName}--active");
+$borderColor-Slider--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderColor-Slider--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+
+// Basic variant mixin for consistent theming
+@mixin variant($variantName) {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+
+  &:hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
+  }
 }
 
 @layer components {
+  // Container for the slider
   .sliderContainer {
-    box-sizing: border-box;
+    width: 100%;
     position: relative;
-    width: 100%;
-    min-width: 10rem;
-    padding: var(--xmlui-space-2, 0.5rem) 0;
+    padding: t.$space-2 0;
   }
 
-  .sliderLabeledItem {
-    display: flex;
-    align-items: center;
-    gap: var(--xmlui-gap-label-Slider, var(--xmlui-gap-normal, 0.5rem));
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .sliderLabelPositionStart {
-    flex-direction: row;
-  }
-
-  .sliderLabelPositionEnd {
-    flex-direction: row-reverse;
-  }
-
-  .sliderLabelPositionTop {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .sliderLabelPositionBottom {
-    flex-direction: column-reverse;
-    align-items: stretch;
-  }
-
-  .sliderLabel {
-    flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-Slider, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-Slider, inherit);
-    white-space: nowrap;
-  }
-
-  .sliderLabelBreak {
-    white-space: normal;
-  }
-
-  .sliderLabelRequired {
-    margin-left: 0.25em;
-  }
-
-  .sliderLabelOptional {
-    margin-left: 0.25em;
-  }
-
+  // Root element
   .sliderRoot {
     position: relative;
     display: flex;
-    align-items: center;
     width: 100%;
-    min-width: 10rem;
-    height: 1.25em;
     touch-action: none;
     user-select: none;
+    align-items: center;
+    height: 1.25em;
   }
 
+  // Track element
   .sliderTrack {
     position: relative;
-    width: 100%;
     height: 0.5em;
-    flex: 1 1 auto;
+    width: 100%;
+    flex-grow: 1;
     overflow: hidden;
-    border-radius: var(--xmlui-borderRadius-Slider);
-    border-color: var(--xmlui-borderColor-Slider);
-    border-width: var(--xmlui-borderWidth-Slider);
-    border-style: var(--xmlui-borderStyle-Slider);
-    box-shadow: var(--xmlui-boxShadow-Slider);
-    background-color: var(--xmlui-backgroundColor-track-Slider);
+    border-radius: 999em;
+    background-color: $backgroundColor-track-Slider;
+
+    @include variant("");
+
+    &.error {
+      @include variant("error");
+    }
+    &.warning {
+      @include variant("warning");
+    }
+    &.valid {
+      @include variant("success");
+    }
+
+    &.disabled, &[data-disabled] {
+      background-color: $backgroundColor-track-Slider--disabled;
+    }
+
+    &:not(.disabled):not([data-disabled]):hover {
+      cursor: pointer;
+    }
   }
 
-  .sliderTrack:hover {
-    border-color: var(--xmlui-borderColor-Slider--hover);
-    box-shadow: var(--xmlui-boxShadow-Slider--hover);
-  }
-
-  .sliderTrack:focus-within {
-    border-color: var(--xmlui-borderColor-Slider--focus);
-    box-shadow: var(--xmlui-boxShadow-Slider--focus);
-  }
-
-  .sliderTrackError {
-    border-radius: var(--xmlui-borderRadius-Slider--error);
-    border-color: var(--xmlui-borderColor-Slider--error);
-    border-width: var(--xmlui-borderWidth-Slider--error);
-    border-style: var(--xmlui-borderStyle-Slider--error);
-    box-shadow: var(--xmlui-boxShadow-Slider--error);
-  }
-
-  .sliderTrackError:hover {
-    border-color: var(--xmlui-borderColor-Slider--error--hover);
-    box-shadow: var(--xmlui-boxShadow-Slider--error--hover);
-  }
-
-  .sliderTrackError:focus-within {
-    border-color: var(--xmlui-borderColor-Slider--error--focus);
-    box-shadow: var(--xmlui-boxShadow-Slider--error--focus);
-  }
-
-  .sliderTrackWarning {
-    border-radius: var(--xmlui-borderRadius-Slider--warning);
-    border-color: var(--xmlui-borderColor-Slider--warning);
-    border-width: var(--xmlui-borderWidth-Slider--warning);
-    border-style: var(--xmlui-borderStyle-Slider--warning);
-    box-shadow: var(--xmlui-boxShadow-Slider--warning);
-  }
-
-  .sliderTrackWarning:hover {
-    border-color: var(--xmlui-borderColor-Slider--warning--hover);
-    box-shadow: var(--xmlui-boxShadow-Slider--warning--hover);
-  }
-
-  .sliderTrackWarning:focus-within {
-    border-color: var(--xmlui-borderColor-Slider--warning--focus);
-    box-shadow: var(--xmlui-boxShadow-Slider--warning--focus);
-  }
-
-  .sliderTrackSuccess {
-    border-radius: var(--xmlui-borderRadius-Slider--success);
-    border-color: var(--xmlui-borderColor-Slider--success);
-    border-width: var(--xmlui-borderWidth-Slider--success);
-    border-style: var(--xmlui-borderStyle-Slider--success);
-    box-shadow: var(--xmlui-boxShadow-Slider--success);
-  }
-
-  .sliderTrackSuccess:hover {
-    border-color: var(--xmlui-borderColor-Slider--success--hover);
-    box-shadow: var(--xmlui-boxShadow-Slider--success--hover);
-  }
-
-  .sliderTrackSuccess:focus-within {
-    border-color: var(--xmlui-borderColor-Slider--success--focus);
-    box-shadow: var(--xmlui-boxShadow-Slider--success--focus);
-  }
-
+  // Range element
   .sliderRange {
     position: absolute;
-    top: 0;
     height: 100%;
-    background-color: var(--xmlui-backgroundColor-range-Slider);
-    border-radius: inherit;
+    background-color: $backgroundColor-range-Slider;
+    border-radius: 999em;
+
+    &.disabled, &[data-disabled] {
+      background-color: $backgroundColor-range-Slider--disabled;
+    }
   }
 
+  // Thumb element
   .sliderThumb {
-    position: absolute;
-    top: 50%;
-    z-index: 1;
+    cursor: pointer;
     display: block;
     width: 1.25em;
     height: 1.25em;
-    border: var(--xmlui-borderWidth-thumb-Slider) var(--xmlui-borderStyle-thumb-Slider) var(--xmlui-borderColor-thumb-Slider);
     border-radius: 50%;
-    background-color: var(--xmlui-backgroundColor-thumb-Slider);
-    box-shadow: var(--xmlui-boxShadow-thumb-Slider);
-    cursor: pointer;
-    outline: none;
-    transform: translate(-50%, -50%);
+    border: $borderWidth-thumb-Slider
+    $borderStyle-thumb-Slider
+    $borderColor-thumb-Slider;
+    background-color: $backgroundColor-thumb-Slider;
+    box-shadow: $boxShadow-thumb-Slider;
+    position: relative;
     transition: background-color 0.2s, box-shadow 0.2s;
+    outline: none;
+
+    &.disabled, &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &:focus-visible, &[data-focus] {
+      background-color: $backgroundColor-thumb-Slider--focus;
+      box-shadow: $boxShadow-thumb-Slider--focus;
+    }
+    &:hover, &[data-hover] {
+      background-color: $backgroundColor-thumb-Slider--hover;
+      box-shadow: $boxShadow-thumb-Slider--hover;
+    }
+    &:active, &[data-active] {
+      background-color: $backgroundColor-thumb-Slider--active;
+      box-shadow: $boxShadow-thumb-Slider--active;
+    }
   }
 
-  .sliderThumb:focus-visible {
-    background-color: var(--xmlui-backgroundColor-thumb-Slider--focus);
-    box-shadow: var(--xmlui-boxShadow-thumb-Slider--focus);
-  }
-
-  .sliderThumb:hover {
-    background-color: var(--xmlui-backgroundColor-thumb-Slider--hover);
-    box-shadow: var(--xmlui-boxShadow-thumb-Slider--hover);
-  }
-
-  .sliderThumb:active {
-    background-color: var(--xmlui-backgroundColor-thumb-Slider--active);
-    box-shadow: var(--xmlui-boxShadow-thumb-Slider--active);
-  }
-
+  /* States */
   .disabled {
-    cursor: not-allowed;
     opacity: 0.5;
-  }
-
-  .disabled .sliderTrack {
-    background-color: var(--xmlui-backgroundColor-track-Slider--disabled);
-  }
-
-  .disabled .sliderRange {
-    background-color: var(--xmlui-backgroundColor-range-Slider--disabled);
-  }
-
-  .disabled .sliderThumb {
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   .readOnly {
-    cursor: default;
     opacity: 0.7;
+    cursor: default;
   }
 
-  .sliderTooltip {
-    position: absolute;
-    bottom: calc(100% + 0.4rem);
-    left: 50%;
-    z-index: 2;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
-    background: var(--xmlui-backgroundColor-tooltip, #1f2937);
-    color: var(--xmlui-textColor-tooltip, #fff);
-    font-size: 0.75rem;
-    white-space: nowrap;
-    transform: translateX(-50%);
-    pointer-events: none;
+  .error {
+    border-color: $borderColor-Slider--error;
   }
+
+  .warning {
+    border-color: $borderColor-Slider--warning;
+  }
+
+  .valid {
+    border-color: $borderColor-Slider--success;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
