@@ -1,5 +1,12 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./FocusScope.defaults";
+import { FocusScope } from "./FocusScopeReact";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import type { RuntimeRenderLayoutContext } from "../../runtime/rendering/types";
+
+const COMP = "FocusScope";
 
 export const FocusScopeMd = createMetadata({
   status: "stable",
@@ -25,3 +32,24 @@ export const FocusScopeMd = createMetadata({
   },
 });
 
+export const focusScopeComponentRenderer = wrapComponent(COMP, FocusScope, FocusScopeMd, {
+  booleans: ["trap", "restore", "autoFocus"],
+});
+
+export const focusScopeRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: FocusScopeMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <FocusScope
+      {...adapter.rootAttrs()}
+      autoFocus={adapter.booleanProp("autoFocus", defaultProps.autoFocus)}
+      restore={adapter.booleanProp("restore", defaultProps.restore)}
+      trap={adapter.booleanProp("trap", defaultProps.trap)}
+    >
+      {adapter.renderChildren(
+        undefined,
+        adapter.props.layoutContext as RuntimeRenderLayoutContext | undefined,
+      )}
+    </FocusScope>
+  ),
+});

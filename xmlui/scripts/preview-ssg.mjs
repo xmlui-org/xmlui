@@ -17,6 +17,13 @@ const mimeTypes = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".ico": "image/x-icon",
+  ".rss": "application/rss+xml; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".eot": "application/vnd.ms-fontobject",
 };
 
 const resourceExtensions = new Set([
@@ -28,14 +35,20 @@ const resourceExtensions = new Set([
   ".jpg",
   ".js",
   ".json",
+  ".md",
+  ".mp3",
+  ".mp4",
   ".mjs",
   ".png",
+  ".rss",
   ".svg",
   ".txt",
+  ".ttf",
   ".webp",
   ".woff",
   ".woff2",
   ".xml",
+  ".zip",
 ]);
 
 const server = createServer((request, response) => {
@@ -90,4 +103,3 @@ function noCache(headers) {
     "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
   };
 }
-

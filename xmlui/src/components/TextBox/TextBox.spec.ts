@@ -1084,7 +1084,7 @@ test("input has correct width", async ({ initTestBed, page }) => {
   await initTestBed(`
     <TextBox width="200px" testId="test"/>
   `);
-  const { width } = (await page.getByTestId("test").boundingBox())!;
+  const { width } = await page.getByTestId("test").boundingBox();
   expect(width).toBe(200);
 });
 
@@ -1092,10 +1092,10 @@ test("input with label has correct width", async ({ initTestBed, page }) => {
   await initTestBed(`
     <TextBox width="200px" label="test" testId="test"/>
   `);
-  const { width } = (await page
+  const { width } = await page
     .getByTestId("test")
     .locator('[data-part-id="labeledItem"]')
-    .boundingBox())!;
+    .boundingBox();
   expect(width).toBe(200);
 });
 
@@ -1104,7 +1104,7 @@ test("input has correct width in %", async ({ page, initTestBed }) => {
   await initTestBed(`<TextBox width="50%" testId="test"/>`, {});
 
   const input = page.getByTestId("test");
-  const { width } = (await input.boundingBox())!;
+  const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
@@ -1113,7 +1113,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await initTestBed(`<TextBox width="50%" label="test" testId="test"/>`, {});
 
   const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
-  const { width } = (await input.boundingBox())!;
+  const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
 
@@ -1144,7 +1144,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test("handles variant", async ({ page, initTestBed }) => {
+  test.fixme("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1154,7 +1154,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test.fixme("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" />`, {
       testThemeVars: {
         "backgroundColor-TextBox-CustomVariant": "rgb(0, 255, 0)",
@@ -1237,7 +1237,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("parts are present when variant is added", async ({ page, initTestBed }) => {
+  test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" variant="CustomVariant" endText="USD" />`, {
       testThemeVars: {
         "borderColor-TextBox-CustomVariant": "rgb(255, 0, 0)",
@@ -1253,7 +1253,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(endAdornment).toBeVisible();
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <TextBox 

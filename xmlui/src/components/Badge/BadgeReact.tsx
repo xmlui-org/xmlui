@@ -1,8 +1,9 @@
-import type { CSSProperties, ForwardedRef, HTMLAttributes } from "react";
-import { forwardRef, memo, useMemo } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, memo, useMemo } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./Badge.defaults";
 import styles from "./Badge.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Badge.defaults";
 
 export const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];
@@ -22,47 +23,39 @@ export function isBadgeColors(color: unknown): color is BadgeColors {
   );
 }
 
-export type BadgeProps = Omit<HTMLAttributes<HTMLDivElement>, "color"> & {
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
-  className?: string;
-  style?: CSSProperties;
+  classes?: Record<string, string>;
+  themeColor?: string;
 };
 
 export const Badge = memo(forwardRef(function Badge(
-  {
-    children,
-    color,
-    variant = defaultProps.variant,
-    style,
-    className,
-    onContextMenu,
-    ...rest
-  }: BadgeProps,
+  { children, color, variant = defaultProps.variant, style, classes, className, onContextMenu, themeColor: _themeColor, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const mergedStyle = useMemo<CSSProperties | undefined>(() => {
-    if (!color) {
-      return style;
-    }
+    if (!color) return style;
     const colorStyle: CSSProperties =
       typeof color === "string"
         ? { backgroundColor: color }
-        : { backgroundColor: color.background, color: color.label };
+        : { backgroundColor: (color as BadgeColors).background, color: (color as BadgeColors).label };
     return { ...colorStyle, ...style };
   }, [color, style]);
-
-  const classNames = [
-    styles.container,
-    variant === "pill" ? styles.pill : styles.badge,
-    className,
-  ].filter(Boolean).join(" ");
 
   return (
     <div
       ref={forwardedRef}
       {...rest}
-      className={classNames}
+      className={classnames(
+        styles.container,
+        {
+          [styles.badge]: variant === "badge",
+          [styles.pill]: variant === "pill",
+        },
+        classes?.[COMPONENT_PART_KEY],
+        className,
+      )}
       onContextMenu={onContextMenu}
       style={mergedStyle}
     >

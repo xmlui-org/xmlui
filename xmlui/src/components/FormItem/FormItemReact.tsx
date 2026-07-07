@@ -1,697 +1,597 @@
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import {
-  Children,
+  forwardRef,
+  memo,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useMemo,
-  useRef,
-  isValidElement,
-  type ChangeEvent,
-  type CSSProperties,
-  type ReactNode,
 } from "react";
+import { FormItemContext, useIsInsideFormItem, useFormItemInputId } from "./FormItemContext";
+export { FormItemContext, useIsInsideFormItem, useFormItemInputId };
+import classnames from "classnames";
 
-import { FormProvider, useFormContext, type FormContextValue } from "../Form/FormContext";
-import { SelectNative } from "../Select/SelectReact";
-import { RadioGroupNative, type RadioGroupOption } from "../RadioGroup/RadioGroupReact";
-import { SliderNative } from "../Slider/SliderReact";
-import { NumberBoxNative } from "../NumberBox/NumberBoxReact";
-import { ColorPickerNative } from "../ColorPicker/ColorPickerReact";
-import { DateInputNative } from "../DateInput/DateInputReact";
-import { DatePickerNative } from "../DatePicker/DatePickerReact";
-import { TimeInputNative } from "../TimeInput/TimeInputReact";
-import type { XmluiOption } from "../Option/OptionReact";
-import { useThemeVariables } from "../../runtime/rendering/theme";
-import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./FormItem.module.scss";
 
-export type FormItemProps = {
-  id?: string;
-  className?: string;
-  style?: CSSProperties;
-  bindTo?: string;
-  label?: string;
-  labelPosition?: string;
-  labelWidth?: string | number;
-  labelBreak?: boolean;
-  enabled?: boolean;
-  autoFocus?: boolean;
-  type?: string;
-  initialValue?: unknown;
-  required?: boolean;
-  requireLabelMode?: string;
-  requiredInvalidMessage?: string;
-  minLength?: number;
-  lengthInvalidMessage?: string;
-  pattern?: string;
-  patternInvalidMessage?: string;
-  patternInvalidSeverity?: "error" | "warning" | string;
-  regex?: string;
-  regexInvalidMessage?: string;
-  regexInvalidSeverity?: "error" | "warning" | string;
-  matchValue?: unknown;
-  matchInvalidMessage?: string;
-  noSubmit?: boolean;
-  validationMode?: string;
-  customValidationsDebounce?: number;
-  onValidate?: (value: unknown) => unknown | Promise<unknown>;
-  options?: XmluiOption[];
-  searchable?: boolean;
-  groupBy?: string;
-  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
-  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
-  children?: ReactNode;
-  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
-  renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
+import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import type {
+  FormControlType,
+  FormItemValidations,
+  ValidateEventHandler,
+  ValidationMode,
+  ValidationSeverity,
+} from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
+import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
+import { ThemedFileInput as FileInput } from "../FileInput/FileInput";
+import { ThemedNumberBox as NumberBox } from "../NumberBox/NumberBox";
+import { ThemedSelect as Select } from "../Select/Select";
+import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
+
+import {
+  fieldChanged,
+  fieldFocused,
+  fieldInitialized,
+  fieldLostFocus,
+  fieldRemoved,
+} from "../Form/formActions";
+import { ThemedTextArea as TextArea } from "../TextArea/TextArea";
+import { useEvent } from "../../components-core/utils/misc";
+import { ThemedDatePicker as DatePicker } from "../DatePicker/DatePicker";
+import { getByPath } from "../Form/FormReact";
+import { ThemedAutoComplete as AutoComplete } from "../AutoComplete/AutoComplete";
+import type { LabelPosition, RequireLabelMode } from "../abstractions";
+import type { FormItemMd } from "./FormItem";
+import { ItemWithLabel } from "./ItemWithLabel";
+import { defaultProps } from "./FormItem.defaults";
+import { resolveFormItemId } from "./FormItemUtils";
+import { ThemedSlider as Slider } from "../Slider/Slider";
+import { ThemedColorPicker as ColorPicker } from "../ColorPicker/ColorPicker";
+import { Items } from "../Items/ItemsReact";
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
+
+const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
+  checkbox: "end",
 };
 
-export function FormItem({
-  id,
-  className,
-  style,
-  bindTo,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-  enabled = true,
-  autoFocus = false,
-  type = "text",
-  initialValue,
-  required = false,
-  requireLabelMode,
+type Props = {
+  children?: ReactNode;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  bindTo: string;
+  type?: FormControlType;
+  labelPosition?: LabelPosition;
+  autoFocus?: boolean;
+  enabled?: boolean;
+  label?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
+  onValidate?: ValidateEventHandler;
+  customValidationsDebounce?: number;
+  validationMode?: ValidationMode;
+  requireLabelMode?: RequireLabelMode;
+  initialValue?: any;
+  registerComponentApi?: RegisterComponentApiFn;
+  maxTextLength?: number;
+  inputRenderer?: any;
+  itemIndex?: number;
+  gap?: string;
+  noSubmit?: boolean;
+  formItemId?: string;
+  validationStatus?: ValidationSeverity;
+  invalidMessages?: string[];
+  validationResult?: ReactNode;
+  validationInProgress?: boolean;
+} & FormItemValidations;
+
+
+const ArrayLikeFormItem = forwardRef(function ArrayLikeFormItem({
+  children,
+  formItemId,
+  registerComponentApi,
+  value = EMPTY_ARRAY,
+  updateState,
+}: any, _ref: ForwardedRef<unknown>) {
+  const formContextValue = useMemo(() => {
+    return {
+      parentFormItemId: formItemId,
+      isInsideFormItem: true,
+      inputId: null,
+    };
+  }, [formItemId]);
+
+  const addItem = useEvent((item) => {
+    updateState({ value: [...value, item] });
+  });
+
+  const removeItem = useEvent((index) => {
+    updateState({ value: value.filter((item, i) => i !== index) });
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      addItem: addItem,
+      removeItem: removeItem,
+    });
+  }, [addItem, registerComponentApi, removeItem]);
+
+  return <FormItemContext.Provider value={formContextValue}>{children}</FormItemContext.Provider>;
+});
+
+export const FormItem = memo(forwardRef(function FormItem({
+  // --- validation props
+  required,
   requiredInvalidMessage,
   minLength,
+  maxLength,
   lengthInvalidMessage,
+  lengthInvalidSeverity,
+  minValue,
+  maxValue,
+  rangeInvalidMessage,
+  rangeInvalidSeverity,
   pattern,
   patternInvalidMessage,
   patternInvalidSeverity,
+  validator,
+  validatorParams,
+  validatorInvalidMessage,
+  validatorInvalidSeverity,
   regex,
   regexInvalidMessage,
   regexInvalidSeverity,
   matchValue,
   matchInvalidMessage,
-  noSubmit = false,
-  validationMode,
-  customValidationsDebounce = 0,
-  onValidate,
-  options,
-  searchable,
-  groupBy,
-  groupHeaderTemplateRenderer,
-  ungroupedHeaderTemplateRenderer,
+  // ---
+  style,
+  className,
+  classes,
+  bindTo,
+  type = defaultProps.type,
+  label,
+  enabled = defaultProps.enabled,
+  labelPosition,
+  labelWidth,
+  labelBreak = defaultProps.labelBreak,
   children,
-  inputRenderer,
-  renderItemTemplate,
+  onValidate: _onValidate,
+  customValidationsDebounce: _customValidationsDebounce = defaultProps.customValidationsDebounce,
+  validationMode: _validationMode,
   registerComponentApi,
+  maxTextLength,
+  inputRenderer,
+  itemIndex,
+  initialValue: initialValueFromProps,
+  gap,
+  noSubmit = defaultProps.noSubmit,
+  requireLabelMode,
+  formItemId: formItemIdFromProps,
+  validationStatus,
+  invalidMessages,
+  validationResult,
+  validationInProgress,
+  layoutContext,
   ...rest
-}: FormItemProps) {
-  const generatedId = useId();
-  const inputId = id ? `${id}-input` : generatedId;
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const validationTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const validateRef = useRef(onValidate);
-  const form = useFormContext();
-  const registerFormItem = form?.registerItem;
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const themeVariables = useThemeVariables();
-  const effectiveLabelPosition = labelPosition ?? form?.itemLabelPosition ?? "top";
-  const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
-  const effectiveLabelBreak = labelBreak ?? form?.itemLabelBreak ?? false;
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const fieldName = resolveFieldName(bindTo, id, generatedId, form?.fieldPrefix);
-  const formEnabled = form?.enabled ?? true;
-  const itemEnabled = enabled && formEnabled;
-  const value = form?.getValue(fieldName) ?? initialValue ?? "";
-  const error = form?.errors[fieldName];
-  const fieldIssue = form?.issues.find((issue) => issue.field === fieldName);
-  const validationStatus = fieldIssue?.severity ?? (error ? "error" : undefined);
-  const validationMessage = error ?? fieldIssue?.message;
-  const showRequiredIndicator =
-    required && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-
-  useEffect(() => {
-    validateRef.current = onValidate;
-  }, [onValidate]);
-
-  const validateRegisteredItem = useCallback((value: unknown) => validateRef.current?.(value), []);
-
-  useEffect(() => {
-    if (!getFormValue || !setFormValue || getFormValue(fieldName) != null || initialValue === undefined) {
-      return;
-    }
-    setFormValue(fieldName, initialValue);
-  }, [fieldName, getFormValue, initialValue, setFormValue]);
-
-  useEffect(() => {
-    if (!registerFormItem) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label,
-      required,
-      requiredInvalidMessage,
-      minLength,
-      lengthInvalidMessage,
-      pattern,
-      patternInvalidMessage,
-      patternInvalidSeverity,
-      regex,
-      regexInvalidMessage,
-      regexInvalidSeverity,
-      matchValue,
-      matchInvalidMessage,
-      noSubmit: noSubmit || bindTo === undefined,
-      validate: validateRegisteredItem,
-    });
-  }, [
-    fieldName,
-    label,
-    lengthInvalidMessage,
-    matchInvalidMessage,
-    matchValue,
+}: Props & { layoutContext?: any },
+  ref: ForwardedRef<HTMLDivElement>,
+) {
+  const validations: FormItemValidations = useShallowCompareMemoize({
+    required,
+    requiredInvalidMessage,
     minLength,
+    maxLength,
+    lengthInvalidMessage,
+    lengthInvalidSeverity,
+    minValue,
+    maxValue,
+    rangeInvalidMessage,
+    rangeInvalidSeverity,
     pattern,
     patternInvalidMessage,
     patternInvalidSeverity,
+    validator,
+    validatorParams,
+    validatorInvalidMessage,
+    validatorInvalidSeverity,
     regex,
     regexInvalidMessage,
     regexInvalidSeverity,
-    noSubmit,
-    required,
-    requiredInvalidMessage,
-    registerFormItem,
-    validateRegisteredItem,
-  ]);
-
-  useEffect(() => () => {
-    if (validationTimerRef.current) {
-      clearTimeout(validationTimerRef.current);
+  matchValue,
+  matchInvalidMessage,
+  });
+  const defaultId = useId();
+  const inputId = useId();
+  const { parentFormItemId } = useContext(FormItemContext);
+  const formItemId = useMemo(() => {
+    if (formItemIdFromProps) {
+      return formItemIdFromProps;
     }
-  }, []);
+    return resolveFormItemId({
+      bindTo,
+      defaultId,
+      parentFormItemId,
+      itemIndex,
+    });
+  }, [bindTo, defaultId, formItemIdFromProps, itemIndex, parentFormItemId]);
 
-  const addItem = useCallback((item: unknown = {}) => {
-    const currentValue = getFormValue?.(fieldName);
-    const currentItems = Array.isArray(currentValue) ? currentValue : [];
-    setFormValue?.(fieldName, [...currentItems, item]);
-  }, [fieldName, getFormValue, setFormValue]);
+  const labelWidthValue = useFormContextPart((value) => labelWidth || value?.itemLabelWidth);
+  const labelBreakValue = useFormContextPart((value) =>
+    labelBreak !== undefined ? labelBreak : value?.itemLabelBreak,
+  );
+  const labelPositionValue = useFormContextPart<any>(
+    (value) => labelPosition || value?.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
+  );
+  const initialValueFromSubject = useFormContextPart<any>((value) =>
+    getByPath(value?.originalSubject, formItemId),
+  );
+  const initialValue =
+    initialValueFromSubject === undefined || initialValueFromSubject === null
+      ? initialValueFromProps
+      : initialValueFromSubject;
 
-  const removeItem = useCallback((index: number) => {
-    const currentValue = getFormValue?.(fieldName);
-    const currentItems = Array.isArray(currentValue) ? currentValue : [];
-    setFormValue?.(fieldName, currentItems.filter((_, itemIndex) => itemIndex !== index));
-  }, [fieldName, getFormValue, setFormValue]);
+  const value = useFormContextPart<any>((value) => getByPath(value?.subject, formItemId));
+
+  const dispatch = useFormContextPart((value) => value?.dispatch);
+  const formEnabled = useFormContextPart((value) => value?.enabled);
+  const itemRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
+
+  const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    if (type !== "items") {
-      return;
-    }
-    registerComponentApi?.({
-      addItem,
-      removeItem,
-    });
-  }, [addItem, registerComponentApi, removeItem, type]);
+    // Always dispatch fieldInitialized to ensure noSubmit tracking
+    // Pass undefined as value when initialValue is undefined to avoid overwriting existing values
+    dispatch(fieldInitialized(formItemId, initialValue, false, noSubmit));
+  }, [dispatch, formItemId, initialValue, noSubmit]);
 
-  const itemArray = useMemo(() => Array.isArray(value) ? value : [], [value]);
+  const onStateChange = useCallback(
+    ({ value }: any, options?: any) => {
+      //we already handled the initial value in the useEffect with fieldInitialized(...);
+      if (!options?.initial) {
+        dispatch(fieldChanged(formItemId, value));
+      }
+    },
+    [formItemId, dispatch],
+  );
 
-  const scheduleChangedValidation = (nextValue: unknown) => {
-    const shouldValidate =
-      validationMode === "onChanged" ||
-      Boolean(onValidate) ||
-      (validationMode === "errorLate" && Boolean(error));
-    if (!shouldValidate) {
-      return;
-    }
-    if (validationTimerRef.current) {
-      clearTimeout(validationTimerRef.current);
-      validationTimerRef.current = undefined;
-    }
-    if (customValidationsDebounce > 0) {
-      validationTimerRef.current = setTimeout(() => {
-        validationTimerRef.current = undefined;
-        void form?.validateField(fieldName, nextValue);
-      }, customValidationsDebounce);
-      return;
-    }
-    void form?.validateField(fieldName, nextValue);
-  };
-  const handleBlurValidation = () => {
-    if (validationMode === "onLostFocus" || validationMode === "errorLate" || required) {
-      void form?.validateField(fieldName);
-    }
-  };
+  useEffect(() => {
+    return () => {
+      dispatch(fieldRemoved(formItemId));
+    };
+  }, [formItemId, dispatch]);
 
-  const labelStyle = effectiveLabelWidth ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined;
-  const control = renderControl({
-    autoFocus,
-    children,
-    enabled: itemEnabled,
-    error,
-    fieldName,
-    form,
-    inputId,
-    inputRenderer,
-    options,
-    searchable,
-    groupBy,
-    groupHeaderTemplateRenderer,
-    ungroupedHeaderTemplateRenderer,
-    parentForm: form,
-    renderItemTemplate,
-    required,
-    scheduleChangedValidation,
-    handleBlurValidation,
-    type,
-    value,
-    itemArray,
-  }) ?? (
-    <input
-      id={inputId}
-      className={cx(styles.input, error ? styles.errorInput : undefined)}
-      data-xmlui-part="input"
-      value={type === "checkbox" ? undefined : stringify(value)}
-      checked={type === "checkbox" ? Boolean(value) : undefined}
-      type={type}
-      required={required}
-      disabled={!itemEnabled}
-      autoFocus={autoFocus}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={error ? `${inputId}-error` : undefined}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-        const nextValue = normalizeInputValue(event.currentTarget, type);
-        form?.setValue(fieldName, nextValue);
-        scheduleChangedValidation(nextValue);
-      }}
-      onBlur={handleBlurValidation}
-    />
+  const onFocus = useEvent(() => {
+    dispatch(fieldFocused(formItemId));
+  });
+
+  const onBlur = useEvent(() => {
+    dispatch(fieldLostFocus(formItemId));
+  });
+
+  let formControl = null;
+
+  switch (type) {
+    case "select": {
+      const { options: selectOptions, ...selectRest } = rest as any;
+      formControl = (
+        <Select
+          {...selectRest}
+          data={Array.isArray(selectOptions) && selectOptions.length > 0 ? selectOptions : selectRest.data}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+        >
+          {children}
+        </Select>
+      );
+      break;
+    }
+    case "autocomplete": {
+      formControl = (
+        <AutoComplete
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+        >
+          {children}
+        </AutoComplete>
+      );
+      break;
+    }
+    case "datePicker": {
+      formControl = (
+        <DatePicker
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          //registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+        />
+      );
+      break;
+    }
+    case "radioGroup": {
+      formControl = (
+        <RadioGroup
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          //registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+        >
+          {children}
+        </RadioGroup>
+      );
+      break;
+    }
+    case "number":
+    case "integer": {
+      formControl = (
+        <NumberBox
+          {...rest}
+          initialValue={initialValue}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          integersOnly={type === "integer"}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+          min={validations.minValue}
+          max={validations.maxValue}
+          maxLength={maxTextLength ?? validations?.maxLength}
+          gap={gap}
+        ></NumberBox>
+      );
+      break;
+    }
+    case "switch":
+    case "checkbox": {
+      formControl = (
+        <Toggle
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          variant={type}
+          inputRenderer={inputRenderer}
+        />
+      );
+      break;
+    }
+    case "file": {
+      formControl = (
+        <FileInput
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          multiple={asOptionalBoolean((rest as any).multiple, false)} //TODO come up with something for this
+        />
+      );
+      break;
+    }
+    case "text": {
+      formControl = (
+        <TextBox
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+          maxLength={maxTextLength ?? validations?.maxLength}
+          gap={gap}
+        />
+      );
+      break;
+    }
+    case "password": {
+      formControl = (
+        <TextBox
+          {...rest}
+          type={"password"}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+          maxLength={maxTextLength ?? validations?.maxLength}
+        />
+      );
+      break;
+    }
+    case "textarea": {
+      formControl = (
+        <TextArea
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          invalidMessages={invalidMessages}
+          maxLength={maxTextLength ?? validations?.maxLength}
+        />
+      );
+      break;
+    }
+    case "slider": {
+      formControl = (
+        <Slider
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          min={validations.minValue}
+          max={validations.maxValue}
+        />
+      );
+      break;
+    }
+    case "colorpicker": {
+      formControl = (
+        <ColorPicker
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+        />
+      );
+      break;
+    }
+    case "items": {
+      formControl = (
+        <ArrayLikeFormItem
+          formItemId={formItemId}
+          registerComponentApi={registerComponentApi}
+          updateState={onStateChange}
+          value={value}
+        >
+          <div className={styles.itemsStack}>
+            <Items items={value} renderItem={inputRenderer} />
+          </div>
+        </ArrayLikeFormItem>
+      );
+      break;
+    }
+    case "custom": {
+      formControl = children;
+      break;
+    }
+    default: {
+      console.warn(`unknown form item type ${type}`);
+      formControl = <div>{value}</div>;
+      break;
+    }
+  }
+
+  const isInsideForm = useIsInsideForm();
+  if (!isInsideForm) {
+    throw new Error("FormItem must be used inside a Form");
+  }
+
+  // Provide FormItem context for children to know they're inside a FormItem
+  const formItemContextValue = useMemo(
+    () => ({
+      parentFormItemId: formItemId ?? null,
+      isInsideFormItem: true,
+      inputId,
+    }),
+    [formItemId, inputId],
   );
 
   return (
-    <div
-      {...rest}
-      ref={rootRef}
-      className={cx(styles.formItem, !label ? styles.noLabel : undefined, className)}
-      style={style}
-      data-xmlui-form-field={fieldName}
-      onClick={(event) => {
-        if (type !== "select") {
-          return;
-        }
-        if ((event.target as HTMLElement).closest("button")) {
-          return;
-        }
-        rootRef.current?.querySelector<HTMLButtonElement>('button[role="combobox"]')?.click();
-      }}
-    >
-      <div className={cx(styles.row, labelPositionClass(effectiveLabelPosition))}>
-        {label && (
-          <label
-            className={cx(styles.label, effectiveLabelBreak ? styles.labelBreak : undefined)}
-            data-part-id="label"
-            data-xmlui-part="label"
-            htmlFor={inputId}
-            style={labelStyle}
-          >
-            {label}
-            {showRequiredIndicator && <span className={styles.requiredIndicator}>*</span>}
-            {showOptionalIndicator && <span className={styles.optionalIndicator}>(Optional)</span>}
-          </label>
-        )}
-        <div className={styles.control} data-xmlui-part="control">
-          {control}
-        </div>
-        {validationStatus && (
-          <span
-            className={styles.validationStatusIndicator}
-            data-validation-status={validationStatus}
-            data-xmlui-part="validationStatusIndicator"
-            aria-hidden="true"
-          />
-        )}
-      </div>
-      {validationMessage && (
-        <div id={`${inputId}-error`} className={styles.error} data-xmlui-part="error">
-          {validationMessage}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function renderControl({
-  autoFocus,
-  children,
-  enabled,
-  error,
-  fieldName,
-  form,
-  inputId,
-  inputRenderer,
-  itemArray,
-  options,
-  searchable,
-  groupBy,
-  groupHeaderTemplateRenderer,
-  ungroupedHeaderTemplateRenderer,
-  parentForm,
-  renderItemTemplate,
-  required,
-  scheduleChangedValidation,
-  handleBlurValidation,
-  type,
-  value,
-}: {
-  autoFocus: boolean;
-  children?: ReactNode;
-  enabled: boolean;
-  error?: string;
-  fieldName: string;
-  form: ReturnType<typeof useFormContext>;
-  inputId: string;
-  inputRenderer?: (contextVars: Record<string, unknown>) => ReactNode;
-  itemArray: unknown[];
-  options?: XmluiOption[];
-  searchable?: boolean;
-  groupBy?: string;
-  groupHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
-  ungroupedHeaderTemplateRenderer?: (contextVars: Record<string, unknown>, key?: string | number) => ReactNode;
-  parentForm: ReturnType<typeof useFormContext>;
-  renderItemTemplate?: (contextVars: Record<string, unknown>, key: number) => ReactNode;
-  required: boolean;
-  scheduleChangedValidation: (nextValue: unknown) => void;
-  handleBlurValidation: () => void;
-  type: string;
-  value: unknown;
-}): ReactNode | undefined {
-  if (inputRenderer && type !== "items") {
-    return inputRenderer({
-      $value: value,
-      $setValue: (nextValue: unknown) => {
-        form?.setValue(fieldName, nextValue);
-        scheduleChangedValidation(nextValue);
-      },
-      $validationResult: error ? { isValid: false, invalidMessage: error, severity: "error" } : undefined,
-    });
-  }
-  if (type === "items") {
-    return (
-      <div className={styles.itemsStack}>
-        {itemArray.map((item, index) => {
-          const itemForm = parentForm ? scopedFormContext(parentForm, `${fieldName}.${index}`) : undefined;
-          const contextVars = {
-            $item: item,
-            $itemIndex: index,
-            $isFirst: index === 0,
-            $isLast: index === itemArray.length - 1,
-          };
-          return (
-            <div key={index}>
-              {itemForm
-                ? <FormProvider value={itemForm}>{renderItemTemplate?.(contextVars, index) ?? children}</FormProvider>
-                : renderItemTemplate?.(contextVars, index) ?? children}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-  if (type === "select") {
-    return (
-      <SelectNative
+    <FormItemContext.Provider value={formItemContextValue}>
+      <ItemWithLabel
+        ref={ref}
         id={inputId}
-        value={value as any}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        options={options ?? optionsFromChildren(children)}
-        searchable={searchable}
-        groupBy={groupBy}
-        groupHeaderTemplateRenderer={groupHeaderTemplateRenderer}
-        ungroupedHeaderTemplateRenderer={ungroupedHeaderTemplateRenderer}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-      />
-    );
-  }
-  if (type === "radioGroup") {
-    return (
-      <RadioGroupNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        options={(options ?? optionsFromChildren(children)) as RadioGroupOption[]}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-      />
-    );
-  }
-  if (type === "slider") {
-    return (
-      <SliderNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-      />
-    );
-  }
-  if (type === "number" || type === "integer") {
-    return (
-      <NumberBoxNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        inputMode="numeric"
-        integersOnly={type === "integer"}
-        hasSpinBox={false}
-        validationStatus={error ? "error" : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-      />
-    );
-  }
-  if (type === "colorpicker" || type === "colorPicker" || type === "color") {
-    return (
-      <ColorPickerNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-        onBlur={handleBlurValidation}
-      />
-    );
-  }
-  if (type === "dateinput" || type === "dateInput" || type === "date") {
-    return (
-      <DateInputNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        invalidMessages={error ? error.split("\n") : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-        onBlur={handleBlurValidation}
-      />
-    );
-  }
-  if (type === "datepicker" || type === "datePicker") {
-    return (
-      <DatePickerNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        invalidMessages={error ? error.split("\n") : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-        onBlur={handleBlurValidation}
-      />
-    );
-  }
-  if (type === "timeinput" || type === "timeInput" || type === "time") {
-    return (
-      <TimeInputNative
-        id={inputId}
-        value={value}
-        enabled={enabled}
-        required={required}
-        autoFocus={autoFocus}
-        validationStatus={error ? "error" : undefined}
-        onDidChange={(nextValue) => {
-          form?.setValue(fieldName, nextValue);
-          scheduleChangedValidation(nextValue);
-        }}
-        onBlur={handleBlurValidation}
-      />
-    );
-  }
-  if (type === "textarea") {
-    return (
-      <div
-        data-part-id="input"
-        data-xmlui-part="input"
+        formItemId={formItemId}
+        labelPosition={labelPositionValue}
+        label={label}
+        labelWidth={labelWidthValue}
+        labelBreak={labelBreakValue}
+        enabled={isEnabled}
+        required={validations.required}
+        validationInProgress={validationInProgress}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+        requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
+        className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+        validationResult={validationResult}
+        layoutContext={layoutContext}
+        compactInlineLabel={type === "checkbox" || type === "switch"}
       >
-        <textarea
-          id={inputId}
-          className={cx(styles.input, error ? styles.errorInput : undefined)}
-          value={stringify(value)}
-          required={required}
-          disabled={!enabled}
-          autoFocus={autoFocus}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${inputId}-error` : undefined}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-            const nextValue = event.currentTarget.value;
-            form?.setValue(fieldName, nextValue);
-            scheduleChangedValidation(nextValue);
-          }}
-          onBlur={handleBlurValidation}
-        />
-      </div>
-    );
-  }
-  return children;
-}
+        {formControl}
+      </ItemWithLabel>
+    </FormItemContext.Provider>
+  );
+}));
 
-function scopedFormContext(parent: FormContextValue, fieldPrefix: string): FormContextValue {
-  return {
-    ...parent,
-    fieldPrefix,
-    getValue: parent.getValue,
-    setValue: parent.setValue,
-    validateField: parent.validateField,
-    registerItem: parent.registerItem,
-  };
-}
+type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
-function resolveFieldName(
-  bindTo: string | undefined,
-  id: string | undefined,
-  generatedId: string,
-  fieldPrefix: string | undefined,
-): string {
-  if (fieldPrefix !== undefined) {
-    return prefixFieldName(fieldPrefix, bindTo ?? id ?? generatedId);
-  }
-  if (bindTo === undefined || bindTo === "") {
-    return id || generatedId;
-  }
-  return bindTo;
-}
+export const CustomFormItem = forwardRef(function CustomFormItem({
+  renderChild,
+  node,
+  bindTo,
+}: {
+  renderChild: RenderChildFn;
+  node: FormItemComponentDef;
+  bindTo: string;
+}, _ref: ForwardedRef<unknown>) {
+  // IMPORTANT NOTE:
+  //  why we use useFormContextPart, and not useFormContext?
+  //  because we want to avoid re-rendering the whole form when the form state changes.
+  const value = useFormContextPart<any>((value) => getByPath(value.subject, bindTo));
+  const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
+  const dispatch = useFormContextPart((value) => value.dispatch);
 
-function prefixFieldName(prefix: string, name: string | undefined): string {
-  return name ? `${prefix}.${name}` : prefix;
-}
+  const decoratedMetadata = useMemo(() => {
+    return {
+      type: "Container",
+      uid: "formFieldContainer - " + bindTo,
+      vars: node.vars,
+      contextVars: {
+        $value: value,
+        $setValue: (newValue: any) => {
+          dispatch(fieldChanged(bindTo, newValue));
+        },
+        $validationResult: validationResult,
+      },
+      children: node.children,
+    };
+  }, [bindTo, dispatch, node.children, node.vars, validationResult, value]);
 
-function optionsFromChildren(children: ReactNode): XmluiOption[] {
-  return Children.toArray(children).flatMap((child) => {
-    if (!isValidElement(child)) {
-      return [];
-    }
-    const props = child.props as Partial<XmluiOption>;
-    const label = props.label ?? props.children ?? props.value;
-    return [{
-      value: props.value,
-      label: isReactNode(label) ? label : String(label ?? ""),
-      enabled: props.enabled !== false,
-      ...props,
-    }];
-  });
-}
-
-function isReactNode(value: unknown): value is ReactNode {
-  return value === undefined ||
-    value === null ||
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    isValidElement(value) ||
-    Array.isArray(value);
-}
-
-function labelPositionClass(value: string): string {
-  if (value === "start") {
-    return styles.labelStart;
-  }
-  if (value === "before") {
-    return styles.labelBefore;
-  }
-  if (value === "end") {
-    return styles.labelEnd;
-  }
-  if (value === "after") {
-    return styles.labelAfter;
-  }
-  return styles.labelTop;
-}
-
-function cssLength(value: string | number, themeVariables: Record<string, unknown>): string {
-  const normalized = resolveThemeReferences(resolveThemeValue(value, themeVariables));
-  return typeof normalized === "number" ? `${normalized}px` : String(normalized);
-}
-
-function resolveThemeValue(value: string | number, themeVariables: Record<string, unknown>): string | number {
-  if (typeof value !== "string" || !value.startsWith("$")) {
-    return value;
-  }
-  return themeVariables[value.slice(1)] as string | number | undefined ?? value;
-}
-
-function stringify(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
-
-function normalizeInputValue(input: HTMLInputElement, type: string): unknown {
-  if (type === "checkbox") {
-    return input.checked;
-  }
-  if (input.value === "") {
-    return "";
-  }
-  if (type === "number" || type === "integer") {
-    const parsed = Number(input.value);
-    return Number.isFinite(parsed) ? parsed : input.value;
-  }
-  return input.value;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+  return <>{renderChild(decoratedMetadata as any)}</>;
+});

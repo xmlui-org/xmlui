@@ -1,55 +1,47 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./ContentSeparator.module.scss";
+
+import type { CSSProperties } from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { orientationOptionMd } from "../abstractions";
 import { defaultProps } from "./ContentSeparator.defaults";
+import { ContentSeparator } from "./ContentSeparatorReact";
+import { createMetadata } from "../metadata-helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "ContentSeparator";
-const contentSeparatorStylesSource = `
-$backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
-$thickness-ContentSeparator: createThemeVar("thickness-ContentSeparator");
-$length-ContentSeparator: createThemeVar("length-ContentSeparator");
-$marginTop-ContentSeparator: createThemeVar("marginTop-ContentSeparator");
-$marginBottom-ContentSeparator: createThemeVar("marginBottom-ContentSeparator");
-$marginVertical-ContentSeparator: createThemeVar("marginVertical-ContentSeparator");
-$marginLeft-ContentSeparator: createThemeVar("marginLeft-ContentSeparator");
-$marginRight-ContentSeparator: createThemeVar("marginRight-ContentSeparator");
-$marginHorizontal-ContentSeparator: createThemeVar("marginHorizontal-ContentSeparator");
-$paddingTop-ContentSeparator: createThemeVar("paddingTop-ContentSeparator");
-$paddingBottom-ContentSeparator: createThemeVar("paddingBottom-ContentSeparator");
-$paddingVertical-ContentSeparator: createThemeVar("paddingVertical-ContentSeparator");
-$paddingLeft-ContentSeparator: createThemeVar("paddingLeft-ContentSeparator");
-$paddingRight-ContentSeparator: createThemeVar("paddingRight-ContentSeparator");
-$paddingHorizontal-ContentSeparator: createThemeVar("paddingHorizontal-ContentSeparator");
-`;
 
 export const ContentSeparatorMd = createMetadata({
   status: "stable",
   description:
-    "`ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines.",
+    "`ContentSeparator` creates visual dividers between content sections using " +
+    "horizontal or vertical lines. It's essential for improving readability by " +
+    "breaking up dense content, separating list items, or creating clear boundaries " +
+    "between different UI sections.",
   props: {
     thickness: {
-      description: "Defines the separator thickness.",
+      description:
+        "This property defines the component's height (if the \`orientation\` is horizontal) " +
+        "or the width (if the \`orientation\` is vertical). " +
+        "If not defined, the component uses the theme variable \`thickness-ContentSeparator\` (default: 1px).",
       valueType: "any",
     },
     length: {
-      description: "Defines the separator length.",
+      description:
+        "This property defines the component's width (if the \`orientation\` is horizontal) " +
+        "or the height (if the \`orientation\` is vertical). " +
+        "If not defined, the component uses the theme variable \`length-ContentSeparator\` (default: 100%).",
       valueType: "any",
     },
     orientation: {
-      description: "Sets the main axis of the component.",
-      valueType: "string",
-      availableValues: ["horizontal", "vertical"],
+      description: "Sets the main axis of the component",
+      availableValues: orientationOptionMd,
       defaultValue: defaultProps.orientation,
-    },
-    style: {
-      description: "Applies inline CSS style declarations to the separator root.",
-      valueType: "string",
-    },
-    testId: {
-      description: "Adds a test identifier to the separator root.",
       valueType: "string",
     },
   },
-  themeVars: extractScssThemeVars(contentSeparatorStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-200",
     [`thickness-${COMP}`]: "1px",
@@ -58,5 +50,70 @@ export const ContentSeparatorMd = createMetadata({
     [`marginHorizontal-${COMP}`]: "0",
     [`paddingVertical-${COMP}`]: "0",
     [`paddingHorizontal-${COMP}`]: "0",
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      // --- No dark-specific theme vars
+    },
+  },
+});
+
+export const contentSeparatorComponentRenderer = wrapComponent(COMP, ContentSeparator, ContentSeparatorMd, {
+  customRender: (_props, { node, extractValue, classes }) => {
+    const orientation = extractValue(node.props.orientation);
+    const length = extractValue.asSize(node.props.length);
+
+    // Check if explicit sizing is provided via length prop or layout properties
+    const hasExplicitLength = length !== undefined ||
+      (orientation === "vertical" && node.props.height !== undefined) ||
+      (orientation === "horizontal" && node.props.width !== undefined);
+
+    return (
+      <ContentSeparator
+        orientation={orientation}
+        thickness={extractValue.asSize(node.props.thickness)}
+        length={length}
+        hasExplicitLength={hasExplicitLength}
+        classes={classes}
+      />
+    );
+  },
+});
+
+export const contentSeparatorRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: ContentSeparatorMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const orientation = adapter.stringProp("orientation");
+    const length = adapter.stringProp("length");
+    const hasExplicitLength = length !== undefined ||
+      (orientation === "vertical" && adapter.props.height !== undefined) ||
+      (orientation === "horizontal" && adapter.props.width !== undefined);
+    const rootAttrs = adapter.rootAttrs();
+    const rootStyle: CSSProperties = rootAttrs.style && typeof rootAttrs.style === "object"
+      ? { ...rootAttrs.style }
+      : {};
+    if (rootStyle.display === "flex") {
+      delete rootStyle.display;
+    }
+    if (
+      (orientation === "vertical" && rootStyle.flexDirection === "column") ||
+      (orientation === "horizontal" && rootStyle.flexDirection === "row")
+    ) {
+      delete rootStyle.flexDirection;
+    }
+
+    return (
+      <ContentSeparator
+        {...rootAttrs}
+        data-testid={adapter.stringProp("testId", "test-id-component")}
+        orientation={orientation}
+        thickness={adapter.stringProp("thickness")}
+        length={length}
+        hasExplicitLength={hasExplicitLength}
+        style={{ ...rootStyle, flexShrink: 0 }}
+      />
+    );
   },
 });

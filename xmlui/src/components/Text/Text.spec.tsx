@@ -46,7 +46,7 @@ describe("Text migration", () => {
     );
 
     expect(html).toContain('data-xmlui-component="Text"');
-    expect(html).toContain(">hello</span>");
+    expect(html).toContain(">hello</div>");
     expect(html).not.toContain("world");
   });
 

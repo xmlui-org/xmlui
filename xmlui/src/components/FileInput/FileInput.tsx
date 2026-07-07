@@ -1,3 +1,8 @@
+import styles from "./FileInput.module.scss";
+import compatStyles from "./FileInput.compat.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
   dAutoFocus,
@@ -9,161 +14,383 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
-} from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+  dValidationStatus,
+} from "../../components/metadata-helpers";
+import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
+import { ThemedIcon } from "../Icon/Icon";
 import { defaultProps } from "./FileInput.defaults";
+import { FileInput, isFileArray } from "./FileInputReact";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { useFormContext } from "../Form/FormContext";
 
 const COMP = "FileInput";
-
-const fileInputStylesSource = `
-$borderRadius-FileInput--focus: createThemeVar("borderRadius-FileInput--focus");
-$borderColor-FileInput--focus: createThemeVar("borderColor-FileInput--focus");
-$backgroundColor-FileInput--focus: createThemeVar("backgroundColor-FileInput--focus");
-$boxShadow-FileInput--focus: createThemeVar("boxShadow-FileInput--focus");
-$textColor-FileInput--focus: createThemeVar("textColor-FileInput--focus");
-$outlineWidth-FileInput--focus: createThemeVar("outlineWidth-FileInput--focus");
-$outlineColor-FileInput--focus: createThemeVar("outlineColor-FileInput--focus");
-$outlineStyle-FileInput--focus: createThemeVar("outlineStyle-FileInput--focus");
-$outlineOffset-FileInput--focus: createThemeVar("outlineOffset-FileInput--focus");
-`;
+const DEFAULT_ICON = "browse:FileInput";
 
 export const FileInputMd = createMetadata({
   status: "stable",
   description:
-    "`FileInput` enables users to select files from their device's file system for upload or processing.",
+    "`FileInput` enables users to select files from their device's file system for " +
+    "upload or processing. It combines a text field displaying selected files with " +
+    "a customizable button that opens the system file browser. Use it for forms, " +
+    "media uploads, and document processing workflows.",
   parts: {
-    input: { description: "The file input area displaying selected file names." },
-    label: { description: "The label displayed for the file input." },
+    label: {
+      description: "The label displayed for the file input.",
+    },
+    input: {
+      description: "The file input area displaying selected file names.",
+    },
   },
-  defaultPart: "input",
   props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
     placeholder: dPlaceholder(),
-    initialValue: dInitialValue(defaultProps.initialValue, "any"),
-    value: { description: "Controlled file value.", valueType: "any" },
+    initialValue: dInitialValue(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),
-    enabled: dEnabled(defaultProps.enabled),
-    validationStatus: { description: "Validation status.", valueType: "string", defaultValue: defaultProps.validationStatus },
+    enabled: dEnabled(),
+    validationStatus: dValidationStatus(),
     buttonVariant: {
-      description: "The button variant to use.",
+      description: "The button variant to use",
       valueType: "string",
-      availableValues: ["solid", "outlined", "ghost"],
-      defaultValue: defaultProps.buttonVariant,
+      availableValues: buttonVariantNames,
     },
     buttonLabel: {
-      description: "This property is an optional string to set a label for the button part.",
+      description: `This property is an optional string to set a label for the button part.`,
       valueType: "string",
-      defaultValue: defaultProps.buttonLabel,
     },
     buttonIcon: {
-      description: "The ID of the icon to display in the button.",
+      description:
+        `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
+        `instances with the "icon.browse:FileInput" declaration in the app configuration file.`,
       valueType: "icon",
     },
     buttonIconPosition: {
-      description: "This optional string determines the location of the button icon.",
+      description: `This optional string determines the location of the button icon.`,
+      availableValues: iconPositionNames,
       valueType: "string",
-      availableValues: ["start", "end"],
-      defaultValue: defaultProps.buttonIconPosition,
+      defaultValue: "start",
     },
     acceptsFileType: {
-      description: "An optional list of file types the input accepts.",
+      description: `An optional list of file types the input controls accepts provided as a string array.`,
       valueType: "string[]",
     },
     multiple: {
-      description: "Enables selecting multiple files.",
+      description:
+        `This boolean property enables to add not just one (\`false\`), but multiple files to the field ` +
+        `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
+        `in the browser menu after clicking the input field button.`,
       valueType: "boolean",
       defaultValue: defaultProps.multiple,
     },
     directory: {
-      description: "Allows selecting directories where browser-supported.",
+      description:
+        `This boolean property indicates whether the component allows selecting directories (\`true\`) ` +
+        `or files only (\`false\`).`,
       valueType: "boolean",
       defaultValue: defaultProps.directory,
     },
     buttonPosition: {
-      description: "This property determines the position of the button relative to the input field.",
+      description: `This property determines the position of the button relative to the input field.`,
       valueType: "string",
       availableValues: ["start", "end"],
       defaultValue: defaultProps.buttonPosition,
     },
     buttonSize: {
-      description: "The size of the button.",
+      description: "The size of the button (small, medium, large)",
       valueType: "string",
-      availableValues: ["xs", "sm", "md", "lg", "xl"],
-      defaultValue: defaultProps.buttonSize,
+      availableValues: sizeMd,
     },
     buttonThemeColor: {
-      description: "The button color scheme.",
+      description: "The button color scheme (primary, secondary, attention)",
       valueType: "string",
-      availableValues: ["attention", "primary", "secondary"],
+      availableValues: buttonThemeNames,
       defaultValue: defaultProps.buttonThemeColor,
     },
     parseAs: {
-      description: "Automatically parse file contents as CSV or JSON.",
+      description:
+        `Automatically parse file contents as CSV or JSON. When set, the \`onDidChange\` event receives ` +
+        `an object \`{ files: File[], parsedData: ParseResult[] }\` containing both the raw files and parsed data. ` +
+        `Each \`ParseResult\` includes \`file\`, \`data\` (parsed rows), and optional \`error\`. ` +
+        `When \`parseAs\` is set, \`acceptsFileType\` is automatically inferred (e.g., ".csv" or ".json") ` +
+        `unless explicitly overridden. Empty files are handled gracefully, returning an empty data array.`,
       valueType: "string",
       availableValues: ["csv", "json"],
     },
     csvOptions: {
-      description: "Configuration options for CSV parsing.",
+      description:
+        `Configuration options for CSV parsing (used when \`parseAs="csv"\`). Supports all Papa Parse ` +
+        `configuration options. Default options: \`{ header: true, skipEmptyLines: true }\`. ` +
+        `Common options include \`delimiter\`, \`header\`, \`dynamicTyping\`, \`skipEmptyLines\`, and \`transform\`.`,
       valueType: "any",
     },
-    verboseValidationFeedback: { description: "Controls verbose validation feedback.", valueType: "boolean" },
-    validationIconSuccess: { description: "Success validation icon.", valueType: "string" },
-    validationIconError: { description: "Error validation icon.", valueType: "string" },
-    invalidMessages: { description: "Invalid messages to display.", valueType: "string[]" },
-    bindTo: { description: "Binds the file input to form data.", valueType: "string" },
-    tooltip: { description: "The tooltip text.", valueType: "string" },
-    tooltipMarkdown: { description: "The markdown tooltip text.", valueType: "string" },
-    animation: { description: "The animation definition.", valueType: "any" },
-    variant: { description: "The variant value.", valueType: "string" },
   },
   events: {
     didChange: dDidChange(COMP),
+    focus: dGotFocus(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     parseError: {
-      description: "This event is triggered when file parsing fails.",
+      description:
+        "This event is triggered when file parsing fails. Receives the error and the file that failed to parse.",
       signature: "parseError(error: Error, file: File): void",
       parameters: {
-        error: "The parsing error that occurred.",
-        file: "The file that failed to parse.",
+        error: "The parsing error that occurred",
+        file: "The file that failed to parse",
       },
     },
   },
   apis: {
-    focus: { description: "Focuses the input field of the component.", signature: "focus(): void" },
-    open: { description: "Triggers the file browsing dialog to open.", signature: "open(): void" },
-    setValue: {
-      description: "Sets the current value of the component.",
-      signature: "setValue(files: File[]): void",
-      parameters: { files: "An array of File objects to set as the current value." },
-    },
     value: {
-      description: "The current value of the component.",
+      description:
+        "This property holds the current value of the component, which is an array of files.",
       signature: "get value(): File[]",
     },
+    setValue: {
+      description: "This method sets the current value of the component.",
+      signature: "setValue(files: File[]): void",
+      parameters: {
+        files: "An array of File objects to set as the current value of the component.",
+      },
+    },
+    focus: {
+      description: "This API command focuses the input field of the component.",
+      signature: "focus(): void",
+    },
+    open: {
+      description: "This API command triggers the file browsing dialog to open.",
+      signature: "open(): void",
+    },
     inProgress: {
-      description: "Indicates whether file parsing is currently in progress.",
+      description:
+        "This property indicates whether file parsing is currently in progress (when using parseAs).",
       signature: "get inProgress(): boolean",
     },
     getFields: {
-      description: "Returns the column headers from the most recently parsed CSV file.",
+      description: "This method returns the column headers from the most recently parsed CSV file.",
       signature: "getFields(): string[] | undefined",
     },
   },
-  themeVars: extractScssThemeVars(fileInputStylesSource),
-  defaultThemeVars: {
-    "borderRadius-FileInput--focus": "$borderRadius-Input",
-    "borderColor-FileInput--focus": "$borderColor-Input--focus",
-    "backgroundColor-FileInput--focus": "$backgroundColor-Input",
-    "boxShadow-FileInput--focus": "$boxShadow-Input",
-    "textColor-FileInput--focus": "$textColor-Input",
-    "outlineWidth-FileInput--focus": "$outlineWidth-Input--focus",
-    "outlineColor-FileInput--focus": "$outlineColor-Input--focus",
-    "outlineStyle-FileInput--focus": "$outlineStyle-Input--focus",
-    "outlineOffset-FileInput--focus": "$outlineOffset-Input--focus",
+  themeVars: parseScssVar(styles.themeVars),
+});
+
+type ThemedFileInputProps = React.ComponentPropsWithoutRef<typeof FileInput>;
+
+export const ThemedFileInput = React.forwardRef<HTMLDivElement, ThemedFileInputProps>(
+  function ThemedFileInput({ className, ...props }, _ref) {
+    const themeClass = useComponentThemeClass(FileInputMd);
+    return <FileInput {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} />;
+  },
+);
+
+export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
+  exposeRegisterApi: true,
+  customRender: (
+    _props,
+    { node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes },
+  ) => {
+    const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
+    return (
+      <FileInput
+        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        variant={extractValue(node.props.buttonVariant)}
+        buttonThemeColor={extractValue(node.props.buttonThemeColor)}
+        buttonSize={extractValue(node.props.buttonSize)}
+        buttonIcon={<ThemedIcon name={iconName} fallback="folder-open" />}
+        buttonIconPosition={extractValue(node.props.buttonIconPosition)}
+        buttonLabel={extractValue.asOptionalString(node.props.buttonLabel)}
+        updateState={updateState}
+        value={isFileArray(state?.value) ? state?.value : undefined}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        onDidChange={lookupEventHandler("didChange")}
+        onFocus={lookupEventHandler("gotFocus")}
+        onBlur={lookupEventHandler("lostFocus")}
+        validationStatus={extractValue(node.props.validationStatus)}
+        registerComponentApi={registerComponentApi}
+        multiple={extractValue.asOptionalBoolean(node.props.multiple)}
+        directory={extractValue.asOptionalBoolean(node.props.directory)}
+        placeholder={extractValue.asOptionalString(node.props.placeholder)}
+        buttonPosition={extractValue.asOptionalString(node.props.buttonPosition)}
+        initialValue={extractValue(node.props.initialValue)}
+        acceptsFileType={extractValue(node.props.acceptsFileType)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
+        parseAs={extractValue.asOptionalString(node.props.parseAs) as "csv" | "json" | undefined}
+        csvOptions={extractValue(node.props.csvOptions)}
+        onParseError={lookupEventHandler("parseError")}
+        classes={classes}
+      />
+    );
   },
 });
 
+type RuntimeFileInputProps = React.ComponentProps<typeof FileInput> & {
+  adapter: XmluiComponentAdapter;
+  bindTo?: string;
+};
+
+function RuntimeFileInputShell({
+  adapter,
+  bindTo,
+  value,
+  initialValue,
+  required,
+  validationStatus,
+  invalidMessages,
+  onDidChange,
+  onFocus,
+  onBlur,
+  onParseError,
+  ...props
+}: RuntimeFileInputProps) {
+  const form = useFormContext();
+  const formRef = React.useRef(form);
+  const adapterRef = React.useRef(adapter);
+  const fieldName = bindTo;
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const controlledValue = formValue ?? value;
+  const [localValue, setLocalValue] = React.useState(controlledValue ?? initialValue);
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  formRef.current = form;
+  adapterRef.current = adapter;
+
+  React.useEffect(() => {
+    const nextValue = formValue ?? value;
+    if (nextValue !== undefined) {
+      setLocalValue(nextValue);
+    }
+  }, [formValue, value]);
+
+  React.useEffect(() => {
+    if (!form || !fieldName) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, required]);
+
+  const registerApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...api,
+      value: localValue,
+    });
+  }, [localValue]);
+
+  React.useEffect(() => {
+    if (lastRegisteredValueRef.current === localValue) {
+      return;
+    }
+    lastRegisteredValueRef.current = localValue;
+    adapterRef.current.registerApi({
+      ...apiRef.current,
+      value: localValue,
+    });
+  }, [localValue]);
+
+  const updateState = React.useCallback((state: Record<string, unknown>, options?: { initial?: boolean }) => {
+    setLocalValue(state.value);
+    const currentForm = formRef.current;
+    if (currentForm && fieldName && !options?.initial) {
+      currentForm.setValue(fieldName, state.value);
+      void currentForm.validateField(fieldName, state.value);
+    }
+    if (!options?.initial) {
+      adapterRef.current.registerApi({ ...apiRef.current, value: state.value });
+    }
+  }, [fieldName]);
+
+  const effectiveValidationStatus = formError
+    ? "error"
+    : required && Array.isArray(localValue) && localValue.length > 0
+      ? "valid"
+      : validationStatus;
+  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
+
+  return (
+    <ThemedFileInput
+      {...props}
+      value={controlledValue ?? localValue}
+      initialValue={initialValue}
+      updateState={updateState}
+      registerComponentApi={registerApi}
+      required={required}
+      validationStatus={effectiveValidationStatus}
+      invalidMessages={effectiveInvalidMessages}
+      onDidChange={(nextValue) => {
+        setLocalValue(nextValue);
+        onDidChange?.(nextValue);
+        void adapter.event("didChange")(nextValue);
+      }}
+      onFocus={() => {
+        onFocus?.();
+        void adapter.event("gotFocus")();
+        void adapter.event("focus")();
+      }}
+      onBlur={() => {
+        onBlur?.();
+        void adapter.event("lostFocus")();
+      }}
+      onParseError={(error, file) => {
+        onParseError?.(error, file);
+        void adapter.event("parseError")(error, file);
+      }}
+    />
+  );
+}
+
+function runtimeFileInputProps(adapter: XmluiComponentAdapter) {
+  const {
+    className,
+    ...rootAttrs
+  } = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;
+  const iconName = adapter.stringProp("buttonIcon") || DEFAULT_ICON;
+  return {
+    ...rootAttrs,
+    className: [className, compatStyles.fileInputRoot].filter(Boolean).join(" "),
+    id: adapter.stringProp("id"),
+    bindTo: adapter.stringProp("bindTo"),
+    value: adapter.prop("value"),
+    initialValue: adapter.prop("initialValue", defaultProps.initialValue),
+    acceptsFileType: adapter.prop("acceptsFileType"),
+    multiple: adapter.booleanProp("multiple", defaultProps.multiple),
+    directory: adapter.booleanProp("directory", defaultProps.directory),
+    placeholder: adapter.stringProp("placeholder"),
+    buttonLabel: adapter.stringProp("buttonLabel", defaultProps.buttonLabel),
+    buttonIcon: <ThemedIcon name={iconName} fallback="folder-open" />,
+    buttonIconPosition: adapter.stringProp("buttonIconPosition", defaultProps.buttonIconPosition) as React.ComponentProps<typeof FileInput>["buttonIconPosition"],
+    buttonPosition: adapter.stringProp("buttonPosition", defaultProps.buttonPosition) as React.ComponentProps<typeof FileInput>["buttonPosition"],
+    buttonSize: adapter.stringProp("buttonSize", defaultProps.buttonSize) as React.ComponentProps<typeof FileInput>["buttonSize"],
+    buttonThemeColor: adapter.stringProp("buttonThemeColor", defaultProps.buttonThemeColor) as React.ComponentProps<typeof FileInput>["buttonThemeColor"],
+    variant: adapter.stringProp("buttonVariant") as React.ComponentProps<typeof FileInput>["variant"],
+    enabled: adapter.booleanProp("enabled", defaultProps.enabled),
+    readOnly: adapter.booleanProp("readOnly", false),
+    required: adapter.booleanProp("required", false),
+    autoFocus: adapter.booleanProp("autoFocus", false),
+    validationStatus: adapter.stringProp("validationStatus", defaultProps.validationStatus) as React.ComponentProps<typeof FileInput>["validationStatus"],
+    invalidMessages: adapter.prop("invalidMessages") as string[] | undefined,
+    parseAs: adapter.stringProp("parseAs") as React.ComponentProps<typeof FileInput>["parseAs"],
+    csvOptions: adapter.prop("csvOptions") as React.ComponentProps<typeof FileInput>["csvOptions"],
+    classes: { [COMPONENT_PART_KEY]: adapter.className },
+  };
+}
+
+Object.assign(FileInputMd, {
+  defaultPart: "input",
+} satisfies Partial<ComponentMetadata>);
+
+export const fileInputRuntimeRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: FileInputMd,
+  defaultPart: "input",
+  renderer: ({ adapter }) => (
+    <RuntimeFileInputShell adapter={adapter} {...runtimeFileInputProps(adapter)} />
+  ),
+});

@@ -59,7 +59,8 @@ export class RuntimeStateStore {
   }
 
   hasLocal(ownerId: StateOwnerId | undefined, name: string): boolean {
-    return Boolean(ownerId && Object.prototype.hasOwnProperty.call(this.locals.get(ownerId), name));
+    const localValues = ownerId ? this.locals.get(ownerId) : undefined;
+    return Boolean(localValues && Object.prototype.hasOwnProperty.call(localValues, name));
   }
 
   hasGlobal(name: string): boolean {
@@ -188,6 +189,20 @@ export class RuntimeStateStore {
     this.markExplicitAssignment(slot);
     const invalidation = this.writeGlobalInternal(name, value);
     this.recomputeReactiveDependents(slot);
+    return invalidation;
+  }
+
+  invalidateLocal(ownerId: StateOwnerId, name: string): StateInvalidation {
+    const value = this.readLocal(ownerId, name);
+    const invalidation = this.emit({ kind: "local", ownerId, name }, value, value);
+    this.recomputeReactiveDependents({ kind: "local", ownerId, name });
+    return invalidation;
+  }
+
+  invalidateGlobal(name: string): StateInvalidation {
+    const value = this.readGlobal(name);
+    const invalidation = this.emit({ kind: "global", name }, value, value);
+    this.recomputeReactiveDependents({ kind: "global", name });
     return invalidation;
   }
 

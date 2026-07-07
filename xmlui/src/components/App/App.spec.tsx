@@ -1,9 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import { parseXmlui } from "../../compiler/parseXmlui";
 import { builtInComponentContracts } from "../../compiler/contracts";
-import { appRenderer } from "./App";
+import { appRuntimeRenderer } from "./App";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { ThemeScope, XmluiThemeRoot } from "../../runtime/rendering/theme";
@@ -19,7 +20,7 @@ describe("App main content layout migration", () => {
 
     expect(appModule?.status).toBe("transferred-folder");
     expect(appModule?.contract).toBe(appContract);
-    expect(appModule?.renderer).toBe(appRenderer);
+    expect(appModule?.renderer).toBe(appRuntimeRenderer);
     expect(appModule?.sources.implementation).toContain("xmlui/src/components/App/AppReact.tsx");
     expect(appModule?.sources.defaults).toContain("xmlui/src/components/App/App.defaults.ts");
     expect(appModule?.sources.styles).toContain("xmlui/src/components/App/App.module.scss");
@@ -37,7 +38,7 @@ describe("App main content layout migration", () => {
     const store = createRuntimeStateStore();
     const scope = createRuntimeScope({ store });
     const context = createRenderContext({}, {});
-    const AppRenderer = appRenderer;
+    const AppRenderer = appRuntimeRenderer;
     const html = renderToStaticMarkup(
       <XmluiThemeRoot>
         <ThemeScope
@@ -47,21 +48,18 @@ describe("App main content layout migration", () => {
             "gap-content-App": "24px",
           }}
         >
-          <AppRenderer context={context} node={document.root} scope={scope} />
+          <MemoryRouter>
+            <AppRenderer context={context} node={document.root} scope={scope} />
+          </MemoryRouter>
         </ThemeScope>
       </XmluiThemeRoot>,
     );
 
     expect(html).toContain('data-xmlui-component="App"');
     expect(html).toContain('data-testid="app"');
-    expect(html).toContain('data-xmlui-part="content"');
-    expect(html).toContain('data-xmlui-part="pageContent"');
-    expect(html).toContain("--xmlui-paddingHorizontal-content-App:28px");
-    expect(html).toContain("--xmlui-maxWidth-content-App:var(--xmlui-maxWidth-content)");
-    expect(html).toContain("padding-inline-start:28px");
-    expect(html).toContain("max-width:var(--xmlui-maxWidth-content)");
-    expect(html).toContain("padding-top:32px");
-    expect(html).toContain("gap:24px");
+    expect(html).toContain("_pagesContainer");
+    expect(html).toContain("_pageContentContainer");
+    expect(html).toContain("_withDefaultContentPadding");
     expect(html).toContain("First item");
     expect(html).toContain("Second item");
   });

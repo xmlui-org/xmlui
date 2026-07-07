@@ -3,4 +3,3 @@ export const defaultProps = {
   restore: true,
   autoFocus: false,
 };
-

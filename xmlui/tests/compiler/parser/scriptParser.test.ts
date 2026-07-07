@@ -99,6 +99,28 @@ describe("ScriptParser expression mode", () => {
     expect((nullish.node as BinaryExpressionNode).operator).toBe("??");
   });
 
+  it("parses assignment expressions in both ternary branches", () => {
+    const result = parseScriptEventHandler(
+      "(value) => { value === 'opt1' ? switchData = true : switchData = false; }",
+    );
+
+    expect(result.diagnostics).toEqual([]);
+    const program = result.node as ProgramNode;
+    const arrow = (program.body[0] as any).expression;
+    const block = arrow.body as BlockStatementNode;
+    const conditional = (block.body[0] as any).expression as ConditionalExpressionNode;
+
+    expect(conditional.kind).toBe("ConditionalExpression");
+    expect((conditional.consequent as AssignmentExpressionNode).left).toMatchObject({
+      kind: "Identifier",
+      name: "switchData",
+    });
+    expect((conditional.alternate as AssignmentExpressionNode).left).toMatchObject({
+      kind: "Identifier",
+      name: "switchData",
+    });
+  });
+
   it("parses arrays, objects, index access, optional members, and arrows", () => {
     const array = parseScriptExpression("[{ label: 'One' }, { label: 'Two' }]");
     const object = parseScriptExpression("{ name, 'title': user?.profile?.title }");
@@ -113,6 +135,16 @@ describe("ScriptParser expression mode", () => {
     expect((object.node as ObjectExpressionNode).properties[0]).toMatchObject({
       kind: "ObjectProperty",
       shorthand: true,
+    });
+
+    const dollarKeyObject = parseScriptExpression("{ name: 'Joe', $update: 123 }");
+    expect(dollarKeyObject.diagnostics).toEqual([]);
+    expect((dollarKeyObject.node as ObjectExpressionNode).properties[1]).toMatchObject({
+      kind: "ObjectProperty",
+      key: {
+        kind: "Identifier",
+        name: "$update",
+      },
     });
 
     expect(indexed.diagnostics).toEqual([]);

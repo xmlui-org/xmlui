@@ -374,17 +374,22 @@ test.describe("Close Button Clearance", () => {
     // `top-closeButton + paddingTop` (= 30px); we don't assert an exact
     // value because `space-2` is derived from `space-base` and resolved
     // against the document font-size at runtime.
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
           <Text testId="bodyContent">Body</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: ":root { --xmlui-paddingTop-Drawer: 20px; --xmlui-top-closeButton-Drawer: 10px; }",
-    });
+      `,
+      {
+        testThemeVars: {
+          "paddingTop-Drawer": "20px",
+          "top-closeButton-Drawer": "10px",
+        },
+      },
+    );
 
     await page.getByTestId("openBtn").click();
     const body = page.getByTestId("bodyContent").locator("..");
@@ -409,7 +414,8 @@ test.describe("Close Button Clearance", () => {
     // Sanity: the fix must not affect drawers that DO supply a
     // headerTemplate. The header owns the top padding and the body retains
     // its original `margin-top: gap-Drawer; padding-top: 0` layout.
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
@@ -419,15 +425,11 @@ test.describe("Close Button Clearance", () => {
           <Text testId="bodyContent">Body</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: "[data-xmlui-component='Drawer'] { --xmlui-gap-Drawer: 20px; }",
-    });
+      `,
+      { testThemeVars: { "gap-Drawer": "20px" } },
+    );
 
     await page.getByTestId("openBtn").click();
-    await page.getByRole("dialog").evaluate((el) => {
-      (el as HTMLElement).style.setProperty("--xmlui-gap-Drawer", "20px");
-    });
     const body = page.getByTestId("bodyContent").locator("..");
     await expect(body).toBeVisible();
     await expect(body).toHaveCSS("padding-top", "0px");
@@ -575,28 +577,25 @@ test.describe("Accessibility", () => {
 
 test.describe("Theme Variables", () => {
   test("backgroundColor-Drawer applies background color", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
           <Text>Content</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: "[data-xmlui-component='Drawer'] { --xmlui-backgroundColor-Drawer: rgb(255, 0, 0); }",
-    });
+      `,
+      { testThemeVars: { "backgroundColor-Drawer": "rgb(255, 0, 0)" } },
+    );
 
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
-    await dialog.evaluate((el) => {
-      (el as HTMLElement).style.setProperty("--xmlui-backgroundColor-Drawer", "rgb(255, 0, 0)");
-    });
-    await expect(dialog).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
   test("padding-Drawer applies padding to header and body edges", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
@@ -606,8 +605,9 @@ test.describe("Theme Variables", () => {
           <Text testId="bodyContent">Content</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({ content: ":root { --xmlui-padding-Drawer: 32px; }" });
+      `,
+      { testThemeVars: { "padding-Drawer": "32px" } },
+    );
 
     await page.getByTestId("openBtn").click();
     // Header: top + horizontal padding, no bottom
@@ -625,7 +625,8 @@ test.describe("Theme Variables", () => {
   });
 
   test("gap-Drawer controls space between header and body", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
@@ -635,60 +636,47 @@ test.describe("Theme Variables", () => {
           <Text testId="bodyContent">Content</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: "[data-xmlui-component='Drawer'] { --xmlui-gap-Drawer: 20px; }",
-    });
+      `,
+      { testThemeVars: { "gap-Drawer": "20px" } },
+    );
 
     await page.getByTestId("openBtn").click();
-    await page.getByRole("dialog").evaluate((el) => {
-      (el as HTMLElement).style.setProperty("--xmlui-gap-Drawer", "20px");
-    });
     const body = page.getByTestId("bodyContent").locator("..");
     await expect(body).toHaveCSS("margin-top", "20px");
   });
 
   test("borderRadius-Drawer applies border radius", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer" position="right">
           <Text>Content</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: "[data-xmlui-component='Drawer'] { --xmlui-borderRadius-Drawer: 16px; }",
-    });
+      `,
+      { testThemeVars: { "borderRadius-Drawer": "16px" } },
+    );
 
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
-    await dialog.evaluate((el) => {
-      (el as HTMLElement).style.setProperty("--xmlui-borderRadius-Drawer", "16px");
-    });
     // right-side drawer has `border-radius: $borderRadius 0 0 $borderRadius` so check top-left
-    await expect(dialog).toHaveCSS("border-top-left-radius", "16px");
+    await expect(page.getByRole("dialog")).toHaveCSS("border-top-left-radius", "16px");
   });
 
   test("width-Drawer applies panel width (left position)", async ({ page, initTestBed }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer" position="left">
           <Text>Content</Text>
         </Drawer>
       </Fragment>
-    `);
-    await page.addStyleTag({
-      content: "[data-xmlui-component='Drawer'] { --xmlui-width-Drawer: 400px; --xmlui-maxWidth-Drawer: 100%; }",
-    });
+      `,
+      { testThemeVars: { "width-Drawer": "400px", "maxWidth-Drawer": "100%" } },
+    );
 
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
-    await dialog.evaluate((el) => {
-      (el as HTMLElement).style.setProperty("--xmlui-width-Drawer", "400px");
-      (el as HTMLElement).style.setProperty("--xmlui-maxWidth-Drawer", "100%");
-    });
-    await expect(dialog).toHaveCSS("width", "400px");
+    await expect(page.getByRole("dialog")).toHaveCSS("width", "400px");
   });
 });

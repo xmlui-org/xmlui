@@ -1,27 +1,24 @@
-import {
-  forwardRef,
-  memo,
-  useEffect,
-  useRef,
-  type CSSProperties,
-  type ForwardedRef,
-  type HTMLAttributeReferrerPolicy,
-  type HTMLAttributes,
-} from "react";
+import type React from "react";
+import { type CSSProperties, forwardRef, memo, useEffect, useRef } from "react";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./IFrame.module.scss";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-type IFrameProps = {
+type Props = {
   src?: string;
   srcdoc?: string;
   allow?: string;
   name?: string;
-  referrerPolicy?: HTMLAttributeReferrerPolicy;
+  referrerPolicy?: "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
   sandbox?: string;
   style?: CSSProperties;
-  registerApi?: (api: Record<string, unknown>) => void;
-} & Pick<HTMLAttributes<HTMLIFrameElement>, "onLoad"> &
-  Omit<HTMLAttributes<HTMLIFrameElement>, "src" | "srcDoc" | "name" | "onLoad">;
+  className?: string;
+  classes?: Record<string, string>;
+  registerComponentApi?: RegisterComponentApiFn;
+} & Pick<React.HTMLAttributes<HTMLIFrameElement>, "onLoad">
 
 export const IFrame = memo(forwardRef(function IFrame(
   {
@@ -32,48 +29,48 @@ export const IFrame = memo(forwardRef(function IFrame(
     referrerPolicy,
     sandbox,
     style,
-    registerApi,
+    className,
+    classes,
     onLoad,
+    registerComponentApi,
     ...rest
-  }: IFrameProps,
-  ref: ForwardedRef<HTMLIFrameElement>,
+  }: Props,
+  ref: React.ForwardedRef<HTMLIFrameElement>,
 ) {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const composedRef = useComposedRefs(ref, iframeRef);
 
+  // Register component APIs
   useEffect(() => {
-    registerApi?.({
-      postMessage: (message: unknown, targetOrigin = "*") => {
-        iframeRef.current?.contentWindow?.postMessage(message, String(targetOrigin));
+    registerComponentApi?.({
+      postMessage: (message: any, targetOrigin: string = "*") => {
+        const contentWindow = iframeRef.current?.contentWindow;
+        if (contentWindow) {
+          contentWindow.postMessage(message, targetOrigin);
+        }
       },
-      getContentWindow: () => iframeRef.current?.contentWindow ?? null,
-      getContentDocument: () => iframeRef.current?.contentDocument ?? null,
+      getContentWindow: () => {
+        return iframeRef.current?.contentWindow || null;
+      },
+      getContentDocument: () => {
+        return iframeRef.current?.contentDocument || null;
+      },
     });
-  }, [registerApi]);
+  }, [registerComponentApi]);
 
   return (
     <iframe
       {...rest}
-      ref={(node) => {
-        iframeRef.current = node;
-        if (typeof ref === "function") {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      }}
+      ref={composedRef}
       src={src}
       srcDoc={srcdoc}
       allow={allow}
       name={name}
       referrerPolicy={referrerPolicy}
       sandbox={sandbox}
-      className={cx(styles["xmlui-iframeRoot"], rest.className)}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.iframe)}
       style={style}
       onLoad={onLoad}
     />
   );
 }));
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}

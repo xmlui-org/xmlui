@@ -35,6 +35,8 @@ export type CheckboxProps = {
   validationStatus?: CheckboxValidationStatus;
   variant?: string;
   inputRenderer?: (contextVars: { $checked: boolean; $setChecked: (value: unknown) => void }, input: ReactNode) => ReactNode;
+  updateState?: (state: { value: boolean }, options?: { initial?: boolean }) => void;
+  registerComponentApi?: (api: CheckboxApi) => void;
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => void | Promise<void>;
   onDidChange?: (value: boolean) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
@@ -65,6 +67,8 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     validationStatus = defaultProps.validationStatus,
     variant,
     inputRenderer,
+    updateState,
+    registerComponentApi,
     onClick,
     onDidChange,
     onFocus,
@@ -76,8 +80,13 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
 ) {
   const generatedInputId = useId();
   const form = useFormContext();
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
+  const formFieldPrefix = form?.fieldPrefix;
+  const formGetValue = form?.getValue;
+  const formSetValue = form?.setValue;
+  const formRegisterItem = form?.registerItem;
+  const formItemRequireLabelMode = form?.itemRequireLabelMode;
+  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, formFieldPrefix) : undefined;
+  const formValue = formGetValue && fieldName !== undefined ? formGetValue(fieldName) : undefined;
   const effectiveValue = formValue ?? value;
   const { inputRef, checked, updateValue, api } = useToggleController({
     value: effectiveValue,
@@ -86,8 +95,10 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     autoFocus,
     indeterminate: Boolean(indeterminate),
     onDidChange: (nextValue) => {
-      if (form && fieldName !== undefined) {
-        form.setValue(fieldName, nextValue);
+      if (updateState) {
+        updateState({ value: nextValue });
+      } else if (formSetValue && fieldName !== undefined) {
+        formSetValue(fieldName, nextValue);
       }
       void onDidChange?.(nextValue);
     },
@@ -95,34 +106,42 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
 
   useImperativeHandle(ref, () => api, [api]);
 
+  void registerComponentApi;
+
   useEffect(() => {
-    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
+    if (
+      !formGetValue ||
+      !formSetValue ||
+      fieldName === undefined ||
+      formGetValue(fieldName) != null ||
+      initialValue === undefined
+    ) {
       return;
     }
-    form.setValue(fieldName, transformToLegitValue(initialValue));
-  }, [fieldName, form, initialValue]);
+    formSetValue(fieldName, transformToLegitValue(initialValue));
+  }, [fieldName, formGetValue, formSetValue, initialValue]);
 
-  const inputId = id ? `${id}__input` : generatedInputId;
+  const inputId = id ?? generatedInputId;
   const hasLabel = label !== undefined && label !== null && label !== "";
   const effectiveTestId = dataTestId ?? id;
   const labelText = stringifyLabel(label);
   const needsVariantWrapper = !hasLabel && !inputRenderer && variant !== undefined;
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
+  const effectiveRequireLabelMode = requireLabelMode ?? formItemRequireLabelMode ?? "markRequired";
   const showRequiredIndicator =
     Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
   const showOptionalIndicator =
     !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   useEffect(() => {
-    if (!form || fieldName === undefined) {
+    if (!formRegisterItem || fieldName === undefined) {
       return;
     }
-    return form.registerItem({
+    return formRegisterItem({
       name: fieldName,
       label: labelText,
       required,
     });
-  }, [fieldName, form, labelText, required]);
+  }, [fieldName, formRegisterItem, labelText, required]);
 
   const input = (
     <input
@@ -151,6 +170,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       aria-required={required}
       aria-disabled={!enabled}
       aria-readonly={readOnly}
+      aria-label={hasLabel ? labelText : undefined}
       onClick={(event) => void onClick?.(event)}
       onChange={(event) => {
         if (readOnly) {

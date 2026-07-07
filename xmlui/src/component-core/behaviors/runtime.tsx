@@ -9,7 +9,9 @@ export function attachBehaviors(
   node: ReactNode,
 ): ReactNode {
   return collectedBehaviors.reduce(
-    (current, behavior) => behavior.canAttach(context)
+    (current, behavior) => context.metadata.excludeBehaviors?.includes(behavior.metadata.name)
+      ? current
+      : behavior.canAttach(context)
       ? behavior.attach(context, current)
       : current,
     node,

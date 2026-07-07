@@ -70,4 +70,37 @@ test.describe("Theme foundation", () => {
     await page.getByTestId("toggle").click();
     await expect(page.getByTestId("inside")).toHaveCSS("color", "rgb(255, 0, 0)");
   });
+
+  test("keeps themed children in the parent stack layout", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <HStack>
+          <Theme width-Button="120px">
+            <Button label="Short" testId="short" />
+            <Button label="Longer" testId="longer" />
+            <Button label="Longest" testId="longest" />
+            <Button label="Disabled" enabled="false" testId="disabled" />
+            <Button label="Outlined" variant="outlined" testId="outlined" />
+          </Theme>
+        </HStack>
+      </App>
+    `);
+
+    await expect(page.locator('[data-xmlui-component="Theme"]')).toHaveCSS("display", "contents");
+
+    const boxes = await Promise.all(
+      ["short", "longer", "longest", "disabled", "outlined"].map(async (testId) => {
+        const box = await page.getByTestId(testId).boundingBox();
+        if (!box) {
+          throw new Error(`Missing button ${testId}`);
+        }
+        return box;
+      }),
+    );
+    const firstY = boxes[0].y;
+    for (const box of boxes) {
+      expect(Math.abs(box.y - firstY)).toBeLessThan(1);
+      expect(Math.round(box.width)).toBe(120);
+    }
+  });
 });

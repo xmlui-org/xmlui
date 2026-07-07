@@ -56,4 +56,32 @@ describe("parseMixedTextSegments", () => {
       },
     ]);
   });
+
+  it("treats escaped braces as literal text", () => {
+    expect(parseMixedTextSegments("before \\{ block } after", { start: 0, end: 23 })).toEqual([
+      {
+        kind: "literal",
+        value: "before { block } after",
+        range: { start: 0, end: 23 },
+      },
+    ]);
+  });
+
+  it("keeps real expressions after escaped JavaScript block braces", () => {
+    const segments = parseMixedTextSegments(
+      "window.addEventListener('message', () => \\{ ok(); }); Status: {messageStatus}",
+      { start: 0, end: 77 },
+    );
+
+    expect(segments).toHaveLength(2);
+    expect(segments[0]).toEqual({
+      kind: "literal",
+      value: "window.addEventListener('message', () => { ok(); }); Status: ",
+      range: { start: 0, end: 62 },
+    });
+    expect(segments[1]).toMatchObject({
+      kind: "expression",
+      source: "messageStatus",
+    });
+  });
 });

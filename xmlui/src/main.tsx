@@ -1,3 +1,5 @@
+import "./global.css";
+
 import { createElement } from "react";
 import type { Root } from "react-dom/client";
 import {
@@ -10,7 +12,7 @@ import {
 } from "./runtime";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
-import "./global.css";
+import type { Extension } from "./extensions";
 import "./components/Inspector/Inspector.scss";
 import "./components/InspectButton/InspectButton.scss";
 
@@ -136,6 +138,7 @@ declare global {
       hasLocal(name: string): boolean;
       readLocal(name: string): unknown;
       readGlobal(name: string): unknown;
+      readReference(name: string): unknown;
     };
     __xmluiTestBedReady?: boolean;
     __xmluiTestBedReinit?: (source: string) => Promise<void>;
@@ -266,18 +269,35 @@ if (!root) {
   throw new Error("Missing #root element");
 }
 
+const TESTBED_EXTENSION_PATHS: Record<string, string> = {
+  "xmlui-calendar": "../../packages/xmlui-calendar/src/index.tsx",
+  "xmlui-docs-blocks": "../../packages/xmlui-docs-blocks/src/index.tsx",
+  "xmlui-echart": "../../packages/xmlui-echart/src/index.tsx",
+  "xmlui-gauge": "../../packages/xmlui-gauge/src/index.tsx",
+  "xmlui-grid-layout": "../../packages/xmlui-grid-layout/src/index.tsx",
+  "xmlui-masonry": "../../packages/xmlui-masonry/src/index.tsx",
+  "xmlui-search": "../../packages/xmlui-search/src/index.tsx",
+  "xmlui-tiptap-editor": "../../packages/xmlui-tiptap-editor/src/index.tsx",
+  "xmlui-website-blocks": "../../packages/xmlui-website-blocks/src/index.tsx",
+};
+
+const TESTBED_EXTENSION_MODULES = import.meta.glob<{ default: Extension }>(
+  "../../packages/xmlui-{calendar,docs-blocks,echart,gauge,grid-layout,masonry,search,tiptap-editor,website-blocks}/src/index.{ts,tsx}",
+);
+
 const params = new URLSearchParams(window.location.search);
 if (params.has("__xmluiTestBed")) {
   let testBedRoot: Root | undefined;
   let testBedRenderKey = 0;
 
-  const compileTestBedModule = (source: string): Extract<XmluiModule, { kind: "app" }> => {
+  const compileTestBedModule = async (source: string): Promise<Extract<XmluiModule, { kind: "app" }>> => {
     const componentSources = readTestBedComponentSources();
+    const extensions = await readTestBedExtensions();
     const knownComponents = componentSources.map((componentSource, index) => {
       const compiled = compileXmluiSource({
         id: `testbed-component-${index}.xmlui`,
         source: componentSource,
-        extensions: [counterBadgeExtension],
+        extensions,
         validateComponentReferences: false,
       });
       if (compiled.runtimeDocument.kind !== "component") {
@@ -290,22 +310,22 @@ if (params.has("__xmluiTestBed")) {
         id: `testbed-component-${index}.xmlui`,
         source: componentSource,
         knownComponents,
-        extensions: [counterBadgeExtension],
+        extensions,
       });
       throwFirstCompilerDiagnostic(compiled);
       return createXmluiModule(compiled.runtimeDocument, [], {
-        extensions: [counterBadgeExtension],
+        extensions,
       });
     });
     const compiled = compileXmluiSource({
       id: "testbed.xmlui",
       source,
       knownComponents,
-      extensions: [counterBadgeExtension],
+      extensions,
     });
     throwFirstCompilerDiagnostic(compiled);
     const module = createXmluiModule(compiled.runtimeDocument, components, {
-      extensions: [counterBadgeExtension],
+      extensions,
     });
     if (module.kind !== "app") {
       throw new Error("Test bed source must compile to an app module.");
@@ -328,18 +348,81 @@ if (params.has("__xmluiTestBed")) {
     }
   };
 
+  const readTestBedResources = (): Record<string, string> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedResources");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? Object.fromEntries(
+            Object.entries(parsed).filter(
+              (entry): entry is [string, string] =>
+                typeof entry[0] === "string" && typeof entry[1] === "string",
+            ),
+          )
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const readTestBedExtensions = async (): Promise<Extension[]> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
+    if (!raw) {
+      return [counterBadgeExtension];
+    }
+    let ids: string[];
+    try {
+      const parsed = JSON.parse(raw);
+      ids = Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    } catch {
+      return [counterBadgeExtension];
+    }
+    return [
+      counterBadgeExtension,
+      ...(await Promise.all(ids.map(loadTestBedExtension))).flat(),
+    ];
+  };
+
+  const loadTestBedExtension = async (id: string): Promise<Extension[]> => {
+    const path = TESTBED_EXTENSION_PATHS[id];
+    if (!path) {
+      return [];
+    }
+    const loader = TESTBED_EXTENSION_MODULES[path];
+    if (!loader) {
+      throw new Error(`Missing XMLUI testbed extension module for '${id}'.`);
+    }
+    const module = await loader();
+    return module.default ? [module.default] : [];
+  };
+
   const showTestBedError = (error: unknown): void => {
     root.innerHTML = `<pre data-testid="xmlui-testbed-error">${escapeHtml(error instanceof Error ? error.message : String(error))}</pre>`;
   };
 
-  const renderTestBedModule = (module: Extract<XmluiModule, { kind: "app" }>): void => {
+  const waitForTestBedRender = (): Promise<void> =>
+    new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, 0);
+      });
+    });
+
+  const renderTestBedModule = async (module: Extract<XmluiModule, { kind: "app" }>): Promise<void> => {
     const key = testBedRenderKey++;
+    const extensions = await readTestBedExtensions();
+    const resources = readTestBedResources();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
     if (!testBedRoot) {
       testBedRoot = mountXmluiApp(module, root, {
-        extensions: [counterBadgeExtension],
+        extensions,
+        resources,
         testProbe,
       });
       return;
@@ -347,25 +430,43 @@ if (params.has("__xmluiTestBed")) {
     testBedRoot.render(createElement(XmluiRoot, {
       key,
       module,
-      extensions: [counterBadgeExtension],
+      extensions,
+      resources,
       testProbe,
     }));
   };
 
   window.__xmluiTestBedReinit = async (source: string) => {
-    const module = compileTestBedModule(source);
-    history.replaceState(null, "", "/?__xmluiTestBed=1");
-    window.scrollTo(0, 0);
-    renderTestBedModule(module);
+    window.__xmluiTestBedReady = false;
+    window.__xmluiTestBedProbe = undefined;
+    try {
+      if (testBedRoot) {
+        testBedRoot.unmount();
+        testBedRoot = undefined;
+        await waitForTestBedRender();
+      }
+      const module = await compileTestBedModule(source);
+      history.replaceState(null, "", "/");
+      window.scrollTo(0, 0);
+      await renderTestBedModule(module);
+      await waitForTestBedRender();
+      window.__xmluiTestBedReady = true;
+    } catch (error) {
+      showTestBedError(error);
+      throw error;
+    }
   };
 
-  try {
+  (async () => {
     const source = window.sessionStorage.getItem("__xmluiTestBedSource") ?? "<App />";
-    renderTestBedModule(compileTestBedModule(source));
-    window.__xmluiTestBedReady = true;
-  } catch (error) {
-    showTestBedError(error);
-  }
+    try {
+      await renderTestBedModule(await compileTestBedModule(source));
+      await waitForTestBedRender();
+      window.__xmluiTestBedReady = true;
+    } catch (error) {
+      showTestBedError(error);
+    }
+  })();
 } else {
   const example = params.get("example") ?? "globals";
   renderXmluiApp(examples[example as keyof typeof examples] ?? globalCounterApp, root, {

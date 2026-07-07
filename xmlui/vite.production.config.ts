@@ -10,7 +10,9 @@ import {
   type ProductionBuildFixture,
 } from "./src/production/manifest";
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
+import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
+import { createXmluiLogger, xmluiCssOptions } from "./vite.shared";
 
 const productionFixtures: ProductionBuildFixture[] = [
   {
@@ -120,8 +122,18 @@ async function collectAssets(outDir: string): Promise<string[]> {
 
 export default defineConfig({
   base: "./",
+  customLogger: createXmluiLogger(),
+  resolve: {
+    alias: {
+      "attr-accept": path.resolve("src/compat/attrAccept.ts"),
+      papaparse: path.resolve("src/compat/papaParse.ts"),
+      "react-qr-code": path.resolve("src/compat/reactQrCode.tsx"),
+    },
+  },
+  css: xmluiCssOptions,
   plugins: [
     rawScssModulePlugin(),
+    svgReactPlugin(),
     xmluiPlugin({ extensions: [counterBadgeExtension] }),
     react(),
     productionArtifactsPlugin(),

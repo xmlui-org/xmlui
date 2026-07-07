@@ -1,68 +1,92 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata } from "../metadata-helpers";
+import { FormSegmentNative } from "./FormSegmentReact";
 
 const COMP = "FormSegment";
-const formSegmentStylesSource = `
-$gap-FormSegment: createThemeVar("gap-FormSegment");
-$padding-FormSegment: createThemeVar("padding-FormSegment");
-$backgroundColor-FormSegment: createThemeVar("backgroundColor-FormSegment");
-$borderRadius-FormSegment: createThemeVar("borderRadius-FormSegment");
-`;
 
 export const FormSegmentMd = createMetadata({
   status: "experimental",
   description:
-    "`FormSegment` groups a subset of fields within a `Form` and exposes segment-scoped context variables.",
+    "`FormSegment` groups a subset of form fields within a `Form` and exposes " +
+    "segment-scoped context variables for the fields it contains. Use it to build " +
+    "multi-step wizards, collapsible sections, or any layout that needs per-section " +
+    "data and validation state without creating a nested form. Children are automatically " +
+    'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
+    "transposed from the segment.",
   props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
     label: {
-      description: "An optional human-readable label for this segment.",
+      description:
+        "An optional human-readable label for this segment. `StepperForm` uses this label " +
+        "as the corresponding step's title; on its own, `FormSegment` does not render the " +
+        "label (it is metadata only).",
       valueType: "string",
     },
     orientation: {
-      description: "Stack orientation for the implicit layout container.",
+      description:
+        'Stack orientation for the implicit layout container. Use "vertical" (default) for a VStack ' +
+        'or "horizontal" for an HStack. Layout properties (width, height, padding, gap, backgroundColor, ' +
+        "etc.) are transposed to this container.",
       availableValues: ["horizontal", "vertical"],
       isStrictEnum: true,
       valueType: "string",
       defaultValue: "vertical",
     },
     fields: {
-      description: "Optional comma-separated field names that belong to this segment.",
+      description:
+        "An optional comma-separated list of field names (matching the `bindTo` values of " +
+        "nested inputs) that belong to this segment. When omitted the segment auto-discovers " +
+        "field names by inspecting its direct and nested children for `bindTo` attributes.",
       valueType: "string",
     },
   },
   contextVars: {
     $segmentData: {
-      description: "An object containing current form values for the fields that belong to this segment.",
+      description:
+        "An object containing the current form values of the fields that belong to this segment, " +
+        "keyed by field name. Only fields registered with this segment are included.",
     },
     $segmentValidationIssues: {
-      description: "An object keyed by field name containing validation issues for this segment.",
+      description:
+        "An object keyed by field name containing an array of failed validation results for each " +
+        "field that belongs to this segment. Fields without validation issues are omitted.",
     },
     $hasSegmentValidationIssue: {
-      description: "Returns true when this segment has a validation issue.",
+      description:
+        "A function that returns `true` when any field in this segment has a validation issue. " +
+        "Pass a field name as the first argument to check a specific field only.",
     },
   },
   apis: {
     isValid: {
-      description: "Returns true when this segment has no validation issues.",
-      signature: "get isValid(): boolean",
+      description:
+        "This property returns `true` when all fields in this segment have passed validation " +
+        "(no validation issues), and `false` when any field has a validation error.",
+      signature: "isValid: boolean",
     },
     hasIssues: {
-      description: "Returns true when this segment has any validation issues.",
-      signature: "get hasIssues(): boolean",
+      description:
+        "This property returns `true` when any field in this segment has a validation issue, " +
+        "and `false` when all fields are valid. This is the counterpart of `isValid`.",
+      signature: "hasIssues: boolean",
     },
     isDirty: {
-      description: "Returns true when at least one segment field was modified by the user.",
-      signature: "get isDirty(): boolean",
+      description:
+        "This property returns `true` when at least one field in this segment has been " +
+        "modified by the user (touched), and `false` when no field has been changed yet. " +
+        "Useful for showing validation feedback only after the user has interacted with " +
+        "the segment.",
+      signature: "isDirty: boolean",
     },
-  },
-  themeVars: extractScssThemeVars(formSegmentStylesSource),
-  defaultThemeVars: {
-    [`gap-${COMP}`]: "$space-4",
-    [`padding-${COMP}`]: "0",
-    [`backgroundColor-${COMP}`]: "transparent",
-    [`borderRadius-${COMP}`]: "0",
   },
 });
 
+export const formSegmentComponentRenderer = wrapComponent(COMP, FormSegmentNative, FormSegmentMd, {
+  customRender: (_props, { node, renderChild, extractValue, registerComponentApi }) => (
+    <FormSegmentNative
+      node={node as any}
+      renderChild={renderChild}
+      extractValue={extractValue}
+      registerComponentApi={registerComponentApi}
+    />
+  ),
+});

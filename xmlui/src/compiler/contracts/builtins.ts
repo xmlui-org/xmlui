@@ -7,6 +7,7 @@ import { BadgeMd } from "../../components/Badge/Badge";
 import { ExpandableItemMd } from "../../components/ExpandableItem/ExpandableItem";
 import { htmlTagMetadata } from "../../components/HtmlTags/HtmlTags";
 import { BrCapitalizedMd, BrMd } from "../../components/Br/Br";
+import { ButtonMd } from "../../components/Button/Button";
 import { CardMd } from "../../components/Card/Card";
 import { FragmentMd } from "../../components/Fragment/Fragment";
 import { ImageMd } from "../../components/Image/Image";
@@ -15,8 +16,10 @@ import { LinkMd } from "../../components/Link/Link";
 import { ItemsMd } from "../../components/Items/Items";
 import { PasswordInputMd, TextBoxMd } from "../../components/TextBox/TextBox";
 import { FormMd } from "../../components/Form/Form";
+import { FormValidatorMd } from "../../components/Form/FormValidator";
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { FormSegmentMd } from "../../components/FormSegment/FormSegment";
+import { FormSectionMd } from "../../components/FormSection/FormSection";
 import { StepperFormMd } from "../../components/StepperForm/StepperForm";
 import { TabsFormMd } from "../../components/TabsForm/TabsForm";
 import { TextAreaMd } from "../../components/TextArea/TextArea";
@@ -270,13 +273,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       click: "onClick",
     },
   }),
-  contractFromMetadata(IFrameMd, {
-    name: "IFrame",
-    includeLayoutProps: true,
-    eventAttributes: {
-      load: "onLoad",
-    },
-  }),
+  withExtraProps(
+    contractFromMetadata(IFrameMd, {
+      name: "IFrame",
+      includeLayoutProps: true,
+      eventAttributes: {
+        load: "onLoad",
+      },
+    }),
+    ["title"],
+  ),
   {
     name: "App",
     kind: "builtin",
@@ -299,6 +305,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       "paddingHorizontal-content-App": { name: "paddingHorizontal-content-App" },
       "paddingVertical-content-App": { name: "paddingVertical-content-App" },
       "gap-content-App": { name: "gap-content-App" },
+      "width-navPanel-App": { name: "width-navPanel-App" },
+      "borderRight-navPanelWrapper-App": { name: "borderRight-navPanelWrapper-App" },
     }),
     events: {
       ready: { name: "ready", attributeName: "onReady" },
@@ -536,8 +544,24 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
     eventAttributes: {
+      willSubmit: "onWillSubmit",
       submit: "onSubmit",
+      submitFailed: "onSubmitFailed",
       cancel: "onCancel",
+      reset: "onReset",
+      success: "onSuccess",
+      saved: "onSaved",
+      submitError: "onSubmitError",
+      submitDropped: "onSubmitDropped",
+    },
+  }),
+  contractFromMetadata(FormValidatorMd, {
+    name: "FormValidator",
+    allowsChildren: false,
+    includeLayoutProps: false,
+    acceptsArbitraryProps: true,
+    eventAttributes: {
+      validate: "onValidate",
     },
   }),
   contractFromMetadata(FormItemMd, {
@@ -548,6 +572,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
   }),
   contractFromMetadata(FormSegmentMd, {
     name: "FormSegment",
+    allowsChildren: true,
+    includeLayoutProps: true,
+    acceptsArbitraryProps: true,
+  }),
+  contractFromMetadata(FormSectionMd, {
+    name: "FormSection",
     allowsChildren: true,
     includeLayoutProps: true,
     acceptsArbitraryProps: true,
@@ -845,35 +875,12 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     }),
     events: {},
   },
-  {
+  contractFromMetadata(ButtonMd, {
     name: "Button",
-    kind: "builtin",
     allowsChildren: true,
+    includeLayoutProps: true,
     declarations: { local: true },
-    props: withLayoutProps({
-      id: { name: "id" },
-      autoFocus: { name: "autoFocus" },
-      busyOnClick: { name: "busyOnClick" },
-      contentPosition: { name: "contentPosition" },
-      contextualLabel: { name: "contextualLabel" },
-      label: { name: "label" },
-      enabled: { name: "enabled" },
-      icon: { name: "icon" },
-      iconPosition: { name: "iconPosition" },
-      orientation: { name: "orientation" },
-      size: { name: "size" },
-      testId: { name: "testId" },
-      themeColor: { name: "themeColor" },
-      type: { name: "type" },
-      variant: { name: "variant" },
-    }),
-    events: {
-      click: { name: "click", attributeName: "onClick" },
-      contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
-      gotFocus: { name: "gotFocus", attributeName: "onGotFocus" },
-      lostFocus: { name: "lostFocus", attributeName: "onLostFocus" },
-    },
-  },
+  }),
   contractFromMetadata(CardMd, {
     name: "Card",
     allowsChildren: true,
@@ -894,6 +901,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       id: { name: "id" },
       value: { name: "value" },
       variant: { name: "variant" },
+      size: { name: "size" },
+      weight: { name: "weight" },
       maxLines: { name: "maxLines" },
       preserveLinebreaks: { name: "preserveLinebreaks" },
       ellipses: { name: "ellipses" },
@@ -1023,6 +1032,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       valueField: { name: "valueField" },
       labelField: { name: "labelField" },
       multiSelect: { name: "multiSelect" },
+      multmultiSelect: { name: "multmultiSelect" },
       modal: { name: "modal" },
       clearable: { name: "clearable" },
       searchable: { name: "searchable" },
@@ -1216,6 +1226,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       rowsSelectable: { name: "rowsSelectable" },
       enableMultiRowSelection: { name: "enableMultiRowSelection" },
       initiallySelected: { name: "initiallySelected" },
+      syncWithVar: { name: "syncWithVar" },
+      refreshOn: { name: "refreshOn" },
       rowUnselectablePredicate: { name: "rowUnselectablePredicate" },
       hideSelectionCheckboxes: { name: "hideSelectionCheckboxes" },
       selectionCheckboxPosition: { name: "selectionCheckboxPosition" },
@@ -1228,6 +1240,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {
       contextMenu: { name: "contextMenu", attributeName: "onContextMenu" },
       rowDoubleClick: { name: "rowDoubleClick", attributeName: "onRowDoubleClick" },
+      scroll: { name: "scroll", attributeName: "onScroll" },
       selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
       requestFetchPrevPage: { name: "requestFetchPrevPage", attributeName: "onRequestFetchPrevPage" },
       requestFetchNextPage: { name: "requestFetchNextPage", attributeName: "onRequestFetchNextPage" },
@@ -1483,6 +1496,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     allowsChildren: true,
     includeLayoutProps: false,
     acceptsArbitraryProps: true,
+    contextVariables: {
+      $routeParams: { name: "$routeParams" },
+      $queryParams: { name: "$queryParams" },
+    },
   }),
   contractFromMetadata(RedirectMd, {
     name: "Redirect",
@@ -1751,6 +1768,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
 
 function stackProps(): XmluiComponentContract["props"] {
   return {
+    id: { name: "id" },
     testId: { name: "testId" },
     desktopOnly: { name: "desktopOnly" },
     gap: { name: "gap" },
@@ -1787,9 +1805,31 @@ function withLayoutProps(
       supportedResponsiveLayoutPropNames.map((name) => [name, { name }]),
     ),
     when: { name: "when" },
+    "when-xs": { name: "when-xs" },
+    "when-sm": { name: "when-sm" },
+    "when-md": { name: "when-md" },
+    "when-lg": { name: "when-lg" },
+    "when-xl": { name: "when-xl" },
+    "when-xxl": { name: "when-xxl" },
+    tooltip: { name: "tooltip" },
+    tooltipMarkdown: { name: "tooltipMarkdown" },
+    tooltipOptions: { name: "tooltipOptions" },
     animation: { name: "animation" },
     animationOptions: { name: "animationOptions" },
     ...props,
+  };
+}
+
+function withExtraProps(
+  contract: XmluiComponentContract,
+  names: readonly string[],
+): XmluiComponentContract {
+  return {
+    ...contract,
+    props: {
+      ...contract.props,
+      ...Object.fromEntries(names.map((name) => [name, { name }])),
+    },
   };
 }
 

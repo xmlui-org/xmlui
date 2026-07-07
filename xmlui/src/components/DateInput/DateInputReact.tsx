@@ -1,41 +1,92 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-
-import { dateFormats, type DateFormat, DateInputModeValues, type DateInputMode, WeekDays } from "./DateInput.constants";
-import { defaultProps } from "./DateInput.defaults";
+import React, { type CSSProperties } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./DateInput.module.scss";
-import { useFormContext } from "../Form/FormContext";
+import { format, parse, isValid } from "date-fns";
+import { PartialInput, type BlurDirection } from "../Input/PartialInput";
+import { InputDivider } from "../Input/InputDivider";
 
-export type DateInputApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  isoValue: () => string | null;
-  value: string | null;
-};
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import { Adornment } from "../Input/InputAdornment";
+import { ThemedIcon } from "../Icon/Icon";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import {
+  PART_CLEAR_BUTTON,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+  PART_DAY,
+  PART_MONTH,
+  PART_YEAR,
+} from "../../components-core/parts";
+import { defaultProps } from "./DateInput.defaults";
 
-export type DateInputProps = {
+// Date validation constants
+const MIN_YEAR = 1900;
+const MAX_YEAR = 2100;
+
+// Date format types
+export const dateFormats = [
+  "MM/dd/yyyy",
+  "MM-dd-yyyy",
+  "yyyy/MM/dd",
+  "yyyy-MM-dd",
+  "dd/MM/yyyy",
+  "dd-MM-yyyy",
+  "yyyyMMdd",
+  "MMddyyyy",
+] as const;
+
+type DateFormat = (typeof dateFormats)[number];
+
+export const DateInputModeValues = ["single", "range"] as const;
+type DateInputMode = (typeof DateInputModeValues)[number];
+
+export const enum WeekDays {
+  Sunday = 0,
+  Monday = 1,
+  Tuesday = 2,
+  Wednesday = 3,
+  Thursday = 4,
+  Friday = 5,
+  Saturday = 6,
+}
+
+type Props = {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
   initialValue?: unknown;
+  value?: string;
   enabled?: boolean;
-  validationStatus?: string;
-  mode?: DateInputMode | string;
-  dateFormat?: DateFormat | string;
+  updateState?: UpdateStateFn;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  onDidChange?: (newValue: string | null) => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onInvalidChange?: () => void;
+  validationStatus?: ValidationStatus;
+  registerComponentApi?: RegisterComponentApiFn;
+  mode?: DateInputMode;
+  dateFormat?: DateFormat;
   showWeekNumber?: boolean;
-  weekStartsOn?: WeekDays | number;
+  weekStartsOn?: WeekDays;
   minValue?: string;
   maxValue?: string;
   disabledDates?: unknown;
   inline?: boolean;
   clearable?: boolean;
-  clearIcon?: string | null;
+  clearIcon?: string;
   clearToInitialValue?: boolean;
   required?: boolean;
-  startText?: unknown;
-  startIcon?: unknown;
-  endText?: unknown;
-  endIcon?: unknown;
+  startText?: string;
+  startIcon?: string;
+  endText?: string;
+  endIcon?: string;
   gap?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
@@ -44,39 +95,34 @@ export type DateInputProps = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
-  label?: unknown;
-  className?: string;
-  style?: CSSProperties;
-  onDidChange?: (value: string | null) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  onInvalidChange?: () => void | Promise<void>;
-  "data-testid"?: string;
 };
 
-type FieldName = "month" | "day" | "year";
-type DateParts = Record<FieldName, string>;
-
-const emptyParts: DateParts = { month: "", day: "", year: "" };
-
-export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(function DateInputNative(
+export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInput(
   {
     id,
-    bindTo,
-    value,
     initialValue,
+    value: controlledValue,
     enabled = defaultProps.enabled,
+    updateState,
+    style,
+    className,
+    classes,
+    onDidChange,
+    onFocus,
+    onBlur,
+    onInvalidChange,
     validationStatus = defaultProps.validationStatus,
-    mode: _mode = defaultProps.mode,
+    registerComponentApi,
+    mode = defaultProps.mode,
     dateFormat = defaultProps.dateFormat,
-    showWeekNumber: _showWeekNumber = defaultProps.showWeekNumber,
-    weekStartsOn: _weekStartsOn = defaultProps.weekStartsOn,
-    minValue: _minValue,
-    maxValue: _maxValue,
-    disabledDates: _disabledDates,
-    inline: _inline = defaultProps.inline,
+    showWeekNumber = defaultProps.showWeekNumber,
+    weekStartsOn = defaultProps.weekStartsOn,
+    minValue,
+    maxValue,
+    disabledDates,
+    inline = defaultProps.inline,
     clearable = defaultProps.clearable,
-    clearIcon: _clearIcon,
+    clearIcon,
     clearToInitialValue = defaultProps.clearToInitialValue,
     required = defaultProps.required,
     startText,
@@ -88,604 +134,1274 @@ export const DateInputNative = memo(forwardRef<DateInputApi, DateInputProps>(fun
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
     verboseValidationFeedback,
-    validationIconSuccess = "checkmark",
-    validationIconError = "close",
+    validationIconSuccess,
+    validationIconError,
     invalidMessages,
-    label,
-    className,
-    style,
-    onDidChange,
-    onFocus,
-    onBlur,
-    onInvalidChange,
-    "data-testid": dataTestId,
     ...rest
   },
   ref,
 ) {
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
-  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const effectiveValue = formValue ?? value;
-  const normalizedFormat = normalizeDateFormat(dateFormat);
-  const controlled = effectiveValue !== undefined;
-  const initialString = stringifyDateValue(controlled ? effectiveValue : initialValue);
-  const [parts, setParts] = useState<DateParts>(() => parseDateParts(initialString, normalizedFormat) ?? emptyParts);
-  const [invalidFields, setInvalidFields] = useState<Partial<Record<FieldName, boolean>>>({});
-  const [hasFocusInside, setHasFocusInside] = useState(false);
-  const [selectAllActive, setSelectAllActive] = useState(false);
-  const [hadValidationError, setHadValidationError] = useState(false);
-  const [showValidFeedback, setShowValidFeedback] = useState(false);
-  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
-  const selectAllActiveRef = useRef(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const inputRefs = {
-    month: useRef<HTMLInputElement | null>(null),
-    day: useRef<HTMLInputElement | null>(null),
-    year: useRef<HTMLInputElement | null>(null),
-  };
+  const dateInputRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, dateInputRef);
 
-  const currentValue = useMemo(() => formatDateParts(parts, normalizedFormat), [normalizedFormat, parts]);
-  const orderedFields = useMemo(() => getFieldOrder(normalizedFormat), [normalizedFormat]);
-  const separator = normalizedFormat.includes("/") ? "/" : normalizedFormat.includes("-") ? "-" : "";
-  const interactive = enabled && !readOnly;
+  // Refs for auto-tabbing between inputs
+  const dayInputRef = useRef<HTMLInputElement>(null);
+  const monthInputRef = useRef<HTMLInputElement>(null);
+  const yearInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (controlled) {
-      setParts(parseDateParts(stringifyDateValue(effectiveValue), normalizedFormat) ?? emptyParts);
+  // Process emptyCharacter according to requirements
+  const processedEmptyCharacter = useMemo(() => {
+    if (!emptyCharacter || emptyCharacter.length === 0) {
+      return "-";
     }
-  }, [controlled, effectiveValue, normalizedFormat]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setParts(parseDateParts(stringifyDateValue(initialValue), normalizedFormat) ?? emptyParts);
+    if (emptyCharacter.length > 1) {
+      // Use proper unicode-aware character extraction
+      const firstChar = [...emptyCharacter][0];
+      return firstChar;
     }
-  }, [controlled, initialValue, normalizedFormat]);
+    return emptyCharacter;
+  }, [emptyCharacter]);
 
-  useEffect(() => {
-    if (autoFocus && enabled) {
-      const timeoutId = setTimeout(() => inputRefs[orderedFields[0]]?.current?.focus(), 0);
-      return () => clearTimeout(timeoutId);
+  // Local state management - sync with value prop
+  const [localValue, setLocalValue] = useState<string | null>(() => {
+    const initial = controlledValue || initialValue || null;
+    return initial;
+  });
+  const localValueRef = useRef(localValue);
+  localValueRef.current = localValue;
+
+  // Parse current value into individual components
+  const [day, setDay] = useState<string | null>(null);
+  const [month, setMonth] = useState<string | null>(null);
+  const [year, setYear] = useState<string | null>(null);
+  const rawDayRef = useRef<string | null>(null);
+  const rawMonthRef = useRef<string | null>(null);
+  const rawYearRef = useRef<string | null>(null);
+
+  // Track whether the component currently has focus
+  const [componentHasFocus, setComponentHasFocus] = useState(false);
+
+  // State to track invalid status for visual feedback
+  const [isDayCurrentlyInvalid, setIsDayCurrentlyInvalid] = useState(false);
+  const [isMonthCurrentlyInvalid, setIsMonthCurrentlyInvalid] = useState(false);
+  const [isYearCurrentlyInvalid, setIsYearCurrentlyInvalid] = useState(false);
+  const invalidDateCombinationRef = useRef(false);
+
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
     }
-  }, [autoFocus, enabled, orderedFields]);
-
-  useEffect(() => {
-    if (formError) {
-      setHadValidationError(true);
-      setShowValidFeedback(false);
-    }
-  }, [formError]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    const initial = formatDateParts(parseDateParts(stringifyDateValue(initialValue), normalizedFormat) ?? emptyParts, normalizedFormat);
-    setFormValue(fieldName, initial);
-  }, [fieldName, getFormValue, initialValue, normalizedFormat, setFormValue]);
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label: stringifyLabel(label),
-      required,
-    });
-  }, [fieldName, label, registerFormItem, required]);
-
-  const emitParts = useCallback((nextParts: DateParts) => {
-    setParts(nextParts);
-    const nextValue = formatDateParts(nextParts, normalizedFormat);
-    setShowValidFeedback(false);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextValue);
-    }
-    void onDidChange?.(nextValue);
-  }, [fieldName, normalizedFormat, onDidChange, setFormValue]);
-
-  const updateField = useCallback((field: FieldName, rawValue: string) => {
-    if (!interactive) {
-      return;
-    }
-    const cleanValue = rawValue.replace(/\D/g, "").slice(0, field === "year" ? 4 : 2);
-    const nextParts = { ...parts, [field]: cleanValue };
-    const nextInvalidFields = computeInvalidFields(nextParts);
-    setInvalidFields(nextInvalidFields);
-    if (Object.values(nextInvalidFields).some(Boolean)) {
-      void onInvalidChange?.();
-    }
-    emitParts(nextParts);
-    const fieldInvalid = Boolean(nextInvalidFields[field]);
-    if (!fieldInvalid && cleanValue.length === (field === "year" ? 4 : 2)) {
-      const nextField = orderedFields[orderedFields.indexOf(field) + 1];
-      if (nextField) {
-        setTimeout(() => {
-          inputRefs[nextField]?.current?.focus();
-          inputRefs[nextField]?.current?.select();
-        }, 0);
-      }
-    }
-  }, [emitParts, inputRefs, interactive, onInvalidChange, orderedFields, parts]);
-
-  const normalizeField = useCallback((field: FieldName) => {
-    const raw = parts[field];
-    const normalized = normalizeFieldValue(field, raw, parts);
-    const nextParts = { ...parts, [field]: normalized };
-    const nextValue = formatDateParts(nextParts, normalizedFormat);
-    const nextInvalidFields = computeInvalidFields(nextParts);
-    setInvalidFields(nextInvalidFields);
-    if (Object.values(nextInvalidFields).some(Boolean)) {
-      void onInvalidChange?.();
-    }
-    emitParts(nextParts);
-    if (validateFormField && fieldName !== undefined && hadValidationError) {
-      void validateFormField(fieldName, nextValue).then((message) => {
-        setShowValidFeedback(!message);
-      });
-    }
-  }, [emitParts, fieldName, hadValidationError, normalizedFormat, onInvalidChange, parts, validateFormField]);
-
-  const setValue = useCallback((nextValue: unknown) => {
-    const nextParts = parseDateParts(stringifyDateValue(nextValue), normalizedFormat) ?? emptyParts;
-    setInvalidFields({});
-    emitParts(nextParts);
-  }, [emitParts, normalizedFormat]);
-
-  const clear = useCallback(() => {
-    setValue(clearToInitialValue ? initialValue : null);
-    setTimeout(() => inputRefs[orderedFields[0]]?.current?.focus(), 0);
-  }, [clearToInitialValue, initialValue, inputRefs, orderedFields, setValue]);
-
-  const focus = useCallback(() => {
-    inputRefs[orderedFields[0]]?.current?.focus();
-  }, [inputRefs, orderedFields]);
-
-  const isoValue = useCallback(() => partsToIso(parts), [parts]);
-
-  useImperativeHandle(ref, () => ({
-    focus,
-    setValue,
-    isoValue,
-    get value() {
-      return formatDateParts(parts, normalizedFormat);
-    },
-  }), [focus, isoValue, normalizedFormat, parts, setValue]);
-
-  const handleFocusCapture = useCallback(() => {
-    if (!hasFocusInside) {
-      setHasFocusInside(true);
-      void onFocus?.();
-    }
-  }, [hasFocusInside, onFocus]);
-
-  const handleBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const relatedTarget = event.relatedTarget as Node | null;
-    if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-      setHasFocusInside(false);
-      setSelectAllActive(false);
-      selectAllActiveRef.current = false;
-      void onBlur?.();
-      if (validateFormField && fieldName !== undefined && hadValidationError) {
-        void validateFormField(fieldName, formatDateParts(parts, normalizedFormat)).then((message) => {
-          setShowValidFeedback(!message);
-        });
-      }
-    }
-  }, [fieldName, hadValidationError, normalizedFormat, onBlur, parts, validateFormField]);
-
-  const handleKeyDown = useCallback((field: FieldName, event: KeyboardEvent<HTMLInputElement>) => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
-      event.preventDefault();
-      selectAllActiveRef.current = true;
-      setSelectAllActive(true);
-      inputRefs[orderedFields[0]]?.current?.focus();
-      inputRefs[orderedFields[0]]?.current?.select();
-      return;
-    }
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c" && selectAllActiveRef.current) {
-      event.preventDefault();
-      if (currentValue) {
-        void navigator.clipboard?.writeText?.(currentValue);
-      }
-      return;
-    }
-    if (selectAllActiveRef.current && (event.key === "Backspace" || event.key === "Delete")) {
-      event.preventDefault();
-      selectAllActiveRef.current = false;
-      setSelectAllActive(false);
-      emitParts(emptyParts);
-      inputRefs[orderedFields[0]]?.current?.focus();
-      return;
-    }
-    const currentIndex = orderedFields.indexOf(field);
-    if (event.key === "ArrowRight" && currentIndex < orderedFields.length - 1) {
-      event.preventDefault();
-      const next = inputRefs[orderedFields[currentIndex + 1]]?.current;
-      next?.focus();
-      next?.select();
-    } else if (event.key === "ArrowLeft" && currentIndex > 0) {
-      event.preventDefault();
-      const previous = inputRefs[orderedFields[currentIndex - 1]]?.current;
-      previous?.focus();
-      previous?.select();
-    } else if (event.key === "Backspace" && event.currentTarget.value === "" && currentIndex > 0) {
-      event.preventDefault();
-      const previous = inputRefs[orderedFields[currentIndex - 1]]?.current;
-      previous?.focus();
-      previous?.select();
-    }
-  }, [currentValue, emitParts, inputRefs, orderedFields]);
-
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const effectiveValidationStatus = formError
-    ? "error"
-    : !effectiveVerboseValidationFeedback && showValidFeedback
-      ? "valid"
-      : validationStatus;
-  const rootStyle = useMemo<CSSProperties>(() => ({
-    ...(hasLabel ? undefined : style),
-    ...(gap ? { "--xmlui-runtime-gap-DateInput": gap } as CSSProperties : undefined),
-  }), [gap, hasLabel, style]);
-  const labeledItemStyle = useMemo<CSSProperties>(() => ({
-    width: "100%",
-    ...(gap ? { "--xmlui-runtime-gap-DateInput": gap } as CSSProperties : undefined),
-  }), [gap]);
-  const inputRoot = (
-    <div
-      {...rest}
-      ref={rootRef}
-      data-xmlui-component="DateInput"
-      data-validation-status={effectiveValidationStatus}
-      data-testid={hasLabel ? undefined : dataTestId}
-      className={cx(
-        styles.dateInputWrapper,
-        effectiveValidationStatus === "error" ? styles.dateInputError : undefined,
-        effectiveValidationStatus === "warning" ? styles.dateInputWarning : undefined,
-        effectiveValidationStatus === "valid" ? styles.dateInputValid : undefined,
-        !enabled ? styles.disabled : undefined,
-        readOnly ? styles.readOnly : undefined,
-        className,
-      )}
-      style={rootStyle}
-      onFocusCapture={handleFocusCapture}
-      onBlur={handleBlur}
-      tabIndex={-1}
-    >
-      <Adornment text={startText} icon={startIcon} />
-      <div className={styles.wrapper}>
-        <div className={cx(styles.inputGroup, selectAllActive ? styles.selectAllActive : undefined)}>
-          {orderedFields.map((field, index) => (
-            <span key={field}>
-              <input
-                id={index === 0 ? id : undefined}
-                ref={inputRefs[field]}
-                data-part-id={field}
-                data-xmlui-part={field}
-                data-input="true"
-                aria-label={field}
-                autoComplete="off"
-                autoFocus={autoFocus && index === 0}
-                className={cx(styles.input, styles[field], invalidFields[field] ? cx(styles.invalid, "invalid") : undefined)}
-                disabled={!enabled}
-                inputMode="numeric"
-                maxLength={field === "year" ? 4 : 2}
-                name={field}
-                placeholder={field === "year" ? repeatChar(emptyCharacter, 4) : repeatChar(emptyCharacter, 2)}
-                readOnly={readOnly}
-                required={required}
-                type="text"
-                value={parts[field]}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => updateField(field, event.currentTarget.value)}
-                onBlur={() => normalizeField(field)}
-                onFocus={(event: FocusEvent<HTMLInputElement>) => {
-                  handleFocusCapture();
-                  event.currentTarget.select();
-                }}
-                onKeyDown={(event) => handleKeyDown(field, event)}
-              />
-              {index < orderedFields.length - 1 && separator ? (
-                <span className={styles.divider}>{separator}</span>
-              ) : null}
-            </span>
-          ))}
-        </div>
-        {clearable ? (
-          <button
-            type="button"
-            data-part-id="clearButton"
-            data-xmlui-part="clearButton"
-            className={styles.clearButton}
-            disabled={!enabled}
-            onClick={clear}
-          >
-            ×
-          </button>
-        ) : null}
-      </div>
-      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
-        <span
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          className={styles.conciseValidationFeedback}
-          onMouseEnter={() => setConciseTooltipVisible(true)}
-          onMouseLeave={() => setConciseTooltipVisible(false)}
-          onFocus={() => setConciseTooltipVisible(true)}
-          onBlur={() => setConciseTooltipVisible(false)}
-          tabIndex={-1}
-        >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? validationIconSuccess : "error"}
-          >
-            {effectiveValidationStatus === "valid" ? validationIconSuccess : validationIconError}
-          </span>
-          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
-            <span data-tooltip-container role="tooltip" className={styles.dateInputConciseTooltip}>
-              {effectiveInvalidMessages.join("\n")}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-      <Adornment text={endText} icon={endIcon} />
-    </div>
-  );
-  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
-    <div data-xmlui-part="error">
-      {effectiveInvalidMessages.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
-    </div>
-  ) : null;
-
-  if (!hasLabel) {
-    return (
-      <>
-        {inputRoot}
-        {validationFeedback}
-      </>
-    );
   }
 
-  return (
-    <div data-testid={dataTestId} style={style}>
-      <label
-        onClick={() => focus()}
-        onFocus={handleFocusCapture}
+  useEffect(() => {
+    // Initialize XMLUI state with initial value on first mount
+    if (updateState && initialValue !== undefined && controlledValue === undefined) {
+      updateState({ value: initialValue }, { initial: true });
+      return; // Don't sync on this first run, let the state update trigger a re-render
+    }
+
+    // Sync with controlled value - always sync when controlledValue changes
+    const newLocalValue = controlledValue || null;
+    setLocalValue(newLocalValue);
+  }, [controlledValue, initialValue, updateState]);
+
+  // Get the order of date inputs based on the format
+  const dateOrder = useMemo(() => {
+    const format = dateFormat.toLowerCase();
+
+    // Determine the order based on the format pattern
+    if (format.startsWith("mm") || format.startsWith("m")) {
+      if (format.includes("/dd/yyyy") || format.includes("-dd-yyyy")) {
+        return ["month", "day", "year"]; // MM/dd/yyyy or MM-dd-yyyy
+      } else {
+        return ["month", "day", "year"]; // MMddyyyy
+      }
+    } else if (format.startsWith("yyyy")) {
+      return ["year", "month", "day"]; // yyyy/MM/dd or yyyy-MM-dd
+    } else if (format.startsWith("dd")) {
+      return ["day", "month", "year"]; // dd/MM/yyyy or dd-MM-yyyy
+    } else {
+      return ["month", "day", "year"]; // fallback
+    }
+  }, [dateFormat]);
+
+  // Parse value into individual components
+  useEffect(() => {
+    if (localValue) {
+      const parsedValues = parseDateString(localValue, dateFormat);
+      if (parsedValues) {
+        setDay(parsedValues.day);
+        setMonth(parsedValues.month);
+        setYear(parsedValues.year);
+        rawDayRef.current = parsedValues.day;
+        rawMonthRef.current = parsedValues.month;
+        rawYearRef.current = parsedValues.year;
+      } else {
+        setDay(null);
+        setMonth(null);
+        setYear(null);
+        rawDayRef.current = null;
+        rawMonthRef.current = null;
+        rawYearRef.current = null;
+      }
+    } else {
+      setDay(null);
+      setMonth(null);
+      setYear(null);
+      rawDayRef.current = null;
+      rawMonthRef.current = null;
+      rawYearRef.current = null;
+    }
+  }, [localValue, dateFormat]);
+
+  // Event handlers
+  const handleChange = useEvent((newValue: string | null) => {
+    invalidDateCombinationRef.current = false;
+    // Update local state immediately for immediate UI feedback
+    setLocalValue(newValue);
+
+    // Also update the XMLUI state
+    if (updateState) {
+      updateState({ value: newValue });
+    }
+    onDidChange?.(newValue);
+  });
+
+  // Helper function to format the complete date value
+  const formatDateValue = useCallback(
+    (d: string | null, m: string | null, y: string | null): string | null => {
+      if (!d || !m || !y) {
+        return null;
+      }
+
+      // Create a date object and format it according to the dateFormat
+      const dayNum = parseInt(d, 10);
+      const monthNum = parseInt(m, 10);
+      const yearNum = parseInt(y, 10);
+
+      if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
+        return null;
+      }
+
+      try {
+        // Create date object (month is 0-indexed in Date constructor)
+        const date = new Date(yearNum, monthNum - 1, dayNum);
+
+        // Validate the date
+        if (
+          date.getFullYear() !== yearNum ||
+          date.getMonth() !== monthNum - 1 ||
+          date.getDate() !== dayNum
+        ) {
+          return null;
+        }
+
+        // Format using the specified format
+        return format(date, dateFormat);
+      } catch (error) {
+        return null;
+      }
+    },
+    [dateFormat],
+  );
+
+  // Generic handlers for input change and blur
+  const createInputChangeHandler = useCallback(
+    (
+      field: "day" | "month" | "year",
+      setValue: (value: string) => void,
+      setInvalid: (invalid: boolean) => void,
+      validateFn: (value: string) => boolean,
+    ) =>
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = event.target.value;
+        if (field === "day") rawDayRef.current = newValue || null;
+        if (field === "month") rawMonthRef.current = newValue || null;
+        if (field === "year") rawYearRef.current = newValue || null;
+        setValue(newValue);
+        // Update invalid state immediately for visual feedback
+        const isInvalid = validateFn(newValue);
+        setInvalid(isInvalid);
+
+        // Clear day invalid state when any field changes, as the date combination might become valid
+        if (!isInvalid) {
+          setIsDayCurrentlyInvalid(false);
+        }
+
+        // Fire invalid event if the value is invalid
+        if (isInvalid) {
+          onInvalidChange?.();
+        }
+        // Don't format/normalize during typing - only on blur
+      },
+    [onInvalidChange],
+  );
+
+  const createInputBlurHandler = useCallback(
+    (
+      field: "day" | "month" | "year",
+      setValue: (value: string) => void,
+      setInvalid: (invalid: boolean) => void,
+      normalizeFn: (value: string) => string | null,
+    ) =>
+      (direction: BlurDirection, event: React.FocusEvent<HTMLInputElement>) => {
+        const currentValue = event.target.value;
+        const normalizedValue = normalizeFn(currentValue);
+
+        // Check if the current value was invalid (needed normalization or couldn't be normalized)
+        const wasInvalid =
+          currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+
+        if (normalizedValue !== null && normalizedValue !== currentValue) {
+          setValue(normalizedValue);
+          setInvalid(false); // Clear invalid state after normalization
+
+          // Check if the complete date would be valid
+          const dateValues = { day, month, year };
+          dateValues[field] = normalizedValue;
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
+
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              invalidDateCombinationRef.current = true;
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
+        } else if (normalizedValue === null && currentValue !== "") {
+          // Reset to previous valid value or clear
+          setValue("");
+          setInvalid(false); // Clear invalid state
+          // Always call handleChange to update the date value (likely to null)
+          const dateValues = { day, month, year };
+          dateValues[field] = "";
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
+          handleChange(dateString);
+        } else if (normalizedValue !== null) {
+          // Value didn't need normalization, but still update the complete date
+          const dateValues = { day, month, year };
+          dateValues[field] = normalizedValue;
+          const dateString = formatDateValue(dateValues.day, dateValues.month, dateValues.year);
+
+          if (dateString !== null) {
+            // Valid complete date - update normally
+            handleChange(dateString);
+          } else {
+            // Invalid date combination - mark the day as invalid if all fields are present
+            if (dateValues.day && dateValues.month && dateValues.year) {
+              setIsDayCurrentlyInvalid(true);
+              invalidDateCombinationRef.current = true;
+              onInvalidChange?.();
+              // Don't call handleChange with null to avoid clearing the fields
+            } else {
+              // Incomplete date - call handleChange as normal (will be null)
+              handleChange(dateString);
+            }
+          }
+        }
+      },
+    [day, month, year, handleChange, onInvalidChange, formatDateValue],
+  );
+
+  // Handle changes from individual inputs
+  const handleDayChange = useMemo(
+    () =>
+      createInputChangeHandler("day", setDay, setIsDayCurrentlyInvalid, (value) =>
+        isDayInvalid(value, month, year),
+      ),
+    [createInputChangeHandler, month, year],
+  );
+
+  const handleDayBlur = useMemo(
+    () =>
+      createInputBlurHandler("day", setDay, setIsDayCurrentlyInvalid, (value) =>
+        normalizeDay(value, month, year),
+      ),
+    [createInputBlurHandler, month, year],
+  );
+
+  const handleMonthChange = useMemo(
+    () => createInputChangeHandler("month", setMonth, setIsMonthCurrentlyInvalid, isMonthInvalid),
+    [createInputChangeHandler],
+  );
+
+  const handleMonthBlur = useMemo(
+    () => createInputBlurHandler("month", setMonth, setIsMonthCurrentlyInvalid, normalizeMonth),
+    [createInputBlurHandler],
+  );
+
+  const handleYearChange = useMemo(
+    () => createInputChangeHandler("year", setYear, setIsYearCurrentlyInvalid, isYearInvalid),
+    [createInputChangeHandler],
+  );
+
+  const handleYearBlur = useMemo(
+    () => createInputBlurHandler("year", setYear, setIsYearCurrentlyInvalid, normalizeYear),
+    [createInputBlurHandler],
+  );
+
+  // Focus method
+  const focus = useCallback(() => {
+    const firstInput = dateInputRef.current?.querySelector("input") as HTMLInputElement;
+    firstInput?.focus();
+  }, []);
+
+  // Custom focus handler that fires gotFocus when component gains focus
+  const handleComponentFocus = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      // If component didn't have focus before, fire gotFocus
+      if (!componentHasFocus) {
+        setComponentHasFocus(true);
+        onFocus?.(event);
+      }
+    },
+    [componentHasFocus, onFocus],
+  );
+
+  const isSelectAllActiveRef = useRef(false);
+  const [isSelectAllActive, setIsSelectAllActiveState] = useState(false);
+  const setSelectAllActive = useCallback((val: boolean) => {
+    isSelectAllActiveRef.current = val;
+    setIsSelectAllActiveState(val);
+  }, [setIsSelectAllActiveState]);
+
+  // Custom blur handler that only fires lostFocus when focus leaves the entire component
+  const handleComponentBlur = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      // Check if the new focus target is still within this DateInput component
+      const relatedTarget = event.relatedTarget as HTMLElement;
+      const currentTarget = event.currentTarget;
+
+      // If there's no related target, or the related target is not within this component, fire lostFocus
+      if (!relatedTarget || !currentTarget.contains(relatedTarget)) {
+        setComponentHasFocus(false);
+        setSelectAllActive(false);
+        onBlur?.(event);
+      }
+    },
+    [onBlur, setSelectAllActive],
+  );
+
+  // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
+  // (defined below, after getInputRefs)
+
+  const clearFocusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (clearFocusTimerRef.current !== null) clearTimeout(clearFocusTimerRef.current);
+    };
+  }, []);
+
+  const clear = useCallback(() => {
+    // Reset to initial value if provided, otherwise null
+    let valueToReset = clearToInitialValue
+      ? initialValue !== undefined
+        ? initialValue
+        : null
+      : null;
+
+    if (valueToReset) {
+      const parsedValues = parseDateString(valueToReset, dateFormat);
+      if (parsedValues) {
+        setDay(parsedValues.day);
+        setMonth(parsedValues.month);
+        setYear(parsedValues.year);
+        rawDayRef.current = parsedValues.day;
+        rawMonthRef.current = parsedValues.month;
+        rawYearRef.current = parsedValues.year;
+      } else {
+        setDay(null);
+        setMonth(null);
+        setYear(null);
+        rawDayRef.current = null;
+        rawMonthRef.current = null;
+        rawYearRef.current = null;
+      }
+    } else {
+      // Clear all fields
+      setDay(null);
+      setMonth(null);
+      setYear(null);
+      rawDayRef.current = null;
+      rawMonthRef.current = null;
+      rawYearRef.current = null;
+    }
+
+    handleChange(valueToReset);
+
+    // Focus the component after clearing
+    if (clearFocusTimerRef.current !== null) clearTimeout(clearFocusTimerRef.current);
+    clearFocusTimerRef.current = setTimeout(() => {
+      if (dateInputRef.current) focus();
+    }, 0);
+  }, [initialValue, handleChange, dateFormat, clearToInitialValue, focus, dateInputRef]);
+
+  function stopPropagation(event: React.FocusEvent) {
+    event.stopPropagation();
+  }
+
+  const setValue = useEvent((newValue: string | null) => {
+    handleChange(newValue);
+  });
+
+  // Function to get ISO formatted date value (YYYY-MM-DD)
+  const getIsoValue = useCallback((): string | null => {
+    if (
+      invalidDateCombinationRef.current ||
+      isDayCurrentlyInvalid ||
+      isMonthCurrentlyInvalid ||
+      isYearCurrentlyInvalid
+    ) {
+      return null;
+    }
+
+    const liveDay = dayInputRef.current?.value || day;
+    const liveMonth = monthInputRef.current?.value || month;
+    const liveYear = yearInputRef.current?.value || year;
+
+    if (!liveDay || !liveMonth || !liveYear) {
+      return null;
+    }
+
+    const currentDay = rawDayRef.current || liveDay;
+    const currentMonth = rawMonthRef.current || liveMonth;
+    const currentYear = rawYearRef.current || liveYear;
+
+    // Convert to numbers
+    const dayNum = parseInt(currentDay, 10);
+    const monthNum = parseInt(currentMonth, 10);
+    const yearNum = parseInt(currentYear, 10);
+
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) {
+      return null;
+    }
+
+    try {
+      // Create date object (month is 0-indexed in Date constructor)
+      const date = new Date(yearNum, monthNum - 1, dayNum);
+
+      // Validate the date
+      if (
+        date.getFullYear() !== yearNum ||
+        date.getMonth() !== monthNum - 1 ||
+        date.getDate() !== dayNum
+      ) {
+        return null;
+      }
+
+      // Format as ISO date string (YYYY-MM-DD)
+      const year4 = yearNum.toString().padStart(4, "0");
+      const month2 = monthNum.toString().padStart(2, "0");
+      const day2 = dayNum.toString().padStart(2, "0");
+
+      return `${year4}-${month2}-${day2}`;
+    } catch (error) {
+      return null;
+    }
+  }, [day, isDayCurrentlyInvalid, isMonthCurrentlyInvalid, isYearCurrentlyInvalid, month, year]);
+
+  // Component API registration
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        focus,
+        setValue,
+        isoValue: getIsoValue,
+      });
+    }
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
+
+  // Custom clear icon
+  const clearIconElement = useMemo(() => {
+    if (clearIcon === null || clearIcon === "null") return null;
+    if (clearIcon) return <ThemedIcon name={clearIcon} />;
+    // Default clear icon
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={19}
+        height={19}
+        viewBox="0 0 19 19"
+        stroke="currentColor"
+        strokeWidth={2}
+        aria-hidden="true"
+        className={classnames(styles.clearButtonIcon, styles.buttonIcon)}
       >
-        {String(label)}
-      </label>
-      <div data-part-id="labeledItem" data-xmlui-part="labeledItem" style={labeledItemStyle}>
-        {inputRoot}
+        <line x1="4" x2="15" y1="4" y2="15" />
+        <line x1="15" x2="4" y1="4" y2="15" />
+      </svg>
+    );
+  }, [clearIcon]);
+
+  // Adornments
+  const startAdornment = useMemo(() => {
+    if (startIcon || startText) {
+      return <Adornment iconName={startIcon} text={startText} className={styles.adornment} />;
+    }
+    return null;
+  }, [startIcon, startText]);
+
+  const endAdornment = useMemo(() => {
+    if (endIcon || endText) {
+      return <Adornment iconName={endIcon} text={endText} className={styles.adornment} />;
+    }
+    return null;
+  }, [endIcon, endText]);
+
+  // Helper function to get input refs based on order
+  const getInputRefs = useCallback(() => {
+    const refs = {
+      day: dayInputRef,
+      month: monthInputRef,
+      year: yearInputRef,
+    };
+    return dateOrder.map((field) => refs[field as keyof typeof refs]);
+  }, [dateOrder]);
+
+  // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
+  const handleArrowKeys = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const { key, ctrlKey, metaKey } = event;
+
+      // Ctrl+A / Cmd+A: activate "select all" mode across all fields
+      if ((ctrlKey || metaKey) && key === "a") {
+        event.preventDefault();
+        setSelectAllActive(true);
+        const inputRefs = getInputRefs();
+        inputRefs[0]?.current?.focus();
+        inputRefs[0]?.current?.select();
+        return;
+      }
+
+      // Ctrl+C / Cmd+C in select-all mode: copy the full formatted date value
+      if ((ctrlKey || metaKey) && key === "c" && isSelectAllActiveRef.current) {
+        event.preventDefault();
+        if (localValueRef.current) {
+          void navigator.clipboard.writeText(localValueRef.current);
+        }
+        return;
+      }
+
+      // In select-all mode: Backspace/Delete clears all fields at once
+      if (isSelectAllActiveRef.current) {
+        if (key === "Backspace" || key === "Delete") {
+          event.preventDefault();
+          setSelectAllActive(false);
+          setDay(null);
+          setMonth(null);
+          setYear(null);
+          handleChange(null);
+          const inputRefs = getInputRefs();
+          inputRefs[0]?.current?.focus();
+          return;
+        }
+        // Any other non-modifier key exits select-all mode
+        if (!["Shift", "Control", "Meta", "Alt", "CapsLock", "Tab"].includes(key)) {
+          setSelectAllActive(false);
+        }
+      }
+
+      if (key !== "ArrowLeft" && key !== "ArrowRight" && key !== "Backspace") return;
+
+      const inputRefs = getInputRefs();
+      const currentIndex = inputRefs.findIndex((r) => r?.current === event.currentTarget);
+      if (currentIndex === -1) return;
+
+      if (key === "ArrowRight" && currentIndex < inputRefs.length - 1) {
+        event.preventDefault();
+        const next = inputRefs[currentIndex + 1];
+        next?.current?.focus();
+        next?.current?.select();
+      } else if (key === "ArrowLeft" && currentIndex > 0) {
+        event.preventDefault();
+        const prev = inputRefs[currentIndex - 1];
+        prev?.current?.focus();
+        prev?.current?.select();
+      } else if (key === "Backspace" && event.currentTarget.value === "" && currentIndex > 0) {
+        event.preventDefault();
+        const prev = inputRefs[currentIndex - 1];
+        prev?.current?.focus();
+        prev?.current?.select();
+      }
+    },
+    [getInputRefs, setSelectAllActive, handleChange],
+  );
+
+  // Helper function to create input components in the right order
+  const createDateInputs = () => {
+    const inputRefs = getInputRefs();
+
+    return dateOrder.map((field, index) => {
+      const nextRef = index < inputRefs.length - 1 ? inputRefs[index + 1] : undefined;
+      // Pass id to the first input field only
+      const inputId = index === 0 ? id : undefined;
+
+      const getSeparator = () => {
+        if (index === dateOrder.length - 1) return null;
+
+        // Get separator based on format
+        if (dateFormat.includes("/")) return "/";
+        if (dateFormat.includes("-")) return "-";
+        return "";
+      };
+
+      switch (field) {
+        case "day":
+          return (
+            <React.Fragment key="day">
+              <DayInput
+                id={inputId}
+                autoFocus={autoFocus && index === 0}
+                disabled={!enabled}
+                inputRef={dayInputRef}
+                nextInputRef={nextRef}
+                minValue={minValue}
+                maxValue={maxValue}
+                onChange={handleDayChange}
+                onBlur={handleDayBlur}
+                onKeyDown={handleArrowKeys}
+                readOnly={readOnly}
+                required={required}
+                value={day}
+                isInvalid={isDayCurrentlyInvalid}
+                month={month}
+                year={year}
+                emptyCharacter={processedEmptyCharacter}
+              />
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
+            </React.Fragment>
+          );
+        case "month":
+          return (
+            <React.Fragment key="month">
+              <MonthInput
+                id={inputId}
+                autoFocus={autoFocus && index === 0}
+                disabled={!enabled}
+                inputRef={monthInputRef}
+                nextInputRef={nextRef}
+                minValue={minValue}
+                maxValue={maxValue}
+                onChange={handleMonthChange}
+                onBlur={handleMonthBlur}
+                onKeyDown={handleArrowKeys}
+                readOnly={readOnly}
+                required={required}
+                value={month}
+                isInvalid={isMonthCurrentlyInvalid}
+                emptyCharacter={processedEmptyCharacter}
+              />
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
+            </React.Fragment>
+          );
+        case "year":
+          return (
+            <React.Fragment key="year">
+              <YearInput
+                id={inputId}
+                autoFocus={autoFocus && index === 0}
+                disabled={!enabled}
+                inputRef={yearInputRef}
+                nextInputRef={nextRef}
+                minValue={minValue}
+                maxValue={maxValue}
+                onChange={handleYearChange}
+                onBlur={handleYearBlur}
+                onKeyDown={handleArrowKeys}
+                readOnly={readOnly}
+                required={required}
+                value={year}
+                isInvalid={isYearCurrentlyInvalid}
+                dateFormat={dateFormat}
+                emptyCharacter={processedEmptyCharacter}
+              />
+              {getSeparator() && <InputDivider separator={getSeparator()} />}
+            </React.Fragment>
+          );
+        default:
+          return null;
+      }
+    });
+  };
+
+  return (
+    <div
+      ref={composedRef}
+      className={classnames(
+        styles.dateInputWrapper,
+        {
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+          [styles.disabled]: !enabled,
+          [styles.readOnly]: readOnly,
+        },
+        classes?.[COMPONENT_PART_KEY],
+        className,
+      )}
+      style={{ ...style, gap }}
+      onFocusCapture={handleComponentFocus}
+      onBlur={handleComponentBlur}
+      data-validation-status={validationStatus}
+      {...rest}
+    >
+      {startAdornment}
+      <div className={styles.wrapper}>
+        <div
+          className={classnames(styles.inputGroup, { [styles.selectAllActive]: isSelectAllActive })}
+          onMouseDown={() => setSelectAllActive(false)}
+        >
+          {createDateInputs()}
+        </div>
+        {clearable && (
+          <Part partId={PART_CLEAR_BUTTON}>
+            <button
+              className={classnames(styles.clearButton, styles.button)}
+              disabled={!enabled}
+              onClick={clear}
+              onFocus={stopPropagation}
+              type="button"
+            >
+              {clearIconElement}
+            </button>
+          </Part>
+        )}
       </div>
-      {validationFeedback}
+      {!finalVerboseValidationFeedback && (
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
+        )}
+      {endAdornment}
     </div>
   );
 }));
 
-function Adornment({ text, icon }: { text?: unknown; icon?: unknown }) {
-  if (text === undefined && icon === undefined) {
-    return null;
-  }
+// Input component types
+type InputProps = {
+  id?: string;
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  className?: string;
+  disabled?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  max: number;
+  min: number;
+  name: string;
+  nextInputRef?: React.RefObject<HTMLInputElement | null>; // For auto-tabbing to next input
+  onChange?: (event: React.ChangeEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  placeholder?: string;
+  readOnly?: boolean;
+  required?: boolean;
+  step?: number;
+  value?: string | null;
+  maxLength?: number;
+  isInvalid?: boolean; // To prevent auto-tabbing when value is invalid
+  validateFn?: (value: string) => boolean; // Function to validate the current input value
+  onBeep?: () => void; // Function to handle beep sound and event
+};
+
+// Input component
+function Input({
+  id,
+  ariaLabel,
+  autoFocus,
+  className,
+  disabled,
+  inputRef,
+  max,
+  min,
+  name,
+  nextInputRef, // For auto-tabbing to next input
+  onChange,
+  onBlur,
+  onKeyDown,
+  onKeyUp,
+  placeholder,
+  readOnly,
+  required,
+  step,
+  value,
+  maxLength = 2,
+  isInvalid = false, // To prevent auto-tabbing when value is invalid
+  validateFn, // Function to validate the current input value
+  onBeep, // Function to handle beep sound and event
+}: InputProps): React.ReactElement {
+  // Handle input changes with auto-tabbing logic
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = event.target.value;
+
+      // Call the original onChange handler
+      if (onChange) {
+        onChange(event);
+      }
+
+      // Auto-tab to next input if we have reached max length, value is numeric, and value is valid
+      if (newValue.length === maxLength && /^\d+$/.test(newValue)) {
+        // Check if the new value is valid before auto-tabbing
+        const isValueInvalid = validateFn ? validateFn(newValue) : false;
+
+        if (!isValueInvalid) {
+          // Small delay to ensure the current input is properly updated
+          setTimeout(() => {
+            if (nextInputRef?.current) {
+              // Tab to next input field
+              nextInputRef.current.focus();
+              nextInputRef.current.select();
+            }
+          }, 0);
+        } else {
+          // Input is ready for auto-tab but invalid - play beep sound and fire event
+          onBeep?.();
+        }
+      }
+    },
+    [onChange, nextInputRef, maxLength, validateFn, onBeep],
+  );
+
   return (
-    <span className={styles.adornment}>
-      {icon !== undefined ? <span role="img" aria-label={String(icon)} data-icon={String(icon)}>{String(icon)}</span> : null}
-      {text !== undefined ? <span>{String(text)}</span> : null}
-    </span>
+    <>
+      <input
+        id={id}
+        aria-label={ariaLabel}
+        autoComplete="off"
+        // biome-ignore lint/a11y/noAutofocus: This is up to developers' decision
+        autoFocus={autoFocus}
+        className={classnames(styles.input, className)}
+        data-input="true"
+        disabled={disabled}
+        inputMode="numeric"
+        max={max}
+        maxLength={maxLength}
+        min={min}
+        name={name}
+        onChange={handleInputChange}
+        onBlur={onBlur}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+        placeholder={placeholder || "--"}
+        readOnly={readOnly}
+        // Assertion is needed for React 18 compatibility
+        ref={inputRef as React.RefObject<HTMLInputElement>}
+        required={required}
+        step={step}
+        type="text"
+        value={value !== null ? value : ""}
+      />
+    </>
   );
 }
 
-function getFieldOrder(format: string): FieldName[] {
-  if (format.startsWith("yyyy")) {
-    return ["year", "month", "day"];
-  }
-  if (format.startsWith("dd")) {
-    return ["day", "month", "year"];
-  }
-  return ["month", "day", "year"];
+// DayInput component
+type DayInputProps = {
+  minValue?: string;
+  maxValue?: string;
+  value?: string | null;
+  isInvalid?: boolean;
+  month?: string | null;
+  year?: string | null;
+  onBeep?: () => void;
+  emptyCharacter?: string;
+} & Omit<
+  React.ComponentProps<typeof PartialInput>,
+  | "max"
+  | "min"
+  | "name"
+  | "value"
+  | "maxLength"
+  | "validateFn"
+  | "emptyCharacter"
+  | "placeholderLength"
+>;
+
+function DayInput({
+  minValue,
+  maxValue,
+  value,
+  isInvalid = false,
+  month,
+  year,
+  onBeep,
+  emptyCharacter = "-",
+  ...otherProps
+}: DayInputProps): React.ReactElement {
+  // Calculate max days for the current month/year
+  const maxDay = useMemo(() => {
+    if (month && year) {
+      const monthNum = parseInt(month, 10);
+      const yearNum = parseInt(year, 10);
+      if (!isNaN(monthNum) && !isNaN(yearNum)) {
+        return new Date(yearNum, monthNum, 0).getDate();
+      }
+    }
+    return 31; // Default to 31 if month/year not available
+  }, [month, year]);
+
+  return (
+    <Part partId={PART_DAY}>
+      <PartialInput
+        id={otherProps.id}
+        value={value}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        max={Math.min(maxDay, 31)}
+        min={1}
+        maxLength={2}
+        validateFn={(val) => isDayInvalid(val, month, year)}
+        onBeep={onBeep}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.day)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        name="day"
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
+  );
 }
 
-function normalizeDateFormat(format: unknown): DateFormat {
-  return dateFormats.includes(format as DateFormat) ? format as DateFormat : defaultProps.dateFormat as DateFormat;
+// MonthInput component
+type MonthInputProps = {
+  minValue?: string;
+  maxValue?: string;
+  value?: string | null;
+  isInvalid?: boolean;
+  onBeep?: () => void;
+  emptyCharacter?: string;
+} & Omit<React.ComponentProps<typeof PartialInput>, "max" | "min" | "name" | "value" | "maxLength">;
+
+function MonthInput({
+  minValue,
+  maxValue,
+  value,
+  isInvalid = false,
+  onBeep,
+  emptyCharacter = "-",
+  ...otherProps
+}: MonthInputProps): React.ReactElement {
+  return (
+    <Part partId={PART_MONTH}>
+      <PartialInput
+        id={otherProps.id}
+        max={12}
+        min={1}
+        name="month"
+        value={value}
+        invalidClassName={styles.invalid}
+        isInvalid={isInvalid}
+        validateFn={isMonthInvalid}
+        onBeep={onBeep}
+        onChange={otherProps.onChange}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        className={classnames(styles.input, styles.month)}
+        maxLength={2}
+        disabled={otherProps.disabled}
+        required={otherProps.required}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        readOnly={otherProps.readOnly}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        ariaLabel={otherProps.ariaLabel}
+      />
+    </Part>
+  );
 }
 
-function stringifyDateValue(value: unknown): string | null {
-  return typeof value === "string" && value.length > 0 ? value : null;
+// YearInput component
+type YearInputProps = {
+  minValue?: string;
+  maxValue?: string;
+  value?: string | null;
+  isInvalid?: boolean;
+  dateFormat?: DateFormat;
+  onBeep?: () => void;
+  emptyCharacter?: string;
+} & Omit<React.ComponentProps<typeof PartialInput>, "max" | "min" | "name" | "value" | "maxLength">;
+
+function YearInput({
+  minValue,
+  maxValue,
+  value,
+  isInvalid = false,
+  dateFormat = "MM/dd/yyyy",
+  onBeep,
+  emptyCharacter = "-",
+  ...otherProps
+}: YearInputProps): React.ReactElement {
+  // Always use 4-digit year format
+  const maxLength = 4;
+
+  const currentYear = new Date().getFullYear();
+  const min = 1900;
+  const max = currentYear + 100;
+
+  const { className: originalClassName, ...restProps } = otherProps;
+
+  return (
+    <Part partId={PART_YEAR}>
+      <PartialInput
+        id={otherProps.id}
+        max={max}
+        min={min}
+        name="year"
+        value={value}
+        isInvalid={isInvalid}
+        invalidClassName={styles.invalid}
+        validateFn={isYearInvalid}
+        onBeep={onBeep}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={4}
+        className={classnames(styles.input, styles.year, originalClassName)}
+        maxLength={maxLength}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but current onBlur expects just event
+          if (otherProps.onBlur) {
+            // Provide both direction and event to match the expected signature
+            otherProps.onBlur(direction, event);
+          }
+        }}
+        {...restProps}
+      />
+    </Part>
+  );
 }
 
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
+// Input helper functions
+function onFocus(event: React.FocusEvent<HTMLInputElement>) {
+  const { target } = event;
+  target.select();
 }
 
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function parseDateParts(value: string | null, format: DateFormat): DateParts | null {
-  if (!value) {
+// Utility function to parse date string into components
+function parseDateString(dateString: unknown, dateFormat: DateFormat) {
+  // Handle non-string values gracefully by returning null (empty fields)
+  if (typeof dateString !== "string" || dateString === null || dateString === undefined) {
     return null;
   }
-  const parsed = parseByFormat(value, format) ?? parseIso(value);
-  if (!parsed || !isRealDate(parsed.year, parsed.month, parsed.day)) {
+  const trimmedDateString = dateString.trim();
+  if (!trimmedDateString) {
     return null;
   }
-  return {
-    month: pad2(parsed.month),
-    day: pad2(parsed.day),
-    year: String(parsed.year).padStart(4, "0"),
-  };
+
+  try {
+    // Try to parse the date using the specified format
+    if (matchesDateFormat(trimmedDateString, dateFormat)) {
+      const parsedDate = parse(trimmedDateString, dateFormat, new Date());
+
+      if (isValid(parsedDate)) {
+        return {
+          day: parsedDate.getDate().toString().padStart(2, "0"),
+          month: (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
+          year: parsedDate.getFullYear().toString(),
+        };
+      }
+    }
+
+    // Fallback: Try to parse as ISO date string
+    if (isIsoDateLike(trimmedDateString)) {
+      const isoDate = new Date(trimmedDateString);
+      if (!isNaN(isoDate.getTime())) {
+        return {
+          day: isoDate.getDate().toString().padStart(2, "0"),
+          month: (isoDate.getMonth() + 1).toString().padStart(2, "0"),
+          year: isoDate.getFullYear().toString(),
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    return null;
+  }
 }
 
-function parseByFormat(value: string, format: DateFormat): { month: number; day: number; year: number } | null {
-  const patterns: Record<DateFormat, RegExp> = {
-    "MM/dd/yyyy": /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-    "MM-dd-yyyy": /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
-    "yyyy/MM/dd": /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/,
-    "yyyy-MM-dd": /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
-    "dd/MM/yyyy": /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-    "dd-MM-yyyy": /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
-    yyyyMMdd: /^(\d{4})(\d{2})(\d{2})$/,
-    MMddyyyy: /^(\d{2})(\d{2})(\d{4})$/,
-  };
-  const match = patterns[format].exec(value);
-  if (!match) {
-    return null;
-  }
-  if (format.startsWith("yyyy")) {
-    return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
-  }
-  if (format.startsWith("dd")) {
-    return { day: Number(match[1]), month: Number(match[2]), year: Number(match[3]) };
-  }
-  return { month: Number(match[1]), day: Number(match[2]), year: Number(match[3]) };
-}
-
-function parseIso(value: string): { month: number; day: number; year: number } | null {
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
-  if (!match) {
-    return null;
-  }
-  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
-}
-
-function formatDateParts(parts: DateParts, format: DateFormat): string | null {
-  if (!parts.month || !parts.day || !parts.year) {
-    return null;
-  }
-  const month = Number(parts.month);
-  const day = Number(parts.day);
-  const year = Number(parts.year);
-  if (!isRealDate(year, month, day)) {
-    return null;
-  }
-  const mm = pad2(month);
-  const dd = pad2(day);
-  const yyyy = String(year).padStart(4, "0");
-  switch (format) {
-    case "MM-dd-yyyy":
-      return `${mm}-${dd}-${yyyy}`;
-    case "yyyy/MM/dd":
-      return `${yyyy}/${mm}/${dd}`;
-    case "yyyy-MM-dd":
-      return `${yyyy}-${mm}-${dd}`;
+function matchesDateFormat(value: string, dateFormat: DateFormat) {
+  switch (dateFormat) {
+    case "MM/dd/yyyy":
     case "dd/MM/yyyy":
-      return `${dd}/${mm}/${yyyy}`;
+    case "yyyy/MM/dd":
+      return /^\d{2}\/\d{2}\/\d{4}$|^\d{4}\/\d{2}\/\d{2}$/.test(value);
+    case "MM-dd-yyyy":
     case "dd-MM-yyyy":
-      return `${dd}-${mm}-${yyyy}`;
+    case "yyyy-MM-dd":
+      return /^\d{2}-\d{2}-\d{4}$|^\d{4}-\d{2}-\d{2}$/.test(value);
     case "yyyyMMdd":
-      return `${yyyy}${mm}${dd}`;
     case "MMddyyyy":
-      return `${mm}${dd}${yyyy}`;
+      return /^\d{8}$/.test(value);
     default:
-      return `${mm}/${dd}/${yyyy}`;
+      return false;
   }
 }
 
-function partsToIso(parts: DateParts): string | null {
-  if (!parts.month || !parts.day || !parts.year) {
-    return null;
-  }
-  const month = Number(parts.month);
-  const day = Number(parts.day);
-  const year = Number(parts.year);
-  return isRealDate(year, month, day) ? `${String(year).padStart(4, "0")}-${pad2(month)}-${pad2(day)}` : null;
+function isIsoDateLike(value: string) {
+  return /^\d{4}-\d{2}-\d{2}(?:[T ][0-9:.+-Z]*)?$/.test(value);
 }
 
-function normalizeFieldValue(field: FieldName, value: string, parts: DateParts): string {
-  if (!value) {
-    return "";
-  }
-  const numberValue = Number(value);
-  if (!Number.isFinite(numberValue)) {
-    return "";
-  }
-  if (field === "year") {
-    if (numberValue >= 1900 && numberValue <= 2100) {
-      return String(numberValue).padStart(4, "0");
+// Normalize functions
+function normalizeDay(
+  value: string | null,
+  month: string | null,
+  year: string | null,
+): string | null {
+  if (!value || value === "") return null;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+
+  // Calculate max days for the current month/year
+  let maxDay = 31;
+  if (month && year) {
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    if (!isNaN(monthNum) && !isNaN(yearNum)) {
+      maxDay = new Date(yearNum, monthNum, 0).getDate();
     }
-    if (value.length <= 2) {
-      const candidate = Number(`20${value.padStart(2, "0")}`);
-      return String(candidate > new Date().getFullYear() + 100 ? Number(`19${value.padStart(2, "0")}`) : candidate);
+  }
+
+  if (num >= 1 && num <= maxDay) {
+    return num.toString().padStart(2, "0");
+  } else {
+    // Keep value % 10. In case of "0" use "01"
+    const normalizedValue = num % 10;
+    if (normalizedValue === 0) {
+      return "01";
+    } else {
+      return normalizedValue.toString().padStart(2, "0");
     }
-    return "";
   }
-  if (field === "month") {
-    if (numberValue >= 1 && numberValue <= 12) {
-      return pad2(numberValue);
+}
+
+function normalizeMonth(value: string | null): string | null {
+  if (!value || value === "") return null;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+
+  if (num >= 1 && num <= 12) {
+    return num.toString().padStart(2, "0");
+  } else {
+    // Keep the last digit. Use "0" as the first digit. In case of "0" use "01"
+    const lastDigit = num % 10;
+    if (lastDigit === 0) {
+      return "01";
+    } else {
+      return `0${lastDigit}`;
     }
-    const lastDigit = numberValue % 10;
-    return pad2(lastDigit === 0 ? 1 : lastDigit);
   }
-  const maxDay = parts.month && parts.year ? new Date(Number(parts.year), Number(parts.month), 0).getDate() : 31;
-  if (numberValue >= 1 && numberValue <= maxDay) {
-    return pad2(numberValue);
-  }
-  if (parts.month && parts.year && numberValue > maxDay) {
-    return value;
-  }
-  const normalized = numberValue % 10;
-  return pad2(normalized === 0 ? 1 : normalized);
 }
 
-function isFieldInvalid(field: FieldName, value: string, parts: DateParts): boolean {
-  const numberValue = Number(value);
-  if (!Number.isFinite(numberValue)) {
-    return true;
+function normalizeYear(value: string | null): string | null {
+  if (!value || value === "") return null;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+
+  if (num >= MIN_YEAR && num <= MAX_YEAR) {
+    return num.toString();
+  } else {
+    // Keep the last two year digits and use "20" as the first two digits if the resulting year is not in the future; otherwise, use "19" as the first two digits
+    const lastTwoDigits = num % 100;
+    const currentYear = new Date().getFullYear();
+    const candidate20 = 2000 + lastTwoDigits;
+    const candidate19 = 1900 + lastTwoDigits;
+
+    // Use "20" if the resulting year is not in the future; otherwise, use "19"
+    if (candidate20 <= currentYear) {
+      return candidate20.toString();
+    } else {
+      return candidate19.toString();
+    }
   }
-  if (field === "year") {
-    return value.length === 4 && (numberValue < 1900 || numberValue > 2100);
-  }
-  if (field === "month") {
-    return numberValue < 1 || numberValue > 12;
-  }
-  const maxDay = parts.month && parts.year ? new Date(Number(parts.year), Number(parts.month), 0).getDate() : 31;
-  return numberValue < 1 || numberValue > maxDay;
 }
 
-function computeInvalidFields(parts: DateParts): Partial<Record<FieldName, boolean>> {
-  const invalidFields: Partial<Record<FieldName, boolean>> = {};
-  for (const field of ["month", "day", "year"] as const) {
-    invalidFields[field] = parts[field] !== "" && isFieldInvalid(field, parts[field], parts);
+// Validation functions
+function isDayInvalid(value: string | null, month: string | null, year: string | null): boolean {
+  if (!value || value === "") return false;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return true;
+
+  // Calculate max days for the current month/year
+  let maxDay = 31;
+  if (month && year) {
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    if (!isNaN(monthNum) && !isNaN(yearNum)) {
+      maxDay = new Date(yearNum, monthNum, 0).getDate();
+    }
   }
-  if (parts.month && parts.day && parts.year && !partsToIso(parts)) {
-    invalidFields.day = true;
-  }
-  return invalidFields;
+
+  return num < 1 || num > maxDay;
 }
 
-function isRealDate(year: number, month: number, day: number): boolean {
-  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
-    return false;
-  }
-  const date = new Date(year, month - 1, day);
-  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+function isMonthInvalid(value: string | null): boolean {
+  if (!value || value === "") return false;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return true;
+
+  return num < 1 || num > 12;
 }
 
-function pad2(value: number) {
-  return String(value).padStart(2, "0");
-}
+function isYearInvalid(value: string | null): boolean {
+  if (!value || value === "") return false;
 
-function repeatChar(value: string | undefined, count: number) {
-  const char = value && [...value][0] ? [...value][0] : "-";
-  return char.repeat(count);
-}
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return true;
 
-function cx(...classes: Array<string | undefined | false>) {
-  return classes.filter(Boolean).join(" ");
+  // Invalid if out of the minimum and maximum year range
+  return num < MIN_YEAR || num > MAX_YEAR;
 }

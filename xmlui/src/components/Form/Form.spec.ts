@@ -1643,6 +1643,34 @@ test.describe("Basic Functionality", () => {
       await expect(nameField).toContainText("This field is required");
     });
 
+    test("submit button displays required errors for empty FormItems", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          data="{{ username: '', password: '', confirmPassword: '' }}"
+          onWillSubmit="(data, allData) => {
+            if (allData.password !== allData.confirmPassword) {
+              return false;
+            }
+          }"
+          onSubmit="testState = 'submitted'"
+          saveLabel="Create account">
+          <FormItem testId="usernameField" label="Username" bindTo="username" required="true" />
+          <FormItem testId="passwordField" label="Password" bindTo="password" type="password" required="true" />
+          <FormItem testId="confirmPasswordField" label="Confirm Password" bindTo="confirmPassword" type="password" required="true" noSubmit="true" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Create account" }).click();
+
+      await expect(page.getByText("This field is required")).toHaveCount(3);
+      await expect(page.getByTestId("usernameField")).toContainText("This field is required");
+      await expect(page.getByTestId("passwordField")).toContainText("This field is required");
+      await expect(page.getByTestId("confirmPasswordField")).toContainText("This field is required");
+    });
+
     test("validate method does not trigger form submission", async ({
       initTestBed,
       page,

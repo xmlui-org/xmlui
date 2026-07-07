@@ -1,5 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
-import { buttonThemeValues, buttonVariantValues } from "../abstractions";
+import { buttonThemeValues, buttonVariantValues } from "../../components/abstractions";
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 
 // --- variant & themeColor

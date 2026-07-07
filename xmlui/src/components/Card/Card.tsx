@@ -1,69 +1,92 @@
-import { createMetadata, dClick, dContextMenu } from "../../component-core/metadata/helpers";
+import styles from "./Card.module.scss";
+
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
+import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
 import { defaultProps } from "./Card.defaults";
+import { Card } from "./CardReact";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { nonPropertyChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "Card";
 
 export const CardMd = createMetadata({
   status: "stable",
   description:
-    "`Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners.",
+    "`Card` is a versatile container that groups related content with a visual " +
+    "boundary, typically featuring background color, padding, borders, and rounded " +
+    "corners. It's ideal for organizing information, creating sections, and " +
+    "establishing visual hierarchy in your interface.",
   parts: {
-    avatar: { description: "The avatar displayed within the card, if any." },
-    title: { description: "The title of the card." },
-    subtitle: { description: "The subtitle of the card." },
+    avatar: {
+      description: "The avatar displayed within the card, if any.",
+    },
+    title: {
+      description: "The title of the card.",
+    },
+    subtitle: {
+      description: "The subtitle of the card.",
+    },
   },
   props: {
-    id: {
-      description: "Defines a component instance identifier used for references and APIs.",
-      valueType: "string",
-    },
     avatarUrl: {
-      description: "The URL for an avatar image.",
+      description:
+        `The url for an avarar image. If not specified, but [\`showAvatar\`](#showAvatar) is true, ${COMP} will show the ` +
+        `first letters of the [\`title\`](#title).`,
       valueType: "string",
     },
     showAvatar: {
-      description: "Indicates whether the avatar should be displayed.",
+      description: `Indicates whether the avatar should be displayed`,
       valueType: "boolean",
       defaultValue: defaultProps.showAvatar,
     },
     avatarSize: {
-      description: "Sets the avatar size.",
+      description: `This prop sets the size of the avatar. The default value is \`sm\`.`,
       availableValues: ["xs", "sm", "md", "lg"],
       valueType: "string",
     },
     title: {
-      description: "This prop sets the pre-styled title. If unset, no title is displayed.",
+      description:
+        "This prop sets the pre-styled title. If the property is not set, no title " +
+        "is displayed in the Card.",
       valueType: "string",
     },
     subtitle: {
-      description: "This prop sets the pre-styled subtitle. If unset, no subtitle is displayed.",
+      description:
+        "This prop sets the pre-styled subtitle. If the property is not set, no subtitle " +
+        "is displayed in the Card.",
       valueType: "string",
     },
     linkTo: {
-      description: "Wraps the title in a Link component that is clickable to navigate.",
+      description:
+        "This optional property wraps the title in a \`Link\` component that is clickable to navigate.",
       valueType: "string",
     },
     orientation: {
-      description: "Controls whether Card children are laid out horizontally or vertically.",
-      availableValues: ["horizontal", "vertical"],
+      description:
+        `An optional property that governs the ${COMP}'s orientation ` +
+        `(whether the ${COMP} lays out its children in a row or a column). ` +
+        `If the orientation is set to \`horizontal\`, the ${COMP} will display ` +
+        `its children in a row, except for its [\`title\`](#title) and [\`subtitle\`](#subtitle).`,
+      availableValues: orientationOptionMd,
       valueType: "string",
       defaultValue: defaultProps.orientation,
     },
     horizontalAlignment: {
       description: "Manages the horizontal content alignment for each child element in the Card.",
-      availableValues: ["start", "center", "end", "stretch"],
+      availableValues: alignmentOptionValues,
       valueType: "string",
       defaultValue: "start",
     },
     verticalAlignment: {
       description: "Manages the vertical content alignment for each child element in the Card.",
-      availableValues: ["start", "center", "end", "stretch", "baseline"],
+      availableValues: alignmentOptionValues,
       valueType: "string",
       defaultValue: "start",
-    },
-    testId: {
-      description: "Adds a test identifier to the card root.",
-      valueType: "string",
     },
   },
   events: {
@@ -79,35 +102,27 @@ export const CardMd = createMetadata({
   },
   apis: {
     scrollToTop: {
-      description: "Scrolls the Card container to the top.",
+      description:
+        "Scrolls the Card container to the top. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
       signature: "scrollToTop(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
     scrollToBottom: {
-      description: "Scrolls the Card container to the bottom.",
+      description:
+        "Scrolls the Card container to the bottom. Works when the Card has an explicit height and overflowY is set to 'scroll'.",
       signature: "scrollToBottom(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
     scrollToStart: {
-      description: "Scrolls the Card container to the start.",
+      description:
+        "Scrolls the Card container to the start (left in LTR, right in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
       signature: "scrollToStart(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
     scrollToEnd: {
-      description: "Scrolls the Card container to the end.",
+      description:
+        "Scrolls the Card container to the end (right in LTR, left in RTL). Works when the Card has an explicit width and overflowX is set to 'scroll'.",
       signature: "scrollToEnd(behavior?: 'auto' | 'instant' | 'smooth'): void",
     },
   },
-  themeVars: {
-    [`padding-${COMP}`]: "Card padding.",
-    [`border-${COMP}`]: "Card border.",
-    [`borderRadius-${COMP}`]: "Card border radius.",
-    [`boxShadow-${COMP}`]: "Card box shadow.",
-    [`backgroundColor-${COMP}`]: "Card background color.",
-    [`backgroundColor-${COMP}--hover`]: "Card background color when hovered.",
-    [`gap-${COMP}`]: "The gap between the component's children.",
-    [`gap-title-${COMP}`]: "The gap between the title and subtitle.",
-    [`gap-avatar-${COMP}`]: "The gap between the avatar and title panel.",
-    [`horizontalAlignment-title-${COMP}`]: "The horizontal alignment of the title panel.",
-    [`verticalAlignment-title-${COMP}`]: "The vertical alignment of the title and subtitle to the avatar.",
-  },
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-4",
     [`border-${COMP}`]: "1px solid $borderColor",
@@ -115,11 +130,99 @@ export const CardMd = createMetadata({
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
     [`backgroundColor-${COMP}--hover`]: "$color-surface-raised",
-    [`gap-${COMP}`]: "$gap-layout",
+    [`gap-${COMP}`]: "var(--stack-gap-default)",
     [`gap-title-${COMP}`]: "$gap-none",
     [`gap-avatar-${COMP}`]: "$gap-normal",
-    [`horizontalAlignment-title-${COMP}`]: "stretch",
     [`verticalAlignment-title-${COMP}`]: "center",
+  },
+  themeVarDescriptions: {
+    [`backgroundColor-${COMP}--hover`]: "The background color of the Card when hovered.",
+    [`gap-${COMP}`]: "The gap between the component's children.",
+    [`gap-title-${COMP}`]: "The gap between the title and the subtitle",
+    [`gap-avatar-${COMP}`]: "The gap between the avatar and the title panel",
+    [`horizontalAlignment-title-${COMP}`]:
+      "The horizontal alignment of panel with the title and subtitle",
+    [`verticalAlignment-title-${COMP}`]:
+      "The vertical alignment of the title and subtitle to the avatar",
   },
 });
 
+type ThemedCardProps = React.ComponentPropsWithoutRef<typeof Card>;
+
+export const ThemedCard = React.forwardRef<React.ElementRef<typeof Card>, ThemedCardProps>(
+  function ThemedCard({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(CardMd);
+    return (
+      <Card
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const cardComponentRenderer = wrapComponent(
+  COMP,
+  ThemedCard,
+  CardMd,
+  {
+    exposeRegisterApi: true,
+    childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+    deriveAriaLabel: (props) => props.title,
+  },
+);
+
+export const cardRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: CardMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const orientation = adapter.stringProp("orientation", defaultProps.orientation);
+    return (
+      <ThemedCard
+        {...rootAttrs}
+        title={adapter.stringProp("title")}
+        subtitle={adapter.stringProp("subtitle")}
+        linkTo={adapter.stringProp("linkTo")}
+        avatarUrl={adapter.stringProp("avatarUrl")}
+        showAvatar={adapter.booleanProp("showAvatar", Boolean(adapter.stringProp("avatarUrl")))}
+        avatarSize={adapter.stringProp("avatarSize")}
+        orientation={orientation}
+        horizontalAlignment={adapter.stringProp("horizontalAlignment")}
+        verticalAlignment={adapter.stringProp("verticalAlignment")}
+        onClick={(event) => void adapter.event("click")(event)}
+        onDoubleClick={(event) => void adapter.event("doubleClick")(event)}
+        onContextMenu={(event) => void adapter.event("contextMenu")(event)}
+        registerComponentApi={adapter.registerApi}
+      >
+        {adapter.context.renderChildren(
+          nonPropertyChildren(adapter.node.children).map((child) =>
+            normalizeCardChild(child, orientation ?? defaultProps.orientation),
+          ),
+          adapter.scope,
+          adapter.node.range.end,
+        )}
+      </ThemedCard>
+    );
+  },
+});
+
+function normalizeCardChild(child: XmluiNode, orientation: string): XmluiNode {
+  if (child.kind !== "element") {
+    return child;
+  }
+  const mainProp = orientation === "horizontal" ? "width" : "height";
+  const mainValue = child.props[mainProp];
+  if (mainValue === undefined || mainValue === null || mainValue === "") {
+    return child;
+  }
+  const props: Record<string, unknown> = { ...child.props };
+  if (props.canShrink === undefined) {
+    props.canShrink = false;
+  }
+  return {
+    ...child,
+    props,
+  } as XmluiElement;
+}

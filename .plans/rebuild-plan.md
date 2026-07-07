@@ -332,7 +332,9 @@ Fresh-session handoff prompt:
 
 Current handoff state:
 
-- Start Phase 6 Extension Packages and External Authoring.
+- Start Phase 6 Extension Packages and External Authoring. Website-driven
+  package migration is tracked in `.plans/website-migration-plan.md`, with the
+  per-package workflow in `.plans/extension-package-migration-template.md`.
 - Keep the component-by-component closure approach.
 - Use `/Users/dotneteer/source/xmlui` as the compatibility source of truth before changing cross-cutting theme, slot, tone, behavior, or part semantics.
 - Preserve existing dirty worktree changes that are unrelated to the current slice.
@@ -987,6 +989,16 @@ Goal:
 - Close extension package registration, metadata, functions, components,
   themes, package exports, standalone scripts, Vite imports, and first-party
   extension packages.
+
+Website migration priority:
+
+- Follow `.plans/website-migration-plan.md` first because the website is the
+  fastest broad visual regression surface for the rewrite.
+- Migrate the website's extension packages before the full website copy:
+  `xmlui-docs-blocks`, `xmlui-website-blocks`, `xmlui-search`, then the
+  remaining visual/demo packages needed by extension docs.
+- Use `.plans/extension-package-migration-template.md` for each package so old
+  E2E tests and new state-update smoke tests are planned consistently.
 
 ### 31. [remaining] Phase 7: Developer Tooling, Docs, Playground, and AI Integrations
 

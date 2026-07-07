@@ -1,14 +1,8 @@
 export const defaultProps = {
-  buttonIconPosition: "start",
-  buttonLabel: "Browse",
-  buttonPosition: "end",
-  buttonSize: "md",
-  buttonThemeColor: "primary",
-  buttonVariant: "solid",
-  directory: false,
   enabled: true,
-  initialValue: undefined,
+  buttonPosition: "end" as const,
+  buttonLabel: "Browse",
   multiple: false,
-  readOnly: false,
-  validationStatus: "none",
-} as const;
+  directory: false,
+  buttonThemeColor: "primary",
+};

@@ -71,6 +71,40 @@ describe("XMLUI script scope model", () => {
       name: "count",
     });
   });
+
+  it("resolves AppContextObject properties as context identifiers", () => {
+    const document = parseXmlui(`<App><Button onClick="toast('Button clicked')" /></App>`);
+    const appScope = createXmluiScope(document.root);
+    const button = document.root.children[0] as XmluiElement;
+    const buttonScope = createChildXmluiScope(appScope, button);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("toast('Button clicked')").node,
+      buttonScope,
+    );
+
+    expect(resolveXmluiIdentifier(buttonScope, "toast")).toMatchObject({
+      kind: "context",
+      name: "toast",
+      mutable: false,
+    });
+    expect(lowered.diagnostics).toEqual([]);
+    expect(lowered.ir).toMatchObject({
+      kind: "EventHandler",
+      body: [
+        {
+          kind: "ExpressionStatement",
+          expression: {
+            kind: "CallExpression",
+            callee: {
+              kind: "IdentifierRead",
+              name: "toast",
+              dependency: expect.objectContaining({ kind: "context", name: "toast" }),
+            },
+          },
+        },
+      ],
+    });
+  });
 });
 
 describe("XMLUI script event write analysis", () => {
@@ -182,6 +216,26 @@ describe("XMLUI script event write analysis", () => {
         }),
       ]),
     );
+  });
+
+  it("tracks array push calls against mutable state as invalidating writes", () => {
+    const document = parseXmlui(`
+      <App var.newItems="{[]}">
+        <AutoComplete onItemCreated="item => newItems.push(item)" />
+      </App>
+    `);
+    const autoComplete = document.root.children[0] as XmluiElement;
+    const event = autoComplete.parsed?.events?.itemCreated;
+
+    expect(event?.writes).toEqual([
+      expect.objectContaining({
+        kind: "local",
+        name: "newItems",
+        path: ["newItems"],
+        operator: "mutate",
+      }),
+    ]);
+    expect(event?.invalidates).toEqual([{ kind: "local", name: "newItems" }]);
   });
 });
 
@@ -318,7 +372,7 @@ describe("XMLUI expression JavaScript compilation", () => {
     );
     expect(compileXmluiExpression(local.ir, local.dependencies).execute(context)).toBe(11);
     expect(compileXmluiExpression(global.ir, global.dependencies).source).toBe(
-      `return ctx.readGlobal("globalCount");`,
+      `return (ctx.readGlobal("globalCount") ?? ctx.readReference?.("globalCount"));`,
     );
     expect(compileXmluiExpression(global.ir, global.dependencies).execute(context)).toBe(22);
   });

@@ -5,18 +5,20 @@ import type { XmluiElement } from "../../compiler/ir";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
-import type { RenderContext } from "./types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export function ExtensionComponentInstance({
   renderer,
   context,
   node,
   scope,
+  layoutContext,
 }: {
   renderer: XmluiExtensionComponent;
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  layoutContext?: RuntimeRenderLayoutContext;
 }): ReactNode {
   const propDependencies = Object.values(node.parsed?.props ?? {}).flatMap((parsed) =>
     Array.isArray(parsed)
@@ -41,7 +43,7 @@ export function ExtensionComponentInstance({
       {renderer({
         props,
         events,
-        children: context.renderChildren(node.children, scope),
+        children: context.renderChildren(node.children, scope, undefined, layoutContext),
         node,
         scope,
         context,
@@ -49,4 +51,3 @@ export function ExtensionComponentInstance({
     </>
   );
 }
-

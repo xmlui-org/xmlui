@@ -1,6 +1,7 @@
 import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./Tooltip.defaults";
+import { TooltipComponent } from "./TooltipReact";
 
 const COMP = "Tooltip";
 const tooltipStylesSource = `
@@ -115,3 +116,5 @@ export const TooltipMd = createMetadata({
     [`animation-${COMP}`]: "cubic-bezier(0.16, 1, 0.3, 1)",
   },
 });
+
+export const ThemedTooltip = TooltipComponent;

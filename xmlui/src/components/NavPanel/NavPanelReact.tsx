@@ -1,83 +1,558 @@
-import type { HTMLAttributes, ReactNode } from "react";
-import { forwardRef } from "react";
+import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useRef } from "react";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_NAV_PANEL_FOOTER } from "../../components-core/parts";
 
-import { NavPanelCollapseProvider, useNavPanelCollapseContext } from "../NavPanelCollapseButton/NavPanelCollapseContext";
 import styles from "./NavPanel.module.scss";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
 
-export type NavPanelProps = HTMLAttributes<HTMLDivElement> & {
-  children?: ReactNode;
-  footerContent?: ReactNode;
-  logoContent?: ReactNode;
-  scrollStyle?: string;
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { ThemedLogo as Logo } from "../Logo/Logo";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { getAppLayoutOrientation } from "../App/AppReact";
+import { useLinkInfoContext } from "../App/LinkInfoContext";
+import { Part } from "../Part/Part";
+
+// Define navigation hierarchy node structure
+export interface NavHierarchyNode {
+  /** The type of navigation node - either a clickable link or a grouping container */
+  type: "NavLink" | "NavGroup";
+
+  /** The display label/text for this navigation item */
+  label: string;
+
+  /** The URL/route path for navigation (present for NavLink and optional for NavGroup) */
+  to?: string;
+
+  /** Child navigation nodes nested under this node (only present for NavGroup types) */
+  children?: NavHierarchyNode[];
+
+  /** Optional icon name associated with this navigation item */
+  icon?: string;
+
+  /** Reference to the immediate parent node in the hierarchy (undefined for root-level nodes) */
+  parent?: NavHierarchyNode;
+
+  /** Array of ancestor nodes from root to this node, excluding this node itself (empty for root-level nodes) */
+  pathSegments?: NavHierarchyNode[];
+
+  /** Reference to the previous NavLink in the flattened navigation order */
+  prevLink?: NavHierarchyNode;
+
+  /** Reference to the next NavLink in the flattened navigation order */
+  nextLink?: NavHierarchyNode;
+
+  /** True if this is the first NavLink within its immediate parent container */
+  firstLink?: boolean;
+
+  /** True if this is the last NavLink within its immediate parent container */
+  lastLink?: boolean;
+}
+
+// Function to build navigation hierarchy from component children
+export function buildNavHierarchy(
+  children: any[] | undefined,
+  extractValue: any,
+  parent?: NavHierarchyNode,
+  pathSegments: NavHierarchyNode[] = [],
+  lookupCompoundComponent?: (name: string) => ComponentDef | undefined,
+  visitedComponents: Set<string> = new Set(),
+): NavHierarchyNode[] {
+  if (!children) return [];
+
+  const hierarchy: NavHierarchyNode[] = [];
+
+  // Skip non-object children
+  children
+    .filter((child) => child && typeof child === "object")
+    .forEach((child) => {
+      if (child.type === "NavLink") {
+        const label =
+          extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+        const to =
+          extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+        const icon =
+          extractValue.asOptionalString?.(child.props?.icon) || extractValue(child.props?.icon);
+
+        // Handle case where label might not be in props but in children as text
+        let finalLabel = label;
+        if (!finalLabel && child.children?.length === 1 && child.children[0].type === "TextNode") {
+          finalLabel = extractValue(child.children[0].props?.value);
+        }
+
+        // Only include NavLinks that have both label and to values
+        if (finalLabel && to) {
+          const node: NavHierarchyNode = {
+            type: "NavLink",
+            label: finalLabel,
+            to: to,
+            icon: typeof icon === "string" ? icon : undefined,
+            parent: parent,
+            pathSegments: [...pathSegments],
+          };
+          hierarchy.push(node);
+        }
+      } else if (child.type === "NavGroup") {
+        const label =
+          extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+        const to =
+          extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+        const icon =
+          extractValue.asOptionalString?.(child.props?.icon) || extractValue(child.props?.icon);
+
+        // NavGroups only need a label, no "to" value required
+        if (label) {
+          const groupNode: NavHierarchyNode = {
+            type: "NavGroup",
+            label: label,
+            to: to,
+            icon: typeof icon === "string" ? icon : undefined,
+            parent: parent,
+            pathSegments: [...pathSegments],
+            children: [],
+          };
+
+          // Build children with this groupNode as parent and updated path
+          const newPathSegments = [...pathSegments, groupNode];
+          groupNode.children = buildNavHierarchy(
+            child.children,
+            extractValue,
+            groupNode,
+            newPathSegments,
+            lookupCompoundComponent,
+            visitedComponents,
+          );
+          hierarchy.push(groupNode);
+        } else if (child.children && child.children.length > 0) {
+          // If no label but has children, process them at the current level with same parent and path
+          hierarchy.push(
+            ...buildNavHierarchy(
+              child.children,
+              extractValue,
+              parent,
+              pathSegments,
+              lookupCompoundComponent,
+              visitedComponents,
+            ),
+          );
+        }
+      } else if (child.children && child.children.length > 0) {
+        //console.log("CN", child.children);
+        // Process any children that might contain NavGroup and NavLink components recursively
+        const nestedNodes = buildNavHierarchy(
+          child.children,
+          extractValue,
+          parent,
+          pathSegments,
+          lookupCompoundComponent,
+          visitedComponents,
+        );
+        if (nestedNodes.length > 0) {
+          hierarchy.push(...nestedNodes);
+        }
+      } else if (lookupCompoundComponent) {
+        // Check if this is a compound component
+        const compoundComponent = lookupCompoundComponent(child.type);
+        if (compoundComponent?.children) {
+          // Cycle detection: skip if we've already visited this component
+          if (visitedComponents.has(child.type)) {
+            return hierarchy;
+          }
+          // Add current component to visited set for cycle detection
+          visitedComponents.add(child.type);
+
+          // Process the compound component's children
+          const compoundNodes = buildNavHierarchy(
+            compoundComponent.children,
+            extractValue,
+            parent,
+            pathSegments,
+            lookupCompoundComponent,
+            visitedComponents,
+          );
+          if (compoundNodes.length > 0) {
+            hierarchy.push(...compoundNodes);
+          }
+        }
+      }
+    });
+
+  // Set navigation properties after building the hierarchy
+  setNavigationProperties(hierarchy);
+  return hierarchy;
+}
+
+// Helper function to set navigation properties (prevLink, nextLink, firstLink, lastLink)
+function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
+  // Collect all NavLinks in traversal order
+  const allNavLinks: NavHierarchyNode[] = [];
+
+  function collectNavLinks(nodes: NavHierarchyNode[]) {
+    nodes.forEach((node) => {
+      if (node.type === "NavLink") {
+        allNavLinks.push(node);
+      }
+      if (node.children) {
+        collectNavLinks(node.children);
+      }
+    });
+  }
+
+  collectNavLinks(hierarchy);
+
+  // Set prevLink and nextLink for all NavLinks
+  allNavLinks.forEach((link, index) => {
+    if (index > 0) {
+      link.prevLink = allNavLinks[index - 1];
+    }
+    if (index < allNavLinks.length - 1) {
+      link.nextLink = allNavLinks[index + 1];
+    }
+  });
+
+  // Set firstLink and lastLink properties
+  function setFirstLastProperties(nodes: NavHierarchyNode[]) {
+    const navLinks = nodes.filter((node) => node.type === "NavLink");
+
+    if (navLinks.length > 0) {
+      navLinks[0].firstLink = true;
+      navLinks[navLinks.length - 1].lastLink = true;
+    }
+
+    // Recursively process children
+    nodes.forEach((node) => {
+      if (node.children) {
+        setFirstLastProperties(node.children);
+      }
+    });
+  }
+
+  setFirstLastProperties(hierarchy);
+}
+
+// Function to build a map of navigation nodes by their "to" property
+export function buildLinkMap(
+  navLinks: NavHierarchyNode[] | undefined,
+): Map<string, NavHierarchyNode> {
+  const linkMap = new Map<string, NavHierarchyNode>();
+
+  if (!navLinks) return linkMap;
+
+  function processNodes(nodes: NavHierarchyNode[]) {
+    nodes.forEach((node) => {
+      if (node.to) {
+        // If multiple items use the same "to" value, the last wins
+        linkMap.set(node.to, node);
+      }
+      if (node.children) {
+        processNodes(node.children);
+      }
+    });
+  }
+
+  processNodes(navLinks);
+  return linkMap;
+}
+
+import { defaultProps } from "./NavPanel.defaults";
+
+interface INavPanelContext {
+  inDrawer: boolean;
+}
+
+export const NavPanelContext = React.createContext<INavPanelContext | null>(null);
+
+const contextValue = {
+  inDrawer: true,
 };
 
-export const NavPanelComponent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPanelComponent(
+const DrawerNavPanel = memo(function DrawerNavPanel({
+  logoContent,
+  footerContent,
+  children,
+  className,
+  classes,
+  style,
+  scrollStyle = defaultProps.scrollStyle,
+  showScrollerFade = defaultProps.showScrollerFade,
+  ...rest
+}: {
+  children: ReactNode;
+  className?: string;
+  classes?: Record<string, string>;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  footerContent?: ReactNode;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
+}) {
+  const hasFooter = !!footerContent;
+  return (
+    <NavPanelContext.Provider value={contextValue}>
+      <div
+        {...rest}
+        role={(rest as React.HTMLAttributes<HTMLDivElement>).role ?? "navigation"}
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.hasFooter]: hasFooter })}
+        style={style}
+      >
+        <div data-part-id="logo" className={classnames(styles.logoWrapper, styles.inDrawer)}>
+          {logoContent || <Logo />}
+        </div>
+        <Scroller
+          data-part-id="content"
+          className={styles.wrapperInner}
+          style={style}
+          scrollStyle={scrollStyle}
+          showScrollerFade={showScrollerFade}
+        >
+          {children}
+        </Scroller>
+        {hasFooter && (
+          <Part partId={PART_NAV_PANEL_FOOTER}>
+            <div data-part-id="footer" className={styles.footer}>
+              {footerContent}
+            </div>
+          </Part>
+        )}
+      </div>
+    </NavPanelContext.Provider>
+  );
+});
+
+type Props = {
+  children: ReactNode;
+  className?: string;
+  classes?: Record<string, string>;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  footerContent?: ReactNode;
+  inDrawer?: boolean;
+  renderChild: RenderChildFn;
+  showScrollerFade?: boolean;
+  navLinks?: NavHierarchyNode[];
+  scrollStyle?: ScrollStyle;
+  syncWithContent?: boolean;
+  syncScrollBehavior?: ScrollBehavior;
+  syncScrollPosition?: ScrollLogicalPosition;
+};
+
+export const NavPanel = memo(forwardRef(function NavPanel(
   {
     children,
-    className,
-    footerContent,
+    style,
     logoContent,
-    scrollStyle = "normal",
+    footerContent,
+    className,
+    classes,
+    inDrawer = defaultProps.inDrawer,
+    renderChild,
+    navLinks,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
+    syncWithContent = defaultProps.syncWithContent,
+    syncScrollBehavior = defaultProps.syncScrollBehavior,
+    syncScrollPosition = defaultProps.syncScrollPosition,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  return (
-    <NavPanelCollapseProvider>
-      <NavPanelContent
+  const appLayoutContext = useAppLayoutContext();
+  const linkInfoContext = useLinkInfoContext();
+  const localRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  // True when the current navigation was initiated by a click inside the NavPanel.
+  // In that case the user already sees the clicked link, so we skip scrolling.
+  const clickedInsideRef = useRef(false);
+
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      localRef.current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [forwardedRef],
+  );
+
+  // Scroll the active NavLink into view when the route changes
+  useEffect(() => {
+    if (!syncWithContent || !localRef.current) return;
+
+    // If the navigation was triggered by clicking inside the NavPanel the user
+    // already sees the link — skip scrolling to avoid it jumping under the cursor.
+    if (clickedInsideRef.current) {
+      clickedInsideRef.current = false;
+      return;
+    }
+
+    const panel = localRef.current;
+    const innerScroller = scrollerRef.current;
+    const innerOverflowY = innerScroller ? getComputedStyle(innerScroller).overflowY : "";
+    const scrollContainer =
+      innerScroller && /^(auto|scroll|overlay)$/.test(innerOverflowY)
+        ? innerScroller
+        : panel;
+    const scrollIntoPanel = (element: Element) => {
+      const target = element as HTMLElement;
+      const targetRect = target.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+      let top = scrollContainer.scrollTop;
+
+      if (syncScrollPosition === "center") {
+        top += targetRect.top - containerRect.top - (containerRect.height - targetRect.height) / 2;
+      } else if (syncScrollPosition === "end") {
+        top += targetRect.bottom - containerRect.bottom;
+      } else if (syncScrollPosition === "nearest") {
+        if (targetRect.top < containerRect.top) {
+          top += targetRect.top - containerRect.top;
+        } else if (targetRect.bottom > containerRect.bottom) {
+          top += targetRect.bottom - containerRect.bottom;
+        }
+      } else {
+        top += targetRect.top - containerRect.top;
+      }
+
+      const behavior = syncScrollBehavior === "instant" ? "auto" : syncScrollBehavior;
+      scrollContainer.scrollTo({ top, behavior });
+      target.scrollIntoView({ block: syncScrollPosition, behavior });
+    };
+
+    // Scrolls the leaf active link if it is not inside a collapsed NavGroup.
+    // Returns true if scrolling was performed.
+    //
+    // Nav hierarchy: a NavGroup header also renders a NavLink with `to` that gets
+    // `xmlui-navlink-active` on a prefix match. That header link has `aria-expanded`
+    // on it (passed from ExpandableNavGroup). Leaf NavLinks never have `aria-expanded`.
+    // We skip header links so we always scroll to the deepest/leaf active link.
+    const findAndScrollToActiveLink = (): boolean => {
+      const candidates = Array.from(panel.querySelectorAll(".xmlui-navlink-active"));
+      // Find the leaf link: exclude NavGroup-header links (they have aria-expanded)
+      const leafLink = candidates.find((el) => el.getAttribute("aria-expanded") === null);
+      if (!leafLink) return false;
+      // If the link is inside a still-collapsed NavGroup content (aria-hidden="true"),
+      // the expansion animation hasn't finished yet — defer until transitionend.
+      let el: Element | null = leafLink.parentElement;
+      while (el && el !== panel) {
+        if (el.getAttribute("aria-hidden") === "true") return false;
+        el = el.parentElement;
+      }
+      scrollIntoPanel(leafLink);
+      return true;
+    };
+
+    const scheduleSyncScroll = () => {
+      requestAnimationFrame(() => {
+        findAndScrollToActiveLink();
+      });
+    };
+
+    // Try immediately — works when the active link is in an already-expanded group.
+    scheduleSyncScroll();
+
+    // Otherwise wait for the NavGroup CSS grid expansion (grid-template-rows, 0.3s)
+    // to complete before scrolling to the leaf link.
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== "grid-template-rows") return;
+      scheduleSyncScroll();
+    };
+
+    const observer = new MutationObserver(scheduleSyncScroll);
+    observer.observe(panel, {
+      attributes: true,
+      attributeFilter: ["class", "aria-hidden"],
+      childList: true,
+      subtree: true,
+    });
+
+    panel.addEventListener("transitionend", handleTransitionEnd);
+    return () => {
+      observer.disconnect();
+      panel.removeEventListener("transitionend", handleTransitionEnd);
+    };
+  }, [syncWithContent, syncScrollBehavior, syncScrollPosition]);
+  const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
+  const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
+  const vertical = appLayoutContext?.layout?.startsWith("vertical");
+  const collapsed = !!appLayoutContext?.navPanelCollapsed && vertical;
+  const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
+  const showLogo =
+    !!safeLogoContent ||
+    appLayoutContext?.layout === "vertical" ||
+    appLayoutContext?.layout === "vertical-sticky";
+  const hasFooter = !!footerContent;
+
+  // Register the linkMap when navLinks change
+  const registerLinkMap = linkInfoContext?.registerLinkMap;
+  useEffect(() => {
+    if (registerLinkMap && navLinks) {
+      const linkMap = buildLinkMap(navLinks);
+      registerLinkMap(linkMap);
+    }
+  }, [navLinks, registerLinkMap]);
+
+  if (inDrawer) {
+    return (
+      <DrawerNavPanel
         {...rest}
+        style={style}
+        logoContent={safeLogoContent}
+        footerContent={hasFooter ? footerContent : undefined}
         className={className}
-        footerContent={footerContent}
-        logoContent={logoContent}
-        ref={ref}
+        classes={classes}
         scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
       >
         {children}
-      </NavPanelContent>
-    </NavPanelCollapseProvider>
-  );
-});
+      </DrawerNavPanel>
+    );
+  }
 
-const NavPanelContent = forwardRef<HTMLDivElement, NavPanelProps>(function NavPanelContent(
-  {
-    children,
-    className,
-    footerContent,
-    logoContent,
-    scrollStyle = "normal",
-    ...rest
-  },
-  ref,
-) {
-  const collapseContext = useNavPanelCollapseContext();
-  const collapsed = collapseContext?.collapsed ?? false;
-
-  return (
-    <nav
+  const wrapperEl = (
+    <div
       {...rest}
-      className={[
-        styles.wrapper,
-        collapsed && styles.collapsed,
-        scrollStyle !== "normal" && styles.overlayScroll,
-        className,
-      ].filter(Boolean).join(" ")}
-      data-nav-panel-collapsed={collapsed ? "true" : "false"}
-      data-xmlui-component="NavPanel"
-      ref={ref}
+      ref={mergedRef}
+      role={(rest as React.HTMLAttributes<HTMLDivElement>).role ?? "navigation"}
+      onMouseDown={() => { clickedInsideRef.current = true; }}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+        [styles.horizontal]: horizontal,
+        [styles.vertical]: vertical,
+        [styles.condensed]: isCondensed,
+        [styles.hasFooter]: hasFooter,
+        [styles.collapsed]: collapsed,
+        [styles.overlayScroll]: scrollStyle !== "normal",
+      })}
+      style={style}
     >
-      {logoContent ? (
-        <div className={styles.logo} data-xmlui-part="logo">
-          {logoContent}
-        </div>
-      ) : null}
-      <div className={styles.content} data-xmlui-part="content">
+      {showLogo && (
+        <div data-part-id="logo" className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
+      )}
+      <Scroller
+        ref={scrollerRef}
+        data-part-id="content"
+        className={styles.wrapperInner}
+        style={style}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+      >
         {children}
-      </div>
-      {footerContent ? (
-        <div className={styles.footer} data-xmlui-part="footer">
-          {footerContent}
-        </div>
-      ) : null}
-    </nav>
+      </Scroller>
+      {hasFooter && (
+        <Part partId={PART_NAV_PANEL_FOOTER}>
+          <div
+            data-part-id="footer"
+            className={classnames(styles.footer, {
+              [styles.footerCollapsed]: collapsed,
+            })}
+          >
+            {footerContent}
+          </div>
+        </Part>
+      )}
+    </div>
   );
-});
+
+  return wrapperEl;
+}));

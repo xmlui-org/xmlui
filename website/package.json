@@ -6,13 +6,24 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "preview-ssg": "preview-ssg dist-ssg",
-    "build": "xmlui build"
+    "build": "xmlui build --buildMode=INLINE_ALL --withMock && node scripts/verify-production-output.mjs",
+    "verify:production-output": "node scripts/verify-production-output.mjs",
+    "build-ssg": "xmlui ssg && node scripts/prepare-ssg-output.mjs && node scripts/verify-ssg-output.mjs",
+    "verify:ssg-output": "node scripts/verify-ssg-output.mjs",
+    "verify:preview-ssg": "node scripts/verify-preview-ssg.mjs",
+    "preview-ssg": "node ../xmlui/scripts/preview-ssg.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "xmlui": "*"
-  },
-  "devDependencies": {
-    "preview-ssg": "*"
+    "xmlui": "*",
+    "xmlui-search": "*",
+    "xmlui-website-blocks": "*",
+    "xmlui-docs-blocks": "*",
+    "xmlui-masonry": "*",
+    "xmlui-gauge": "*",
+    "xmlui-echart": "*",
+    "xmlui-calendar": "*",
+    "xmlui-grid-layout": "*",
+    "xmlui-tiptap-editor": "*"
   }
 }

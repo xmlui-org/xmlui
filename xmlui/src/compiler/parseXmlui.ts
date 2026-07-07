@@ -52,7 +52,8 @@ export class XmluiParseError extends Error {
 
 export function parseXmlui(source: string, options: ParseXmluiOptions = {}): XmluiDocument {
   const sourceId = options.sourceId ?? "anonymous.xmlui";
-  const parsed = parseMarkup(source, sourceId);
+  const normalizedSource = normalizeImplicitBooleanAttributes(normalizeCdataSections(source));
+  const parsed = parseMarkup(normalizedSource, sourceId);
   if (parsed.diagnostics.length > 0) {
     throw diagnosticToError(parsed.diagnostics[0]);
   }
@@ -82,12 +83,6 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     };
   }
 
-  if (transformedRoot.type !== "App") {
-    throw new Error(
-      `Expected <App> or <Component> as the document root, got <${transformedRoot.type}>.`,
-    );
-  }
-
   analyzeElementScripts(transformedRoot, {
     sourceId,
     allowImplicitGlobals: false,
@@ -98,6 +93,138 @@ export function parseXmlui(source: string, options: ParseXmluiOptions = {}): Xml
     kind: "app",
     root: transformedRoot,
   };
+}
+
+function normalizeImplicitBooleanAttributes(source: string): string {
+  let result = "";
+  let index = 0;
+  while (index < source.length) {
+    const tagStart = source.indexOf("<", index);
+    if (tagStart < 0) {
+      result += source.slice(index);
+      break;
+    }
+    result += source.slice(index, tagStart);
+    const tagEnd = findTagEnd(source, tagStart + 1);
+    if (
+      tagEnd < 0 ||
+      source.startsWith("<!--", tagStart) ||
+      source.startsWith("</", tagStart) ||
+      source.startsWith("<!", tagStart) ||
+      source.startsWith("<?", tagStart)
+    ) {
+      result += source.slice(tagStart, tagEnd < 0 ? source.length : tagEnd + 1);
+      index = tagEnd < 0 ? source.length : tagEnd + 1;
+      continue;
+    }
+    result += normalizeTagBooleanAttributes(source.slice(tagStart, tagEnd + 1));
+    index = tagEnd + 1;
+  }
+  return result;
+}
+
+function findTagEnd(source: string, start: number): number {
+  let quote: string | undefined;
+  for (let index = start; index < source.length; index++) {
+    const char = source[index];
+    if (quote) {
+      if (char === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (char === `"` || char === `'`) {
+      quote = char;
+      continue;
+    }
+    if (char === ">") {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function normalizeCdataSections(source: string): string {
+  return source.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_match, content: string) =>
+    encodeTextEntities(content),
+  );
+}
+
+function encodeTextEntities(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function normalizeTagBooleanAttributes(tag: string): string {
+  let index = 1;
+  let result = "<";
+  while (index < tag.length && /[^\s/>]/.test(tag[index])) {
+    result += tag[index++];
+  }
+  while (index < tag.length) {
+    const char = tag[index];
+    if (char === ">" || (char === "/" && tag[index + 1] === ">")) {
+      result += tag.slice(index);
+      break;
+    }
+    if (!/\s/.test(char)) {
+      result += char;
+      index++;
+      continue;
+    }
+
+    const whitespaceStart = index;
+    while (index < tag.length && /\s/.test(tag[index])) {
+      index++;
+    }
+    const whitespace = tag.slice(whitespaceStart, index);
+    if (tag[index] === ">" || (tag[index] === "/" && tag[index + 1] === ">")) {
+      result += whitespace + tag.slice(index);
+      break;
+    }
+
+    const nameStart = index;
+    if (!/[A-Za-z_:]/.test(tag[index])) {
+      result += whitespace + tag[index++];
+      continue;
+    }
+    index++;
+    while (index < tag.length && /[\w:.-]/.test(tag[index])) {
+      index++;
+    }
+    const name = tag.slice(nameStart, index);
+    let lookahead = index;
+    while (lookahead < tag.length && /\s/.test(tag[lookahead])) {
+      lookahead++;
+    }
+    if (tag[lookahead] !== "=") {
+      result += `${whitespace}${name}="true"`;
+      continue;
+    }
+
+    result += whitespace + name + tag.slice(index, lookahead + 1);
+    index = lookahead + 1;
+    while (index < tag.length && /\s/.test(tag[index])) {
+      result += tag[index++];
+    }
+    const quote = tag[index];
+    if (quote !== `"` && quote !== `'`) {
+      while (index < tag.length && !/[\s/>]/.test(tag[index])) {
+        result += tag[index++];
+      }
+      continue;
+    }
+    result += tag[index++];
+    while (index < tag.length) {
+      result += tag[index];
+      if (tag[index++] === quote) {
+        break;
+      }
+    }
+  }
+  return result;
 }
 
 type AnalyzeOptions = {
@@ -545,7 +672,7 @@ function contentChildren(
     if (child.kind === MarkupSyntaxKind.Text) {
       const rawText = getNodeText(child, source);
       if (parentType === "Markdown") {
-        const value = rawText.replace(/\r\n?/g, "\n");
+        const value = decodeEntities(rawText).replace(/\r\n?/g, "\n");
         if (!value.trim()) {
           continue;
         }
@@ -795,7 +922,7 @@ function rangeOf(node: MarkupSyntaxNode): SourceRange {
 }
 
 function normalizeText(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return decodeEntities(text).replace(/\s+/g, " ").trim();
 }
 
 function decodeEntities(value: string): string {

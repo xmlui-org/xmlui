@@ -1,112 +1,178 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode, Ref } from "react";
-import { forwardRef } from "react";
+import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
+import type React from "react";
+import { forwardRef, type ForwardedRef, memo, useContext, useMemo } from "react";
+import { NavLink as RrdNavLink } from "react-router-dom";
+import type { To } from "react-router-dom";
+import classnames from "classnames";
 
 import styles from "./NavLink.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import type { LinkAria, LinkTarget } from "../abstractions";
+import { createUrlWithQueryParams } from "../component-utils";
+import { getAppLayoutOrientation } from "../App/AppReact";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { NavPanelContext } from "../NavPanel/NavPanelReact";
+import { NavGroupContext } from "../NavGroup/NavGroupContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
-export type NavLinkProps = {
-  active?: boolean;
-  children?: ReactNode;
-  className?: string;
-  disabled?: boolean;
-  displayActive?: boolean;
-  href?: string;
-  icon?: ReactNode;
-  iconAlignment?: "baseline" | "start" | "center" | "end";
-  level?: number;
-  noIndicator?: boolean;
-  onClick?: () => void | Promise<void>;
-  target?: string;
+import { defaultProps } from "./NavLink.defaults";
+
+type Props = {
+  uid?: string;
   to?: string;
+  target?: LinkTarget;
+  disabled?: boolean;
+  children?: ReactNode;
+  displayActive?: boolean;
+  noIndicator?: boolean;
+  forceActive?: boolean;
   vertical?: boolean;
-} & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "children" | "href" | "onClick" | "target"> &
-  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "disabled" | "onClick">;
+  level?: number;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  href?: string;
+  onClick?: MouseEventHandler;
+  icon?: React.ReactNode;
+  iconAlignment?: "baseline" | "start" | "center" | "end";
+  exact?: boolean;
+  activeOverride?: boolean;
+} & Pick<React.HTMLAttributes<HTMLAnchorElement>, LinkAria>;
 
-export const NavLinkComponent = forwardRef<HTMLAnchorElement | HTMLButtonElement, NavLinkProps>(
-  function NavLinkComponent(
-    {
-      active = false,
-      children,
-      className,
-      disabled = false,
-      displayActive = true,
-      href,
-      icon,
-      iconAlignment = "center",
-      level,
-      noIndicator = false,
-      onClick,
-      style,
-      target,
-      vertical = false,
-      ...rest
-    },
-    ref,
-  ) {
-    const classes = [
-      styles.content,
-      active && displayActive && styles.active,
-      active && "xmlui-navlink-active",
-      vertical && styles.vertical,
-      disabled && styles.disabled,
-      noIndicator && styles.noIndicator,
-      className,
-    ].filter(Boolean).join(" ");
-    const mergedStyle = {
-      ...(style as CSSProperties | undefined),
-      ...(level ? { "--nav-link-level": level } : null),
-    } as CSSProperties;
-    const innerContent = (
-      <span className={[
-        styles.innerContent,
-        iconAlignment === "baseline" && styles.iconAlignBaseline,
-        iconAlignment === "start" && styles.iconAlignStart,
-        iconAlignment === "center" && styles.iconAlignCenter,
-        iconAlignment === "end" && styles.iconAlignEnd,
-      ].filter(Boolean).join(" ")}>
-        {icon ? <span className={styles.icon}>{icon}</span> : null}
-        {children}
-      </span>
-    );
+export const NavLink = memo(forwardRef(function NavLink(
+  {
+    /* eslint-disable react/prop-types */
+    uid,
+    children,
+    disabled,
+    to,
+    displayActive = defaultProps.displayActive,
+    noIndicator = defaultProps.noIndicator,
+    vertical,
+    level: levelProp,
+    style,
+    href,
+    onClick,
+    icon,
+    iconAlignment,
+    forceActive,
+    exact,
+    activeOverride,
+    className,
+    classes,
+    ...rest
+  }: Props,
+  ref: ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
+) {
+  const { getThemeVar } = useTheme();
+  const effectiveIconAlignment = iconAlignment ?? getThemeVar("iconAlignment-NavLink") ?? "center";
+  const appLayoutContext = useAppLayoutContext();
+  const layoutIsVertical =
+    !!appLayoutContext && getAppLayoutOrientation(appLayoutContext.layout).includes("vertical");
+  const navPanelContext = useContext(NavPanelContext);
+  const inDrawer = navPanelContext?.inDrawer;
 
-    if (disabled || !href) {
-      return (
-        <button
-          {...rest}
-          aria-current={active ? "page" : undefined}
-          className={classes}
-          data-active={active || undefined}
-          disabled={disabled}
-          onClick={() => { void onClick?.(); }}
-          ref={ref as Ref<HTMLButtonElement>}
-          style={mergedStyle}
-          type="button"
-        >
-          {innerContent}
-        </button>
-      );
+  const { level: contextLevel } = useContext(NavGroupContext);
+  const effectiveLevel = levelProp ?? contextLevel;
+  let safeVertical = vertical;
+
+  if (safeVertical === undefined) {
+    safeVertical = layoutIsVertical || inDrawer;
+  }
+  const smartTo = useMemo(() => {
+    if (to) {
+      return createUrlWithQueryParams(to) as To;
     }
+  }, [to]) as To;
+  const matchExact = exact || to === "/";
 
-    return (
+  const styleObj = useMemo(() => {
+    return {
+      "--nav-link-level": layoutIsVertical ? effectiveLevel + 1 : 0,
+      ...style,
+    };
+  }, [effectiveLevel, style, layoutIsVertical]);
+
+  const baseClasses = classnames(styles.content, styles.base, classes?.[COMPONENT_PART_KEY], className, {
+    [styles.disabled]: disabled,
+    [styles.vertical]: safeVertical,
+    [styles.includeHoverIndicator]: displayActive && !noIndicator,
+    [styles.navItemActive]: displayActive && forceActive,
+    [styles.level1]: effectiveLevel === 0,
+    [styles.level2]: effectiveLevel === 1,
+    [styles.level3]: effectiveLevel === 2,
+    [styles.level4]: effectiveLevel === 3,
+  });
+
+  let innerContent = (
+    <div
+      className={classnames(styles.innerContent, {
+        [styles.iconAlignBaseline]: effectiveIconAlignment === "baseline",
+        [styles.iconAlignStart]: effectiveIconAlignment === "start",
+        [styles.iconAlignCenter]: effectiveIconAlignment === "center",
+        [styles.iconAlignEnd]: effectiveIconAlignment === "end",
+      })}
+    >
+      {icon}
+      {children}
+    </div>
+  );
+  let content: React.ReactNode = null;
+  if (disabled || !smartTo) {
+    content = (
+      <button
+        {...rest}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        onClick={onClick}
+        className={baseClasses}
+        style={styleObj}
+        disabled={disabled}
+      >
+        {innerContent}
+      </button>
+    );
+  } else if (activeOverride !== undefined) {
+    const isActive = activeOverride || forceActive;
+    content = (
       <a
         {...rest}
-        aria-current={active ? "page" : undefined}
-        className={classes}
-        data-active={active || undefined}
-        href={href}
-        onClick={(event) => {
-          if (target) {
-            void onClick?.();
-            return;
-          }
-          event.preventDefault();
-          void onClick?.();
-        }}
-        ref={ref as Ref<HTMLAnchorElement>}
-        style={mergedStyle}
-        target={target || undefined}
+        id={uid}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href ?? String(smartTo)}
+        style={styleObj}
+        onClick={onClick}
+        aria-current={isActive ? "page" : undefined}
+        className={classnames(baseClasses, {
+          [styles.displayActive]: displayActive,
+          [styles.navItemActive]: displayActive && isActive,
+          "xmlui-navlink-active": isActive,
+        })}
       >
         {innerContent}
       </a>
     );
-  },
-);
+  } else {
+    content = (
+      <RrdNavLink
+        {...rest}
+        id={uid}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        to={smartTo as To}
+        end={matchExact}
+        style={styleObj}
+        onClick={onClick}
+        className={({ isActive }) =>
+          classnames(baseClasses, {
+            [styles.displayActive]: displayActive,
+            [styles.navItemActive]: displayActive && (isActive || forceActive),
+            "xmlui-navlink-active": isActive || forceActive,
+          })
+        }
+      >
+        {innerContent}
+      </RrdNavLink>
+    );
+  }
+
+  return content;
+}));

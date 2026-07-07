@@ -2,6 +2,7 @@ import { createRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { IconRegistryContext } from "../IconRegistryContext";
 import { Adornment } from "./InputAdornment";
 import { InputDivider } from "./InputDivider";
 import { InputLabel } from "./InputLabel";
@@ -24,7 +25,11 @@ describe("Input shared internals", () => {
   it("renders adornments only when text or icon is present", () => {
     expect(renderToStaticMarkup(<Adornment />)).toBe("");
 
-    const html = renderToStaticMarkup(<Adornment text="USD" iconName="search" />);
+    const html = renderToStaticMarkup(
+      <IconRegistryContext.Provider value={fakeIconRegistry}>
+        <Adornment text="USD" iconName="search" />
+      </IconRegistryContext.Provider>,
+    );
     expect(html).toContain("wrapper");
     expect(html).toContain('role="presentation"');
     expect(html).toContain('data-icon-name="search"');
@@ -56,6 +61,18 @@ describe("Input shared internals", () => {
     expect(html).toContain('data-input="true"');
     expect(html).toContain('inputMode="numeric"');
     expect(html).toContain('placeholder="••"');
-    expect(html).toContain('type="number"');
+    expect(html).toContain('type="text"');
   });
 });
+
+const fakeIconRegistry = {
+  getRegisteredIconNames: () => ["search"],
+  lookupIconRenderer: (name: string) =>
+    name === "search"
+      ? {
+          renderer: (props: Record<string, unknown>) => <svg {...props} />,
+        }
+      : undefined,
+  ensureCustomSvgIcon: async () => {},
+  customSvgs: {},
+};

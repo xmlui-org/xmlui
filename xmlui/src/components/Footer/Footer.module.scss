@@ -1,68 +1,57 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-Footer: createThemeVar("backgroundColor-Footer");
-$textColor-Footer: createThemeVar("textColor-Footer");
-$height-Footer: createThemeVar("height-Footer");
-$fontSize-Footer: createThemeVar("fontSize-Footer");
-$verticalAlignment-Footer: createThemeVar("verticalAlignment-Footer");
-$maxWidth-content-Footer: createThemeVar("maxWidth-content-Footer");
-$gap-Footer: createThemeVar("gap-Footer");
+// --- Theme vars for paddings
+$component: "Footer";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component) !global;
+
+// --- Other theme vars
+$backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
+$textColor-Footer: createThemeVar("textColor-#{$component}");
+$height-Footer: createThemeVar("height-#{$component}");
+$fontSize-Footer: createThemeVar("fontSize-#{$component}");
+$verticalAlignment-Footer: createThemeVar("verticalAlignment-#{$component}");
+$maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
+$gap-Footer: createThemeVar("gap-#{$component}");
 $maxWidth-App: createThemeVar("maxWidth-App");
-$margin-Footer: createThemeVar("margin-Footer");
-$padding-Footer: createThemeVar("padding-Footer");
-$paddingHorizontal-Footer: createThemeVar("paddingHorizontal-Footer");
-$paddingVertical-Footer: createThemeVar("paddingVertical-Footer");
-$paddingTop-Footer: createThemeVar("paddingTop-Footer");
-$paddingRight-Footer: createThemeVar("paddingRight-Footer");
-$paddingBottom-Footer: createThemeVar("paddingBottom-Footer");
-$paddingLeft-Footer: createThemeVar("paddingLeft-Footer");
-$border-Footer: createThemeVar("border-Footer");
-$borderTop-Footer: createThemeVar("borderTop-Footer");
-$borderRight-Footer: createThemeVar("borderRight-Footer");
-$borderBottom-Footer: createThemeVar("borderBottom-Footer");
-$borderLeft-Footer: createThemeVar("borderLeft-Footer");
-$borderRadius-Footer: createThemeVar("borderRadius-Footer");
+$margin-Footer: createThemeVar("margin-#{$component}");
 
-.outerWrapper {
-  background-color: $backgroundColor-Footer;
-  color: $textColor-Footer;
-  height: $height-Footer;
-  border: $border-Footer;
-  border-top: $borderTop-Footer;
-  border-right: $borderRight-Footer;
-  border-bottom: $borderBottom-Footer;
-  border-left: $borderLeft-Footer;
-  border-radius: $borderRadius-Footer;
+
+@layer components {
+  .outerWrapper{
+    @include t.borderVars($themeVars, $component);
+    background-color: $backgroundColor-Footer;
+    color: $textColor-Footer;
+    height: $height-Footer;
+  }
+
+  .wrapper {
+    width: 100%;
+    display: flex;
+    min-height: 0;
+    height: 100%;
+    flex-direction: row;
+    gap: $gap-Footer;
+    @include t.paddingVars($themeVars, $component);
+    font-size: $fontSize-Footer;
+    align-items: $verticalAlignment-Footer;
+    max-width: $maxWidth-content-Footer;
+    margin: $margin-Footer;
+
+    &.full{
+      max-width: $maxWidth-App;
+    }
+  }
 }
 
-.wrapper {
-  width: 100%;
-  display: flex;
-  min-height: 0;
-  height: 100%;
-  flex-direction: row;
-  gap: $gap-Footer;
-  padding: $padding-Footer;
-  padding-inline: $paddingHorizontal-Footer;
-  padding-block: $paddingVertical-Footer;
-  padding-top: $paddingTop-Footer;
-  padding-right: $paddingRight-Footer;
-  padding-bottom: $paddingBottom-Footer;
-  padding-left: $paddingLeft-Footer;
-  font-size: $fontSize-Footer;
-  align-items: $verticalAlignment-Footer;
-  max-width: $maxWidth-content-Footer;
-  margin: $margin-Footer;
-}
-
-.full {
-  max-width: $maxWidth-App;
-}
-
-:export {
-  themeVars: "";
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

@@ -17,12 +17,13 @@ import {
   responsiveBreakpoints,
   supportedLayoutPropNames,
   supportedResponsiveLayoutPropNames,
+  type LayoutOrientation,
 } from "../../styling";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
 import { useComponentThemeClass } from "./theme";
-import type { RenderContext } from "./types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export type XmluiAdapterRendererProps = {
   adapter: XmluiComponentAdapter;
@@ -36,12 +37,14 @@ export type XmluiComponentAdapterOptions = {
   themeContributors?: readonly ComponentMetadata[];
   renderer: XmluiAdapterRenderer;
   defaultPart?: string;
+  layoutOrientation?: LayoutOrientation;
 };
 
 export type XmluiWrappedRenderer = (props: {
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  [key: string]: unknown;
 }) => ReactNode;
 
 export type XmluiComponentAdapter = {
@@ -61,25 +64,32 @@ export type XmluiComponentAdapter = {
   numberProp(name: string, fallback?: number): number;
   booleanProp(name: string, fallback?: boolean): boolean;
   event(name: string): (...args: unknown[]) => Promise<unknown>;
-  renderChildren(children?: XmluiNode[]): ReactNode;
+  renderChildren(children?: XmluiNode[], layoutContext?: RuntimeRenderLayoutContext): ReactNode;
   renderTemplate(name: string, fallbackChildren?: XmluiNode[]): ReactNode;
   registerApi(api: Record<string, unknown>): void;
   resourceUrl(value: unknown): string | undefined;
 };
 
 export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrappedRenderer {
-  function WrappedXmluiComponent({ context, node, scope }: Parameters<XmluiWrappedRenderer>[0]) {
+  function WrappedXmluiComponent({
+    context,
+    node,
+    scope,
+    ...extraProps
+  }: Parameters<XmluiWrappedRenderer>[0]) {
     const adapter = useXmluiComponentAdapter({
       ...options,
       context,
       node,
       scope,
+      extraProps,
     });
     const rendered = options.renderer({ adapter });
     return <>{attachBehaviors({
       componentName: options.name,
       metadata: options.metadata,
       props: adapter.props,
+      layoutContext: extraProps.layoutContext as Record<string, unknown> | undefined,
     }, rendered)}</>;
   }
   return WrappedXmluiComponent;
@@ -89,14 +99,17 @@ export function useXmluiComponentAdapter({
   name,
   metadata,
   themeContributors = [],
+  layoutOrientation,
   context,
   node,
   scope,
   defaultPart = "root",
+  extraProps = {},
 }: XmluiComponentAdapterOptions & {
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  extraProps?: Record<string, unknown>;
 }): XmluiComponentAdapter {
   const propDependencies = Object.values(node.parsed?.props ?? {}).flatMap((parsed) =>
     Array.isArray(parsed)
@@ -105,8 +118,11 @@ export function useXmluiComponentAdapter({
   );
   useBindingRevision(propDependencies, scope);
   const props = useMemo(
-    () => evaluateProps(node.props, node.parsed?.props, scope),
-    [node.props, node.parsed?.props, scope, scope.store.getSnapshot()],
+    () => ({
+      ...evaluateProps(node.props, node.parsed?.props, scope),
+      ...extraProps,
+    }),
+    [extraProps, node.props, node.parsed?.props, scope, scope.store.getSnapshot()],
   );
   const events = useMemo(
     () => Object.fromEntries(Object.keys(node.events).map((eventName) => [
@@ -126,12 +142,12 @@ export function useXmluiComponentAdapter({
   const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
-    () => resolveActiveLayoutStyle(props, viewportWidth),
-    [props, viewportWidth],
+    () => resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
+    [layoutOrientation, props, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => resolveResponsiveLayoutStyles(props),
-    [props],
+    () => resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
+    [layoutOrientation, props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
@@ -143,11 +159,21 @@ export function useXmluiComponentAdapter({
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
+    const changed = Object.entries(api).some(([key, value]) =>
+      apiRef.current[key] !== value
+    );
     Object.assign(apiRef.current, api);
     const id = typeof props.id === "string" ? props.id : undefined;
     if (id) {
+      const alreadyRegistered = scope.references[id] === apiRef.current;
       scope.references[id] = apiRef.current;
-      scope.store.invalidateReference(id);
+      if (!alreadyRegistered || changed) {
+        setTimeout(() => {
+          if (scope.references[id] === apiRef.current) {
+            scope.store.invalidateReference(id);
+          }
+        }, 0);
+      }
     }
   }, [props.id, scope.references, scope.store]);
 
@@ -155,19 +181,32 @@ export function useXmluiComponentAdapter({
     const id = typeof props.id === "string" ? props.id : undefined;
     if (registeredIdRef.current && registeredIdRef.current !== id) {
       delete scope.references[registeredIdRef.current];
-      scope.store.invalidateReference(registeredIdRef.current);
+      const previousId = registeredIdRef.current;
+      setTimeout(() => {
+        if (scope.references[previousId] === undefined) {
+          scope.store.invalidateReference(previousId);
+        }
+      }, 0);
       registeredIdRef.current = undefined;
     }
     if (!id) {
       return;
     }
     scope.references[id] = apiRef.current;
-    scope.store.invalidateReference(id);
+    setTimeout(() => {
+      if (scope.references[id] === apiRef.current) {
+        scope.store.invalidateReference(id);
+      }
+    }, 0);
     registeredIdRef.current = id;
     return () => {
       if (scope.references[id] === apiRef.current) {
         delete scope.references[id];
-        scope.store.invalidateReference(id);
+        setTimeout(() => {
+          if (scope.references[id] === undefined) {
+            scope.store.invalidateReference(id);
+          }
+        }, 0);
       }
     };
   }, [props.id, scope.references, scope.store]);
@@ -187,6 +226,7 @@ export function useXmluiComponentAdapter({
       ...layoutStyle,
     },
     rootAttrs: (part = rootPart) => ({
+      ...externalRootAttrs(metadata, extraProps),
       ...arbitraryRootAttrs(metadata, props),
       "data-xmlui-component": name,
       "data-xmlui-part": part,
@@ -228,12 +268,13 @@ export function useXmluiComponentAdapter({
     },
     event: (eventName) =>
       events[eventName] ?? ((..._args: unknown[]) => Promise.resolve(undefined)),
-    renderChildren: (children = nonPropertyChildren(node.children)) =>
-      context.renderChildren(children, scope),
+    renderChildren: (children = nonPropertyChildren(node.children), layoutContext) =>
+      context.renderChildren(children, scope, node.range.end, layoutContext),
     renderTemplate: (templateName, fallbackChildren) =>
       context.renderChildren(
         templateChildren(node, templateName) ?? fallbackChildren ?? [],
         scope,
+        node.range.end,
       ),
     registerApi,
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
@@ -260,14 +301,23 @@ export function useXmluiComponentAdapter({
 function resolveActiveLayoutStyle(
   props: Record<string, unknown>,
   viewportWidth: number | undefined,
+  orientation?: LayoutOrientation,
 ): CSSProperties {
-  const responsive = resolveResponsiveLayoutStyles(props);
+  const style: CSSProperties = resolveLayoutStyle(props, { orientation });
+  const responsive = resolveResponsiveLayoutStyles(props, { orientation });
   const componentStyle = responsive[COMPONENT_PART_KEY];
   if (!componentStyle) {
-    return resolveLayoutStyle(props);
+    return style;
   }
 
-  return resolveActiveLayoutStyleForPart(responsive, COMPONENT_PART_KEY, viewportWidth) ?? {};
+  if (viewportWidth !== undefined) {
+    for (const [breakpoint, minWidth] of Object.entries(responsiveBreakpoints)) {
+      if (viewportWidth >= minWidth) {
+        Object.assign(style, componentStyle.breakpoints[breakpoint as keyof typeof responsiveBreakpoints]);
+      }
+    }
+  }
+  return style;
 }
 
 function resolveActiveLayoutStyleForPart(
@@ -336,6 +386,15 @@ function arbitraryRootAttrs(
     ...supportedResponsiveLayoutPropNames,
     "testId",
     "when",
+    "when-xs",
+    "when-sm",
+    "when-md",
+    "when-lg",
+    "when-xl",
+    "when-xxl",
+    "tooltip",
+    "tooltipMarkdown",
+    "tooltipOptions",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>
@@ -345,6 +404,28 @@ function arbitraryRootAttrs(
       typeof value !== "object" &&
       typeof value !== "function" &&
       !name.startsWith("on"),
+    ),
+  );
+}
+
+function externalRootAttrs(
+  metadata: ComponentMetadata,
+  props: Record<string, unknown>,
+): Record<string, unknown> {
+  const knownProps = new Set([
+    ...Object.keys(metadata.props ?? {}),
+    ...supportedLayoutPropNames,
+    ...supportedResponsiveLayoutPropNames,
+    "children",
+    "className",
+    "layoutContext",
+    "style",
+  ]);
+  return Object.fromEntries(
+    Object.entries(props).filter(([name, value]) =>
+      !knownProps.has(name) &&
+      value !== undefined &&
+      value !== null,
     ),
   );
 }

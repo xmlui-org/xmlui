@@ -5,147 +5,135 @@ export const INT_REGEXP = /^-?\d+$/;
 export const FLOAT_REGEXP = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/;
 export const DEFAULT_STEP = 1;
 
-export type EmptyNumberValue = null | undefined | "";
+export type empty = null | undefined;
 
-export function isEmptyLike(value: unknown): value is EmptyNumberValue {
-  return value === undefined || value === null || value === "";
+export function isEmptyLike(value: string | number | empty): value is empty {
+  return typeof value === "undefined" || value === null || value === "";
 }
 
-export function mapToRepresentation(value: unknown): string {
-  if (isEmptyLike(value)) {
+export function mapToRepresentation(value: string | number | empty) {
+  if (typeof value === "string") {
+    // Only return strings that look like valid numeric input (or partial input like "-", "1e", "0.")
+    if (value === "" || value === "-" || FLOAT_REGEXP.test(value) || INT_REGEXP.test(value) ||
+        /^-?\d*\.?\d*([eE][+-]?\d*)?$/.test(value)) {
+      return value;
+    }
     return "";
   }
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? String(value) : "";
-  }
-  if (typeof value === "string") {
-    return isRepresentableNumberString(value) ? value : "";
-  }
+  if (typeof value === "number") return value.toString();
   return "";
 }
 
-export function toUsableNumber(value: unknown, integerOnly = false): number | null {
-  if (!isUsableNumber(value, integerOnly)) {
-    return null;
-  }
-  return typeof value === "number"
-    ? value
-    : integerOnly
-      ? Number.parseInt(String(value), 10)
-      : Number(value);
+export function isOutOfBounds(value: number, min: number, max: number) {
+  return value < min || value > max;
 }
 
-export function isUsableNumber(value: unknown, integerOnly = false): boolean {
-  if (typeof value === "number") {
-    return integerOnly ? Number.isSafeInteger(value) : Number.isFinite(value);
-  }
-  if (typeof value !== "string" || value.length === 0) {
-    return false;
-  }
-  if (integerOnly) {
-    return INT_REGEXP.test(value) && Number.isSafeInteger(Number(value));
-  }
-  return !Number.isNaN(Number(value)) && naiveFloatBounding(value);
+export function clamp(value: number, min: number, max: number) {
+  let clamped = value;
+  if (value < min) clamped = min;
+  if (value > max) clamped = max;
+  return clamped;
 }
 
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
+export function toUsableNumber(value: string | number | empty, isInteger = false): number | empty {
+  if (!isUsableNumber(value, isInteger)) return null;
+
+  if (typeof value === "string") {
+    value = isInteger ? Number.parseInt(value) : +value;
+  }
+
+  return value;
 }
 
-export function normalizeNumberInput(value: string, integerOnly: boolean, zeroOrPositive: boolean): string {
-  let next = value.replace(/,/g, "");
-  next = next.replace(/[^\d.eE+-]/g, "");
-  next = next.replace(/E/g, EXPONENTIAL_SEPARATOR);
-  if (integerOnly) {
-    next = next.split(/[.eE]/)[0] ?? "";
-  }
-  if (zeroOrPositive) {
-    next = next.replace(/-/g, "");
-  } else {
-    next = normalizeMinusSigns(next);
-  }
-  next = normalizePlusSigns(next);
-  next = normalizeDecimalSeparators(next, integerOnly);
-  next = normalizeExponentSeparators(next, integerOnly);
-  return next;
+export function isUsableNumber(value: string | number | empty, isInteger = false) {
+  const isUsable = isInteger ? isUsableInteger : isUsableFloat;
+  return isUsable(value);
 }
 
-export function applyStep(
-  currentValue: string,
-  step: number,
-  min: number,
-  max: number,
-  integerOnly: boolean,
-): number | undefined {
-  const current = toUsableNumber(currentValue, integerOnly) ?? 0;
-  const precision = Math.max(decimalPlaces(currentValue), decimalPlaces(String(step)));
-  const scale = 10 ** precision;
-  const rounded = Math.round((current + step) * scale) / scale;
-  const next = clamp(rounded, min, max);
-  return integerOnly ? Math.trunc(next) : next;
+/**
+ * Check whether the input value is a usable number for operations.
+ * Passes if it's of type number or a non-empty string that evaluates to a number.
+ */
+export function isUsableFloat(value: string | number | empty) {
+  if (typeof value === "string" && value.length > 0) {
+    return !Number.isNaN(+value) && naiveFloatBounding(value);
+  }
+  return typeof value === "number";
 }
 
-function isRepresentableNumberString(value: string): boolean {
-  return value === "" ||
-    value === "-" ||
-    FLOAT_REGEXP.test(value) ||
-    INT_REGEXP.test(value) ||
-    /^-?\d*\.?\d*([eE][+-]?\d*)?$/.test(value);
+// TEMP
+// Rounding and arithmetic with large floats is a hassle if loss of precision is apparent.
+// Just bound the incoming floating point value to the max value available.
+// This is an edge case but makes it so that we stay consistent and can do arithmetic with the spinner box.
+function naiveFloatBounding(value: string) {
+  const integerPart = value.split(".")[0];
+  return Math.abs(Number.parseInt(integerPart)) <= NUMBERBOX_MAX_VALUE;
 }
 
-function naiveFloatBounding(value: string): boolean {
-  const integerPart = value.split(".")[0] ?? "";
-  return Math.abs(Number.parseInt(integerPart, 10) || 0) <= NUMBERBOX_MAX_VALUE;
+/**
+ * Check whether the input value is a usable integer for operations.
+ * Passes if it's of type number and is an integer
+ * or a non-empty string that evaluates to an integer.
+ */
+export function isUsableInteger(value: string | number | empty) {
+  if (
+    typeof value === "string" &&
+    value.length > 0 &&
+    ![EXPONENTIAL_SEPARATOR, DECIMAL_SEPARATOR].some((item) => value.includes(item))
+  ) {
+    return Number.isSafeInteger(+value);
+  } else if (typeof value === "number") {
+    return Number.isSafeInteger(value);
+  }
+  return false;
 }
 
-function normalizeMinusSigns(value: string): string {
-  const negative = value.startsWith("-");
-  let next = negative ? value.slice(1) : value;
-  const exponentIndex = next.toLowerCase().indexOf(EXPONENTIAL_SEPARATOR);
-  let exponentNegative = false;
-  if (exponentIndex >= 0) {
-    const afterExponent = next.slice(exponentIndex + 1);
-    exponentNegative = afterExponent.startsWith("-");
-  }
-  next = next.replace(/-/g, "");
-  if (exponentIndex >= 0 && exponentNegative) {
-    next = `${next.slice(0, exponentIndex + 1)}-${next.slice(exponentIndex + 1)}`;
-  }
-  return negative ? `-${next}` : next;
-}
+// TODO:
 
-function normalizePlusSigns(value: string): string {
-  return value.replace(/\+/g, "");
-}
+class NumberFormatter2 {
+  private formatter: Intl.NumberFormat;
+  private model: {
+    value: number;
+    formatted: string;
+    stripped: string;
 
-function normalizeDecimalSeparators(value: string, integerOnly: boolean): string {
-  if (integerOnly) {
-    return value.replace(/\./g, "");
+    group: string;
+    decimal: string;
+    sign: string;
+    //exponent: string;
   }
-  const first = value.indexOf(".");
-  if (first < 0) {
-    return value;
-  }
-  return `${value.slice(0, first + 1)}${value.slice(first + 1).replace(/\./g, "")}`;
-}
+  locale: string;
+  options?: Intl.NumberFormatOptions;
 
-function normalizeExponentSeparators(value: string, integerOnly: boolean): string {
-  if (integerOnly) {
-    return value.replace(/[eE]/g, "");
+  constructor(locale: string, options?: Intl.NumberFormatOptions) {
+    this.locale = locale;
+    this.options = options;
+    this.formatter = new Intl.NumberFormat(locale, options);
   }
-  const first = value.indexOf(EXPONENTIAL_SEPARATOR);
-  if (first < 0) {
-    return value;
-  }
-  return `${value.slice(0, first + 1)}${value.slice(first + 1).replace(/[eE]/g, "")}`;
-}
 
-function decimalPlaces(value: string): number {
-  const normalized = value.toLowerCase();
-  if (normalized.includes("e")) {
-    const numberValue = Number(normalized);
-    return Number.isFinite(numberValue) ? decimalPlaces(String(numberValue)) : 0;
+  set input(value: string | number | empty) {
+
   }
-  const fraction = normalized.split(".")[1];
-  return fraction?.length ?? 0;
+
+  private buildModel() {
+    const parts = this.formatter.formatToParts(1234.5);
+    this.model.group = parts.find((p) => p.type === "group")?.value || "";
+    this.model.decimal = parts.find((p) => p.type === "decimal")?.value || "";
+  }
+
+  parse(value: string): number {
+    return 0;
+  }
+
+  format(value: number): string {
+    return this.formatter.format(value);
+  }
+
+  /**
+   * Strip all non-numeric characters but keep the type of string
+   * @param value 
+   */
+  sanitize(value: string): string {
+    return "";
+  }
 }

@@ -1,9 +1,13 @@
+import React from "react";
 import { extractScssThemeVars } from "../../styling/theme";
 import {
   createMetadata,
   dClick,
 } from "../../component-core/metadata/helpers";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { defaultProps } from "./Image.defaults";
+import { Image } from "./ImageReact";
 
 const COMP = "Image";
 const imageStylesSource = `
@@ -67,3 +71,19 @@ export const ImageMd = createMetadata({
     [`borderColor-${COMP}`]: "transparent",
   },
 });
+
+type ThemedImageProps = React.ComponentPropsWithoutRef<typeof Image> & { classes?: Record<string, string> };
+
+export const ThemedImage = React.forwardRef<React.ElementRef<typeof Image>, ThemedImageProps>(
+  function ThemedImage({ className, classes, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ImageMd);
+    const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
+    return (
+      <Image
+        {...props}
+        className={mergedClass}
+        ref={ref}
+      />
+    );
+  },
+);

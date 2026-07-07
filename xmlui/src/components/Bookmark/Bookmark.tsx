@@ -1,29 +1,39 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./Bookmark.defaults";
+import { Bookmark } from "./BookmarkReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { HTMLAttributes } from "react";
 
-export const defaultProps = {
-  level: 1,
-  omitFromToc: false,
-};
+const COMP = "Bookmark";
 
 export const BookmarkMd = createMetadata({
   status: "stable",
-  deprecationMessage:
-    "The Bookmark component is deprecated. We will remove it in a future release. Please use the `bookmark` property instead.",
+  deprecationMessage: "The Bookmark component is deprecated. We will remove it in a future release. Please use the `bookmark` property instead.",
   description:
-    "Places a bookmark into its parent component's view so links and component APIs can scroll to it.",
+    "As its name suggests, this component places a bookmark into its parent component's view. The " +
+    "component has an \`id\` that you can use in links to navigate (scroll to) the bookmark's location.",
   opaque: true,
   props: {
     id: {
-      description: "The unique identifier of the bookmark.",
+      description:
+        "The unique identifier of the bookmark. You can use this identifier in links " +
+        "to navigate to this component's location. If this identifier is not set, you cannot " +
+        "programmatically visit this bookmark.",
       valueType: "string",
     },
     level: {
-      description: "The bookmark level used by table-of-contents components.",
+      description:
+        "The level of the bookmark. The level is used to determine the bookmark's " +
+        "position in the table of contents.",
       valueType: "number",
       defaultValue: defaultProps.level,
     },
     title: {
-      description: "The text used by table-of-contents components.",
+      description:
+        "Defines the text to display the bookmark in the table of contents. If this property is " +
+        "empty, the text falls back to the value of \`id\`.",
       valueType: "string",
     },
     omitFromToc: {
@@ -31,15 +41,46 @@ export const BookmarkMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.omitFromToc,
     },
-    testId: {
-      description: "Adds a test identifier to the bookmark anchor.",
-      valueType: "string",
-    },
   },
   apis: {
     scrollIntoView: {
       signature: "scrollIntoView()",
       description: "Scrolls the bookmark into view.",
     },
+  },
+});
+
+export const bookmarkComponentRenderer = wrapComponent(
+  COMP,
+  Bookmark,
+  BookmarkMd,
+  {
+    passUid: true,
+    exposeRegisterApi: true,
+  },
+);
+
+export const bookmarkRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: BookmarkMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs() as HTMLAttributes<HTMLSpanElement>;
+    const title = adapter.stringProp("title");
+    const omitFromToc = adapter.booleanProp("omitFromToc", defaultProps.omitFromToc);
+    return (
+      <Bookmark
+        {...rootAttrs}
+        uid={adapter.stringProp("id")}
+        level={adapter.numberProp("level", defaultProps.level)}
+        title={title}
+        omitFromToc={omitFromToc}
+        registerComponentApi={adapter.registerApi}
+        data-bookmark-level={String(adapter.numberProp("level", defaultProps.level))}
+        data-bookmark-title={title || undefined}
+        data-bookmark-omit-from-toc={String(omitFromToc)}
+      >
+        {adapter.renderChildren()}
+      </Bookmark>
+    );
   },
 });

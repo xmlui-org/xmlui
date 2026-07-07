@@ -1,0 +1,25 @@
+<App>
+  <VStack var.messageStatus="Ready to send" gap="$space-2">
+    <Button
+      label="Send Message to IFrame"
+      onClick="
+        myIframe.postMessage({type: 'greeting', text: 'Hello from parent!'}, '*');
+        messageStatus = 'Message sent!';
+      " />
+    <Card title="Status: {messageStatus}" />
+    <IFrame
+      id="myIframe"
+      srcdoc="
+        <script>
+          window.addEventListener('message', (event) => \{
+            console.log('Received message:', event.data);
+            document.body.innerHTML =
+              '<h1>Message: ' + JSON.stringify(event.data) + '</h1>';
+          });
+        </script>
+        <h1>Waiting for message...</h1>
+      "
+      width="100%"
+      height="200px" />
+  </VStack>
+</App>

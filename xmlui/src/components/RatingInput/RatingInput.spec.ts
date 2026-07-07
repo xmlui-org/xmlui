@@ -1,6 +1,5 @@
+import { PART_INPUT } from "../../components-core/parts";
 import { expect, test } from "../../testing/fixtures";
-
-const PART_INPUT = "input";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS

@@ -19,9 +19,13 @@ export type ComponentThemeClass = {
   variables: ThemeVariableMap;
 };
 
+const paddingRegExp = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const paddingHorizontalRegExp = /^paddingHorizontal-(.+)$/;
+const paddingVerticalRegExp = /^paddingVertical-(.+)$/;
+
 export const rootThemeVariables: ThemeVariableLayer = {
   "space-base": "0.25em",
-  "space-0": "0",
+  "space-0": "0em",
   "space-0_5": "calc(0.5 * var(--xmlui-space-base))",
   "space-1": "calc(1 * var(--xmlui-space-base))",
   "space-2": "calc(2 * var(--xmlui-space-base))",
@@ -32,12 +36,14 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "space-8": "calc(8 * var(--xmlui-space-base))",
   "space-10": "calc(10 * var(--xmlui-space-base))",
   "space-11": "calc(11 * var(--xmlui-space-base))",
+  "space-40": "calc(40 * var(--xmlui-space-base))",
   "space-64": "calc(64 * var(--xmlui-space-base))",
+  "col-3": "25%",
 
   "const-color-surface-0": "white",
   "const-color-surface-50": "hsl(204, 30.3%, 96.5%)",
   "const-color-surface-100": "hsl(204, 30.3%, 93%)",
-  "const-color-surface-200": "hsl(204, 30.3%, 85%)",
+  "const-color-surface-200": "hsl(204, 30.3%, 83%)",
   "const-color-surface-300": "hsl(204, 30.3%, 75%)",
   "const-color-surface-400": "hsl(204, 30.3%, 65%)",
   "const-color-surface-500": "hsl(204, 30.3%, 52%)",
@@ -54,7 +60,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-primary-200": "hsl(212,71.9%,78.1%)",
   "const-color-primary-300": "hsl(212,71.9%,67.2%)",
   "const-color-primary-400": "hsl(212,71.9%,56.3%)",
-  "const-color-primary-500": "#206bc4",
+  "const-color-primary-500": "hsl(212.60000000000002, 71.9%, 45.4%)",
   "const-color-primary-600": "hsl(212,71.9%,36.3%)",
   "const-color-primary-700": "hsl(212,71.9%,27.2%)",
   "const-color-primary-800": "hsl(212,71.9%,18.1%)",
@@ -102,17 +108,19 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-danger": "$const-color-danger-600",
   "const-color-attention": "$const-color-danger-500",
 
-  "const-color-success-50": "hsl(129.5, 58.4%, 96.4%)",
-  "const-color-success-100": "hsl(129.5, 58.4%, 92.9%)",
-  "const-color-success-200": "hsl(129.5, 58.4%, 85.7%)",
-  "const-color-success-300": "hsl(129.5, 58.4%, 78.6%)",
-  "const-color-success-400": "hsl(129.5, 58.4%, 71.5%)",
-  "const-color-success-500": "hsl(129.5, 58.4%, 51.5%)",
-  "const-color-success-600": "hsl(129.5, 58.4%, 45%)",
-  "const-color-success-700": "hsl(129.5, 58.4%, 38.6%)",
-  "const-color-success-800": "hsl(129.5, 58.4%, 25.7%)",
-  "const-color-success-900": "hsl(129.5, 58.4%, 12.9%)",
-  "const-color-success-950": "hsl(129.5, 58.4%, 6.4%)",
+  "const-color-success-0": "hsl(129.5, 58.4%, 100%)",
+  "const-color-success-50": "hsl(129.5, 58.4%, 97.3%)",
+  "const-color-success-100": "hsl(129.5, 58.4%, 94.5%)",
+  "const-color-success-200": "hsl(129.5, 58.4%, 89%)",
+  "const-color-success-300": "hsl(129.5, 58.4%, 83.5%)",
+  "const-color-success-400": "hsl(129.5, 58.4%, 78.1%)",
+  "const-color-success-500": "hsl(129.5, 58.4%, 72.6%)",
+  "const-color-success-600": "hsl(129.5, 58.4%, 58.1%)",
+  "const-color-success-700": "hsl(129.5, 58.4%, 43.5%)",
+  "const-color-success-800": "hsl(129.5, 58.4%, 29%)",
+  "const-color-success-900": "hsl(129.5, 58.4%, 14.5%)",
+  "const-color-success-950": "hsl(129.5, 58.4%, 7.3%)",
+  "const-color-success-1000": "hsl(129.5, 58.4%, 0%)",
   "const-color-success": "$const-color-success-500",
 
   "const-color-info-50": "hsl(183, 97%, 95%)",
@@ -146,7 +154,11 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "backgroundColor-attention": "$color-attention",
   "backgroundColor--disabled": "$color-surface-50",
   "backgroundColor--selected": "$color-primary-50",
-  backgroundColor: "$color-surface-subtle",
+  "backgroundColor-dropdown-item": "transparent",
+  "backgroundColor-dropdown-item--hover": "$color-surface-50",
+  "backgroundColor-dropdown-item--active": "$color-surface-100",
+  "backgroundColor-dropdown-item--active-hover": "$color-surface-50",
+  backgroundColor: "hsl(204, 30.3%, 98%)",
 
   "color-info": "$color-info-500",
   "color-valid": "$color-success-600",
@@ -241,22 +253,34 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "maxWidth-columnContent": "800px",
   borderRadius: "4px",
   radius: "4px",
+  "outlineColor--focus": "rgb(from $color-primary-500 r g b / 0.5)",
+  "outlineWidth--focus": "2px",
+  "outlineStyle--focus": "solid",
+  "outlineOffset--focus": "0",
   borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
+  "borderColor-dropdown-item": "$borderColor",
   "borderColor--disabled": "$color-surface-200",
+  "borderColor-Input-default": "$color-surface-200",
+  "borderColor-Input-default--hover": "$color-surface-600",
+  "borderColor-Input-default--focus": "$color-surface-600",
+  "borderColor-Input-default--success": "$color-success-600",
+  "borderColor-Input-default--warning": "$color-warn-700",
+  "borderColor-Input-default--error": "$color-danger-500",
   "borderColor-outlined": "$color-primary-600",
   "borderColor-outlined--hover": "$color-primary-500",
   "borderColor-outlined--active": "$color-primary-700",
   "borderColor-outlined--focus": "$color-primary-600",
 
   light: {
+    textColor: "black",
     "color-surface-0": "$const-color-surface-0",
     "color-surface-50": "$const-color-surface-50",
-    "color-surface-100": "$const-color-surface-100",
+    "color-surface-100": "hsl(204, 30.3%, 95%)",
     "color-surface-200": "$const-color-surface-200",
     "color-surface-300": "$const-color-surface-300",
     "color-surface-400": "$const-color-surface-400",
     "color-surface-500": "$const-color-surface-500",
-    "color-surface-600": "$const-color-surface-600",
+    "color-surface-600": "hsl(204, 30.3%, 40%)",
     "color-surface-700": "$const-color-surface-700",
     "color-surface-800": "$const-color-surface-800",
     "color-surface-900": "$const-color-surface-900",
@@ -270,7 +294,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
     "color-primary-50": "$const-color-primary-50",
     "color-primary-100": "$const-color-primary-100",
     "color-primary-200": "$const-color-primary-200",
-    "color-primary-300": "$const-color-primary-300",
+    "color-primary-300": "color(srgb 0.436168 0.651561 0.907832)",
     "color-primary-400": "$const-color-primary-400",
     "color-primary-500": "$const-color-primary-500",
     "color-primary-600": "$const-color-primary-600",
@@ -287,7 +311,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
     "color-secondary-500": "$const-color-secondary-500",
     "color-secondary-600": "$const-color-secondary-600",
     "color-secondary-700": "$const-color-secondary-700",
-    "color-secondary-800": "$const-color-secondary-800",
+    "color-secondary-800": "rgb(44, 50, 59)",
     "color-secondary-900": "$const-color-secondary-900",
     "color-secondary-950": "$const-color-secondary-950",
     "color-secondary": "$const-color-secondary-500",
@@ -380,6 +404,8 @@ export const rootThemeVariables: ThemeVariableLayer = {
 export const xmluiThemeVariables: ThemeVariableLayer = {
   "font-size": "15px",
   "boxShadow-Input": "$boxShadow-sm",
+  "backgroundColor-Button-secondary-solid--hover": "rgb(140, 151, 169)",
+  "borderColor-Button-secondary-solid--hover": "rgb(226, 229, 234)",
   light: {
     "backgroundColor-ModalDialog": "white",
     "backgroundColor-checked-RadioGroupOption": "$color-primary-400",
@@ -389,8 +415,24 @@ export const xmluiThemeVariables: ThemeVariableLayer = {
   },
 };
 
+export const generatedThemeVariables: ThemeVariableLayer = {
+  "fontSize-Text-keyboard": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-sample": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-sup": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-sub": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-title": `calc(${themeVarReference("fontSize-Text")} * 1.5)`,
+  "fontSize-Text-subtitle": `calc(${themeVarReference("fontSize-Text")} * 1.25)`,
+  "fontSize-Text-small": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-placeholder": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+  "fontSize-Text-paragraph": themeVarReference("fontSize-Text"),
+  "fontSize-Text-subheading": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-tableheading": `calc(${themeVarReference("fontSize-Text")} * 0.625)`,
+  "fontSize-Text-secondary": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
+};
+
 export const defaultThemeVariables = mergeThemeVariableLayers([
   rootThemeVariables,
+  generatedThemeVariables,
   xmluiThemeVariables,
 ]);
 
@@ -491,7 +533,219 @@ export function mergeThemeVariableLayers(
     const { light, dark, tones, ...base } = layer;
     Object.assign(merged, base, layer[tone], tones?.[tone]);
   }
-  return merged;
+  return transformThemeVariables(merged);
+}
+
+function transformThemeVariables(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  return {
+    ...generateBootstrapBaseColumns(),
+    ...generateBaseSpacings(themeVariables),
+    ...generateBaseFontSizes(themeVariables),
+    ...generatePaddingSegments(themeVariables),
+    ...generateBorderSegments(themeVariables),
+    ...themeVariables,
+  };
+}
+
+function generateBootstrapBaseColumns(): ThemeVariableMap {
+  const columns: ThemeVariableMap = {};
+  for (let index = 1; index <= 12; index += 1) {
+    columns[`col-${index}`] = `${((100 / 12) * index).toFixed(4)}%`;
+  }
+  return columns;
+}
+
+function generateBaseSpacings(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const base = resolvedThemeValue("space-base", themeVariables);
+  if (typeof base !== "string") {
+    return {};
+  }
+  const parsed = parseCssNumber(base);
+  if (!parsed) {
+    return {};
+  }
+  const scale = [
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
+  ];
+  return Object.fromEntries(
+    scale.map((step) => [
+      `space-${String(step).replace(".", "_")}`,
+      `${step * parsed.value}${parsed.unit}`,
+    ]),
+  );
+}
+
+function generateBaseFontSizes(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const base = resolvedThemeValue("fontSize", themeVariables);
+  if (typeof base !== "string") {
+    return {};
+  }
+  const parsed = parseCssNumber(base);
+  const value = parsed?.unit === "px" ? parsed.value : 16;
+  return {
+    "const-fontSize-tiny": `${0.625 * value}px`,
+    "const-fontSize-xs": `${0.75 * value}px`,
+    "const-fontSize-code": `${0.85 * value}px`,
+    "const-fontSize-sm": `${0.875 * value}px`,
+    "const-fontSize-base": base,
+    "const-fontSize-lg": `${1.125 * value}px`,
+    "const-fontSize-xl": `${1.25 * value}px`,
+    "const-fontSize-2xl": `${1.5 * value}px`,
+    "const-fontSize-3xl": `${1.875 * value}px`,
+    "const-fontSize-4xl": `${2.25 * value}px`,
+    "const-fontSize-5xl": `${3 * value}px`,
+    "const-fontSize-6xl": `${3.75 * value}px`,
+    "const-fontSize-7xl": `${4.5 * value}px`,
+    "const-fontSize-8xl": `${6 * value}px`,
+    "const-fontSize-9xl": `${8 * value}px`,
+  };
+}
+
+function generatePaddingSegments(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const result: ThemeVariableMap = {};
+  for (const [key, rawValue] of Object.entries(themeVariables)) {
+    if (rawValue === null || rawValue === undefined || typeof rawValue === "object") {
+      continue;
+    }
+    const value = String(rawValue);
+    let match = paddingHorizontalRegExp.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingLeft-${suffix}`] ??= value;
+      result[`paddingRight-${suffix}`] ??= value;
+    }
+    match = paddingVerticalRegExp.exec(key);
+    if (match) {
+      const suffix = match[1];
+      result[`paddingTop-${suffix}`] ??= value;
+      result[`paddingBottom-${suffix}`] ??= value;
+    }
+    match = paddingRegExp.exec(key);
+    if (!match) {
+      continue;
+    }
+    const suffix = match[1];
+    const horizontal = themeVariables[`paddingHorizontal-${suffix}`];
+    const vertical = themeVariables[`paddingVertical-${suffix}`];
+    const segments = value.trim().replace(/ +/g, " ").split(" ");
+    if (segments.length < 1 || segments.length > 4) {
+      continue;
+    }
+    const [top, right = top, bottom = top, left = right] = segments.length === 2
+      ? [segments[0], segments[1], segments[0], segments[1]]
+      : segments.length === 3
+        ? [segments[0], segments[1], segments[2], segments[1]]
+        : [segments[0], segments[1] ?? segments[0], segments[2] ?? segments[0], segments[3] ?? segments[1] ?? segments[0]];
+    result[`paddingTop-${suffix}`] ??= vertical ?? top;
+    result[`paddingRight-${suffix}`] ??= horizontal ?? right;
+    result[`paddingBottom-${suffix}`] ??= vertical ?? bottom;
+    result[`paddingLeft-${suffix}`] ??= horizontal ?? left;
+  }
+  return result;
+}
+
+function generateBorderSegments(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const result: ThemeVariableMap = {};
+  const priorities: Record<string, number> = {};
+  const setSegment = (key: string, value: string, priority: number) => {
+    if ((priorities[key] ?? -1) <= priority) {
+      result[key] = value;
+      priorities[key] = priority;
+    }
+  };
+  for (const [key, rawValue] of Object.entries(themeVariables)) {
+    if (rawValue === null || rawValue === undefined || typeof rawValue === "object") {
+      continue;
+    }
+    const value = String(rawValue);
+    const shorthand = borderShorthandLonghandPrefix(key);
+    if (shorthand) {
+      const suffix = key.slice(shorthand.sourcePrefix.length);
+      const sides = borderSegmentSides(shorthand.targetPrefix);
+      const parsed = parseBorderShorthand(String(resolveThemeReferences(value)));
+      const priority = borderSegmentPriority(shorthand.targetPrefix);
+      for (const side of sides) {
+        setSegment(`border${side}-${suffix}`, value, priority);
+        if (parsed?.width) setSegment(`border${side}Width-${suffix}`, parsed.width, priority);
+        if (parsed?.style) setSegment(`border${side}Style-${suffix}`, parsed.style, priority);
+        if (parsed?.color) setSegment(`border${side}Color-${suffix}`, parsed.color, priority);
+      }
+      if (shorthand.targetPrefix === "border") {
+        if (parsed?.width) setSegment(`borderWidth-${suffix}`, parsed.width, priority);
+        if (parsed?.style) setSegment(`borderStyle-${suffix}`, parsed.style, priority);
+        if (parsed?.color) setSegment(`borderColor-${suffix}`, parsed.color, priority);
+      }
+      continue;
+    }
+    const longhand = /^(border(?:Horizontal|Vertical|Left|Right|Top|Bottom)?)(Width|Style|Color)-(.+)$/.exec(key);
+    if (!longhand) {
+      continue;
+    }
+    const [, prefix, prop, suffix] = longhand;
+    const priority = borderSegmentPriority(prefix) + 3;
+    for (const side of borderSegmentSides(prefix)) {
+      setSegment(`border${side}${prop}-${suffix}`, value, priority);
+    }
+  }
+  return result;
+}
+
+function borderSegmentSides(prefix: string): string[] {
+  switch (prefix) {
+    case "borderHorizontal":
+      return ["Left", "Right"];
+    case "borderVertical":
+      return ["Top", "Bottom"];
+    case "borderLeft":
+      return ["Left"];
+    case "borderRight":
+      return ["Right"];
+    case "borderTop":
+      return ["Top"];
+    case "borderBottom":
+      return ["Bottom"];
+    default:
+      return ["Left", "Right", "Top", "Bottom"];
+  }
+}
+
+function borderSegmentPriority(prefix: string): number {
+  switch (prefix) {
+    case "borderLeft":
+    case "borderRight":
+    case "borderTop":
+    case "borderBottom":
+      return 2;
+    case "borderHorizontal":
+    case "borderVertical":
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function resolvedThemeValue(name: string, themeVariables: ThemeVariableMap): unknown {
+  const value = themeVariables[name];
+  if (typeof value === "string" && value.startsWith("$")) {
+    return resolvedThemeValue(value.slice(1), themeVariables);
+  }
+  return value;
+}
+
+function parseCssNumber(value: string): { value: number; unit: string } | undefined {
+  let source = value.trim();
+  if (source.startsWith(".")) {
+    source = `0${source}`;
+  }
+  const amount = Number.parseFloat(source);
+  if (!Number.isFinite(amount)) {
+    return undefined;
+  }
+  return {
+    value: amount,
+    unit: source.replace(String(amount), "") || "px",
+  };
 }
 
 export function collectComponentThemeDefaults(
@@ -545,10 +799,14 @@ export function createComponentThemeClass(
   contributors: readonly ComponentMetadata[] = [],
   variant?: string,
 ): ComponentThemeClass {
+  const effectiveContributors =
+    componentName === "Heading" && contributors.length === 0
+      ? [headingLevelThemeContributor]
+      : contributors;
   const baseThemeVariables = mergeThemeVariableLayers([
-    collectComponentThemeDefaults(metadata, contributors),
+    collectComponentThemeDefaults(metadata, effectiveContributors),
     themeVariables,
-    variant ? componentVariantThemeVariables(metadata, themeVariables, contributors, variant) : {},
+    variant ? componentVariantThemeVariables(metadata, themeVariables, effectiveContributors, variant) : {},
   ]);
   const mergedThemeVariables = mergeThemeVariableLayers([
     generateButtonTones(baseThemeVariables),
@@ -557,7 +815,7 @@ export function createComponentThemeClass(
   const style = componentThemeVariablesToCssProperties(
     metadata,
     mergedThemeVariables,
-    contributors,
+    effectiveContributors,
     themeVariables,
   );
   return {
@@ -571,6 +829,53 @@ export function createComponentThemeClass(
     ),
   };
 }
+
+const headingLevelThemeContributor = {
+  defaultThemeVars: {
+    "fontSize-H1": "$fontSize-2xl",
+    "lineHeight-H1": "$lineHeight-tight",
+    "marginTop-H1": "0",
+    "marginBottom-H1": "0",
+    "fontSize-H1-markdown": "$fontSize-2xl",
+    "marginTop-H1-markdown": "0",
+    "marginBottom-H1-markdown": "$space-6",
+    "fontSize-H2": "$fontSize-xl",
+    "lineHeight-H2": "$lineHeight-tight",
+    "marginTop-H2": "0",
+    "marginBottom-H2": "0",
+    "fontSize-H2-markdown": "$fontSize-xl",
+    "marginTop-H2-markdown": "$space-10",
+    "marginBottom-H2-markdown": "$space-3",
+    "fontSize-H3": "$fontSize-lg",
+    "lineHeight-H3": "$lineHeight-tight",
+    "marginTop-H3": "0",
+    "marginBottom-H3": "0",
+    "fontSize-H3-markdown": "$fontSize-lg",
+    "marginTop-H3-markdown": "$space-6",
+    "marginBottom-H3-markdown": "$space-2",
+    "fontSize-H4": "$fontSize-base",
+    "lineHeight-H4": "$lineHeight-tight",
+    "marginTop-H4": "0",
+    "marginBottom-H4": "0",
+    "fontSize-H4-markdown": "$fontSize-base",
+    "marginTop-H4-markdown": "$space-5",
+    "marginBottom-H4-markdown": "$space-1",
+    "fontSize-H5": "$fontSize-sm",
+    "lineHeight-H5": "$lineHeight-tight",
+    "marginTop-H5": "0",
+    "marginBottom-H5": "0",
+    "fontSize-H5-markdown": "$fontSize-sm",
+    "marginTop-H5-markdown": "0",
+    "marginBottom-H5-markdown": "$space-0",
+    "fontSize-H6": "$fontSize-xs",
+    "lineHeight-H6": "$lineHeight-tight",
+    "marginTop-H6": "0",
+    "marginBottom-H6": "0",
+    "fontSize-H6-markdown": "$fontSize-xs",
+    "marginTop-H6-markdown": "0",
+    "marginBottom-H6-markdown": "$space-0",
+  },
+} satisfies ComponentMetadata;
 
 function componentVariantThemeVariables(
   metadata: ComponentMetadata,
@@ -586,12 +891,17 @@ function componentVariantThemeVariables(
     ]);
     for (const key of keys) {
       const variantKey = `${key}-${variant}`;
-      if (themeVariables[variantKey] !== undefined) {
-        aliases[key] = themeVariables[variantKey];
+      const value = themeVariables[variantKey];
+      if (value !== undefined && !isSelfReferentialVariantAlias(key, value)) {
+        aliases[key] = value;
       }
     }
   }
   return aliases;
+}
+
+function isSelfReferentialVariantAlias(key: string, value: unknown): boolean {
+  return typeof value === "string" && value.includes(themeVarReference(key));
 }
 
 export function generateButtonTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
@@ -623,9 +933,9 @@ export function generateButtonTones(themeVariables: ThemeVariableMap | undefined
 
       [`backgroundColor-Button-${themeColor}-ghost--hover`]: tone.alphaHover,
       [`backgroundColor-Button-${themeColor}-ghost--active`]: tone.alphaActive,
-      [`textColor-Button-${themeColor}-ghost`]: tone.base,
-      [`textColor-Button-${themeColor}-ghost--hover`]: tone.hover,
-      [`textColor-Button-${themeColor}-ghost--active`]: tone.active,
+      [`textColor-Button-${themeColor}-ghost`]: tone.ghostText,
+      [`textColor-Button-${themeColor}-ghost--hover`]: tone.ghostTextHover,
+      [`textColor-Button-${themeColor}-ghost--active`]: tone.ghostTextActive,
     });
   }
   return generated;
@@ -636,6 +946,9 @@ function buttonToneReferences(themeColor: string, themeVariables: ThemeVariableM
   hover: string;
   active: string;
   contrast: string;
+  ghostText: string;
+  ghostTextHover: string;
+  ghostTextActive: string;
   alphaHover: string;
   alphaActive: string;
 } {
@@ -663,11 +976,27 @@ function buttonToneReferences(themeColor: string, themeVariables: ThemeVariableM
     `textColor-Button-${themeColor}-solid`,
     "textColor-Button-solid",
   ]) ?? "$const-color-surface-50";
+  const ghostText = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost`,
+    `textColor-Button-${themeColor}`,
+    "textColor-Button",
+  ]) ?? base;
+  const ghostTextHover = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost--hover`,
+    `textColor-Button-${themeColor}--hover`,
+  ]) ?? ghostText;
+  const ghostTextActive = firstThemeReference(themeVariables, [
+    `textColor-Button-${themeColor}-ghost--active`,
+    `textColor-Button-${themeColor}--active`,
+  ]) ?? ghostText;
   return {
     base,
     hover,
     active,
     contrast,
+    ghostText,
+    ghostTextHover,
+    ghostTextActive,
     alphaHover: alphaThemeColor(base, 0.1),
     alphaActive: alphaThemeColor(base, 0.2),
   };
@@ -744,7 +1073,7 @@ function themeVariableValue(
   sourceNames: Set<string> | undefined,
   themeVariables: ThemeVariableMap,
 ): unknown {
-  for (const sourceName of sourceNames ?? [name]) {
+  for (const sourceName of themeVariableLookupNames(sourceNames ?? [name])) {
     const value = themeVariables[sourceName];
     if (value !== undefined) {
       return value;
@@ -753,8 +1082,36 @@ function themeVariableValue(
   return themeVariables[name];
 }
 
+function themeVariableLookupNames(sourceNames: Iterable<string>): string[] {
+  const names: string[] = [];
+  for (const sourceName of sourceNames) {
+    const aliases = [
+      sourceName.startsWith("borderWidth-")
+        ? sourceName.replace(/^borderWidth-/, "borderThickness-")
+        : undefined,
+      sourceName.startsWith("paddingTop-")
+        ? sourceName.replace(/^paddingTop-/, "paddingVertical-")
+        : undefined,
+      sourceName.startsWith("paddingRight-")
+        ? sourceName.replace(/^paddingRight-/, "paddingHorizontal-")
+        : undefined,
+      sourceName.startsWith("paddingBottom-")
+        ? sourceName.replace(/^paddingBottom-/, "paddingVertical-")
+        : undefined,
+      sourceName.startsWith("paddingLeft-")
+        ? sourceName.replace(/^paddingLeft-/, "paddingHorizontal-")
+        : undefined,
+    ].filter((name): name is string => !!name);
+    names.push(sourceName, ...aliases);
+    for (const lookupName of [sourceName, ...aliases]) {
+      names.push(...themeVariableFallbackNames(lookupName));
+    }
+  }
+  return [...new Set(names)];
+}
+
 function stripLegacyThemeClassPrefix(name: string): string {
-  return name.replace("Input:", "").replace("Heading:", "");
+  return name.replace("Input:", "").replace("Heading:", "").replace("Dialog:", "");
 }
 
 function addBorderShorthandLonghands(
@@ -808,10 +1165,19 @@ function addDerivedCssVariable(
   name: string,
   value: string | undefined,
 ): void {
-  if (!value || themeVariables[name] !== undefined) {
+  if (!value || explicitThemeVariableExists(themeVariables, name)) {
     return;
   }
   cssVariables[themePropNameToCssVarName(name)] = value;
+}
+
+function explicitThemeVariableExists(themeVariables: ThemeVariableMap, name: string): boolean {
+  if (themeVariables[name] !== undefined) {
+    return true;
+  }
+  return name.startsWith("borderWidth-")
+    ? themeVariables[name.replace(/^borderWidth-/, "borderThickness-")] !== undefined
+    : false;
 }
 
 function parseBorderShorthand(

@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useState, type ReactNode } from "react";
+import { cloneElement, isValidElement, useState, type CSSProperties, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -7,6 +7,37 @@ import {
   parseAnimation,
   parseAnimationOptions,
 } from "../../components/Animation/AnimationReact";
+import { FormItemMd } from "../../components/FormItem/FormItem";
+import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
+import { useFormContextPart } from "../../components/Form/FormContext";
+import { useComponentThemeClass } from "../../runtime/rendering/theme";
+
+const responsiveWhenProps = {
+  "when-xs": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xs breakpoint and above.",
+  },
+  "when-sm": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the sm breakpoint and above.",
+  },
+  "when-md": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the md breakpoint and above.",
+  },
+  "when-lg": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the lg breakpoint and above.",
+  },
+  "when-xl": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xl breakpoint and above.",
+  },
+  "when-xxl": {
+    valueType: "boolean",
+    description: "Conditionally renders a component at the xxl breakpoint and above.",
+  },
+} satisfies BehaviorMetadata["props"];
 
 export const whenBehavior: Behavior = {
   metadata: {
@@ -19,6 +50,7 @@ export const whenBehavior: Behavior = {
         valueType: "boolean",
         description: "If false, the component is not rendered.",
       },
+      ...responsiveWhenProps,
     },
   },
   canAttach: (context) => Object.prototype.hasOwnProperty.call(context.props, "when"),
@@ -99,6 +131,10 @@ export const labelBehavior: Behavior = {
         valueType: "boolean",
         description: "Whether the input component is read-only.",
       },
+      requireLabelMode: {
+        valueType: "string",
+        description: "Controls whether required or optional labels show an indicator.",
+      },
     },
     condition: {
       type: "and",
@@ -110,17 +146,11 @@ export const labelBehavior: Behavior = {
       ],
     },
   },
-  canAttach: canAttachWhenTriggered("label"),
-  attach: (context, node) => (
-    <label
-      data-xmlui-behavior="label"
-      data-xmlui-label-position={stringValue(context.props.labelPosition)}
-      data-xmlui-label-width={stringValue(context.props.labelWidth)}
-    >
-      <span data-xmlui-part="label">{stringValue(context.props.label)}</span>
-      {node}
-    </label>
-  ),
+  attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
+  canAttach: (context) =>
+    context.componentName !== "Switch" &&
+    context.componentName !== "RadioGroup" &&
+    canAttachWhenTriggered("label")(context),
 };
 
 export const variantBehavior: Behavior = {
@@ -329,8 +359,15 @@ function simpleWrapperBehavior(metadata: BehaviorMetadata): Behavior {
     canAttach: (context: BehaviorAttachContext) =>
       canBehaviorAttachToComponent(behaviorMetadata, context.metadata, context.componentName) &&
       hasTriggeredBehaviorProp(behaviorMetadata, context.props),
-    attach: (_context, node) => (
-      <span data-xmlui-behavior={metadata.name}>
+    attach: (context, node) => (
+      <span
+        data-xmlui-behavior={metadata.name}
+        style={
+          metadata.name === "validation" && context.componentName === "ColorPicker"
+            ? { display: "contents" }
+            : undefined
+        }
+      >
         {node}
       </span>
     ),
@@ -351,6 +388,62 @@ function canAttachWhenTriggered(name: string) {
       hasTriggeredBehaviorProp(metadata, context.props)
     );
   };
+}
+
+function LabelBehavior({
+  children,
+  context,
+}: {
+  children: ReactNode;
+  context: BehaviorAttachContext;
+}) {
+  const childStyle = isValidElement(children)
+    ? (children.props as { style?: CSSProperties }).style
+    : undefined;
+  const readOnly = isTruthyWhenValue(context.props.readOnly);
+  const hasValueApiPair = !!context.metadata.apis?.value && !!context.metadata.apis?.setValue;
+  const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
+  const labelBreak =
+    context.props.labelBreak === undefined
+      ? context.componentName === "Select"
+        ? false
+        : undefined
+      : isTruthyWhenValue(context.props.labelBreak);
+  const shrinkToLabel = context.props.shrinkToLabel === undefined
+    ? !hasValueApiPair
+    : isTruthyWhenValue(context.props.shrinkToLabel);
+  const formItemThemeClass = useComponentThemeClass("FormItem", FormItemMd);
+  return (
+    <ItemWithLabel
+      id={stringValue(context.props.id)}
+      className={formItemThemeClass.className}
+      componentName={context.componentName}
+      labelPosition={stringValue(context.props.labelPosition) as any}
+      label={stringValue(context.props.label)}
+      labelWidth={stringValue(context.props.labelWidth)}
+      labelBreak={labelBreak}
+      required={isTruthyWhenValue(context.props.required)}
+      enabled={
+        context.props.enabled === undefined
+          ? true
+          : isTruthyWhenValue(context.props.enabled)
+      }
+      style={childStyle}
+      cloneStyle={true}
+      requireLabelMode={
+        (stringValue(context.props.requireLabelMode) as any) ?? formRequireLabelMode
+      }
+      shrinkToLabel={shrinkToLabel}
+      labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
+      isInputTemplateUsed={!!context.props.inputTemplate}
+      testId={stringValue(context.props.testId)}
+      direction={stringValue(context.props.direction) as "rtl" | "ltr" | undefined}
+      layoutContext={context.layoutContext as any}
+      compactInlineLabel={context.metadata.compactInlineLabel === true}
+    >
+      {children}
+    </ItemWithLabel>
+  );
 }
 
 function TooltipBehavior({

@@ -385,6 +385,30 @@ describe("binding and event code generation", () => {
     expect(textSource).toContain(`return ctx.readLocal("count");`);
     expect(evaluateGeneratedObject(localSource).evaluate(fakeContext())).toBe(0);
   });
+
+  it("emits parseable top-level arrow event handlers with nested callback arrows", async () => {
+    const document = parseXmlui(
+      `<App var.selection=""><List data="{[]}" onSelectionDidChange="(items) => selection = items.map(i => i.name).join(', ')" /></App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const list = document.root.children[0];
+    if (list.kind !== "element") {
+      throw new Error("Expected list.");
+    }
+    const event = list.parsed?.events?.selectionDidChange;
+    if (!event) {
+      throw new Error("Expected selectionDidChange event.");
+    }
+
+    const eventSource = emitValue(emitGeneratedEventHandler(event));
+    const descriptor = evaluateGeneratedObject(eventSource);
+    const locals = { selection: "" };
+    const handler = await descriptor.execute(fakeContext({ locals }));
+
+    expect(typeof handler).toBe("function");
+    await handler([{ name: "Apples" }, { name: "Bananas" }]);
+    expect(locals.selection).toBe("Apples, Bananas");
+  });
 });
 
 describe("runtime descriptor attachment and module emission", () => {

@@ -1,439 +1,374 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
-import {
+import React, {
+  type ChangeEventHandler,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
   memo,
+  type TextareaHTMLAttributes,
   useCallback,
   useEffect,
-  useId,
-  useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from "react";
+import classnames from "classnames";
+import TextareaAutosize from "react-textarea-autosize";
+import { isNil } from "lodash-es";
+
+import styles from "./TextArea.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import TextAreaResizable from "./TextAreaResizable";
+import { PART_INPUT } from "../../components-core/parts";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+
+const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 import { defaultProps } from "./TextArea.defaults";
-import { useFormContext } from "../Form/FormContext";
-import styles from "./TextArea.module.scss";
 
-export type TextAreaProps = {
+export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
+export type ResizeOptions = (typeof resizeOptionKeys)[number];
+
+type Props = {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
-  className?: string;
-  style?: CSSProperties;
-  label?: unknown;
-  requireLabelMode?: string;
+  value?: string;
   placeholder?: string;
+  required?: boolean;
+  readOnly?: boolean;
+  allowCopy?: boolean;
+  updateState?: UpdateStateFn;
+  validationStatus?: ValidationStatus;
+  autoFocus?: boolean;
+  initialValue?: string;
+  resize?: ResizeOptions;
+  enterSubmits?: boolean;
+  escResets?: boolean;
+  onDidChange?: (e: any) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  controlled?: boolean;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  registerComponentApi?: RegisterComponentApiFn;
+  autoSize?: boolean;
+  maxRows?: number;
+  minRows?: number;
   maxLength?: number;
   rows?: number;
-  minRows?: number;
-  maxRows?: number;
-  autoSize?: boolean;
-  resize?: string;
   enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  autoFocus?: boolean;
   autoComplete?: string | boolean;
   autoCorrect?: boolean;
   spellCheck?: boolean;
   autoCapitalize?: string;
-  enterSubmits?: boolean;
-  escResets?: boolean;
-  tabIndex?: number;
-  allowCopy?: boolean;
   verboseValidationFeedback?: boolean;
-  validationStatus?: string;
+  validationIconSuccess?: string;
+  validationIconError?: string;
   invalidMessages?: string[];
-  onDidChange?: (value: string) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
 };
 
-export type TextAreaApi = {
-  focus: () => void;
-  insert: (value: unknown) => void;
-  setValue: (value: unknown) => void;
-  value: string;
-};
+const normalizeOnOff = (value: boolean | undefined) =>
+  value === undefined ? undefined : value ? "on" : "off";
 
-export const TextAreaNative = memo(forwardRef<TextAreaApi, TextAreaProps>(function TextAreaNative(
-  {
-    id,
-    bindTo,
-    value,
-    initialValue = defaultProps.initialValue,
-    className,
-    style,
-    label,
-    requireLabelMode,
-    placeholder = defaultProps.placeholder,
-    maxLength,
-    rows = defaultProps.rows,
-    minRows,
-    maxRows,
-    autoSize,
-    resize,
-    enabled = defaultProps.enabled,
-    readOnly = defaultProps.readOnly,
-    required = defaultProps.required,
-    autoFocus = defaultProps.autoFocus,
-    autoComplete = defaultProps.autoComplete,
-    autoCorrect,
-    spellCheck,
-    autoCapitalize,
-    enterSubmits = defaultProps.enterSubmits,
-    escResets = false,
-    tabIndex,
-    allowCopy = defaultProps.allowCopy,
-    verboseValidationFeedback,
-    validationStatus = defaultProps.validationStatus,
-    invalidMessages = defaultProps.invalidMessages,
-    onDidChange,
-    onFocus,
-    onBlur,
-    ...rest
-  },
-  ref,
-) {
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const generatedInputId = useId();
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
-  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const effectiveValue = formValue ?? value;
-  const controlled = effectiveValue !== undefined;
-  const [localValue, setLocalValue] = useState(() => stringifyTextAreaValue(effectiveValue ?? initialValue));
-  const [selectionAfterInsert, setSelectionAfterInsert] = useState<number | null>(null);
-  const [hadValidationError, setHadValidationError] = useState(false);
-  const [showValidFeedback, setShowValidFeedback] = useState(false);
-  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
+const normalizeAutoComplete = (value: string | boolean | undefined) =>
+  typeof value === "boolean" ? normalizeOnOff(value) : value;
 
-  useEffect(() => {
-    if (controlled) {
-      setLocalValue(stringifyTextAreaValue(effectiveValue));
-    }
-  }, [controlled, effectiveValue]);
+export const TextArea = memo(
+  forwardRef(function TextArea(
+    {
+      id: idProp,
+      value = defaultProps.value,
+      placeholder = defaultProps.placeholder,
+      required = defaultProps.required,
+      readOnly = defaultProps.readOnly,
+      allowCopy = defaultProps.allowCopy,
+      updateState = defaultProps.updateState,
+      validationStatus,
+      autoFocus = defaultProps.autoFocus,
+      initialValue = defaultProps.initialValue,
+      resize,
+      onDidChange = defaultProps.onDidChange,
+      onFocus = defaultProps.onFocus,
+      onBlur = defaultProps.onBlur,
+      controlled = defaultProps.controlled,
+      enterSubmits = defaultProps.enterSubmits,
+      escResets,
+      style,
+      className,
+      classes,
+      registerComponentApi,
+      autoSize,
+      maxRows,
+      minRows,
+      maxLength,
+      rows = defaultProps.rows,
+      enabled = defaultProps.enabled,
+      autoComplete = defaultProps.autoComplete,
+      autoCorrect,
+      spellCheck,
+      autoCapitalize,
+      verboseValidationFeedback,
+      validationIconSuccess,
+      validationIconError,
+      invalidMessages,
+      ...rest
+    }: Props,
+    forwardedRef: ForwardedRef<HTMLTextAreaElement>,
+  ) {
+    const id = useFormItemInputId(idProp);
+    // --- The component is initially unfocused
+    const inputRef = useRef<HTMLTextAreaElement>(null);
+    const ref = useComposedRefs(inputRef, forwardedRef);
+    const [cursorPosition, setCursorPosition] = useState(null);
+    const [focused, setFocused] = React.useState(false);
+    const [localValue, setLocalValue] = React.useState(value);
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
 
-  useEffect(() => {
-    if (formError) {
-      setHadValidationError(true);
-      setShowValidFeedback(false);
-    }
-  }, [formError]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setLocalValue(stringifyTextAreaValue(initialValue));
-    }
-  }, [controlled, initialValue]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, initialValue);
-  }, [fieldName, getFormValue, initialValue, setFormValue]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => textareaRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  useEffect(() => {
-    if (selectionAfterInsert === null) {
-      return;
-    }
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.setSelectionRange(selectionAfterInsert, selectionAfterInsert);
-    }
-    setSelectionAfterInsert(null);
-  }, [localValue, selectionAfterInsert]);
-
-  const updateValue = useCallback((nextValue: unknown) => {
-    const normalized = stringifyTextAreaValue(nextValue);
-    setShowValidFeedback(false);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, normalized);
-    }
-    setLocalValue(normalized);
-    void onDidChange?.(normalized);
-  }, [fieldName, onDidChange, setFormValue]);
-
-  const handleBlur = useCallback(() => {
-    void onBlur?.();
-    if (!validateFormField || fieldName === undefined || !hadValidationError) {
-      return;
-    }
-    void validateFormField(fieldName, textareaRef.current?.value).then((message) => {
-      setShowValidFeedback(!message);
-    });
-  }, [fieldName, hadValidationError, onBlur, validateFormField]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        textareaRef.current?.focus();
-      }
-    },
-    insert: (insertedValue: unknown) => {
-      const textarea = textareaRef.current;
-      const insertedText = stringifyTextAreaApiValue(insertedValue);
-      if (!textarea || !insertedText) {
-        return;
-      }
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const nextValue = `${localValue.slice(0, start)}${insertedText}${localValue.slice(end)}`;
-      updateValue(nextValue);
-      setSelectionAfterInsert(start + insertedText.length);
-    },
-    setValue: (value: unknown) => updateValue(stringifyTextAreaApiValue(value)),
-    get value() {
-      return localValue;
-    },
-  }), [enabled, localValue, updateValue]);
-
-  useEffect(() => {
-    if (!autoSize) {
-      return;
-    }
-    const textarea = textareaRef.current;
-    if (!textarea) {
-      return;
-    }
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  }, [autoSize, localValue, rows, minRows, maxRows]);
-
-  const inputId = id ? `${id}__input` : generatedInputId;
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const labelText = stringifyLabel(label);
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-  const effectiveValidationStatus = formError
-    ? "error"
-    : !effectiveVerboseValidationFeedback && showValidFeedback
-      ? "valid"
-      : validationStatus;
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label: labelText,
-      required,
-    });
-  }, [fieldName, labelText, registerFormItem, required]);
-
-  const textareaStyle = useMemo<CSSProperties>(() => ({
-    ...(minRows ? { minHeight: `${minRows * 1.5}em` } : undefined),
-    ...(maxRows ? { maxHeight: `${maxRows * 1.5}em` } : undefined),
-    ...(maxRows ? { overflowY: "auto" } : undefined),
-  }), [maxRows, minRows]);
-  const textarea = (
-    <div
-      {...(!hasLabel ? rest : undefined)}
-      data-part-id="root"
-      data-xmlui-part="root"
-      className={cx(styles.textAreaContainer, !hasLabel ? className : undefined)}
-      style={!hasLabel ? style : undefined}
-    >
-      <textarea
-        id={inputId}
-        ref={textareaRef}
-        data-part-id="input"
-        data-xmlui-part="input"
-        className={cx(
-          styles.textAreaInput,
-          resize === "horizontal" ? styles.textAreaResizeHorizontal : undefined,
-          resize === "vertical" ? styles.textAreaResizeVertical : undefined,
-          resize === "both" ? styles.textAreaResizeBoth : undefined,
-          effectiveValidationStatus === "error" ? styles.textAreaError : undefined,
-          effectiveValidationStatus === "warning" ? styles.textAreaWarning : undefined,
-          effectiveValidationStatus === "valid" ? styles.textAreaSuccess : undefined,
-        )}
-        style={textareaStyle}
-        value={localValue}
-        placeholder={placeholder}
-        maxLength={normalizeMaxLength(maxLength)}
-        rows={normalizePositiveRows(rows)}
-        disabled={!enabled}
-        readOnly={readOnly}
-        required={required}
-        tabIndex={enabled ? tabIndex : -1}
-        aria-multiline="true"
-        aria-readonly={readOnly}
-        autoComplete={normalizeAutoComplete(autoComplete)}
-        autoCorrect={normalizeOnOff(autoCorrect)}
-        spellCheck={spellCheck}
-        autoCapitalize={autoCapitalize}
-        onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateValue(event.currentTarget.value)}
-        onCopy={(event) => {
-          if (!allowCopy) {
-            event.preventDefault();
-          }
-        }}
-        onFocus={(_event: FocusEvent<HTMLTextAreaElement>) => void onFocus?.()}
-        onBlur={(_event: FocusEvent<HTMLTextAreaElement>) => handleBlur()}
-        onKeyDown={(event: KeyboardEvent<HTMLTextAreaElement>) => {
-          if (event.currentTarget.form && event.key.toLowerCase() === "enter" && enterSubmits && !event.shiftKey) {
-            event.preventDefault();
-            event.currentTarget.form.requestSubmit();
-          }
-          if (event.currentTarget.form && event.key.toLowerCase() === "escape" && escResets && !event.shiftKey) {
-            event.preventDefault();
-            updateValue(initialValue);
-            event.currentTarget.form.reset();
-          }
-        }}
-      />
-      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
-        <span
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          className={styles.textAreaConciseFeedback}
-          onMouseEnter={() => setConciseTooltipVisible(true)}
-          onMouseLeave={() => setConciseTooltipVisible(false)}
-          onFocus={() => setConciseTooltipVisible(true)}
-          onBlur={() => setConciseTooltipVisible(false)}
-          tabIndex={-1}
-        >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
-            className={styles.textAreaIconMarker}
-          />
-          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
-            <span data-tooltip-container role="tooltip" className={styles.textAreaConciseTooltip}>
-              {effectiveInvalidMessages.join("\n")}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-    </div>
-  );
-  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
-    <div data-xmlui-part="error">
-      {effectiveInvalidMessages.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
-    </div>
-  ) : null;
-
-  if (!hasLabel) {
-    return (
-      <>
-        {textarea}
-        {validationFeedback}
-      </>
+    const contextVerboseValidationFeedback = useFormContextPart(
+      (ctx) => ctx?.verboseValidationFeedback,
     );
-  }
+    const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+    const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  return (
-    <div {...rest} className={className} style={style}>
-      <div className={styles.textAreaLabeledItem} data-part-id="labeledItem" data-xmlui-part="labeledItem">
-        <label data-part-id="label" data-xmlui-part="label" htmlFor={inputId} className={styles.textAreaLabel}>
-          {labelText}
-          {showRequiredIndicator ? <span className={styles.textAreaLabelRequired}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.textAreaLabelOptional}>(Optional)</span> : null}
-        </label>
-        {textarea}
-        {validationFeedback}
+    const finalVerboseValidationFeedback =
+      verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+    const finalValidationIconSuccess =
+      validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+    const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+    let validationIcon = null;
+    if (!finalVerboseValidationFeedback) {
+      if (validationStatus === "valid") {
+        validationIcon = finalValidationIconSuccess;
+      } else if (validationStatus === "error") {
+        validationIcon = finalValidationIconError;
+      }
+    }
+
+    const updateValue = useCallback(
+      (value: string) => {
+        setLocalValue(value);
+        updateState({ value: value });
+        onDidChange(value);
+      },
+      [onDidChange, updateState],
+    );
+
+    const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
+      (event) => {
+        updateValue(event.target.value);
+      },
+      [updateValue],
+    );
+
+    useEffect(() => {
+      updateState({ value: initialValue }, { initial: true });
+    }, [initialValue, updateState]);
+
+    useEffect(() => {
+      if (autoFocus) {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
+      }
+    }, [autoFocus]);
+
+    // --- Execute this function when the user copies the value
+    const handleCopy = (event: React.SyntheticEvent) => {
+      if (allowCopy) {
+        return true;
+      } else {
+        event.preventDefault();
+        return false;
+      }
+    };
+
+    // --- Manage obtaining and losing the focus
+    const handleOnFocus = () => {
+      setFocused(true);
+      onFocus?.();
+    };
+    const handleOnBlur = () => {
+      setFocused(false);
+      onBlur?.();
+    };
+
+    const focus = useCallback(() => {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }, []);
+
+    const insert = useCallback(
+      (text: any) => {
+        const input = inputRef?.current;
+        if (input && text) {
+          const start = input.selectionStart;
+          const value = input.value;
+          onInputChange({
+            // @ts-ignore
+            target: {
+              value: value.substring(0, start) + text + value.substring(start),
+            },
+          });
+          setCursorPosition(start + text.length);
+        }
+      },
+      [inputRef, onInputChange],
+    );
+
+    const setValue = useEvent((val: string) => {
+      updateValue(val);
+    });
+
+    useEffect(() => {
+      if (cursorPosition) {
+        const input = inputRef?.current;
+        if (input) {
+          input.setSelectionRange(cursorPosition, cursorPosition);
+          setCursorPosition(null);
+        }
+      }
+    }, [localValue, cursorPosition, inputRef]);
+
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        insert,
+        setValue,
+      });
+    }, [focus, insert, registerComponentApi, setValue]);
+
+    // --- Handle the Enter key press
+    const handleEnter = useCallback(
+      (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (
+          e.currentTarget.form &&
+          enterSubmits &&
+          e.key.toLowerCase() === "enter" &&
+          !e.shiftKey
+        ) {
+          // -- Do not generate a new line
+          e.preventDefault();
+          e.currentTarget.form?.requestSubmit();
+        }
+        if (e.currentTarget.form && escResets && e.key.toLowerCase() === "escape" && !e.shiftKey) {
+          e.preventDefault();
+          e.currentTarget.form?.reset();
+        }
+      },
+      [enterSubmits, escResets],
+    );
+
+    let textareaClasses = classnames(className, styles.textarea, {
+      [styles.resizeHorizontal]: resize === "horizontal",
+      [styles.resizeVertical]: resize === "vertical",
+      [styles.resizeBoth]: resize === "both",
+      [styles.focused]: focused,
+      [styles.disabled]: !enabled,
+      [styles.error]: validationStatus === "error",
+      [styles.warning]: validationStatus === "warning",
+      [styles.valid]: validationStatus === "valid",
+    });
+    const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
+      React.RefAttributes<HTMLTextAreaElement> = {
+      ...rest,
+      id,
+      className: textareaClasses,
+      ref,
+      style: style as any,
+      value: controlled ? localValue || "" : undefined,
+      disabled: !enabled,
+      name: id,
+      placeholder,
+      required,
+      maxLength,
+      "aria-multiline": true,
+      "aria-readonly": readOnly,
+      readOnly: readOnly,
+      onChange: onInputChange,
+      onCopy: handleCopy,
+      onFocus: handleOnFocus,
+      onBlur: handleOnBlur,
+      onKeyDown: handleEnter,
+      autoComplete: normalizeAutoComplete(autoComplete),
+      autoCorrect: normalizeOnOff(autoCorrect),
+      spellCheck,
+      autoCapitalize,
+    };
+
+    const renderConciseFeedback = () =>
+      !finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <div className={styles.floatingFeedback}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </div>
+        </Part>
+      );
+
+    if (resize === "both" || resize === "horizontal" || resize === "vertical") {
+      return (
+        <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
+          <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
+            <TextAreaResizable
+              ref={ref}
+              {...textareaProps}
+              style={style as any}
+              className={classnames(textareaClasses)}
+              maxRows={maxRows}
+              minRows={minRows}
+              rows={rows}
+            />
+          </div>
+          {renderConciseFeedback()}
+        </div>
+      );
+    }
+    if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
+      return (
+        <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
+          <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
+            <TextareaAutosize
+              ref={ref}
+              {...textareaProps}
+              style={style as any}
+              className={classnames(textareaClasses)}
+              maxRows={maxRows}
+              minRows={minRows}
+              rows={rows}
+            />
+          </div>
+          {renderConciseFeedback()}
+        </div>
+      );
+    }
+
+    return (
+      <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
+        <div data-part-id={PART_INPUT} data-xmlui-part={PART_INPUT}>
+          <textarea
+            ref={ref}
+            {...textareaProps}
+            rows={rows}
+            className={classnames(textareaClasses)}
+          />
+        </div>
+        {renderConciseFeedback()}
       </div>
-    </div>
-  );
-}));
-
-function stringifyTextAreaValue(value: unknown): string {
-  if (value === undefined || value === null) {
-    return "";
-  }
-  if (Array.isArray(value)) {
-    return "";
-  }
-  if (typeof value === "function") {
-    return "[object Object]";
-  }
-  if (typeof value === "object") {
-    return String(value);
-  }
-  return String(value);
-}
-
-function stringifyTextAreaApiValue(value: unknown): string {
-  const stringValue = stringifyTextAreaValue(value);
-  return stringValue
-    .replace(/\\r\\n/g, "\r\n")
-    .replace(/\\n/g, "\n")
-    .replace(/\\r/g, "\r")
-    .replace(/\\t/g, "\t");
-}
-
-function stringifyLabel(value: unknown): string {
-  if (value === undefined || value === null) {
-    return "";
-  }
-  if (typeof value === "function") {
-    return "";
-  }
-  if (typeof value === "object") {
-    return "";
-  }
-  return String(value);
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function normalizePositiveRows(value: unknown): number {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) && numberValue > 0 ? Math.floor(numberValue) : defaultProps.rows;
-}
-
-function normalizeMaxLength(value: unknown): number | undefined {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) && numberValue >= 0 ? numberValue : undefined;
-}
-
-function normalizeOnOff(value: boolean | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  return value ? "on" : "off";
-}
-
-function normalizeAutoComplete(value: string | boolean | undefined): string | undefined {
-  return typeof value === "boolean" ? normalizeOnOff(value) : value;
-}
-
-function cx(...values: Array<string | undefined | false>): string | undefined {
-  const className = values.filter(Boolean).join(" ");
-  return className || undefined;
-}
+    );
+  }),
+);

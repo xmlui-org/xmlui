@@ -162,6 +162,36 @@ describe("Managed React contracts in compileXmluiModule", () => {
     ).toThrow("<Button> has unknown prop 'foo'.");
   });
 
+  it("accepts migrated List sync props in component modules", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/MyList.xmlui",
+        source: `
+          <Component name="MyList">
+            <List syncWithVar="selState" refreshOn="{selState}" rowsSelectable="true" data="{[]}">
+              <Text>{$item.name}</Text>
+            </List>
+          </Component>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
+  it("accepts Text size and weight aliases used by copied component docs", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App>
+            <Drawer id="drawer" position="right">
+              <Text weight="bold" size="lg">Navigation</Text>
+            </Drawer>
+          </App>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
   it("uses sibling component names as user-defined contracts", () => {
     const dir = path.join(tmpdir(), `xmlui-rs-contracts-${Date.now()}`);
     mkdirSync(dir, { recursive: true });

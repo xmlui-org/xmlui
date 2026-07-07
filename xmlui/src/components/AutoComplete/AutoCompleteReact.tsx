@@ -1,613 +1,1081 @@
 import {
-  Fragment,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
   memo,
+  type ReactNode,
+  useId,
+  useCallback,
   useEffect,
-  useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useCallback,
-  useId,
-  type CSSProperties,
-  type ReactNode,
 } from "react";
+import classnames from "classnames";
 
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { Option, ValidationStatus } from "../abstractions";
+import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+import { ThemedIcon } from "../../components/Icon/Icon";
+import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
+import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
+import { OptionContext, useOption } from "../Select/OptionContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+import { HiddenOption } from "../Select/HiddenOption";
+import { PART_INPUT } from "../../components-core/parts";
+import { PART_CONCISE_VALIDATION_FEEDBACK, PART_LIST_WRAPPER } from "../../components-core/parts";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 import { defaultProps } from "./AutoComplete.defaults";
-import { useFormContext } from "../Form/FormContext";
-import styles from "./AutoComplete.module.scss";
-import { isTopLayer, registerLayer } from "../layerStack";
 
-export type AutoCompleteOption = {
-  value: unknown;
-  label: ReactNode;
-  enabled: boolean;
-  searchText?: string;
-  selectionLabel?: string;
-  group?: string;
-  groupHeader?: ReactNode;
-  keywords?: string[];
-};
 
-export type AutoCompleteApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: unknown;
-};
-
-export type AutoCompleteProps = {
+type AutoCompleteProps = {
   id?: string;
-  bindTo?: string;
-  label?: string;
-  initialValue?: unknown;
-  value?: unknown;
+  initialValue?: string | string[];
+  value?: string | string[];
   enabled?: boolean;
   placeholder?: string;
-  autoFocus?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  requireLabelMode?: string;
-  validationStatus?: string;
-  verboseValidationFeedback?: boolean;
-  validationMode?: string;
-  multi?: boolean;
-  initiallyOpen?: boolean;
-  creatable?: boolean;
-  dropdownHeight?: string | number;
-  className?: string;
-  style?: CSSProperties;
-  options?: AutoCompleteOption[];
-  popupChildren?: ReactNode;
+  maxLength?: number;
+  updateState?: UpdateStateFn;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
   emptyListTemplate?: ReactNode;
-  onDidChange?: (value: unknown) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  onItemCreated?: (value: string) => void | Promise<void>;
-  "data-testid"?: string;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  onDidChange?: (newValue: string | string[]) => void;
+  validationStatus?: ValidationStatus;
+  onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLInputElement>) => void;
+  onItemCreated?: (item: string) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  children?: ReactNode;
+  autoFocus?: boolean;
+  dropdownHeight?: CSSProperties["height"];
+  multi?: boolean;
+  required?: boolean;
+  readOnly?: boolean;
+  creatable?: boolean;
+  initiallyOpen?: boolean;
+  modal?: boolean;
+  verboseValidationFeedback?: boolean;
+  validationIconSuccess?: string;
+  validationIconError?: string;
+  invalidMessages?: string[];
+  contentClassName?: string;
+  /** Field name on each Option to group by. When set, the dropdown shows a
+   *  section header above each group of options sharing the same value of
+   *  `option[groupBy]`. Headers are computed from the *visible* (filtered)
+   *  options, so searching automatically updates which option carries the
+   *  group's header. Matches Select's `groupBy` prop. */
+  groupBy?: string;
+  /** Renderer for a group's section header. Receives the group name as the
+   *  `$group` context var. When omitted, the group key string is rendered as
+   *  plain text. */
+  groupHeaderRenderer?: (groupName: string) => ReactNode;
+  /** Renderer for the "Ungrouped" bucket header (options missing the `groupBy`
+   *  field). When omitted, the Ungrouped bucket has no header. */
+  ungroupedHeaderRenderer?: () => ReactNode;
 };
 
-export const AutoCompleteNative = memo(forwardRef<AutoCompleteApi, AutoCompleteProps>(function AutoCompleteNative(
+function isOptionsExist(options: Option[], newOptions: Option[]) {
+  return newOptions.some((option) =>
+    options.some((o) => o.value === option.value || o.label === option.label),
+  );
+}
+
+export const AutoComplete = memo(forwardRef(function AutoComplete(
   {
-    id,
-    bindTo,
-    label,
+    id: idProp,
     initialValue,
-    value: controlledValue,
+    value,
     enabled = defaultProps.enabled,
-    placeholder = defaultProps.placeholder,
-    autoFocus = defaultProps.autoFocus,
-    readOnly = defaultProps.readOnly,
-    required = defaultProps.required,
-    requireLabelMode,
-    validationStatus,
-    verboseValidationFeedback,
-    validationMode,
-    multi = defaultProps.multi,
-    initiallyOpen = defaultProps.initiallyOpen,
-    creatable = defaultProps.creatable,
-    dropdownHeight,
-    className,
-    style,
-    options = [],
-    popupChildren,
+    placeholder,
+    updateState = noop,
+    validationStatus = defaultProps.validationStatus,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    onItemCreated = noop,
+    registerComponentApi,
     emptyListTemplate,
-    onDidChange,
-    onFocus,
-    onBlur,
-    onItemCreated,
-    "data-testid": dataTestId,
+    style,
+    className,
+    classes,
+    children,
+    readOnly = defaultProps.readOnly,
+    autoFocus = defaultProps.autoFocus,
+    dropdownHeight,
+    multi = defaultProps.multi,
+    required = defaultProps.required,
+    creatable = defaultProps.creatable,
+    optionRenderer,
+    initiallyOpen = defaultProps.initiallyOpen,
+    modal,
+    verboseValidationFeedback,
+    validationIconSuccess,
+    validationIconError,
+    invalidMessages,
+    contentClassName,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
     ...rest
-  },
-  ref,
+  }: AutoCompleteProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const generatedInputId = useId();
-  const inputId = id ?? generatedInputId;
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const layerIdRef = useRef<symbol>(Symbol("AutoComplete"));
-  const closeOnInputClickRef = useRef(false);
-  const ignoreNextMultiArrowDownRef = useRef(false);
-  const [internalValue, setInternalValue] = useState<unknown>(() => normalizeValue(initialValue, multi));
-  const [inputValue, setInputValue] = useState("");
+  const id = useFormItemInputId(idProp);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [validationTooltipVisible, setValidationTooltipVisible] = useState(false);
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const effectiveControlledValue = formValue ?? controlledValue;
-  const currentValue = effectiveControlledValue === undefined ? internalValue : normalizeValue(effectiveControlledValue, multi);
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
+  const [options, setOptions] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+  const { root } = useTheme();
+  const [width, setWidth] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  useEffect(() => {
-    setInternalValue(normalizeValue(initialValue, multi));
-  }, [initialValue, multi]);
+  // Refs and state for the multi-mode "+N more" truncation. Badge widths
+  // depend on labels, so we do a hidden measurement pass and decide how many
+  // fit alongside the input. `visibleBadgeCount` starts at Infinity so the
+  // initial render shows every badge; the layout effect immediately cuts it
+  // down based on real DOM measurements.
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const inputWrapperRef = useRef<HTMLDivElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
+  const ghostRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [visibleBadgeCount, setVisibleBadgeCount] = useState<number>(Number.POSITIVE_INFINITY);
+  // Bumped by ResizeObserver so the measurement effect re-runs on width change.
+  const [resizeKey, setResizeKey] = useState(0);
 
-  useEffect(() => {
-    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
-      return;
+  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+  const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
+
+  let validationIcon = null;
+  if (!finalVerboseValidationFeedback) {
+    if (validationStatus === "valid") {
+      validationIcon = finalValidationIconSuccess;
+    } else if (validationStatus === "error") {
+      validationIcon = finalValidationIconError;
     }
-    setFormValue(fieldName, normalizeValue(initialValue, multi));
-  }, [fieldName, getFormValue, initialValue, multi, setFormValue]);
+  }
 
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return options;
     }
-    return registerFormItem({
-      name: fieldName,
-      label,
-      required,
+
+    const searchLower = searchTerm.toLowerCase();
+    return options.filter((option) => {
+      const extendedValue =
+        option.value + " " + option.label + " " + (option.keywords || []).join(" ");
+      return extendedValue.toLowerCase().includes(searchLower);
     });
-  }, [fieldName, label, registerFormItem, required]);
+  }, [options, searchTerm]);
+
+  // Check if we should show creatable item
+  const shouldShowCreatable = useMemo(() => {
+    if (!creatable || !searchTerm || searchTerm.trim() === "") return false;
+
+    // Check if the search term already exists as an option
+    const searchTermExists = options.some(
+      (option) => option.value === searchTerm || option.label === searchTerm,
+    );
+
+    if (searchTermExists) return false;
+
+    // Check if it's already selected
+    if (Array.isArray(value) && value.includes(searchTerm)) return false;
+    if (value === searchTerm) return false;
+
+    // Only show creatable if there are no matching filtered options
+    return filteredOptions.length === 0;
+  }, [creatable, searchTerm, options, value, filteredOptions]);
+
+  // Set initial state based on the initialValue prop
+  useEffect(() => {
+    if (initialValue !== undefined) {
+      updateState({ value: initialValue || [] }, { initial: true });
+    }
+  }, [initialValue, updateState]);
+
+  const selectedValue = useMemo(() => {
+    if (Array.isArray(value)) {
+      if (value.length === 0) return [];
+      return options.filter((o) => value.includes(`${o.value}`));
+    }
+
+    return options.find((o) => `${o.value}` === `${value}`);
+  }, [value, options]);
+
+  const toggleOption = useCallback(
+    (selectedItem: string) => {
+      if (selectedItem === "") return;
+
+      // Check if the option is enabled
+      const option = options.find((opt) => opt.value === selectedItem);
+      if (option && option.enabled === false) return;
+
+      const newSelectedValue = multi
+        ? Array.isArray(value)
+          ? value.includes(selectedItem)
+            ? value.filter((v) => v !== selectedItem)
+            : [...value, selectedItem]
+          : [selectedItem]
+        : selectedItem === value
+          ? null
+          : selectedItem;
+
+      updateState({ value: newSelectedValue });
+      onDidChange(newSelectedValue);
+
+      if (multi) {
+        setInputValue("");
+        setSearchTerm("");
+        // Keep dropdown open for multi-select
+      } else {
+        // Close dropdown for single select
+        setOpen(false);
+        setSearchTerm("");
+      }
+
+      // `preventScroll` avoids dragging any ancestor scrollable container —
+      // without it, the browser tries to keep the input fully in view after
+      // each selection, which scrolls a parent <VStack overflowY="auto"> up
+      // by hundreds of pixels in long pages (e.g. Reports filters).
+      inputRef.current?.focus({ preventScroll: true });
+    },
+    [multi, value, updateState, onDidChange, options],
+  );
+
+  useEffect(() => {
+    if (!Array.isArray(selectedValue)) {
+      setInputValue(selectedValue?.label || "");
+      setSearchTerm("");
+    }
+  }, [selectedValue]);
+
+  // --- Multi-mode badge truncation (+N more) ---
+  // Selected items as a stable array (or empty when not multi/no value).
+  const selectedArray: Option[] = useMemo(
+    () => (multi && Array.isArray(selectedValue) ? (selectedValue as Option[]) : []),
+    [multi, selectedValue],
+  );
+
+  // Measure ghost badges and decide how many fit alongside the input + actions.
+  // The ghost wrapper renders every selected badge plus a max-width "+N more"
+  // placeholder at `position: absolute; visibility: hidden` so we can read
+  // real label widths without disturbing layout. Recomputed on every value
+  // change and on container resize.
+  useLayoutEffect(() => {
+    if (!multi || selectedArray.length === 0) {
+      setVisibleBadgeCount(selectedArray.length);
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    const inputWrap = inputWrapperRef.current;
+    const ghost = ghostRef.current;
+    if (!wrapper || !inputWrap || !ghost) return;
+
+    const ghostBadgeEls = Array.from(
+      ghost.querySelectorAll<HTMLElement>('[data-ghost="badge"]'),
+    );
+    const moreEl = ghost.querySelector<HTMLElement>('[data-ghost="more"]');
+    const actionsW = actionsRef.current?.getBoundingClientRect().width ?? 0;
+
+    const wrapperW = wrapper.clientWidth;
+    // Reserve room for the input and the actions block. The input wrapper
+    // is `flex: 1`, so its rendered width grows to swallow whatever space is
+    // free — we must reserve only its CSS-enforced `min-width`, otherwise
+    // the measurement says "no badge fits" when in fact most do.
+    const inputMinW =
+      parseFloat(window.getComputedStyle(inputWrap).minWidth) || 100;
+    const moreW = moreEl?.getBoundingClientRect().width ?? 0;
+    const gap = 4; // matches `.badgeList`/`.ghostMeasurer` gap (0.25rem)
+
+    const reserved = inputMinW + actionsW + gap * 2;
+    const availableForBadges = wrapperW - reserved;
+
+    let used = 0;
+    let count = 0;
+    for (let i = 0; i < ghostBadgeEls.length; i++) {
+      const w = ghostBadgeEls[i].getBoundingClientRect().width;
+      const remainingAfter = ghostBadgeEls.length - (i + 1);
+      // Reserve a "+N more" slot only when at least one badge would overflow.
+      const reserveMore = remainingAfter > 0 ? moreW + gap : 0;
+      const needed = used + w + (i > 0 ? gap : 0) + reserveMore;
+      if (needed <= availableForBadges) {
+        used += w + (i > 0 ? gap : 0);
+        count = i + 1;
+      } else {
+        break;
+      }
+    }
+    setVisibleBadgeCount(count);
+  }, [selectedArray, multi, resizeKey]);
+
+  // Recompute the truncation when the trigger's width changes.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const ro = new ResizeObserver(() => {
+      setWidth(wrapper.clientWidth);
+      setResizeKey((k) => k + 1);
+    });
+    setWidth(wrapper.clientWidth);
+    ro.observe(wrapper);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!open) {
       return;
     }
-    const unregisterLayer = registerLayer(layerIdRef.current);
-    const onPointerDown = (event: PointerEvent) => {
-      if (!isTopLayer(layerIdRef.current)) {
+    const closeOnOutsidePointerDown = (event: PointerEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      const content = contentRef.current;
+      const wrapper = wrapperRef.current;
+      if (!target || !content || content.contains(target) || wrapper?.contains(target)) {
         return;
       }
-      if ((event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
+      const layers = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          ".xmlui-AutoCompleteContent, .xmlui-SelectContent, [data-xmlui-component='DropdownMenuContent'], [data-xmlui-component='SubMenuContent'], [role='dialog']",
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      if (layers[layers.length - 1] !== content) {
         return;
       }
-      if ((event.target as Element | null)?.closest("[data-xmlui-confirm-layer]")) {
-        return;
-      }
-      if (rootRef.current?.contains(event.target as Node)) {
-        return;
-      }
-      (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
+      const suppressionWindow = window as Window & {
+        __xmluiSuppressNextDropdownClose?: boolean;
+        __xmluiSuppressDropdownCloseUntil?: number;
+      };
+      suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+      suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
       setOpen(false);
-      setActiveIndex(-1);
+      setSelectedIndex(-1);
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
     };
-    window.addEventListener("pointerdown", onPointerDown, true);
-    return () => {
-      unregisterLayer();
-      window.removeEventListener("pointerdown", onPointerDown, true);
-    };
+    window.addEventListener("pointerdown", closeOnOutsidePointerDown, true);
+    return () => window.removeEventListener("pointerdown", closeOnOutsidePointerDown, true);
   }, [open]);
 
-  useEffect(() => {
-    if (multi) {
-      return;
-    }
-    const selected = options.find((option) => valuesEqual(option.value, currentValue));
-    if (selected && typeof selected.label === "string") {
-      setInputValue(selected.label);
-    }
-  }, [currentValue, multi, options]);
+  // Clear selected value
+  const clearValue = useCallback(() => {
+    const newValue = multi ? [] : "";
+    setInputValue("");
+    updateState({ value: newValue });
+    onDidChange(newValue);
+  }, [multi, updateState, onDidChange]);
 
-  const updateValue = useCallback((nextValue: unknown) => {
-    const normalizedNextValue = normalizeValue(nextValue, multi);
-    setInternalValue(normalizedNextValue);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, normalizedNextValue);
-      void validateFormField?.(fieldName, normalizedNextValue);
+  // Deselect every item the "+N more" chip stands for, in one state update.
+  const removeOverflowSelections = useCallback(() => {
+    if (selectedArray.length === 0) return;
+    const keptValues = selectedArray.slice(0, visibleBadgeCount).map((o) => o.value);
+    updateState({ value: keptValues });
+    onDidChange(keptValues);
+  }, [selectedArray, visibleBadgeCount, updateState, onDidChange]);
+
+  const onOptionAdd = useCallback((option: Option) => {
+    setOptions((prev) => [...prev, option]);
+  }, []);
+
+  const onOptionRemove = useCallback((option: Option) => {
+    setOptions((prev) => prev.filter((opt) => opt.value !== option.value));
+  }, []);
+
+  // Combined list of all items (creatable + filtered options)
+  const allItems = useMemo(() => {
+    const items = [];
+    if (shouldShowCreatable) {
+      items.push({ type: "creatable", value: searchTerm, label: `Create "${searchTerm}"` });
     }
-    void onDidChange?.(normalizedNextValue);
-  }, [fieldName, multi, onDidChange, setFormValue, validateFormField]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => inputRef.current?.focus(),
-    setValue: (nextValue) => {
-      updateValue(nextValue);
-    },
-    get value() {
-      return currentValue;
-    },
-  }), [currentValue, updateValue]);
-
-  const selectedValues = useMemo(() => normalizeArrayValue(currentValue), [currentValue]);
-  const selectedOptions = useMemo(
-    () => selectedValues
-      .map((selectedValue) => options.find((option) => valuesEqual(option.value, selectedValue)))
-      .filter((option): option is AutoCompleteOption => option !== undefined),
-    [options, selectedValues],
-  );
-  const validationMessage = fieldName ? form?.errors[fieldName] : undefined;
-  const effectiveVerboseValidation = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const validAfterChange =
-    !validationMessage &&
-    required &&
-    selectedValues.length > 0 &&
-    (validationMode === "onChanged" || validationMode === undefined);
-  const showConciseValidation =
-    !effectiveVerboseValidation && (Boolean(validationMessage) || validAfterChange);
-
-  const filteredOptions = useMemo(() => {
-    const term = inputValue.trim().toLowerCase();
-    if (!term) {
-      return options;
-    }
-    return options.filter((option) => {
-      const haystack = [
-        String(option.value ?? ""),
-        option.searchText ?? labelText(option.label),
-        ...(option.keywords ?? []),
-      ].join(" ").toLowerCase();
-      return haystack.includes(term);
+    filteredOptions.forEach((option) => {
+      items.push({ type: "option", ...option });
     });
-  }, [inputValue, options]);
+    return items;
+  }, [shouldShowCreatable, searchTerm, filteredOptions]);
 
-  const showCreatable = creatable &&
-    inputValue.trim() !== "" &&
-    !options.some((option) =>
-      String(option.value) === inputValue ||
-      (option.searchText ?? labelText(option.label)) === inputValue
-    );
-
-  const createValue = () => {
-    if (!showCreatable || readOnly || !enabled) {
-      return;
-    }
-    const value = inputValue.trim();
-    if (multi) {
-      updateValue([...selectedValues, value]);
-      setInputValue("");
-      setOpen(true);
-    } else {
-      updateValue(value);
-      setOpen(false);
-    }
-    setActiveIndex(-1);
-    void onItemCreated?.(value);
-  };
-
-  const selectValue = (value: unknown, label: ReactNode, inputLabel = labelText(label)) => {
-    if (readOnly || !enabled) {
-      return;
-    }
-    if (multi) {
-      const exists = selectedValues.some((selectedValue) => valuesEqual(selectedValue, value));
-      updateValue(exists
-        ? selectedValues.filter((selectedValue) => !valuesEqual(selectedValue, value))
-        : [...selectedValues, value]);
-      setInputValue("");
-      setOpen(true);
-    } else {
-      updateValue(value);
-      setInputValue(inputLabel);
-      setOpen(false);
-    }
-    setActiveIndex(-1);
-  };
-
-  const visibleBadgeCount = selectedOptions.length > 3 ? 2 : selectedOptions.length;
-  const visibleBadges = selectedOptions.slice(0, visibleBadgeCount);
-  const overflowOptions = selectedOptions.slice(visibleBadgeCount);
-  const removeOverflowValues = () => {
-    if (overflowOptions.length === 0) {
-      return;
-    }
-    const overflowValues = new Set(overflowOptions.map((option) => String(option.value ?? "")));
-    updateValue(selectedValues.filter((value) => !overflowValues.has(String(value ?? ""))));
-  };
-
-  const input = (
-    <input
-      ref={inputRef}
-      id={inputId}
-      className={multi ? styles.autoCompleteMultiInput : styles.autoCompleteInput}
-      type="text"
-      role="combobox"
-      aria-expanded={open}
-      aria-autocomplete="list"
-      placeholder={multi && selectedOptions.length > 0 ? "" : placeholder}
-      disabled={!enabled}
-      readOnly={readOnly}
-      required={required}
-      autoFocus={autoFocus}
-      value={inputValue}
-      data-xmlui-part="input"
-      data-part-id="input"
-      onFocus={() => {
-        if (enabled && !readOnly) {
-          ignoreNextMultiArrowDownRef.current = multi;
-          setOpen(true);
+  // Helper functions to find next/previous enabled option
+  const findNextEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex + 1; i < allItems.length; i++) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
         }
-        void onFocus?.();
-      }}
-      onBlur={() => {
-        if (fieldName !== undefined) {
-          void validateFormField?.(fieldName, currentValue);
+      }
+      // Wrap around to beginning
+      for (let i = 0; i <= currentIndex; i++) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
         }
-        void onBlur?.();
-      }}
-      onChange={(event) => {
-        setInputValue(event.currentTarget.value);
-        setActiveIndex(-1);
-        if (enabled && !readOnly) {
-          setOpen(true);
-        }
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "ArrowDown") {
-          event.preventDefault();
-          if (multi && open && activeIndex < 0 && ignoreNextMultiArrowDownRef.current) {
-            ignoreNextMultiArrowDownRef.current = false;
-            setOpen(true);
-            return;
-          }
-          ignoreNextMultiArrowDownRef.current = false;
-          moveActive(1);
-          return;
-        }
-        if (event.key === "ArrowUp") {
-          event.preventDefault();
-          moveActive(-1);
-          return;
-        }
-        if (event.key === "Escape") {
-          event.preventDefault();
-          setOpen(false);
-          setActiveIndex(-1);
-          return;
-        }
-        if (event.key === "Enter" && activeIndex >= 0 && filteredOptions[activeIndex]) {
-          event.preventDefault();
-          const option = filteredOptions[activeIndex];
-          if (option.enabled) {
-            selectValue(option.value, option.label, option.selectionLabel);
-          }
-          return;
-        }
-        if (event.key === "Enter" && !open && enabled && !readOnly) {
-          event.preventDefault();
-          setOpen(true);
-          return;
-        }
-        if (event.key === "Enter" && showCreatable) {
-          event.preventDefault();
-          createValue();
-        }
-      }}
-      onMouseDown={() => {
-        closeOnInputClickRef.current = multi && open && document.activeElement === inputRef.current;
-      }}
-      onClick={() => {
-        if (!multi || !enabled || readOnly) {
-          return;
-        }
-        if (closeOnInputClickRef.current) {
-          setOpen(false);
-          setActiveIndex(-1);
-          return;
-        }
-        setOpen(true);
-      }}
-    />
+      }
+      return -1;
+    },
+    [allItems],
   );
 
-  const moveActive = useCallback((offset: number) => {
-    if (readOnly || !enabled) {
-      return;
+  const findPreviousEnabledIndex = useCallback(
+    (currentIndex: number) => {
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
+      }
+      // Wrap around to end
+      for (let i = allItems.length - 1; i >= currentIndex; i--) {
+        const item = allItems[i];
+        if (item.type === "creatable" || item.enabled !== false) {
+          return i;
+        }
+      }
+      return -1;
+    },
+    [allItems],
+  );
+
+  // Reset selected index when options change, but select matching option when dropdown opens
+  useEffect(() => {
+    if (!open) {
+      setSelectedIndex(-1);
+    } else if (!multi && open && inputValue) {
+      // For single-select, when dropdown opens and there's an input value, try to find and select the matching option
+      const matchingIndex = allItems.findIndex((item) => {
+        if (item.type === "creatable") return false;
+        return (
+          item.label?.toLowerCase() === inputValue.toLowerCase() ||
+          item.value?.toLowerCase() === inputValue.toLowerCase()
+        );
+      });
+      if (matchingIndex !== -1) {
+        setSelectedIndex(matchingIndex);
+      } else {
+        setSelectedIndex(-1);
+      }
+    } else if (!multi && open && !inputValue) {
+      setSelectedIndex(-1);
     }
-    setOpen(true);
-    const enabledIndexes = filteredOptions
-      .map((option, index) => option.enabled ? index : -1)
-      .filter((index) => index >= 0);
-    if (enabledIndexes.length === 0) {
-      return;
-    }
-    const currentEnabledPosition = enabledIndexes.indexOf(activeIndex);
-    const nextPosition = currentEnabledPosition < 0
-      ? 0
-      : Math.max(0, Math.min(enabledIndexes.length - 1, currentEnabledPosition + offset));
-    setActiveIndex(enabledIndexes[nextPosition]);
-  }, [activeIndex, enabled, filteredOptions, readOnly]);
+    // For multi-select, don't reset selectedIndex when dropdown is open - preserve keyboard navigation
+  }, [allItems, multi, open, inputValue]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!open) return;
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const nextIndex = findNextEnabledIndex(prev);
+            return nextIndex !== -1 ? nextIndex : prev;
+          });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedIndex((prev) => {
+            const prevIndex = findPreviousEnabledIndex(prev);
+            return prevIndex !== -1 ? prevIndex : prev;
+          });
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+            const selectedItem = allItems[selectedIndex];
+            if (selectedItem.type === "creatable") {
+              const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+              onOptionAdd(newOption);
+              onItemCreated(searchTerm);
+              toggleOption(searchTerm);
+            } else if (selectedItem.enabled !== false) {
+              // Only toggle if the option is enabled
+              toggleOption(selectedItem.value);
+            }
+          } else if (allItems.length === 1) {
+            // If there's only one item (creatable or regular) and no selection, select it
+            const singleItem = allItems[0];
+            if (singleItem.type === "creatable") {
+              const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+              onOptionAdd(newOption);
+              onItemCreated(searchTerm);
+              toggleOption(searchTerm);
+            } else if (singleItem.enabled !== false) {
+              // Only toggle if the option is enabled
+              toggleOption(singleItem.value);
+            }
+          }
+          break;
+        case "Escape":
+          event.preventDefault();
+          setOpen(false);
+          break;
+      }
+    },
+    [
+      open,
+      selectedIndex,
+      allItems,
+      searchTerm,
+      onOptionAdd,
+      onItemCreated,
+      toggleOption,
+      setOpen,
+      findNextEnabledIndex,
+      findPreviousEnabledIndex,
+    ],
+  );
+
+  // Render the "empty list" message
+  const emptyListNode = useMemo(
+    () =>
+      emptyListTemplate ?? (
+        <div className={styles.autoCompleteEmpty}>
+          <ThemedIcon name="noresult" />
+          <span>List is empty</span>
+        </div>
+      ),
+    [emptyListTemplate],
+  );
+
+  // Register component API for external interactions
+  const focus = useCallback(() => {
+    inputRef?.current?.focus({ preventScroll: true });
+  }, [inputRef]);
+
+  const setValue = useEvent((newValue: string | string[]) => {
+    updateState({ value: newValue });
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
+  const optionContextValue = useMemo(
+    () => ({
+      onOptionAdd,
+      onOptionRemove,
+    }),
+    [onOptionAdd, onOptionRemove],
+  );
+
+  const autoCompleteContextValue = useMemo(() => {
+    return {
+      multi,
+      value,
+      onChange: toggleOption,
+      options,
+      inputValue,
+      searchTerm,
+      open,
+      setOpen,
+      setSelectedIndex,
+      selectedIndex,
+      allItems,
+      readOnly,
+      optionRenderer,
+      groupBy,
+      groupHeaderRenderer,
+      ungroupedHeaderRenderer,
+    };
+  }, [
+    inputValue,
+    searchTerm,
+    multi,
+    options,
+    toggleOption,
+    value,
+    open,
+    setOpen,
+    setSelectedIndex,
+    selectedIndex,
+    allItems,
+    readOnly,
+    optionRenderer,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
+  ]);
 
   return (
-    <div
-      {...rest}
-      ref={rootRef}
-      data-xmlui-component="AutoComplete"
-      data-xmlui-id={id}
-      data-testid={dataTestId}
-      className={cx(styles.autoCompleteRoot, validationStatusClass(validationStatus), className)}
-      style={style}
-    >
-      {label ? (
-        <label className={styles.autoCompleteLabel} htmlFor={inputId}>
-          {label}
-          {showRequiredIndicator ? <span className={styles.requiredIndicator}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.optionalIndicator}>(Optional)</span> : null}
-        </label>
-      ) : null}
-      {multi ? (
-        <div
-          className={styles.autoCompleteMultiTrigger}
-          onMouseDown={(event) => {
-            if (event.target !== inputRef.current) {
-              event.preventDefault();
+    <AutoCompleteContext.Provider value={autoCompleteContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
+        <Popover
+          open={open}
+          onOpenChange={(isOpen) => {
+            if (readOnly || !enabled) return;
+            if (!isOpen) {
+              const suppressionWindow = window as Window & {
+                __xmluiSuppressNextDropdownClose?: boolean;
+                __xmluiSuppressDropdownCloseUntil?: number;
+                __xmluiSuppressNextAutoCompleteClose?: boolean;
+                __xmluiSuppressAutoCompleteCloseUntil?: number;
+              };
+              if (
+                suppressionWindow.__xmluiSuppressNextAutoCompleteClose ||
+                (suppressionWindow.__xmluiSuppressAutoCompleteCloseUntil ?? 0) > Date.now()
+              ) {
+                suppressionWindow.__xmluiSuppressNextAutoCompleteClose = false;
+                suppressionWindow.__xmluiSuppressAutoCompleteCloseUntil = 0;
+                return;
+              }
+              suppressionWindow.__xmluiSuppressNextDropdownClose = true;
+              suppressionWindow.__xmluiSuppressDropdownCloseUntil = Date.now() + 80;
+            }
+            setOpen(isOpen);
+            if (!isOpen) {
+              // Reset highlighted option when dropdown closes
+              setSelectedIndex(-1);
             }
           }}
-          onClick={() => inputRef.current?.focus()}
+          modal={modal}
         >
-          {visibleBadges.map((option) => (
-            <span className={styles.autoCompleteBadge} key={String(option.value)}>
-              {option.selectionLabel ?? labelText(option.label)}
-            </span>
-          ))}
-          {overflowOptions.length > 0 ? (
-            <button
-              type="button"
-              className={styles.autoCompleteMoreChip}
-              aria-label={`${overflowOptions.length} more selected`}
-              onMouseDown={(event) => event.preventDefault()}
+          <PopoverTrigger asChild>
+            <div
+              ref={composeRefs(wrapperRef, forwardedRef)}
+              data-part-id={PART_LIST_WRAPPER}
+              style={style}
+              className={classnames(
+                classes?.[COMPONENT_PART_KEY],
+                className,
+                styles.badgeListWrapper,
+                styles[validationStatus],
+                {
+                  [styles.disabled]: !enabled,
+                  [styles.focused]: isFocused,
+                },
+              )}
+              aria-expanded={open}
               onClick={(event) => {
+                if (readOnly || !enabled) return;
+                // In multi mode, only open the dropdown, don't toggle
+                // In single mode, toggle as usual
+                if (multi && open) {
+                  return; // Already open, don't close
+                }
                 event.stopPropagation();
-                setOpen(true);
-                inputRef.current?.focus();
+                setOpen((prev) => !prev);
               }}
             >
-              +{overflowOptions.length} more
-              <svg
-                viewBox="0 0 10 10"
-                aria-hidden="true"
-                focusable="false"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  removeOverflowValues();
-                }}
-              >
-                <path d="M2 2l6 6M8 2L2 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </button>
-          ) : null}
-          {selectedOptions.map((option) => (
-            <span
-              className={styles.autoCompleteGhostBadge}
-              data-ghost="badge"
-              aria-hidden="true"
-              key={`ghost:${String(option.value)}`}
-            >
-              {option.selectionLabel ?? labelText(option.label)}
-            </span>
-          ))}
-          {input}
-        </div>
-      ) : input}
-      {showConciseValidation ? (
-        <span
-          className={styles.autoCompleteConciseValidationFeedback}
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          onMouseEnter={() => setValidationTooltipVisible(true)}
-          onMouseLeave={() => setValidationTooltipVisible(false)}
-        >
-          <span data-icon-name={validationMessage ? "error" : "checkmark"} />
-          {validationTooltipVisible && validationMessage ? (
-            <span className={styles.autoCompleteValidationTooltip} data-tooltip-container="">
-              {validationMessage}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-      <div
-        className={styles.autoCompleteMenu}
-        role="listbox"
-        data-xmlui-part="listWrapper"
-        data-part-id="listWrapper"
-        aria-expanded={open}
-        hidden={!open || !enabled}
-        style={dropdownHeight !== undefined ? { maxHeight: cssLength(dropdownHeight) } : undefined}
-      >
-          {filteredOptions.map((option, index) => {
-            const previousGroup = index > 0 ? filteredOptions[index - 1]?.group : undefined;
-            const showGroupHeader = option.group !== undefined && option.group !== previousGroup;
-            return (
-              <Fragment key={`${String(option.value)}:${index}`}>
-                {showGroupHeader ? (
-                  <div className={styles.autoCompleteGroupHeader}>
-                    {option.groupHeader ?? option.group}
+                {selectedArray.length > 0 && (
+                  <div className={styles.badgeList}>
+                    {selectedArray
+                      .slice(0, Number.isFinite(visibleBadgeCount) ? visibleBadgeCount : selectedArray.length)
+                      .map((v, index) => (
+                        <span key={index} className={styles.badge}>
+                          {v?.label}
+                          {!readOnly && (
+                            <span
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v.value);
+                              }}
+                            >
+                              <ThemedIcon name="close" size="sm" />
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    {Number.isFinite(visibleBadgeCount) &&
+                      selectedArray.length > visibleBadgeCount && (
+                        <span
+                          className={styles.badge}
+                          role="button"
+                          aria-label={`${selectedArray.length - visibleBadgeCount} more selected, click to open`}
+                          onClick={(event) => {
+                            // Open the dropdown so the user can see the full
+                            // selection — multi mode keeps it open afterwards.
+                            event.stopPropagation();
+                            setOpen(true);
+                          }}
+                        >
+                          {`+${selectedArray.length - visibleBadgeCount} more`}
+                          {!readOnly && (
+                            <span
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                removeOverflowSelections();
+                              }}
+                            >
+                              <ThemedIcon name="close" size="sm" />
+                            </span>
+                          )}
+                        </span>
+                      )}
                   </div>
-                ) : null}
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={index === activeIndex}
-                  className={styles.autoCompleteItem}
-                  disabled={!option.enabled}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    if (option.enabled) {
-                      selectValue(option.value, option.label, option.selectionLabel);
-                    }
-                  }}
-                >
-                  {option.label}
-                </button>
-              </Fragment>
-            );
-          })}
-          {showCreatable ? (
-            <button
-              type="button"
-              role="option"
-              className={styles.autoCompleteItem}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={createValue}
+                )}
+                {/* Ghost measurer — invisible, off-screen list used to read real
+                    label widths so we can decide how many badges fit before
+                    swapping the overflow into a "+N more" chip. */}
+                {multi && selectedArray.length > 0 && (
+                  <div ref={ghostRef} className={styles.ghostMeasurer} aria-hidden="true">
+                    {selectedArray.map((v, index) => (
+                      <span key={`g-${index}`} data-ghost="badge" className={styles.badge}>
+                        {v?.label}
+                        {!readOnly && (
+                          <span>
+                            <ThemedIcon name="close" size="sm" />
+                          </span>
+                        )}
+                      </span>
+                    ))}
+                    {/* Worst-case "+N more" placeholder — three-digit count
+                        gives an upper bound for the reserved slot. */}
+                    <span data-ghost="more" className={styles.badge}>
+                      {`+${selectedArray.length} more`}
+                      {!readOnly && (
+                        <span>
+                          <ThemedIcon name="close" size="sm" />
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )}
+                <div ref={inputWrapperRef} className={styles.inputWrapper}>
+                  <Part partId={PART_INPUT}>
+                    <input
+                      {...rest}
+                      role="combobox"
+                      id={id}
+                      ref={inputRef}
+                      onFocus={(ev) => {
+                        setIsFocused(true);
+                        onFocus(ev);
+                      }}
+                      onBlur={(ev) => {
+                        if (inputValue === "" && !multi) {
+                          clearValue();
+                        } else {
+                          if (!Array.isArray(selectedValue) && selectedValue) {
+                            setInputValue(selectedValue?.label);
+                          } else {
+                            setInputValue("");
+                          }
+                        }
+                        onBlur(ev);
+                        setIsFocused(false);
+                      }}
+                      onKeyDown={(event) => {
+                        if (readOnly) return;
+
+                        // Handle opening dropdown
+                        if (event.key === "ArrowDown" && !open) {
+                          setOpen(true);
+                          return;
+                        }
+
+                        // Handle keyboard navigation when dropdown is open
+                        if (open) {
+                          handleKeyDown(event);
+                        } else if (event.key === "Enter") {
+                          setOpen(true);
+                        }
+                      }}
+                      readOnly={readOnly}
+                      autoFocus={autoFocus}
+                      aria-autocomplete="list"
+                      value={inputValue}
+                      disabled={!enabled}
+                      onChange={(event) => {
+                        setOpen(true);
+                        setInputValue(event.target.value);
+                        setSearchTerm(event.target.value);
+                      }}
+                      placeholder={!readOnly ? placeholder : ""}
+                      className={styles.commandInput}
+                    />
+                  </Part>
+                  <div ref={actionsRef} className={styles.actions}>
+                    {!finalVerboseValidationFeedback && (
+                      <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+                        <ConciseValidationFeedback
+                          validationStatus={validationStatus}
+                          invalidMessages={invalidMessages}
+                          successIcon={finalValidationIconSuccess}
+                          errorIcon={finalValidationIconError}
+                        />
+                      </Part>
+                    )}
+                    {value?.length > 0 && enabled && !readOnly && (
+                      <span
+                        className={styles.action}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      >
+                        <ThemedIcon name="close" />
+                      </span>
+                    )}
+                    <span
+                      className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
+                      aria-disabled={!enabled || readOnly}
+                      onClick={() => {
+                        if (readOnly || !enabled) return;
+                        setOpen(!open);
+                        // Focus the input after opening dropdown
+                        inputRef.current?.focus({ preventScroll: true });
+                      }}
+                    >
+                      <ThemedIcon name="chevrondown" />
+                    </span>
+                  </div>
+                </div>
+            </div>
+          </PopoverTrigger>
+          <Portal container={root}>
+            <PopoverContent
+              ref={contentRef}
+              style={{ width, height: dropdownHeight }}
+              className={classnames(contentClassName, styles.popoverContent)}
+              align="start"
+              onClick={(event) => event.stopPropagation()}
+              onInteractOutside={(event) => {
+                const target = event.target instanceof Node ? event.target : null;
+                if (
+                  target &&
+                  document.querySelector("[data-xmlui-component='DropdownMenuContent']")?.contains(target)
+                ) {
+                  (window as Window & { __xmluiSuppressNextDropdownClose?: boolean }).__xmluiSuppressNextDropdownClose = true;
+                  event.preventDefault();
+                }
+              }}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              onPointerDown={(event) => event.stopPropagation()}
             >
-              {inputValue.trim()}
-            </button>
-          ) : null}
-          {filteredOptions.length === 0 && !showCreatable ? (
-            <div className={styles.autoCompleteEmpty}>{emptyListTemplate ?? "No options"}</div>
-          ) : null}
-          {popupChildren}
-      </div>
-      {effectiveVerboseValidation && validationMessage ? (
-        <div className={styles.autoCompleteValidationMessage} data-xmlui-part="validationMessage">
-          {validationMessage}
+              <div role="listbox" className={styles.commandList} style={{ height: dropdownHeight }}>
+                {/* Always render through OptionTypeProvider so user-provided
+                    Option children (custom templates) are preserved when
+                    filtering. AutoCompleteOption hides itself if its value is
+                    not in `allItems` (i.e. filtered out by searchTerm). The
+                    creatable item and empty-list message are rendered as
+                    siblings. */}
+                {shouldShowCreatable && (
+                  <CreatableItem
+                    onNewItem={onItemCreated}
+                    isHighlighted={selectedIndex === 0}
+                  />
+                )}
+                <OptionTypeProvider Component={AutoCompleteOption}>{children}</OptionTypeProvider>
+                {filteredOptions.length === 0 && !shouldShowCreatable && (
+                  <div>{emptyListNode}</div>
+                )}
+              </div>
+            </PopoverContent>
+          </Portal>
+        </Popover>
+        <div style={{ display: "none"}}>
+          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
         </div>
-      ) : null}
-    </div>
+      </OptionContext.Provider>
+    </AutoCompleteContext.Provider>
   );
 }));
 
-function labelText(label: ReactNode): string {
-  if (typeof label === "string" || typeof label === "number" || typeof label === "boolean") {
-    return String(label);
+type CreatableItemProps = {
+  onNewItem: (item: string) => void;
+  isHighlighted?: boolean;
+};
+
+function CreatableItem({ onNewItem, isHighlighted = false }: CreatableItemProps) {
+  const { value, options, searchTerm, onChange, setOpen, setSelectedIndex, multi } =
+    useAutoComplete();
+  const { onOptionAdd } = useOption();
+  if (
+    isOptionsExist(options, [{ value: searchTerm, label: searchTerm }]) ||
+    (Array.isArray(value) && value?.find((s) => s === searchTerm)) ||
+    searchTerm === value
+  ) {
+    return <span style={{ display: "none" }} />;
   }
-  return "";
+
+  const handleClick = () => {
+    const newOption = { value: searchTerm, label: searchTerm, enabled: true };
+    onOptionAdd(newOption);
+    onNewItem?.(searchTerm);
+    onChange(searchTerm);
+    // Only close dropdown for single select mode
+    if (!multi) {
+      setOpen(false);
+    }
+  };
+
+  const Item = (
+    <div
+      className={classnames(styles.autoCompleteOption, {
+        [styles.highlighted]: isHighlighted,
+      })}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseEnter={() => {
+        if (setSelectedIndex) {
+          setSelectedIndex(0); // CreatableItem is always at index 0
+        }
+      }}
+      onClick={handleClick}
+      role="option"
+      aria-selected={false}
+    >
+      {`Create "${searchTerm}"`}
+    </div>
+  );
+
+  // For normal creatable
+  if (searchTerm.length > 0) {
+    return Item;
+  }
+
+  return <span style={{ display: "none" }} />;
 }
 
-function normalizeValue(value: unknown, multi: boolean): unknown {
-  if (multi) {
-    return normalizeArrayValue(value);
-  }
-  if (Array.isArray(value)) {
-    return value[0] ?? "";
-  }
-  return value ?? "";
-}
+function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {
+  const {
+    value,
+    label,
+    enabled = true,
+    readOnly,
+    children,
+    isHighlighted: explicitHighlighted,
+    itemIndex: explicitItemIndex,
+  } = option;
+  const id = useId();
+  const {
+    value: selectedValue,
+    onChange,
+    multi,
+    setOpen,
+    setSelectedIndex,
+    selectedIndex,
+    allItems,
+    optionRenderer,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
+  } = useAutoComplete();
+  const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
-function normalizeArrayValue(value: unknown): unknown[] {
-  if (Array.isArray(value)) {
-    return value;
+  // AutoCompleteOption is always rendered through OptionTypeProvider so the
+  // user's custom Option children (templates) are preserved even when a
+  // search term is active. We derive `itemIndex`/`isHighlighted` from the
+  // shared context `allItems`/`selectedIndex` when explicit props weren't
+  // passed (legacy callers can still override). If our value isn't in
+  // `allItems`, the searchTerm filtered us out — render nothing.
+  const itemIndex =
+    explicitItemIndex !== undefined
+      ? explicitItemIndex
+      : allItems.findIndex((i) => i.type === "option" && i.value === value);
+  if (explicitItemIndex === undefined && itemIndex === -1) {
+    return null;
   }
-  if (value === undefined || value === null || value === "") {
-    return [];
+  const isHighlighted =
+    explicitHighlighted !== undefined
+      ? explicitHighlighted
+      : itemIndex !== -1 && selectedIndex === itemIndex;
+
+  // Decide whether to render a section header above this option. When `groupBy`
+  // is set on the parent AutoComplete, each option is grouped by the value of
+  // `option[groupBy]`. This option is the first visible member of its group iff
+  // the previous visible option in `allItems` either doesn't exist or sits in a
+  // different group. `allItems` is computed against the *current* filtered list,
+  // so searching automatically shifts the header to whichever option becomes
+  // first in its group. Missing group field values fall back to the "Ungrouped"
+  // bucket, matching Select's behavior.
+  let showGroupHeader = false;
+  let groupHeaderContent: ReactNode = null;
+  if (groupBy && itemIndex !== -1) {
+    const groupKey = (option as any)[groupBy] ?? "Ungrouped";
+    const prev = itemIndex > 0 ? allItems[itemIndex - 1] : null;
+    const prevGroupKey =
+      prev && prev.type === "option" ? (prev as any)[groupBy] ?? "Ungrouped" : null;
+    if (prevGroupKey !== groupKey) {
+      if (groupKey === "Ungrouped") {
+        if (ungroupedHeaderRenderer) {
+          showGroupHeader = true;
+          groupHeaderContent = ungroupedHeaderRenderer();
+        }
+      } else {
+        showGroupHeader = true;
+        groupHeaderContent = groupHeaderRenderer
+          ? groupHeaderRenderer(String(groupKey))
+          : String(groupKey);
+      }
+    }
   }
-  return [value];
-}
 
-function valuesEqual(left: unknown, right: unknown): boolean {
-  return Object.is(left, right) || String(left ?? "") === String(right ?? "");
-}
+  const handleClick = () => {
+    if (!readOnly && enabled) {
+      onChange(value);
+      // Only close dropdown for single select mode
+      if (!multi) {
+        setOpen(false);
+      }
+    }
+  };
 
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
-}
-
-function cx(...parts: Array<string | undefined | false>): string {
-  return parts.filter(Boolean).join(" ");
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  return fieldPrefix ? `${fieldPrefix}.${bindTo}` : bindTo;
-}
-
-function validationStatusClass(status?: string): string | undefined {
-  if (status === "warning") {
-    return styles.autoCompleteValidationWarning;
-  }
-  if (status === "error") {
-    return styles.autoCompleteValidationError;
-  }
-  if (status === "valid" || status === "success") {
-    return styles.autoCompleteValidationSuccess;
-  }
-  return undefined;
+  return (
+    <>
+      {showGroupHeader && (
+        <div role="presentation" className={styles.groupHeader}>
+          {groupHeaderContent}
+        </div>
+      )}
+      <div
+        id={id}
+        role="option"
+        aria-disabled={!enabled}
+        aria-selected={selected}
+        className={classnames(styles.autoCompleteOption, {
+          [styles.disabledOption]: !enabled,
+          [styles.highlighted]: isHighlighted,
+        })}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseEnter={() => {
+          if (itemIndex !== undefined && itemIndex !== -1 && setSelectedIndex && enabled) {
+            setSelectedIndex(itemIndex);
+          }
+        }}
+        onClick={handleClick}
+      >
+        {children ? (
+          <>
+            <div className={styles.autoCompleteOptionContent}>{children}</div>
+            {selected && <ThemedIcon name="checkmark" />}
+          </>
+        ) : optionRenderer ? (
+          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+        ) : (
+          <>
+            <div className={styles.autoCompleteOptionContent}>{label}</div>
+            {selected && <ThemedIcon name="checkmark" />}
+          </>
+        )}
+      </div>
+    </>
+  );
 }

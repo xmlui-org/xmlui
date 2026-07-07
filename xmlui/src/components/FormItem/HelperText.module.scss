@@ -1,0 +1,64 @@
+@use "../../components-core/theming/themes" as t;
+
+@layer components {
+  .helper {
+    padding-top: t.$space-1;
+    padding-bottom: t.$space-1;
+    display: flex;
+    align-items: center;
+    animation: helperTextAdd 150ms ease-in;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .helperText {
+    font-size: t.$fontSize-sm;
+    color: t.$textColor-primary;
+  }
+
+  .valid {
+    .helperText {
+      margin-inline-start: 0.25em;
+      color: t.$color-valid;
+    }
+  }
+
+  .error {
+    .helperText {
+      margin-inline-start: 0.25em;
+      color: t.$color-error;
+    }
+  }
+
+  .warning {
+    .helperText {
+      margin-inline-start: 0.25em;
+      color: t.$color-warning;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .helper {
+      animation: none;
+    }
+  }
+
+  @keyframes helperTextAdd {
+    0% {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    50% {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

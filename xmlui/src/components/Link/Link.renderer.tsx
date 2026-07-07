@@ -26,11 +26,16 @@ export const linkRenderer = wrapComponent({
     ]);
     const variant = adapter.stringProp("variant");
     const rootAttrs = adapter.rootAttrs();
+    const to = adapter.prop("to");
+    const hasClickEvent = Object.prototype.hasOwnProperty.call(adapter.node.events, "click");
+    const needsRuntimeNavigation =
+      typeof to === "string" &&
+      (to.startsWith("#") || (to.startsWith("/") && !to.startsWith("//") && !adapter.stringProp("target")));
 
     return (
       <LinkNative
         {...rootAttrs}
-        to={adapter.prop("to")}
+        to={to}
         target={adapter.stringProp("target")}
         label={adapter.prop("label")}
         icon={adapter.prop("icon")}
@@ -54,7 +59,21 @@ export const linkRenderer = wrapComponent({
           ...(rootAttrs.style as CSSProperties | undefined),
           ...currentVariantCssVariables(variant, mergedThemeVariables),
         }}
-        onClick={(event) => void adapter.event("click")(event)}
+        onClick={
+          hasClickEvent || needsRuntimeNavigation
+            ? (event) => {
+                if (needsRuntimeNavigation && typeof to === "string") {
+                  window.history.pushState({}, "", to);
+                  const hashIndex = to.indexOf("#");
+                  if (hashIndex >= 0 && hashIndex < to.length - 1) {
+                    scrollHashTarget(to.slice(hashIndex + 1));
+                  }
+                  window.dispatchEvent(new PopStateEvent("popstate"));
+                }
+                void adapter.event("click")(event);
+              }
+            : undefined
+        }
         onContextMenu={(event) => void adapter.event("contextMenu")(event)}
       >
         {adapter.renderChildren()}
@@ -90,4 +109,12 @@ function currentVariantCssVariables(
     }
   }
   return style as CSSProperties;
+}
+
+function scrollHashTarget(hash: string) {
+  try {
+    document.getElementById(decodeURIComponent(hash))?.scrollIntoView();
+  } catch {
+    document.getElementById(hash)?.scrollIntoView();
+  }
 }

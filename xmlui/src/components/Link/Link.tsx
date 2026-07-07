@@ -1,11 +1,14 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
+import React from "react";
 
 import { createMetadata, dEnabled, dLabel } from "../../component-core/metadata/helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   collectComponentThemeDefaults,
   extractScssThemeVars,
 } from "../../styling/theme";
 import { defaultProps } from "./Link.defaults";
+import { LinkNative } from "./LinkReact";
 
 const COMP = "Link";
 
@@ -223,4 +226,34 @@ export const LinkMd = createMetadata({
     [`padding-${COMP}`]: "0",
     [`padding-icon-${COMP}`]: "$space-0_5",
   },
+});
+
+type ThemedLinkNativeProps = React.ComponentPropsWithoutRef<typeof LinkNative>;
+
+export const ThemedLinkNative = React.forwardRef<
+  React.ElementRef<typeof LinkNative>,
+  ThemedLinkNativeProps
+>(function ThemedLinkNative({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(LinkMd);
+  const navigateInternally = (event: MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
+    props.onClick?.(event);
+    if (
+      typeof props.to === "string" &&
+      props.to.startsWith("/") &&
+      !props.to.startsWith("//") &&
+      !props.target
+    ) {
+      event.preventDefault();
+      window.history.pushState({}, "", props.to);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  };
+  return (
+    <LinkNative
+      {...props}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
+      onClick={navigateInternally}
+      ref={ref}
+    />
+  );
 });

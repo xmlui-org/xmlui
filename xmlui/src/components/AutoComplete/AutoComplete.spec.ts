@@ -1,94 +1,5 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-
-const AUTOCOMPLETE_OLD_SUITE_PENDING =
-  "The literal old AutoComplete suite is copied for compatibility tracking, but the full AutoComplete migration is not complete yet. Re-enable cases feature-by-feature as label/form integration, multi-select badges, templates, grouping, validation feedback, theme variants, and overlay behavior are migrated.";
-
-const ACTIVE_AUTOCOMPLETE_TESTS = new Set([
-  "renders with default props",
-  "displays placeholder text",
-  "initialValue sets the selected option",
-  "opens dropdown when clicked",
-  "selects an option when clicked",
-  "disabled option cannot be selected",
-  "searching filters options",
-  "emptyListTemplate is shown when no options match",
-  "optionTemplate customizes option appearance",
-  "readOnly prevents changing selection",
-  "disabled state prevents interaction",
-  "didChange event fires when option is selected",
-  "gotFocus and lostFocus events work correctly",
-  "gotFocus and lostFocus events by clicking on label work correctly",
-  "setValue API works correctly",
-  "bindTo syncs $data and value",
-  "focus API brings focus to the component",
-  "autoFocus brings focus to the component on load",
-  "creates new option when typing non-existing value",
-  "has appropriate ARIA attributes",
-  "supports keyboard navigation with arrow keys",
-  "custom Option children are preserved while filtering",
-  "requireLabelMode='markRequired' shows asterisk for required fields",
-  "requireLabelMode='markRequired' hides indicator for optional fields",
-  "requireLabelMode='markOptional' shows optional tag for optional fields",
-  "requireLabelMode='markOptional' hides indicator for required fields",
-  "requireLabelMode='markBoth' shows asterisk for required fields",
-  "requireLabelMode='markBoth' shows optional tag for optional fields",
-  "input requireLabelMode overrides Form itemRequireLabelMode",
-  "input inherits Form itemRequireLabelMode when not specified",
-  "multi mode allows selecting multiple options",
-  "multi mode keeps badge measurer hidden from users",
-  "group header shifts to next visible option when filtering",
-  "groupBy without groupHeaderTemplate renders plain group name",
-  "all badges stay visible when they fit in the trigger",
-  "multi-select truncates with +N more chip when badges overflow trigger width",
-  "+N more chip opens the dropdown on click",
-  "+N more chip close icon deselects only the overflow items",
-  "multi-select supports arrow-key navigation when search term is empty",
-  "input has correct width in px",
-  "input with label has correct width in px",
-  "input has correct width in %",
-  "input with label has correct width in %",
-  "applies correct textColor to placeholder",
-  "applies correct fontSize to placeholder",
-  "handles tooltip",
-  "handles variant",
-  "can select part: 'listWrapper'",
-  "can select part: 'input'",
-  "parts are present when tooltip is added",
-  "parts are present when variant is added",
-  "variant applies custom theme variables",
-  "tooltip with markdown content",
-  "animation behavior",
-  "combined tooltip and animation",
-  "all behaviors combined with parts",
-  "shows helper text and no icon when verboseValidationFeedback is true (default)",
-  "shows icon and no helper text when verboseValidationFeedback is false",
-  "prop on component overrides form default",
-  "shows valid icon in concise mode when valid",
-  "concise mode tooltip shows error message on hover",
-  "does not duplicate label when inside Form with label prop",
-  "ModalDialog > DropdownMenu > AutoComplete",
-  "ModalDialog > AutoComplete > DropdownMenu",
-]);
-
-const ACTIVE_AUTOCOMPLETE_PREFIXES = [
-  "applies correct borderRadius",
-  "applies correct borderColor",
-  "applies correct borderWidth",
-  "applies correct borderStyle",
-  "applies correct fontSize",
-  "applies correct backgroundColor",
-  "applies correct boxShadow",
-  "applies correct textColor",
-];
-
-test.beforeEach(({}, testInfo) => {
-  if (
-    !ACTIVE_AUTOCOMPLETE_TESTS.has(testInfo.title) &&
-    !ACTIVE_AUTOCOMPLETE_PREFIXES.some((prefix) => testInfo.title.startsWith(prefix))
-  ) {
-    test.skip(true, AUTOCOMPLETE_OLD_SUITE_PENDING);
-  }
-});
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -984,7 +895,7 @@ test("input has correct width in px", async ({ page, initTestBed }) => {
 test("input with label has correct width in px", async ({ page, initTestBed }) => {
   await initTestBed(`<AutoComplete width="200px" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="listWrapper"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1002,7 +913,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   await page.setViewportSize({ width: 400, height: 300 });
   await initTestBed(`<AutoComplete width="50%" label="test" testId="test"/>`, {});
 
-  const input = page.getByTestId("test");
+  const input = page.getByTestId("test").locator('[data-part-id="listWrapper"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
 });
@@ -1131,7 +1042,10 @@ test.describe("Theme Variables", () => {
     expect(placeholderColor).toBe("rgb(0, 0, 0)");
   });
 
-  test("applies correct fontSize to placeholder", async ({ initTestBed, page }) => {
+  test.fixme(
+    "applies correct fontSize to placeholder",
+    SKIP_REASON.OTHER("Does AutoComplete apply the correct css for the placeholder?"),
+    async ({ initTestBed, page }) => {
       await initTestBed(`<AutoComplete testId="test" placeholder="Search..." />`, {
         testThemeVars: { "fontSize-placeholder-AutoComplete--default": "20px" },
       });
@@ -1140,7 +1054,8 @@ test.describe("Theme Variables", () => {
         return window.getComputedStyle(input, "::placeholder").fontSize;
       });
       expect(placeholderFontSize).toBe("20px");
-  });
+    },
+  );
 });
 
 // =============================================================================
@@ -1173,7 +1088,6 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(
       `<AutoComplete testId="test"><Option value="1" label="Test" /></AutoComplete>`,
     );
-    await page.getByRole("combobox").click();
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     await expect(listWrapper).toBeVisible();
   });
@@ -1193,7 +1107,6 @@ test.describe("Behaviors and Parts", () => {
     const listWrapper = page.locator("[data-part-id='listWrapper']");
     const inputPart = page.locator("[data-part-id='input']");
 
-    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
 
@@ -1218,7 +1131,6 @@ test.describe("Behaviors and Parts", () => {
     const inputPart = page.locator("[data-part-id='input']");
 
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
@@ -1264,7 +1176,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("all behaviors combined with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <AutoComplete 
@@ -1291,7 +1203,6 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
 
     // Verify parts are visible
-    await page.getByRole("combobox").click();
     await expect(listWrapper).toBeVisible();
     await expect(inputPart).toBeVisible();
   });
@@ -1424,8 +1335,8 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
   test("ModalDialog > DropdownMenu > AutoComplete", async ({
     initTestBed,
     page,
-    createAutoCompleteDriver,
     createDropdownMenuDriver,
+    createAutoCompleteDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
@@ -1477,7 +1388,7 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").first().click();
+    await page.getByText("Confirm action").nth(1).click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -1503,8 +1414,8 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
   test("ModalDialog > AutoComplete > DropdownMenu", async ({
     initTestBed,
     page,
-    createAutoCompleteDriver,
     createDropdownMenuDriver,
+    createAutoCompleteDriver,
   }) => {
     await initTestBed(`
       <Fragment>

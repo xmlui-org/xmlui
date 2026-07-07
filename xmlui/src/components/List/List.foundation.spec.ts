@@ -24,6 +24,121 @@ test.describe("List foundation", () => {
     await expect(page.getByText("Data")).toHaveCount(0);
   });
 
+  test("keeps default item renderer with group header template only", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <List
+        availableGroups="{['fruits', 'vegetables']}"
+        groupBy="category"
+        data="{[
+          { id: 0, name: 'Apples', quantity: 5, category: 'fruits' },
+          { id: 1, name: 'Carrots', quantity: 100, category: 'vegetables' },
+          { id: 2, name: 'Milk', quantity: 10, category: 'dairy' }
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Stack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </Stack>
+        </property>
+      </List>
+    `);
+
+    await expect(page.getByText("dairy")).toBeVisible();
+    await expect(page.getByText("Milk")).toBeVisible();
+    await expect(page.getByText("10", { exact: true })).toBeVisible();
+    await expect(page.getByText("fruits")).toBeVisible();
+    await expect(page.getByText("Apples")).toBeVisible();
+    await expect(page.getByText("vegetables")).toBeVisible();
+    await expect(page.getByText("Carrots")).toBeVisible();
+  });
+
+  test("hides empty default groups by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <List
+        defaultGroups="{['dairy', 'meat', 'vegetables']}"
+        groupBy="category"
+        data="{[
+          { id: 0, name: 'Apples', quantity: 5, category: 'fruits' },
+          { id: 1, name: 'Carrots', quantity: 100, category: 'vegetables' },
+          { id: 2, name: 'Milk', quantity: 10, category: 'dairy' }
+        ]}">
+        <property name="groupHeaderTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </VStack>
+        </property>
+      </List>
+    `);
+
+    await expect(page.getByText("dairy")).toBeVisible();
+    await expect(page.getByText("Milk")).toBeVisible();
+    await expect(page.getByText("meat")).toHaveCount(0);
+    await expect(page.getByText("vegetables")).toBeVisible();
+    await expect(page.getByText("Carrots")).toBeVisible();
+    await expect(page.getByText("fruits")).toBeVisible();
+    await expect(page.getByText("Apples")).toBeVisible();
+  });
+
+  test("keeps overlay selection checkboxes inside card rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <List
+        enableMultiRowSelection="true"
+        data="{[
+          { id: 0, name: 'Apples', category: 'fruits' },
+          { id: 1, name: 'Bananas', category: 'fruits' },
+          { id: 2, name: 'Carrots', category: 'vegetables' },
+          { id: 3, name: 'Spinach', category: 'vegetables' }
+        ]}"
+        rowsSelectable="true"
+        selectionCheckboxPosition="overlay"
+        selectionCheckboxAnchor="bottom-left">
+        <Card paddingLeft="36px" minHeight="50px">
+          {$item.name}
+        </Card>
+      </List>
+    `);
+
+    const rows = page.locator("[data-list-item-type='ITEM']");
+    await expect(rows).toHaveCount(4);
+    await expect(page.locator("input[type='checkbox']")).toHaveCount(4);
+
+    for (let index = 0; index < 4; index++) {
+      const row = rows.nth(index);
+      const checkbox = row.locator("input[type='checkbox']");
+      await expect(checkbox).toBeVisible();
+      const rowBox = await row.boundingBox();
+      const checkboxBox = await checkbox.boundingBox();
+      expect(rowBox).not.toBeNull();
+      expect(checkboxBox).not.toBeNull();
+      expect(checkboxBox!.x).toBeGreaterThanOrEqual(rowBox!.x);
+      expect(checkboxBox!.y).toBeGreaterThanOrEqual(rowBox!.y);
+      expect(checkboxBox!.x + checkboxBox!.width).toBeLessThanOrEqual(rowBox!.x + rowBox!.width);
+      expect(checkboxBox!.y + checkboxBox!.height).toBeLessThanOrEqual(rowBox!.y + rowBox!.height);
+    }
+  });
+
+  test("does not materialize empty syncWithVar selection on mount", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App global.selState="{{}}">
+        <List
+          syncWithVar="selState"
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          data="{[
+            { id: 0, name: 'Apples', category: 'fruits' },
+            { id: 1, name: 'Bananas', category: 'fruits' }
+          ]}">
+          <Text>{$item.name} - {$item.category}</Text>
+        </List>
+        <Text testId="selectionText">Selection: {JSON.stringify(selState)}</Text>
+      </App>
+    `);
+
+    await expect(page.getByTestId("selectionText")).toHaveText("Selection: {}");
+    await page.getByText("Apples - fruits").click();
+    await expect(page.getByTestId("selectionText")).toContainText("selectedIds");
+    await expect(page.getByTestId("selectionText")).toContainText("0");
+  });
+
   test("supports limit and item context variables", async ({ initTestBed, page }) => {
     await initTestBed(`
       <List limit="{2}" data="{[

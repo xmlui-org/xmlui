@@ -1,0 +1,50 @@
+<Component name="HeroBackgroundBreakoutPage">
+  <H1>
+    Hero Section with no background breakout
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    fullWidthBackground="false"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  fullWidthBackground="false"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+/>
+```        
+        ]]>
+  </Markdown>
+  <H1>
+    Hero Section with background breakout (default)
+  </H1>
+  <HeroSection
+    backgroundColor="lightblue"
+    fullWidthBackground="true"
+    preamble="pmengine"
+    headline="Modern Project Management You Truly Own"
+    subheadline="A fast, intuitive tool you can host, shape, and trust."
+    mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." />
+  <Markdown>
+    <![CDATA[
+```xmlui
+<HeroSection
+  backgroundColor="lightblue"
+  fullWidthBackground="true"
+  preamble="pmengine"
+  headline="Modern Project Management You Truly Own"
+  subheadline="A fast, intuitive tool you can host, shape, and trust."
+  mainText="Manage your projects, tasks, and teams with ease using our open-source project management tool. Enjoy full control over your data and workflows." 
+/>
+```        
+        ]]>
+  </Markdown>
+</Component>

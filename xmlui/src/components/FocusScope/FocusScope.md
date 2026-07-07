@@ -84,4 +84,3 @@ do not want to keep keyboard navigation inside the scope.
 ```
 
 %-PROP-END
-

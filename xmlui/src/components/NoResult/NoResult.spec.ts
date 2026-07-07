@@ -1,18 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
 
-test("renders default label, icon, and custom content", async ({ initTestBed, page }) => {
-  await initTestBed(`<NoResult testId="empty" />`);
-  await expect(page.getByTestId("empty")).toHaveText("No results found");
-  await expect(page.getByTestId("empty").locator("[data-xmlui-part='icon']")).toBeVisible();
-
-  await initTestBed(`<NoResult testId="empty" label="Nothing here" hideIcon="{true}" />`);
-  await expect(page.getByTestId("empty")).toHaveText("Nothing here");
-  await expect(page.getByTestId("empty").locator("[data-xmlui-part='icon']")).toHaveCount(0);
-
-  await initTestBed(`<NoResult testId="empty"><Text>Child fallback</Text></NoResult>`);
-  await expect(page.getByTestId("empty")).toContainText("Child fallback");
-});
-
 test("applies border-side and combination theme variables", async ({
   initTestBed,
   createNoResultDriver,

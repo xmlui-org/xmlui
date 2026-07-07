@@ -1,286 +1,382 @@
-import {
+import React, {
+  createContext,
+  type ForwardedRef,
   forwardRef,
   memo,
   useCallback,
+  useContext,
   useEffect,
   useId,
-  useImperativeHandle,
+  useMemo,
   useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
 } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import * as InnerRadioGroup from "@radix-ui/react-radio-group";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-import { defaultProps } from "./RadioGroup.defaults";
-import { convertOptionValue } from "../Option/OptionReact";
-import { useFormContext } from "../Form/FormContext";
 import styles from "./RadioGroup.module.scss";
 
-export type RadioGroupOption = {
-  value: unknown;
-  label: ReactNode;
-  enabled: boolean;
-  testId?: string;
-};
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { Option, OrientationOptions, ValidationStatus } from "../abstractions";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { UnwrappedRadioItem } from "./RadioItemReact";
+import { convertOptionValue } from "../Option/OptionReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { defaultProps } from "./RadioGroup.defaults";
 
-export type RadioGroupApi = {
-  setValue: (value: unknown) => void;
-  value: unknown;
-};
-
-export type RadioGroupProps = {
+type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defaultValue"> & {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
+  initialValue?: string;
+  autofocus?: boolean;
+  value?: string;
   enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  autoFocus?: boolean;
-  orientation?: string;
+  orientation?: OrientationOptions;
   gap?: string;
-  validationStatus?: string;
+  classes?: Record<string, string>;
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
   label?: string;
   labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
   requireLabelMode?: string;
-  direction?: string;
-  className?: string;
-  style?: CSSProperties;
-  options?: RadioGroupOption[];
-  extraChildren?: ReactNode;
-  onDidChange?: (value: unknown) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  direction?: "ltr" | "rtl";
+  required?: boolean;
+  readOnly?: boolean;
+  updateState?: UpdateStateFn;
+  onDidChange?: (newValue: string) => void;
+  registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const RadioGroupNative = memo(forwardRef<RadioGroupApi, RadioGroupProps>(function RadioGroupNative(
+const RadioGroupStatusContext = createContext<{
+  value?: string;
+  setValue?: (value: string) => void;
+  status: ValidationStatus;
+  enabled?: boolean;
+}>({
+  status: "none",
+  enabled: defaultProps.enabled,
+});
+
+export const RadioGroup = memo(forwardRef(function RadioGroup(
   {
-    id,
-    bindTo,
-    value: controlledValue,
+    id: idProp,
+    value = defaultProps.value,
     initialValue = defaultProps.initialValue,
+    autofocus,
     enabled = defaultProps.enabled,
-    readOnly = defaultProps.readOnly,
-    required = defaultProps.required,
-    autoFocus,
     orientation = defaultProps.orientation,
     gap,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages: _invalidMessages,
     label,
-    labelPosition = "top",
+    labelPosition,
+    labelWidth,
+    labelBreak,
     requireLabelMode,
     direction = "ltr",
-    className,
-    style,
-    options = [],
-    extraChildren,
-    onDidChange,
+    required = defaultProps.required,
+    readOnly = defaultProps.readOnly,
+    updateState = noop,
+    onDidChange = noop,
     onFocus,
     onBlur,
-    "data-testid": dataTestId,
+    children,
+    registerComponentApi,
+    style,
+    className,
+    classes,
     ...rest
-  },
-  ref,
+  }: RadioGroupProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const groupId = useId();
-  const groupRef = useRef<HTMLDivElement | null>(null);
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const normalizedInitialValue = convertOptionValue(initialValue ?? "");
-  const [internalValue, setInternalValue] = useState<unknown>(normalizedInitialValue);
-  const effectiveControlledValue = formValue ?? controlledValue;
-  const currentValue = effectiveControlledValue === undefined ? internalValue : effectiveControlledValue;
-  const effectiveValidationStatus = formError ? "error" : validationStatus;
+  const id = useFormItemInputId(idProp);
+  const [focused, setFocused] = React.useState(false);
+  const radioGroupRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(forwardedRef, radioGroupRef);
+  const lastInitialValueRef = useRef<unknown>(Symbol("initial"));
 
+  // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    setInternalValue(normalizedInitialValue);
-  }, [normalizedInitialValue]);
-
-  useEffect(() => {
-    if (!getFormValue || !setFormValue || fieldName === undefined || getFormValue(fieldName) != null || initialValue === undefined) {
+    if (lastInitialValueRef.current === initialValue) {
       return;
     }
-    setFormValue(fieldName, normalizedInitialValue);
-  }, [fieldName, getFormValue, initialValue, normalizedInitialValue, setFormValue]);
+    lastInitialValueRef.current = initialValue;
+    updateState({ value: convertOptionValue(initialValue) }, { initial: true });
+  }, [initialValue, updateState]);
 
+  // --- Handle autofocus by focusing the first radio option
   useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
+    if (autofocus && radioGroupRef.current) {
+      // Find the first radio item element
+      const firstRadioItem = radioGroupRef.current.querySelector('[role="radio"]');
+      if (firstRadioItem) {
+        (firstRadioItem as HTMLElement).focus();
+      }
     }
-    return registerFormItem({
-      name: fieldName,
-      label,
-      required,
-    });
-  }, [fieldName, label, registerFormItem, required]);
+  }, [autofocus]);
 
-  const updateValue = useCallback((nextValue: unknown) => {
-    setInternalValue(nextValue);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextValue);
-      void validateFormField?.(fieldName, nextValue);
+  // --- Custom focus handler for label clicks
+  const focusActiveOption = useCallback(() => {
+    if (radioGroupRef.current) {
+      // First try to find the currently selected radio option
+      const selectedRadio = radioGroupRef.current.querySelector(
+        '[role="radio"][aria-checked="true"]',
+      );
+      if (selectedRadio) {
+        (selectedRadio as HTMLElement).focus();
+        return;
+      }
+
+      // If no option is selected, focus the first one
+      const firstRadio = radioGroupRef.current.querySelector('[role="radio"]');
+      if (firstRadio) {
+        (firstRadio as HTMLElement).focus();
+      }
     }
-    void onDidChange?.(nextValue);
-  }, [fieldName, onDidChange, setFormValue, validateFormField]);
-
-  const focusFirstOption = useCallback(() => {
-    const firstRadio = groupRef.current?.querySelector<HTMLInputElement>('input[type="radio"]');
-    firstRadio?.focus();
   }, []);
 
-  useImperativeHandle(ref, () => ({
-    setValue: updateValue,
-    get value() {
-      return currentValue;
+  // --- Handle the value change events for this input
+
+  const updateValue = useCallback(
+    (value: string) => {
+      updateState({ value });
+      onDidChange(value);
     },
-  }), [currentValue, updateValue]);
+    [onDidChange, updateState],
+  );
 
-  useEffect(() => {
-    if (!autoFocus) {
-      return;
-    }
-    const firstRadio = groupRef.current?.querySelector<HTMLInputElement>('input[type="radio"]');
-    firstRadio?.focus();
-  }, [autoFocus]);
+  const onInputChange = useCallback(
+    (value: string) => {
+      if (readOnly) return;
+      updateValue(value);
+    },
+    [updateValue, readOnly],
+  );
 
-  const optionRadios = options.map((option, index) => {
-    const inputId = `${id ?? groupId}__option_${index}`;
-    const optionDisabled = !enabled || !option.enabled;
-    const checked = Object.is(option.value, currentValue);
-    const statusClass = checked ? validationStatusClass(effectiveValidationStatus) : undefined;
-    return (
-      <div
-        className={styles.radioOptionContainer}
-        data-radio-item
-        data-testid={option.testId}
-        key={`${String(option.value)}:${index}`}
-      >
-        <input
-          id={inputId}
-          className={cx(styles.radioOption, statusClass)}
-          type="radio"
-          role="radio"
-          name={id ?? groupId}
-          value={String(option.value ?? "")}
-          checked={checked}
-          disabled={optionDisabled}
-          required={required}
-          aria-checked={checked}
-          onChange={() => {
-            if (readOnly || optionDisabled) {
-              return;
-            }
-            updateValue(option.value);
-          }}
-        />
-        <label
-          htmlFor={inputId}
-          className={cx(styles.radioOptionLabel, optionDisabled ? styles.radioOptionDisabled : undefined, statusClass)}
-        >
-          {option.label ?? String(option.value ?? "")}
-        </label>
-      </div>
-    );
+  // --- Handle arrow-key navigation to update the selected value
+  // Radix's built-in mechanism (click-on-focus via isArrowKeyPressedRef) is unreliable
+  // because keyup can fire before the deferred focus, preventing the click.
+  // We handle arrow keys directly on the group root (via event bubbling) so that the
+  // value always follows focus.
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (readOnly || !enabled) return;
+
+      const isVerticalKey = e.key === "ArrowDown" || e.key === "ArrowUp";
+      const isHorizontalKey = e.key === "ArrowRight" || e.key === "ArrowLeft";
+
+      if (!isVerticalKey && !isHorizontalKey) return;
+      if (orientation === "horizontal" && isVerticalKey) return;
+      if (orientation === "vertical" && isHorizontalKey) return;
+
+      const isNext = e.key === "ArrowDown" || e.key === "ArrowRight";
+
+      const radios = Array.from(
+        radioGroupRef.current?.querySelectorAll('[role="radio"]:not(:disabled)') ?? [],
+      ) as HTMLElement[];
+
+      if (radios.length === 0) return;
+
+      const focused =
+        (e.target as HTMLElement).closest?.('[role="radio"]') ??
+        (radioGroupRef.current?.contains(document.activeElement)
+          ? document.activeElement
+          : e.target);
+      const currentIndex = radios.indexOf(focused);
+      if (currentIndex === -1) return;
+
+      const nextIndex = isNext
+        ? (currentIndex + 1) % radios.length
+        : (currentIndex - 1 + radios.length) % radios.length;
+
+      const nextValue = radios[nextIndex].getAttribute("value");
+      if (nextValue != null) {
+        e.preventDefault();
+        onInputChange(nextValue);
+        // Radix's roving-focus does not reliably move focus to the next radio
+        // when the value prop changes via our handler mid-event (same caveat as
+        // the click-on-focus race noted above). Force focus to the new selection
+        // so each keystroke leaves focus on the now-checked option; otherwise
+        // sequential arrow presses stop advancing after one hop and wrap-around
+        // never moves off the second-to-last option.
+        radios[nextIndex].focus();
+      }
+    },
+    [readOnly, enabled, orientation, onInputChange],
+  );
+
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback(
+    (ev: React.FocusEvent<HTMLDivElement, Element>) => {
+      setFocused(true);
+      onFocus?.(ev);
+    },
+    [onFocus],
+  );
+
+  const handleOnBlur = useCallback(
+    (ev: React.FocusEvent<HTMLDivElement, Element>) => {
+      setFocused(false);
+      onBlur?.(ev);
+    },
+    [onBlur],
+  );
+
+  const setValue = useEvent((val: string) => {
+    updateValue(val);
   });
 
-  const group = (
-    <div
-      {...rest}
-      ref={groupRef}
-      id={id}
-      role="radiogroup"
-      aria-required={required || undefined}
-      aria-readonly={readOnly || undefined}
-      aria-disabled={!enabled || undefined}
-      data-testid={dataTestId}
-      className={cx(
-        styles.radioGroupContainer,
-        orientation === "horizontal" ? styles.radioGroupHorizontal : undefined,
-        !enabled ? styles.radioGroupDisabled : undefined,
-        className,
-      )}
-      style={{
-        ...style,
-        ...(gap !== undefined ? { gap } : undefined),
-      }}
-      onFocus={() => void onFocus?.()}
-      onBlur={() => void onBlur?.()}
-    >
-      {extraChildren}
-      {optionRadios}
-    </div>
+  useEffect(() => {
+    registerComponentApi?.({
+      //focus,
+      setValue,
+    });
+  }, [/* focus, */ registerComponentApi, setValue]);
+
+  const contextValue = useMemo(() => {
+    return { value, setValue: updateValue, status: validationStatus, enabled };
+  }, [value, updateValue, validationStatus, enabled]);
+
+  const groupRoot = (
+    <OptionTypeProvider Component={RadioGroupOption}>
+      <RadioGroupStatusContext.Provider value={contextValue}>
+        <InnerRadioGroup.Root
+          {...rest}
+          style={{ ...style, ...(gap != null ? { gap } : undefined) }}
+          ref={composedRef}
+          id={id}
+          onBlur={handleOnBlur}
+          onFocus={handleOnFocus}
+          onKeyDownCapture={handleKeyDown}
+          onValueChange={onInputChange}
+          value={value}
+          disabled={!enabled}
+          required={required}
+          aria-readonly={readOnly}
+          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
+            [styles.focused]: focused,
+            [styles.disabled]: !enabled,
+            [styles.horizontal]: orientation === "horizontal",
+          })}
+        >
+          {children}
+        </InnerRadioGroup.Root>
+      </RadioGroupStatusContext.Provider>
+    </OptionTypeProvider>
   );
 
   if (!label) {
-    return group;
+    return groupRoot;
   }
-
-  const inlineLabel = labelPosition === "start" || labelPosition === "end";
-  const labelBeforeOptions = inlineLabel && (
+  const legendBefore =
     (labelPosition === "start" && direction !== "rtl") ||
-    (labelPosition === "end" && direction === "rtl")
-  );
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
+    (labelPosition === "end" && direction === "rtl");
+  const effectiveRequireLabelMode = requireLabelMode ?? "markRequired";
+  const showRequiredMark =
     Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
+  const showOptionalMark =
     !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
 
   return (
     <fieldset
-      className={styles.radioGroupField}
+      className={classnames(styles.fieldset, {
+        [styles.legendBefore]: legendBefore,
+        [styles.legendAfter]: !legendBefore,
+      })}
+      dir="ltr"
     >
-      <div
-        className={cx(
-          inlineLabel ? styles.radioGroupFieldInline : styles.radioGroupFieldStacked,
-          labelBeforeOptions ? styles.radioGroupLabelBefore : styles.radioGroupLabelAfter,
-        )}
+      <legend
+        data-part-id="label"
+        data-xmlui-part="label"
+        className={styles.legend}
+        onClick={focusActiveOption}
       >
-        <legend
-          className={styles.radioGroupLabel}
-          onClick={() => {
-            focusFirstOption();
-            void onFocus?.();
-          }}
-        >
-          {label}
-          {showRequiredIndicator ? <span className={styles.requiredIndicator}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.optionalIndicator}>(Optional)</span> : null}
-        </legend>
-        {group}
-      </div>
+        {label}
+        {showRequiredMark && <span className={styles.requiredMark}>*</span>}
+        {showOptionalMark && <span className={styles.optionalMark}>(Optional)</span>}
+      </legend>
+      {groupRoot}
     </fieldset>
   );
 }));
 
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
+export const RadioGroupOption = ({
+  value,
+  label,
+  enabled = true,
+  optionRenderer,
+  style,
+  className,
+  testId,
+}: Option) => {
+  const id = useId();
+  const radioGroupContext = useContext(RadioGroupStatusContext);
 
-function validationStatusClass(status: string | undefined): string | undefined {
-  switch (status) {
-    case "error":
-      return styles.radioOptionError;
-    case "warning":
-      return styles.radioOptionWarning;
-    case "valid":
-    case "success":
-      return styles.radioOptionValid;
-    default:
-      return undefined;
-  }
-}
+  const statusStyles = useMemo(
+    () => ({
+      [styles.disabled]: radioGroupContext.enabled === false ? true : !enabled,
+      [styles.error]: value === radioGroupContext.value && radioGroupContext.status === "error",
+      [styles.warning]: value === radioGroupContext.value && radioGroupContext.status === "warning",
+      [styles.valid]: value === radioGroupContext.value && radioGroupContext.status === "valid",
+    }),
+    [enabled, radioGroupContext, value],
+  );
 
-function cx(...parts: Array<string | undefined | false>): string {
-  return parts.filter(Boolean).join(" ");
-}
+  const item = useMemo(() => {
+    // When optionRenderer is present, it will render the children in the outer label
+    // So we only render the radio button itself, not a separate label
+    if (optionRenderer) {
+      return (
+        <UnwrappedRadioItem
+          id={id}
+          value={value}
+          checked={value === radioGroupContext.value}
+          disabled={!enabled}
+          statusStyles={statusStyles}
+        />
+      );
+    }
+
+    // Without optionRenderer, render the standard radio + label structure
+    return (
+      <>
+        <UnwrappedRadioItem
+          id={id}
+          value={value}
+          checked={value === radioGroupContext.value}
+          disabled={!enabled}
+          statusStyles={statusStyles}
+        />
+        <label htmlFor={id} className={classnames(styles.label, statusStyles)}>
+          {label ?? value}
+        </label>
+      </>
+    );
+  }, [enabled, id, label, optionRenderer, statusStyles, value, radioGroupContext]);
+
+  return (
+    <div
+      key={id}
+      className={classnames(styles.radioOptionContainer, className)}
+      style={style}
+      data-radio-item
+      data-testid={testId}
+    >
+      {!!optionRenderer ? (
+        <label htmlFor={id} className={styles.optionLabel}>
+          <div className={styles.itemContainer}>{item}</div>
+          {optionRenderer({
+            $checked: value === radioGroupContext.value,
+            $setChecked: radioGroupContext.setValue,
+          })}
+        </label>
+      ) : (
+        item
+      )}
+    </div>
+  );
+};

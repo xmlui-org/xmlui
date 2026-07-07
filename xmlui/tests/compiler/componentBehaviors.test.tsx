@@ -128,12 +128,15 @@ describe("component behavior attachment", () => {
       <input data-base-renderer="yes" />,
     );
 
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('data-xmlui-behavior="tooltip"');
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('title="Helpful text"');
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('data-xmlui-behavior="label"');
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('data-xmlui-part="label"');
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('data-xmlui-variant="quiet"');
-    expect(renderToStaticMarkup(<>{node}</>)).toContain('data-base-renderer="yes"');
+    const markup = renderToStaticMarkup(<>{node}</>);
+
+    expect(markup).toContain('data-xmlui-behavior="tooltip"');
+    expect(markup).toContain('title="Helpful text"');
+    expect(markup).toContain("xmlui-FormItem");
+    expect(markup).toContain('data-part-id="label"');
+    expect(markup).toContain('data-part-id="labeledItem"');
+    expect(markup).toContain('data-xmlui-variant="quiet"');
+    expect(markup).toContain('data-base-renderer="yes"');
   });
 
   it("does not attach behavior when metadata excludes it or no trigger prop is present", () => {

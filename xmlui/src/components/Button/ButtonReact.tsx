@@ -1,160 +1,152 @@
-import type { CSSProperties, MouseEvent, ReactNode } from "react";
-import { forwardRef, useEffect, useRef } from "react";
+import React, { type ForwardedRef, forwardRef, memo, useRef, useEffect } from "react";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_ICON } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
-import { defaultProps } from "./Button.defaults";
 import styles from "./Button.module.scss";
 
-export type ButtonProps = {
-  id?: string;
-  type?: "button" | "submit" | "reset" | string;
-  variant?: string;
-  themeColor?: string;
-  size?: string;
-  icon?: ReactNode;
-  iconPosition?: string;
-  contentPosition?: string;
-  orientation?: string;
+import {
+  buttonVariantValues,
+  isSizeType,
+  type SizeType,
+  type AlignmentOptions,
+  type ButtonThemeColor,
+  type ButtonType,
+  type ButtonVariant,
+  type IconPosition,
+  type OrientationOptions,
+} from "../abstractions";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { VisuallyHidden } from "../VisuallyHidden";
+import { defaultProps } from "./Button.defaults";
+
+type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "form"> & {
+  type?: ButtonType;
+  variant?: ButtonVariant;
+  themeColor?: ButtonThemeColor;
+  size?: SizeType;
+  icon?: React.ReactNode;
+  iconPosition?: IconPosition;
+  contentPosition?: AlignmentOptions;
+  orientation?: OrientationOptions;
+  formId?: string;
   contextualLabel?: string;
-  autoFocus?: boolean;
-  disabled?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  "data-part-id"?: string;
-  "data-xmlui-part"?: string;
-  "data-testid"?: string;
-  onClick?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
-  onContextMenu?: (event: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  children?: ReactNode;
+  classes?: Record<string, string>;
 };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+
+export const Button = memo(forwardRef(function Button(
   {
+    id,
     type = defaultProps.type,
-    variant = defaultProps.variant,
-    themeColor = defaultProps.themeColor,
-    size = defaultProps.size,
     icon,
     iconPosition = defaultProps.iconPosition,
     contentPosition = defaultProps.contentPosition,
     orientation = defaultProps.orientation,
-    contextualLabel,
-    autoFocus = defaultProps.autoFocus,
+    variant = defaultProps.variant,
+    themeColor = defaultProps.themeColor,
+    size = defaultProps.size,
     disabled,
-    className,
-    style,
     children,
+    formId,
+    onClick,
+    onContextMenu,
+    onFocus,
+    onBlur,
+    style,
+    classes,
+    className,
+    autoFocus = defaultProps.autoFocus,
+    contextualLabel,
     ...rest
-  },
-  ref,
+  }: Props,
+  ref: ForwardedRef<HTMLButtonElement>,
 ) {
-  const innerRef = useRef<HTMLButtonElement | null>(null);
+  const innerRef = useRef<HTMLButtonElement>(null);
+  const composedRef = useComposedRefs(ref, innerRef);
   useEffect(() => {
-    if (!autoFocus) {
-      return;
-    }
+    if (!autoFocus) return;
     const timeoutId = setTimeout(() => innerRef.current?.focus(), 0);
     return () => clearTimeout(timeoutId);
   }, [autoFocus]);
 
-  const normalizedIcon = normalizeIcon(icon);
+  if (!variant || !buttonVariantValues.includes(variant as ButtonVariant)) {
+    variant = defaultProps.variant;
+  }
   const iconToLeft = iconPosition === "start";
-  const hasChildren = children !== undefined && children !== null;
-  const normalizedVariant = validVariant(variant);
-  const normalizedThemeColor = validThemeColor(themeColor);
-  const normalizedSize = validSize(size);
-  const normalizedOrientation = validOrientation(orientation);
 
+  if (!isSizeType(size)) {
+    size = defaultProps.size;
+  }
   return (
     <button
       {...rest}
-      ref={(node) => {
-        innerRef.current = node;
-        if (typeof ref === "function") {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      }}
-      type={normalizeButtonType(type)}
-      className={cx(
+      id={id}
+      type={type}
+      ref={composedRef}
+      className={classnames(
         styles.button,
-        normalizedOrientation === "horizontal" ? styles.buttonHorizontal : styles.buttonVertical,
-        styles[normalizedSize],
-        variantThemeClass(normalizedVariant, normalizedThemeColor),
-        contentPosition === "start" ? styles.alignStart : undefined,
-        contentPosition === "end" ? styles.alignEnd : undefined,
+        {
+          [styles.buttonHorizontal]: orientation === "horizontal",
+          [styles.buttonVertical]: orientation === "vertical",
+          [styles.xs]: size === "xs",
+          [styles.sm]: size === "sm",
+          [styles.md]: size === "md",
+          [styles.lg]: size === "lg",
+          [styles.solidPrimary]: variant === "solid" && themeColor === "primary",
+          [styles.solidSecondary]: variant === "solid" && themeColor === "secondary",
+          [styles.solidAttention]: variant === "solid" && themeColor === "attention",
+          [styles.outlinedPrimary]: variant === "outlined" && themeColor === "primary",
+          [styles.outlinedSecondary]: variant === "outlined" && themeColor === "secondary",
+          [styles.outlinedAttention]: variant === "outlined" && themeColor === "attention",
+          [styles.ghostPrimary]: variant === "ghost" && themeColor === "primary",
+          [styles.ghostSecondary]: variant === "ghost" && themeColor === "secondary",
+          [styles.ghostAttention]: variant === "ghost" && themeColor === "attention",
+          [styles.alignStart]: contentPosition === "start",
+          [styles.alignEnd]: contentPosition === "end",
+        },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       disabled={disabled}
+      form={formId}
       style={style}
-      data-xmlui-button-variant={normalizedVariant}
-      data-xmlui-button-theme-color={normalizedThemeColor}
-      data-xmlui-button-size={normalizedSize}
-      data-xmlui-button-orientation={normalizedOrientation}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
-      {normalizedIcon && iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
+      {icon && iconToLeft && (
+        <Part partId={PART_ICON}>
+          <span className={classes?.[PART_ICON]}>{icon}</span>
+        </Part>
+      )}
       {children}
-      {normalizedIcon && !hasChildren ? (
-        <span className={styles.visuallyHidden}>{contextualLabel ?? normalizedIcon}</span>
-      ) : null}
-      {normalizedIcon && !iconToLeft ? <ButtonIcon icon={normalizedIcon} /> : null}
+      {icon && !children && <IconLabel icon={icon} accessibleName={contextualLabel} />}
+      {icon && !iconToLeft && (
+        <Part partId={PART_ICON}>
+          <span className={classes?.[PART_ICON]}>{icon}</span>
+        </Part>
+      )}
     </button>
+  );
+}));
+
+type IconLabelProps = {
+  icon: React.ReactNode;
+  accessibleName?: string;
+};
+
+const IconLabel = memo(function IconLabel({ icon, accessibleName = "" }: IconLabelProps) {
+  const iconProps = React.isValidElement(icon)
+    ? (icon.props as Record<string, unknown>)
+    : undefined;
+  const label = accessibleName || (iconProps?.name as string) || (iconProps?.alt as string) || "";
+  return (
+    <VisuallyHidden>
+      <span>{label}</span>
+    </VisuallyHidden>
   );
 });
 
-function validSize(value: string): string {
-  return ["xs", "sm", "md", "lg"].includes(value) ? value : defaultProps.size;
-}
-
-function validVariant(value: string): string {
-  return ["solid", "outlined", "ghost"].includes(value) ? value : defaultProps.variant;
-}
-
-function validThemeColor(value: string): string {
-  return ["primary", "secondary", "attention"].includes(value) ? value : defaultProps.themeColor;
-}
-
-function validOrientation(value: string): string {
-  return value === "vertical" ? "vertical" : defaultProps.orientation;
-}
-
-function normalizeButtonType(value: string): "button" | "submit" | "reset" {
-  return value === "submit" || value === "reset" ? value : "button";
-}
-
-function normalizeIcon(icon: ReactNode): string | undefined {
-  if (typeof icon !== "string") {
-    return undefined;
-  }
-  const trimmed = icon.trim();
-  return trimmed !== "" && trimmed !== "_" && !trimmed.startsWith("() =>") ? icon : undefined;
-}
-
-function ButtonIcon({ icon }: { icon: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      data-icon={icon}
-      data-xmlui-component="Button"
-      data-xmlui-part="icon"
-      className={styles.icon}
-      focusable="false"
-      viewBox="0 0 16 16"
-      width="16"
-      height="16"
-    >
-      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function variantThemeClass(variant: string, themeColor: string): string | undefined {
-  const className = `${variant}${themeColor[0]?.toUpperCase() ?? ""}${themeColor.slice(1)}`;
-  return styles[className];
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}

@@ -247,4 +247,40 @@ describe("parseXmlui", () => {
       "Expected expression.",
     );
   });
+
+  it("keeps escaped JavaScript block braces literal in string props", () => {
+    const document = parseXmlui(`
+      <App>
+        <VStack var.messageStatus="Ready to send">
+          <Card title="Status: {messageStatus}" />
+          <IFrame
+            srcdoc="
+              <script>
+                window.addEventListener('message', (event) => \\{
+                  document.body.innerHTML =
+                    '<h1>Message: ' + JSON.stringify(event.data) + '</h1>';
+                });
+              </script>
+              <h1>Waiting for message...</h1>
+            " />
+        </VStack>
+      </App>
+    `);
+
+    const stack = document.root.children[0];
+    if (stack.kind !== "element") {
+      throw new Error("Expected VStack element.");
+    }
+    const iframe = stack.children[1];
+    if (iframe.kind !== "element") {
+      throw new Error("Expected IFrame element.");
+    }
+
+    expect(iframe.parsed?.props?.srcdoc).toMatchObject([
+      {
+        kind: "literal",
+      },
+    ]);
+    expect(iframe.props.srcdoc).toContain("\\{");
+  });
 });

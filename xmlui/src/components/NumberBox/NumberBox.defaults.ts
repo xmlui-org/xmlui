@@ -1,12 +1,18 @@
+import { noop } from "../../components-core/constants";
+import { NUMBERBOX_MAX_VALUE } from "./numberbox-abstractions";
+import type { ValidationStatus } from "../abstractions";
+
 export const defaultProps = {
   enabled: true,
-  initialValue: undefined,
-  validationStatus: "none",
+  validationStatus: "none" as ValidationStatus,
   hasSpinBox: true,
-  step: 1,
   integersOnly: false,
   zeroOrPositive: false,
-  min: -999999999999999,
-  max: 999999999999999,
-  invalidMessages: [] as string[],
+  min: -NUMBERBOX_MAX_VALUE,
+  max: NUMBERBOX_MAX_VALUE,
+  step: 1,
+  updateState: noop,
+  onDidChange: noop,
+  onFocus: noop,
+  onBlur: noop,
 };

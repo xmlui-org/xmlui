@@ -273,7 +273,7 @@ class ScriptParser {
         } else {
           this.consume();
         }
-        const alternate = this.parseExpression(1);
+        const alternate = this.parseExpression();
         left = this.createConditionalExpression(left, question, consequent, alternate);
         continue;
       }
@@ -529,6 +529,14 @@ class ScriptParser {
   private parseObjectKey(): IdentifierNode | LiteralNode {
     if (this.at(ScriptTokenKind.Identifier)) {
       return this.createIdentifier(this.consume());
+    }
+    if (this.at(ScriptTokenKind.Dollar)) {
+      const dollar = this.consume();
+      if (!this.at(ScriptTokenKind.Identifier)) {
+        return this.createIdentifierFromError(this.expected("XS104", "Expected identifier after '$'."));
+      }
+      const identifier = this.consume();
+      return this.createIdentifier(identifier, `$${identifier.text}`, dollar);
     }
     if (this.at(ScriptTokenKind.StringLiteral) || this.at(ScriptTokenKind.NumberLiteral)) {
       return this.createLiteral(this.consume());

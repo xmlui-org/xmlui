@@ -27,18 +27,32 @@
     "build-vscode-extension": "npm --workspace xmlui-vscode run build:vsix",
     "test": "npm --workspace xmlui run test",
     "test-smoke": "npm --workspace xmlui run test:e2e",
+    "test:core:e2e": "npm --workspace xmlui run test:e2e",
+    "test:extensions:e2e": "playwright test -c playwright.extensions.config.ts",
+    "test:website:e2e": "npm --workspace xmlui-website run test:e2e",
     "test-integration": "node scripts/phase1-integration-smoke.mjs",
     "test:vscode": "npm --workspace xmlui-vscode run test",
-    "test:e2e": "npm --workspace xmlui run test:e2e",
+    "test:e2e": "npm run test:core:e2e && npm run test:extensions:e2e && npm run test:website:e2e",
     "compatibility:sweep": "npm --workspace xmlui run compatibility:sweep",
     "compatibility:perf": "npm --workspace xmlui run compatibility:perf",
     "build:counter-badge": "npm --workspace xmlui-counter-badge run build",
     "build:counter-badge:metadata": "npm --workspace xmlui-counter-badge run build:metadata",
-    "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata",
+    "build:website-extensions": "npm --workspace xmlui-docs-blocks run build && npm --workspace xmlui-website-blocks run build && npm --workspace xmlui-search run build && npm --workspace xmlui-masonry run build && npm --workspace xmlui-gauge run build && npm --workspace xmlui-echart run build && npm --workspace xmlui-calendar run build && npm --workspace xmlui-grid-layout run build && npm --workspace xmlui-tiptap-editor run build",
+    "build:website-extensions:metadata": "npm --workspace xmlui-docs-blocks run build:metadata && npm --workspace xmlui-website-blocks run build:metadata && npm --workspace xmlui-search run build:metadata && npm --workspace xmlui-masonry run build:metadata && npm --workspace xmlui-gauge run build:metadata && npm --workspace xmlui-echart run build:metadata && npm --workspace xmlui-calendar run build:metadata && npm --workspace xmlui-grid-layout run build:metadata && npm --workspace xmlui-tiptap-editor run build:metadata",
+    "verify:website-extensions": "npm run build:website-extensions && npm run build:website-extensions:metadata && npm run test:extensions:e2e",
+    "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata && npm run build:website-extensions && npm run build:website-extensions:metadata",
+    "verify:website": "npm --workspace xmlui-website run build && npm --workspace xmlui-website run build-ssg && npm --workspace xmlui-website run verify:preview-ssg && npm run test:website:e2e",
     "build-playground": "node scripts/compatibility-missing.mjs COMP-0006 build-playground"
   },
   "optionalDependencies": {
     "@rolldown/binding-darwin-arm64": "^1.1.3",
     "lightningcss-darwin-arm64": "^1.32.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-visually-hidden": "^1.2.4",
+    "react-helmet-async": "^1.3.0",
+    "use-context-selector": "^1.4.1"
   }
 }

@@ -40,9 +40,9 @@ describe("component metadata compatibility shape", () => {
     });
     expect(AppMd.props).toHaveProperty("layout");
     expect(AppMd.props?.logoTemplate.valueType).toBe("ComponentDef");
-    expect(AppMd.themeVars).toHaveProperty("backgroundColor-content-App");
-    expect(AppMd.themeVars).toHaveProperty("maxWidth-content-App--withToc");
-    expect(AppMd.themeVars).not.toHaveProperty("backgroundColor-App");
+    expect(AppMd.defaultThemeVars).toHaveProperty("backgroundColor-content-App");
+    expect(AppMd.defaultThemeVars).toHaveProperty("maxWidth-content-App");
+    expect(AppMd.defaultThemeVars).not.toHaveProperty("backgroundColor-App");
 
     expect(ButtonMd.props?.enabled).toMatchObject({
       valueType: "boolean",
@@ -51,7 +51,7 @@ describe("component metadata compatibility shape", () => {
     expect(ButtonMd.parts).toHaveProperty("icon");
     expect(ButtonMd.events?.click.signature).toBe("click(event: MouseEvent): void");
     expect(ButtonMd.events).toHaveProperty("contextMenu");
-    expect(ButtonMd.themeVars).toHaveProperty("padding-Button");
+    expect(ButtonMd.defaultThemeVars).toHaveProperty("padding-Button");
 
     expect(TextMd.props?.variant).toMatchObject({
       valueType: "string",

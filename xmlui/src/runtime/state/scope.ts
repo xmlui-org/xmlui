@@ -57,10 +57,10 @@ export function createRuntimeScope({
     contextValues,
     references,
     slots,
-    routing,
+    routing: routing ?? parent?.routing,
     toast: toast ?? parent?.toast,
     i18n: i18n ?? parent?.i18n,
-    emitEvent,
+    emitEvent: emitEvent ?? parent?.emitEvent,
     extensionFunctions: extensionFunctions ?? parent?.extensionFunctions ?? {},
   };
 }
@@ -162,6 +162,10 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
   const routeValue = readRouteContext(scope, name);
   if (routeValue !== undefined) {
     return routeValue;
+  }
+  const builtInReference = readBuiltInReference(scope, name);
+  if (builtInReference !== undefined) {
+    return builtInReference;
   }
   return readContext(scope.parent, name);
 }
@@ -283,6 +287,9 @@ function readActionPath(value: unknown, path: string): unknown {
 }
 
 function readBuiltInReference(scope: RuntimeScope | undefined, name: string): unknown {
+  if (name === "window") {
+    return typeof window === "undefined" ? undefined : window;
+  }
   if (name === "Array") {
     return Array;
   }
@@ -294,6 +301,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   }
   if (name === "Date") {
     return Date;
+  }
+  if (name === "Math") {
+    return Math;
   }
   if (name === "getDate") {
     return getDate;

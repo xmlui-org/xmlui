@@ -347,7 +347,7 @@ test.describe("Basic functionality", () => {
     expect(buttonBox.width).toBeCloseTo(expectedWidth, -1); // Allow 10px tolerance
   });
 
-  test.skip("FormItem with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
+  test("FormItem with width='50%' renders correctly in FlowLayout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Form>
         <FlowLayout testId="layout" width="600px" gap="0">
@@ -433,7 +433,7 @@ test.describe("Basic functionality", () => {
     expect(buttonBox.width).toBeLessThanOrEqual(300);
   });
 
-  test.skip("multiple items with different widths render correctly", async ({ page, initTestBed }) => {
+  test("multiple items with different widths render correctly", async ({ page, initTestBed }) => {
     await initTestBed(`
       <FlowLayout width="600px">
         <Button testId="btn1" width="25%">25%</Button>
@@ -465,8 +465,7 @@ test.describe("Basic functionality", () => {
     expect(box3.width).toBeLessThanOrEqual(150);
   });
 
-  // P7D follow-up: scroller fade overlays depend on the shared overlay scrollbar layer.
-  test.skip("showScrollerFade is true by default", async ({ initTestBed, page }) => {
+  test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="overlay">
         <Stack height="500px">
@@ -480,7 +479,7 @@ test.describe("Basic functionality", () => {
     await expect(fadeOverlays).toHaveCount(2);
   });
 
-  test.skip("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
+  test("showScrollerFade displays fade indicators", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
         <Stack height="500px">
@@ -494,7 +493,7 @@ test.describe("Basic functionality", () => {
     await expect(fadeOverlays).toHaveCount(2);
   });
 
-  test.skip("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
+  test("bottom fade is visible when not at bottom", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
         <Stack height="500px">
@@ -512,7 +511,7 @@ test.describe("Basic functionality", () => {
     await expect(bottomFade).toBeVisible();
   });
 
-  test.skip("top fade appears when scrolled down", async ({ initTestBed, page }) => {
+  test("top fade appears when scrolled down", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="overlay" showScrollerFade="true">
         <Stack height="500px">
@@ -535,7 +534,7 @@ test.describe("Basic functionality", () => {
     await expect(topFade).toBeVisible();
   });
 
-  test.skip("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
+  test("showScrollerFade works with whenMouseOver scrollStyle", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="whenMouseOver" showScrollerFade="true">
         <Stack height="500px">
@@ -552,7 +551,7 @@ test.describe("Basic functionality", () => {
     await expect(fadeOverlays).toHaveCount(2);
   });
 
-  test.skip("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
+  test("showScrollerFade works with whenScrolling scrollStyle", async ({ initTestBed, page }) => {
     await initTestBed(`
       <FlowLayout testId="layout" height="200px" scrollStyle="whenScrolling" showScrollerFade="true">
         <Stack height="500px">
@@ -805,7 +804,7 @@ test.describe("Edge cases", () => {
     await expect(layout).toBeEmpty();
   });
 
-  test.skip("component handles very long items correctly (#1)", async ({ page, initTestBed }) => {
+  test("component handles very long items correctly (#1)", async ({ page, initTestBed }) => {
     await initTestBed(`
       <FlowLayout width="200px">
         <Text testId="item1">This is a very long item that should wrap to the next line because it's too long</Text>
@@ -821,7 +820,7 @@ test.describe("Edge cases", () => {
     expect(rect2.y).toBeGreaterThan(rect1.y + rect1.height);
   });
 
-  test.skip("component handles very long items correctly (#2)", async ({ page, initTestBed }) => {
+  test("component handles very long items correctly (#2)", async ({ page, initTestBed }) => {
     await initTestBed(`
       <FlowLayout width="200px">
         <Text testId="item1">Short item</Text>
@@ -880,7 +879,7 @@ test.describe("Edge cases", () => {
     expect(width).toEqual(expectedWidth);
   });
 
-  test.skip("4 item 25% width", async ({ page, initTestBed }) => {
+  test("4 item 25% width", async ({ page, initTestBed }) => {
     const layoutWidth = "400px";
     const itemWidthPercent = "25%";
     const itemHeight = 64;
@@ -939,8 +938,7 @@ test.describe("Edge cases", () => {
     expect(layoutHeight).toEqual(expectedHeight);
   });
 
-  // P7D follow-up: star-sized flow items require old FlowLayout's proportional width solver.
-  test.skip("item with * width fills row", async ({ page, initTestBed }) => {
+  test("item with * width fills row", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidth = "*";
     await initTestBed(`
@@ -961,7 +959,7 @@ test.describe("Edge cases", () => {
   });
 
   // rowGap applies when wrapping
-  test.skip("wrap with rowGap", async ({ page, initTestBed }) => {
+  test("wrap with rowGap", async ({ page, initTestBed }) => {
     const itemHeight = 64;
     const itemWidthPercent = "50%";
     const rowGap = 24;
@@ -1121,7 +1119,7 @@ test.describe("Edge cases", () => {
     expect(result).toEqual(true);
   });
 
-  test.skip("multiple star sized next to each other doesn't break", async ({ page, initTestBed }) => {
+  test("multiple star sized next to each other doesn't break", async ({ page, initTestBed }) => {
     await initTestBed(`
     <FlowLayout testId="layout" width="100px" columnGap="10px">
       <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>
@@ -1141,7 +1139,7 @@ test.describe("Edge cases", () => {
     expect(blueWidth).toEqual(40);
   });
 
-  test.skip("SpaceFiller breaks star sized items", async ({ page, initTestBed }) => {
+  test("SpaceFiller breaks star sized items", async ({ page, initTestBed }) => {
     await initTestBed(`
     <FlowLayout testId="layout" width="100px" gap="10px">
       <Stack testId="red" backgroundColor="red" height="10px" width="20px"/>
@@ -1170,8 +1168,6 @@ test.describe("Edge cases", () => {
 // =============================================================================
 
 test.describe("Non-visual components", () => {
-  test.skip(true, "P7D follow-up: FlowLayout needs layout-context hints to avoid wrapping non-visual children.");
-
   test("ChangeListener does not create wrapper div or affect layout", async ({ page, initTestBed }) => {
     await initTestBed(`
       <FlowLayout testId="layout" width="300px" gap="10px">

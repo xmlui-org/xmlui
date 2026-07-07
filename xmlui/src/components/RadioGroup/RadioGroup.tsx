@@ -1,78 +1,85 @@
+import React from "react";
 import type { ReactNode } from "react";
+import styles from "./RadioGroup.module.scss";
 
-import { createMetadata, dAutoFocus, dDidChange, dEnabled, dGotFocus, dInitialValue, dLostFocus, dReadonly, dRequired } from "../../component-core/metadata/helpers";
-import type { XmluiElement, XmluiNode } from "../../compiler/ir";
-import { wrapComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
-import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
-import { extractScssThemeVars } from "../../styling/theme";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import {
+  createMetadata,
+  dAutoFocus,
+  dDidChange,
+  dEnabled,
+  dGotFocus,
+  dInitialValue,
+  dInternal,
+  dLostFocus,
+  dOrientation,
+  dReadonly,
+  dRequired,
+  dValidationStatus,
+} from "../metadata-helpers";
 import { defaultProps } from "./RadioGroup.defaults";
-import { RadioGroupNative, type RadioGroupApi, type RadioGroupOption } from "./RadioGroupReact";
+import { RadioGroup } from "./RadioGroupReact";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { evaluateExpressionOrText } from "../../runtime/rendering/bindings";
+import { useFormContext } from "../Form/FormContext";
 
 const COMP = "RadioGroup";
-const RGOption = "RadioGroupOption";
-
-const radioGroupStylesSource = `
-$gap-RadioGroupOption: createThemeVar("gap-RadioGroupOption");
-$gap-RadioGroup: createThemeVar("gap-RadioGroup");
-$borderWidth-RadioGroupOption: createThemeVar("borderWidth-RadioGroupOption");
-$borderWidth-RadioGroupOption-validation: createThemeVar("borderWidth-RadioGroupOption-validation");
-$backgroundColor-RadioGroup: createThemeVar("Input:backgroundColor-RadioGroup");
-$backgroundColor-RadioGroupOption: createThemeVar("Input:backgroundColor-RadioGroupOption");
-$backgroundColor-checked-RadioGroupOption: createThemeVar("Input:backgroundColor-checked-RadioGroupOption");
-$backgroundColor-checked-RadioGroupOption--disabled: createThemeVar("Input:backgroundColor-checked-RadioGroupOption--disabled");
-$textColor-RadioGroupOption--disabled: createThemeVar("Input:textColor-RadioGroupOption--disabled");
-$fontSize-RadioGroupOption: createThemeVar("Input:fontSize-RadioGroupOption");
-$fontWeight-RadioGroupOption: createThemeVar("Input:fontWeight-RadioGroupOption");
-$textColor-RadioGroupOption: createThemeVar("Input:textColor-RadioGroupOption");
-$textColor-RadioGroupOption--error: createThemeVar("Input:textColor-RadioGroupOption--error");
-$textColor-RadioGroupOption--warning: createThemeVar("Input:textColor-RadioGroupOption--warning");
-$textColor-RadioGroupOption--success: createThemeVar("Input:textColor-RadioGroupOption--success");
-`;
+const RGOption = `RadioGroupOption`;
 
 export const RadioGroupMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
-    "`RadioGroup` creates a mutually exclusive selection interface where users choose one option from a group.",
+    "`RadioGroup` creates a mutually exclusive selection interface where users can " +
+    "choose only one option from a group of radio buttons. It manages the selection " +
+    "state and ensures that selecting one option automatically deselects all others in " +
+    "the group." +
+    "Radio options store their values as strings. Numbers and booleans are converted to strings " +
+    "when assigned, while objects, functions and arrays default to an empty string unless resolved " +
+    "via binding expressions.",
   parts: {
-    label: { description: "The label displayed for the radio group." },
+    label: {
+      description: "The label displayed for the radio group.",
+    }
+  },
+  contextVars: {
+    $checked: dInternal("Current checked state, injected into the option template."),
+    $setChecked: dInternal("Setter for the checked state, injected into the option template."),
   },
   props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
-    bindTo: { description: "Binds the radio group to form data.", valueType: "string" },
-    initialValue: { ...dInitialValue(defaultProps.initialValue, "string"), defaultValue: defaultProps.initialValue },
-    value: { description: "Controlled value.", valueType: "any" },
-    label: { description: "Radio group label.", valueType: "string" },
-    requireLabelMode: {
-      description: "Controls required/optional label indicators for this radio group.",
+    initialValue: {
+      ...dInitialValue(),
       valueType: "string",
-      availableValues: ["markRequired", "markOptional", "markBoth"],
-    },
-    labelPosition: {
-      description: "Controls where the label is placed relative to the options.",
-      valueType: "string",
-      availableValues: ["start", "end", "top", "bottom"],
-      defaultValue: "top",
-    },
-    direction: {
-      description: "Sets text direction for label placement.",
-      valueType: "string",
-      availableValues: ["ltr", "rtl"],
-      defaultValue: "ltr",
+      defaultValue: defaultProps.initialValue,
     },
     autoFocus: dAutoFocus(),
-    required: { ...dRequired(), defaultValue: defaultProps.required },
+    required: {
+      ...dRequired(),
+      defaultValue: defaultProps.required,
+    },
     readOnly: dReadonly(),
-    enabled: { ...dEnabled(), defaultValue: defaultProps.enabled },
-    validationStatus: { description: "Validation status.", valueType: "string", defaultValue: defaultProps.validationStatus },
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     orientation: {
-      description: "Sets the layout direction of radio options.",
-      valueType: "string",
-      availableValues: ["horizontal", "vertical"],
-      defaultValue: defaultProps.orientation,
+      ...dOrientation(defaultProps.orientation),
+      description:
+        "This property sets the layout direction of the radio options within the group. " +
+        "Use `horizontal` to arrange them in a row, or `vertical` (default) to stack them.",
     },
     gap: {
-      description: "Sets the gap between radio options.",
+      description:
+        "This property sets the gap between the radio options in the group. " +
+        "Accepts any valid CSS size value or a theme token (e.g. `$gap-normal`).",
       valueType: "string",
       defaultValue: defaultProps.gap,
     },
@@ -84,78 +91,267 @@ export const RadioGroupMd = createMetadata({
   },
   apis: {
     value: {
-      description: "Returns the current value.",
+      description: `This API retrieves the current value of the \`${COMP}\`. You can use it to get the value programmatically.`,
       signature: "get value(): string | undefined",
     },
     setValue: {
-      description: "Sets the current value.",
+      description: `This API sets the value of the \`${COMP}\`. You can use it to programmatically change the value.`,
       signature: "setValue(value: string): void",
+      parameters: {
+        value: "The new value to set.",
+      },
     },
   },
-  themeVars: extractScssThemeVars(radioGroupStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`gap-${COMP}`]: "$gap-normal",
+    [`gap-RadioGroup`]: "$gap-normal",
     [`gap-${RGOption}`]: "0.25em",
     [`borderWidth-${RGOption}`]: "1px",
-    [`borderWidth-${RGOption}-validation`]: "2px",
-    [`backgroundColor-${COMP}`]: "transparent",
-    [`backgroundColor-${RGOption}`]: "$color-surface-0",
+    [`borderWidth-${RGOption}-validation`]: `2px`,
+
+    [`borderColor-${RGOption}--default`]: "$color-surface-500",
+    [`borderColor-checked-${RGOption}`]: "$color-primary-500",
+    [`borderColor-${RGOption}--default--hover`]: "$color-surface-700",
+    [`borderColor-${RGOption}--default--active`]: "$color-primary-500",
+    [`borderColor-${RGOption}--error`]: `$borderColor-Input--error`,
+    [`borderColor-${RGOption}--warning`]: `$borderColor-Input--warning`,
+    [`borderColor-${RGOption}--success`]: `$borderColor-Input--success`,
+
+    [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
     [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
-    [`backgroundColor-checked-${RGOption}--disabled`]: "$textColor--disabled",
+    [`backgroundColor-checked-${RGOption}--disabled`]: `$textColor--disabled`,
+
     [`fontSize-${RGOption}`]: "$fontSize-sm",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
-    [`textColor-${RGOption}`]: "$textColor-primary",
     [`textColor-${RGOption}--disabled`]: "$textColor--disabled",
-    [`textColor-${RGOption}--error`]: "$textColor-danger",
-    [`textColor-${RGOption}--warning`]: "$textColor-warning",
-    [`textColor-${RGOption}--success`]: "$textColor-success",
   },
 });
 
-export const radioGroupRenderer = wrapComponent({
-  name: COMP,
-  metadata: RadioGroupMd,
-  renderer: ({ adapter }) => {
-    const apiRef = { current: null as RadioGroupApi | null };
+type ThemedRadioGroupProps = React.ComponentPropsWithoutRef<typeof RadioGroup>;
+
+export const ThemedRadioGroup = React.forwardRef<React.ElementRef<typeof RadioGroup>, ThemedRadioGroupProps>(
+  function ThemedRadioGroup({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(RadioGroupMd);
     return (
-      <RadioGroupNative
-        {...adapter.rootAttrs()}
-        ref={(api) => {
-          apiRef.current = api;
-          if (api) {
-            adapter.registerApi(api as unknown as Record<string, unknown>);
-          }
-        }}
-        id={adapter.stringProp("id")}
-        bindTo={adapter.stringProp("bindTo")}
-        initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
-        value={adapter.prop("value")}
-        enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
-        readOnly={adapter.booleanProp("readOnly", defaultProps.readOnly)}
-        required={adapter.booleanProp("required", defaultProps.required)}
-        autoFocus={adapter.booleanProp("autoFocus", false)}
-        orientation={adapter.stringProp("orientation", defaultProps.orientation)}
-        gap={adapter.stringProp("gap")}
-        validationStatus={adapter.stringProp("validationStatus", defaultProps.validationStatus)}
-        label={adapter.stringProp("label")}
-        labelPosition={adapter.stringProp("labelPosition", "top")}
-        requireLabelMode={adapter.stringProp("requireLabelMode")}
-        direction={adapter.stringProp("direction", "ltr")}
-        options={radioOptions(adapter)}
-        extraChildren={adapter.renderChildren(nonOptionChildren(adapter.node.children))}
-        onDidChange={(value) => void adapter.event("didChange")(value)}
-        onFocus={() => void adapter.event("gotFocus")()}
-        onBlur={() => void adapter.event("lostFocus")()}
+      <RadioGroup
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
   },
+);
+
+export const radioGroupRenderer = wrapComponent(COMP, ThemedRadioGroup, RadioGroupMd, {
+  customRender: (_props, { node, extractValue, classes, state, updateState, lookupEventHandler, renderChild, registerComponentApi }) => (
+    <ThemedRadioGroup
+      autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      orientation={extractValue(node.props.orientation)}
+      gap={extractValue.asSize(node.props.gap)}
+      classes={classes}
+      initialValue={extractValue(node.props.initialValue)}
+      value={state?.value}
+      updateState={updateState}
+      validationStatus={extractValue(node.props.validationStatus)}
+      onDidChange={lookupEventHandler("didChange")}
+      onFocus={lookupEventHandler("gotFocus")}
+      onBlur={lookupEventHandler("lostFocus")}
+      registerComponentApi={registerComponentApi}
+      required={extractValue.asOptionalBoolean(node.props.required)}
+      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+    >
+      {renderChild(node.children)}
+    </ThemedRadioGroup>
+  ),
 });
 
-export function radioOptions(adapter: XmluiComponentAdapter): RadioGroupOption[] {
+type RuntimeRadioGroupProps = React.ComponentProps<typeof ThemedRadioGroup> & {
+  adapter: XmluiComponentAdapter;
+  bindTo?: string;
+};
+
+function RuntimeRadioGroupShell({
+  adapter,
+  bindTo,
+  value,
+  initialValue,
+  required,
+  requireLabelMode,
+  validationStatus,
+  onDidChange,
+  onFocus,
+  onBlur,
+  ...props
+}: RuntimeRadioGroupProps) {
+  const form = useFormContext();
+  const formRef = React.useRef(form);
+  const fieldName = bindTo;
+  const formValue = fieldName ? form?.getValue(fieldName) : undefined;
+  const formError = fieldName ? form?.errors[fieldName] : undefined;
+  const controlledValue = optionValue(formValue !== undefined ? formValue : value);
+  const initial = optionValue(initialValue);
+  const [localValue, setLocalValue] = React.useState<unknown>(controlledValue ?? initial);
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  formRef.current = form;
+
+  React.useEffect(() => {
+    if (controlledValue !== undefined) {
+      setLocalValue(controlledValue);
+    }
+  }, [controlledValue]);
+
+  React.useEffect(() => {
+    if (!form || !fieldName) {
+      return;
+    }
+    return form.registerItem({
+      name: fieldName,
+      required,
+    });
+  }, [fieldName, required]);
+
+  const updateState = React.useCallback((state: Record<string, unknown>) => {
+    const nextValue = optionValue(state.value);
+    setLocalValue(nextValue);
+    lastRegisteredValueRef.current = nextValue;
+    adapter.registerApi({
+      ...apiRef.current,
+      value: nextValue,
+    });
+    const currentForm = formRef.current;
+    if (currentForm && fieldName) {
+      currentForm.setValue(fieldName, nextValue);
+      void currentForm.validateField(fieldName, nextValue);
+    }
+  }, [adapter, fieldName]);
+
+  const effectiveValidationStatus = formError ? "error" : validationStatus;
+  const currentValue = controlledValue ?? localValue;
+
+  const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    lastRegisteredValueRef.current = currentValue;
+    adapter.registerApi({
+      ...api,
+      value: currentValue,
+    });
+  }, [adapter, currentValue]);
+
+  React.useEffect(() => {
+    if (lastRegisteredValueRef.current === currentValue) {
+      return;
+    }
+    lastRegisteredValueRef.current = currentValue;
+    adapter.registerApi({
+      ...apiRef.current,
+      value: currentValue,
+    });
+  }, [adapter, currentValue]);
+
+  return (
+    <ThemedRadioGroup
+      {...props}
+      value={currentValue}
+      initialValue={initial}
+      updateState={updateState}
+      registerComponentApi={registerComponentApi}
+      required={required}
+      requireLabelMode={requireLabelMode ?? form?.itemRequireLabelMode}
+      validationStatus={effectiveValidationStatus}
+      onDidChange={(nextValue) => {
+        setLocalValue(nextValue);
+        onDidChange?.(nextValue);
+        void adapter.event("didChange")(nextValue);
+      }}
+      onFocus={(event) => {
+        onFocus?.(event);
+        void adapter.event("gotFocus")();
+      }}
+      onBlur={(event) => {
+        onBlur?.(event);
+        void adapter.event("lostFocus")();
+      }}
+    />
+  );
+}
+
+function runtimeRadioGroupProps(adapter: XmluiComponentAdapter) {
+  const rootAttrs = adapter.rootAttrs() as React.HTMLAttributes<HTMLDivElement>;
+  return {
+    ...rootAttrs,
+    id: adapter.stringProp("id"),
+    bindTo: adapter.stringProp("bindTo"),
+    value: adapter.prop("value"),
+    initialValue: adapter.prop("initialValue", defaultProps.initialValue),
+    autofocus: adapter.booleanProp("autoFocus", false),
+    enabled: adapter.booleanProp("enabled", defaultProps.enabled),
+    orientation: adapter.stringProp("orientation", defaultProps.orientation) as React.ComponentProps<typeof ThemedRadioGroup>["orientation"],
+    gap: adapter.stringProp("gap"),
+    label: adapter.stringProp("label"),
+    labelPosition: adapter.stringProp("labelPosition"),
+    labelWidth: adapter.stringProp("labelWidth"),
+    labelBreak: adapter.booleanProp("labelBreak", false),
+    requireLabelMode: adapter.stringProp("requireLabelMode"),
+    direction: adapter.stringProp("direction") as "ltr" | "rtl" | undefined,
+    validationStatus: adapter.stringProp("validationStatus", defaultProps.validationStatus) as React.ComponentProps<typeof ThemedRadioGroup>["validationStatus"],
+    required: adapter.booleanProp("required", defaultProps.required),
+    readOnly: adapter.booleanProp("readOnly", defaultProps.readOnly),
+    classes: { [COMPONENT_PART_KEY]: adapter.className },
+    children: adapter.renderChildren(),
+  };
+}
+
+function optionValue(value: unknown): unknown {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    value === null
+  ) {
+    return typeof value === "number" && Number.isNaN(value) ? undefined : value;
+  }
+  return undefined;
+}
+
+const radioGroupThemeAliases = {
+  [`borderColor-${RGOption}`]: "$borderColor-Input-default",
+  [`borderColor-${RGOption}--hover`]: "$borderColor-Input-default--hover",
+  [`borderColor-${RGOption}--active`]: "$color-primary-500",
+  [`borderColor-${RGOption}--disabled`]: "$borderColor--disabled",
+  [`borderColor-${RGOption}--error`]: "hsl(356, 100%, 48%)",
+  [`borderColor-${RGOption}--warning`]: "hsl(35, 100%, 42.8%)",
+  [`borderColor-${RGOption}--success`]: "hsl(129.5, 58.4%, 58.1%)",
+};
+
+Object.assign(RadioGroupMd.defaultThemeVars ??= {}, radioGroupThemeAliases);
+
+Object.assign(RadioGroupMd, {
+  defaultPart: "root",
+} satisfies Partial<ComponentMetadata>);
+
+export const radioGroupRuntimeRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: RadioGroupMd,
+  renderer: ({ adapter }) => (
+    <RuntimeRadioGroupShell adapter={adapter} {...runtimeRadioGroupProps(adapter)} />
+  ),
+});
+
+export function radioOptions(adapter: XmluiComponentAdapter) {
   return adapter.node.children.flatMap((child) => optionFromChild(child, adapter));
 }
 
-function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): RadioGroupOption[] {
+function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Array<{
+  value: unknown;
+  label: ReactNode;
+  enabled: boolean;
+  testId?: string;
+}> {
   if (child.kind !== "element") {
     return [];
   }
@@ -178,15 +374,6 @@ function optionFromChild(child: XmluiNode, adapter: XmluiComponentAdapter): Radi
   return [{ value, label: renderableLabel(label, value), enabled, testId: child.props.testId }];
 }
 
-function isValidOptionValue(value: unknown): boolean {
-  return (
-    typeof value === "string" ||
-    typeof value === "boolean" ||
-    value === null ||
-    (typeof value === "number" && !Number.isNaN(value))
-  );
-}
-
 function optionLabelFromChildren(child: XmluiElement, adapter: XmluiComponentAdapter) {
   if (child.children.length === 0) {
     return String(child.props.value ?? "");
@@ -196,17 +383,6 @@ function optionLabelFromChildren(child: XmluiElement, adapter: XmluiComponentAda
     return child.children.map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join("");
   }
   return adapter.renderChildren(child.children);
-}
-
-function nonOptionChildren(children: XmluiNode[]): XmluiNode[] {
-  return children.filter((child) => !containsOption(child));
-}
-
-function containsOption(child: XmluiNode): boolean {
-  if (child.kind !== "element") {
-    return false;
-  }
-  return child.type === "Option" || child.children.some(containsOption);
 }
 
 function booleanOptionValue(value: unknown): boolean {

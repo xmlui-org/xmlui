@@ -41,6 +41,8 @@ export function ItemsNative({
   );
 }
 
+export { ItemsNative as Items };
+
 function normalizeItems(items: unknown): unknown[] {
   if (!items) {
     return [];

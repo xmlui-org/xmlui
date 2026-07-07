@@ -1,320 +1,267 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: (
+);
 
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-TextBox--disabled: createThemeVar("backgroundColor-TextBox--disabled");
-$borderRadius-TextBox: createThemeVar("borderRadius-TextBox");
-$borderColor-TextBox: createThemeVar("borderColor-TextBox");
-$borderColor-TextBox--error: createThemeVar("borderColor-TextBox--error");
-$borderColor-TextBox--warning: createThemeVar("borderColor-TextBox--warning");
-$borderColor-TextBox--success: createThemeVar("borderColor-TextBox--success");
-$borderWidth-TextBox: createThemeVar("borderWidth-TextBox");
-$borderWidth-TextBox--error: createThemeVar("borderWidth-TextBox--error");
-$borderWidth-TextBox--warning: createThemeVar("borderWidth-TextBox--warning");
-$borderWidth-TextBox--success: createThemeVar("borderWidth-TextBox--success");
-$borderStyle-TextBox: createThemeVar("borderStyle-TextBox");
-$borderStyle-TextBox--error: createThemeVar("borderStyle-TextBox--error");
-$borderStyle-TextBox--warning: createThemeVar("borderStyle-TextBox--warning");
-$borderStyle-TextBox--success: createThemeVar("borderStyle-TextBox--success");
-$fontSize-TextBox: createThemeVar("fontSize-TextBox");
-$fontSize-TextBox--error: createThemeVar("fontSize-TextBox--error");
-$fontSize-TextBox--warning: createThemeVar("fontSize-TextBox--warning");
-$fontSize-TextBox--success: createThemeVar("fontSize-TextBox--success");
-$backgroundColor-TextBox: createThemeVar("backgroundColor-TextBox");
-$backgroundColor-TextBox--error: createThemeVar("backgroundColor-TextBox--error");
-$backgroundColor-TextBox--warning: createThemeVar("backgroundColor-TextBox--warning");
-$backgroundColor-TextBox--success: createThemeVar("backgroundColor-TextBox--success");
-$boxShadow-TextBox: createThemeVar("boxShadow-TextBox");
-$boxShadow-TextBox--error: createThemeVar("boxShadow-TextBox--error");
-$boxShadow-TextBox--warning: createThemeVar("boxShadow-TextBox--warning");
-$boxShadow-TextBox--success: createThemeVar("boxShadow-TextBox--success");
-$textColor-TextBox: createThemeVar("textColor-TextBox");
-$textColor-TextBox--error: createThemeVar("textColor-TextBox--error");
-$textColor-TextBox--warning: createThemeVar("textColor-TextBox--warning");
-$textColor-TextBox--success: createThemeVar("textColor-TextBox--success");
-$borderColor-TextBox--hover: createThemeVar("borderColor-TextBox--hover");
-$borderColor-TextBox--error--hover: createThemeVar("borderColor-TextBox--error--hover");
-$borderColor-TextBox--warning--hover: createThemeVar("borderColor-TextBox--warning--hover");
-$borderColor-TextBox--success--hover: createThemeVar("borderColor-TextBox--success--hover");
-$backgroundColor-TextBox--hover: createThemeVar("backgroundColor-TextBox--hover");
-$backgroundColor-TextBox--error--hover: createThemeVar("backgroundColor-TextBox--error--hover");
-$backgroundColor-TextBox--warning--hover: createThemeVar("backgroundColor-TextBox--warning--hover");
-$backgroundColor-TextBox--success--hover: createThemeVar("backgroundColor-TextBox--success--hover");
-$boxShadow-TextBox--hover: createThemeVar("boxShadow-TextBox--hover");
-$boxShadow-TextBox--error--hover: createThemeVar("boxShadow-TextBox--error--hover");
-$boxShadow-TextBox--warning--hover: createThemeVar("boxShadow-TextBox--warning--hover");
-$boxShadow-TextBox--success--hover: createThemeVar("boxShadow-TextBox--success--hover");
-$textColor-TextBox--hover: createThemeVar("textColor-TextBox--hover");
-$textColor-TextBox--error--hover: createThemeVar("textColor-TextBox--error--hover");
-$textColor-TextBox--warning--hover: createThemeVar("textColor-TextBox--warning--hover");
-$textColor-TextBox--success--hover: createThemeVar("textColor-TextBox--success--hover");
-$borderColor-TextBox--focus: createThemeVar("borderColor-TextBox--focus");
-$backgroundColor-TextBox--focus: createThemeVar("backgroundColor-TextBox--focus");
-$boxShadow-TextBox--focus: createThemeVar("boxShadow-TextBox--focus");
-$textColor-TextBox--focus: createThemeVar("textColor-TextBox--focus");
-$outlineWidth-TextBox--focus: createThemeVar("outlineWidth-TextBox--focus");
-$outlineColor-TextBox--focus: createThemeVar("outlineColor-TextBox--focus");
-$outlineStyle-TextBox--focus: createThemeVar("outlineStyle-TextBox--focus");
-$outlineOffset-TextBox--focus: createThemeVar("outlineOffset-TextBox--focus");
-$textColor-placeholder-TextBox: createThemeVar("textColor-placeholder-TextBox");
-$fontSize-placeholder-TextBox: createThemeVar("fontSize-placeholder-TextBox");
-$color-adornment-TextBox: createThemeVar("color-adornment-TextBox");
-$color-passwordToggle-TextBox: createThemeVar("color-passwordToggle-TextBox");
-$paddingLeft-passwordToggle-TextBox: createThemeVar("paddingLeft-passwordToggle-TextBox");
-$paddingRight-passwordToggle-TextBox: createThemeVar("paddingRight-passwordToggle-TextBox");
-$color-passwordToggle-TextBox--hover: createThemeVar("color-passwordToggle-TextBox--hover");
-$color-passwordToggle-TextBox--focus: createThemeVar("color-passwordToggle-TextBox--focus");
-$minHeight-TextBox: createThemeVar("minHeight-TextBox");
-$gap-adornment-TextBox: createThemeVar("gap-adornment-TextBox");
-$textColor-TextBox--disabled: createThemeVar("textColor-TextBox--disabled");
-$borderColor-TextBox--disabled: createThemeVar("borderColor-TextBox--disabled");
-$paddingHorizontal-TextBox: createThemeVar("paddingHorizontal-TextBox");
-$paddingVertical-TextBox: createThemeVar("paddingVertical-TextBox");
+$componentName: "TextBox";
+$themeVars: t.composePaddingVars($themeVars, $componentName);
 
-:export {
-  themeVars: "";
+$backgroundColor-TextBox--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+
+$borderRadius-TextBox: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderRadius-TextBox--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
+$borderRadius-TextBox--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+$borderRadius-TextBox--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
+
+// Variables for default variant
+$borderColor-TextBox: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-TextBox: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-TextBox: createThemeVar("Input:borderStyle-#{$componentName}");
+$fontSize-TextBox: createThemeVar("Input:fontSize-#{$componentName}");
+$backgroundColor-TextBox: createThemeVar("Input:backgroundColor-#{$componentName}");
+$boxShadow-TextBox: createThemeVar("Input:boxShadow-#{$componentName}");
+$textColor-TextBox: createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-TextBox--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-TextBox--hover: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$boxShadow-TextBox--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$textColor-TextBox--hover: createThemeVar("Input:textColor-#{$componentName}--hover");
+$borderColor-TextBox--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$backgroundColor-TextBox--focus: createThemeVar("Input:backgroundColor-#{$componentName}--focus");
+$boxShadow-TextBox--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
+$textColor-TextBox--focus: createThemeVar("Input:textColor-#{$componentName}--focus");
+$outlineWidth-TextBox--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-TextBox--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-TextBox--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-TextBox--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-TextBox: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-TextBox: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
+$color-adornment-TextBox: createThemeVar("Input:color-adornment-#{$componentName}");
+
+// Variables for error variant
+$borderColor-TextBox--error: createThemeVar("Input:borderColor-#{$componentName}--error");
+$borderWidth-TextBox--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
+$borderStyle-TextBox--error: createThemeVar("Input:borderStyle-#{$componentName}--error");
+$fontSize-TextBox--error: createThemeVar("Input:fontSize-#{$componentName}--error");
+$backgroundColor-TextBox--error: createThemeVar("Input:backgroundColor-#{$componentName}--error");
+$boxShadow-TextBox--error: createThemeVar("Input:boxShadow-#{$componentName}--error");
+$textColor-TextBox--error: createThemeVar("Input:textColor-#{$componentName}--error");
+$borderColor-TextBox--error--hover: createThemeVar("Input:borderColor-#{$componentName}--error--hover");
+$backgroundColor-TextBox--error--hover: createThemeVar("Input:backgroundColor-#{$componentName}--error--hover");
+$boxShadow-TextBox--error--hover: createThemeVar("Input:boxShadow-#{$componentName}--error--hover");
+$textColor-TextBox--error--hover: createThemeVar("Input:textColor-#{$componentName}--error--hover");
+$borderColor-TextBox--error--focus: createThemeVar("Input:borderColor-#{$componentName}--error--focus");
+$backgroundColor-TextBox--error--focus: createThemeVar("Input:backgroundColor-#{$componentName}--error--focus");
+$boxShadow-TextBox--error--focus: createThemeVar("Input:boxShadow-#{$componentName}--error--focus");
+$textColor-TextBox--error--focus: createThemeVar("Input:textColor-#{$componentName}--error--focus");
+$outlineWidth-TextBox--error--focus: createThemeVar("Input:outlineWidth-#{$componentName}--error--focus");
+$outlineColor-TextBox--error--focus: createThemeVar("Input:outlineColor-#{$componentName}--error--focus");
+$outlineStyle-TextBox--error--focus: createThemeVar("Input:outlineStyle-#{$componentName}--error--focus");
+$outlineOffset-TextBox--error--focus: createThemeVar("Input:outlineOffset-#{$componentName}--error--focus");
+$textColor-placeholder-TextBox--error: createThemeVar("Input:textColor-placeholder-#{$componentName}--error");
+$fontSize-placeholder-TextBox--error: createThemeVar("Input:fontSize-placeholder-#{$componentName}--error");
+$color-adornment-TextBox--error: createThemeVar("Input:color-adornment-#{$componentName}--error");
+
+// Variables for warning variant
+$borderColor-TextBox--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
+$borderWidth-TextBox--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
+$borderStyle-TextBox--warning: createThemeVar("Input:borderStyle-#{$componentName}--warning");
+$fontSize-TextBox--warning: createThemeVar("Input:fontSize-#{$componentName}--warning");
+$backgroundColor-TextBox--warning: createThemeVar("Input:backgroundColor-#{$componentName}--warning");
+$boxShadow-TextBox--warning: createThemeVar("Input:boxShadow-#{$componentName}--warning");
+$textColor-TextBox--warning: createThemeVar("Input:textColor-#{$componentName}--warning");
+$borderColor-TextBox--warning--hover: createThemeVar("Input:borderColor-#{$componentName}--warning--hover");
+$backgroundColor-TextBox--warning--hover: createThemeVar("Input:backgroundColor-#{$componentName}--warning--hover");
+$boxShadow-TextBox--warning--hover: createThemeVar("Input:boxShadow-#{$componentName}--warning--hover");
+$textColor-TextBox--warning--hover: createThemeVar("Input:textColor-#{$componentName}--warning--hover");
+$borderColor-TextBox--warning--focus: createThemeVar("Input:borderColor-#{$componentName}--warning--focus");
+$backgroundColor-TextBox--warning--focus: createThemeVar("Input:backgroundColor-#{$componentName}--warning--focus");
+$boxShadow-TextBox--warning--focus: createThemeVar("Input:boxShadow-#{$componentName}--warning--focus");
+$textColor-TextBox--warning--focus: createThemeVar("Input:textColor-#{$componentName}--warning--focus");
+$outlineWidth-TextBox--warning--focus: createThemeVar("Input:outlineWidth-#{$componentName}--warning--focus");
+$outlineColor-TextBox--warning--focus: createThemeVar("Input:outlineColor-#{$componentName}--warning--focus");
+$outlineStyle-TextBox--warning--focus: createThemeVar("Input:outlineStyle-#{$componentName}--warning--focus");
+$outlineOffset-TextBox--warning--focus: createThemeVar("Input:outlineOffset-#{$componentName}--warning--focus");
+$textColor-placeholder-TextBox--warning: createThemeVar("Input:textColor-placeholder-#{$componentName}--warning");
+$fontSize-placeholder-TextBox--warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}--warning");
+$color-adornment-TextBox--warning: createThemeVar("Input:color-adornment-#{$componentName}--warning");
+
+// Variables for success variant
+$borderColor-TextBox--success: createThemeVar("Input:borderColor-#{$componentName}--success");
+$borderWidth-TextBox--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
+$borderStyle-TextBox--success: createThemeVar("Input:borderStyle-#{$componentName}--success");
+$fontSize-TextBox--success: createThemeVar("Input:fontSize-#{$componentName}--success");
+$backgroundColor-TextBox--success: createThemeVar("Input:backgroundColor-#{$componentName}--success");
+$boxShadow-TextBox--success: createThemeVar("Input:boxShadow-#{$componentName}--success");
+$textColor-TextBox--success: createThemeVar("Input:textColor-#{$componentName}--success");
+$borderColor-TextBox--success--hover: createThemeVar("Input:borderColor-#{$componentName}--success--hover");
+$backgroundColor-TextBox--success--hover: createThemeVar("Input:backgroundColor-#{$componentName}--success--hover");
+$boxShadow-TextBox--success--hover: createThemeVar("Input:boxShadow-#{$componentName}--success--hover");
+$textColor-TextBox--success--hover: createThemeVar("Input:textColor-#{$componentName}--success--hover");
+$borderColor-TextBox--success--focus: createThemeVar("Input:borderColor-#{$componentName}--success--focus");
+$backgroundColor-TextBox--success--focus: createThemeVar("Input:backgroundColor-#{$componentName}--success--focus");
+$boxShadow-TextBox--success--focus: createThemeVar("Input:boxShadow-#{$componentName}--success--focus");
+$textColor-TextBox--success--focus: createThemeVar("Input:textColor-#{$componentName}--success--focus");
+$outlineWidth-TextBox--success--focus: createThemeVar("Input:outlineWidth-#{$componentName}--success--focus");
+$outlineColor-TextBox--success--focus: createThemeVar("Input:outlineColor-#{$componentName}--success--focus");
+$outlineStyle-TextBox--success--focus: createThemeVar("Input:outlineStyle-#{$componentName}--success--focus");
+$outlineOffset-TextBox--success--focus: createThemeVar("Input:outlineOffset-#{$componentName}--success--focus");
+$textColor-placeholder-TextBox--success: createThemeVar("Input:textColor-placeholder-#{$componentName}--success");
+$fontSize-placeholder-TextBox--success: createThemeVar("Input:fontSize-placeholder-#{$componentName}--success");
+$color-adornment-TextBox--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
+
+// Variables for passwordToggle (not variant-specific)
+$color-passwordToggle-TextBox: createThemeVar("Input:color-passwordToggle-#{$componentName}");
+$paddingLeft-passwordToggle-TextBox: createThemeVar("Input:paddingLeft-passwordToggle-#{$componentName}");
+$paddingRight-passwordToggle-TextBox: createThemeVar("Input:paddingRight-passwordToggle-#{$componentName}");
+$color-passwordToggle-TextBox--hover: createThemeVar("Input:color-passwordToggle-#{$componentName}--hover");
+$color-passwordToggle-TextBox--focus: createThemeVar("Input:color-passwordToggle-#{$componentName}--focus");
+
+// Variables for @layer section
+$minHeight-TextBox: createThemeVar("Input:minHeight-#{$componentName}");
+$gap-adornment-TextBox: createThemeVar("Input:gap-adornment-#{$componentName}");
+$textColor-TextBox--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
+// --- CSS properties of a particular TextBox variant
+@mixin variant($variantName) {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-Checkbox#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-Checkbox#{$suffix}");
+
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}#{$suffix}");
+
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}");
+
+  &:hover {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--focus"
+    );
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--focus");
+  }
+
+  &:has(.input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+  }
+
+  .input {
+    &::placeholder {
+      color: createThemeVar("Input:textColor-placeholder-#{$componentName}#{$suffix}");
+      font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}#{$suffix}");
+    }
+  }
+
+  .adornment {
+    color: createThemeVar("Input:color-adornment-#{$componentName}#{$suffix}");
+
+    * {
+      color: inherit;
+    }
+  }
+
+  .passwordToggle {
+    cursor: pointer;
+    color: createThemeVar("Input:color-passwordToggle-#{$componentName}");
+    padding-inline-start: createThemeVar("Input:paddingLeft-passwordToggle-#{$componentName}");
+    padding-inline-end: createThemeVar("Input:paddingRight-passwordToggle-#{$componentName}");
+
+    &:hover {
+      color: createThemeVar("Input:color-passwordToggle-#{$componentName}--hover");
+    }
+
+    &:focus {
+      color: createThemeVar("Input:color-passwordToggle-#{$componentName}--focus");
+    }
+  }
 }
 
 @layer components {
-  .textBoxLabeledItem {
+  .inputRoot {
     display: flex;
     align-items: center;
-    gap: var(--xmlui-gap-label-TextBox, var(--xmlui-gap-normal));
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .textBoxLabel {
-    flex: 0 0 auto;
-    color: var(--xmlui-textColor-label-TextBox, var(--xmlui-textColor-primary));
-    font-size: var(--xmlui-fontSize-label-TextBox, inherit);
-    white-space: nowrap;
-  }
-
-  .textBoxLabelBreak {
-    white-space: normal;
-  }
-
-  .textBoxLabelRequired {
-    margin-left: 0.25em;
-  }
-
-  .textBoxLabelOptional {
-    margin-left: 0.25em;
-  }
-
-  .textBoxLabelPositionStart {
-    flex-direction: row;
-  }
-
-  .textBoxLabelPositionEnd {
-    flex-direction: row-reverse;
-  }
-
-  .textBoxLabelPositionStart[dir="rtl"] {
-    flex-direction: row-reverse;
-  }
-
-  .textBoxLabelPositionEnd[dir="rtl"] {
-    flex-direction: row;
-  }
-
-  .textBoxLabelPositionTop {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .textBoxLabelPositionBottom {
-    flex-direction: column-reverse;
-    align-items: flex-start;
-  }
-
-  .textBoxRoot {
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    gap: var(--xmlui-runtime-gap-TextBox, #{$gap-adornment-TextBox});
+    gap: $gap-adornment-TextBox;
     width: 100%;
     height: max-content;
-    min-height: var(--xmlui-minHeight-TextBox);
+    min-height: $minHeight-TextBox;
     line-height: normal;
+    border-style: solid;
+    border-width: 1px;
+    transition: background-color ease-in 0.1s;
     overflow: hidden;
-    border-radius: var(--xmlui-borderRadius-TextBox);
-    border-color: var(--xmlui-borderColor-TextBox);
-    border-width: var(--xmlui-borderWidth-TextBox);
-    border-style: var(--xmlui-borderStyle-TextBox);
-    font-size: var(--xmlui-fontSize-TextBox);
-    background-color: var(--xmlui-backgroundColor-TextBox);
-    box-shadow: var(--xmlui-boxShadow-TextBox);
-    color: var(--xmlui-textColor-TextBox);
-    padding: var(--xmlui-padding-TextBox, var(--xmlui-paddingVertical-TextBox) var(--xmlui-paddingHorizontal-TextBox));
-    transition: background-color ease-in 0.1s, border-color ease-in 0.1s;
+    @include t.paddingVars($themeVars, $componentName);
+    @include variant("");
+
+    &.error {
+      @include variant("error");
+    }
+
+    &.warning {
+      @include variant("warning");
+    }
+
+    &.valid {
+      @include variant("success");
+    }
+
+    &:has(.input:is(:disabled)) {
+      cursor: not-allowed;
+      background-color: $backgroundColor-TextBox--disabled;
+      color: $textColor-TextBox--disabled;
+      border-color: $borderColor-TextBox--disabled;
+    }
+
+    .input {
+      font-size: inherit;
+      color: inherit;
+      border: 0;
+      outline: none !important;
+      background-color: transparent;
+      width: 100%;
+      padding: 0;
+      cursor: inherit;
+
+      &::-ms-reveal {
+        display: none;
+      }
+
+      // Remove default search input styles if type="search"
+      &[type="search"]::-webkit-search-cancel-button,
+      &[type="search"]::-webkit-search-decoration {
+        -webkit-appearance: none;
+        appearance: none;
+      }
+    }
   }
 
-  .textBoxRoot:hover {
-    border-color: var(--xmlui-borderColor-TextBox--hover);
-    background-color: var(--xmlui-backgroundColor-TextBox--hover);
-    box-shadow: var(--xmlui-boxShadow-TextBox--hover);
-    color: var(--xmlui-textColor-TextBox--hover);
-  }
-
-  .textBoxRoot:focus-within {
-    border-color: var(--xmlui-borderColor-TextBox--focus);
-    background-color: var(--xmlui-backgroundColor-TextBox--focus);
-    box-shadow: var(--xmlui-boxShadow-TextBox--focus);
-    color: var(--xmlui-textColor-TextBox--focus);
-  }
-
-  .textBoxRoot.textBoxError {
-    border-radius: var(--xmlui-borderRadius-TextBox--error);
-    border-color: var(--xmlui-borderColor-TextBox--error);
-    border-width: var(--xmlui-borderWidth-TextBox--error);
-    border-style: var(--xmlui-borderStyle-TextBox--error);
-    font-size: var(--xmlui-fontSize-TextBox--error);
-    background-color: var(--xmlui-backgroundColor-TextBox--error);
-    box-shadow: var(--xmlui-boxShadow-TextBox--error);
-    color: var(--xmlui-textColor-TextBox--error);
-  }
-
-  .textBoxRoot.textBoxWarning {
-    border-radius: var(--xmlui-borderRadius-TextBox--warning);
-    border-color: var(--xmlui-borderColor-TextBox--warning);
-    border-width: var(--xmlui-borderWidth-TextBox--warning);
-    border-style: var(--xmlui-borderStyle-TextBox--warning);
-    font-size: var(--xmlui-fontSize-TextBox--warning);
-    background-color: var(--xmlui-backgroundColor-TextBox--warning);
-    box-shadow: var(--xmlui-boxShadow-TextBox--warning);
-    color: var(--xmlui-textColor-TextBox--warning);
-  }
-
-  .textBoxRoot.textBoxSuccess {
-    border-radius: var(--xmlui-borderRadius-TextBox--success);
-    border-color: var(--xmlui-borderColor-TextBox--success);
-    border-width: var(--xmlui-borderWidth-TextBox--success);
-    border-style: var(--xmlui-borderStyle-TextBox--success);
-    font-size: var(--xmlui-fontSize-TextBox--success);
-    background-color: var(--xmlui-backgroundColor-TextBox--success);
-    box-shadow: var(--xmlui-boxShadow-TextBox--success);
-    color: var(--xmlui-textColor-TextBox--success);
-  }
-
-  .textBoxRoot.textBoxError:hover {
-    border-color: var(--xmlui-borderColor-TextBox--error--hover);
-    background-color: var(--xmlui-backgroundColor-TextBox--error--hover);
-    box-shadow: var(--xmlui-boxShadow-TextBox--error--hover);
-    color: var(--xmlui-textColor-TextBox--error--hover);
-  }
-
-  .textBoxRoot.textBoxWarning:hover {
-    border-color: var(--xmlui-borderColor-TextBox--warning--hover);
-    background-color: var(--xmlui-backgroundColor-TextBox--warning--hover);
-    box-shadow: var(--xmlui-boxShadow-TextBox--warning--hover);
-    color: var(--xmlui-textColor-TextBox--warning--hover);
-  }
-
-  .textBoxRoot.textBoxSuccess:hover {
-    border-color: var(--xmlui-borderColor-TextBox--success--hover);
-    background-color: var(--xmlui-backgroundColor-TextBox--success--hover);
-    box-shadow: var(--xmlui-boxShadow-TextBox--success--hover);
-    color: var(--xmlui-textColor-TextBox--success--hover);
-  }
-
-  .textBoxRoot:has(.textBoxInput:focus-visible) {
-    outline-width: var(--xmlui-outlineWidth-TextBox--focus);
-    outline-color: var(--xmlui-outlineColor-TextBox--focus);
-    outline-style: var(--xmlui-outlineStyle-TextBox--focus);
-    outline-offset: var(--xmlui-outlineOffset-TextBox--focus);
-  }
-
-  .textBoxRoot.textBoxDisabled {
-    cursor: not-allowed;
-    background-color: var(--xmlui-backgroundColor-TextBox--disabled);
-    color: var(--xmlui-textColor-TextBox--disabled);
-    border-color: var(--xmlui-borderColor-TextBox--disabled);
-  }
-
-  .textBoxRoot.textBoxReadOnly {
+  .readOnly {
     cursor: default;
   }
+}
 
-  .textBoxInput {
-    box-sizing: border-box;
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: inherit;
-    color: inherit;
-    border: 0;
-    outline: none !important;
-    background-color: transparent;
-    width: 100%;
-    padding: 0;
-    cursor: inherit;
-  }
-
-  .textBoxInput::placeholder {
-    color: var(--xmlui-textColor-placeholder-TextBox);
-    font-size: var(--xmlui-fontSize-placeholder-TextBox);
-  }
-
-  .textBoxInput::-ms-reveal {
-    display: none;
-  }
-
-  .textBoxInput[type="search"]::-webkit-search-cancel-button,
-  .textBoxInput[type="search"]::-webkit-search-decoration {
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  .textBoxAdornment {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    color: var(--xmlui-color-adornment-TextBox);
-  }
-
-  .textBoxIconMarker {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    border-radius: 999px;
-    background-color: currentColor;
-  }
-
-  .textBoxPasswordToggle {
-    cursor: pointer;
-    color: var(--xmlui-color-passwordToggle-TextBox);
-    padding-inline-start: var(--xmlui-paddingLeft-passwordToggle-TextBox);
-    padding-inline-end: var(--xmlui-paddingRight-passwordToggle-TextBox);
-  }
-
-  .textBoxPasswordToggle:hover {
-    color: var(--xmlui-color-passwordToggle-TextBox--hover);
-  }
-
-  .textBoxPasswordToggle:focus {
-    color: var(--xmlui-color-passwordToggle-TextBox--focus);
-  }
-
-  .textBoxConciseFeedback {
-    position: relative;
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .textBoxConciseTooltip {
-    position: absolute;
-    z-index: 1000;
-    inset-block-start: calc(100% + 0.25rem);
-    inset-inline-start: 50%;
-    transform: translateX(-50%);
-    border-radius: var(--xmlui-borderRadius-tooltip, var(--xmlui-borderRadius));
-    background: var(--xmlui-backgroundColor-tooltip, #1f2937);
-    color: var(--xmlui-textColor-tooltip, #fff);
-    padding: var(--xmlui-paddingVertical-tooltip, 0.25rem) var(--xmlui-paddingHorizontal-tooltip, 0.5rem);
-    white-space: nowrap;
-  }
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

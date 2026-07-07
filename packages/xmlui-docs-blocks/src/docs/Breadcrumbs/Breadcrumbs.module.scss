@@ -1,0 +1,52 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Breadcrumbs";
+
+$gap-Breadcrumbs: createThemeVar("gap-#{$component}");
+$color-Breadcrumbs: createThemeVar("color-#{$component}");
+$color-Breadcrumbs--hover: createThemeVar("color-#{$component}--hover");
+$color-Breadcrumbs--current: createThemeVar("color-#{$component}--current");
+$fontWeight-Breadcrumbs--current: createThemeVar("fontWeight-#{$component}--current");
+
+@layer components {
+  .breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $gap-Breadcrumbs;
+  }
+
+  .link {
+    color: $color-Breadcrumbs;
+    --xmlui-textDecorationLine-Link: none !important;
+
+
+    &:hover {
+      color: $color-Breadcrumbs--hover;
+    }
+  }
+
+  .intermediate {
+    color: $color-Breadcrumbs;
+  }
+
+  .current {
+    color: $color-Breadcrumbs--current;
+    font-weight: $fontWeight-Breadcrumbs--current;
+  }
+
+  .chevron {
+    color: $color-Breadcrumbs;
+    display: inline-flex;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

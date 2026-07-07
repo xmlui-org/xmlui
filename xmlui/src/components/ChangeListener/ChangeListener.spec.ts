@@ -1,228 +1,524 @@
-import { expect, test } from "../../testing/fixtures";
+import { test, expect } from "../../testing/fixtures";
 
-test.describe("ChangeListener foundation", () => {
-  test("fires didChange when listenTo changes", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.counter="{0}" var.result="ready">
-        <Button testId="inc" onClick="counter++">Increment</Button>
-        <ChangeListener listenTo="{counter}" onDidChange="chg => result = chg.prevValue + '>' + chg.newValue" />
-        <Text testId="result">{result}</Text>
-      </App>
-    `);
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
-    await expect(page.getByTestId("result")).toHaveText("ready");
-    await page.getByTestId("inc").click();
-    await expect(page.getByTestId("result")).toHaveText("0>1");
-  });
+test("component fires didChange event when listenTo value changes", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `<App var.counter="{0}" var.oneBigger="{1}">
+      <Button label="Increment" onClick="{counter++}" />
+      <ChangeListener
+        listenTo="{counter}"
+        onDidChange="oneBigger = counter + 1" />
+      <Text testId="counterText">{counter}</Text>
+      <Text testId="oneBiggerText">{oneBigger}</Text>
+    </App>`,
+  );
 
-  test("does not fire for unrelated values", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.watched="{0}" var.other="{0}" var.count="{0}">
-        <Button testId="other" onClick="other++">Other</Button>
-        <ChangeListener listenTo="{watched}" onDidChange="count++" />
-        <Text testId="result">{other}:{count}</Text>
-      </App>
-    `);
+  const counterText = page.getByTestId("counterText");
+  const oneBiggerText = page.getByTestId("oneBiggerText");
 
-    await page.getByTestId("other").click();
-    await expect(page.getByTestId("result")).toHaveText("1:0");
-  });
+  await expect(counterText).toHaveText("0");
+  await expect(oneBiggerText).toHaveText("1");
 
-  test("listenToSources reports changed source details", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.first="alpha" var.second="beta" var.result="">
-        <Button testId="change" onClick="second = 'gamma'">Change</Button>
-        <ChangeListener
-          listenToSources="{{ first: first, second: second }}"
-          onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes.second.prevValue + '>' + chg.changes.second.newValue" />
-        <Text testId="result">{result}</Text>
-      </App>
-    `);
+  await page.getByRole("button", { name: "Increment" }).click();
 
-    await page.getByTestId("change").click();
-    await expect(page.getByTestId("result")).toHaveText("second:beta>gamma");
-  });
+  await expect(counterText).toHaveText("1");
+  await expect(oneBiggerText).toHaveText("2");
+});
 
-  test("listenToSources takes precedence and supports array source indexes", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
-      <App var.single="{0}" var.first="alpha" var.second="beta" var.result="">
-        <Button testId="single" onClick="single++">Single</Button>
-        <Button testId="second" onClick="second = 'gamma'">Second</Button>
-        <ChangeListener
-          listenTo="{single}"
-          listenToSources="{[first, second]}"
-          onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes['1'].prevValue + '>' + chg.changes['1'].newValue" />
-        <Text testId="result">{single}:{result}</Text>
-      </App>
-    `);
+test("component does not fire event when unrelated values change", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `<App var.a="{0}" var.counter="{0}" var.oneBigger="{1}">
+      <Button label="Increment" onClick="{counter++}" />
+      <ChangeListener
+        listenTo="{a}"
+        onDidChange="oneBigger = counter + 1" />
+      <Text testId="counterText">{counter}</Text>
+      <Text testId="oneBiggerText">{oneBigger}</Text>
+    </App>`,
+  );
 
-    await page.getByTestId("single").click();
-    await expect(page.getByTestId("result")).toHaveText("1:");
-    await page.getByTestId("second").click();
-    await expect(page.getByTestId("result")).toHaveText("1:1:beta>gamma");
-  });
+  const counterText = page.getByTestId("counterText");
+  const oneBiggerText = page.getByTestId("oneBiggerText");
 
-  test("listenTo keeps arrays and objects as aggregate payloads", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
-      <App var.first="{1}" var.second="{10}" var.data="{{ name: 'Ada', title: 'Countess' }}" var.result="">
-        <Button testId="array" onClick="second++">Array</Button>
-        <Button testId="object" onClick="data = { ...data, title: 'Programmer' }">Object</Button>
-        <ChangeListener
-          listenTo="{[first, second]}"
-          onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.join('|') + '>' + chg.newValue.join('|')" />
-        <ChangeListener
-          listenTo="{data}"
-          onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.title + '>' + chg.newValue.title" />
-        <Text testId="result">{result}</Text>
-      </App>
-    `);
+  await expect(counterText).toHaveText("0");
+  await expect(oneBiggerText).toHaveText("1");
 
-    await page.getByTestId("array").click();
-    await expect(page.getByTestId("result")).toHaveText("single:1|10>1|11");
-    await page.getByTestId("object").click();
-    await expect(page.getByTestId("result")).toHaveText("single:Countess>Programmer");
-  });
+  await page.getByRole("button", { name: "Increment" }).click();
 
-  test("stays inactive without listenTo and does not fire for identical primitive values", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
-      <App var.value="{1}" var.clicked="{0}" var.fireCount="{0}">
-        <Button testId="same" onClick="clicked++; value = value + 1 - 1">Same</Button>
-        <Button testId="unwatched" onClick="clicked++">Unwatched</Button>
-        <ChangeListener listenTo="{value}" onDidChange="fireCount++" />
-        <ChangeListener onDidChange="fireCount = fireCount + 100" />
-        <Text testId="result">{clicked}:{fireCount}:{value}</Text>
-      </App>
-    `);
+  await expect(counterText).toHaveText("1");
+  await expect(oneBiggerText).toHaveText("1");
+});
 
-    await page.getByTestId("same").click();
-    await expect(page.getByTestId("result")).toHaveText("1:0:1");
-    await page.getByTestId("unwatched").click();
-    await expect(page.getByTestId("result")).toHaveText("2:0:1");
-  });
+test("component passes both previous and new values to the handler", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.clone="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{clone}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        onDidChange="chg => clone = chg.prevValue + '|' + chg.newValue" />
+    </VStack>
+  `);
 
-  test("handles null, undefined, multiple listeners, and conditional rendering", async ({
-    initTestBed,
-    page,
-  }) => {
-    await initTestBed(`
-      <App var.value="{0}" var.first="{0}" var.second="{0}" var.show="{false}" var.conditional="{0}" var.result="">
-        <Button testId="null" onClick="value = null">Null</Button>
-        <Button testId="undefined" onClick="value = undefined">Undefined</Button>
-        <Button testId="value" onClick="value = 3">Value</Button>
-        <Button testId="conditional" onClick="conditional++">Conditional</Button>
-        <Button testId="toggle" onClick="show = !show">Toggle</Button>
-        <ChangeListener listenTo="{value}" onDidChange="chg => result = chg.newValue === undefined ? 'undefined' : JSON.stringify(chg.newValue)" />
-        <ChangeListener listenTo="{value}" onDidChange="first++" />
-        <ChangeListener listenTo="{value}" onDidChange="second++" />
-        <ChangeListener when="{show}" listenTo="{conditional}" onDidChange="result = 'conditional:' + conditional" />
-        <Text testId="result">{result}|{first}|{second}|{conditional}</Text>
-      </App>
-    `);
+  // Click the button to change the counter value
+  await page.locator("button").click();
 
-    await page.getByTestId("null").click();
-    await expect(page.getByTestId("result")).toHaveText("null|1|1|0");
-    await page.getByTestId("undefined").click();
-    await expect(page.getByTestId("result")).toHaveText("undefined|2|2|0");
-    await page.getByTestId("value").click();
-    await expect(page.getByTestId("result")).toHaveText("3|3|3|0");
-    await page.getByTestId("conditional").click();
-    await expect(page.getByTestId("result")).toHaveText("3|3|3|1");
-    await page.getByTestId("toggle").click();
-    await page.getByTestId("conditional").click();
-    await expect(page.getByTestId("result")).toHaveText("conditional:2|3|3|2");
-  });
+  // Check that the event fired and testState was updated
+  await expect(page.getByTestId("text")).toHaveText("0|1");
+});
 
-  test("debounces didChange", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.counter="{0}" var.fireCount="{0}">
-        <Button testId="inc" onClick="counter++; counter++">Increment twice</Button>
-        <ChangeListener listenTo="{counter}" debounceWaitInMs="{50}" onDidChange="fireCount++" />
-        <Text testId="result">{counter}:{fireCount}</Text>
-      </App>
-    `);
+test("component passes source-level changes with listenToSources object", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="alpha" var.second="beta" var.result="">
+      <Button testId="changeSecond" onClick="second = 'gamma'">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes.second.prevValue + '>' + chg.changes.second.newValue" />
+    </VStack>
+  `);
 
-    await page.getByTestId("inc").click();
-    await expect(page.getByTestId("result")).toHaveText("2:0");
-    await expect(page.getByTestId("result")).toHaveText("2:1");
-  });
+  await page.getByTestId("changeSecond").click();
 
-  test("debounce timer resets and preserves previous/new payload", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.clock.install();
-    await initTestBed(`
-      <App var.counter="{0}" var.result="">
-        <Button testId="inc" onClick="counter++">Increment</Button>
-        <ChangeListener
-          listenTo="{counter}"
-          debounceWaitInMs="{300}"
-          onDidChange="chg => result = chg.prevValue + '>' + chg.newValue" />
-        <Text testId="result">{counter}:{result}</Text>
-      </App>
-    `);
+  await expect(page.getByTestId("text")).toHaveText("second:beta>gamma");
+});
 
-    const flushEffects = () =>
-      page.evaluate(
-        () =>
-          new Promise<void>((resolve) => {
-            const { port1, port2 } = new MessageChannel();
-            port2.onmessage = () => resolve();
-            port1.postMessage(null);
-          }),
-      );
+test("component reports the changed named source with aggregate values", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.result="">
+      <Button testId="changeSecond" onClick="second++">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.newValue.first + ',' + chg.newValue.second" />
+    </VStack>
+  `);
 
-    await page.getByTestId("inc").click();
-    await flushEffects();
-    await page.clock.fastForward(200);
-    await expect(page.getByTestId("result")).toHaveText("1:");
-    await page.getByTestId("inc").click();
-    await flushEffects();
-    await page.clock.fastForward(200);
-    await expect(page.getByTestId("result")).toHaveText("2:");
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("result")).toHaveText("2:1>2");
-  });
+  await page.getByTestId("changeSecond").click();
 
-  test("debounce takes precedence over throttle and duplicate sources warn", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.clock.install();
-    const warnings: string[] = [];
-    page.on("console", (message) => {
-      if (message.type() === "warning") {
-        warnings.push(message.text());
-      }
-    });
-    await initTestBed(`
-      <App var.single="{0}" var.source="{0}" var.fireCount="{0}">
-        <Button testId="inc" onClick="single++; source++">Increment</Button>
-        <ChangeListener
-          listenTo="{single}"
-          listenToSources="{{ source: source }}"
-          debounceWaitInMs="{300}"
-          throttleWaitInMs="{50}"
-          onDidChange="fireCount++" />
-        <Text testId="result">{single}:{source}:{fireCount}</Text>
-      </App>
-    `);
+  await expect(page.getByTestId("text")).toHaveText("second:1,11");
+});
 
-    await page.getByTestId("inc").click();
-    await page.getByTestId("inc").click();
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("result")).toHaveText("2:2:0");
-    await page.clock.fastForward(200);
-    await expect(page.getByTestId("result")).toHaveText("2:2:1");
-    expect(warnings.some((warning) => warning.includes("ChangeListener cannot use both listenTo and listenToSources"))).toBe(true);
-  });
+test("listenToSources does not fire when unrelated values change", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.unrelated="{0}" var.fireCount="{0}">
+      <Button testId="changeUnrelated" onClick="unrelated++">Change unrelated</Button>
+      <Text testId="text">{unrelated}|{fireCount}</Text>
+      <ChangeListener
+        listenToSources="{{ first: first, second: second }}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeUnrelated").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+});
+
+test("listenToSources takes precedence over listenTo", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.single="{0}" var.source="{0}" var.fireCount="{0}">
+      <Button testId="changeSingle" onClick="single++">Change single</Button>
+      <Button testId="changeSource" onClick="source++">Change source</Button>
+      <Text testId="text">{single}|{source}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{single}"
+        listenToSources="{{ source: source }}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSingle").click();
+  await expect(page.getByTestId("text")).toHaveText("1|0|0");
+
+  await page.getByTestId("changeSource").click();
+  await expect(page.getByTestId("text")).toHaveText("1|1|1");
+});
+
+test("listenToSources accepts arrays and reports changed indexes", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.first="alpha" var.second="beta" var.result="">
+      <Button testId="changeSecond" onClick="second = 'gamma'">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenToSources="{[first, second]}"
+        onDidChange="chg => result = chg.changedSources.join('|') + ':' + chg.changes['1'].prevValue + '>' + chg.changes['1'].newValue" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1:beta>gamma");
+});
+
+test("listenTo keeps the existing aggregate payload shape", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.first="{1}" var.second="{10}" var.result="">
+      <Button testId="changeSecond" onClick="second++">Change second</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{[first, second]}"
+        onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.join('|') + '>' + chg.newValue.join('|')" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeSecond").click();
+
+  await expect(page.getByTestId("text")).toHaveText("single:1|10>1|11");
+});
+
+test("listenTo keeps object values as a single aggregate payload", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack var.data="{{ first: 'Ada', last: 'Lovelace' }}" var.result="">
+      <Button testId="changeLast" onClick="data.last = 'Byron'">Change last</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{data}"
+        onDidChange="chg => result = (chg.changes === undefined ? 'single' : 'multi') + ':' + chg.prevValue.last + '>' + chg.newValue.last" />
+    </VStack>
+  `);
+
+  await page.getByTestId("changeLast").click();
+
+  await expect(page.getByTestId("text")).toHaveText("single:Lovelace>Byron");
+});
+
+test("component stays inactive when listenTo is not set", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="increment" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("increment").click();
+
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+});
+
+// =============================================================================
+// EDGE CASE TESTS
+// =============================================================================
+
+test("component handles complex data types", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.data="{{ a: 1, b: [2, { counter: 10}] }}" var.clone="{10}">
+      <Button testId="incRelevant" onClick="data.b[1].counter++">Increment</Button>
+      <Button testId="incIrrelevant" onClick="data.a++">Increment irrelevant</Button>
+      <Text testId="text">{clone}</Text>
+      <ChangeListener
+        listenTo="{data.b[1].counter}"
+        onDidChange="chg => clone = chg.newValue" />
+    </VStack>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("10");
+
+  // make sure the irrelevant parts of the data doesn't get listenedTo
+  await page.getByTestId("incIrrelevant").click();
+  await expect(page.getByTestId("text")).toHaveText("10");
+
+  await page.getByTestId("incRelevant").click();
+
+  // Check that the event fired and testState was updated
+  await expect(page.getByTestId("text")).toHaveText("11");
+});
+
+test("component handles undefined and null values", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.clone="{0}">
+      <Button testId="setNull" onClick="counter = null">Set Null</Button>
+      <Button testId="setUndefined" onClick="counter = undefined">Set Undefined</Button>
+      <Button testId="setValue" onClick="counter = 3">Set Value</Button>
+      <Text testId="text">
+        {clone === undefined ? 'undefined' : JSON.stringify(clone)}
+      </Text>
+      <ChangeListener listenTo="{counter}" onDidChange="chg => clone = chg.newValue" />
+    </VStack>`);
+
+  await page.getByTestId("setNull").click();
+  await expect(page.getByTestId("text")).toHaveText("null");
+  await page.getByTestId("setUndefined").click();
+  await expect(page.getByTestId("text")).toHaveText("undefined");
+  await page.getByTestId("setValue").click();
+  await expect(page.getByTestId("text")).toHaveText("3");
+});
+
+test("component doesn't fire on identical primitive values", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.clicked="{0}" var.data="{1}">
+      <Button testId="setToPrimitive" onClick="clicked++; data = data + 1 - 1">
+        Set The Same Primitive
+      </Button>
+      <Text testId="text">{clicked}|{counter}|{data}</Text>
+      <ChangeListener listenTo="{data}" onDidChange="counter++" />
+    </VStack>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("0|0|1");
+  await page.locator("button").click();
+  await expect(page.getByTestId("text")).toHaveText("1|0|1");
+  await page.locator("button").click();
+  await expect(page.getByTestId("text")).toHaveText("2|0|1");
+});
+
+// =============================================================================
+// INTEGRATION TESTS
+// =============================================================================
+
+test("component works with multiple listeners on the same value", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter1="{0}" var.counter2="{0}" var.clicked="{0}">
+      <Button testId="setToPrimitive" onClick="clicked++;">
+        Set The Same Primitive
+      </Button>
+      <Text testId="text">{clicked}|{counter1}|{counter2}</Text>
+      <ChangeListener listenTo="{clicked}" onDidChange="counter1++" />
+      <ChangeListener listenTo="{clicked}" onDidChange="counter2++" />
+    </VStack>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("0|0|0");
+  await page.locator("button").click();
+  await expect(page.getByTestId("text")).toHaveText("1|1|1");
+  await page.locator("button").click();
+  await expect(page.getByTestId("text")).toHaveText("2|2|2");
+});
+
+test("component works with conditional rendering", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <VStack var.counter="{0}" var.clone="{0}" var.show="{false}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Button testId="showButton" onClick="show = !show">Toggle Show</Button>
+      <Text testId="text">
+        {clone}
+      </Text>
+      <ChangeListener
+        when="{show}"
+        listenTo="{counter}"
+        onDidChange="clone = counter" />
+    </VStack>
+  `);
+
+  // Click the button to change the counter value
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("0");
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("0");
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("0");
+  // ChangeListener mounts with show=true but does not fire on initial mount.
+  // The next counter change (button click) will be detected as the first change.
+  await page.getByTestId("showButton").click();
+  await expect(page.getByTestId("text")).toHaveText("0");
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("4");
+  await page.getByTestId("showButton").click();
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("4");
+});
+
+// =============================================================================
+// DEBOUNCEWAITINMS TESTS
+// =============================================================================
+
+test("debounceWaitInMs delays handler until the debounce period expires", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("0|0");
+
+  await page.getByTestId("button").click();
+
+  // Advance to T=100 — still within the 300ms debounce window, handler not fired yet
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Advance to T=300 — debounce window expires, handler fires
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("1|1");
+});
+
+test("debounceWaitInMs fires handler only once for rapid consecutive changes", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  // Click 3 times rapidly without advancing time
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+
+  // Advance to T=100 — still within the 300ms debounce window, handler has not fired
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("3|0");
+
+  // Advance to T=300 — debounce window expires, handler fires exactly once
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("3|1");
+});
+
+test("debounceWaitInMs resets timer on each change within the window", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  // Helper: yield to the browser's message queue so React's passive effects
+  // (useEffect, which is scheduled via MessageChannel internally) have time to
+  // run before we advance the fake clock.  setTimeout and requestAnimationFrame
+  // are both faked by page.clock.install(), but MessageChannel is NOT faked, so
+  // this is the correct synchronisation primitive here.
+  const flushEffects = () =>
+    page.evaluate(
+      () =>
+        new Promise<void>(resolve => {
+          const { port1, port2 } = new MessageChannel();
+          port2.onmessage = () => resolve();
+          port1.postMessage(null);
+        }),
+    );
+
+  // First change
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Flush React effects so the first debounce timer is registered before we
+  // advance the clock (prevents it from being registered at a shifted time).
+  await flushEffects();
+
+  // Advance 200ms — still within debounce window
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Second change — resets the debounce timer
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("2|0");
+
+  // Critical flush: ensures the useEffect from click #2 has called the debounce
+  // function (resetting the T=300 timer to T=500) before fastForward processes
+  // the original T=300 expiry.  Without this, under load the effect can run
+  // DURING fastForward, after the T=300 timer has already fired.
+  await flushEffects();
+
+  // Advance another 200ms — 400ms since first change but only 200ms since last change
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("2|0");
+
+  // Advance 100ms more — now 300ms since last change, debounce fires
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("2|1");
+});
+
+test("debounceWaitInMs passes correct prevValue and newValue to handler", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.result="{''}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{200}"
+        onDidChange="chg => result = chg.prevValue + '|' + chg.newValue" />
+    </VStack>
+  `);
+
+  await page.getByTestId("button").click();
+  await page.clock.fastForward(200);
+
+  await expect(page.getByTestId("text")).toHaveText("0|1");
+});
+
+test("debounceWaitInMs takes precedence over throttleWaitInMs when both are set", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        throttleWaitInMs="{50}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+
+  // Advance past throttle window — if throttle were active it would have fired by now
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("3|0");
+
+  // Advance to full debounce window
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("3|1");
 });

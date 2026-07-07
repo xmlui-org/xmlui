@@ -60,7 +60,7 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     width: max-content;
     max-width: 100%;
     border: 0 solid var(--xmlui-borderColor-Checkbox);
-    border-radius: var(--xmlui-borderRadius-Checkbox);
+    border-radius: var(--xmlui-borderRadius-Checkbox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)));
     background-color: var(--xmlui-backgroundColor-Checkbox);
   }
 
@@ -116,11 +116,11 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     appearance: none;
     -webkit-appearance: none;
     border: 2px solid transparent;
-    border-radius: var(--xmlui-borderRadius-Checkbox);
+    border-radius: var(--xmlui-borderRadius-Checkbox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)));
     border-color: var(--xmlui-borderColor-Checkbox);
     background-color: var(--xmlui-backgroundColor-Checkbox);
     color: var(--xmlui-backgroundColor-indicator-Checkbox);
-    font: inherit;
+    font-size: 1rem;
   }
 
   .checkboxRoot:not([readonly]) {
@@ -131,7 +131,6 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     border-color: var(--xmlui-borderColor-Checkbox--hover);
   }
 
-  .checkboxRoot:focus,
   .checkboxRoot:focus-visible {
     outline-width: var(--xmlui-outlineWidth-Checkbox, var(--xmlui-outlineWidth-Checkbox--focus));
     outline-color: var(--xmlui-outlineColor-Checkbox, var(--xmlui-outlineColor-Checkbox--focus));
@@ -176,19 +175,28 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
   }
 
   .checkboxError {
-    border-radius: var(--xmlui-borderRadius-Checkbox--error);
+    border-radius: var(
+      --xmlui-borderRadius-Checkbox--error,
+      var(--xmlui-borderRadius-Checkbox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)))
+    );
     border-color: var(--xmlui-borderColor-Checkbox--error);
     background-color: var(--xmlui-backgroundColor-Checkbox--error);
   }
 
   .checkboxWarning {
-    border-radius: var(--xmlui-borderRadius-Checkbox--warning);
+    border-radius: var(
+      --xmlui-borderRadius-Checkbox--warning,
+      var(--xmlui-borderRadius-Checkbox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)))
+    );
     border-color: var(--xmlui-borderColor-Checkbox--warning);
     background-color: var(--xmlui-backgroundColor-Checkbox--warning);
   }
 
   .checkboxSuccess {
-    border-radius: var(--xmlui-borderRadius-Checkbox--success);
+    border-radius: var(
+      --xmlui-borderRadius-Checkbox--success,
+      var(--xmlui-borderRadius-Checkbox, var(--xmlui-borderRadius-Input, var(--xmlui-borderRadius, 4px)))
+    );
     border-color: var(--xmlui-borderColor-Checkbox--success);
     background-color: var(--xmlui-backgroundColor-Checkbox--success);
   }

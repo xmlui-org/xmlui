@@ -1,27 +1,25 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $size-Spinner: createThemeVar("size-Spinner");
 $thickness-Spinner: createThemeVar("thickness-Spinner");
 $borderColor-Spinner: createThemeVar("borderColor-Spinner");
-$current-borderColor-Spinner: var(--xmlui-current-borderColor-Spinner, #{$borderColor-Spinner});
-
-:export {
-  themeVars: "";
-}
 
 @layer components {
-  .spinner {
+  .lds-ring {
     display: inline-block;
     position: relative;
     width: $size-Spinner;
     height: $size-Spinner;
-    border-color: $current-borderColor-Spinner;
   }
 
-  .spinnerSegment {
+  .lds-ring div {
     box-sizing: border-box;
     display: block;
     position: absolute;
@@ -31,27 +29,26 @@ $current-borderColor-Spinner: var(--xmlui-current-borderColor-Spinner, #{$border
     border-width: $thickness-Spinner;
     border-style: solid;
     border-radius: 50%;
-    animation: spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: $current-borderColor-Spinner transparent transparent transparent;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: var(--xmlui-current-borderColor-Spinner, #{$borderColor-Spinner}) transparent transparent transparent;
   }
 
-  .spinnerSegment:nth-child(1) {
+  .lds-ring div:nth-child(1) {
     animation-delay: -0.45s;
   }
 
-  .spinnerSegment:nth-child(2) {
+  .lds-ring div:nth-child(2) {
     animation-delay: -0.3s;
   }
 
-  .spinnerSegment:nth-child(3) {
+  .lds-ring div:nth-child(3) {
     animation-delay: -0.15s;
   }
 
-  @keyframes spinner-ring {
+  @keyframes lds-ring {
     0% {
       transform: rotate(0deg);
     }
-
     100% {
       transform: rotate(360deg);
     }
@@ -66,4 +63,9 @@ $current-borderColor-Spinner: var(--xmlui-current-borderColor-Spinner, #{$border
     align-items: center;
     justify-content: center;
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -1,14 +1,20 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./Spinner.module.scss";
+
+import React from "react";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./Spinner.defaults";
+import { Spinner } from "./SpinnerReact";
+import { createMetadata } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { CSSProperties } from "react";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { useThemeVariables } from "../../runtime/rendering/theme";
+import { collectComponentThemeDefaults, mergeThemeVariableLayers, resolveThemeReferences, resolveThemeVariable } from "../../styling/theme";
 
 const COMP = "Spinner";
-
-const spinnerStylesSource = `
-$size-Spinner: createThemeVar("size-Spinner");
-$thickness-Spinner: createThemeVar("thickness-Spinner");
-$borderColor-Spinner: createThemeVar("borderColor-Spinner");
-`;
 
 export const SpinnerMd = createMetadata({
   status: "stable",
@@ -22,25 +28,80 @@ export const SpinnerMd = createMetadata({
   },
   props: {
     delay: {
-      description: "The delay in milliseconds before the spinner is displayed.",
+      description: `The delay in milliseconds before the spinner is displayed.`,
       valueType: "number",
       defaultValue: defaultProps.delay,
     },
     fullScreen: {
-      description: "If set to `true`, the component will be rendered in a full screen container.",
+      description: `If set to \`true\`, the component will be rendered in a full screen container.`,
       valueType: "boolean",
       defaultValue: defaultProps.fullScreen,
     },
-    testId: {
-      description: "Adds a test identifier to the component root.",
-      valueType: "string",
-    },
   },
   defaultAriaLabel: "Loading",
-  themeVars: extractScssThemeVars(spinnerStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`size-${COMP}`]: "2.5em",
     [`thickness-${COMP}`]: "0.125em",
     [`borderColor-${COMP}`]: "$color-surface-400",
   },
 });
+
+type ThemedSpinnerProps = Omit<React.ComponentProps<typeof Spinner>, "classes"> & { className?: string };
+export const ThemedSpinner = React.forwardRef<HTMLDivElement, ThemedSpinnerProps>(
+  function ThemedSpinner({ className, ...props }: ThemedSpinnerProps, ref) {
+    const themeClass = useComponentThemeClass(SpinnerMd);
+    const combinedClass = [themeClass, className].filter(Boolean).join(" ");
+    return <Spinner {...props} classes={{ [COMPONENT_PART_KEY]: combinedClass }} ref={ref} />;
+  },
+);
+
+export const spinnerComponentRenderer = wrapComponent(
+  COMP,
+  ThemedSpinner,
+  SpinnerMd,
+);
+
+export const spinnerRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: SpinnerMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const themeVariables = useThemeVariables();
+    const mergedThemeVariables = mergeThemeVariableLayers([
+      collectComponentThemeDefaults(SpinnerMd),
+      themeVariables,
+    ]);
+    const variant = adapter.stringProp("variant");
+    const rootAttrs = adapter.rootAttrs();
+
+    return (
+      <Spinner
+        {...rootAttrs}
+        delay={adapter.numberProp("delay", defaultProps.delay)}
+        fullScreen={adapter.booleanProp("fullScreen", defaultProps.fullScreen)}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+        style={{
+          ...(rootAttrs.style as CSSProperties | undefined),
+          ...currentVariantCssVariables(variant, mergedThemeVariables),
+        }}
+      />
+    );
+  },
+});
+
+function currentVariantCssVariables(
+  variant: string | undefined,
+  themeVariables: Record<string, unknown>,
+): CSSProperties {
+  if (!variant) {
+    return {};
+  }
+  const borderColor = resolveThemeVariable(`borderColor-Spinner-${variant}`, [themeVariables]);
+  if (borderColor === undefined || borderColor === null || borderColor === "") {
+    return {};
+  }
+  return {
+    borderColor: String(resolveThemeReferences(borderColor)),
+    "--xmlui-current-borderColor-Spinner": String(resolveThemeReferences(borderColor)),
+  } as CSSProperties;
+}

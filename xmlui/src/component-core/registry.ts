@@ -2,16 +2,16 @@ import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
-import { appRenderer } from "../components/App/App";
-import { appHeaderRenderer } from "../components/AppHeader/AppHeader.renderer";
-import { avatarRenderer } from "../components/Avatar/Avatar.renderer";
-import { badgeRenderer } from "../components/Badge/Badge.renderer";
+import { appRuntimeRenderer } from "../components/App/App";
+import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
+import { avatarRenderer } from "../components/Avatar/Avatar";
+import { badgeRenderer } from "../components/Badge/Badge";
 import { buttonRenderer } from "../components/Button/Button";
-import { cardRenderer } from "../components/Card/Card.renderer";
+import { cardRenderer } from "../components/Card/Card";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
-import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator.renderer";
-import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
+import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
+import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import {
   headingRenderer,
@@ -30,17 +30,17 @@ import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
 import { imageRenderer } from "../components/Image/Image.renderer";
-import { iframeRenderer } from "../components/IFrame/IFrame.renderer";
+import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
 import { linkRenderer } from "../components/Link/Link.renderer";
 import { logoRenderer } from "../components/Logo/Logo";
-import { noResultRenderer } from "../components/NoResult/NoResult.renderer";
+import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
-import { progressBarRenderer } from "../components/ProgressBar/ProgressBar.renderer";
-import { qrCodeRenderer } from "../components/QRCode/QRCode.renderer";
+import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
+import { qrCodeRenderer } from "../components/QRCode/QRCode";
 import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
-import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller.renderer";
+import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import {
   hSplitterRenderer,
   splitterRenderer,
@@ -48,7 +48,7 @@ import {
 } from "../components/Splitter/Splitter.renderer";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
-import { spinnerRenderer } from "../components/Spinner/Spinner.renderer";
+import { spinnerRenderer } from "../components/Spinner/Spinner";
 import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
 import {
   chStackRenderer,
@@ -58,40 +58,43 @@ import {
   vStackRenderer,
 } from "../components/Stack/Stack";
 import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
-import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox.renderer";
-import { textAreaRenderer } from "../components/TextArea/TextArea.renderer";
-import { numberBoxRenderer } from "../components/NumberBox/NumberBox.renderer";
-import { checkboxRenderer } from "../components/Checkbox/Checkbox.renderer";
-import { switchRenderer } from "../components/Switch/Switch.renderer";
-import { ratingInputRenderer } from "../components/RatingInput/RatingInput.renderer";
-import { sliderRenderer } from "../components/Slider/Slider.renderer";
-import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker.renderer";
-import { dateInputRenderer } from "../components/DateInput/DateInput.renderer";
-import { datePickerRenderer } from "../components/DatePicker/DatePicker.renderer";
-import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
-import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog.renderer";
+import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
+import { textAreaRenderer } from "../components/TextArea/TextArea";
+import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
+import { checkboxRenderer } from "../components/Checkbox/Checkbox";
+import { switchRenderer } from "../components/Switch/Switch";
+import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
+import { sliderRenderer } from "../components/Slider/Slider";
+import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
+import { dateInputRenderer } from "../components/DateInput/DateInput";
+import { datePickerRenderer } from "../components/DatePicker/DatePicker";
+import { drawerRenderer } from "../components/Drawer/Drawer";
+import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
-import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu.renderer";
+import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import {
   dropdownMenuRenderer,
-  menuItemRenderer,
-  menuSeparatorRenderer,
-  subMenuItemRenderer,
-} from "../components/DropdownMenu/DropdownMenu.renderer";
+  menuItemRuntimeRenderer as menuItemRenderer,
+  menuSeparatorRuntimeRenderer as menuSeparatorRenderer,
+  subMenuItemRuntimeRenderer as subMenuItemRenderer,
+} from "../components/DropdownMenu/DropdownMenu";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
-import { fileInputRenderer } from "../components/FileInput/FileInput.renderer";
-import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
-import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
-import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout.renderer";
-import { footerRenderer } from "../components/Footer/Footer.renderer";
+import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
+import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
+import { focusScopeRenderer } from "../components/FocusScope/FocusScope";
+import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
+import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
+import { formValidatorRenderer } from "../components/Form/FormValidator";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
+import { formSectionRenderer } from "../components/FormSection/FormSection.renderer";
 import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
-import { radioGroupRenderer } from "../components/RadioGroup/RadioGroup";
+import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
+import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
@@ -103,22 +106,22 @@ import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
-import { navGroupRenderer } from "../components/NavGroup/NavGroup.renderer";
-import { navLinkRenderer } from "../components/NavLink/NavLink.renderer";
+import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
+import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
-import { navPanelRenderer } from "../components/NavPanel/NavPanel.renderer";
+import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { apiCallRenderer } from "../components/APICall/APICall.renderer";
-import { appStateRenderer } from "../components/AppState/AppState.renderer";
-import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener.renderer";
+import { appStateRenderer } from "../components/AppState/AppState";
+import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
 import { timerRenderer } from "../components/Timer/Timer.renderer";
 import { queueRenderer } from "../components/Queue/Queue.renderer";
-import { messageListenerRenderer } from "../components/MessageListener/MessageListener.renderer";
+import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
-import { bookmarkRenderer } from "../components/Bookmark/Bookmark.renderer";
+import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { themeRenderer } from "../components/Theme/Theme.renderer";
@@ -126,8 +129,8 @@ import { slotRenderer } from "../components/Slot/Slot.renderer";
 import { partRenderer } from "../components/Part/Part";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
-import { pageRenderer, pagesRenderer } from "../components/Pages/Pages.renderer";
-import { redirectRenderer } from "../components/Redirect/Redirect.renderer";
+import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
+import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
@@ -230,8 +233,10 @@ const implementedRuntimeNames = [
   "FocusScope",
   "Footer",
   "Form",
+  "FormValidator",
   "FormItem",
   "FormSegment",
+  "FormSection",
   "StepperForm",
   "TabsForm",
   "TimeInput",
@@ -277,8 +282,8 @@ const legacyRuntimeRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = le
 const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Accordion: accordionRenderer,
   AccordionItem: accordionItemRenderer,
-  App: appRenderer,
-  AppHeader: appHeaderRenderer,
+  App: appRuntimeRenderer,
+  AppHeader: appHeaderRuntimeRenderer,
   Avatar: avatarRenderer,
   Badge: badgeRenderer,
   br: brRenderer,
@@ -347,13 +352,15 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   MenuSeparator: menuSeparatorRenderer,
   SubMenuItem: subMenuItemRenderer,
   AutoComplete: autoCompleteRenderer,
-  FileInput: fileInputRenderer,
+  FileInput: fileInputRuntimeRenderer,
   FileUploadDropZone: fileUploadDropZoneRenderer,
   FocusScope: focusScopeRenderer,
-  Footer: footerRenderer,
+  Footer: footerRuntimeRenderer,
   Form: formRenderer,
+  FormValidator: formValidatorRenderer,
   FormItem: formItemRenderer,
   FormSegment: formSegmentRenderer,
+  FormSection: formSectionRenderer,
   StepperForm: stepperFormRenderer,
   TabsForm: tabsFormRenderer,
   Option: optionRenderer,
@@ -364,17 +371,18 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Tree: treeRenderer,
   TreeDisplay: treeDisplayRenderer,
   TableOfContents: tableOfContentsRenderer,
-  RadioGroup: radioGroupRenderer,
+  RadioGroup: radioGroupRuntimeRenderer,
+  RadioItem: radioItemRenderer,
   ScrollViewer: scrollViewerRenderer,
   Select: selectRenderer,
   SelectionStore: selectionStoreRenderer,
   Items: itemsRenderer,
   TimeInput: timeInputRenderer,
   ValidationSummary: validationSummaryRenderer,
-  NavGroup: navGroupRenderer,
-  NavLink: navLinkRenderer,
+  NavGroup: navGroupRuntimeRenderer,
+  NavLink: navLinkRuntimeRenderer,
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
-  NavPanel: navPanelRenderer,
+  NavPanel: navPanelRuntimeRenderer,
   DataSource: dataSourceRenderer,
   APICall: apiCallRenderer,
   AppState: appStateRenderer,
@@ -394,9 +402,9 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   Part: partRenderer,
   ToneSwitch: toneSwitchRenderer,
   ToneChangerButton: toneChangerButtonRenderer,
-  Pages: pagesRenderer,
-  Page: pageRenderer,
-  Redirect: redirectRenderer,
+  Pages: pagesRuntimeRenderer,
+  Page: pageRuntimeRenderer,
+  Redirect: redirectRuntimeRenderer,
   NestedApp: nestedAppRenderer,
   IncludeMarkup: includeMarkupRenderer,
   Markdown: markdownRenderer,
@@ -843,11 +851,11 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (tooltipTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TooltipReact.tsx`);
     } else if (contextMenuTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContextMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ContextMenu.tsx`);
     } else if (dropdownMenuTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenu.tsx`);
     } else if (menuPrimitiveTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenuReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DropdownMenu.tsx`);
     } else if (fileInputTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/FileInputReact.tsx`);
     } else if (fileUploadDropZoneTransferred) {
@@ -945,9 +953,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (apiCallTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.renderer.tsx`);
     } else if (appStateTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.tsx`);
     } else if (changeListenerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ChangeListener.tsx`);
     } else if (lifecycleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
     } else if (timerTransferred) {
@@ -957,13 +965,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (eventSourceTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/EventSource.renderer.tsx`);
     } else if (messageListenerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListener.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListenerReact.tsx`);
     } else if (webSocketTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocket.renderer.tsx`);
     } else if (liveRegionTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LiveRegion.renderer.tsx`);
     } else if (bookmarkTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Bookmark.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Bookmark.tsx`);
     } else if (skipLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
     } else if (toastTransferred) {
@@ -979,7 +987,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (pagesTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
     } else if (redirectTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Redirect.tsx`);
     } else if (nestedAppTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NestedAppReact.tsx`);
     }
@@ -1280,8 +1288,8 @@ function componentRunnablePaths(flags: {
   if (flags.buttonTransferred) {
     return [
       "xmlui/src/components/Button/Button.spec.ts",
-      "xmlui/src/components/Button/Button.spec.tsx",
       "xmlui/src/components/Button/Button-style.spec.ts",
+      "xmlui/src/components/Button/Button.compat.spec.ts",
       "xmlui/tests/e2e/counter-components.spec.ts",
       "xmlui/tests/e2e/counter-globals.spec.ts",
     ];

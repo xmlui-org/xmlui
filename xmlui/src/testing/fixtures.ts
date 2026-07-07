@@ -35,6 +35,7 @@ import {
   SplitterDriver,
   DateInputDriver,
   FileUploadDropZoneDriver,
+  FileInputDriver,
   FooterDriver,
   FormDriver,
   FormItemDriver,
@@ -47,9 +48,13 @@ import {
   TreeDriver,
 } from "./ComponentDrivers";
 
+const e2eDevPort = process.env.XMLUI_E2E_DEV_PORT ?? "5173";
+
 export type InitTestBedOptions = {
   testThemeVars?: Record<string, unknown>;
   components?: string[];
+  extensionIds?: string | string[];
+  mainXs?: string;
   resources?: Record<string, string>;
   apiInterceptor?: {
     initialize?: string;
@@ -64,6 +69,7 @@ export type InitTestBedOptions = {
 
 export type TestBedResult = {
   width: number;
+  height: number;
   clipboard: {
     write: (value: string) => Promise<void>;
     paste: (target: Locator) => Promise<void>;
@@ -71,6 +77,14 @@ export type TestBedResult = {
   };
   testStateDriver: {
     testState: () => Promise<unknown>;
+  };
+  testIcons: {
+    boxIcon: Locator;
+    docIcon: Locator;
+    sunIcon: Locator;
+    eyeIcon: Locator;
+    txtIcon: Locator;
+    bellIcon: Locator;
   };
 };
 
@@ -108,6 +122,7 @@ type Fixtures = {
   createTextAreaDriver: (testId?: string | Locator) => Promise<TextAreaDriver>;
   createNumberBoxDriver: (testId?: string | Locator) => Promise<NumberBoxDriver>;
   createDateInputDriver: (testId?: string | Locator) => Promise<DateInputDriver>;
+  createFileInputDriver: (testId?: string | Locator) => Promise<FileInputDriver>;
   createFileUploadDropZoneDriver: (testId?: string | Locator) => Promise<FileUploadDropZoneDriver>;
   createFooterDriver: (testId?: string | Locator) => Promise<FooterDriver>;
   createFormDriver: (testId?: string | Locator) => Promise<FormDriver>;
@@ -132,13 +147,19 @@ type WorkerFixtures = {
 declare global {
   interface Window {
     __xmluiClipboardText?: string;
+    __xmluiTestBedProbe?: {
+      hasLocal(name: string): boolean;
+      readLocal(name: string): unknown;
+      readGlobal(name: string): unknown;
+      readReference(name: string): unknown;
+    };
     __xmluiTestBedReady?: boolean;
     __xmluiTestBedReinit?: (source: string) => Promise<void>;
   }
 }
 
 export const expect = baseExpect.extend({
-  toEqualWithTolerance(actual: number, expected: number, tolerance: number) {
+  toEqualWithTolerance(actual: number, expected: number, tolerance = 0.001) {
     const pass = Math.abs(actual - expected) <= Math.abs(expected * tolerance);
     return {
       pass,
@@ -165,7 +186,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
     async ({ browser }, use) => {
       const context = await browser.newContext({
         ...devices["Desktop Chrome"],
-        baseURL: "http://127.0.0.1:5173/",
+        baseURL: `http://127.0.0.1:${e2eDevPort}/`,
         permissions: ["clipboard-read", "clipboard-write"],
       });
       await use(context);
@@ -204,13 +225,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       await _sharedPage.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
+        document.documentElement.style.fontSize = "";
         window.scrollTo(0, 0);
         if ((window as any).__originalMatchMedia) {
           window.matchMedia = (window as any).__originalMatchMedia;
           delete (window as any).__originalMatchMedia;
         }
       });
-      await _sharedPage.mouse.move(0, 0);
+      await moveMouseAwayFromOrigin(_sharedPage);
     } catch {
       // The shared page can already be gone after a hard test failure.
     }
@@ -218,8 +240,10 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   initTestBed: async ({ page }, use) => {
     await use(async (markup, options = {}) => {
       await initTestBed(page, markup, options);
+      const viewport = page.viewportSize();
       return {
         width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
+        height: viewport?.height ?? 0,
         clipboard: createClipboardHelper(page),
         testStateDriver: {
           testState: async () => {
@@ -235,6 +259,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
             }
             return parseTestState(await page.getByTestId("__xmlui-test-state").textContent());
           },
+        },
+        testIcons: {
+          boxIcon: page.getByTestId("box-svg"),
+          docIcon: page.getByTestId("doc-svg"),
+          sunIcon: page.getByTestId("sun-svg"),
+          eyeIcon: page.getByTestId("eye-svg"),
+          txtIcon: page.getByTestId("txt-svg"),
+          bellIcon: page.getByTestId("bell-svg"),
         },
       };
     });
@@ -424,10 +456,9 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   createDropdownMenuDriver: async ({ page }, use) => {
     await use(async (testId) => new DropdownMenuDriver({
       locator: typeof testId === "string"
-        ? page.getByTestId(testId)
+        ? preferVisibleLocator(page.getByTestId(testId)
             .or(page.locator(`[data-xmlui-id="${testId}"]`))
-            .or(page.locator(`#${testId}`))
-            .first()
+            .or(page.locator(`#${testId}`)))
         : testId ?? page.locator('[data-xmlui-component="DropdownMenu"]').first(),
       page,
     }));
@@ -536,6 +567,17 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
             .or(page.locator(`#${testId}`))
             .first()
         : testId ?? page.locator('[data-xmlui-component="DateInput"]').first(),
+      page,
+    }));
+  },
+  createFileInputDriver: async ({ page }, use) => {
+    await use(async (testId) => new FileInputDriver({
+      locator: typeof testId === "string"
+        ? page.getByTestId(testId)
+            .or(page.locator(`[data-xmlui-id="${testId}"]`))
+            .or(page.locator(`#${testId}`))
+            .first()
+        : testId ?? page.locator('[data-xmlui-component="FileInput"]').first(),
       page,
     }));
   },
@@ -700,12 +742,25 @@ async function initTestBed(
   options: InitTestBedOptions,
 ): Promise<void> {
   const source = normalizeTestBedSource(markup, options);
+  const defaultTestResources = {
+    "icon.box": "/resources/box.svg",
+    "icon.doc": "/resources/doc.svg",
+    "icon.sun": "/resources/sun.svg",
+    "icon.eye": "/resources/eye.svg",
+    "icon.txt": "/resources/txt.svg",
+    "icon.bell": "/resources/bell.svg",
+  };
   const testBedPayload = {
     source,
     components: options.components ?? [],
+    extensionIds: normalizeExtensionIds(options.extensionIds),
+    resources: {
+      ...defaultTestResources,
+      ...(options.resources ?? {}),
+    },
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[] }) => {
+  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -718,6 +773,8 @@ async function initTestBed(
     });
     window.sessionStorage.setItem("__xmluiTestBedSource", payload.source);
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
+    window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
+    window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -728,19 +785,15 @@ async function initTestBed(
         await window.__xmluiTestBedReinit?.(xmluiSource);
       }, source);
     } catch {
-      await page.addInitScript(installTestBedSource, testBedPayload);
-      await page.goto("/?__xmluiTestBed=1");
+      await navigateWithTestBedSource(page, installTestBedSource, testBedPayload);
     }
   } else {
-    await page.addInitScript(installTestBedSource, testBedPayload);
-    await page.goto("/?__xmluiTestBed=1");
+    await navigateWithTestBedSource(page, installTestBedSource, testBedPayload);
   }
+  await page.waitForFunction(() => window.__xmluiTestBedReady === true);
   const error = page.getByTestId("xmlui-testbed-error");
   if (await error.count()) {
     throw new Error(await error.textContent() ?? "XMLUI testbed failed to compile.");
-  }
-  if (source.includes(`testId="__xmlui-test-state"`)) {
-    await page.getByTestId("__xmlui-test-state").waitFor({ state: "attached" });
   }
   await page.evaluate(() =>
     document.fonts.ready.then(
@@ -750,7 +803,36 @@ async function initTestBed(
         }),
     ),
   );
+  await moveMouseAwayFromOrigin(page);
   await page.keyboard.press("Shift");
+}
+
+async function navigateWithTestBedSource(
+  page: Page,
+  installTestBedSource: (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => void,
+  testBedPayload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> },
+): Promise<void> {
+  await page.goto("/?__xmluiTestBed=1");
+  await page.waitForFunction(() =>
+    typeof window.__xmluiTestBedReinit === "function" ||
+    !!document.querySelector('[data-testid="xmlui-testbed-error"]'),
+  );
+  await page.evaluate(installTestBedSource, testBedPayload);
+  await page.evaluate(async (xmluiSource) => {
+    await window.__xmluiTestBedReinit?.(xmluiSource);
+  }, testBedPayload.source);
+}
+
+async function moveMouseAwayFromOrigin(page: Page): Promise<void> {
+  const viewport = page.viewportSize() ?? { width: 1280, height: 720 };
+  await page.mouse.move(Math.max(viewport.width - 1, 0), Math.max(viewport.height - 1, 0));
+}
+
+function normalizeExtensionIds(extensionIds: string | string[] | undefined): string[] {
+  if (!extensionIds) {
+    return [];
+  }
+  return Array.isArray(extensionIds) ? extensionIds : [extensionIds];
 }
 
 async function installApiInterceptor(
@@ -899,31 +981,52 @@ function normalizeTestBedSource(markup: string, options: InitTestBedOptions): st
   const { markup: normalizedMarkup, declarations } = normalizeLegacyVariableDeclarations(
     normalizeLegacyTestMarkup(markup.trim()),
   );
+  const mainXsDeclarations = normalizeLegacyMainXsDeclarations(options.mainXs);
   const trimmed = normalizedMarkup;
   const testBedAppAttributes = {
+    "padding": "0",
+    "noScrollbarGutters": "true",
+  };
+  const testBedThemeVars = {
     "paddingHorizontal-content-App": "0",
     "paddingVertical-content-App": "0",
     "gap-content-App": "0",
+    "maxWidth-content-App": "none",
+    "maxWidth-App": "none",
+    ...options.testThemeVars,
   };
   const appThemeAttributeEntries = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`);
   if (/^<App\b[^>]*\S[^>]*>/.test(trimmed) && !/^<App\s*>/.test(trimmed)) {
     const injectedAttributes = [
       ...appThemeAttributeEntries,
+      ...mainXsDeclarations,
       ...declarations,
       trimmed.includes("testState") && !/\bvar\.testState=/.test(trimmed) ? `var.testState="{${implicitTestStateInitialValue(trimmed)}}"` : "",
     ].filter(Boolean);
-    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), options.testThemeVars);
+    return wrapRootAppTheme(injectAppAttributes(trimmed, injectedAttributes), testBedThemeVars);
   }
-  const bodyMarkup = startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed;
+  const bodyMarkup = injectDefaultRootTestId(startsWithRoot(trimmed) ? stripAppRoot(trimmed) : trimmed);
   const defaultAppThemeAttributes = Object.entries(testBedAppAttributes)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
-  const themeAttributes = Object.entries(options.testThemeVars ?? {})
+  const themeAttributes = Object.entries(testBedThemeVars)
     .map(([name, value]) => `${name}=${quoteAttribute(String(value))}`)
     .join(" ");
   const themedBody = themeAttributes ? `<Theme ${themeAttributes}>${bodyMarkup}</Theme>` : bodyMarkup;
-  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+  return `<App var.testState="{${implicitTestStateInitialValue(trimmed)}}" ${defaultAppThemeAttributes} ${mainXsDeclarations.join(" ")} ${declarations.join(" ")}>${themedBody}<Text testId="__xmlui-test-state">{testState}</Text></App>`;
+}
+
+function normalizeLegacyMainXsDeclarations(mainXs: string | undefined): string[] {
+  if (!mainXs) {
+    return [];
+  }
+  const declarations: string[] = [];
+  const variablePattern = /\bvar\s+([A-Za-z_$][\w$]*)\s*=\s*([\s\S]*?);(?=\s*(?:var\b|$))/g;
+  for (const match of mainXs.matchAll(variablePattern)) {
+    declarations.push(`var.${match[1]}="{${match[2].trim()}}"`);
+  }
+  return declarations;
 }
 
 function implicitTestStateInitialValue(markup: string): "null" | "undefined" {
@@ -960,6 +1063,26 @@ function injectAppAttributes(markup: string, attributes: string[]): string {
     ? `<App${existing} ${filtered} />`
     : `<App${existing} ${filtered}>`;
   return `${rebuilt}${markup.slice(end + 1)}`;
+}
+
+function injectDefaultRootTestId(markup: string): string {
+  const contentSeparatorMatch = markup.match(/<ContentSeparator\b([^>]*)>/);
+  if (contentSeparatorMatch && !/\stestId\s*=/.test(contentSeparatorMatch[1])) {
+    const selfClosingOffset = /\/\s*>$/.test(contentSeparatorMatch[0])
+      ? contentSeparatorMatch[0].lastIndexOf("/")
+      : contentSeparatorMatch[0].length - 1;
+    const insertAt = contentSeparatorMatch.index! + selfClosingOffset;
+    return `${markup.slice(0, insertAt)} testId="test-id-component"${markup.slice(insertAt)}`;
+  }
+  const openTagMatch = markup.match(/^\s*<([A-Z][\w.]*)\b([^>]*)>/);
+  if (!openTagMatch || /\stestId\s*=/.test(openTagMatch[2])) {
+    return markup;
+  }
+  const selfClosingOffset = /\/\s*>$/.test(openTagMatch[0])
+    ? openTagMatch[0].lastIndexOf("/")
+    : openTagMatch[0].length - 1;
+  const insertAt = openTagMatch.index! + selfClosingOffset;
+  return `${markup.slice(0, insertAt)} testId="test-id-component"${markup.slice(insertAt)}`;
 }
 
 function wrapRootAppTheme(markup: string, themeVars: Record<string, unknown> | undefined): string {
@@ -1185,6 +1308,10 @@ function stripAppRoot(markup: string): string {
 
 function quoteAttribute(value: string): string {
   return `"${value.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}"`;
+}
+
+function preferVisibleLocator(locator: Locator): Locator {
+  return locator.filter({ visible: true }).first();
 }
 
 function parseTestState(value: string | null): unknown {

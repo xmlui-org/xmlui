@@ -1,40 +1,39 @@
-import { forwardRef, memo, type CSSProperties, type ForwardedRef } from "react";
+import type { CSSProperties, ForwardedRef} from "react";
+import { forwardRef, memo } from "react";
+import classnames from "classnames";
 
-import { Image } from "../Image/ImageReact";
+import { ThemedImage as Image } from "../Image/Image";
+import { useLogoUrl } from "../AppHeader/AppHeaderReact";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
 import { defaultProps } from "./Logo.defaults";
-import styles from "./Logo.module.scss";
 
-export type LogoProps = {
-  src?: string;
+type LogoProps = {
   alt?: string;
-  inline?: boolean;
-  className?: string;
   style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  inline?: boolean;
 };
 
 export const Logo = memo(forwardRef(function Logo(
-  {
-    src,
-    alt = defaultProps.alt,
-    inline = defaultProps.inline,
-    className,
-    style,
-    ...rest
-  }: LogoProps,
-  ref: ForwardedRef<HTMLImageElement>,
+  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, classes, ...rest }: LogoProps,
+  forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
-  if (!src) {
+  const logoUrl = useLogoUrl();
+  if (!logoUrl) {
     return null;
   }
+  //width auto for safari
   return (
     <Image
       {...rest}
-      ref={ref}
-      src={src}
+      ref={forwardedRef}
+      src={logoUrl}
       alt={alt}
       inline={inline}
-      className={[styles.logo, className].filter(Boolean).join(" ")}
-      style={style}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+      style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );
 }));

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createToastService } from "../../src/runtime/services/toast";
 import {
   createEventContext,
+  createExpressionContext,
   createRuntimeScope,
 } from "../../src/runtime/state";
 import { createRuntimeStateStore } from "../../src/runtime/state/store";
@@ -20,6 +21,14 @@ describe("runtime services", () => {
     expect(toast.getSnapshot()).toEqual([
       { id: "toast-1", message: "Saved", kind: "success" },
     ]);
+  });
+
+  it("exposes the app toast service through app context reads", () => {
+    const store = createRuntimeStateStore();
+    const toast = createToastService();
+    const context = createExpressionContext(createRuntimeScope({ store, toast }));
+
+    expect(context.readContext?.("toast")).toBe(toast.reference);
   });
 
   it("updates loading toasts by id and supports dismissing all notifications", () => {

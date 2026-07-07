@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Widget",
+    "price": 9.99,
+    "category": "Tools",
+    "inStock": true
+  },
+  {
+    "name": "Gadget",
+    "price": 19.99,
+    "category": "Electronics",
+    "inStock": true
+  },
+  {
+    "name": "Doohickey",
+    "price": 4.99,
+    "category": "Misc",
+    "inStock": false
+  },
+  {
+    "name": "Thingamajig",
+    "price": 14.99,
+    "category": "Tools",
+    "inStock": true
+  },
+  {
+    "name": "Whatsit",
+    "price": 24.99,
+    "category": "Electronics",
+    "inStock": true
+  },
+  {
+    "name": "Gizmo",
+    "price": 7.99,
+    "category": "Misc",
+    "inStock": true
+  }
+]

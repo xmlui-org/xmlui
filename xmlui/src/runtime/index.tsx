@@ -11,14 +11,18 @@ import {
   useRuntimeStateStore,
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
-import { XmluiThemeRoot } from "./rendering/theme";
+import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
+import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, ToastHost, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
+import { IconProvider } from "../components/IconProvider";
+import { LegacyThemeProvider } from "../components-core/theming/ThemeContext";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
+import { responsiveBreakpoints } from "../styling/contracts";
 
 ensureXmluiDebugBridge();
 
@@ -27,19 +31,20 @@ export function createXmluiModule(
   components: XmluiModule[] = [],
   options: { extensions?: Iterable<Extension> } = {},
 ): XmluiModule {
-  if (document.kind === "component") {
-    return {
-      kind: "component",
-      name: document.name,
-      root: document.root,
-    };
-  }
-
   const componentMap: Record<string, XmluiComponentModule> = {};
   for (const component of components) {
     if (component.kind === "component") {
       componentMap[component.name] = component;
     }
+  }
+
+  if (document.kind === "component") {
+    return {
+      kind: "component",
+      name: document.name,
+      root: document.root,
+      components: componentMap,
+    };
   }
 
   const normalizedExtensions = normalizeExtensions(options.extensions ?? []);
@@ -70,6 +75,8 @@ export type MountXmluiAppOptions = {
   isolateRouting?: boolean;
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
+  appGlobals?: Record<string, unknown>;
+  resources?: Record<string, string>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -77,6 +84,7 @@ export type XmluiRuntimeTestProbe = {
   hasLocal(name: string): boolean;
   readLocal(name: string): unknown;
   readGlobal(name: string): unknown;
+  readReference(name: string): unknown;
 };
 
 export function mountXmluiApp(
@@ -96,6 +104,8 @@ export function mountXmluiApp(
         isolateRouting={options.isolateRouting}
         defaultTone={options.defaultTone}
         extensions={options.extensions}
+        appGlobals={options.appGlobals}
+        resources={options.resources}
         testProbe={options.testProbe}
       />,
     );
@@ -108,6 +118,8 @@ export function mountXmluiApp(
       isolateRouting={options.isolateRouting}
       defaultTone={options.defaultTone}
       extensions={options.extensions}
+      appGlobals={options.appGlobals}
+      resources={options.resources}
       testProbe={options.testProbe}
     />,
   );
@@ -120,6 +132,8 @@ export function XmluiRoot({
   isolateRouting = false,
   defaultTone,
   extensions,
+  appGlobals = {},
+  resources = {},
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -127,11 +141,17 @@ export function XmluiRoot({
   isolateRouting?: boolean;
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
+  appGlobals?: Record<string, unknown>;
+  resources?: Record<string, string>;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
   const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
+  const [loggedInUser, setLoggedInUser] = useState<unknown>(undefined);
+  const updateLoggedInUser = useCallback((user: unknown) => {
+    setLoggedInUser((current) => areContextValuesEqual(current, user) ? current : user);
+  }, []);
   const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
@@ -142,7 +162,7 @@ export function XmluiRoot({
     i18nRef.current = createRuntimeI18n();
   }
   const rootOwnerId = "app:root";
-  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting);
+  const routeMode = routeModeFromApp(module.root.props.useHashBasedRouting, appGlobals.useHashBasedRouting);
   const routingRef = useRef<RuntimeRoutingStore>();
   if (!routingRef.current) {
     routingRef.current = new RuntimeRoutingStore(
@@ -174,15 +194,18 @@ export function XmluiRoot({
       hasLocal: (name) => store.hasLocal(rootOwnerId, name),
       readLocal: (name) => store.readLocal(rootOwnerId, name),
       readGlobal: (name) => store.readGlobal(name),
+      readReference: (name) => referencesRef.current[name],
     });
   }, [store, testProbe]);
 
   if (!initializedRef.current) {
     store.createLocalOwner(rootOwnerId);
+    store.setInitialGlobalValue("appGlobals", appGlobals);
     const initialScope = createRuntimeScope({
       store,
       localOwnerId: rootOwnerId,
       props: {},
+      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -215,6 +238,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
+      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -224,7 +248,7 @@ export function XmluiRoot({
         ...normalizedExtensions.functions,
       },
     }),
-    [module.extensionFunctions, normalizedExtensions.functions, store],
+    [appGlobals, loggedInUser, module.extensionFunctions, normalizedExtensions.functions, store],
   );
   const context = useMemo(
     () => createRenderContext(module.components, {
@@ -233,15 +257,100 @@ export function XmluiRoot({
     }),
     [module.components, module.extensionRenderers, normalizedExtensions.renderers],
   );
+  const mediaSize = useRuntimeMediaSize();
 
   return (
-    <XmluiThemeRoot tone={defaultTone}>
-      <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-      {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
-      <GlobalLiveRegion />
-      <ToastHost service={toastRef.current} />
-    </XmluiThemeRoot>
+    <StyleProvider>
+      <XmluiAppContextProvider value={{ appGlobals, loggedInUser, setLoggedInUser: updateLoggedInUser, mediaSize }}>
+        <IconProvider icons={{}}>
+          <XmluiThemeRoot tone={defaultTone}>
+            <LegacyThemeProvider resources={resources}>
+              <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+              {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+              <GlobalLiveRegion />
+              <ToastHost service={toastRef.current} />
+            </LegacyThemeProvider>
+          </XmluiThemeRoot>
+        </IconProvider>
+      </XmluiAppContextProvider>
+    </StyleProvider>
   );
+}
+
+type RuntimeMediaSize = XmluiAppContextValue["mediaSize"];
+
+function useRuntimeMediaSize(): RuntimeMediaSize {
+  const [mediaSize, setMediaSize] = useState<RuntimeMediaSize>(() => runtimeMediaSizeFromWidth(
+    typeof window === "undefined" ? responsiveBreakpoints.xl : window.innerWidth,
+  ));
+
+  useEffect(() => {
+    const update = () => setMediaSize(runtimeMediaSizeFromWidth(window.innerWidth));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return mediaSize;
+}
+
+function runtimeMediaSizeFromWidth(width: number): RuntimeMediaSize {
+  if (width >= responsiveBreakpoints.xxl) {
+    return mediaSizeValue("xxl", 5);
+  }
+  if (width >= responsiveBreakpoints.xl) {
+    return mediaSizeValue("xl", 4);
+  }
+  if (width >= responsiveBreakpoints.lg) {
+    return mediaSizeValue("lg", 3);
+  }
+  if (width >= responsiveBreakpoints.md) {
+    return mediaSizeValue("md", 2);
+  }
+  if (width >= responsiveBreakpoints.sm) {
+    return mediaSizeValue("sm", 1);
+  }
+  return mediaSizeValue("xs", 0);
+}
+
+function mediaSizeValue(size: RuntimeMediaSize["size"], sizeIndex: number): RuntimeMediaSize {
+  return {
+    size,
+    sizeIndex,
+    phone: size === "xs",
+    landscapePhone: size === "sm",
+    tablet: size === "md",
+    desktop: size === "lg",
+    largeDesktop: size === "xl",
+    xlDesktop: size === "xxl",
+    smallScreen: sizeIndex <= 2,
+    largeScreen: sizeIndex >= 3,
+  };
+}
+
+function areContextValuesEqual(left: unknown, right: unknown): boolean {
+  if (Object.is(left, right)) {
+    return true;
+  }
+  if (!isPlainRecord(left) || !isPlainRecord(right)) {
+    return false;
+  }
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+  return leftKeys.every((key) =>
+    Object.prototype.hasOwnProperty.call(right, key) && Object.is(left[key], right[key])
+  );
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function renderConfirmDialog(
@@ -257,8 +366,13 @@ function renderConfirmDialog(
       style={{
         position: "fixed",
         inset: 0,
-        zIndex: 10000,
+        zIndex: 2147483647,
         background: "rgba(0, 0, 0, 0.2)",
+        pointerEvents: "auto",
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        close();
       }}
       onMouseDown={(event) => {
         event.stopPropagation();
@@ -296,8 +410,8 @@ export type { XmluiDocumentInput, XmluiModule } from "./types";
 
 export { startApp } from "./startApp";
 
-function routeModeFromApp(value: string | undefined): RoutingMode {
-  if (value === "false" || value === "{false}") {
+function routeModeFromApp(value: string | undefined, configValue: unknown): RoutingMode {
+  if (value === "false" || value === "{false}" || configValue === false) {
     return "history";
   }
   return "hash";

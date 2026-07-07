@@ -1,10 +1,10 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
 import styles from "./ScrollViewer.module.scss";
 
-export type ScrollViewerProps = {
+export type ScrollViewerProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;

@@ -146,13 +146,13 @@ describe("compileXmluiModule", () => {
     );
   });
 
-  it("surfaces parser diagnostics during compilation", () => {
+  it("accepts implicit boolean attributes during compilation", () => {
     expect(() =>
       compileXmluiModule({
         id: "/tmp/Main.xmlui",
         source: `<App><Button label /></App>`,
       }),
-    ).toThrow("Expected '=' after attribute name.");
+    ).not.toThrow();
   });
 
   it("surfaces semantic diagnostics during compilation", () => {
@@ -162,6 +162,49 @@ describe("compileXmluiModule", () => {
         source: `<App><Button>{missing}</Button></App>`,
       }),
     ).toThrow("Unresolved XMLUI script identifier 'missing'.");
+  });
+
+  it("accepts AppContextObject global functions in event handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `<App><Button label="Click me!" onClick="toast('Button clicked')" /></App>`,
+    });
+
+    expect(code).toContain(`ctx.readContext?.("toast")`);
+    expect(code).toContain("Button clicked");
+  });
+
+  it("compiles AppState API calls from event handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `
+        <App>
+          <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
+          <Checkbox
+            initialValue="{appState.value.enhancedMode}"
+            onDidChange="v => appState.update({ enhancedMode: v})" />
+        </App>
+      `,
+    });
+
+    expect(code).toContain(`"type": "AppState"`);
+    expect(code).toContain(`"update"`);
+    expect(code).toContain(`ctx.call`);
+  });
+
+  it("binds static component ids as references inside component files", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Component2.xmlui",
+      source: `
+        <Component name="Component2">
+          <AppState id="state" />
+          <Button enabled="{state.value.enhancedMode}">Set enhanced options</Button>
+        </Component>
+      `,
+    });
+
+    expect(code).toContain(`ctx.readReference?.("state")`);
+    expect(code).not.toContain(`ctx.readGlobal("state")`);
   });
 
   it("surfaces IR diagnostics during compilation", () => {

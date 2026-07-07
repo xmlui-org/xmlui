@@ -1,0 +1,47 @@
+import type React from "react";
+
+import styles from "./Dialog.module.scss";
+
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedModalDialog as ModalDialog } from "./ModalDialog";
+
+export type Props = {
+  title?: string;
+  description?: string;
+  isOpen?: boolean;
+  onClose: () => (Promise<boolean | undefined | void> | boolean | undefined | void);
+  buttons: React.ReactNode;
+  // Accept any React component - provides a way to add custom content to the dialog,
+  // like complex layouts, images, etc.
+  children?: React.ReactNode;
+  portalTo?: HTMLElement;
+  width?: string;
+};
+
+/**
+ * Dialog component that is customizable with action buttons. The children prop accepts React elements.
+ *
+ * Note that clicking outside of the dialog or pressing Escape will call the onClose function.
+ * Thus, if you want to stop that from firing, do so in the onClose function from outside.
+ */
+export const Dialog = ({
+  title,
+  description,
+  children,
+  isOpen,
+  onClose,
+  buttons,
+  width,
+}: Props) => {
+  return (
+    <ModalDialog onClose={onClose} isInitiallyOpen={isOpen} title={title} style={width ? { width } : undefined}>
+      <div className={styles.dialogContent}>
+        <div id="dialogDesc">
+          <Text>{description}</Text>
+        </div>
+        {children}
+      </div>
+      {!!buttons && <footer className={styles.dialogActions}>{buttons}</footer>}
+    </ModalDialog>
+  );
+};

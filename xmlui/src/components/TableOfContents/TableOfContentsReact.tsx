@@ -67,9 +67,9 @@ export const TableOfContentsNative = memo(function TableOfContentsNative({
 
   return (
     <nav {...rest} className={[styles.root, className].filter(Boolean).join(" ")} style={style} data-testid={dataTestId}>
-      {headings.map((heading) => (
+      {headings.map((heading, index) => (
         <div
-          key={heading.id}
+          key={`${heading.id}-${index}`}
           className={[styles.itemWrapper, activeId === heading.id ? styles.active : ""].filter(Boolean).join(" ")}
           style={activeId === heading.id ? { backgroundColor: "var(--xmlui-backgroundColor-TableOfContentsItem--active, rgb(150, 150, 255))" } : undefined}
         >

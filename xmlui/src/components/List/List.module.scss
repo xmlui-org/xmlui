@@ -1,112 +1,231 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
 
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-List: createThemeVar("backgroundColor-List");
-$backgroundColor-selected-List: createThemeVar("backgroundColor-selected-List");
-$backgroundColor-selected-List--hover: createThemeVar("backgroundColor-selected-List--hover");
-$backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-List--hover");
+$component: "List";
 
-:export {
-  themeVars: "";
+@function createThemeVarWithFallback($componentVariable, $fallbackVar) {
+  $themeVars: t.appendThemeVarWithFallback($themeVars, $componentVariable, $fallbackVar) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
+
+$backgroundColor-List: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-selected-List: createThemeVar("backgroundColor-selected-#{$component}");
+$backgroundColor-selected-List--hover: createThemeVar("backgroundColor-selected-#{$component}--hover");
+$backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
+
+// Variables for List selection checkbox — fall back to the Checkbox component's equivalent vars
+$borderRadius-selectionCheckbox-List: createThemeVarWithFallback("borderRadius-selectionCheckbox-#{$component}", "borderRadius-Checkbox");
+$borderColor-selectionCheckbox-List: createThemeVarWithFallback("borderColor-selectionCheckbox-#{$component}", "borderColor-Checkbox");
+$backgroundColor-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-selectionCheckbox-#{$component}", "backgroundColor-Checkbox");
+$borderColor-checked-selectionCheckbox-List: createThemeVarWithFallback("borderColor-checked-selectionCheckbox-#{$component}", "borderColor-checked-Checkbox");
+$backgroundColor-checked-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-checked-selectionCheckbox-#{$component}", "backgroundColor-checked-Checkbox");
+$backgroundColor-indicator-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-indicator-selectionCheckbox-#{$component}", "backgroundColor-indicator-Checkbox");
+$outlineWidth-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineWidth-selectionCheckbox-#{$component}--focus", "outlineWidth-Checkbox--focus");
+$outlineColor-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineColor-selectionCheckbox-#{$component}--focus", "outlineColor-Checkbox--focus");
+$outlineStyle-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineStyle-selectionCheckbox-#{$component}--focus", "outlineStyle-Checkbox--focus");
+$outlineOffset-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineOffset-selectionCheckbox-#{$component}--focus", "outlineOffset-Checkbox--focus");
 
 @layer components {
   .outerListWrapper {
     overflow: auto;
+    //max-height: 100%;
     overflow-anchor: none;
-    background-color: var(--xmlui-backgroundColor-List);
+    background-color: $backgroundColor-List;
+
+    &.hasOutsideScroll {
+      overflow: visible; // Let content overflow so parent can scroll
+      flex: 0 1 auto; // Don't grow, shrink if needed, natural size
+      min-height: 0; // Allow flex shrinking
+      position: relative; // Establish positioning context for Virtualizer
+      
+      .innerListWrapper {
+        position: relative; // Needed for Virtualizer to measure its offset
+      }
+    }
   }
 
   .innerListWrapper {
     display: flex;
     flex-direction: column;
     min-height: 100%;
+
+    &.reverse {
+      justify-content: flex-end;
+    }
   }
 
-  .loadingWrapper,
+  .infoWrapper {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .loadingWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: t.$space-2;
+    padding-bottom: t.$space-2;
+  }
+
   .noRows {
     width: 100%;
-    padding: var(--xmlui-padding-empty-List, var(--xmlui-space-4));
     text-align: center;
-  }
-
-  .listRow {
-    box-sizing: border-box;
+    margin-top: t.$space-4;
   }
 
   .row {
-    box-sizing: border-box;
-    position: relative;
-  }
+    &.selectable {
+      cursor: pointer;
+    }
 
-  .borderCollapse + .borderCollapse {
-    margin-top: -1px;
-  }
+    &.hasCheckboxes {
+      display: flex;
+      align-items: center;
 
-  .listRow.listRowSelectable {
-    cursor: pointer;
-  }
+      > *:not(.checkboxWrapper) {
+        flex: 1;
+        min-width: 0;
+      }
+    }
 
-  .selectable {
-    cursor: pointer;
-  }
+    &.selected {
+      background-color: $backgroundColor-selected-List;
+    }
 
-  .listRow.listRowSelectable:hover {
-    background-color: var(--xmlui-backgroundColor-row-List--hover);
-  }
+    &.selectable:hover {
+      background-color: $backgroundColor-row-List--hover;
+    }
 
-  .listRow.listRowSelected {
-    background-color: var(--xmlui-backgroundColor-selected-List);
-  }
+    &.selected.focused {
+      background-color: $backgroundColor-selected-List;
+    }
 
-  .selected {
-    background-color: var(--xmlui-backgroundColor-selected-List);
-  }
-
-  .listRow.listRowSelected:hover {
-    background-color: var(--xmlui-backgroundColor-selected-List--hover);
-  }
-
-  .listRow.listRowHasCheckboxes {
-    display: flex;
-    align-items: center;
-    gap: var(--xmlui-gap-selectionCheckbox-List, var(--xmlui-space-2));
-  }
-
-  .hasCheckboxes {
-    display: flex;
-    align-items: center;
-    gap: var(--xmlui-gap-selectionCheckbox-List, var(--xmlui-space-2));
-  }
-
-  .hasOverlayCheckbox {
-    position: relative;
-  }
-
-  .listCheckboxWrapper {
-    flex: 0 0 auto;
+    &.selected:hover {
+      background-color: $backgroundColor-selected-List--hover;
+    }
+    &.hasOverlayCheckbox {
+      position: relative;
+    }
   }
 
   .checkboxWrapper {
-    flex: 0 0 auto;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 t.$space-2;
+
+    // Override the Checkbox component's theme vars with List-specific vars (with Checkbox fallback).
+    // Specificity of .checkboxWrapper input (0,1,1) beats Toggle's .checkbox (0,1,0).
+    input {
+      border-radius: $borderRadius-selectionCheckbox-List;
+      border-color: $borderColor-selectionCheckbox-List;
+      background-color: $backgroundColor-selectionCheckbox-List;
+
+      &::before {
+        box-shadow: inset 1em 1em $backgroundColor-indicator-selectionCheckbox-List;
+      }
+
+      &:checked {
+        border-color: $borderColor-checked-selectionCheckbox-List;
+        background-color: $backgroundColor-checked-selectionCheckbox-List;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:focus-visible {
+        outline-width: $outlineWidth-selectionCheckbox-List--focus;
+        outline-color: $outlineColor-selectionCheckbox-List--focus;
+        outline-style: $outlineStyle-selectionCheckbox-List--focus;
+        outline-offset: $outlineOffset-selectionCheckbox-List--focus;
+      }
+    }
+
+    &.checkboxDisabled {
+      opacity: 0.6;
+    }
+
+    &.checkboxOverlay {
+      position: absolute;
+      padding: 0;
+      z-index: 1;
+    }
   }
 
-  .checkboxOverlay {
-    position: absolute;
-    z-index: 1;
-  }
+  .borderCollapse {
+    &:not(.sectioned) {
+      .row {
+        //first row in the list (but not the last)
+        &:first-child:not(:last-child) {
+          & > * {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: 0;
+          }
+        }
 
-  .listGroupHeader,
-  .listGroupFooter {
-    font-weight: 700;
-    padding: var(--xmlui-padding-groupHeader-List, var(--xmlui-space-2));
-  }
+        //last row in the list (but not the first)
+        &:last-child:not(:first-child) {
+          & > * {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+          }
+        }
 
-  .section,
-  .sectionFooter {
-    box-sizing: border-box;
+        //rows in the middle of the list
+        &:not(:first-child):not(:last-child) {
+          & > * {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom: 0;
+          }
+        }
+      }
+    }
+
+    &.sectioned {
+      //.row after the section header (first row in a section)
+      .section + .row:not(:has(+ .sectionFooter)) {
+        & > * {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          border-bottom: 0;
+        }
+      }
+
+      //.row before the sectionFooter (last row in a section)
+      .row:has(+ .sectionFooter):not(.section + .row) {
+        & > * {
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+        }
+      }
+
+      //we select the rows that has .row as direct sibling, but not the first row of a section (rows in the middle of the section)
+      .row:has(+ .row):not(.section + .row) {
+        & > * {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          border-bottom: 0;
+        }
+      }
+    }
   }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

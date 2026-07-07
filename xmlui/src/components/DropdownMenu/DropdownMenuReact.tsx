@@ -1,402 +1,342 @@
-import type { CSSProperties, HTMLAttributes, MutableRefObject, ReactNode, Ref } from "react";
-import { Children, createContext, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ReactNode,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
+import { useEffect, useState, useRef } from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import classnames from "classnames";
 
 import styles from "./DropdownMenu.module.scss";
-import { isTopLayer, registerLayer } from "../layerStack";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-export type MenuContextValue = {
-  closeMenu?: () => void;
-};
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { noop } from "../../components-core/constants";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import type {
+  IconPosition,
+  ButtonVariant,
+  ButtonThemeColor,
+  AlignmentOptions,
+} from "../abstractions";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedButton } from "../Button/Button";
 
-export const MenuContext = createContext<MenuContextValue | undefined>(undefined);
-
-export function useMenuContext(): MenuContextValue {
-  return useContext(MenuContext) ?? {};
-}
-
-export type DropdownMenuApi = {
-  close: () => void;
-  open: () => void;
-};
-
-export type DropdownMenuProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  alignment?: "start" | "center" | "end";
-  children?: ReactNode;
+// Context to manage dropdown menu state
+type DropdownMenuContextType = {
+  closeMenu: () => void;
   contentClassName?: string;
-  disabled?: boolean;
-  label?: string;
-  menuWidth?: string;
-  onWillOpen?: () => boolean | undefined | Promise<boolean | undefined>;
-  registerComponentApi?: (api: DropdownMenuApi) => void;
-  triggerTemplate?: ReactNode;
 };
 
-export const defaultDropdownMenuProps = {
-  alignment: "start" as "start" | "center" | "end",
+export const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
+
+export const useDropdownMenuContext = () => {
+  const context = useContext(DropdownMenuContext);
+  return context;
+};
+
+type DropdownMenuProps = {
+  triggerTemplate?: ReactNode;
+  children?: ReactNode;
+  label?: string;
+  registerComponentApi?: RegisterComponentApiFn;
+  style?: CSSProperties;
+  className?: string;
+  contentClassName?: string;
+  classes?: Record<string, string>;
+  alignment?: AlignmentOptions;
+  onWillOpen?: () => Promise<boolean | undefined>;
+  disabled?: boolean;
+  triggerButtonVariant?: string;
+  triggerButtonThemeColor?: string;
+  triggerButtonIcon?: string;
+  triggerButtonIconPosition?: IconPosition;
+  compact?: boolean;
+  modal?: boolean;
+};
+
+export const defaultDropdownMenuProps: Pick<
+  DropdownMenuProps,
+  | "alignment"
+  | "triggerButtonVariant"
+  | "triggerButtonThemeColor"
+  | "triggerButtonIcon"
+  | "triggerButtonIconPosition"
+> = {
+  alignment: "start",
   triggerButtonVariant: "ghost",
   triggerButtonThemeColor: "primary",
-  triggerButtonIcon: "triggerButton:DropdownMenu",
-  triggerButtonIconPosition: "end" as "start" | "end",
+  triggerButtonIcon: "triggerButton:DropdownMenu", // Use component-specific icon resource pattern
+  triggerButtonIconPosition: "end",
 };
 
-export const DropdownMenuComponent = forwardRef<HTMLDivElement, DropdownMenuProps>(function DropdownMenuComponent(
+export const DropdownMenu = memo(forwardRef(function DropdownMenu(
   {
-    alignment = defaultDropdownMenuProps.alignment,
+    triggerTemplate,
     children,
-    className,
-    contentClassName,
-    disabled = false,
     label,
-    menuWidth,
-    onWillOpen,
     registerComponentApi,
     style,
-    triggerTemplate,
+    className,
+    contentClassName,
+    classes,
+    onWillOpen,
+    alignment = defaultDropdownMenuProps.alignment,
+    disabled = false,
+    triggerButtonVariant = defaultDropdownMenuProps.triggerButtonVariant,
+    triggerButtonThemeColor = defaultDropdownMenuProps.triggerButtonThemeColor,
+    triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
+    triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
+    compact = false,
+    modal = false,
     ...rest
-  },
-  ref,
+  }: DropdownMenuProps,
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const triggerRef = useRef<HTMLButtonElement | HTMLSpanElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const layerIdRef = useRef<symbol>(Symbol("DropdownMenu"));
-  const [openState, setOpenState] = useState(false);
-  const [position, setPosition] = useState({ left: 0, top: 0 });
-  const hasContent = Children.count(children) > 0;
-  const dataTestId = (rest as { "data-testid"?: string })["data-testid"];
-
-  const close = useCallback(() => setOpenState(false), []);
-  const open = useCallback(async () => {
-    if (disabled) {
-      return;
-    }
-    if (!hasContent) {
-      setOpenState(false);
-      return;
-    }
-    const willOpenResult = await onWillOpen?.();
-    if (willOpenResult === false) {
-      return;
-    }
-    const rect = triggerRef.current?.getBoundingClientRect();
-    if (rect) {
-      const left = alignment === "end"
-        ? rect.right
-        : alignment === "center"
-          ? rect.left + rect.width / 2
-          : rect.left;
-      setPosition({ left, top: rect.bottom + 4 });
-    }
-    setOpenState(true);
-  }, [alignment, disabled, hasContent, onWillOpen]);
+  const { root } = useTheme();
+  const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    registerComponentApi?.({ open, close });
-  }, [close, open, registerComponentApi]);
+    registerComponentApi?.({
+      open: () => setOpen(true),
+      close: () => setOpen(false),
+    });
+  }, [registerComponentApi]);
 
+  // Cleanup timeout on unmount
   useEffect(() => {
-    if (!openState) {
-      return;
-    }
-    const unregisterLayer = registerLayer(layerIdRef.current);
-    const onPointerDown = (event: PointerEvent) => {
-      if (!isTopLayer(layerIdRef.current)) {
-        return;
-      }
-      if ((event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
-        return;
-      }
-      if ((event.target as Element | null)?.closest("[data-xmlui-confirm-layer]")) {
-        return;
-      }
-      const target = event.target as Node;
-      if (triggerRef.current?.contains(target) || contentRef.current?.contains(target)) {
-        return;
-      }
-      (event as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled = true;
-      close();
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        close();
-        return;
-      }
-      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-        event.preventDefault();
-        focusMenuItem(contentRef.current, event.key === "ArrowDown" ? 1 : -1);
-      }
-    };
-    window.addEventListener("pointerdown", onPointerDown, true);
-    window.addEventListener("keydown", onKeyDown);
     return () => {
-      unregisterLayer();
-      window.removeEventListener("pointerdown", onPointerDown, true);
-      window.removeEventListener("keydown", onKeyDown);
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
     };
-  }, [close, openState]);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <MenuContext.Provider value={{ closeMenu: close }}>
-      {triggerTemplate ? (
-        <span
-          data-testid={dataTestId}
-          data-xmlui-component="DropdownMenuTrigger"
-          onClick={(event) => {
-            event.stopPropagation();
-            void (openState ? close() : open());
-          }}
-          ref={triggerRef}
-        >
-          {triggerTemplate}
-        </span>
-      ) : (
-        <button
-          className={styles.trigger}
-          aria-expanded={openState}
-          aria-haspopup="menu"
-          data-testid={dataTestId}
-          data-xmlui-component="DropdownMenu"
-          disabled={disabled}
-          onClick={(event) => {
-            event.stopPropagation();
-            void (openState ? close() : open());
-          }}
-          ref={triggerRef as React.Ref<HTMLButtonElement>}
-          type="button"
-        >
-          {label || "Menu"}
-        </button>
-      )}
-      {openState && hasContent ? (
-        <div
-          {...rest}
-          className={[styles.content, "DropdownMenuContent", contentClassName, className].filter(Boolean).join(" ")}
-          data-xmlui-component="DropdownMenuContent"
-          data-xmlui-part="content"
-          ref={mergeRefs(ref, contentRef)}
-          role="menu"
-          style={{
-            ...(style as CSSProperties),
-            left: position.left,
-            top: position.top,
-            transform: alignment === "end" ? "translateX(-100%)" : alignment === "center" ? "translateX(-50%)" : undefined,
-            ...(menuWidth ? { width: menuWidth } : null),
-          }}
-          onPointerDown={(event) => event.stopPropagation()}
-        >
-          {children}
-        </div>
-      ) : null}
-    </MenuContext.Provider>
-  );
-});
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classnames(contentClassName, classes?.[COMPONENT_PART_KEY], className) }}>
+      <DropdownMenuPrimitive.Root
+        open={open}
+        onOpenChange={async (isOpen) => {
+          if (disabled) return;
 
-export type MenuItemProps = Omit<HTMLAttributes<HTMLDivElement>, "onClick"> & {
-  active?: boolean;
-  children?: ReactNode;
-  enabled?: boolean;
-  icon?: ReactNode;
-  iconPosition?: "start" | "end";
-  label?: string;
-  onClick?: () => void | Promise<void>;
-};
+          if (isOpen) {
+            // Clear any pending close timeout when opening
+            if (closeTimeoutRef.current) {
+              clearTimeout(closeTimeoutRef.current);
+              closeTimeoutRef.current = undefined;
+            }
 
-export const MenuItemComponent = forwardRef<HTMLDivElement, MenuItemProps>(function MenuItemComponent(
-  {
-    active = false,
-    children,
-    className,
-    enabled = true,
-    icon,
-    iconPosition = "start",
-    label,
-    onClick,
-    ...rest
-  },
-  ref,
-) {
-  const menu = useMenuContext();
-  const content = Children.count(children) > 0 ? children : label;
-  return (
-    <div
-      {...rest}
-      aria-disabled={!enabled || undefined}
-      className={[
-        styles.menuItem,
-        active && styles.menuItemActive,
-        !enabled && styles.menuItemDisabled,
-        className,
-      ].filter(Boolean).join(" ")}
-      data-xmlui-component="MenuItem"
-      ref={ref}
-      role="menuitem"
-      tabIndex={enabled ? 0 : -1}
-      onClick={() => {
-        if (!enabled) {
-          return;
-        }
-        void onClick?.();
-        menu.closeMenu?.();
-      }}
-      onKeyDown={(event) => {
-        if ((event.key === "Enter" || event.key === " ") && enabled) {
-          event.preventDefault();
-          void onClick?.();
-          menu.closeMenu?.();
-        }
-      }}
-    >
-      {icon && iconPosition !== "end" ? <MenuIcon icon={icon} /> : null}
-      <span>{content}</span>
-      {icon && iconPosition === "end" ? <MenuIcon icon={icon} /> : null}
-    </div>
-  );
-});
-
-export type MenuSeparatorProps = HTMLAttributes<HTMLDivElement>;
-
-export const MenuSeparatorComponent = forwardRef<HTMLDivElement, MenuSeparatorProps>(
-  function MenuSeparatorComponent({ className, ...rest }, ref) {
-    return (
-      <div
-        {...rest}
-        aria-orientation="horizontal"
-        className={[styles.menuSeparator, className].filter(Boolean).join(" ")}
-        data-xmlui-component="MenuSeparator"
-        ref={ref}
-        role="separator"
-      />
-    );
-  },
-);
-
-export type SubMenuItemProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  children?: ReactNode;
-  icon?: ReactNode;
-  iconPosition?: "start" | "end";
-  label?: string;
-  triggerTemplate?: ReactNode;
-};
-
-export const SubMenuItemComponent = forwardRef<HTMLDivElement, SubMenuItemProps>(function SubMenuItemComponent(
-  {
-    children,
-    className,
-    icon,
-    iconPosition = "start",
-    label,
-    triggerTemplate,
-    ...rest
-  },
-  ref,
-) {
-  const [openState, setOpenState] = useState(false);
-
-  return (
-    <div
-      {...rest}
-      className={[styles.subMenuItem, className].filter(Boolean).join(" ")}
-      data-xmlui-component="SubMenuItem"
-      ref={ref}
-      onMouseEnter={() => setOpenState(true)}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          setOpenState(false);
-        }
-      }}
-    >
-      <div
-        aria-expanded={openState}
-        className={styles.subMenuTrigger}
-        role="menuitem"
-        tabIndex={0}
-        onClick={(event) => {
-          event.stopPropagation();
-          setOpenState((current) => !current);
-        }}
-        onFocus={() => setOpenState(true)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " " || event.key === "ArrowRight") {
-            event.preventDefault();
-            setOpenState(true);
+            const willOpenResult = await onWillOpen?.();
+            if (willOpenResult === false) {
+              return;
+            }
+            setOpen(isOpen);
+          } else {
+            const suppressionWindow = window as Window & {
+              __xmluiSuppressNextDropdownClose?: boolean;
+              __xmluiSuppressDropdownCloseUntil?: number;
+            };
+            if (
+              suppressionWindow.__xmluiSuppressNextDropdownClose ||
+              (suppressionWindow.__xmluiSuppressDropdownCloseUntil ?? 0) > Date.now()
+            ) {
+              suppressionWindow.__xmluiSuppressNextDropdownClose = false;
+              suppressionWindow.__xmluiSuppressDropdownCloseUntil = 0;
+              return;
+            }
+            // When closing, add a small delay to allow child components (like Select)
+            // to handle their click-outside events first before the DropdownMenu closes
+            closeTimeoutRef.current = setTimeout(() => {
+              setOpen(false);
+              closeTimeoutRef.current = undefined;
+            }, 0);
           }
         }}
+        modal={modal}
       >
-        {triggerTemplate ?? (
-          <>
-            {icon && iconPosition !== "end" ? <MenuIcon icon={icon} /> : null}
-            <span className={styles.subMenuLabel}>{label}</span>
-            {icon && iconPosition === "end" ? <MenuIcon icon={icon} /> : null}
-            <ChevronIcon />
-          </>
+        <DropdownMenuPrimitive.Trigger {...rest} asChild disabled={disabled} ref={ref}>
+          {triggerTemplate ? (
+            triggerTemplate
+          ) : (
+            <ThemedButton
+              icon={<ThemedIcon name={triggerButtonIcon} fallback="chevrondown" />}
+              iconPosition={triggerButtonIconPosition}
+              type="button"
+              variant={triggerButtonVariant as ButtonVariant}
+              themeColor={triggerButtonThemeColor as ButtonThemeColor}
+              disabled={disabled}
+              className=""
+            >
+              {label}
+            </ThemedButton>
+          )}
+        </DropdownMenuPrimitive.Trigger>
+        <DropdownMenuPrimitive.Portal container={root}>
+          <DropdownMenuPrimitive.Content
+            ref={contentRef}
+            align={alignment}
+            style={style}
+            className={classnames(styles.DropdownMenuContent, contentClassName, classes?.[COMPONENT_PART_KEY], className, {
+              [styles.compact]: compact,
+            })}
+            tabIndex={-1}
+            loop={true}
+          >
+            {children}
+          </DropdownMenuPrimitive.Content>
+        </DropdownMenuPrimitive.Portal>
+      </DropdownMenuPrimitive.Root>
+    </DropdownMenuContext.Provider>
+  );
+}));
+
+type MenuItemProps = {
+  icon?: ReactNode;
+  iconPosition?: IconPosition;
+  onClick?: (event: any) => void;
+  children?: ReactNode;
+  label?: string;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  to?: string;
+  active?: boolean;
+  enabled?: boolean;
+  compact?: boolean;
+  [key: string]: any;
+};
+
+export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"> = {
+  iconPosition: "start",
+  active: false,
+};
+
+export const MenuItem = memo(forwardRef(function MenuItem(
+  {
+    children,
+    onClick = noop,
+    label,
+    style,
+    className,
+    icon,
+    iconPosition = defaultMenuItemProps.iconPosition,
+    active = defaultMenuItemProps.active,
+    enabled = true,
+    compact = false,
+    classes,
+    ...rest
+  }: MenuItemProps,
+  ref,
+) {
+  const iconToStart = iconPosition === "start";
+  const context = useDropdownMenuContext();
+
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (!enabled) return;
+      onClick(event);
+      // Close the menu after clicking an item
+      context?.closeMenu();
+    },
+    [enabled, onClick, context],
+  );
+
+  return (
+    <DropdownMenuPrimitive.Item
+      {...rest}
+      style={style}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.DropdownMenuItem, {
+        [styles.active]: active,
+        [styles.disabled]: !enabled,
+        [styles.compact]: compact,
+      })}
+      ref={ref as any}
+      onClick={handleClick}
+      role="menuitem"
+      tabIndex={enabled ? 0 : -1}
+    >
+      {iconToStart && icon}
+      <div className={styles.wrapper}>{label ?? children}</div>
+      {!iconToStart && icon}
+    </DropdownMenuPrimitive.Item>
+  );
+}));
+
+type SubMenuItemProps = {
+  label?: string;
+  icon?: ReactNode;
+  iconPosition?: IconPosition;
+  children?: ReactNode;
+  triggerTemplate?: ReactNode;
+  className?: string;
+  contentClassName?: string;
+};
+
+export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function SubMenuItem(
+  { children, label, icon, iconPosition = defaultMenuItemProps.iconPosition, triggerTemplate, className, contentClassName },
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  const { root } = useTheme();
+  const [open, setOpen] = useState(false);
+  const iconToStart = iconPosition === "start";
+  const context = useDropdownMenuContext();
+  const resolvedContentClassName = classnames(styles.DropdownMenuSubContent, contentClassName, context?.contentClassName);
+
+  const handleOpenChange = useCallback((isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen) {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "submenu:open",
+        displayLabel: label,
+        componentLabel: label,
+        ariaRole: "menuitem",
+        ariaName: label,
+      });
+    }
+  }, [label]);
+
+  return (
+    <DropdownMenuPrimitive.Sub open={open} onOpenChange={handleOpenChange}>
+      <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
+        {triggerTemplate ? (
+          triggerTemplate
+        ) : (
+          <div className={styles.subMenuItemTrigger}>
+            {iconToStart && icon}
+            <div className={styles.wrapper}>{label}</div>
+            {!iconToStart && icon}
+            <ThemedIcon name="chevronright" fallback="chevronright" />
+          </div>
         )}
-      </div>
-      {openState ? (
-        <div className={[styles.subMenuContent, "DropdownMenuSubContent"].join(" ")} data-xmlui-component="SubMenuContent" role="menu">
+      </DropdownMenuPrimitive.SubTrigger>
+      <DropdownMenuPrimitive.Portal container={root}>
+        <DropdownMenuPrimitive.SubContent
+          className={resolvedContentClassName}
+          sideOffset={2}
+          loop={true}
+        >
           {children}
-        </div>
-      ) : null}
-    </div>
+        </DropdownMenuPrimitive.SubContent>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Sub>
   );
 });
 
-export function focusMenuItem(container: HTMLElement | null, direction: 1 | -1): void {
-  const items = Array.from(
-    container?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])') ?? [],
-  );
-  if (items.length === 0) {
-    return;
-  }
-  const activeIndex = items.indexOf(document.activeElement as HTMLElement);
-  const nextIndex = activeIndex < 0
-    ? direction === 1 ? 0 : items.length - 1
-    : (activeIndex + direction + items.length) % items.length;
-  items[nextIndex]?.focus();
-}
-
-function mergeRefs<T>(...refs: Array<Ref<T> | undefined>) {
-  return (value: T | null) => {
-    refs.forEach((ref) => {
-      if (!ref) {
-        return;
-      }
-      if (typeof ref === "function") {
-        ref(value);
-        return;
-      }
-      (ref as MutableRefObject<T | null>).current = value;
-    });
-  };
-}
-
-function MenuIcon({ icon }: { icon: ReactNode }) {
-  if (!icon) {
-    return null;
-  }
-  return (
-    <svg
-      aria-hidden="true"
-      data-icon={typeof icon === "string" ? icon : undefined}
-      focusable="false"
-      viewBox="0 0 16 16"
-      width="16"
-      height="16"
-    >
-      <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className={styles.subMenuIndicator}
-      focusable="false"
-      viewBox="0 0 16 16"
-      width="12"
-      height="12"
-    >
-      <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+export const MenuSeparator = forwardRef<HTMLDivElement>(function MenuSeparator(props, ref) {
+  return <div ref={ref} className={styles.DropdownMenuSeparator} role="separator" {...props} />;
+});

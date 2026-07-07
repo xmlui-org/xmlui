@@ -39,4 +39,19 @@ test.describe("Stack family foundation", () => {
     await expect(page.getByTestId("column")).toHaveCSS("flex-direction", "column");
     await expect(page.getByTestId("column")).toHaveCSS("gap", "10px");
   });
+
+  test("implicit vertical Stack keeps verticalAlignment on the main axis", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Stack testId="stack" height="100px" verticalAlignment="end" backgroundColor="cyan">
+          <Stack testId="box" width="36px" height="36px" backgroundColor="red" />
+        </Stack>
+      </App>
+    `);
+
+    const stackBox = await page.getByTestId("stack").boundingBox();
+    const box = await page.getByTestId("box").boundingBox();
+    expect(box?.x).toBe(stackBox?.x);
+    expect(box?.y).toBe((stackBox?.y ?? 0) + (stackBox?.height ?? 0) - (box?.height ?? 0));
+  });
 });

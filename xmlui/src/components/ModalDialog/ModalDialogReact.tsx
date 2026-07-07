@@ -1,217 +1,366 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+import classnames from "classnames";
 
-import { defaultProps } from "./ModalDialog.defaults";
-import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import styles from "./ModalDialog.module.scss";
 
-type CloseResult = boolean | void;
-type RenderTitle = ReactNode | ((params: unknown[]) => ReactNode);
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useEvent } from "../../components-core/utils/misc";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedButton as Button } from "../Button/Button";
+import { ModalVisibilityContext } from "./ModalVisibilityContext";
+import { Part } from "../Part/Part";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-export type ModalDialogApi = {
-  open: (...params: unknown[]) => void;
-  close: () => void;
-  isOpen: () => boolean;
-};
+import { defaultProps } from "./ModalDialog.defaults";
 
-export type ModalDialogProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "onClose" | "onOpen" | "title"> & {
-  children?: (params: unknown[]) => ReactNode;
-  closeButtonVisible?: boolean;
+// Part IDs for theming
+const PART_TITLE = "title";
+const PART_CONTENT = "content";
+
+// =====================================================================================================================
+// React component definition
+
+type OnClose = (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
+type OnOpen = (...args: any[]) => void;
+type ModalProps = {
+  isInitiallyOpen?: boolean;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  onClose?: OnClose;
+  onOpen?: OnOpen;
+  children?: ReactNode;
   fullScreen?: boolean;
-  initiallyOpen?: boolean;
-  onClose?: () => CloseResult | Promise<CloseResult>;
-  onOpen?: (...params: unknown[]) => void | Promise<void>;
-  registerComponentApi?: (api: ModalDialogApi) => void;
-  title?: RenderTitle;
-  tooltip?: string;
-  tooltipMarkdown?: string;
+  title?: string;
+  titleTemplate?: ReactNode;
+  closeButtonVisible?: boolean;
+  externalAnimation?: boolean;
 };
 
-export const ModalDialogComponent = forwardRef<HTMLDivElement, ModalDialogProps>(function ModalDialogComponent(
-  {
-    children,
-    className,
-    closeButtonVisible = defaultProps.closeButtonVisible,
-    fullScreen = defaultProps.fullScreen,
-    initiallyOpen = false,
-    onClose,
-    onOpen,
-    registerComponentApi,
-    style,
-    title,
-    tooltip,
-    tooltipMarkdown,
-    ...rest
+type ModalDialogFrameProps = {
+  isInitiallyOpen?: boolean;
+  registerComponentApi?: RegisterComponentApiFn;
+  onClose?: OnClose;
+  onOpen?: OnOpen;
+  renderDialog?: (modalContext?: any) => ReactNode;
+};
+
+export const ModalDialogFrame = React.forwardRef(
+  (
+    { isInitiallyOpen, onOpen, onClose, registerComponentApi, renderDialog }: ModalDialogFrameProps,
+    ref,
+  ) => {
+    const modalContextStateValue = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
+    const { doOpen, doClose, isOpen, openParams } = modalContextStateValue;
+
+    useEffect(() => {
+      registerComponentApi?.({
+        open: doOpen,
+        close: doClose,
+      });
+    }, [doClose, doOpen, registerComponentApi]);
+
+    return (
+      <ModalStateContext.Provider value={modalContextStateValue}>
+        {renderDialog({
+          openParams,
+          ref,
+        })}
+      </ModalStateContext.Provider>
+    );
   },
-  ref,
-) {
-  const [isOpen, setIsOpen] = useState(initiallyOpen);
-  const [openParams, setOpenParams] = useState<unknown[]>([]);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
+);
 
-  const open = useCallback((...params: unknown[]) => {
-    setOpenParams(params);
+const ModalStateContext = React.createContext(null);
+
+function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClose?: OnClose) {
+  const [isOpen, setIsOpen] = useState(isInitiallyOpen);
+  const isClosing = useRef(false);
+  const [openParams, setOpenParams] = useState(null);
+
+  const doOpen = useEvent((...openParams: any) => {
+    setOpenParams(openParams);
+    onOpen?.();
     setIsOpen(true);
-    void onOpen?.(...params);
-  }, [onOpen]);
+  });
 
-  const close = useCallback(() => {
-    void (async () => {
-      const closeResult = await onClose?.();
-      if (closeResult === false) {
-        return;
-      }
-      setIsOpen(false);
-    })();
-  }, [onClose]);
-
-  const isOpenApi = useCallback(() => isOpen, [isOpen]);
-
-  useEffect(() => {
-    registerComponentApi?.({ open, close, isOpen: isOpenApi });
-  }, [close, isOpenApi, open, registerComponentApi]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        close();
-      }
-    };
-    if (isOpen) {
-      window.addEventListener("keydown", onKeyDown);
-    }
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close, isOpen]);
-
-  useEffect(() => {
-    if (!isOpen || typeof document === "undefined") {
-      return;
-    }
-    const hiddenSiblings: Array<[Element, string | null]> = [];
-    const isModalPortal = (element: Element) =>
-      element.getAttribute("data-xmlui-component") === "ModalDialogPortal";
-
-    for (const child of Array.from(document.body.children)) {
-      if (isModalPortal(child)) {
-        continue;
-      }
-      hiddenSiblings.push([child, child.getAttribute("aria-hidden")]);
-      child.setAttribute("aria-hidden", "true");
-    }
-
-    return () => {
-      for (const [child, previousValue] of hiddenSiblings) {
-        if (previousValue === null) {
-          child.removeAttribute("aria-hidden");
-        } else {
-          child.setAttribute("aria-hidden", previousValue);
+  const doClose = useEvent(async () => {
+    if (!isClosing.current) {
+      try {
+        isClosing.current = true;
+        const result = await onClose?.();
+        if (result === false) {
+          return;
         }
+      } finally {
+        isClosing.current = false;
       }
+    }
+    setIsOpen(false);
+  });
+
+  return useMemo(() => {
+    return {
+      isOpen,
+      doClose,
+      doOpen,
+      openParams,
     };
-  }, [isOpen]);
+  }, [doClose, doOpen, isOpen, openParams]);
+}
+function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
+  const modalStateContext = useContext(ModalStateContext);
+  const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
 
-  const renderedChildren = useMemo(() => children?.(openParams), [children, openParams]);
-  const renderedTitle = useMemo(
-    () => typeof title === "function" ? title(openParams) : title,
-    [openParams, title],
-  );
-  const registeredFormsRef = useRef(new Set<string>());
-  const modalVisibilityContextValue = useMemo(() => ({
-    registerForm: (id: string) => {
-      registeredFormsRef.current.add(id);
-    },
-    unRegisterForm: (id: string) => {
-      registeredFormsRef.current.delete(id);
-    },
-    amITheSingleForm: (id: string) =>
-      registeredFormsRef.current.size === 1 && registeredFormsRef.current.has(id),
-    requestClose: close,
-  }), [close]);
+  // When inside a ModalDialogFrame context, wrap doClose so the inner onClose handler
+  // (which has access to inner container vars like counter) fires before the frame closes.
+  const wrappedDoClose = useEvent(async () => {
+    const result = await onClose?.();
+    if (result !== false) {
+      await modalStateContext?.doClose();
+    }
+  });
 
-  if (!isOpen) {
-    return null;
-  }
-  const tooltipContent = tooltipMarkdown || tooltip;
-
-  const dialogAttrs = { ...rest } as HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
-  if (dialogAttrs["data-testid"] == null && typeof dialogAttrs["data-xmlui-id"] === "string") {
-    dialogAttrs["data-testid"] = dialogAttrs["data-xmlui-id"];
+  if (!modalStateContext) {
+    return modalLocalOpenState;
   }
 
-  const modal = (
-    <div className={styles.portal} data-xmlui-component="ModalDialogPortal">
-      <div aria-hidden="true" className={styles.overlayBackground} />
-      <div
-        className={cx(styles.overlay, fullScreen && styles.fullScreenOverlay)}
-        onPointerDown={(event) => {
-          if ((event.nativeEvent as PointerEvent & { __xmluiLayerHandled?: boolean }).__xmluiLayerHandled) {
-            return;
-          }
-          close();
-        }}
-      >
-        <div
-          {...dialogAttrs}
-          ref={ref}
-          aria-labelledby={renderedTitle ? "modal-dialog-title" : undefined}
-          aria-modal="true"
-          className={cx(styles.content, fullScreen && styles.fullScreenContent, className)}
-          data-state="open"
-          role="dialog"
-          style={style as CSSProperties}
-          onPointerDown={(event) => event.stopPropagation()}
+  if (!onClose) {
+    return modalStateContext;
+  }
+
+  return {
+    ...modalStateContext,
+    doClose: wrappedDoClose,
+  };
+}
+
+export const ModalDialog = memo(React.forwardRef(
+  (
+    {
+      children,
+      style,
+      isInitiallyOpen,
+      fullScreen = defaultProps.fullScreen,
+      title,
+      titleTemplate,
+      closeButtonVisible = defaultProps.closeButtonVisible,
+      className,
+      classes,
+      onOpen,
+      onClose,
+      externalAnimation = true,
+      ...rest
+    }: ModalProps,
+    ref,
+  ) => {
+    const { root } = useTheme();
+    // NOTE: at this point, we can't use useAppContext here,
+    // since the ModalDialog context provider (via ConfirmationModalContextProvider) is mounted outside of the AppContext,
+    // and ModalDialogs can also be called using the imperative API (see functions like "confirm")
+    // String-based type checking: Use constructor.name to identify ShadowRoot
+    // This avoids direct ShadowRoot type dependency while being more explicit than duck typing
+    const isDialogRootInShadowDom =
+      typeof ShadowRoot !== "undefined" && root?.getRootNode() instanceof ShadowRoot;
+    const modalRef = useRef<HTMLDivElement>(null);
+    const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
+
+    const modalStateContext = useContext(ModalStateContext);
+    const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+
+    // When inside a ModalDialogFrame, fire onOpen in the inner container context when the
+    // dialog transitions from closed to open (triggered by the outer frame's doOpen call).
+    const prevIsOpenRef = useRef(false);
+    useIsomorphicLayoutEffect(() => {
+      if (modalStateContext && isOpen && !prevIsOpenRef.current) {
+        onOpen?.();
+      }
+      prevIsOpenRef.current = isOpen;
+    }, [isOpen, modalStateContext, onOpen]);
+
+    /**
+     * https://github.com/radix-ui/primitives/issues/3648
+     */
+    useIsomorphicLayoutEffect(() => {
+      return () => {
+        const root = document.getElementById("root");
+        if (root)
+          requestAnimationFrame(() => {
+            root.removeAttribute("aria-hidden");
+            document.body.style.pointerEvents = "auto";
+          });
+      };
+    }, []);
+
+    useEffect(() => {
+      if (isOpen) {
+        modalRef.current?.focus();
+      }
+    }, [isOpen]);
+
+    // https://github.com/radix-ui/primitives/issues/2122#issuecomment-2140827998
+    useEffect(() => {
+      if (isOpen) {
+        // Pushing the change to the end of the call stack
+        const timer = setTimeout(() => {
+          document.body.style.pointerEvents = "";
+        }, 0);
+
+        return () => clearTimeout(timer);
+      } else {
+        document.body.style.pointerEvents = "auto";
+      }
+    }, [isOpen]);
+
+    const registeredForms = useRef(new Set());
+    const modalVisibilityContextValue = useMemo(() => {
+      return {
+        registerForm: (id: string) => {
+          registeredForms.current.add(id);
+        },
+        unRegisterForm: (id: string) => {
+          registeredForms.current.delete(id);
+        },
+        amITheSingleForm: (id: string) => {
+          return registeredForms.current.size === 1 && registeredForms.current.has(id);
+        },
+        requestClose: () => {
+          return doClose();
+        },
+      };
+    }, [doClose]);
+
+    if (!root) {
+      return null;
+    }
+
+    const Content = isOpen ? (
+      <Part partId={PART_CONTENT}>
+        <Dialog.Content
+          {...rest}
+          className={classnames(
+            {
+              [styles.contentAnimation]: !externalAnimation,
+            },
+            styles.content,
+            classes?.[COMPONENT_PART_KEY],
+            className,
+          )}
+          onPointerDownOutside={(event) => {
+            if (
+              event.target instanceof Element &&
+              (event.target.closest("._debug-inspect-button") !== null ||
+                event.target.localName === "com-1password-button")
+            ) {
+              //we prevent the auto modal close on clicking the inspect button
+              event.preventDefault();
+            }
+          }}
+          ref={composedRef}
+          style={{ ...style, gap: undefined }}
         >
-          {renderedTitle ? (
-            <header
-              aria-level={2}
-              className={styles.title}
-              data-part-id="title"
-              data-xmlui-part="title"
-              id="modal-dialog-title"
-              role="heading"
-            >
-              {renderedTitle}
-            </header>
-          ) : null}
-          <div
-            className={styles.innerContent}
-            data-part-id="content"
-            data-xmlui-part="content"
-            data-xmlui-tooltip-markdown={tooltipMarkdown}
-            onBlur={() => setTooltipVisible(false)}
-            onFocus={() => setTooltipVisible(true)}
-            onMouseEnter={() => setTooltipVisible(true)}
-            onMouseLeave={() => setTooltipVisible(false)}
-            title={tooltip}
-          >
+          {(!!title || !!titleTemplate) ? (
+            <Part partId={PART_TITLE}>
+              <Dialog.Title style={{ marginTop: 0 }}>
+                <header id="dialogTitle" className={styles.dialogTitle}>
+                  {titleTemplate || title}
+                </header>
+              </Dialog.Title>
+            </Part>
+          ) : (
+            <VisuallyHidden>
+              <Dialog.Title />
+            </VisuallyHidden>
+          )}
+          <div className={styles.innerContent} style={{ gap: style?.gap }}>
             <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-              {renderedChildren}
+              {children}
             </ModalVisibilityContext.Provider>
-            {tooltipVisible && tooltipContent ? (
-              <span role="tooltip">
-                {tooltipMarkdown ? renderTinyMarkdown(tooltipMarkdown) : tooltipContent}
-              </span>
-            ) : null}
           </div>
-          {closeButtonVisible ? (
-            <button aria-label="Close" className={styles.closeButton} onClick={close} type="button">
-              x
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
+          {closeButtonVisible && (
+            <Dialog.Close asChild={true}>
+              <Button
+                variant={"ghost"}
+                themeColor={"secondary"}
+                className={styles.closeButton}
+                aria-label="Close"
+                icon={<ThemedIcon name={"close"} size={"sm"} />}
+                orientation={"vertical"}
+              />
+            </Dialog.Close>
+          )}
+        </Dialog.Content>
+      </Part>
+    ) : null;
 
-  return typeof document === "undefined" ? modal : createPortal(modal, document.body);
-});
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
-
-function renderTinyMarkdown(markdown: string): ReactNode {
-  const strongMatch = /^\*\*(.*)\*\*$/.exec(markdown.trim());
-  return strongMatch ? <strong>{strongMatch[1]}</strong> : markdown;
-}
+    return (
+      <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
+        <Dialog.Portal container={root}>
+          {/* className is placed on this wrapper so that CSS custom properties
+              (theme variables) cascade to both the backdrop (.overlayBg) and
+              the dialog content, without applying layout styles like max-width
+              directly to the fixed-position backdrop. */}
+          <div className={classnames(classes?.[COMPONENT_PART_KEY], className)}>
+            {isDialogRootInShadowDom && (
+              /*
+                In the Shadow DOM we can omit the Dialog.Overlay,
+                since we get the same result & the main content outside remains scrollable.
+              */
+              <div
+                className={classnames(styles.overlayBg, styles.nested, {
+                  [styles.fullScreen]: fullScreen,
+                })}
+                onPointerDown={(event) => {
+                  if (event.target === event.currentTarget) {
+                    void doClose();
+                  }
+                }}
+              >
+                {Content}
+              </div>
+            )}
+            {!isDialogRootInShadowDom && (
+              <>
+                <div
+                  className={classnames(styles.overlayBg)}
+                  onPointerDown={(event) => {
+                    if (event.target === event.currentTarget) {
+                      void doClose();
+                    }
+                  }}
+                />
+                {/* This Overlay is responsible for the focus capture & scroll-lock */}
+                <Dialog.Overlay
+                  className={classnames(styles.overlay, {
+                    [styles.fullScreen]: fullScreen,
+                  })}
+                  onPointerDown={(event) => {
+                    if (event.target === event.currentTarget) {
+                      void doClose();
+                    }
+                  }}
+                >
+                  {Content}
+                </Dialog.Overlay>
+              </>
+            )}
+          </div>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  },
+));

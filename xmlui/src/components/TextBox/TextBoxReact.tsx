@@ -1,489 +1,330 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, memo, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./TextBox.defaults";
-import { useFormContext } from "../Form/FormContext";
-import { useThemeVariables } from "../../runtime/rendering/theme";
-import { resolveThemeReferences } from "../../styling/theme";
 import styles from "./TextBox.module.scss";
 
-export type TextBoxProps = {
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import { defaultProps } from "./TextBox.defaults";
+import { Adornment } from "../Input/InputAdornment";
+import type { ValidationStatus } from "../abstractions";
+import {
+  PART_START_ADORNMENT,
+  PART_INPUT,
+  PART_END_ADORNMENT,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+} from "../../components-core/parts";
+import { Part } from "../Part/Part";
+import { useFormContextPart } from "../Form/FormContext";
+import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+
+/**
+ * TextBox component that supports text input with various configurations.
+ * Features:
+ * - Standard text, password, and search input types
+ * - Input validation states
+ * - Start/end adornments (icons and text)
+ * - Password visibility toggle option
+ */
+
+type Props = {
   id?: string;
-  bindTo?: string;
-  type?: "text" | "password" | "search" | "email" | string;
-  value?: unknown;
-  initialValue?: unknown;
-  className?: string;
+  type?: "text" | "password" | "search";
+  value?: string;
+  updateState?: UpdateStateFn;
+  initialValue?: string;
   style?: CSSProperties;
-  label?: unknown;
-  labelPosition?: "start" | "end" | "top" | "bottom" | string;
-  labelBreak?: boolean;
-  labelWidth?: string | number;
-  requireLabelMode?: string;
-  direction?: string;
-  placeholder?: string;
+  classes?: Record<string, string>;
+  className?: string;
   maxLength?: number;
   enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  requiredInvalidMessage?: string;
-  matchValue?: unknown;
-  matchInvalidMessage?: string;
-  validationMode?: string;
+  placeholder?: string;
+  validationStatus?: ValidationStatus;
+  onDidChange?: (newValue: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  startText?: string;
+  startIcon?: string;
+  endText?: string;
+  endIcon?: string;
+  gap?: string;
   autoFocus?: boolean;
   autoComplete?: string | boolean;
   autoCorrect?: boolean;
   spellCheck?: boolean;
   autoCapitalize?: string;
+  readOnly?: boolean;
   tabIndex?: number;
-  startText?: unknown;
-  startIcon?: unknown;
-  endText?: unknown;
-  endIcon?: unknown;
-  gap?: string;
+  required?: boolean;
+  /**
+   * When true and type is "password", displays a toggle icon to show/hide password text
+   * Default: false
+   */
   showPasswordToggle?: boolean;
+  /**
+   * The icon to show when the password is visible
+   * Default: "eye"
+   */
   passwordVisibleIcon?: string;
+  /**
+   * The icon to show when the password is hidden
+   * Default: "eye-off"
+   */
   passwordHiddenIcon?: string;
   verboseValidationFeedback?: boolean;
-  validationStatus?: string;
+  validationIconSuccess?: string;
+  validationIconError?: string;
   invalidMessages?: string[];
-  onDidChange?: (value: string) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
 };
 
-export type TextBoxApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: string;
-};
+const normalizeOnOff = (value: boolean | undefined) =>
+  value === undefined ? undefined : value ? "on" : "off";
 
-export const TextBoxNative = memo(forwardRef<TextBoxApi, TextBoxProps>(function TextBoxNative(
-  {
-    id,
-    bindTo,
-    type = defaultProps.type,
-    value,
-    initialValue = defaultProps.initialValue,
-    className,
-    style,
-    label,
-    labelPosition,
-    labelBreak,
-    labelWidth,
-    requireLabelMode,
-    direction,
-    placeholder,
-    maxLength,
-    enabled = defaultProps.enabled,
-    readOnly,
-    required,
-    requiredInvalidMessage,
-    matchValue,
-    matchInvalidMessage,
-    validationMode,
-    autoFocus,
-    autoComplete = defaultProps.autoComplete,
-    autoCorrect,
-    spellCheck,
-    autoCapitalize,
-    tabIndex,
-    startText,
-    startIcon,
-    endText,
-    endIcon,
-    gap,
-    showPasswordToggle,
-    passwordVisibleIcon = defaultProps.passwordVisibleIcon,
-    passwordHiddenIcon = defaultProps.passwordHiddenIcon,
-    verboseValidationFeedback,
-    validationStatus = defaultProps.validationStatus,
-    invalidMessages = defaultProps.invalidMessages,
-    onDidChange,
-    onFocus,
-    onBlur,
-    onKeyDown,
-    ...rest
-  },
-  ref,
-) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const validateFormField = form?.validateField;
-  const registerFormItem = form?.registerItem;
-  const themeVariables = useThemeVariables();
-  const effectiveLabelPosition = labelPosition ?? form?.itemLabelPosition ?? "top";
-  const effectiveLabelBreak = labelBreak ?? form?.itemLabelBreak ?? false;
-  const effectiveLabelWidth = labelWidth ?? form?.itemLabelWidth;
-  const generatedInputId = useId();
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const formError = form && fieldName !== undefined ? form.errors[fieldName] : undefined;
-  const effectiveInvalidMessages = formError ? formError.split("\n") : invalidMessages;
-  const effectiveVerboseValidationFeedback = verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
-  const effectiveValue = formValue ?? value;
-  const controlled = effectiveValue !== undefined;
-  const [localValue, setLocalValue] = useState(() => stringifyInputValue(effectiveValue ?? initialValue));
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [hadValidationError, setHadValidationError] = useState(false);
-  const [showValidFeedback, setShowValidFeedback] = useState(false);
-  const [conciseTooltipVisible, setConciseTooltipVisible] = useState(false);
+const normalizeAutoComplete = (value: string | boolean | undefined) =>
+  typeof value === "boolean" ? normalizeOnOff(value) : value;
 
-  useEffect(() => {
-    if (controlled) {
-      setLocalValue(stringifyInputValue(effectiveValue));
-    }
-  }, [controlled, effectiveValue]);
-
-  useEffect(() => {
-    if (formError) {
-      setHadValidationError(true);
-      setShowValidFeedback(false);
-    }
-  }, [formError]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setLocalValue(stringifyInputValue(initialValue));
-    }
-  }, [controlled, initialValue]);
-
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, initialValue);
-  }, [fieldName, getFormValue, initialValue, setFormValue]);
-
-  useEffect(() => {
-    if (!autoFocus || !enabled) {
-      return;
-    }
-    const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
-    return () => clearTimeout(timeoutId);
-  }, [autoFocus, enabled]);
-
-  const updateValue = useCallback((nextValue: unknown) => {
-    const normalized = stringifyInputValue(nextValue);
-    setShowValidFeedback(false);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, normalized);
-      if (validationMode === "onChanged" || matchValue !== undefined) {
-        void validateFormField?.(fieldName, normalized).then((message) => {
-          if (!message && hadValidationError) {
-            setShowValidFeedback(true);
-          }
-        });
-      }
-    }
-    setLocalValue(normalized);
-    void onDidChange?.(normalized);
-  }, [fieldName, hadValidationError, matchValue, onDidChange, setFormValue, validateFormField, validationMode]);
-
-  const handleBlur = useCallback(() => {
-    void onBlur?.();
-    if (!validateFormField || fieldName === undefined || !hadValidationError) {
-      return;
-    }
-    void validateFormField(fieldName, inputRef.current?.value).then((message) => {
-      setShowValidFeedback(!message);
-    });
-  }, [fieldName, hadValidationError, onBlur, validateFormField]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        inputRef.current?.focus();
-      }
-    },
-    setValue: updateValue,
-    get value() {
-      return localValue;
-    },
-  }), [enabled, localValue, updateValue]);
-
-  const actualType = type === "password" && passwordVisible ? "text" : type;
-  const rootStyle = useMemo<CSSProperties>(() => ({
-    ...style,
-    ...(gap ? { "--xmlui-runtime-gap-TextBox": gap } as CSSProperties : undefined),
-  }), [gap, style]);
-  const inputId = id ? `${id}__input` : generatedInputId;
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const labelText = stringifyLabel(label);
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-  const effectiveValidationStatus = formError
-    ? "error"
-    : !effectiveVerboseValidationFeedback && showValidFeedback
-      ? "valid"
-      : validationStatus;
-
-  useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
-    }
-    return registerFormItem({
-      name: fieldName,
-      label: labelText,
+export const TextBox = memo(
+  forwardRef(function TextBox(
+    {
+      id: idProp,
+      type = defaultProps.type,
+      value = defaultProps.value,
+      updateState = defaultProps.updateState,
+      initialValue = defaultProps.initialValue,
+      style,
+      classes,
+      className,
+      maxLength,
+      enabled = defaultProps.enabled,
+      placeholder,
+      validationStatus = defaultProps.validationStatus,
+      invalidMessages = defaultProps.invalidMessages,
+      onDidChange = defaultProps.onDidChange,
+      onFocus = defaultProps.onFocus,
+      onBlur = defaultProps.onBlur,
+      onKeyDown = defaultProps.onKeyDown,
+      registerComponentApi,
+      startText,
+      startIcon,
+      endText,
+      endIcon,
+      gap,
+      autoFocus,
+      autoComplete = defaultProps.autoComplete,
+      autoCorrect,
+      spellCheck,
+      autoCapitalize,
+      readOnly,
+      tabIndex,
       required,
-      requiredInvalidMessage,
-      matchValue,
-      matchInvalidMessage,
+      showPasswordToggle,
+      passwordVisibleIcon = defaultProps.passwordVisibleIcon,
+      passwordHiddenIcon = defaultProps.passwordHiddenIcon,
+      verboseValidationFeedback,
+      validationIconSuccess,
+      validationIconError,
+      ...rest
+    }: Props,
+    forwardedRef: ForwardedRef<HTMLDivElement>,
+  ) {
+    const id = useFormItemInputId(idProp);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // State to control password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Determine the actual input type based on the password visibility toggle
+    const actualType = type === "password" && showPassword ? "text" : type;
+
+    // Toggle password visibility
+    const togglePasswordVisibility = useCallback(() => {
+      setShowPassword((prev) => !prev);
+    }, []);
+
+    const contextVerboseValidationFeedback = useFormContextPart(
+      (ctx) => ctx?.verboseValidationFeedback,
+    );
+    const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
+    const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
+
+    const finalVerboseValidationFeedback =
+      verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+    const finalValidationIconSuccess =
+      validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+    const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
+
+    useEffect(() => {
+      if (autoFocus) {
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
+      }
+    }, [autoFocus, inputRef]);
+
+    // --- NOTE: This is a workaround for the jumping caret issue.
+    // --- Local state can sync up values that can get set asynchronously outside the component.
+    const [localValue, setLocalValue] = React.useState(value);
+    useEffect(() => {
+      setLocalValue(value);
+    }, [value]);
+    // --- End NOTE
+
+    // --- Initialize the related field with the input's initial value
+    // Normalize null/undefined to empty string
+    const normalizedInitialValue = initialValue ?? "";
+    useEffect(() => {
+      updateState({ value: normalizedInitialValue }, { initial: true });
+    }, [normalizedInitialValue, updateState]);
+
+    const updateValue = useCallback(
+      (value: string) => {
+        setLocalValue(value);
+        updateState({ value });
+        onDidChange(value);
+      },
+      [onDidChange, updateState],
+    );
+
+    // --- Handle the value change events for this input
+    const onInputChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        updateValue(event.target.value);
+      },
+      [updateValue],
+    );
+
+    // --- Manage obtaining and losing the focus
+    const handleOnFocus = useCallback(() => {
+      onFocus?.();
+    }, [onFocus]);
+
+    const handleOnBlur = useCallback(() => {
+      onBlur?.();
+    }, [onBlur]);
+
+    const focus = useCallback(() => {
+      inputRef.current?.focus();
+    }, []);
+
+    // Relay focus from the outer div to the inner input without triggering browser scroll.
+    // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
+    // scroll side-effect here since the host already handles scroll if desired.
+    // Only relay when focus arrives from outside — if a child (e.g. the password toggle button)
+    // receives focus we must not steal it back, otherwise Tab navigation becomes trapped.
+    const relayFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        inputRef.current?.focus({ preventScroll: true });
+      }
+    }, []);
+
+    const setValue = useEvent((newValue) => {
+      updateValue(newValue);
     });
-  }, [
-    fieldName,
-    labelText,
-    matchInvalidMessage,
-    matchValue,
-    registerFormItem,
-    required,
-    requiredInvalidMessage,
-  ]);
 
-  const labelNode = hasLabel ? (
-    <label
-      data-part-id="label"
-      data-xmlui-part="label"
-      htmlFor={inputId}
-      className={cx(styles.textBoxLabel, effectiveLabelBreak ? styles.textBoxLabelBreak : undefined)}
-      style={effectiveLabelWidth !== undefined ? { width: cssLength(effectiveLabelWidth, themeVariables) } : undefined}
-    >
-      {labelText}
-      {showRequiredIndicator ? <span className={styles.textBoxLabelRequired}>*</span> : null}
-      {showOptionalIndicator ? <span className={styles.textBoxLabelOptional}>(Optional)</span> : null}
-    </label>
-  ) : null;
-  const inputRoot = (
-    <div
-      {...(!hasLabel ? rest : undefined)}
-      data-xmlui-part="input"
-      className={cx(
-        styles.textBoxRoot,
-        !enabled ? styles.textBoxDisabled : undefined,
-        readOnly ? styles.textBoxReadOnly : undefined,
-        effectiveValidationStatus === "error" ? styles.textBoxError : undefined,
-        effectiveValidationStatus === "warning" ? styles.textBoxWarning : undefined,
-        effectiveValidationStatus === "valid" ? styles.textBoxSuccess : undefined,
-        !hasLabel ? className : undefined,
-      )}
-      style={!hasLabel ? rootStyle : undefined}
-    >
-      <Adornment partId="startAdornment" text={startText} icon={startIcon} />
-      <input
-        id={inputId}
-        ref={inputRef}
-        data-part-id="input"
-        data-xmlui-part="input"
-        className={styles.textBoxInput}
-        type={normalizeInputType(actualType)}
-        value={localValue}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        disabled={!enabled}
-        readOnly={readOnly}
-        required={required}
-        tabIndex={enabled ? tabIndex : -1}
-        autoComplete={normalizeAutoComplete(autoComplete)}
-        autoCorrect={normalizeOnOff(autoCorrect)}
-        spellCheck={spellCheck}
-        autoCapitalize={autoCapitalize}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => updateValue(event.currentTarget.value)}
-        onFocus={(_event: FocusEvent<HTMLInputElement>) => void onFocus?.()}
-        onBlur={(_event: FocusEvent<HTMLInputElement>) => handleBlur()}
-        onKeyDown={(event) => void onKeyDown?.(event)}
-      />
-      {type === "search" && enabled && !readOnly && localValue ? (
-        <button
-          type="button"
-          data-part-id="endAdornment"
-          data-xmlui-part="endAdornment"
-          className={cx(styles.textBoxAdornment, styles.textBoxPasswordToggle)}
-          onClick={() => updateValue("")}
-          aria-label="Clear"
-        >
-          <span aria-hidden="true" data-icon-name="close" className={styles.textBoxIconMarker} />
-        </button>
-      ) : type === "password" && showPasswordToggle ? (
-        <button
-          type="button"
-          data-part-id="endAdornment"
-          data-xmlui-part="endAdornment"
-          className={cx(styles.textBoxAdornment, styles.textBoxPasswordToggle)}
-          onClick={() => setPasswordVisible((visible) => !visible)}
-          tabIndex={-1}
-          aria-label={passwordVisible ? "Hide password" : "Show password"}
-        >
-          <span
-            aria-hidden="true"
-            data-icon-name={passwordVisible ? passwordVisibleIcon : passwordHiddenIcon}
-            className={styles.textBoxIconMarker}
-          />
-        </button>
-      ) : (
-        <Adornment partId="endAdornment" text={endText} icon={endIcon} />
-      )}
-      {!effectiveVerboseValidationFeedback && effectiveValidationStatus && effectiveValidationStatus !== "none" ? (
-        <span
-          data-part-id="conciseValidationFeedback"
-          data-xmlui-part="conciseValidationFeedback"
-          className={styles.textBoxConciseFeedback}
-          onMouseEnter={() => setConciseTooltipVisible(true)}
-          onMouseLeave={() => setConciseTooltipVisible(false)}
-          onFocus={() => setConciseTooltipVisible(true)}
-          onBlur={() => setConciseTooltipVisible(false)}
-          tabIndex={-1}
-        >
-          <span
-            data-icon-name={effectiveValidationStatus === "valid" ? "checkmark" : "error"}
-            className={styles.textBoxIconMarker}
-          />
-          {conciseTooltipVisible && effectiveValidationStatus !== "valid" && effectiveInvalidMessages?.length ? (
-            <span data-tooltip-container role="tooltip" className={styles.textBoxConciseTooltip}>
-              {effectiveInvalidMessages.join("\n")}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
-    </div>
-  );
-  const validationFeedback = effectiveVerboseValidationFeedback && effectiveInvalidMessages?.length ? (
-    <div data-xmlui-part="error">
-      {effectiveInvalidMessages.map((message, index) => (
-        <div key={index}>{message}</div>
-      ))}
-    </div>
-  ) : null;
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        setValue,
+      });
+    }, [focus, registerComponentApi, setValue]);
 
-  if (!hasLabel) {
+    const searchAriaAttributes =
+      type === "search"
+        ? {
+            "aria-controls": rest["aria-controls"],
+            "aria-autocomplete": rest["aria-autocomplete"],
+            "aria-activedescendant": rest["aria-activedescendant"],
+          }
+        : {};
     return (
-      <>
-        {inputRoot}
-        {validationFeedback}
-      </>
-    );
-  }
-
-  return (
-    <div
-      {...rest}
-      className={className}
-      style={rootStyle}
-    >
       <div
-      className={cx(
-        styles.textBoxLabeledItem,
-        labelPositionClass(effectiveLabelPosition, direction),
-      )}
-      data-part-id="labeledItem"
-      data-xmlui-part="labeledItem"
-      dir={direction === "rtl" ? "rtl" : direction === "ltr" ? "ltr" : undefined}
+        {...rest}
+        ref={forwardedRef}
+        className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
+          [styles.disabled]: !enabled,
+          [styles.readOnly]: readOnly,
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        tabIndex={-1}
+        onFocus={relayFocus}
+        style={{ ...style, gap }}
       >
-        {labelNode}
-        {inputRoot}
+        <Part partId={PART_START_ADORNMENT}>
+          <Adornment
+            text={startText}
+            iconName={startIcon}
+            className={classnames(styles.adornment)}
+          />
+        </Part>
+        <Part partId={PART_INPUT}>
+          <input
+            id={id}
+            ref={inputRef}
+            type={actualType}
+            aria-label={(rest as any)["aria-label"]}
+            className={classnames(styles.input, {
+              [styles.readOnly]: readOnly,
+            })}
+            disabled={!enabled}
+            value={localValue}
+            maxLength={maxLength}
+            placeholder={placeholder}
+            onChange={onInputChange}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            onKeyDown={onKeyDown}
+            readOnly={readOnly}
+            autoFocus={autoFocus}
+            autoComplete={normalizeAutoComplete(autoComplete)}
+            autoCorrect={normalizeOnOff(autoCorrect)}
+            spellCheck={spellCheck}
+            autoCapitalize={autoCapitalize}
+            tabIndex={enabled ? tabIndex : -1}
+            required={required}
+            {...searchAriaAttributes}
+          />
+        </Part>
+        {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment
+              iconName="close"
+              className={styles.adornment}
+              onClick={() => updateValue("")}
+            />
+          </Part>
+        )}
+        {!finalVerboseValidationFeedback && (
+          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+            <ConciseValidationFeedback
+              validationStatus={validationStatus}
+              invalidMessages={invalidMessages}
+              successIcon={finalValidationIconSuccess}
+              errorIcon={finalValidationIconError}
+            />
+          </Part>
+        )}
+        {type === "password" && showPasswordToggle ? (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment
+              iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
+              className={classnames(styles.adornment, styles.passwordToggle)}
+              onClick={togglePasswordVisibility}
+              tabIndex={-1}
+            />
+          </Part>
+        ) : (
+          <Part partId={PART_END_ADORNMENT}>
+            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+          </Part>
+        )}
       </div>
-      {validationFeedback}
-    </div>
-  );
-}));
-
-function Adornment({
-  partId,
-  text,
-  icon,
-}: {
-  partId: "startAdornment" | "endAdornment";
-  text?: unknown;
-  icon?: unknown;
-}) {
-  const iconName = typeof icon === "string" && icon !== "" ? icon : undefined;
-  const content = text !== undefined && text !== null && text !== "" ? String(text) : undefined;
-  if (!iconName && content === undefined) {
-    return (
-      <span
-        data-part-id={partId}
-        data-xmlui-part={partId}
-        className={styles.textBoxAdornment}
-        hidden
-      />
     );
-  }
-  return (
-    <span data-part-id={partId} data-xmlui-part={partId} className={styles.textBoxAdornment}>
-      {iconName ? <span aria-hidden="true" data-icon-name={iconName} className={styles.textBoxIconMarker} /> : null}
-      {content}
-    </span>
-  );
-}
-
-function stringifyInputValue(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
-
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
-
-function normalizeInputType(value: string): string {
-  return ["text", "password", "search", "email"].includes(value) ? value : "text";
-}
-
-function normalizeOnOff(value: boolean | undefined): "on" | "off" | undefined {
-  return value === undefined ? undefined : value ? "on" : "off";
-}
-
-function normalizeAutoComplete(value: string | boolean | undefined): string | undefined {
-  return typeof value === "boolean" ? normalizeOnOff(value) : value;
-}
-
-function cssLength(value: string | number, themeVariables: Record<string, unknown>): string {
-  const normalized = resolveThemeReferences(resolveThemeValue(value, themeVariables));
-  return typeof normalized === "number" ? `${normalized}px` : String(normalized);
-}
-
-function resolveThemeValue(value: string | number, themeVariables: Record<string, unknown>): string | number {
-  if (typeof value !== "string" || !value.startsWith("$")) {
-    return value;
-  }
-  return themeVariables[value.slice(1)] as string | number | undefined ?? value;
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function labelPositionClass(value: string, direction?: string): string {
-  const normalized = value === "before"
-    ? direction === "rtl" ? "end" : "start"
-    : value === "after"
-      ? direction === "rtl" ? "start" : "end"
-      : value;
-  if (normalized === "start") {
-    return styles.textBoxLabelPositionStart;
-  }
-  if (normalized === "end") {
-    return styles.textBoxLabelPositionEnd;
-  }
-  if (normalized === "bottom") {
-    return styles.textBoxLabelPositionBottom;
-  }
-  return styles.textBoxLabelPositionTop;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+  }),
+);

@@ -1,3 +1,4 @@
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import type { XmluiElement } from "../../compiler/ir";
@@ -5,9 +6,13 @@ import { createRuntimeScope } from "../../runtime/state";
 import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../../runtime/routing";
 import { useStringProp } from "../../runtime/rendering/props";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
+import { useThemeVariables } from "../../runtime/rendering/theme";
+import { resolveThemeReferences } from "../../styling";
+import styles from "./Pages.module.scss";
 
 export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => {
   const fallbackPath = useStringProp(node, scope, "fallbackPath", "");
+  const pageStyle = usePagesThemeStyle();
   const snapshot = useRouteSnapshot(scope);
   const pages = node.children.filter(
     (child): child is XmluiElement => child.kind === "element" && child.type === "Page",
@@ -40,7 +45,8 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
 
   const pageContent = matched ? (
     <div
-      className="xmlui-page-root"
+      className={`${styles.pageWrapper} xmlui-page-root`}
+      style={pageStyle}
       data-xmlui-component="Page"
       data-xmlui-part="root"
       data-xmlui-page-url={matched.url}
@@ -75,10 +81,34 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
 };
 
 export const pageRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => (
-  <div className="xmlui-page-root" data-xmlui-component="Page" data-xmlui-part="root">
+  <PageRoot>
     {context.renderChildren(node.children, scope)}
-  </div>
+  </PageRoot>
 );
+
+function PageRoot({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className={`${styles.pageWrapper} xmlui-page-root`}
+      style={usePagesThemeStyle()}
+      data-xmlui-component="Page"
+      data-xmlui-part="root"
+    >
+      {children}
+    </div>
+  );
+}
+
+function usePagesThemeStyle(): CSSProperties {
+  const themeVariables = useThemeVariables();
+  const paddingHorizontal =
+    themeVariables["paddingHorizontal-Pages"] ??
+    themeVariables["paddingHorizontal-layout"];
+  return {
+    "--xmlui-paddingHorizontal-Pages":
+      paddingHorizontal == null ? undefined : String(resolveThemeReferences(paddingHorizontal)),
+  } as CSSProperties;
+}
 
 function useRouteSnapshot(scope: Parameters<XmluiBuiltInRenderer>[0]["scope"]): RouteSnapshot {
   const fallback = {

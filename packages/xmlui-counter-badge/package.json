@@ -5,8 +5,9 @@
   "type": "module",
   "exports": "./src/index.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "build:metadata": "node scripts/build-metadata.mjs",
+    "build": "xmlui build-lib",
+    "build:extension": "xmlui build-lib",
+    "build:metadata": "xmlui build-lib --mode=metadata",
     "test": "vitest run tests"
   },
   "dependencies": {

@@ -4,5 +4,4 @@ export const defaultProps = {
   text: "Drop files here",
   icon: "upload",
   disabled: false,
-  enabled: true,
 };

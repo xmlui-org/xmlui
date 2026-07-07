@@ -1,154 +1,505 @@
+import styles from "./FormItem.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import {
+  defaultValidationMode,
+  formControlTypesMd,
+  validationModeMd,
+  validationSeverityValues,
+} from "../Form/FormContext";
 import {
   createMetadata,
   dAutoFocus,
   dComponent,
   dEnabled,
+  dInitialValue,
+  dLabel,
+  dLabelPosition,
+  dLabelWidth,
   dRequired,
-} from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+} from "../metadata-helpers";
+import { parseSeverity } from "./Validations";
+import { defaultProps } from "./FormItem.defaults";
+import { CustomFormItem, FormItem } from "./FormItemReact";
+import { MemoizedItem } from "../container-helpers";
+import { partitionObject } from "../../components-core/utils/misc";
+import { requireLabelModeMd } from "../abstractions";
+import { layoutOptionKeys } from "../../components-core/descriptorHelper";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 const COMP = "FormItem";
-const formItemStylesSource = `
-$gap-FormItem: createThemeVar("gap-FormItem");
-$gap-label-FormItem: createThemeVar("gap-label-FormItem");
-$width-label-FormItem: createThemeVar("width-label-FormItem");
-$textColor-label-FormItem: createThemeVar("textColor-label-FormItem");
-$textColor-label-formItem: createThemeVar("textColor-label-formItem");
-$fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
-$fontWeight-label-FormItem: createThemeVar("fontWeight-label-FormItem");
-$fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
-$fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
-$textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
-$textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
-$textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
-$textColor-error-FormItem: createThemeVar("textColor-error-FormItem");
-$fontSize-error-FormItem: createThemeVar("fontSize-error-FormItem");
-$borderColor-input-FormItem--error: createThemeVar("borderColor-input-FormItem--error");
-`;
+const layoutOptionKeySet = new Set(layoutOptionKeys);
+const mediaBreakpointKeySet = new Set<string>(MediaBreakpointKeys);
+
+function isLayoutPropName(propName: string) {
+  if (layoutOptionKeySet.has(propName)) {
+    return true;
+  }
+
+  const separatorIndex = propName.lastIndexOf("-");
+  if (separatorIndex < 0) {
+    return false;
+  }
+
+  const baseName = propName.slice(0, separatorIndex);
+  const breakpointName = propName.slice(separatorIndex + 1);
+  return mediaBreakpointKeySet.has(breakpointName) && layoutOptionKeySet.has(baseName);
+}
+
+// NOTE: We need to filter the "none" value out so that it doesn't show up in the docs.
+const filteredValidationSeverityValues = validationSeverityValues.filter(
+  (value) => value !== "none",
+);
 
 export const FormItemMd = createMetadata({
-  status: "experimental",
+  status: "stable",
+  allowArbitraryProps: true,
   description:
-    "`FormItem` connects a form field to form data, displays a label, and reports validation feedback.",
+    "`FormItem` wraps individual input controls within a `Form`, providing data " +
+    "binding, validation, labeling, and layout functionality. It connects form " +
+    "controls to the parent form's data model and handles validation feedback " +
+    "automatically. " +
+    "**Note:** `FormItem` must be used inside a `Form` component.",
   props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
-    bindTo: { description: "The form data field name.", valueType: "string" },
-    label: { description: "The form item label.", valueType: "string" },
-    labelPosition: {
-      description: "Controls the label position.",
+    bindTo: {
+      description:
+        "This property binds a particular input field to one of the attributes of the \`Form\` data. " +
+        "It names the property of the form's \`data\` data to get the input's initial value." +
+        "If the property is not set, the input will be bound to an internal data field but not submitted.",
       valueType: "string",
-      availableValues: ["top", "start", "before", "end", "after"],
-      defaultValue: "top",
     },
-    labelWidth: { description: "Sets the label width.", valueType: "length" },
-    labelBreak: { description: "Allows label line breaks.", valueType: "boolean" },
-    requireLabelMode: {
-      description: "Controls whether required and optional markers are shown next to the label.",
-      valueType: "string",
-      availableValues: ["markRequired", "markOptional", "markBoth"],
-      defaultValue: "markRequired",
-    },
-    enabled: dEnabled(true),
     autoFocus: dAutoFocus(),
-    type: {
-      description: "The native fallback input type for this foundation implementation.",
-      valueType: "string",
-      defaultValue: "text",
+    label: dLabel(),
+    labelPosition: dLabelPosition(),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: {
+      description:
+        `This boolean value indicates if the label can be split into multiple lines if it would ` +
+        `overflow the available label width.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.labelBreak,
     },
-    initialValue: { description: "Initial value when form data does not contain the bound field.", valueType: "any" },
+    enabled: dEnabled(),
+    type: {
+      description:
+        `This property is used to determine the specific input control the FormItem will wrap ` +
+        `around. Note that the control names start with a lowercase letter and map to input ` +
+        `components found in XMLUI.`,
+      availableValues: formControlTypesMd,
+      defaultValue: defaultProps.type,
+      valueType: "string",
+    },
+    customValidationsDebounce: {
+      description: `This optional number prop determines the time interval between two runs of a custom validation.`,
+      valueType: "number",
+      defaultValue: defaultProps.customValidationsDebounce,
+    },
+    validationDisplayDelay: {
+      description:
+        `When an async \`onValidate\` handler takes longer than this many milliseconds, ` +
+        `the validation result is shown immediately once it resolves — without waiting for the ` +
+        `field to lose focus. Set to \`0\` to disable early display. Default: \`400\`.`,
+      valueType: "number",
+      defaultValue: 400,
+    },
+    validationMode: {
+      description:
+        `This property sets what kind of validation mode or strategy to employ for a particular ` +
+        `input field.`,
+      valueType: "string",
+      availableValues: validationModeMd,
+      defaultValue: defaultValidationMode,
+    },
+    requireLabelMode: {
+      description: "Controls how required/optional status is visually indicated in the label.",
+      valueType: "string",
+      availableValues: requireLabelModeMd,
+      isRequired: false,
+    },
+    initialValue: dInitialValue(),
     required: dRequired(),
     requiredInvalidMessage: {
-      description: "Validation message used when a required field is empty.",
+      description:
+        "This optional string property is used to customize the message that is displayed if the " +
+        "field is not filled in. If not defined, the default message is used.",
       valueType: "string",
     },
     minLength: {
-      description: "Minimum allowed string length.",
+      description:
+        "This property sets the minimum length of the input value. If the value is not set, " +
+        "no minimum length check is done.",
+      valueType: "number",
+    },
+    maxLength: {
+      description:
+        "This property sets the maximum length of the input value. If the value is not set, " +
+        "no maximum length check is done.",
+      valueType: "number",
+    },
+    maxTextLength: {
+      description:
+        "The maximum length of the text in the input field. If this value is not set, " +
+        "no maximum length constraint is set for the input field.",
       valueType: "number",
     },
     lengthInvalidMessage: {
-      description: "Validation message displayed when length validation fails.",
+      description:
+        "This optional string property is used to customize the message that is displayed on a failed " +
+        "length check: [minLength](#minlength) or [maxLength](#maxlength).",
       valueType: "string",
     },
+    lengthInvalidSeverity: {
+      description: `This property sets the severity level of the length validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    minValue: {
+      description:
+        "The minimum value of the input. If this value is not specified, no minimum " +
+        "value check is done.",
+      valueType: "number",
+    },
+    maxValue: {
+      description:
+        "The maximum value of the input. If this value is not specified, no maximum " +
+        "value check is done.",
+      valueType: "number",
+    },
+    zeroOrPositive: {
+      description:
+        "For numeric FormItems, this property determines whether the input value can only be " +
+        "0 or positive numbers.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    rangeInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed when ` +
+        `a value is out of range.`,
+      valueType: "string",
+    },
+    rangeInvalidSeverity: {
+      description: `This property sets the severity level of the value range validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
     pattern: {
-      description: "Predefined pattern validator name or regular expression.",
+      description:
+        "**Deprecated** alias of `validator`. " +
+        "This value specifies a predefined validator name (or regex placeholder) to test the input value. " +
+        "If this value is not set, no validator check is done. Use `validator` instead.",
       valueType: "string",
     },
     patternInvalidMessage: {
-      description: "Validation message displayed when pattern validation fails.",
+      description:
+        `**Deprecated** alias of \`validatorInvalidMessage\`. This optional string property is used to customize ` +
+        `the message that is displayed on a failed pattern test.`,
       valueType: "string",
     },
     patternInvalidSeverity: {
-      description: "Severity level applied to pattern validation failures.",
+      description:
+        `**Deprecated** alias of \`validatorInvalidSeverity\`. This property sets the severity level of ` +
+        `the pattern validation.`,
       valueType: "string",
-      availableValues: ["error", "warning"],
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    validator: {
+      description:
+        "Name of a registered validator (or an array of names) to run against the input value. " +
+        "Built-in validators include `email`, `phone`, `url`, `creditCard`, `iban`, `isoDate`, " +
+        "`strongPassword`, `noLeadingTrailingWhitespace`, and `length`. Register additional " +
+        "validators via `App.registerValidator`. When both `validator` and `pattern` are set, " +
+        "`validator` wins.",
+      valueType: "string",
+    },
+    validatorParams: {
+      description:
+        "Optional parameters object forwarded to the validator function (e.g. " +
+        "`{ minLength: 16 }` for `strongPassword`).",
+      valueType: "any",
+    },
+    validatorInvalidMessage: {
+      description:
+        "Optional message displayed when the configured validator reports the value as invalid. " +
+        "Overrides the validator's default message.",
+      valueType: "string",
+    },
+    validatorInvalidSeverity: {
+      description: "Severity level applied to a validator failure.",
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
     regex: {
-      description: "Regular expression used to validate the field value.",
+      description:
+        "This value specifies a custom regular expression to test the input value. If this value " +
+        "is not set, no regular expression pattern check is done.",
       valueType: "string",
     },
     regexInvalidMessage: {
-      description: "Validation message displayed when regex validation fails.",
+      description:
+        `This optional string property is used to customize the message that is displayed on a ` +
+        `failed regular expression test.`,
       valueType: "string",
     },
     regexInvalidSeverity: {
-      description: "Severity level applied to regex validation failures.",
+      description: `This property sets the severity level of regular expression validation.`,
       valueType: "string",
-      availableValues: ["error", "warning"],
+      availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
-    validationMode: {
-      description: "Controls when field validation feedback is shown.",
-      valueType: "string",
-      availableValues: ["onChanged", "onLostFocus", "errorLate"],
-    },
-    searchable: {
-      description: "Pass-through option for select-like FormItem controls.",
-      valueType: "boolean",
-    },
-    groupBy: {
-      description: "Pass-through option for grouped select-like FormItem controls.",
-      valueType: "string",
-    },
-    groupHeaderTemplate: dComponent("Template rendered for grouped select headers."),
-    ungroupedHeaderTemplate: dComponent("Template rendered before ungrouped select options."),
-    customValidationsDebounce: {
-      description: "Debounces custom validation after value changes by the specified number of milliseconds.",
-      valueType: "number",
-      defaultValue: 0,
-    },
-    inputTemplate: dComponent("This property is used to define a custom input template."),
     matchValue: {
-      description: "The value this field must match.",
+      description:
+        "The value this field must match. This is useful for confirmation fields, " +
+        "such as checking a repeated password against the original password.",
       valueType: "any",
     },
     matchInvalidMessage: {
-      description: "Validation message displayed when the field value does not match `matchValue`.",
+      description:
+        "This optional string property is used to customize the message displayed when " +
+        "the field value does not match `matchValue`.",
       valueType: "string",
+    },
+    inputTemplate: dComponent("This property is used to define a custom input template."),
+    gap: {
+      description: "This property defines the gap between the adornments and the input area.",
+      valueType: "string",
+      defaultValue: defaultProps.gap,
+    },
+    noSubmit: {
+      description:
+        "When set to `true`, the field will not be included in the form's submitted data. " +
+        "This is useful for fields that should be present in the form but not submitted, " +
+        "similar to hidden fields. If multiple FormItems reference the same `bindTo` value " +
+        "and any of them has `noSubmit` set to `true`, the field will NOT be submitted.",
+      valueType: "boolean",
+      defaultValue: defaultProps.noSubmit,
     },
   },
   events: {
     validate: {
-      description: "This event is used to define a custom validation function.",
+      description: `This event is used to define a custom validation function.`,
+      signature: "validate(value: any): string | null | undefined | void",
+      parameters: {
+        value: "The current value of the FormItem to validate.",
+      },
     },
   },
-  themeVars: extractScssThemeVars(formItemStylesSource),
+  apis: {
+    addItem: {
+      description:
+        "This method adds a new item to the list held by the FormItem. The function has a single " +
+        "parameter, the data to add to the FormItem. The new item is appended to the end of the list.",
+      signature: "addItem(data: any): void",
+      parameters: {
+        data: "The data to add to the FormItem's list.",
+      },
+    },
+    removeItem: {
+      description:
+        "Removes the item specified by its index from the list held by the FormItem. " +
+        "The function has a single argument, the index to remove.",
+      signature: "removeItem(index: number): void",
+      parameters: {
+        index: "The index of the item to remove from the FormItem's list.",
+      },
+    },
+  },
+  contextVars: {
+    $value: {
+      description: "Current value of the FormItem, accessible in expressions and code snippets",
+    },
+    $setValue: {
+      description: "Function to set the FormItem's value programmatically",
+    },
+    $validationResult: {
+      description: "Current validation state and error messages for this field",
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`gap-${COMP}`]: "$space-1",
-    [`gap-label-${COMP}`]: "$space-2",
-    [`width-label-${COMP}`]: "12rem",
-    [`textColor-label-${COMP}`]: "$textColor",
     "textColor-label-formItem": "$textColor",
-    "fontSize-label-formItem": "$fontSize-base",
-    [`fontWeight-label-${COMP}`]: "$fontWeight-semibold",
-    "fontWeight-label-formItem": "$fontWeight-semibold",
+    "textColor-label-formItem--required": "$textColor",
+    "fontSize-label-formItem": "$fontSize-sm",
+    "fontSize-label-formItem--required": "$fontSize-sm",
+    "fontWeight-label-formItem": "$fontWeight-medium",
+    "fontWeight-label-formItem--required": "$fontWeight-medium",
     "fontStyle-label-formItem": "normal",
     "textTransform-label-formItem": "none",
-    "textColor-requiredMark-formItem": "$color-danger-500",
+    "textColor-requiredMark-formItem": "$color-danger-400",
     "textColor-optionalTag-formItem": "$textColor-secondary",
-    [`textColor-error-${COMP}`]: "$color-danger-500",
-    [`fontSize-error-${COMP}`]: "$fontSize-sm",
-    [`borderColor-input-${COMP}--error`]: "$color-danger-500",
+  },
+});
+
+export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemMd, {
+  exposeRegisterApi: true,
+  exclude: ["inputTemplate"],
+  customRender: (
+    _props,
+    {
+      node,
+      renderChild,
+      extractValue,
+      classes,
+      layoutContext,
+      lookupEventHandler,
+      registerComponentApi,
+    },
+  ) => {
+    const {
+      bindTo,
+      autoFocus,
+      label,
+      labelPosition,
+      labelWidth,
+      labelBreak,
+      enabled,
+      required,
+      type,
+      requiredInvalidMessage,
+      minLength,
+      maxLength,
+      lengthInvalidMessage,
+      lengthInvalidSeverity,
+      minValue,
+      maxValue,
+      rangeInvalidMessage,
+      rangeInvalidSeverity,
+      pattern,
+      patternInvalidMessage,
+      patternInvalidSeverity,
+      validator,
+      validatorParams,
+      validatorInvalidMessage,
+      validatorInvalidSeverity,
+      regex,
+      regexInvalidMessage,
+      regexInvalidSeverity,
+      matchValue,
+      matchInvalidMessage,
+      customValidationsDebounce,
+      validationDisplayDelay,
+      validationMode,
+      maxTextLength,
+      gap,
+      noSubmit,
+      ...rest
+    } = node.props;
+
+    // Separate template props from regular props
+    // i.e. props like groupHeaderTemplate
+    const [templateProps, nonTemplateProps] = partitionObject(rest, (key) =>
+      key.endsWith("Template"),
+    );
+    // Remove the *Template suffix and create renderer functions with the same name + Renderer
+    const resolvedRestProps: Record<string | number | symbol, any> = {
+      ...Object.fromEntries(
+        Object.entries(nonTemplateProps)
+          .filter(([key]) => !isLayoutPropName(key))
+          .map(([key, value]) => [key, extractValue(value)]),
+      ),
+      ...Object.fromEntries(
+        Object.entries(templateProps).map(([key, value]) => [
+          key.replace(/Template$/, "Renderer"),
+          (contextVars: Record<string, any>) => {
+            return (
+              <MemoizedItem
+                contextVars={contextVars}
+                node={value as any}
+                renderChild={renderChild}
+                layoutContext={layoutContext}
+              />
+            );
+          },
+        ]),
+      ),
+    };
+
+    const formItemType = extractValue.asOptionalString(type);
+    const isCustomFormItem =
+      (formItemType === undefined || formItemType === "custom") && !!node.children;
+    const inputTemplate = node.children || node.props?.inputTemplate;
+
+    return (
+      <FormItem
+        // --- validation props
+        required={extractValue.asOptionalBoolean(required)}
+        requiredInvalidMessage={extractValue.asOptionalString(requiredInvalidMessage)}
+        minLength={extractValue.asOptionalNumber(minLength)}
+        maxLength={extractValue.asOptionalNumber(maxLength)}
+        lengthInvalidMessage={extractValue.asOptionalString(lengthInvalidMessage)}
+        lengthInvalidSeverity={parseSeverity(extractValue.asOptionalString(lengthInvalidSeverity))}
+        minValue={extractValue.asOptionalNumber(minValue)}
+        maxValue={extractValue.asOptionalNumber(maxValue)}
+        rangeInvalidMessage={extractValue.asOptionalString(rangeInvalidMessage)}
+        rangeInvalidSeverity={parseSeverity(extractValue.asOptionalString(rangeInvalidSeverity))}
+        pattern={extractValue.asOptionalString(pattern)}
+        patternInvalidMessage={extractValue.asOptionalString(patternInvalidMessage)}
+        patternInvalidSeverity={parseSeverity(
+          extractValue.asOptionalString(patternInvalidSeverity),
+        )}
+        validator={extractValue(validator)}
+        validatorParams={extractValue(validatorParams)}
+        validatorInvalidMessage={extractValue.asOptionalString(validatorInvalidMessage)}
+        validatorInvalidSeverity={parseSeverity(
+          extractValue.asOptionalString(validatorInvalidSeverity),
+        )}
+        regex={extractValue(regex)}
+        regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
+        regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
+        matchValue={extractValue(matchValue)}
+        matchInvalidMessage={extractValue.asOptionalString(matchInvalidMessage)}
+        //  ----
+        classes={classes}
+        layoutContext={layoutContext}
+        labelBreak={extractValue.asOptionalBoolean(labelBreak)}
+        labelWidth={extractValue.asOptionalString(labelWidth)}
+        bindTo={extractValue.asString(bindTo)}
+        autoFocus={extractValue.asOptionalBoolean(autoFocus)}
+        enabled={extractValue.asOptionalBoolean(enabled)}
+        label={extractValue.asOptionalString(label)}
+        labelPosition={extractValue.asOptionalString(labelPosition)}
+        type={isCustomFormItem ? "custom" : (formItemType as any)}
+        onValidate={lookupEventHandler("validate")}
+        customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
+        validationMode={extractValue.asOptionalString(validationMode)}
+        requireLabelMode={extractValue.asOptionalString(rest.requireLabelMode)}
+        registerComponentApi={registerComponentApi}
+        maxTextLength={extractValue(maxTextLength)}
+        itemIndex={extractValue("{$itemIndex}")}
+        initialValue={extractValue(node.props.initialValue)}
+        noSubmit={extractValue.asOptionalBoolean(noSubmit)}
+        inputRenderer={
+          inputTemplate
+            ? (contextVars: Record<string, any>) => (
+                <MemoizedItem
+                  contextVars={contextVars}
+                  node={inputTemplate}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                />
+              )
+            : undefined
+        }
+        gap={extractValue.asOptionalString(gap)}
+        {...resolvedRestProps}
+      >
+        {isCustomFormItem ? (
+          <CustomFormItem
+            renderChild={renderChild}
+            node={node as any}
+            bindTo={extractValue.asString(bindTo)}
+          />
+        ) : (
+          renderChild(node.children, {
+            type: formItemType,
+          })
+        )}
+      </FormItem>
+    );
   },
 });

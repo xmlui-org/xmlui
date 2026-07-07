@@ -1,0 +1,11 @@
+<App>
+  <Stack height="40px" width="100px" backgroundColor="lightgray">
+    <ContentSeparator
+      orientation="vertical"
+      width="20px"
+      size="4px"
+      backgroundColor="red"
+      paddingVertical="4px"
+      paddingHorizontal="4px" />
+  </Stack>
+</App>

@@ -1,6 +1,8 @@
 import { createMetadata } from "../../component-core/metadata/helpers";
 import { extractScssThemeVars } from "../../styling/theme";
 
+export { ValidationSummary } from "./ValidationSummaryReact";
+
 const COMP = "ValidationSummary";
 const validationSummaryStylesSource = `
 $gap-ValidationSummary: createThemeVar("gap-ValidationSummary");
@@ -40,4 +42,3 @@ export const ValidationSummaryMd = createMetadata({
     "textColor-ValidationDisplay-warning": "$color-warning",
   },
 });
-

@@ -14,3 +14,10 @@ declare module "*.module.scss?xmlui-css-module" {
   const classes: Record<string, string>;
   export default classes;
 }
+
+declare module "*.svg?react" {
+  import type { SVGProps, ForwardRefExoticComponent, RefAttributes } from "react";
+
+  const component: ForwardRefExoticComponent<SVGProps<SVGSVGElement> & RefAttributes<SVGSVGElement>>;
+  export default component;
+}

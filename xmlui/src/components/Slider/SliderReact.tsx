@@ -1,498 +1,492 @@
-import type { CSSProperties, FocusEvent, KeyboardEvent, PointerEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-
-import { defaultProps } from "./Slider.defaults";
-import { useFormContext } from "../Form/FormContext";
+import type { CSSProperties, ForwardedRef } from "react";
+import React, { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { forwardRef } from "react";
+import { Root, Range, Track, Thumb } from "@radix-ui/react-slider";
 import styles from "./Slider.module.scss";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./Slider.defaults";
+import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
+import { isNaN } from "lodash-es";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
-export type SliderApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  value: number | number[];
-};
-
-export type SliderProps = {
+export type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBlur"> & {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
-  min?: unknown;
-  max?: unknown;
-  step?: unknown;
-  minStepsBetweenThumbs?: unknown;
-  inverted?: unknown;
-  enabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
+  value?: number | number[];
+  initialValue?: number | number[];
+  classes?: Record<string, string>;
+  step?: number;
+  max?: number;
+  min?: number;
+  inverted?: false;
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
+  minStepsBetweenThumbs?: number;
+  onDidChange?: (newValue: number | number[]) => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  updateState?: UpdateStateFn;
+  registerComponentApi?: RegisterComponentApiFn;
   autoFocus?: boolean;
+  readOnly?: boolean;
   tabIndex?: number;
-  label?: unknown;
-  labelPosition?: "start" | "end" | "top" | "bottom" | string;
-  labelBreak?: boolean;
-  labelWidth?: string | number;
-  requireLabelMode?: string;
-  validationStatus?: string;
-  showValues?: boolean;
-  valueFormat?: unknown;
-  className?: string;
-  style?: CSSProperties;
+  required?: boolean;
+  enabled?: boolean;
   rangeStyle?: CSSProperties;
   thumbStyle?: CSSProperties;
-  title?: string;
-  onDidChange?: (value: number | number[]) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  "data-testid"?: string;
+  showValues?: boolean;
+  valueFormat?: (value: number) => string;
 };
 
-export const SliderNative = memo(forwardRef<SliderApi, SliderProps>(function SliderNative(
-  {
-    id,
-    bindTo,
-    value,
-    initialValue,
-    min = defaultProps.min,
-    max = defaultProps.max,
-    step = defaultProps.step,
-    minStepsBetweenThumbs = defaultProps.minStepsBetweenThumbs,
-    inverted,
-    enabled = defaultProps.enabled,
-    readOnly,
-    required,
-    autoFocus,
-    tabIndex = defaultProps.tabIndex,
-    label,
-    labelPosition = "top",
-    labelBreak,
-    labelWidth,
-    requireLabelMode,
-    validationStatus = defaultProps.validationStatus,
-    showValues = defaultProps.showValues,
-    valueFormat,
-    className,
-    style,
-    rangeStyle,
-    thumbStyle,
-    title,
-    onDidChange,
-    onFocus,
-    onBlur,
-    "data-testid": dataTestId,
-    ...rest
-  },
-  ref,
-) {
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const thumbRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  const form = useFormContext();
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = form && fieldName !== undefined ? form.getValue(fieldName) : undefined;
-  const effectiveValue = formValue ?? value;
-  const controlled = effectiveValue !== undefined;
-  const bounds = useMemo(() => normalizeBounds(min, max), [max, min]);
-  const normalizedStep = normalizePositiveNumber(step, defaultProps.step);
-  const normalizedGap = Math.max(0, normalizePositiveNumber(minStepsBetweenThumbs, defaultProps.minStepsBetweenThumbs)) * normalizedStep;
-  const [localValue, setLocalValue] = useState<number[]>(() =>
-    normalizeValue(controlled ? effectiveValue : initialValue, bounds.min, bounds.max),
-  );
-  const currentValue = controlled ? normalizeValue(effectiveValue, bounds.min, bounds.max) : localValue;
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-  const interactive = enabled && !readOnly;
-
-  useEffect(() => {
-    if (controlled) {
-      setLocalValue(normalizeValue(effectiveValue, bounds.min, bounds.max));
+const parseValue = (val: string | number | undefined, defaultVal: number): number => {
+  if (typeof val === "number") {
+    return val;
+  } else if (typeof val === "string") {
+    const parsed = parseFloat(val);
+    if (!isNaN(parsed)) {
+      return parsed;
     }
-  }, [bounds.max, bounds.min, controlled, effectiveValue]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setLocalValue(normalizeValue(initialValue, bounds.min, bounds.max));
-    }
-  }, [bounds.max, bounds.min, controlled, initialValue]);
-
-  useEffect(() => {
-    if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
-      return;
-    }
-    form.setValue(fieldName, toPublicValue(normalizeValue(initialValue, bounds.min, bounds.max)));
-  }, [bounds.max, bounds.min, fieldName, form, initialValue]);
-
-  useEffect(() => {
-    if (autoFocus && enabled) {
-      const timeoutId = setTimeout(() => thumbRefs.current[0]?.focus(), 0);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [autoFocus, enabled]);
-
-  const emitValue = useCallback((next: number[]) => {
-    const normalized = normalizeRangeOrder(enforceThumbGap(next, currentValue, -1, bounds.min, bounds.max, normalizedGap));
-    setLocalValue(normalized);
-    const publicValue = toPublicValue(normalized);
-    if (form && fieldName !== undefined) {
-      form.setValue(fieldName, publicValue);
-    }
-    void onDidChange?.(publicValue);
-  }, [bounds.max, bounds.min, currentValue, fieldName, form, normalizedGap, onDidChange]);
-
-  const updateThumb = useCallback((index: number, nextNumber: number) => {
-    if (!interactive) {
-      return;
-    }
-    const next = [...currentValue];
-    next[index] = snapToStep(nextNumber, bounds.min, bounds.max, normalizedStep);
-    emitValue(enforceThumbGap(next, currentValue, index, bounds.min, bounds.max, normalizedGap));
-  }, [bounds.max, bounds.min, currentValue, emitValue, interactive, normalizedGap, normalizedStep]);
-
-  const updateFromPointer = useCallback((event: PointerEvent, index: number) => {
-    if (!interactive || !trackRef.current) {
-      return;
-    }
-    event.preventDefault();
-    const rect = trackRef.current.getBoundingClientRect();
-    const rawRatio = rect.width === 0 ? 0 : (event.clientX - rect.left) / rect.width;
-    const ratio = truthy(inverted) ? 1 - rawRatio : rawRatio;
-    updateThumb(index, bounds.min + clamp(ratio, 0, 1) * (bounds.max - bounds.min));
-  }, [bounds.max, bounds.min, interactive, inverted, updateThumb]);
-
-  const handlePointerDown = useCallback((event: PointerEvent<HTMLSpanElement>, index: number) => {
-    updateFromPointer(event, index);
-    const target = event.currentTarget;
-    target.setPointerCapture(event.pointerId);
-    target.focus();
-  }, [updateFromPointer]);
-
-  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLSpanElement>, index: number) => {
-    if (!interactive) {
-      return;
-    }
-    let nextValue: number | undefined;
-    const current = currentValue[index] ?? bounds.min;
-    switch (event.key) {
-      case "ArrowRight":
-      case "ArrowUp":
-        nextValue = current + normalizedStep;
-        break;
-      case "ArrowLeft":
-      case "ArrowDown":
-        nextValue = current - normalizedStep;
-        break;
-      case "Home":
-        nextValue = bounds.min;
-        break;
-      case "End":
-        nextValue = bounds.max;
-        break;
-      default:
-        return;
-    }
-    event.preventDefault();
-    updateThumb(index, nextValue);
-  }, [bounds.max, bounds.min, currentValue, interactive, normalizedStep, updateThumb]);
-
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      if (enabled) {
-        thumbRefs.current[0]?.focus();
-      }
-    },
-    setValue: (nextValue) => {
-      if (!interactive) {
-        return;
-      }
-      emitValue(normalizeValue(nextValue, bounds.min, bounds.max));
-    },
-    get value() {
-      return toPublicValue(currentValue);
-    },
-  }), [bounds.max, bounds.min, currentValue, emitValue, enabled, interactive]);
-
-  const labelText = stringifyLabel(label);
-  const hasLabel = labelText !== "";
-  const effectiveRequireLabelMode = requireLabelMode ?? form?.itemRequireLabelMode ?? "markRequired";
-  const showRequiredIndicator =
-    Boolean(required) && (effectiveRequireLabelMode === "markRequired" || effectiveRequireLabelMode === "markBoth");
-  const showOptionalIndicator =
-    !required && (effectiveRequireLabelMode === "markOptional" || effectiveRequireLabelMode === "markBoth");
-
-  useEffect(() => {
-    if (!form || fieldName === undefined) {
-      return;
-    }
-    return form.registerItem({
-      name: fieldName,
-      label: labelText,
-      required,
-    });
-  }, [fieldName, form, labelText, required]);
-
-  const slider = (
-    <div
-      {...(!hasLabel ? rest : undefined)}
-      data-slider-container
-      data-part-id="input"
-      data-xmlui-part="input"
-      data-testid={!hasLabel ? dataTestId ?? id : undefined}
-      title={title}
-      className={cx(
-        styles.sliderContainer,
-        !enabled ? styles.disabled : undefined,
-        readOnly ? styles.readOnly : undefined,
-        !hasLabel ? className : undefined,
-      )}
-      style={!hasLabel ? style : undefined}
-    >
-      <div className={styles.sliderRoot}>
-        <div
-          ref={trackRef}
-          data-track
-          className={cx(
-            styles.sliderTrack,
-            validationStatus === "error" ? styles.sliderTrackError : undefined,
-            validationStatus === "warning" ? styles.sliderTrackWarning : undefined,
-            validationStatus === "valid" ? styles.sliderTrackSuccess : undefined,
-          )}
-        >
-          <div data-range className={styles.sliderRange} style={{ ...rangeRect(currentValue, bounds.min, bounds.max, truthy(inverted)), ...rangeStyle }} />
-          {currentValue.map((thumbValue, index) => {
-            const position = valueToPercent(thumbValue, bounds.min, bounds.max, truthy(inverted));
-            return (
-              <span
-                key={index}
-                id={id}
-                ref={(element) => {
-                  thumbRefs.current[index] = element;
-                }}
-                role="slider"
-                data-thumb-index={index}
-                className={styles.sliderThumb}
-                style={{ left: `${position}%`, ...thumbStyle }}
-                tabIndex={enabled ? tabIndex : -1}
-                aria-valuemin={bounds.min}
-                aria-valuemax={bounds.max}
-                aria-valuenow={thumbValue}
-                aria-required={required}
-                aria-readonly={readOnly}
-                aria-disabled={!enabled}
-                onPointerDown={(event) => handlePointerDown(event, index)}
-                onPointerMove={(event) => {
-                  if (event.buttons === 1) {
-                    updateFromPointer(event, index);
-                  }
-                }}
-                onKeyDown={(event) => handleKeyDown(event, index)}
-                onFocus={(_event: FocusEvent<HTMLSpanElement>) => {
-                  setTooltipVisible(true);
-                  if (enabled) {
-                    void onFocus?.();
-                  }
-                }}
-                onBlur={(_event: FocusEvent<HTMLSpanElement>) => {
-                  setTooltipVisible(false);
-                  void onBlur?.();
-                }}
-                onMouseEnter={() => setTooltipVisible(true)}
-                onMouseLeave={() => setTooltipVisible(false)}
-              >
-                {showValues && tooltipVisible ? (
-                  <span className={styles.sliderTooltip}>{formatSliderValue(thumbValue, valueFormat)}</span>
-                ) : null}
-              </span>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-
-  if (!hasLabel) {
-    return slider;
   }
+  return defaultVal;
+};
 
-  return (
-    <div
-      {...rest}
-      data-xmlui-component="Slider"
-      data-xmlui-part="input"
-      data-xmlui-id={id}
-      data-testid={dataTestId ?? id}
-      className={className}
-      style={style}
-    >
-      <div
-        data-part-id="labeledItem"
-        data-xmlui-part="labeledItem"
-        className={cx(styles.sliderLabeledItem, labelPositionClass(labelPosition))}
-      >
-        <label
-          className={cx(styles.sliderLabel, labelBreak ? styles.sliderLabelBreak : undefined)}
-          style={labelWidth !== undefined ? { display: "inline-block", width: cssLength(labelWidth) } : undefined}
-          onClick={() => {
-            if (enabled) {
-              thumbRefs.current[0]?.focus();
-            }
-          }}
-        >
-          {labelText}
-          {showRequiredIndicator ? <span className={styles.sliderLabelRequired}>*</span> : null}
-          {showOptionalIndicator ? <span className={styles.sliderLabelOptional}>(Optional)</span> : null}
-        </label>
-        {slider}
-      </div>
-    </div>
-  );
-}));
-
-function normalizeBounds(min: unknown, max: unknown): { min: number; max: number } {
-  const normalizedMin = normalizeNumber(min, defaultProps.min);
-  const normalizedMax = normalizeNumber(max, defaultProps.max);
-  return normalizedMin <= normalizedMax
-    ? { min: normalizedMin, max: normalizedMax }
-    : { min: normalizedMax, max: normalizedMin };
-}
-
-function normalizeValue(value: unknown, min: number, max: number): number[] {
-  const parsed = parseInitialValue(value);
-  const values = Array.isArray(parsed) ? parsed : [parsed];
-  return normalizeRangeOrder(values.map((item) => clamp(normalizeNumber(item, min), min, max)));
-}
-
-function parseInitialValue(value: unknown): unknown {
-  if (typeof value !== "string") {
+// Helper function to ensure value is properly formatted
+const formatValue = (
+  val: number | number[] | undefined,
+  defaultVal: number = 0,
+  minVal?: number,
+  maxVal?: number,
+): number[] => {
+  const clampValue = (value: number): number => {
+    if (minVal !== undefined && value < minVal) return minVal;
+    if (maxVal !== undefined && value > maxVal) return maxVal;
     return value;
-  }
-  if (value.trim() === "") {
-    return undefined;
-  }
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
-}
-
-function normalizeRangeOrder(values: number[]): number[] {
-  return values.length > 1 ? [...values].sort((a, b) => a - b) : values;
-}
-
-function enforceThumbGap(values: number[], previous: number[], activeIndex: number, min: number, max: number, gap: number): number[] {
-  if (values.length < 2 || gap <= 0) {
-    return values.map((value) => clamp(value, min, max));
-  }
-  const next = [...values];
-  if (activeIndex === 0) {
-    next[0] = Math.min(next[0], next[1] - gap);
-  } else if (activeIndex === 1) {
-    next[1] = Math.max(next[1], next[0] + gap);
-  } else if (activeIndex < 0) {
-    return normalizeRangeOrder(next).map((value, index, array) => {
-      if (index > 0 && value - array[index - 1] < gap) {
-        return array[index - 1] + gap;
-      }
-      return value;
-    }).map((value) => clamp(value, min, max));
-  }
-  return next.map((value) => clamp(value, min, max)).map((value, index) => {
-    if (index === activeIndex) {
-      return value;
-    }
-    return previous[index] ?? value;
-  });
-}
-
-function toPublicValue(values: number[]): number | number[] {
-  return values.length === 1 ? values[0] : values;
-}
-
-function normalizeNumber(value: unknown, fallback: number): number {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-  if (typeof value === "string" && value.trim() !== "") {
-    const parsed = Number.parseFloat(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  }
-  return fallback;
-}
-
-function normalizePositiveNumber(value: unknown, fallback: number): number {
-  const parsed = normalizeNumber(value, fallback);
-  return parsed > 0 ? parsed : fallback;
-}
-
-function snapToStep(value: number, min: number, max: number, step: number): number {
-  const snapped = min + Math.round((value - min) / step) * step;
-  return clamp(roundStep(snapped, step), min, max);
-}
-
-function roundStep(value: number, step: number): number {
-  const decimalPart = String(step).split(".")[1];
-  if (!decimalPart && !String(step).includes("e-")) {
-    return value;
-  }
-  if (String(step).includes("e-")) {
-    return Number(value.toExponential());
-  }
-  return Number(value.toFixed(decimalPart.length));
-}
-
-function valueToPercent(value: number, min: number, max: number, invertedValue: boolean): number {
-  const range = max - min || 1;
-  const percent = ((value - min) / range) * 100;
-  return invertedValue ? 100 - percent : percent;
-}
-
-function rangeRect(values: number[], min: number, max: number, invertedValue: boolean): CSSProperties {
-  const percents = values.map((value) => valueToPercent(value, min, max, invertedValue));
-  const start = values.length > 1 ? Math.min(...percents) : invertedValue ? percents[0] : 0;
-  const end = values.length > 1 ? Math.max(...percents) : invertedValue ? 100 : percents[0];
-  return {
-    left: `${start}%`,
-    width: `${Math.max(0, end - start)}%`,
   };
-}
 
-function formatSliderValue(value: number, formatter: unknown): string {
-  return typeof formatter === "function" ? String((formatter as (value: number) => unknown)(value)) : String(value);
-}
-
-function labelPositionClass(position: SliderProps["labelPosition"]): string {
-  switch (position) {
-    case "start":
-      return styles.sliderLabelPositionStart;
-    case "end":
-      return styles.sliderLabelPositionEnd;
-    case "bottom":
-      return styles.sliderLabelPositionBottom;
-    case "top":
-    default:
-      return styles.sliderLabelPositionTop;
+  if (val === undefined) {
+    return [clampValue(defaultVal)];
   }
-}
-
-function cssLength(value: string | number): string {
-  return typeof value === "number" ? `${value}px` : value;
-}
-
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
-
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
+  if (typeof val === "number") {
+    return [clampValue(val)];
   }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
+  if (Array.isArray(val) && val.length > 0) {
+    return val.map(clampValue);
+  }
+  return [clampValue(defaultVal)];
+};
 
-function truthy(value: unknown): boolean {
-  return value === true || value === "true";
-}
+export const Slider = memo(forwardRef(
+  (
+    {
+      id: idProp,
+      style,
+      className,
+      classes,
+      step = defaultProps.step,
+      min = defaultProps.min,
+      max = defaultProps.max,
+      inverted,
+      updateState,
+      onDidChange = noop,
+      onFocus = noop,
+      onBlur = noop,
+      registerComponentApi,
+      enabled = defaultProps.enabled,
+      value,
+      autoFocus,
+      readOnly,
+      tabIndex = defaultProps.tabIndex,
+      required,
+      validationStatus = defaultProps.validationStatus,
+      invalidMessages: _invalidMessages,
+      initialValue,
+      minStepsBetweenThumbs = defaultProps.minStepsBetweenThumbs,
+      rangeStyle,
+      thumbStyle,
+      showValues = defaultProps.showValues,
+      valueFormat = defaultProps.valueFormat,
+      ...rest
+    }: Props,
+    forwardedRef: ForwardedRef<HTMLDivElement>,
+  ) => {
+    const id = useFormItemInputId(idProp);
+    const inputRef = useRef(null);
+    const outerDivRef = useRef<HTMLDivElement>(null);
+    const composedRef = useComposedRefs(forwardedRef, outerDivRef);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const thumbsRef = useRef<(HTMLSpanElement | null)[]>([]);
+    min = parseValue(min, defaultProps.min);
+    max = parseValue(max, defaultProps.max);
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
+    // Initialize localValue properly
+    const [localValue, setLocalValue] = React.useState<number[]>(() =>
+      formatValue(value || initialValue, min, min, max),
+    );
+    const [showTooltip, setShowTooltip] = React.useState(false);
+    const onShowTooltip = useCallback(() => setShowTooltip(true), []);
+    const onHideTooltip = useCallback(() => setShowTooltip(false), []);
 
-function cx(...values: Array<string | undefined | false>): string {
-  return values.filter(Boolean).join(" ");
-}
+    // Process initialValue on mount
+    useEffect(() => {
+      let initialVal: number | number[] = min;
+
+      if (typeof initialValue === "string") {
+        try {
+          // Try to parse as JSON first (for arrays)
+          const parsed = JSON.parse(initialValue);
+          initialVal = parsed;
+        } catch (e) {
+          // If not JSON, try to parse as number
+          const num = parseFloat(initialValue);
+          if (!isNaN(num)) {
+            initialVal = num;
+          }
+        }
+      } else if (typeof initialValue === "number") {
+        initialVal = initialValue;
+      } else if (initialValue !== undefined) {
+        initialVal = initialValue;
+      }
+
+      // Format the value properly - single call to formatValue with bounds checking
+      const formattedValue = formatValue(initialVal, min, min, max);
+      setLocalValue(formattedValue);
+
+      // Notify parent component
+      if (updateState) {
+        updateState(
+          {
+            value: formattedValue.length === 1 ? formattedValue[0] : formattedValue,
+          },
+          { initial: true },
+        );
+      }
+    }, [initialValue, min, max, updateState]);
+
+    // Sync with external value changes
+    useEffect(() => {
+      if (value !== undefined) {
+        const formattedValue = formatValue(value, min, min, max);
+        setLocalValue(formattedValue);
+      }
+    }, [value, min, max]);
+
+    const updateValue = useCallback(
+      (value: number | number[]) => {
+        if (updateState) {
+          updateState({ value });
+        }
+        // Call onDidChange without extra arguments to maintain type compatibility
+        onDidChange(value);
+      },
+      [onDidChange, updateState],
+    );
+
+    const onInputChange = useCallback(
+      (value: number[]) => {
+        if (readOnly) {
+          return;
+        }
+        setLocalValue(value);
+
+        // 👇 Force the DOM element to reflect the latest value synchronously
+        if (inputRef.current) {
+          inputRef.current.value = value;
+        }
+
+        if (value.length > 1) {
+          updateValue(value); // calls updateState + onDidChange
+        } else if (value.length === 1) {
+          updateValue(value[0]);
+        }
+      },
+      [updateValue, readOnly],
+    );
+
+    // Component APIs
+    const handleOnFocus = useCallback(
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        onShowTooltip();
+        onFocus?.(ev);
+      },
+      [onFocus, onShowTooltip],
+    );
+    const handleOnBlur = useCallback(
+      (ev: React.FocusEvent<HTMLInputElement>) => {
+        onBlur?.(ev);
+      },
+      [onBlur],
+    );
+
+    const focus = useCallback(() => {
+      // Focus the first available thumb
+      const firstThumb = thumbsRef.current.find(thumb => thumb !== null);
+      if (firstThumb) {
+        firstThumb.focus();
+      } else {
+        inputRef.current?.focus();
+      }
+    }, []);
+
+    const setValue = useEvent((newValue) => {
+      if (readOnly || !enabled) {
+        return;
+      }
+      const formattedValue = formatValue(newValue, min, min, max);
+      const valueToUpdate = formattedValue.length === 1 ? formattedValue[0] : formattedValue;
+      setLocalValue(formattedValue);
+      updateValue(valueToUpdate);
+    });
+
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        setValue,
+      });
+    }, [focus, registerComponentApi, setValue]);
+
+    // Ensure we always have at least one thumb
+    const displayValue = localValue.length > 0 ? localValue : formatValue(undefined, min, min, max);
+
+    // Clean up thumbs ref array when number of thumbs changes
+    useEffect(() => {
+      thumbsRef.current = thumbsRef.current.slice(0, displayValue.length);
+    }, [displayValue.length]);
+
+    const handleKeyDownCapture = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (readOnly || !enabled) return;
+
+        if (
+          e.key !== "ArrowRight" &&
+          e.key !== "ArrowUp" &&
+          e.key !== "ArrowLeft" &&
+          e.key !== "ArrowDown" &&
+          e.key !== "Home" &&
+          e.key !== "End"
+        ) {
+          return;
+        }
+
+        const eventThumb = (e.target as HTMLElement | null)?.closest?.("[data-thumb-index]") as HTMLElement | null;
+        const focusedThumbIndex =
+          eventThumb?.dataset.thumbIndex !== undefined
+            ? Number(eventThumb.dataset.thumbIndex)
+            : thumbsRef.current.findIndex((thumb) => thumb === document.activeElement);
+        if (focusedThumbIndex === -1) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentThumbValue = displayValue[focusedThumbIndex];
+        const nextThumbValue =
+          e.key === "Home"
+            ? min
+            : e.key === "End"
+              ? max
+              : currentThumbValue + (e.key === "ArrowRight" || e.key === "ArrowUp" ? step : -step);
+        const newValues = [...displayValue];
+        newValues[focusedThumbIndex] = Math.max(min, Math.min(max, nextThumbValue));
+        const minimumGap = Math.max(0, minStepsBetweenThumbs) * step;
+        if (focusedThumbIndex > 0) {
+          newValues[focusedThumbIndex] = Math.max(
+            newValues[focusedThumbIndex],
+            newValues[focusedThumbIndex - 1] + minimumGap,
+          );
+        }
+        if (focusedThumbIndex < newValues.length - 1) {
+          newValues[focusedThumbIndex] = Math.min(
+            newValues[focusedThumbIndex],
+            newValues[focusedThumbIndex + 1] - minimumGap,
+          );
+        }
+        newValues[focusedThumbIndex] = Math.max(min, Math.min(max, newValues[focusedThumbIndex]));
+        onInputChange(newValues);
+      },
+      [step, readOnly, enabled, displayValue, min, max, minStepsBetweenThumbs, onInputChange],
+    );
+
+    useLayoutEffect(() => {
+      const outer = outerDivRef.current;
+      if (!outer) {
+        return;
+      }
+      const applyThumbValue = (thumbNumber: number, rawValue: number, values = [...displayValue]) => {
+        const safeIndex = Math.max(0, Math.min(thumbNumber, values.length - 1));
+        values[safeIndex] = Math.max(min, Math.min(max, rawValue));
+        const minimumGap = Math.max(0, minStepsBetweenThumbs) * step;
+        if (safeIndex > 0) {
+          values[safeIndex] = Math.max(values[safeIndex], values[safeIndex - 1] + minimumGap);
+        }
+        if (safeIndex < values.length - 1) {
+          values[safeIndex] = Math.min(values[safeIndex], values[safeIndex + 1] - minimumGap);
+        }
+        values[safeIndex] = Math.max(min, Math.min(max, values[safeIndex]));
+        return values;
+      };
+      const driverSet = (event: Event) => {
+        if (readOnly || !enabled) {
+          return;
+        }
+        const detail = (event as CustomEvent<{
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }>).detail ?? {};
+        const thumbNumber = Number(detail.thumbNumber ?? 0) || 0;
+        let values = [...displayValue];
+        if (detail.key) {
+          const repeat = Math.max(1, Number(detail.repeat ?? 1) || 1);
+          for (let i = 0; i < repeat; i += 1) {
+            const safeIndex = Math.max(0, Math.min(thumbNumber, values.length - 1));
+            const current = values[safeIndex] ?? min;
+            const nextValue =
+              detail.key === "Home"
+                ? min
+                : detail.key === "End"
+                  ? max
+                  : current + (detail.key === "ArrowRight" ? step : -step);
+            values = applyThumbValue(thumbNumber, nextValue, values);
+          }
+        } else {
+          const nextValue =
+            detail.location === "start"
+              ? min
+              : detail.location === "end"
+                ? max
+                : min + (max - min) / 2;
+          values = applyThumbValue(thumbNumber, nextValue, values);
+        }
+        event.stopImmediatePropagation();
+        onInputChange(values);
+      };
+      const keyDown = (event: KeyboardEvent) => {
+        if (readOnly || !enabled) {
+          return;
+        }
+        if (
+          event.key !== "ArrowRight" &&
+          event.key !== "ArrowUp" &&
+          event.key !== "ArrowLeft" &&
+          event.key !== "ArrowDown" &&
+          event.key !== "Home" &&
+          event.key !== "End"
+        ) {
+          return;
+        }
+        const eventThumb = (event.target as HTMLElement | null)?.closest?.("[data-thumb-index]") as HTMLElement | null;
+        if (!eventThumb || !outer.contains(eventThumb)) {
+          return;
+        }
+        const thumbIndex = Number(eventThumb.dataset.thumbIndex);
+        if (!Number.isFinite(thumbIndex)) {
+          return;
+        }
+        const current = displayValue[thumbIndex] ?? min;
+        const nextValue =
+          event.key === "Home"
+            ? min
+            : event.key === "End"
+              ? max
+              : current + (event.key === "ArrowRight" || event.key === "ArrowUp" ? step : -step);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        onInputChange(applyThumbValue(thumbIndex, nextValue));
+      };
+      outer.addEventListener("xmlui-slider-driver-set", driverSet);
+      (outer as HTMLDivElement & {
+        __xmluiSliderDriverSet?: (detail: {
+          location?: string;
+          thumbNumber?: number;
+          key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
+          repeat?: number;
+        }) => void;
+      }).__xmluiSliderDriverSet = (detail) => {
+        driverSet(new CustomEvent("xmlui-slider-driver-set", { detail }));
+      };
+      outer.addEventListener("keydown", keyDown, true);
+      return () => {
+        outer.removeEventListener("xmlui-slider-driver-set", driverSet);
+        delete (outer as HTMLDivElement & { __xmluiSliderDriverSet?: unknown }).__xmluiSliderDriverSet;
+        outer.removeEventListener("keydown", keyDown, true);
+      };
+    }, [displayValue, enabled, max, min, minStepsBetweenThumbs, onInputChange, readOnly, step]);
+
+      return (
+          <div {...rest} ref={composedRef} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container onKeyDownCapture={handleKeyDownCapture}>
+            <Root
+              ref={inputRef}
+              minStepsBetweenThumbs={minStepsBetweenThumbs}
+              tabIndex={tabIndex}
+              aria-readonly={readOnly}
+              className={classnames(styles.sliderRoot, {
+                [styles.disabled]: !enabled,
+                [styles.readOnly]: readOnly,
+              })}
+              max={max}
+              min={min}
+              inverted={inverted}
+              step={step}
+              disabled={!enabled}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              onValueChange={onInputChange}
+              onMouseOver={onShowTooltip}
+              onMouseLeave={onHideTooltip}
+              onPointerDown={onShowTooltip}
+              value={displayValue}
+            >
+            <Track
+              data-track
+              className={classnames(styles.sliderTrack, {
+                [styles.disabled]: !enabled,
+                [styles.readOnly]: readOnly,
+                [styles.error]: validationStatus === "error",
+                [styles.warning]: validationStatus === "warning",
+                [styles.valid]: validationStatus === "valid",
+              })}
+              style={rangeStyle ? { ...rangeStyle } : undefined}
+            >
+              <Range
+                data-range
+                className={classnames(styles.sliderRange, {
+                  [styles.disabled]: !enabled,
+                })}
+              />
+            </Track>
+            {displayValue.map((_, index) => (
+              <Tooltip
+                key={index}
+                ref={tooltipRef}
+                text={valueFormat(displayValue[index])}
+                delayDuration={100}
+                open={showValues && showTooltip}
+              >
+                <Thumb
+                  id={id}
+                  aria-required={required}
+                  ref={(el) => {
+                    thumbsRef.current[index] = el;
+                  }}
+                  className={classnames(styles.sliderThumb, {
+                    [styles.disabled]: !enabled,
+                  })}
+                  style={thumbStyle ? { ...thumbStyle } : undefined}
+                  data-thumb-index={index}
+                  autoFocus={autoFocus && index === 0}
+                  onKeyDownCapture={handleKeyDownCapture}
+                />
+              </Tooltip>
+            ))}
+          </Root>
+        </div>
+    );
+  },
+));

@@ -1,7 +1,21 @@
+import { memo } from "react";
+import type { ReactNode } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { createMetadata } from "../../component-core/metadata/helpers";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiElement } from "../../compiler/ir";
+
+// --- WIP
+
+type Props = {
+  children: ReactNode;
+  partId?: string;
+};
+
+export const Part = memo(function Part({ children, partId }: Props) {
+  return <Slot data-part-id={partId}>{children}</Slot>;
+});
 
 const COMP = "Part";
 

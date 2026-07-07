@@ -38,6 +38,7 @@ export type BehaviorAttachContext = {
   componentName: string;
   metadata: ComponentMetadata;
   props: Record<string, unknown>;
+  layoutContext?: Record<string, unknown>;
 };
 
 export type Behavior = {

@@ -1,0 +1,20 @@
+{
+  "AutoComplete": [
+    "AutoCompleteContext.tsx"
+  ],
+  "ModalDialog": [
+    "ConfirmationModalContextProvider.tsx",
+    "Dialog.tsx"
+  ],
+  "Option": [
+    "OptionTypeProvider.tsx"
+  ],
+  "Select": [
+    "HiddenOption.tsx",
+    "MultiSelectOption.tsx",
+    "OptionContext.ts",
+    "SelectContext.tsx",
+    "SelectOption.tsx",
+    "SimpleSelect.tsx"
+  ]
+}

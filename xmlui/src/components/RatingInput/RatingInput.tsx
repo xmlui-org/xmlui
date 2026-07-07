@@ -1,3 +1,7 @@
+import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import {
   createMetadata,
   dAutoFocus,
@@ -9,92 +13,20 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
-} from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+  dValidationStatus,
+} from "../metadata-helpers";
 import { defaultProps } from "./RatingInput.defaults";
+import { RatingInput } from "./RatingInputReact";
+import styles from "./RatingInput.module.scss";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 
 const COMP = "RatingInput";
 
-const ratingInputStylesSource = `
-$textColor-placeholder-RatingInput: createThemeVar("textColor-placeholder-RatingInput");
-$fontSize-placeholder-RatingInput: createThemeVar("fontSize-placeholder-RatingInput");
-$color-star-RatingInput: createThemeVar("color-star-RatingInput");
-$color-star-RatingInput--active: createThemeVar("color-star-RatingInput--active");
-$fontSize-star-RatingInput: createThemeVar("fontSize-star-RatingInput");
-$gap-RatingInput: createThemeVar("gap-RatingInput");
-$outlineColor-RatingInput--error: createThemeVar("outlineColor-RatingInput--error");
-$outlineWidth-RatingInput--error: createThemeVar("outlineWidth-RatingInput--error");
-$outlineStyle-RatingInput--error: createThemeVar("outlineStyle-RatingInput--error");
-$borderRadius-RatingInput--error: createThemeVar("borderRadius-RatingInput--error");
-$outlineColor-RatingInput--warning: createThemeVar("outlineColor-RatingInput--warning");
-$outlineWidth-RatingInput--warning: createThemeVar("outlineWidth-RatingInput--warning");
-$outlineStyle-RatingInput--warning: createThemeVar("outlineStyle-RatingInput--warning");
-$borderRadius-RatingInput--warning: createThemeVar("borderRadius-RatingInput--warning");
-$outlineColor-RatingInput--valid: createThemeVar("outlineColor-RatingInput--valid");
-$outlineWidth-RatingInput--valid: createThemeVar("outlineWidth-RatingInput--valid");
-$outlineStyle-RatingInput--valid: createThemeVar("outlineStyle-RatingInput--valid");
-$borderRadius-RatingInput--valid: createThemeVar("borderRadius-RatingInput--valid");
-$opacity-RatingInput--disabled: createThemeVar("opacity-RatingInput--disabled");
-$opacity-RatingInput--readOnly: createThemeVar("opacity-RatingInput--readOnly");
-`;
-
 export const RatingInputMd = createMetadata({
   status: "experimental",
-  description: "`RatingInput` provides a star-based input for selecting a numeric rating.",
-  parts: {
-    input: { description: "The rating input area." },
-  },
-  defaultPart: "input",
-  props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
-    placeholder: dPlaceholder(),
-    initialValue: dInitialValue(defaultProps.initialValue, "number"),
-    value: { description: "Controlled rating value.", valueType: "number" },
-    maxRating: {
-      description: "The maximum rating value and number of stars to display.",
-      valueType: "number",
-      defaultValue: defaultProps.maxRating,
-    },
-    autoFocus: dAutoFocus(),
-    required: dRequired(),
-    readOnly: dReadonly(),
-    enabled: dEnabled(defaultProps.enabled),
-    validationStatus: { description: "Validation status.", valueType: "string" },
-    invalidMessages: { description: "Invalid messages.", valueType: "string[]" },
-    verboseValidationFeedback: { description: "Controls verbose validation feedback.", valueType: "boolean" },
-    validationIconSuccess: { description: "Icon shown for valid concise validation feedback.", valueType: "icon" },
-    validationIconError: { description: "Icon shown for invalid concise validation feedback.", valueType: "icon" },
-    tooltip: { description: "The tooltip text.", valueType: "string" },
-    tooltipMarkdown: { description: "The markdown tooltip text.", valueType: "string" },
-    animation: { description: "The animation definition.", valueType: "any" },
-    variant: { description: "The variant value.", valueType: "string" },
-    requireLabelMode: { description: "Controls required/optional label markers.", valueType: "string" },
-    bindTo: { description: "Binds the rating input to form data.", valueType: "string" },
-  },
-  events: {
-    gotFocus: dGotFocus(COMP),
-    lostFocus: dLostFocus(COMP),
-    didChange: dDidChange(COMP),
-  },
-  apis: {
-    focus: {
-      description: "Sets focus on the RatingInput component.",
-      signature: "focus(): void",
-    },
-    value: {
-      description: "Returns the current rating value.",
-      signature: "get value(): number | undefined",
-    },
-    setValue: {
-      description: "Sets the current rating value.",
-      signature: "setValue(value: number | undefined): void",
-      parameters: {
-        value: "The new rating value.",
-      },
-    },
-  },
-  themeVars: extractScssThemeVars(ratingInputStylesSource),
+  description: "`RatingInput` is a star-based rating input control.",
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`textColor-placeholder-${COMP}`]: "$color-surface-500",
     [`fontSize-placeholder-${COMP}`]: "14px",
@@ -114,9 +46,224 @@ export const RatingInputMd = createMetadata({
     [`outlineWidth-${COMP}--valid`]: "1px",
     [`outlineStyle-${COMP}--valid`]: "solid",
     [`borderRadius-${COMP}--valid`]: "$borderRadius",
-    [`opacity-${COMP}--disabled`]: "0.5",
-    [`opacity-${COMP}--readOnly`]: "0.7",
+    [`opacity-${COMP}--disabled`]: "0.6",
+    [`opacity-${COMP}--readOnly`]: "0.8",
   },
-  limitThemeVarsToComponent: true,
+  parts: {
+    input: {
+      description: "The rating input area (star buttons container).",
+    },
+  },
+  props: {
+    placeholder: dPlaceholder(),
+    initialValue: {
+      ...dInitialValue(),
+      valueType: "number",
+      defaultValue: defaultProps.initialValue,
+    },
+    maxRating: {
+      description: "Maximum number of stars to render.",
+      isRequired: false,
+      valueType: "number",
+      defaultValue: defaultProps.maxRating,
+    },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      valueType: "boolean",
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      valueType: "icon",
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      valueType: "icon",
+    },
+    autoFocus: dAutoFocus(),
+    required: dRequired(),
+    readOnly: dReadonly(),
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
+    invalidMessages: {
+      description: "The invalid messages to display for the input component.",
+      valueType: "string[]",
+    },
+  },
+  events: {
+    didChange: dDidChange(COMP),
+    gotFocus: dGotFocus(COMP),
+    lostFocus: dLostFocus(COMP),
+  },
+  apis: {
+    value: {
+      description: "The current rating value.",
+      signature: "get value(): number | undefined",
+    },
+    setValue: {
+      description: "Set the rating value.",
+      signature: "setValue(value: number): void",
+    },
+    focus: {
+      description: "Focus the rating input.",
+      signature: "focus(): void",
+    },
+  },
 });
 
+export const ratingInputComponentRenderer = wrapComponent(
+  COMP,
+  RatingInput,
+  RatingInputMd,
+  {
+    exposeRegisterApi: true,
+    stateful: true,
+    exclude: ["maxRating"],
+    events: [],
+    customRender(_props, {
+      node,
+      state,
+      updateState,
+      lookupEventHandler,
+      extractValue,
+      classes,
+      registerComponentApi,
+    }) {
+      const props = (node.props ?? {}) as Record<string, unknown>;
+      const rawMax = extractValue(props.maxRating);
+      const maxRating =
+        typeof rawMax === "number" && Number.isFinite(rawMax)
+          ? rawMax
+          : typeof rawMax === "string" && !Number.isNaN(parseFloat(rawMax))
+            ? Number(rawMax)
+            : defaultProps.maxRating;
+
+      return (
+        <RatingInput
+          classes={classes}
+          value={state?.value}
+          updateState={updateState}
+          initialValue={extractValue.asOptionalNumber(props.initialValue)}
+          maxRating={maxRating}
+          autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
+          readOnly={extractValue.asOptionalBoolean(props.readOnly)}
+          required={extractValue.asOptionalBoolean(props.required)}
+          verboseValidationFeedback={extractValue.asOptionalBoolean(props.verboseValidationFeedback)}
+          validationIconSuccess={extractValue.asOptionalString(props.validationIconSuccess)}
+          validationIconError={extractValue.asOptionalString(props.validationIconError)}
+          enabled={extractValue.asOptionalBoolean(props.enabled)}
+          placeholder={extractValue.asOptionalString(props.placeholder)}
+          validationStatus={extractValue(props.validationStatus)}
+          invalidMessages={extractValue(props.invalidMessages)}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          registerComponentApi={registerComponentApi}
+        />
+      );
+    },
+  },
+);
+
+type RuntimeRatingInputProps = React.ComponentProps<typeof RatingInput> & {
+  adapter: XmluiComponentAdapter;
+};
+
+function RuntimeRatingInputShell({
+  adapter,
+  value,
+  initialValue,
+  onDidChange,
+  onFocus,
+  onBlur,
+  ...props
+}: RuntimeRatingInputProps) {
+  const controlledValue = numberValue(value);
+  const initial = numberValue(initialValue);
+  const [localValue, setLocalValue] = React.useState<number | undefined>(controlledValue ?? initial);
+
+  React.useEffect(() => {
+    if (controlledValue !== undefined) {
+      setLocalValue(controlledValue);
+    }
+  }, [controlledValue]);
+
+  const updateState = React.useCallback((state: Record<string, unknown>) => {
+    const nextValue = numberValue(state.value);
+    setLocalValue(nextValue);
+    adapter.registerApi({ value: nextValue });
+  }, [adapter]);
+
+  return (
+    <RatingInput
+      {...props}
+      value={controlledValue ?? localValue}
+      initialValue={initial}
+      updateState={updateState}
+      registerComponentApi={adapter.registerApi}
+      onDidChange={(nextValue) => {
+        setLocalValue(nextValue);
+        onDidChange?.(nextValue);
+        void adapter.event("didChange")(nextValue);
+      }}
+      onFocus={() => {
+        onFocus?.();
+        void adapter.event("gotFocus")();
+      }}
+      onBlur={() => {
+        onBlur?.();
+        void adapter.event("lostFocus")();
+      }}
+    />
+  );
+}
+
+function runtimeRatingInputProps(adapter: XmluiComponentAdapter) {
+  const rootAttrs = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;
+  return {
+    ...rootAttrs,
+    id: adapter.stringProp("id"),
+    value: adapter.prop("value"),
+    initialValue: adapter.prop("initialValue", defaultProps.initialValue),
+    maxRating: adapter.numberProp("maxRating", defaultProps.maxRating),
+    placeholder: adapter.stringProp("placeholder"),
+    enabled: adapter.booleanProp("enabled", defaultProps.enabled),
+    readOnly: adapter.booleanProp("readOnly", defaultProps.readOnly),
+    required: adapter.booleanProp("required", false),
+    autoFocus: adapter.booleanProp("autoFocus", false),
+    validationStatus: adapter.stringProp("validationStatus", defaultProps.validationStatus) as React.ComponentProps<typeof RatingInput>["validationStatus"],
+    invalidMessages: adapter.prop("invalidMessages") as string[] | undefined,
+    verboseValidationFeedback: Object.prototype.hasOwnProperty.call(adapter.props, "verboseValidationFeedback")
+      ? adapter.booleanProp("verboseValidationFeedback", true)
+      : undefined,
+    validationIconSuccess: adapter.stringProp("validationIconSuccess"),
+    validationIconError: adapter.stringProp("validationIconError"),
+    classes: { [COMPONENT_PART_KEY]: adapter.className },
+  };
+}
+
+function numberValue(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  const numeric = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numeric) ? numeric : undefined;
+}
+
+Object.assign(RatingInputMd, {
+  defaultPart: "input",
+} satisfies Partial<ComponentMetadata>);
+
+export const ratingInputRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: RatingInputMd,
+  defaultPart: "input",
+  renderer: ({ adapter }) => (
+    <RuntimeRatingInputShell adapter={adapter} {...runtimeRatingInputProps(adapter)} />
+  ),
+});

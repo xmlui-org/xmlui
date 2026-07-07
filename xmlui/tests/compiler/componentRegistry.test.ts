@@ -18,7 +18,7 @@ describe("component transfer registry", () => {
     expect(button?.sources.implementation).toContain("xmlui/src/components/Button/ButtonReact.tsx");
     expect(button?.sources.metadata).toContain("xmlui/src/components/Button/Button.tsx");
     expect(button?.sources.styles).toContain("xmlui/src/components/Button/Button.module.scss");
-    expect(button?.transferredTests?.runnablePaths).toContain("xmlui/src/components/Button/Button.spec.tsx");
+    expect(button?.transferredTests?.runnablePaths).toContain("xmlui/src/components/Button/Button.spec.ts");
     expect(button?.transferredTests?.runnablePaths).toContain("xmlui/src/components/Button/Button-style.spec.ts");
     expect(runtimeComponentModules.map((component) => component.name)).toContain("Button");
     expect(builtInComponentRenderers.Button).toBe(button?.renderer);

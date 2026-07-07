@@ -5,10 +5,10 @@ import {
   buttonTypeValues,
   buttonThemeValues,
   buttonVariantValues,
-  sizeValues,
   type IconPosition,
-} from "../abstractions";
+} from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
+import { sizeValues } from "../abstractions";
 
 // --- Smoke
 
@@ -468,9 +468,7 @@ alignmentOptionValues.forEach((pos) => {
         },
       },
     );
-    await expect.poll(async () => {
-      return (await createButtonDriver()).component.evaluate((element) => getComputedStyle(element).justifyContent);
-    }).toMatch(pos === "start" ? /^(start|flex-start)$/ : pos === "end" ? /^(end|flex-end)$/ : new RegExp(`^${pos}$`));
+    await expect((await createButtonDriver()).component).toHaveCSS("justify-content", pos);
   });
 });
 

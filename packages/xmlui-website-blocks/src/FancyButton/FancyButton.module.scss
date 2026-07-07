@@ -1,0 +1,205 @@
+// FancyButton.module.scss
+@use "../../../../xmlui/src/components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Define theme variables
+$component: "FancyButton";
+$fontSize-FancyButton: createThemeVar("fontSize-#{$component}");
+$fontWeight-FancyButton: createThemeVar("fontWeight-#{$component}");
+$textColor-FancyButton: createThemeVar("textColor-#{$component}");
+$gap-FancyButton: createThemeVar("gap-#{$component}");
+$borderStyle-FancyButton: createThemeVar("borderStyle-#{$component}");
+$borderWidth-FancyButton: createThemeVar("borderWidth-#{$component}");
+$outlineColor-FancyButton--focus: createThemeVar("outlineColor-#{$component}--focus");
+$outlineWidth-FancyButton--focus: createThemeVar("outlineWidth-#{$component}--focus");
+$outlineStyle-FancyButton--focus: createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset-FancyButton--focus: createThemeVar("outlineOffset-#{$component}--focus");
+
+// Disabled state variables
+$backgroundColor-FancyButton--disabled: createThemeVar("backgroundColor-#{$component}--disabled");
+$borderColor-FancyButton--disabled: createThemeVar("borderColor-#{$component}--disabled");
+$textColor-FancyButton--disabled: createThemeVar("textColor-#{$component}--disabled");
+
+@mixin sizeVariant($size) {
+  padding: createThemeVar("paddingVertical-#{$component}-#{$size}")
+    createThemeVar("paddingHorizontal-#{$component}-#{$size}");
+  font-size: createThemeVar("fontSize-#{$component}-#{$size}");
+  gap: createThemeVar("gap-#{$component}-#{$size}");
+}
+
+@mixin themeVariant($variant) {
+  border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}");
+  background-color: createThemeVar("backgroundColor-#{$component}-#{$variant}");
+  color: createThemeVar("textColor-#{$component}-#{$variant}");
+  border: createThemeVar("border-#{$component}-#{$variant}");
+  border-color: createThemeVar("borderColor-#{$component}-#{$variant}");
+  border-style: createThemeVar("borderStyle-#{$component}-#{$variant}");
+  border-width: createThemeVar("borderWidth-#{$component}-#{$variant}");
+
+  &.xs {
+    border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}-xs");
+    border: createThemeVar("border-#{$component}-#{$variant}-xs");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}-xs");
+    border-style: createThemeVar("borderStyle-#{$component}-#{$variant}-xs");
+    border-width: createThemeVar("borderWidth-#{$component}-#{$variant}-xs");
+  }
+
+  &.sm {
+    border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}-sm");
+    border: createThemeVar("border-#{$component}-#{$variant}-sm");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}-sm");
+    border-style: createThemeVar("borderStyle-#{$component}-#{$variant}-sm");
+    border-width: createThemeVar("borderWidth-#{$component}-#{$variant}-sm");
+  }
+
+  &.md {
+    border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}-md");
+    border: createThemeVar("border-#{$component}-#{$variant}-md");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}-md");
+    border-style: createThemeVar("borderStyle-#{$component}-#{$variant}-md");
+    border-width: createThemeVar("borderWidth-#{$component}-#{$variant}-md");
+  }
+
+  &.lg {
+    border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}-lg");
+    border: createThemeVar("border-#{$component}-#{$variant}-lg");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}-lg");
+    border-style: createThemeVar("borderStyle-#{$component}-#{$variant}-lg");
+    border-width: createThemeVar("borderWidth-#{$component}-#{$variant}-lg");
+  }
+
+  &.xl {
+    border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}-xl");
+    border: createThemeVar("border-#{$component}-#{$variant}-xl");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}-xl");
+    border-style: createThemeVar("borderStyle-#{$component}-#{$variant}-xl");
+    border-width: createThemeVar("borderWidth-#{$component}-#{$variant}-xl");
+  }
+
+  &:hover:not(.fancyButton--disabled) {
+    background-color: createThemeVar("backgroundColor-#{$component}-#{$variant}--hover");
+    border-color: createThemeVar("borderColor-#{$component}-#{$variant}--hover");
+  }
+
+  &:active:not(.fancyButton--disabled) {
+    background-color: createThemeVar("backgroundColor-#{$component}-#{$variant}--active");
+  }
+}
+
+// --- This part defines the CSS styles
+
+@layer components {
+  .fancyButton {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: $gap-FancyButton;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    text-decoration: none;
+    user-select: none;
+    position: relative;
+
+    width: fit-content;
+    height: fit-content;
+    font-size: $fontSize-FancyButton;
+    font-weight: $fontWeight-FancyButton;
+    color: $textColor-FancyButton;
+    border-style: $borderStyle-FancyButton;
+    border-width: $borderWidth-FancyButton;
+
+    &:focus-visible {
+      outline: $outlineStyle-FancyButton--focus $outlineWidth-FancyButton--focus
+        $outlineColor-FancyButton--focus;
+      outline-offset: $outlineOffset-FancyButton--focus;
+    }
+
+    // Size variations
+    &.xs {
+      @include sizeVariant("xs");
+    }
+
+    &.sm {
+      @include sizeVariant("sm");
+    }
+
+    &.md {
+      @include sizeVariant("md");
+    }
+
+    &.lg {
+      @include sizeVariant("lg");
+    }
+
+    &.xl {
+      @include sizeVariant("xl");
+    }
+
+    // Rounded variant
+    &.rounded {
+      @include themeVariant("rounded");
+    }
+
+    // Square variant
+    &.square {
+      @include themeVariant("square");
+    }
+
+    // Pill variant
+    &.pill {
+      @include themeVariant("pill");
+    }
+
+    // Outlines pill variant
+    &.outlinedPill {
+      @include themeVariant("outlinedPill");
+    }
+
+    // Disabled state
+    &.disabled {
+      cursor: not-allowed;
+      background-color: $backgroundColor-FancyButton--disabled !important;
+      border-color: $borderColor-FancyButton--disabled !important;
+      color: $textColor-FancyButton--disabled !important;
+    }
+
+    // Icon only styling
+    &.iconOnly {
+      aspect-ratio: 1;
+      padding: 0.5rem;
+    }
+
+    // Content position
+    &.contentPositionStart {
+      justify-content: flex-start;
+    }
+
+    &.contentPositionCenter {
+      justify-content: center;
+    }
+
+    &.contentPositionEnd {
+      justify-content: flex-end;
+    }
+
+    // Icon position (when both icon and content exist)
+    &.iconPositionEnd {
+      flex-direction: row-reverse;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
