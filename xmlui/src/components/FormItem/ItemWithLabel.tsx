@@ -41,6 +41,7 @@ type ItemWithLabelProps = {
   validationResult?: ReactNode;
   layoutContext?: LayoutContext;
   testId?: string;
+  componentName?: string;
   cloneStyle?: boolean;
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
@@ -72,6 +73,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     onLabelClick,
     layoutContext, // Destructured to prevent passing to DOM
     testId,
+    componentName,
     cloneStyle = defaultProps.cloneStyle,
     requireLabelMode = defaultProps.requireLabelMode,
     compactInlineLabel = defaultProps.compactInlineLabel,
@@ -115,6 +117,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const isInHorizontalStack = layoutContext?.orientation === "horizontal";
 
   const [inputElement, setInputElement] = useState<HTMLElement | null>(null);
+  const [wrapperElement, setWrapperElement] = useState<HTMLDivElement | null>(null);
+  const [labelWrapperElement, setLabelWrapperElement] = useState<HTMLDivElement | null>(null);
   const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
   const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
 
@@ -122,22 +126,72 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     setInputElement(node instanceof HTMLElement ? node : null);
   }, []);
 
+  const wrapperRefCallback = useCallback((node: HTMLDivElement | null) => {
+    setWrapperElement(node);
+  }, []);
+
+  const labelWrapperRefCallback = useCallback((node: HTMLDivElement | null) => {
+    setLabelWrapperElement(node);
+  }, []);
+
   useIsomorphicLayoutEffect(() => {
-    if (!inputElement) return;
+    const hostElement = inputElement ?? wrapperElement;
+    if (!hostElement) return;
+
+    const measuredElement =
+      componentName === "Select" && wrapperElement
+        ? getLabelControlElement(wrapperElement) ?? hostElement
+        : getLabelControlElement(hostElement) ?? hostElement;
+
+    if (!isFocusableControl(hostElement)) {
+      const nested = measuredElement;
+      if (nested && nested.id !== inputId) {
+        if (hostElement.id === inputId) {
+          hostElement.removeAttribute("id");
+        }
+        nested.id = inputId;
+      }
+    }
+
+    if (componentName === "Select") {
+      measuredElement.setAttribute("data-part-id", PART_LABELED_ITEM);
+    }
 
     // Measure immediately
-    setInputHeight(inputElement.offsetHeight);
-    setInputWidth(inputElement.offsetWidth);
+    applyMeasuredSize(measuredElement);
 
     if (typeof ResizeObserver !== "undefined") {
       const observer = new ResizeObserver(() => {
-        setInputHeight(inputElement.offsetHeight);
-        setInputWidth(inputElement.offsetWidth);
+        applyMeasuredSize(measuredElement);
       });
-      observer.observe(inputElement);
+      observer.observe(measuredElement);
       return () => observer.disconnect();
     }
-  }, [inputElement]);
+  }, [
+    componentName,
+    effectiveLabelPosition,
+    inputElement,
+    inputId,
+    labelWrapperElement,
+    resolvedLabelBreak,
+    resolvedLabelWidthProp,
+    wrapperElement,
+  ]);
+
+  const shouldSyncLabelWidthToInput =
+    resolvedLabelWidthProp === undefined &&
+    !resolvedLabelBreak &&
+    (effectiveLabelPosition === "top" || effectiveLabelPosition === "bottom");
+
+  function applyMeasuredSize(measuredElement: HTMLElement) {
+    const measuredHeight = measuredElement.offsetHeight;
+    const measuredWidth = measuredElement.offsetWidth;
+    setInputHeight(measuredHeight);
+    setInputWidth(measuredWidth);
+    if (labelWrapperElement && shouldSyncLabelWidthToInput) {
+      labelWrapperElement.style.width = `${measuredWidth}px`;
+    }
+  }
 
   const labelWrapperHeight =
     effectiveLabelPosition === "start" || effectiveLabelPosition === "end" ||
@@ -158,6 +212,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 
   // Check if the child is a RadioGroup component
   const isRadioGroup = React.isValidElement(children) && children.type === RadioGroup;
+  const wrapperPartId = shouldExposeWrapperLabeledItemPart(componentName)
+    ? PART_LABELED_ITEM
+    : undefined;
 
   if (label === undefined && !validationResult) {
     return (
@@ -167,6 +224,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           style={style}
           className={className}
           id={inputId}
+          data-testid={testId}
+          data-xmlui-component={componentName}
+          data-xmlui-part={componentName ? "root" : undefined}
           data-xmlui-form-field={formItemId}
           ref={ref}
         >
@@ -186,6 +246,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         ref={ref as unknown as React.Ref<HTMLFieldSetElement>}
         style={style}
         className={classnames(className, styles.itemWithLabel)}
+        data-testid={testId}
+        data-xmlui-component={componentName}
+        data-xmlui-part={componentName ? "root" : undefined}
         disabled={!enabled}
       >
         <div
@@ -203,6 +266,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           {label && (
             <div
               className={styles.labelWrapper}
+              ref={labelWrapperRefCallback}
               style={{
                 height: labelWrapperHeight,
                 width: resolvedLabelWidth,
@@ -212,6 +276,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             >
               <Part partId={PART_LABEL}>
                 <legend
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={
                     onLabelClick ||
                     ((e) => {
@@ -225,7 +290,14 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   }
                   style={{
                     ...labelStyle,
-                    width: resolvedLabelWidthProp !== undefined ? "100%" : undefined,
+                    display:
+                      resolvedLabelWidthProp !== undefined || shouldSyncLabelWidthToInput
+                        ? "block"
+                        : labelStyle?.display,
+                    width:
+                      resolvedLabelWidthProp !== undefined || shouldSyncLabelWidthToInput
+                        ? "100%"
+                        : undefined,
                     flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                   }}
                   className={classnames(styles.inputLabel, {
@@ -258,7 +330,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               </Part>
             </div>
           )}
-          <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
+          <div
+            className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}
+            data-part-id={wrapperPartId}
+            ref={wrapperRefCallback}
+          >
             <Part partId={PART_LABELED_ITEM}>
               {cloneElement(children as ReactElement, {
                 id: !isInputTemplateUsed ? inputId : undefined,
@@ -281,6 +357,9 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       {...rest}
       ref={ref}
       data-xmlui-form-field={formItemId}
+      data-testid={testId}
+      data-xmlui-component={componentName}
+      data-xmlui-part={componentName ? "root" : undefined}
       style={style}
       className={classnames(className, styles.itemWithLabel, {
         [styles.noLabel]: !label && compactInlineLabel,
@@ -303,6 +382,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         {label && (
           <div
             className={styles.labelWrapper}
+            ref={labelWrapperRefCallback}
             style={{
               height: labelWrapperHeight,
               width: resolvedLabelWidth,
@@ -313,10 +393,18 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             <Part partId={PART_LABEL}>
               <label
                 htmlFor={inputId}
-                onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={onLabelClick || (() => focusLabeledControl(inputId))}
                 style={{
                   ...labelStyle,
-                  width: resolvedLabelWidthProp !== undefined ? "100%" : undefined,
+                  display:
+                    resolvedLabelWidthProp !== undefined || shouldSyncLabelWidthToInput
+                      ? "block"
+                      : labelStyle?.display,
+                  width:
+                    resolvedLabelWidthProp !== undefined || shouldSyncLabelWidthToInput
+                      ? "100%"
+                      : undefined,
                   flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                 }}
                 className={classnames(styles.inputLabel, {
@@ -344,7 +432,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             </Part>
           </div>
         )}
-        <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
+        <div
+          className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}
+          data-part-id={wrapperPartId}
+          ref={wrapperRefCallback}
+        >
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
               id: !isInputTemplateUsed ? inputId : undefined,
@@ -360,3 +452,55 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     </div>
   );
 });
+
+function focusLabeledControl(inputId: string) {
+  const target = document.getElementById(inputId);
+  if (!target) {
+    return;
+  }
+  if (isFocusableControl(target)) {
+    target.focus({ preventScroll: true });
+    clickLabelActivatedControl(target);
+    return;
+  }
+  const nested = getLabelControlElement(target);
+  nested?.focus({ preventScroll: true });
+  if (nested) {
+    clickLabelActivatedControl(nested);
+  }
+}
+
+function isFocusableControl(element: HTMLElement): element is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement {
+  return element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLButtonElement ||
+    element.tabIndex >= 0;
+}
+
+function clickLabelActivatedControl(element: HTMLElement) {
+  const tagName = element.tagName;
+  const role = element.getAttribute("role");
+  if (
+    tagName === "BUTTON" ||
+    role === "button" ||
+    role === "combobox" ||
+    role === "switch" ||
+    (element instanceof HTMLInputElement && (element.type === "checkbox" || element.type === "radio"))
+  ) {
+    element.click();
+  }
+}
+
+function getLabelControlElement(element: HTMLElement) {
+  if (isFocusableControl(element)) {
+    return element;
+  }
+  return element.querySelector<HTMLElement>(
+    "input, textarea, select, button, [role='combobox'], [role='switch'], [tabindex]:not([tabindex='-1'])",
+  );
+}
+
+function shouldExposeWrapperLabeledItemPart(componentName: string | undefined) {
+  return componentName !== "Select";
+}

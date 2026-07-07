@@ -379,6 +379,8 @@ function AppNode({
     : undefined;
 
   return (
+    <>
+    <HorizontalAppBandStyle />
     <AppComponent
       scrollWholePage={scrollWholePage}
       fitContent={fitContent}
@@ -422,6 +424,7 @@ function AppNode({
       {renderChild(restChildren, contentLayoutContext)}
       <SearchIndexCollector Pages={Pages} NavPanel={NavPanel} renderChild={renderChild} />
     </AppComponent>
+    </>
   );
 }
 
@@ -467,6 +470,11 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
     const contentLayoutContext = !scrollWholePage
       ? { type: "Stack" as const, orientation: "vertical" as const }
       : undefined;
+    const layout = adapter.stringProp("layout") as any;
+    const horizontalBandClass =
+      layout === "horizontal" || layout === "horizontal-sticky"
+        ? "xmlui-runtime-horizontal-app-band"
+        : undefined;
     const i18nConfigSignatureRef = useRef<string>();
     const i18nConfigSignature = runtimeI18nConfigSignature(
       adapter.stringProp("locale"),
@@ -497,13 +505,18 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
 
     return (
       <RuntimeAppProviders>
+      <HorizontalAppBandStyle />
       <AppComponent
         {...adapter.rootAttrs()}
         scrollWholePage={scrollWholePage}
         fitContent={adapter.booleanProp("fitContent", defaultProps.fitContent)}
         noScrollbarGutters={adapter.booleanProp("noScrollbarGutters", defaultProps.noScrollbarGutters)}
-        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
-        layout={adapter.stringProp("layout") as any}
+        classes={{
+          [COMPONENT_PART_KEY]: [adapter.className, horizontalBandClass]
+            .filter(Boolean)
+            .join(" "),
+        }}
+        layout={layout}
         loggedInUser={adapter.prop("loggedInUser")}
         onReady={adapter.event("ready") as any}
         onMessageReceived={adapter.event("messageReceived") as any}
@@ -543,6 +556,29 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
     );
   },
 });
+
+function HorizontalAppBandStyle() {
+  return (
+    <style>
+      {`
+        [data-xmlui-component="App"] > header > div,
+        [data-xmlui-component="App"] > header nav > div,
+        [data-xmlui-component="App"] > [data-xmlui-component="Footer"] > div {
+          width: 100%;
+          max-width: var(--xmlui-maxWidth-content, 1280px);
+          margin-inline: auto;
+        }
+        [data-xmlui-component="App"] .xmlui-Pages {
+          display: flex !important;
+          flex-direction: column;
+          width: 100%;
+          max-width: var(--xmlui-maxWidth-content, 1280px);
+          margin-inline: auto;
+        }
+      `}
+    </style>
+  );
+}
 
 function RuntimeAppProviders({ children }: { children: React.ReactNode }) {
   const isInRouterContext = useInRouterContext();

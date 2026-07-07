@@ -1066,6 +1066,14 @@ function injectAppAttributes(markup: string, attributes: string[]): string {
 }
 
 function injectDefaultRootTestId(markup: string): string {
+  const contentSeparatorMatch = markup.match(/<ContentSeparator\b([^>]*)>/);
+  if (contentSeparatorMatch && !/\stestId\s*=/.test(contentSeparatorMatch[1])) {
+    const selfClosingOffset = /\/\s*>$/.test(contentSeparatorMatch[0])
+      ? contentSeparatorMatch[0].lastIndexOf("/")
+      : contentSeparatorMatch[0].length - 1;
+    const insertAt = contentSeparatorMatch.index! + selfClosingOffset;
+    return `${markup.slice(0, insertAt)} testId="test-id-component"${markup.slice(insertAt)}`;
+  }
   const openTagMatch = markup.match(/^\s*<([A-Z][\w.]*)\b([^>]*)>/);
   if (!openTagMatch || /\stestId\s*=/.test(openTagMatch[2])) {
     return markup;

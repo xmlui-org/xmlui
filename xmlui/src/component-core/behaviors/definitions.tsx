@@ -9,6 +9,7 @@ import {
 } from "../../components/Animation/AnimationReact";
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
+import { useFormContextPart } from "../../components/Form/FormContext";
 import { useComponentThemeClass } from "../../runtime/rendering/theme";
 
 const responsiveWhenProps = {
@@ -129,6 +130,10 @@ export const labelBehavior: Behavior = {
       readOnly: {
         valueType: "boolean",
         description: "Whether the input component is read-only.",
+      },
+      requireLabelMode: {
+        valueType: "string",
+        description: "Controls whether required or optional labels show an indicator.",
       },
     },
     condition: {
@@ -397,6 +402,13 @@ function LabelBehavior({
     : undefined;
   const readOnly = isTruthyWhenValue(context.props.readOnly);
   const hasValueApiPair = !!context.metadata.apis?.value && !!context.metadata.apis?.setValue;
+  const formRequireLabelMode = useFormContextPart((value) => value?.itemRequireLabelMode);
+  const labelBreak =
+    context.props.labelBreak === undefined
+      ? context.componentName === "Select"
+        ? false
+        : undefined
+      : isTruthyWhenValue(context.props.labelBreak);
   const shrinkToLabel = context.props.shrinkToLabel === undefined
     ? !hasValueApiPair
     : isTruthyWhenValue(context.props.shrinkToLabel);
@@ -405,14 +417,11 @@ function LabelBehavior({
     <ItemWithLabel
       id={stringValue(context.props.id)}
       className={formItemThemeClass.className}
+      componentName={context.componentName}
       labelPosition={stringValue(context.props.labelPosition) as any}
       label={stringValue(context.props.label)}
       labelWidth={stringValue(context.props.labelWidth)}
-      labelBreak={
-        context.props.labelBreak === undefined
-          ? undefined
-          : isTruthyWhenValue(context.props.labelBreak)
-      }
+      labelBreak={labelBreak}
       required={isTruthyWhenValue(context.props.required)}
       enabled={
         context.props.enabled === undefined
@@ -421,9 +430,13 @@ function LabelBehavior({
       }
       style={childStyle}
       cloneStyle={true}
+      requireLabelMode={
+        (stringValue(context.props.requireLabelMode) as any) ?? formRequireLabelMode
+      }
       shrinkToLabel={shrinkToLabel}
       labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
       isInputTemplateUsed={!!context.props.inputTemplate}
+      testId={stringValue(context.props.testId)}
       direction={stringValue(context.props.direction) as "rtl" | "ltr" | undefined}
       layoutContext={context.layoutContext as any}
       compactInlineLabel={context.metadata.compactInlineLabel === true}
