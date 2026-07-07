@@ -328,6 +328,14 @@ function normalizeStackChild(
   const mainProp = orientation === "horizontal" ? "width" : "height";
   const mainValue = child.props[mainProp];
   if (mainValue === undefined || mainValue === null || mainValue === "") {
+    if (orientation === "horizontal" && isStackFamilyElement(child)) {
+      const props: Record<string, unknown> = { ...child.props };
+      props.style = appendInlineStyle(props.style, "flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0");
+      return {
+        ...child,
+        props,
+      } as XmluiElement;
+    }
     if (!preserveHorizontalOverflow || orientation !== "horizontal") {
       return child;
     }
@@ -359,6 +367,11 @@ function normalizeStackChild(
     props,
     parsed: child.parsed ? { ...child.parsed, props: parsedProps } : child.parsed,
   } as XmluiElement;
+}
+
+function isStackFamilyElement(child: XmluiElement): boolean {
+  return child.type === "Stack" || child.type === "HStack" || child.type === "VStack" ||
+    child.type === "CHStack" || child.type === "CVStack";
 }
 
 function parseStarSize(value: unknown): number | undefined {

@@ -294,7 +294,7 @@ export const textRenderer = wrapRuntimeComponent({
       Object.entries(adapter.props)
         .filter(([key]) => VariantPropsKeys.includes(key as any)),
     );
-    const value = adapter.prop("value");
+    const value = adapter.prop("value") ?? adapter.prop("label");
     const valueText = normalizeMultilineValueText(displayText(value));
     const preserveLinebreaks = adapter.booleanProp(
       "preserveLinebreaks",
@@ -305,6 +305,11 @@ export const textRenderer = wrapRuntimeComponent({
     const textStyle = { ...(style as React.CSSProperties | undefined) };
     if (textVariant === "strong" && textStyle.fontWeight === undefined) {
       textStyle.fontWeight = "var(--xmlui-fontWeight-Text-strong)";
+    }
+    if (overflowMode === "flow") {
+      textStyle.minWidth = textStyle.minWidth ?? 0;
+      textStyle.maxWidth = textStyle.maxWidth ?? "100%";
+      textStyle.flexShrink = textStyle.flexShrink ?? 1;
     }
 
     return (
@@ -321,6 +326,11 @@ export const textRenderer = wrapRuntimeComponent({
         onContextMenu={
           Object.prototype.hasOwnProperty.call(adapter.node.events, "contextMenu")
             ? adapter.event("contextMenu")
+            : undefined
+        }
+        onClick={
+          Object.prototype.hasOwnProperty.call(adapter.node.events, "click")
+            ? adapter.event("click")
             : undefined
         }
         style={textStyle}

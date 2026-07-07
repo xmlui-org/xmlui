@@ -232,7 +232,7 @@ export function useXmluiComponentAdapter({
       "data-xmlui-part": part,
       "data-part-id": explicitRootPart ? part : undefined,
       "data-xmlui-id": props.id,
-      "data-testid": props.testId,
+      "data-testid": props.testId ?? props.id,
       className: themeClass.className,
       style: {
         ...themeClass.style,

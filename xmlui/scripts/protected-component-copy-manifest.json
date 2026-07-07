@@ -2,6 +2,9 @@
   "AutoComplete": [
     "AutoCompleteContext.tsx"
   ],
+  "Column": [
+    "TableContext.tsx"
+  ],
   "ModalDialog": [
     "ConfirmationModalContextProvider.tsx",
     "Dialog.tsx"
@@ -16,5 +19,9 @@
     "SelectContext.tsx",
     "SelectOption.tsx",
     "SimpleSelect.tsx"
+  ],
+  "Table": [
+    "react-table-config.d.ts",
+    "useRowSelection.tsx"
   ]
 }

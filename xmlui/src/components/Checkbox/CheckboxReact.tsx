@@ -42,6 +42,7 @@ export type CheckboxProps = {
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
   "data-testid"?: string;
+  "aria-label"?: string;
 };
 
 export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(function CheckboxNative(
@@ -74,6 +75,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     onFocus,
     onBlur,
     "data-testid": dataTestId,
+    "aria-label": ariaLabel,
     ...rest
   },
   ref,
@@ -158,7 +160,9 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
         validationStatus === "valid" ? styles.checkboxSuccess : undefined,
         !hasLabel && !inputRenderer && !needsVariantWrapper ? className : undefined,
       )}
-      style={!hasLabel && !inputRenderer && !needsVariantWrapper ? style : undefined}
+      style={!hasLabel && !inputRenderer && !needsVariantWrapper
+        ? { fontSize: "inherit", ...style }
+        : { fontSize: "inherit" }}
       type="checkbox"
       role="checkbox"
       checked={checked}
@@ -170,7 +174,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       aria-required={required}
       aria-disabled={!enabled}
       aria-readonly={readOnly}
-      aria-label={hasLabel ? labelText : undefined}
+      aria-label={hasLabel ? labelText : ariaLabel}
       onClick={(event) => void onClick?.(event)}
       onChange={(event) => {
         if (readOnly) {

@@ -89,6 +89,7 @@ export const CheckboxMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`borderColor-${COMP}--hover`]: `$borderColor-Input-default--hover`,
     [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
     [`outlineColor-${COMP}`]: `$outlineColor--focus`,
     [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,

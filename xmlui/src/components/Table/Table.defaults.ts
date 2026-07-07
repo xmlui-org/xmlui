@@ -1,13 +1,15 @@
+import { EMPTY_ARRAY } from "../../components-core/constants";
+
 export const defaultProps = {
   idKey: "id",
-  data: [] as unknown[],
-  columns: [] as unknown[],
+  data: EMPTY_ARRAY,
+  columns: EMPTY_ARRAY,
   isPaginated: false,
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
   toggleSelectionOnClick: false,
-  initiallySelected: [] as unknown[],
+  initiallySelected: EMPTY_ARRAY,
   pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as "ascending" | "descending",
   autoFocus: false,
@@ -32,13 +34,13 @@ export const defaultProps = {
   userSelectCell: "auto",
   userSelectRow: "auto",
   userSelectHeading: "none",
-  alwaysShowHeader: false,
   keyBindings: {
-    selectAll: "ControlOrMeta+A",
-    copy: "ControlOrMeta+C",
-    cut: "ControlOrMeta+X",
-    paste: "ControlOrMeta+V",
+    selectAll: "CmdOrCtrl+A",
+    cut: "CmdOrCtrl+X",
+    copy: "CmdOrCtrl+C",
+    paste: "CmdOrCtrl+V",
     delete: "Delete",
-  } as Record<string, string>,
+  },
+  alwaysShowHeader: false,
   striped: false,
 };

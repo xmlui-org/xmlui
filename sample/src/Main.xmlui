@@ -1,25 +1,64 @@
 <App>
-  <VStack var.messageStatus="Ready to send" gap="$space-2">
-    <Button
-      label="Send Message to IFrame"
-      onClick="
-        myIframe.postMessage({type: 'greeting', text: 'Hello from parent!'}, '*');
-        messageStatus = 'Message sent!';
-      " />
-    <Card title="Status: {messageStatus}" />
-    <IFrame
-      id="myIframe"
-      srcdoc="
-        <script>
-          window.addEventListener('message', (event) => \{
-            console.log('Received message:', event.data);
-            document.body.innerHTML =
-              '<h1>Message: ' + JSON.stringify(event.data) + '</h1>';
-          });
-        </script>
-        <h1>Waiting for message...</h1>
-      "
-      width="100%"
-      height="200px" />
-  </VStack>
+  <HStack>
+    <Button label="Select all" onClick="table.selectAll()" />
+    <Button label="Clear all" onClick="table.clearSelection()" />
+    <Button label="Select 1" onClick="table.selectId(1)" />
+    <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
+  </HStack>
+  <Table id="table" data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true">
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
 </App>

@@ -62,10 +62,11 @@ export function LegacyThemeProvider({
     themeVars,
     themes: {},
     getThemeVar: (name: string) => {
-      const cssVar = `--xmlui-${name}`;
-      return typeof document === "undefined"
-        ? undefined
-        : getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim() || undefined;
+      const themeVarName = name.startsWith("$") ? name.slice(1) : name;
+      return (
+        legacyThemeVarFromRuntime(themeVarName, runtimeTheme.variables) ??
+        legacyThemeVarFromDocument(themeVarName)
+      );
     },
     getResourceUrl: (name: string) => {
       if (!name.startsWith("resource:")) {
@@ -90,6 +91,57 @@ function legacyThemeVarValue(value: unknown): string {
     return `var(--xmlui-${value.slice(1)})`;
   }
   return value === undefined || value === null ? "" : String(value);
+}
+
+function legacyThemeVarFromRuntime(
+  name: string,
+  variables: Record<string, unknown>,
+  seen = new Set<string>(),
+): string | undefined {
+  if (seen.has(name)) {
+    return undefined;
+  }
+  seen.add(name);
+  const value = variables[name];
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  return normalizeLegacyThemeLength(resolveLegacyThemeValue(value, variables, seen));
+}
+
+function resolveLegacyThemeValue(
+  value: unknown,
+  variables: Record<string, unknown>,
+  seen: Set<string>,
+): string {
+  if (typeof value !== "string") {
+    return String(value);
+  }
+  if (value.startsWith("$")) {
+    return legacyThemeVarFromRuntime(value.slice(1), variables, seen) ?? value;
+  }
+  return value.replace(/var\(--xmlui-([A-Za-z][A-Za-z0-9_-]*)\)/g, (match, name: string) =>
+    legacyThemeVarFromRuntime(name, variables, seen) ?? match,
+  );
+}
+
+function legacyThemeVarFromDocument(name: string): string | undefined {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+  const cssVar = `--xmlui-${name}`;
+  const value = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+  return value ? normalizeLegacyThemeLength(value) : undefined;
+}
+
+function normalizeLegacyThemeLength(value: string): string {
+  const calcMatch = value.match(
+    /^\s*calc\(\s*(-?\d+(?:\.\d+)?)\s*\*\s*(-?\d+(?:\.\d+)?)(px|rem|em)\s*\)\s*$/,
+  );
+  if (!calcMatch) {
+    return value;
+  }
+  return `${Number(calcMatch[1]) * Number(calcMatch[2])}${calcMatch[3]}`;
 }
 
 export function useTheme(): LegacyThemeContextValue {

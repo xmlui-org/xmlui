@@ -148,6 +148,7 @@ export const labelBehavior: Behavior = {
   },
   attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
   canAttach: (context) =>
+    context.componentName !== "Text" &&
     context.componentName !== "Switch" &&
     context.componentName !== "RadioGroup" &&
     canAttachWhenTriggered("label")(context),

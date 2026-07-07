@@ -1,10 +1,15 @@
+import React from "react";
 import { createMetadata, dEnabled } from "../../component-core/metadata/helpers";
 import { wrapComponent } from "../../runtime/rendering/adapter";
+import { useComponentThemeClass } from "../../runtime/rendering/theme";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps, PageNumberValues, PositionValues, type PageNumber, type Position } from "./Pagination.defaults";
 import { PaginationNative, type PaginationApi } from "./PaginationReact";
 
 const COMP = "Pagination";
+
+export { PositionValues };
+export type { Position };
 
 const paginationStylesSource = `
 $backgroundColor-Pagination: createThemeVar("backgroundColor-Pagination");
@@ -150,6 +155,22 @@ export const paginationRenderer = wrapComponent({
       />
     );
   },
+});
+
+type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof PaginationNative>;
+
+export const ThemedPagination = React.forwardRef<
+  React.ElementRef<typeof PaginationNative>,
+  ThemedPaginationProps
+>(function ThemedPagination({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(COMP, PaginationMd);
+  return (
+    <PaginationNative
+      {...props}
+      className={[themeClass.className, className].filter(Boolean).join(" ")}
+      ref={ref}
+    />
+  );
 });
 
 function arrayOfNumbers(value: unknown): number[] | undefined {

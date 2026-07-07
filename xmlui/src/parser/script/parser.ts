@@ -530,6 +530,9 @@ class ScriptParser {
     if (this.at(ScriptTokenKind.Identifier)) {
       return this.createIdentifier(this.consume());
     }
+    if (isIdentifierObjectKey(this.current().kind)) {
+      return this.createIdentifier(this.consume());
+    }
     if (this.at(ScriptTokenKind.Dollar)) {
       const dollar = this.consume();
       if (!this.at(ScriptTokenKind.Identifier)) {
@@ -868,6 +871,20 @@ class ScriptParser {
       end: endToken?.span.end ?? startToken?.span.end ?? fallback.end,
     };
   }
+}
+
+function isIdentifierObjectKey(kind: ScriptTokenKind): boolean {
+  return (
+    kind === ScriptTokenKind.LetKeyword ||
+    kind === ScriptTokenKind.ConstKeyword ||
+    kind === ScriptTokenKind.IfKeyword ||
+    kind === ScriptTokenKind.ElseKeyword ||
+    kind === ScriptTokenKind.WhileKeyword ||
+    kind === ScriptTokenKind.ForKeyword ||
+    kind === ScriptTokenKind.ReturnKeyword ||
+    kind === ScriptTokenKind.DeleteKeyword ||
+    kind === ScriptTokenKind.TypeofKeyword
+  );
 }
 
 function literalValue(token: ScriptToken): string | number | boolean | null | undefined {
