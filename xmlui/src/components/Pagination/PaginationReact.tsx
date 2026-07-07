@@ -1,29 +1,31 @@
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useState,
-  type CSSProperties,
-} from "react";
-import type React from "react";
+import { forwardRef, memo, useEffect, useState, useCallback, useMemo, useRef, useId } from "react";
+import classnames from "classnames";
 
-import { defaultProps, type PageNumber, type Position } from "./Pagination.defaults";
 import styles from "./Pagination.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import {
+  PART_PAGINATION_CONTROLS,
+  PART_PAGE_INFO,
+  PART_PAGE_SIZE_SELECTOR_CONTAINER,
+} from "../../components-core/parts";
+import { ThemedButton as Button } from "../Button/Button";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedIcon } from "../Icon/Icon";
+import type { OrientationOptions } from "../abstractions";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { Part } from "../Part/Part";
+import { ThemedSelect as Select } from "../Select/Select";
+import { convertOptionValue, OptionNative } from "../Option/OptionReact";
+import type { ComponentApi } from "../../abstractions/ApiDefs";
 
-export type PaginationApi = {
-  moveFirst: () => void;
-  moveLast: () => void;
-  movePrev: () => void;
-  moveNext: () => void;
-  currentPage: number;
-  currentPageSize: number;
-};
+export const PageNumberValues = [1, 3, 5] as const;
+export type PageNumber = (typeof PageNumberValues)[number];
 
-export type PaginationProps = {
-  id?: string;
+export const PositionValues = ["start", "center", "end"] as const;
+export type Position = (typeof PositionValues)[number];
+
+type Props = {
   enabled?: boolean;
   itemCount?: number;
   pageSize?: number;
@@ -33,21 +35,33 @@ export type PaginationProps = {
   showPageSizeSelector?: boolean;
   showCurrentPage?: boolean;
   pageSizeOptions?: number[];
-  orientation?: string;
+  orientation?: OrientationOptions;
   buttonRowPosition?: Position;
   pageSizeSelectorPosition?: Position;
   pageInfoPosition?: Position;
   hasPrevPage?: boolean;
   hasNextPage?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  onPageDidChange?: (pageIndex: number, pageSize: number, itemCount: number) => void | Promise<void>;
-  onPageSizeDidChange?: (pageSize: number) => void | Promise<void>;
-  registerApi?: (api: Record<string, unknown>) => void;
-  "data-testid"?: string;
-};
+  onPageDidChange?: (pageIndex: number, pageSize: number, totalItemCount: number) => void;
+  onPageSizeDidChange?: (pageSize: number) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
+  classes?: Record<string, string>;
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export const PaginationNative = memo(forwardRef<PaginationApi, PaginationProps>(function PaginationNative(
+import { defaultProps } from "./Pagination.defaults";
+
+export interface PaginationAPI extends ComponentApi {
+  moveFirst: () => void;
+  moveLast: () => void;
+  movePrev: () => void;
+  moveNext: () => void;
+  currentPage: number;
+  currentPageSize: number;
+}
+
+const ICON_BUTTON_STYLE = { minHeight: "36px", padding: "8px" } as const;
+
+export const Pagination = memo(forwardRef<HTMLElement, Props>(function Pagination(
   {
     id,
     enabled = true,
@@ -65,234 +79,396 @@ export const PaginationNative = memo(forwardRef<PaginationApi, PaginationProps>(
     pageInfoPosition = defaultProps.pageInfoPosition,
     hasPrevPage,
     hasNextPage,
-    className,
-    style,
     onPageDidChange,
     onPageSizeDidChange,
-    registerApi,
-    "data-testid": dataTestId,
+    registerComponentApi,
+    updateState,
+    style,
+    className,
+    classes,
     ...rest
   },
   ref,
 ) {
+  // Check if we have valid itemCount for full pagination
   const hasValidItemCount = typeof itemCount === "number" && itemCount >= 0;
-  const safePageSize = pageSize > 0 ? pageSize : defaultProps.pageSize;
-  const totalPages = hasValidItemCount ? Math.max(1, Math.ceil(itemCount / safePageSize)) : 1;
+
+  // Calculate pagination values only when itemCount is valid
+  const totalPages = hasValidItemCount ? Math.max(1, Math.ceil(itemCount / pageSize)) : 1;
   const currentPage = hasValidItemCount
     ? Math.max(0, Math.min(pageIndex, totalPages - 1))
-    : Math.max(0, pageIndex);
-  const currentPageNumber = currentPage + 1;
-  const visiblePages = useMemo(
-    () => visiblePageNumbers(currentPageNumber, totalPages, maxVisiblePages),
-    [currentPageNumber, totalPages, maxVisiblePages],
-  );
-  const [pageSizeOpen, setPageSizeOpen] = useState(false);
+    : pageIndex;
+  const currentPageNumber = currentPage + 1; // 1-based for display
 
-  const changePage = useCallback((newPageIndex: number) => {
-    const clamped = hasValidItemCount
-      ? Math.max(0, Math.min(newPageIndex, totalPages - 1))
-      : Math.max(0, newPageIndex);
-    if (clamped !== currentPage) {
-      void onPageDidChange?.(clamped, safePageSize, itemCount ?? 0);
-    }
-  }, [currentPage, hasValidItemCount, itemCount, onPageDidChange, safePageSize, totalPages]);
+  // Track internal state for API access
+  const [internalState, setInternalState] = useState({
+    currentPage: currentPageNumber,
+    currentPageSize: pageSize,
+  });
 
-  const api = useMemo<PaginationApi>(() => ({
-    moveFirst: () => changePage(0),
-    moveLast: () => changePage(totalPages - 1),
-    movePrev: () => changePage(currentPage - 1),
-    moveNext: () => changePage(currentPage + 1),
-    get currentPage() {
-      return currentPageNumber;
-    },
-    get currentPageSize() {
-      return safePageSize;
-    },
-  }), [changePage, currentPage, currentPageNumber, safePageSize, totalPages]);
-
-  useImperativeHandle(ref, () => api, [api]);
-
+  // Update internal state when props change
   useEffect(() => {
-    registerApi?.(api as unknown as Record<string, unknown>);
-  }, [api, registerApi]);
+    setInternalState({
+      currentPage: currentPageNumber,
+      currentPageSize: pageSize,
+    });
 
+    // Update XMLUI container state
+    updateState?.({
+      currentPage: currentPageNumber,
+      currentPageSize: pageSize,
+      totalPages: hasValidItemCount ? totalPages : undefined,
+      itemCount,
+    });
+  }, [currentPageNumber, pageSize, totalPages, itemCount, updateState, hasValidItemCount]);
+
+  // Helper function to handle page changes
+  const handlePageChange = useCallback(
+    (newPageIndex: number) => {
+      const clampedPageIndex = hasValidItemCount
+        ? Math.max(0, Math.min(newPageIndex, totalPages - 1))
+        : newPageIndex;
+      if (clampedPageIndex !== currentPage) {
+        onPageDidChange?.(clampedPageIndex, pageSize, itemCount || 0);
+      }
+    },
+    [currentPage, totalPages, onPageDidChange, pageSize, itemCount, hasValidItemCount],
+  );
+
+  // Helper function to handle page size changes
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      if (newPageSize !== pageSize) {
+        onPageSizeDidChange?.(newPageSize);
+      }
+    },
+    [pageSize, onPageSizeDidChange],
+  );
+
+  // Memoize the API object to prevent unnecessary re-renders
+  const paginationAPI: PaginationAPI = useMemo(
+    () => ({
+      moveFirst: () => handlePageChange(0),
+      moveLast: () => handlePageChange(totalPages - 1),
+      movePrev: () => handlePageChange(currentPage - 1),
+      moveNext: () => handlePageChange(currentPage + 1),
+      currentPage: internalState.currentPage,
+      currentPageSize: internalState.currentPageSize,
+    }),
+    [handlePageChange, totalPages, currentPage, internalState],
+  );
+
+  // Register APIs with XMLUI framework
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi(paginationAPI);
+    }
+  }, [registerComponentApi, paginationAPI]);
+
+  // For undefined itemCount, show simplified pagination
+  if (!hasValidItemCount) {
+    return (
+      <nav
+        {...rest}
+        role="navigation"
+        aria-label="Pagination"
+        ref={ref}
+        id={id}
+        className={classnames(
+          styles.pagination,
+          {
+            [styles.paginationVertical]: orientation === "vertical",
+            [styles.paginationHorizontal]: orientation === "horizontal",
+          },
+          classes?.[COMPONENT_PART_KEY],
+          className,
+        )}
+        style={style}
+      >
+        <ul
+          key={`${id}-pagination-controls`}
+          className={classnames(styles.buttonRow, {
+            [styles.paginationListVertical]: orientation === "vertical",
+            // layout is already horizontal by default
+          })}
+        >
+          {/* Previous page button */}
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || !hasPrevPage}
+              onClick={() => handlePageChange(currentPage - 1)}
+              contextualLabel="Previous page"
+              style={ICON_BUTTON_STYLE}
+              aria-label="Previous page"
+            >
+              <ThemedIcon
+                name="prev:Pagination"
+                fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
+                size="sm"
+              />
+            </Button>
+          </li>
+
+          {/* Next page button */}
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || !hasNextPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              contextualLabel="Next page"
+              style={ICON_BUTTON_STYLE}
+              aria-label="Next page"
+            >
+              <ThemedIcon
+                name="next:Pagination"
+                fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
+                size="sm"
+              />
+            </Button>
+          </li>
+        </ul>
+      </nav>
+    );
+  }
+
+  // Calculate which page numbers to show
+  const getVisiblePages = () => {
+    const pages: number[] = [];
+
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show current page with context
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      let start = Math.max(1, currentPageNumber - halfVisible);
+      let end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+      // Adjust start if we're near the end
+      if (end === totalPages) {
+        start = Math.max(1, end - maxVisiblePages + 1);
+      }
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages();
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
-  const buttons = hasValidItemCount
-    ? (
-      <>
-        <PageButton label="First page" disabled={!enabled || isFirstPage} onClick={() => changePage(0)}>First</PageButton>
-        <PageButton label="Previous page" disabled={!enabled || isFirstPage} onClick={() => changePage(currentPage - 1)}>Prev</PageButton>
-        {showCurrentPage && visiblePages.map((page) => (
-          maxVisiblePages === 1
-            ? <li key={page} aria-current={page === currentPageNumber ? "true" : undefined}>{page}</li>
-            : (
-              <PageButton
-                key={page}
-                label={page === currentPageNumber ? `Page ${page} (current)` : `Page ${page}`}
-                current={page === currentPageNumber}
-                disabled={!enabled}
-                onClick={() => changePage(page - 1)}
-              >
-                {page}
-              </PageButton>
-            )
-        ))}
-        <PageButton label="Next page" disabled={!enabled || isLastPage} onClick={() => changePage(currentPage + 1)}>Next</PageButton>
-        <PageButton label="Last page" disabled={!enabled || isLastPage} onClick={() => changePage(totalPages - 1)}>Last</PageButton>
-      </>
-    )
-    : (
-      <>
-        <PageButton label="Previous page" disabled={!enabled || !hasPrevPage} onClick={() => changePage(currentPage - 1)}>Prev</PageButton>
-        <PageButton label="Next page" disabled={!enabled || !hasNextPage} onClick={() => changePage(currentPage + 1)}>Next</PageButton>
-      </>
-    );
-
   const buttonRow = (
-    <ul
-      className={cx(styles.buttonRow, orientation === "vertical" ? styles.paginationListVertical : undefined)}
-      data-xmlui-part="pagination-controls"
-      data-part-id="pagination-controls"
-    >
-      {buttons}
-    </ul>
-  );
-  const pageInfo = showPageInfo && hasValidItemCount
-    ? <div className={styles.pageInfo} data-xmlui-part="page-info" data-part-id="page-info">Page {currentPageNumber} of {totalPages} ({itemCount} items)</div>
-    : null;
-  const selector = showPageSizeSelector && pageSizeOptions && pageSizeOptions.length > 1
-    ? (
-      <div
-        className={styles.selectorContainer}
-        data-xmlui-part="page-size-selector-container"
-        data-part-id="page-size-selector-container"
+    <Part partId={PART_PAGINATION_CONTROLS}>
+      <ul
+        className={classnames(styles.buttonRow, {
+          [styles.paginationListVertical]: orientation === "vertical",
+          // layout is already horizontal by default
+        })}
       >
-        <span
-          id={`${id ?? "pagination"}-page-size-label`}
-          className={styles.pageSizeLabel}
-          onClick={() => {
-            if (enabled) {
-              setPageSizeOpen(true);
-            }
-          }}
-        >
-          Items per page
-        </span>
-        <button
-          className={styles.pageSizeSelect}
-          type="button"
-          disabled={!enabled}
-          aria-labelledby={`${id ?? "pagination"}-page-size-label`}
-          aria-haspopup="listbox"
-          aria-expanded={pageSizeOpen}
-          onClick={() => setPageSizeOpen((open) => enabled ? !open : open)}
-        >
-          {safePageSize}
-        </button>
-        {pageSizeOpen
-          ? (
-            <ul className={styles.pageSizeOptions} role="listbox">
-              {pageSizeOptions.map((size) => (
-                <li
-                  key={size}
-                  role="option"
-                  aria-selected={size === safePageSize}
-                  className={styles.pageSizeOption}
-                  onClick={() => {
-                    setPageSizeOpen(false);
-                    void onPageSizeDidChange?.(size);
-                  }}
-                >
-                  {size}
-                </li>
-              ))}
-            </ul>
-          )
-          : null}
-      </div>
-    )
-    : null;
+        {/* First page button */}
+        <li>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!enabled || isFirstPage}
+            onClick={() => handlePageChange(0)}
+            contextualLabel="First page"
+            style={ICON_BUTTON_STYLE}
+            aria-label="First page"
+          >
+            <ThemedIcon
+              name={`first:Pagination`}
+              fallback={orientation === "vertical" ? "doublechevronup" : "doublechevronleft"}
+              size="sm"
+            />
+          </Button>
+        </li>
 
+        {/* Previous page button */}
+        {visiblePages.length <= 2 && (
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || isFirstPage}
+              onClick={() => handlePageChange(currentPage - 1)}
+              contextualLabel="Previous page"
+              style={ICON_BUTTON_STYLE}
+              aria-label="Previous page"
+            >
+              <ThemedIcon
+                name={`prev:Pagination`}
+                fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
+                size="sm"
+              />
+            </Button>
+          </li>
+        )}
+
+        {/* Page number buttons or text indicator */}
+        {showCurrentPage && visiblePages.length === 1 && (
+          <li>
+            <Text
+              variant="strong"
+              style={{ paddingLeft: "1rem", paddingRight: "1rem" }}
+              aria-current="true"
+            >
+              {visiblePages[0]}
+            </Text>
+          </li>
+        )}
+        {visiblePages.length > 1 &&
+          visiblePages.map((pageNum) => (
+            <li key={`page-${pageNum}`}>
+              <Button
+                variant={pageNum === currentPageNumber ? "solid" : "ghost"}
+                disabled={!enabled}
+                size="sm"
+                onClick={() => handlePageChange(pageNum - 1)}
+                contextualLabel={`Page ${pageNum}`}
+                aria-current={pageNum === currentPageNumber || undefined}
+                aria-label={`Page ${pageNum}${pageNum === currentPageNumber ? " (current)" : ""}`}
+              >
+                {pageNum}
+              </Button>
+            </li>
+          ))}
+
+        {/* Next page button */}
+        {visiblePages.length <= 2 && (
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!enabled || isLastPage}
+              onClick={() => handlePageChange(currentPage + 1)}
+              contextualLabel="Next page"
+              style={ICON_BUTTON_STYLE}
+              aria-label="Next page"
+            >
+              <ThemedIcon
+                name={`next:Pagination`}
+                fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
+                size="sm"
+              />
+            </Button>
+          </li>
+        )}
+
+        {/* Last page button */}
+        <li>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!enabled || isLastPage}
+            onClick={() => handlePageChange(totalPages - 1)}
+            contextualLabel="Last page"
+              style={ICON_BUTTON_STYLE}
+            aria-label="Last page"
+          >
+            <ThemedIcon
+              name={`last:Pagination`}
+              fallback={orientation === "vertical" ? "doublechevrondown" : "doublechevronright"}
+              size="sm"
+            />
+          </Button>
+        </li>
+      </ul>
+    </Part>
+  );
+
+  const pageSizeSelector = showPageSizeSelector &&
+    pageSizeOptions &&
+    pageSizeOptions.length > 1 && (
+      <Part partId={PART_PAGE_SIZE_SELECTOR_CONTAINER}>
+        <div className={classnames(styles.selectorContainer)}>
+          <ItemWithLabel
+            id={`${id}-page-size-selector`}
+            label={"Items per page"}
+            enabled={enabled}
+            cloneStyle={true}
+            labelPosition={orientation === "vertical" ? "top" : "start"}
+          >
+            <Select
+              id={`${id}-page-size-selector`}
+              className={classnames(styles.pageSizeSelect)}
+              value={pageSize}
+              onDidChange={(newValue) => handlePageSizeChange(newValue as number)}
+              enabled={enabled}
+            >
+              {pageSizeOptions.map((size) => (
+                <OptionNative key={size} value={convertOptionValue(size)} label={`${size}`} />
+              ))}
+            </Select>
+          </ItemWithLabel>
+        </div>
+      </Part>
+    );
+  const pageInfo = showPageInfo && (
+    <Part partId={PART_PAGE_INFO}>
+      <div className={classnames(styles.pageInfo)}>
+        <Text variant="secondary">
+          Page {currentPageNumber} of {totalPages} ({itemCount} items)
+        </Text>
+      </div>
+    </Part>
+  );
+
+  // Used the following resource to provide a11y:
+  // https://a11ymatters.com/pattern/pagination/
   return (
     <nav
       {...rest}
-      id={id}
       role="navigation"
       aria-label="Pagination"
-      data-testid={dataTestId}
-      className={cx(styles.pagination, orientation === "vertical" ? styles.paginationVertical : undefined, className)}
+      ref={ref}
+      id={id}
+      className={classnames(
+        styles.pagination,
+        {
+          [styles.paginationVertical]: orientation === "vertical",
+          [styles.paginationHorizontal]: orientation === "horizontal",
+        },
+        classes?.[COMPONENT_PART_KEY],
+        className,
+      )}
       style={style}
     >
-      <Slot position={pageSizeSelectorPosition}>{selector}</Slot>
-      <Slot position={buttonRowPosition}>{buttonRow}</Slot>
-      <Slot position={pageInfoPosition}>{pageInfo}</Slot>
+      {(pageInfoPosition === "start" ||
+        pageSizeSelectorPosition === "start" ||
+        buttonRowPosition === "start") && (
+        <div className={classnames(styles.slot, styles.startSlot)}>
+          {pageInfoPosition === "start" && pageInfo}
+          {pageSizeSelectorPosition === "start" && pageSizeSelector}
+          {buttonRowPosition === "start" && buttonRow}
+        </div>
+      )}
+      {(pageInfoPosition === "center" ||
+        pageSizeSelectorPosition === "center" ||
+        buttonRowPosition === "center") && (
+        <div className={classnames(styles.slot, styles.centerSlot)}>
+          {pageInfoPosition === "center" && pageInfo}
+          {pageSizeSelectorPosition === "center" && pageSizeSelector}
+          {buttonRowPosition === "center" && buttonRow}
+        </div>
+      )}
+      {(pageInfoPosition === "end" ||
+        pageSizeSelectorPosition === "end" ||
+        buttonRowPosition === "end") && (
+        <div className={classnames(styles.slot, styles.endSlot)}>
+          {pageInfoPosition === "end" && pageInfo}
+          {pageSizeSelectorPosition === "end" && pageSizeSelector}
+          {buttonRowPosition === "end" && buttonRow}
+        </div>
+      )}
     </nav>
   );
 }));
-
-function PageButton({
-  label,
-  disabled,
-  current,
-  onClick,
-  children,
-}: {
-  label: string;
-  disabled?: boolean;
-  current?: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <li>
-      <button
-        className={styles.paginationButton}
-        type="button"
-        disabled={disabled}
-        aria-label={label}
-        aria-current={current ? "true" : undefined}
-        onClick={onClick}
-      >
-        {children}
-      </button>
-    </li>
-  );
-}
-
-function Slot({ position, children }: { position: Position; children: React.ReactNode }) {
-  if (!children) {
-    return null;
-  }
-  return <div className={cx(styles.slot, positionClass(position))}>{children}</div>;
-}
-
-function visiblePageNumbers(currentPage: number, totalPages: number, maxVisiblePages: PageNumber): number[] {
-  const count = Math.max(1, maxVisiblePages);
-  if (totalPages <= count) {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }
-  const half = Math.floor(count / 2);
-  let start = Math.max(1, currentPage - half);
-  const end = Math.min(totalPages, start + count - 1);
-  if (end === totalPages) {
-    start = Math.max(1, end - count + 1);
-  }
-  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-}
-
-function positionClass(position: Position): string {
-  switch (position) {
-    case "start":
-      return styles.startSlot;
-    case "end":
-      return styles.endSlot;
-    case "center":
-    default:
-      return styles.centerSlot;
-  }
-}
-
-function cx(...parts: Array<string | undefined | false>): string {
-  return parts.filter(Boolean).join(" ");
-}

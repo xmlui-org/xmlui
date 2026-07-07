@@ -426,6 +426,9 @@ describe("XMLUI expression JavaScript compilation", () => {
     const object = compileXmluiExpression(
       lowerScriptExpression(parseScriptExpression("{ name: user.name, labels: items.map(item => item.label) }").node, scope).ir,
     );
+    const arraySpread = compileXmluiExpression(
+      lowerScriptExpression(parseScriptExpression("[0, ...items.map(item => item.label), 'Done']").node, scope).ir,
+    );
 
     expect(arithmetic.source).toBe(`return (ctx.readLocal("count") + (1 * 2));`);
     expect(arithmetic.execute(context)).toBe(4);
@@ -434,6 +437,7 @@ describe("XMLUI expression JavaScript compilation", () => {
     expect(indexed.execute(context)).toBe("Two");
     expect(mapped.execute(context)).toBe("One, Two");
     expect(object.execute(context)).toEqual({ name: "Ada", labels: ["One", "Two"] });
+    expect(arraySpread.execute(context)).toEqual([0, "One", "Two", "Done"]);
   });
 
   it("rejects unsupported expression calls during semantic analysis", () => {

@@ -1,106 +1,163 @@
 import React from "react";
-import { createMetadata, dEnabled } from "../../component-core/metadata/helpers";
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { useComponentThemeClass } from "../../runtime/rendering/theme";
-import { extractScssThemeVars } from "../../styling/theme";
-import { defaultProps, PageNumberValues, PositionValues, type PageNumber, type Position } from "./Pagination.defaults";
-import { PaginationNative, type PaginationApi } from "./PaginationReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { createMetadata, dEnabled } from "../metadata-helpers";
+import { defaultProps } from "./Pagination.defaults";
+import { PositionValues, type PageNumber, PageNumberValues, Pagination } from "./PaginationReact";
+export { PositionValues } from "./PaginationReact";
+export type { Position } from "./PaginationReact";
+import styles from "./Pagination.module.scss";
+import {
+  orientationOptionMd,
+  type OrientationOptions,
+  orientationOptionValues,
+} from "../abstractions";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "Pagination";
 
-export { PositionValues };
-export type { Position };
-
-const paginationStylesSource = `
-$backgroundColor-Pagination: createThemeVar("backgroundColor-Pagination");
-$borderColor-Pagination: createThemeVar("borderColor-Pagination");
-$borderRadius-selector-Pagination: createThemeVar("borderRadius-selector-Pagination");
-$textColor-Pagination: createThemeVar("textColor-Pagination");
-$backgroundColor-selector-Pagination: createThemeVar("backgroundColor-selector-Pagination");
-$textColor-selector-Pagination: createThemeVar("textColor-selector-Pagination");
-$padding-Pagination: createThemeVar("padding-Pagination");
-$gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
-`;
-
 export const PaginationMd = createMetadata({
   status: "experimental",
-  description: "`Pagination` enables navigation through large datasets by dividing content into pages.",
+  description:
+    "`Pagination` enables navigation through large datasets by dividing content into pages. " +
+    "It provides controls for page navigation and can display current page information.",
   parts: {
-    "pagination-controls": { description: "The container for pagination buttons." },
-    "page-info": { description: "The container for page information display." },
-    "page-size-selector-container": { description: "The container for the page size selector dropdown." },
+    "pagination-controls": {
+      description: "The container for pagination buttons.",
+    },
+    "page-info": {
+      description: "The container for page information display.",
+    },
+    "page-size-selector-container": {
+      description: "The container for the page size selector dropdown.",
+    },
   },
   props: {
-    id: { description: "The component id.", valueType: "string" },
-    testId: { description: "The test id.", valueType: "string" },
     enabled: dEnabled(),
-    itemCount: { description: "Total number of items to paginate.", valueType: "number" },
-    pageSize: { description: "Number of items per page.", valueType: "number", defaultValue: defaultProps.pageSize },
-    pageIndex: { description: "Current page index (0-based).", valueType: "number", defaultValue: defaultProps.pageIndex },
+    itemCount: {
+      description:
+        "Total number of items to paginate. " +
+        "If not provided, the component renders simplified pagination controls " +
+        "that are enabled/disabled using the `hasPrevPage` and `hasNextPage` props.",
+      valueType: "number",
+    },
+    pageSize: {
+      description: "Number of items per page",
+      valueType: "number",
+      defaultValue: defaultProps.pageSize,
+    },
+    pageIndex: {
+      description: "Current page index (0-based)",
+      valueType: "number",
+      defaultValue: defaultProps.pageIndex,
+    },
     maxVisiblePages: {
-      description: "Maximum number of page buttons to display.",
-      availableValues: [...PageNumberValues],
+      description:
+        "Maximum number of page buttons to display. " +
+        "If the value is not among the allowed values, it will fall back to the default.",
+      availableValues: PageNumberValues,
       valueType: "number",
       defaultValue: defaultProps.maxVisiblePages,
     },
-    showPageInfo: { description: "Whether to show page information.", valueType: "boolean", defaultValue: defaultProps.showPageInfo },
+    showPageInfo: {
+      description: "Whether to show page information",
+      valueType: "boolean",
+      defaultValue: defaultProps.showPageInfo,
+    },
     showPageSizeSelector: {
-      description: "Whether to show the page size selector.",
+      description: "Whether to show the page size selector",
       valueType: "boolean",
       defaultValue: defaultProps.showPageSizeSelector,
     },
     showCurrentPage: {
-      description: "Whether to show the current page indicator.",
+      description: "Whether to show the current page indicator",
       valueType: "boolean",
       defaultValue: defaultProps.showCurrentPage,
     },
-    pageSizeOptions: { description: "Array of page sizes.", valueType: "any" },
-    hasPrevPage: { description: "Whether a previous page is available in simplified mode.", valueType: "boolean" },
-    hasNextPage: { description: "Whether a next page is available in simplified mode.", valueType: "boolean" },
+    pageSizeOptions: {
+      description:
+        "Array of page sizes the user can select from. If provided, shows a page size selector dropdown",
+      valueType: "any",
+    },
+    hasPrevPage: {
+      description:
+        "Whether to disable the previous page button. Only takes effect if itemCount is not provided.",
+      valueType: "boolean",
+    },
+    hasNextPage: {
+      description:
+        "Whether to disable the next page button. Only takes effect if itemCount is not provided.",
+      valueType: "boolean",
+    },
     orientation: {
-      description: "Layout orientation.",
+      description: "Layout orientation of the pagination component",
+      options: orientationOptionValues,
       valueType: "string",
-      availableValues: ["horizontal", "vertical"],
+      availableValues: orientationOptionMd,
       defaultValue: defaultProps.orientation,
     },
     pageSizeSelectorPosition: {
-      description: "Position of the page size selector.",
+      description: "Determines where to place the page size selector in the layout.",
+      options: PositionValues,
       valueType: "string",
-      availableValues: [...PositionValues],
       defaultValue: defaultProps.pageSizeSelectorPosition,
     },
     pageInfoPosition: {
-      description: "Position of page information.",
+      description: "Determines where to place the page information in the layout.",
+      options: PositionValues,
       valueType: "string",
-      availableValues: [...PositionValues],
       defaultValue: defaultProps.pageInfoPosition,
     },
     buttonRowPosition: {
-      description: "Position of pagination controls.",
+      description: "Determines where to place the pagination button row in the layout.",
+      availableValues: PositionValues,
       valueType: "string",
-      availableValues: [...PositionValues],
       defaultValue: defaultProps.buttonRowPosition,
     },
   },
   events: {
     pageDidChange: {
-      description: "Fired when the current page changes.",
+      description: "Fired when the current page changes",
       signature: "pageDidChange(pageIndex: number): void",
+      parameters: {
+        pageIndex: "The new page index (0-based).",
+      },
     },
     pageSizeDidChange: {
-      description: "Fired when page size changes.",
+      description: "Fired when the page size changes",
       signature: "pageSizeDidChange(pageSize: number): void",
+      parameters: {
+        pageSize: "The new page size.",
+      },
     },
   },
   apis: {
-    moveFirst: { description: "Moves to the first page.", signature: "moveFirst(): void" },
-    moveLast: { description: "Moves to the last page.", signature: "moveLast(): void" },
-    movePrev: { description: "Moves to the previous page.", signature: "movePrev(): void" },
-    moveNext: { description: "Moves to the next page.", signature: "moveNext(): void" },
-    currentPage: { description: "Gets the current page number (1-based)." },
-    currentPageSize: { description: "Gets the current page size." },
+    moveFirst: {
+      description: "Moves to the first page",
+      signature: "moveFirst(): void",
+    },
+    moveLast: {
+      description: "Moves to the last page",
+      signature: "moveLast(): void",
+    },
+    movePrev: {
+      description: "Moves to the previous page",
+      signature: "movePrev(): void",
+    },
+    moveNext: {
+      description: "Moves to the next page",
+      signature: "moveNext(): void",
+    },
+    currentPage: {
+      description: "Gets the current page number (1-based)",
+    },
+    currentPageSize: {
+      description: "Gets the current page size",
+    },
   },
-  themeVars: extractScssThemeVars(paginationStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "padding-Pagination": "$space-4",
     "backgroundColor-Pagination": "$backgroundColor",
@@ -113,72 +170,159 @@ export const PaginationMd = createMetadata({
   },
 });
 
-export const paginationRenderer = wrapComponent({
-  name: COMP,
-  metadata: PaginationMd,
-  renderer: ({ adapter }) => {
-    const maxVisiblePages = adapter.numberProp("maxVisiblePages", defaultProps.maxVisiblePages);
-    const sanitizedMaxVisiblePages = PageNumberValues.includes(maxVisiblePages as PageNumber)
-      ? maxVisiblePages as PageNumber
-      : defaultProps.maxVisiblePages;
-    const orientation = adapter.stringProp("orientation", defaultProps.orientation);
-    const sanitizedOrientation = orientation === "vertical" ? "vertical" : "horizontal";
-    const apiRef = { current: null as PaginationApi | null };
-    return (
-      <PaginationNative
-        {...adapter.rootAttrs()}
-        ref={(api) => {
-          apiRef.current = api;
-          if (api) {
-            adapter.registerApi(api as unknown as Record<string, unknown>);
-          }
-        }}
-        id={adapter.stringProp("id")}
-        enabled={adapter.booleanProp("enabled", true)}
-        itemCount={optionalNumber(adapter.prop("itemCount"))}
-        pageSize={adapter.numberProp("pageSize", defaultProps.pageSize)}
-        pageIndex={adapter.numberProp("pageIndex", defaultProps.pageIndex)}
-        maxVisiblePages={sanitizedMaxVisiblePages}
-        showPageInfo={adapter.booleanProp("showPageInfo", defaultProps.showPageInfo)}
-        showPageSizeSelector={adapter.booleanProp("showPageSizeSelector", defaultProps.showPageSizeSelector)}
-        showCurrentPage={adapter.booleanProp("showCurrentPage", defaultProps.showCurrentPage)}
-        pageSizeOptions={arrayOfNumbers(adapter.prop("pageSizeOptions"))}
-        orientation={sanitizedOrientation}
-        buttonRowPosition={positionProp(adapter.stringProp("buttonRowPosition"), defaultProps.buttonRowPosition)}
-        pageInfoPosition={positionProp(adapter.stringProp("pageInfoPosition"), defaultProps.pageInfoPosition)}
-        pageSizeSelectorPosition={positionProp(adapter.stringProp("pageSizeSelectorPosition"), defaultProps.pageSizeSelectorPosition)}
-        hasPrevPage={adapter.booleanProp("hasPrevPage", false)}
-        hasNextPage={adapter.booleanProp("hasNextPage", false)}
-        onPageDidChange={(pageIndex, pageSize, itemCount) =>
-          void adapter.event("pageDidChange")(pageIndex, pageSize, itemCount)}
-        onPageSizeDidChange={(pageSize) => void adapter.event("pageSizeDidChange")(pageSize)}
-      />
-    );
-  },
-});
-
-type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof PaginationNative>;
+type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof Pagination>;
 
 export const ThemedPagination = React.forwardRef<
-  React.ElementRef<typeof PaginationNative>,
+  React.ElementRef<typeof Pagination>,
   ThemedPaginationProps
 >(function ThemedPagination({ className, ...props }, ref) {
-  const themeClass = useComponentThemeClass(COMP, PaginationMd);
+  const themeClass = useComponentThemeClass(PaginationMd);
   return (
-    <PaginationNative
+    <Pagination
       {...props}
-      className={[themeClass.className, className].filter(Boolean).join(" ")}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
       ref={ref}
     />
   );
 });
 
-function arrayOfNumbers(value: unknown): number[] | undefined {
-  if (!Array.isArray(value)) {
-    return undefined;
-  }
-  return value.map((item) => Number(item)).filter((item) => Number.isFinite(item));
-}
+export const paginationComponentRenderer = wrapComponent(COMP, Pagination, PaginationMd, {
+  exposeRegisterApi: true,
+  stateful: true,
+  exclude: ["maxVisiblePages"],
+  events: [],
+  customRender(
+    _props,
+    { node, extractValue, lookupEventHandler, registerComponentApi, updateState, classes },
+  ) {
+    let maxVisiblePages = extractValue.asOptionalNumber(
+      node.props.maxVisiblePages,
+      defaultProps.maxVisiblePages,
+    );
+    if (!PageNumberValues.includes(maxVisiblePages as any)) {
+      console.warn(
+        `Invalid maxVisiblePages value provided To Pagination: ${maxVisiblePages}. Falling back to default.`,
+      );
+      maxVisiblePages = defaultProps.maxVisiblePages;
+    }
+
+    let orientation = extractValue.asOptionalString(
+      node.props.orientation,
+      defaultProps.orientation,
+    );
+    if (!orientationOptionValues.includes(orientation as any)) {
+      console.warn(
+        `Invalid orientation value provided To Pagination: ${orientation}. Falling back to default.`,
+      );
+      orientation = defaultProps.orientation;
+    }
+
+    return (
+      <Pagination
+        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
+        itemCount={extractValue.asOptionalNumber(node.props.itemCount)}
+        pageSize={extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize)}
+        pageIndex={extractValue.asOptionalNumber(node.props.pageIndex, defaultProps.pageIndex)}
+        showPageInfo={extractValue.asOptionalBoolean(
+          node.props.showPageInfo,
+          defaultProps.showPageInfo,
+        )}
+        showPageSizeSelector={extractValue.asOptionalBoolean(
+          node.props.showPageSizeSelector,
+          defaultProps.showPageSizeSelector,
+        )}
+        showCurrentPage={extractValue.asOptionalBoolean(
+          node.props.showCurrentPage,
+          defaultProps.showCurrentPage,
+        )}
+        hasPrevPage={extractValue.asOptionalBoolean(node.props.hasPrevPage)}
+        hasNextPage={extractValue.asOptionalBoolean(node.props.hasNextPage)}
+        maxVisiblePages={maxVisiblePages as PageNumber}
+        pageSizeOptions={extractValue(node.props.pageSizeOptions) as number[] | undefined}
+        orientation={orientation as OrientationOptions}
+        buttonRowPosition={extractValue.asOptionalString(
+          node.props.buttonRowPosition,
+          defaultProps.buttonRowPosition,
+        )}
+        pageSizeSelectorPosition={extractValue.asOptionalString(
+          node.props.pageSizeSelectorPosition,
+          defaultProps.pageSizeSelectorPosition,
+        )}
+        pageInfoPosition={extractValue.asOptionalString(
+          node.props.pageInfoPosition,
+          defaultProps.pageInfoPosition,
+        )}
+        onPageDidChange={lookupEventHandler("pageDidChange")}
+        onPageSizeDidChange={lookupEventHandler("pageSizeDidChange")}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
+        classes={classes}
+      />
+    );
+  },
+});
+
+export const paginationRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: PaginationMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    let maxVisiblePages = adapter.numberProp("maxVisiblePages", defaultProps.maxVisiblePages);
+    if (!PageNumberValues.includes(maxVisiblePages as PageNumber)) {
+      console.warn(
+        `Invalid maxVisiblePages value provided To Pagination: ${maxVisiblePages}. Falling back to default.`,
+      );
+      maxVisiblePages = defaultProps.maxVisiblePages;
+    }
+
+    let orientation = adapter.stringProp("orientation", defaultProps.orientation);
+    if (!orientationOptionValues.includes(orientation as OrientationOptions)) {
+      console.warn(
+        `Invalid orientation value provided To Pagination: ${orientation}. Falling back to default.`,
+      );
+      orientation = defaultProps.orientation;
+    }
+
+    return (
+      <Pagination
+        {...adapter.rootAttrs()}
+        id={adapter.stringProp("id")}
+        enabled={adapter.booleanProp("enabled", true)}
+        itemCount={optionalNumber(adapter.prop("itemCount"))}
+        pageSize={adapter.numberProp("pageSize", defaultProps.pageSize)}
+        pageIndex={adapter.numberProp("pageIndex", defaultProps.pageIndex)}
+        showPageInfo={adapter.booleanProp("showPageInfo", defaultProps.showPageInfo)}
+        showPageSizeSelector={adapter.booleanProp(
+          "showPageSizeSelector",
+          defaultProps.showPageSizeSelector,
+        )}
+        showCurrentPage={adapter.booleanProp("showCurrentPage", defaultProps.showCurrentPage)}
+        hasPrevPage={adapter.booleanProp("hasPrevPage")}
+        hasNextPage={adapter.booleanProp("hasNextPage")}
+        maxVisiblePages={maxVisiblePages as PageNumber}
+        pageSizeOptions={adapter.prop("pageSizeOptions") as number[] | undefined}
+        orientation={orientation as OrientationOptions}
+        buttonRowPosition={adapter.stringProp(
+          "buttonRowPosition",
+          defaultProps.buttonRowPosition,
+        ) as React.ComponentProps<typeof Pagination>["buttonRowPosition"]}
+        pageSizeSelectorPosition={adapter.stringProp(
+          "pageSizeSelectorPosition",
+          defaultProps.pageSizeSelectorPosition,
+        ) as React.ComponentProps<typeof Pagination>["pageSizeSelectorPosition"]}
+        pageInfoPosition={adapter.stringProp(
+          "pageInfoPosition",
+          defaultProps.pageInfoPosition,
+        ) as React.ComponentProps<typeof Pagination>["pageInfoPosition"]}
+        onPageDidChange={(pageIndex, pageSize, totalItemCount) =>
+          void adapter.event("pageDidChange")(pageIndex, pageSize, totalItemCount)}
+        onPageSizeDidChange={(pageSize) => void adapter.event("pageSizeDidChange")(pageSize)}
+        registerComponentApi={adapter.registerApi}
+        updateState={(state) => adapter.registerApi(state)}
+        classes={{ root: adapter.className }}
+      />
+    );
+  },
+});
 
 function optionalNumber(value: unknown): number | undefined {
   if (value === undefined || value === null || value === "") {
@@ -186,8 +330,4 @@ function optionalNumber(value: unknown): number | undefined {
   }
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function positionProp(value: string | undefined, fallback: Position): Position {
-  return PositionValues.includes(value as Position) ? value as Position : fallback;
 }

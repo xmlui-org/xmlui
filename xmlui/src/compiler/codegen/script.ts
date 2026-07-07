@@ -269,7 +269,11 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
-      return `[${ir.elements.map(emitExpression).join(", ")}]`;
+      return `[${ir.elements.map((element) =>
+        element.kind === "ArraySpreadElement"
+          ? `...${emitExpression(element.argument)}`
+          : emitExpression(element)
+      ).join(", ")}]`;
     case "ObjectExpression":
       return `{${ir.properties.map((property) =>
         property.kind === "spread"

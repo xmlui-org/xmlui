@@ -40,6 +40,7 @@ export const itemsRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     const items = adapter.prop("items") ?? adapter.prop("data");
     const itemTemplate = templateChildren(adapter.node, "itemTemplate") ?? nonPropertyChildren(adapter.node.children);
+    const layoutContext = adapter.props.layoutContext as Parameters<typeof adapter.context.renderChildren>[3];
     return (
       <ItemsNative
         items={items}
@@ -54,7 +55,16 @@ export const itemsRenderer = wrapComponent({
             slots: adapter.scope.slots,
             emitEvent: adapter.scope.emitEvent,
           });
-          return <>{adapter.context.renderChildren(itemTemplate, itemScope)}</>;
+          return (
+            <>
+              {adapter.context.renderChildren(
+                itemTemplate,
+                itemScope,
+                adapter.node.range.end,
+                layoutContext,
+              )}
+            </>
+          );
         }}
       />
     );

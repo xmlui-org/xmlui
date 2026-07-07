@@ -1,11 +1,5 @@
 <App>
-  <HStack>
-    <Button label="Select all" onClick="table.selectAll()" />
-    <Button label="Clear all" onClick="table.clearSelection()" />
-    <Button label="Select 1" onClick="table.selectId(1)" />
-    <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
-  </HStack>
-  <Table id="table" data='{[
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -54,11 +48,10 @@
     category: "dairy",
     key: 0,
   },
-]}'
-    rowsSelectable="true"
-    enableMultiRowSelection="true">
-    <Column bindTo="name" canSort="true"/>
-    <Column bindTo="quantity" canSort="true"/>
-    <Column bindTo="unit" canSort="true"/>
+]}' 
+    isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>
 </App>

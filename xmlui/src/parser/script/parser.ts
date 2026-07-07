@@ -3,6 +3,7 @@ import { SourceText, type SourceSpan } from "../common/source";
 import {
   type AssignmentExpressionNode,
   type ArrayExpressionNode,
+  type ArraySpreadElementNode,
   type ArrowFunctionExpressionNode,
   type BinaryExpressionNode,
   type BlockStatementNode,
@@ -439,10 +440,18 @@ class ScriptParser {
 
   private parseArrayExpression(): ArrayExpressionNode {
     const open = this.consume(ScriptTokenKind.OpenBracket);
-    const elements: ScriptNode[] = [];
+    const elements: Array<ScriptNode | ArraySpreadElementNode> = [];
 
     while (!this.at(ScriptTokenKind.EndOfFile) && !this.at(ScriptTokenKind.CloseBracket)) {
-      elements.push(this.parseExpression());
+      if (this.at(ScriptTokenKind.Ellipsis)) {
+        const spread = this.consume();
+        const argument = this.parseExpression();
+        elements.push(this.node("ArraySpreadElement", spread, argument.endToken, [argument], {
+          argument,
+        }) as ArraySpreadElementNode);
+      } else {
+        elements.push(this.parseExpression());
+      }
       if (this.at(ScriptTokenKind.Comma)) {
         this.consume();
         continue;

@@ -23,6 +23,7 @@ export type ScriptNodeKind =
   | "PrefixExpression"
   | "PostfixExpression"
   | "ArrayExpression"
+  | "ArraySpreadElement"
   | "ObjectExpression"
   | "ObjectProperty"
   | "ObjectSpreadProperty"
@@ -155,7 +156,12 @@ export type PostfixExpressionNode = ScriptNodeBase & {
 
 export type ArrayExpressionNode = ScriptNodeBase & {
   kind: "ArrayExpression";
-  elements: ScriptNode[];
+  elements: Array<ScriptNode | ArraySpreadElementNode>;
+};
+
+export type ArraySpreadElementNode = ScriptNodeBase & {
+  kind: "ArraySpreadElement";
+  argument: ScriptNode;
 };
 
 export type ObjectPropertyNode = ScriptNodeBase & {
@@ -200,6 +206,7 @@ export type ScriptNode =
   | PrefixExpressionNode
   | PostfixExpressionNode
   | ArrayExpressionNode
+  | ArraySpreadElementNode
   | ObjectPropertyNode
   | ObjectSpreadPropertyNode
   | ObjectExpressionNode

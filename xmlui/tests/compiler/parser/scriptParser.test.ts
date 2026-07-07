@@ -123,12 +123,22 @@ describe("ScriptParser expression mode", () => {
 
   it("parses arrays, objects, index access, optional members, and arrows", () => {
     const array = parseScriptExpression("[{ label: 'One' }, { label: 'Two' }]");
+    const arraySpread = parseScriptExpression("[1, ...items, 4]");
     const object = parseScriptExpression("{ name, 'title': user?.profile?.title }");
     const indexed = parseScriptExpression("items?.[index].label");
     const mapped = parseScriptExpression("items.map(item => item.label).join(', ')");
 
     expect(array.diagnostics).toEqual([]);
     expect(array.node.kind).toBe("ArrayExpression");
+    expect(arraySpread.diagnostics).toEqual([]);
+    expect(arraySpread.node).toMatchObject({
+      kind: "ArrayExpression",
+      elements: [
+        { kind: "Literal", value: 1 },
+        { kind: "ArraySpreadElement", argument: { kind: "Identifier", name: "items" } },
+        { kind: "Literal", value: 4 },
+      ],
+    });
 
     expect(object.diagnostics).toEqual([]);
     expect((object.node as ObjectExpressionNode).properties).toHaveLength(2);

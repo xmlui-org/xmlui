@@ -1170,6 +1170,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       pageSizeSelectorPosition: { name: "pageSizeSelectorPosition" },
       pageInfoPosition: { name: "pageInfoPosition" },
       buttonRowPosition: { name: "buttonRowPosition" },
+      variant: { name: "variant" },
     }),
     events: {
       pageDidChange: { name: "pageDidChange", attributeName: "onPageDidChange" },

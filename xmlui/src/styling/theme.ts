@@ -54,6 +54,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-surface-950": "hsl(204, 30.3%, 13%)",
   "const-color-surface-1000": "hsl(204, 30.3%, 9%)",
   "const-color-surface": "$const-color-surface-500",
+  "const-color-gray-300": "$const-color-surface-200",
 
   "const-color-primary-50": "hsl(212,71.9%,94.5%)",
   "const-color-primary-100": "hsl(212,71.9%,89.1%)",
@@ -164,6 +165,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "color-valid": "$color-success-600",
   "color-warning": "$color-warn-700",
   "color-error": "$color-danger-500",
+  "color-gray-300": "$const-color-gray-300",
 
   "fontFamily-sans-serif":
     "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
@@ -403,7 +405,17 @@ export const rootThemeVariables: ThemeVariableLayer = {
 
 export const xmluiThemeVariables: ThemeVariableLayer = {
   "font-size": "15px",
-  "boxShadow-Input": "$boxShadow-sm",
+  "boxShadow-Input": "",
+  "textColor-label-formItem": "$textColor",
+  "textColor-label-formItem--required": "$textColor",
+  "fontSize-label-formItem": "$fontSize-sm",
+  "fontSize-label-formItem--required": "$fontSize-sm",
+  "fontWeight-label-formItem": "$fontWeight-medium",
+  "fontWeight-label-formItem--required": "$fontWeight-medium",
+  "fontStyle-label-formItem": "normal",
+  "textTransform-label-formItem": "none",
+  "textColor-requiredMark-formItem": "$color-danger-400",
+  "textColor-optionalTag-formItem": "$textColor-secondary",
   "backgroundColor-Button-secondary-solid--hover": "rgb(140, 151, 169)",
   "borderColor-Button-secondary-solid--hover": "rgb(226, 229, 234)",
   light: {

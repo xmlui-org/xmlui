@@ -150,7 +150,12 @@ export type XmluiConditionalExpressionIr = XmluiScriptIrBase & {
 
 export type XmluiArrayExpressionIr = XmluiScriptIrBase & {
   kind: "ArrayExpression";
-  elements: XmluiScriptIr[];
+  elements: Array<XmluiScriptIr | XmluiArraySpreadElementIr>;
+};
+
+export type XmluiArraySpreadElementIr = XmluiScriptIrBase & {
+  kind: "ArraySpreadElement";
+  argument: XmluiScriptIr;
 };
 
 export type XmluiObjectExpressionIr = XmluiScriptIrBase & {
@@ -545,6 +550,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         return;
       case "ArrayExpression":
         current.elements.forEach(visit);
+        return;
+      case "ArraySpreadElement":
+        visit(current.argument);
         return;
       case "ObjectExpression":
         current.properties.forEach(visit);
@@ -1185,7 +1193,15 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       return {
         kind: "ArrayExpression",
         span: node.span,
-        elements: node.elements.map((element) => lowerNode(element, bound)),
+        elements: node.elements.map((element) =>
+          element.kind === "ArraySpreadElement"
+            ? {
+                kind: "ArraySpreadElement",
+                span: element.span,
+                argument: lowerNode(element.argument, bound),
+              }
+            : lowerNode(element, bound)
+        ),
       };
     case "ObjectExpression":
       return {
@@ -1399,7 +1415,11 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
         expressionContainsSyncUnsafeCall(expression.consequent) ||
         expressionContainsSyncUnsafeCall(expression.alternate);
     case "ArrayExpression":
-      return expression.elements.some(expressionContainsSyncUnsafeCall);
+      return expression.elements.some((element) =>
+        expressionContainsSyncUnsafeCall(
+          element.kind === "ArraySpreadElement" ? element.argument : element,
+        )
+      );
     case "ObjectExpression":
       return expression.properties.some((property) =>
         expressionContainsSyncUnsafeCall(property.kind === "spread" ? property.argument : property.value)
@@ -1922,7 +1942,11 @@ function emitExpression(ir: XmluiScriptIr): string {
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
     case "ArrayExpression":
-      return `[${ir.elements.map(emitExpression).join(", ")}]`;
+      return `[${ir.elements.map((element) =>
+        element.kind === "ArraySpreadElement"
+          ? `...${emitExpression(element.argument)}`
+          : emitExpression(element)
+      ).join(", ")}]`;
     case "ObjectExpression":
       return `{${ir.properties.map((property) =>
         property.kind === "spread"
@@ -1995,7 +2019,14 @@ function markArrowParameterReads(ir: XmluiScriptIr, params: Set<string>): XmluiS
         alternate: markArrowParameterReads(ir.alternate, params),
       };
     case "ArrayExpression":
-      return { ...ir, elements: ir.elements.map((element) => markArrowParameterReads(element, params)) };
+      return {
+        ...ir,
+        elements: ir.elements.map((element) =>
+          element.kind === "ArraySpreadElement"
+            ? { ...element, argument: markArrowParameterReads(element.argument, params) }
+            : markArrowParameterReads(element, params)
+        ),
+      };
     case "ObjectExpression":
       return {
         ...ir,
@@ -2397,7 +2428,11 @@ function executeExpressionIr(
         ? executeExpressionIr(ir.consequent, context, lexical)
         : executeExpressionIr(ir.alternate, context, lexical);
     case "ArrayExpression":
-      return ir.elements.map((element) => executeExpressionIr(element, context, lexical));
+      return ir.elements.flatMap((element) =>
+        element.kind === "ArraySpreadElement"
+          ? Array.from(executeExpressionIr(element.argument, context, lexical) as Iterable<unknown>)
+          : [executeExpressionIr(element, context, lexical)]
+      );
     case "ObjectExpression":
       return ir.properties.reduce<Record<string, unknown>>((result, property) => {
         if (property.kind === "spread") {
@@ -2552,7 +2587,11 @@ async function executeExpressionIrAsync(
         ? executeExpressionIrAsync(ir.consequent, context, lexical)
         : executeExpressionIrAsync(ir.alternate, context, lexical);
     case "ArrayExpression":
-      return Promise.all(ir.elements.map((element) => executeExpressionIrAsync(element, context, lexical)));
+      return (await Promise.all(ir.elements.map(async (element) =>
+        element.kind === "ArraySpreadElement"
+          ? Array.from(await executeExpressionIrAsync(element.argument, context, lexical) as Iterable<unknown>)
+          : [await executeExpressionIrAsync(element, context, lexical)]
+      ))).flat();
     case "ObjectExpression": {
       const result: Record<string, unknown> = {};
       for (const property of ir.properties) {
@@ -3141,7 +3180,9 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
         isEventMutationExpression(ir.consequent) ||
         isEventMutationExpression(ir.alternate);
     case "ArrayExpression":
-      return ir.elements.some(isEventMutationExpression);
+      return ir.elements.some((element) =>
+        isEventMutationExpression(element.kind === "ArraySpreadElement" ? element.argument : element)
+      );
     case "ObjectExpression":
       return ir.properties.some((property) =>
         isEventMutationExpression(property.kind === "spread" ? property.argument : property.value)

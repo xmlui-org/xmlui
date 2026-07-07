@@ -315,10 +315,10 @@ branch.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 51 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 50 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 61 |
+| Complete | User approved after audit and verification. | 62 |
 
 These counts are derived from the detailed component table below. Update them
 whenever a component changes state.
@@ -402,7 +402,7 @@ it.
 | Option | `OptionReact.tsx` | Select, RadioGroup | Audit required | option registration |
 | PageMetaTitle | `PageMetaTitle.tsx`, `PageMetaTitleReact.tsx`, `PageMetaTitle.defaults.ts`, `PageMetaTitle.md`, `PageMetaTitle.spec.ts` | document title | Complete | User approved after protected-file audit, metadata verification, filtered build diagnostics, and copied E2E coverage. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs PageMetaTitle` passed (`PageMetaTitle.tsx` entry-adapted; copied React/defaults/docs/spec identical). Runtime adapter appended below copied entry; adapter supplies the missing test-bed app-name title suffix through an explicit final Helmet title while leaving the copied Helmet-based implementation unchanged. Verification passed: `npm --prefix xmlui run check:metadata`; filtered development build diagnostics found no touched-file errors; `XMLUI_E2E_DEV_PORT=5337 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/PageMetaTitle/PageMetaTitle.spec.ts --workers=1` passed 7/7. |
 | Pages / Page | `Pages.tsx`, `PagesReact.tsx`, `Pages.module.scss`, `Pages.defaults.ts`, `Pages.md`, `Page.md`, `Pages.spec.ts` | router | Complete | User approved after protected-file audit and verification. Strict copy migrated from original. `node xmlui/scripts/verify-protected-component-copy.mjs Pages` passed (`Pages.tsx` entry-adapted; copied React/SCSS/docs/defaults/spec identical). Runtime adapters for `Pages` and `Page` appended below copied entry, and routing/query-state host shims added outside protected files. `npm --prefix xmlui run check:metadata` passed. |
-| Pagination | `PaginationReact.tsx`, module SCSS | Button/Icon | Audit required | page navigation and styles |
+| Pagination | `Pagination.tsx`, `PaginationReact.tsx`, `Pagination.module.scss`, `Pagination.defaults.ts`, `Pagination.md`, `Pagination.spec.ts`; added `Pagination.compat.spec.ts` | Button, Icon, Select, Part, shared behavior props, script array spread | Complete | User approved after protected-file audit, metadata verification, copied-suite coverage, compiler regressions, and the Table pagination selector style follow-up. Strict copy restored from the original component folder. `node xmlui/scripts/verify-protected-component-copy.mjs Pagination` passed (`Pagination.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical). Runtime adapter appended below copied entry and reuses the original `Pagination` implementation, preserving max-visible-page/orientation fallback warnings, event payloads, component API registration, and state publication through the rewrite adapter. Host fixes stayed outside copied Pagination source: the hand-written compiler contract now accepts the shared `variant` behavior prop for Pagination, and the script parser/compiler/runtime now supports array spread in array literals such as `[...testState, arg]`, matching the copied original API boundary tests. Follow-up shared theme/Select compatibility restores original page-size label and trigger metrics in Table pagination. Verification passed: `npm --prefix xmlui run check:metadata`; focused compiler regression `npx vitest run xmlui/tests/compiler/parser/scriptParser.test.ts xmlui/tests/compiler/scriptSemantics.test.ts --testNamePattern "array|broader expression syntax"` passed 3/3; full copied suite `XMLUI_E2E_DEV_PORT=5342 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Pagination/Pagination.spec.ts --workers=1` passed 98/99 with the original `fixme` skip preserved; final focused Pagination run `XMLUI_E2E_DEV_PORT=5342 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Pagination/Pagination.spec.ts xmlui/src/components/Pagination/Pagination.compat.spec.ts --workers=1` passed 99/99 with 1 existing skipped test. |
 | Part / Slot | original implementation files | component composition | Audit required | slot/part rendering |
 | ProfileMenu | `ProfileMenuReact.tsx`, module SCSS | App shell, menu | Audit required | profile menu visibility |
 | ProgressBar | `ProgressBar.tsx`, `ProgressBarReact.tsx`, `ProgressBar.module.scss`, `ProgressBar.defaults.ts`, `ProgressBar.md`, `ProgressBar.spec.ts` | theme variants, single-file metadata/renderer entry | Complete | User approved after protected-file audit and verification. `node xmlui/scripts/verify-protected-component-copy.mjs ProgressBar` passed (`ProgressBar.tsx` entry-adapted; copied React/SCSS/defaults/docs/spec identical); `npm --prefix xmlui run check:metadata` passed; `npm --workspace xmlui run test:e2e -- xmlui/src/components/ProgressBar/ProgressBar.spec.ts xmlui/src/components/ProgressBar/ProgressBar.compat.spec.ts --workers=1` passed 22/22. |
@@ -489,6 +489,25 @@ completed only after APICall/DataSource behavior is available.
 
 ## Current Handoff Notes
 
+- Pagination is `Complete`. The user approved it after protected-file audit,
+  copied-suite verification, compiler regressions, and the Table pagination
+  selector style follow-up. Protected files were restored from
+  `/Users/dotneteer/source/xmlui/xmlui/src/components/Pagination`; the copied
+  React/defaults/docs/SCSS/spec files are identical and `Pagination.tsx` is
+  entry-adapted with the rewrite runtime adapter appended below the copied
+  source. Host changes outside protected files added the shared `variant`
+  behavior prop to the compiler contract and array-spread support to the script
+  parser/compiler/runtime so copied API boundary tests using
+  `[...testState, arg]` compile and execute. Verification passed:
+  `node xmlui/scripts/verify-protected-component-copy.mjs Pagination`;
+  `npm --prefix xmlui run check:metadata`;
+  `npx vitest run xmlui/tests/compiler/parser/scriptParser.test.ts xmlui/tests/compiler/scriptSemantics.test.ts --testNamePattern "array|broader expression syntax"`
+  (3/3); and
+  `XMLUI_E2E_DEV_PORT=5342 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui run test:e2e -- xmlui/src/components/Pagination/Pagination.spec.ts --workers=1`
+  (98/99, with the copied original `fixme` skip preserved). Follow-up DOM
+  probing and `Pagination.compat.spec.ts` verify the original Table pagination
+  page-size label/trigger metrics; final focused run with both Pagination specs
+  passed 99/99 with 1 existing skipped test.
 - Protected-copy verifier exists at
   `xmlui/scripts/verify-protected-component-copy.mjs`. It currently audits
   copied React files, helper TSX files named in a future manifest,
@@ -916,6 +935,24 @@ completed only after APICall/DataSource behavior is available.
   `XMLUI_E2E_DEV_PORT=5289 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
   run test:e2e -- xmlui/src/components/RadioGroup/RadioGroup.compat.spec.ts
   --workers=1` passed 2/2.
+- Pagination selector style follow-up: direct original/rewrite DOM probes for
+  the Table pagination sample found that the copied Pagination page-size label
+  should inherit global FormItem label defaults (`14px`, `500`, black), while
+  the page-size Select trigger should render at `16px` with a `1px solid
+  rgb(199, 214, 225)` border and no shadow. The rewrite was missing global
+  FormItem label defaults, emitted Select defaults as concrete values instead
+  of original Input aliases, lacked the legacy `color-gray-300` alias consumed
+  by copied Pagination, and loaded Pagination's page-size font rule after
+  Select in this runtime path. Added the missing root defaults/alias,
+  restored Select-to-Input theme aliases, and added a targeted Select
+  compatibility class only for Pagination's `pageSizeSelect` trigger. Added
+  `Pagination.compat.spec.ts`. Verification passed:
+  `node xmlui/scripts/verify-protected-component-copy.mjs Pagination`;
+  `npm --prefix xmlui run check:metadata`;
+  `XMLUI_E2E_DEV_PORT=5342 XMLUI_REUSE_EXISTING_SERVER=0 npm --workspace xmlui
+  run test:e2e -- xmlui/src/components/Pagination/Pagination.spec.ts
+  xmlui/src/components/Pagination/Pagination.compat.spec.ts --workers=1`
+  passed 99/99 with 1 existing skipped test.
 
 ## New Session Bootstrap
 

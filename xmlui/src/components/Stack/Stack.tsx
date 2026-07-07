@@ -224,6 +224,30 @@ function createStackRenderer(
       }
       if (actualOrientation === "horizontal" && adapter.booleanProp("wrapContent", false)) {
         const resolvedItemWidth = resolveCssSize(itemWidth) ?? itemWidth;
+        const flowLayoutContext = {
+          type: "FlowLayout",
+          ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+          wrapChild: (
+            { node }: { node: XmluiElement },
+            renderedChild: ReactNode,
+          ) => {
+            if (node.type === "Items") {
+              return renderedChild;
+            }
+            if (node.type === "SpaceFiller") {
+              return <FlowItemBreak force={true} />;
+            }
+            return (
+              <FlowItemWrapper
+                width={resolveCssSize(node.props.width)}
+                minWidth={resolveCssSize(node.props.minWidth)}
+                maxWidth={resolveCssSize(node.props.maxWidth)}
+              >
+                {renderedChild}
+              </FlowItemWrapper>
+            );
+          },
+        };
         return (
           <FlowLayout
             {...rootAttrs}
@@ -235,19 +259,11 @@ function createStackRenderer(
             onContextMenu={() => void adapter.event("contextMenu")()}
             registerComponentApi={adapter.registerApi}
           >
-            {children.map((child, index) =>
-              child.kind === "element" && child.type === "SpaceFiller" ? (
-                <FlowItemBreak key={index} />
-              ) : (
-                <FlowItemWrapper
-                  key={index}
-                  width={child.kind === "element" ? resolveCssSize(child.props.width) : undefined}
-                  minWidth={child.kind === "element" ? resolveCssSize(child.props.minWidth) : undefined}
-                  maxWidth={child.kind === "element" ? resolveCssSize(child.props.maxWidth) : undefined}
-                >
-                  {adapter.context.renderChildren([stripLayoutProps(child, ["width", "minWidth", "maxWidth"])], adapter.scope)}
-                </FlowItemWrapper>
-              ),
+            {adapter.context.renderChildren(
+              children,
+              adapter.scope,
+              adapter.node.range.end,
+              flowLayoutContext,
             )}
           </FlowLayout>
         );
@@ -275,7 +291,7 @@ function createStackRenderer(
             adapter,
             children,
             actualOrientation,
-            itemWidth,
+            resolveCssSize(itemWidth) ?? itemWidth,
             adapter.node.props.itemWidth !== undefined,
             style.overflowX === "scroll",
           )}
@@ -328,14 +344,6 @@ function normalizeStackChild(
   const mainProp = orientation === "horizontal" ? "width" : "height";
   const mainValue = child.props[mainProp];
   if (mainValue === undefined || mainValue === null || mainValue === "") {
-    if (orientation === "horizontal" && isStackFamilyElement(child)) {
-      const props: Record<string, unknown> = { ...child.props };
-      props.style = appendInlineStyle(props.style, "flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0");
-      return {
-        ...child,
-        props,
-      } as XmluiElement;
-    }
     if (!preserveHorizontalOverflow || orientation !== "horizontal") {
       return child;
     }
@@ -367,11 +375,6 @@ function normalizeStackChild(
     props,
     parsed: child.parsed ? { ...child.parsed, props: parsedProps } : child.parsed,
   } as XmluiElement;
-}
-
-function isStackFamilyElement(child: XmluiElement): boolean {
-  return child.type === "Stack" || child.type === "HStack" || child.type === "VStack" ||
-    child.type === "CHStack" || child.type === "CVStack";
 }
 
 function parseStarSize(value: unknown): number | undefined {

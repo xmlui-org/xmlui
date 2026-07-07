@@ -46,6 +46,7 @@ type ItemWithLabelProps = {
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
   compactInlineLabel?: boolean;
+  activateOnRootClick?: boolean;
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -77,6 +78,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     cloneStyle = defaultProps.cloneStyle,
     requireLabelMode = defaultProps.requireLabelMode,
     compactInlineLabel = defaultProps.compactInlineLabel,
+    activateOnRootClick = false,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -215,6 +217,16 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const wrapperPartId = shouldExposeWrapperLabeledItemPart(componentName)
     ? PART_LABELED_ITEM
     : undefined;
+  const activateFromWrapperClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    if (!activateOnRootClick) {
+      return;
+    }
+    const target = event.target as HTMLElement;
+    if (target.closest("label, button, input, textarea, select, [role='combobox'], [role='radio'], [role='switch']")) {
+      return;
+    }
+    focusLabeledControl(inputId);
+  }, [activateOnRootClick, inputId]);
 
   if (label === undefined && !validationResult) {
     return (
@@ -365,6 +377,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         [styles.noLabel]: !label && compactInlineLabel,
         [styles.shrinkToLabel]: shrinkToLabel,
       })}
+      onClick={activateFromWrapperClick}
     >
       <div
         className={classnames(styles.container, {

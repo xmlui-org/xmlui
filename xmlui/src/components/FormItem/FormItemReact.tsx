@@ -552,6 +552,7 @@ export const FormItem = memo(forwardRef(function FormItem({
         validationResult={validationResult}
         layoutContext={layoutContext}
         compactInlineLabel={type === "checkbox" || type === "switch"}
+        activateOnRootClick={type === "select"}
       >
         {formControl}
       </ItemWithLabel>

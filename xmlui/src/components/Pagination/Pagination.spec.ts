@@ -1117,8 +1117,7 @@ test.describe("Component APIs", () => {
     await expect.poll(testStateDriver.testState).toBe(15);
   });
 
-  // Deferred until the expression parser supports array spread in event handlers.
-  test.skip("API methods handle boundary conditions correctly (moveFirst, movePrev)", async ({
+  test("API methods handle boundary conditions correctly (moveFirst, movePrev)", async ({
     initTestBed,
     page,
   }) => {
@@ -1144,8 +1143,7 @@ test.describe("Component APIs", () => {
     await expect.poll(testStateDriver.testState).toBeNull();
   });
 
-  // Deferred until the expression parser supports array spread in event handlers.
-  test.skip("API methods handle boundary conditions correctly (moveLast, moveNext)", async ({
+  test("API methods handle boundary conditions correctly (moveLast, moveNext)", async ({
     initTestBed,
     page,
   }) => {
@@ -1305,8 +1303,7 @@ test.describe("Other Edge Cases", () => {
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  // Deferred until the shared behavior layer supports tooltip, variant, and animation props.
-  test.skip("handles tooltip", async ({ page, initTestBed }) => {
+  test("handles tooltip", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" tooltip="Tooltip text" itemCount="100" />`);
 
     const component = page.getByTestId("test");
@@ -1317,7 +1314,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test.skip("handles variant", async ({ page, initTestBed }) => {
+  test("handles variant", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" variant="CustomVariant" itemCount="100" />`, {
       testThemeVars: {
         "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
@@ -1341,7 +1338,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(pageInfo).toBeVisible();
   });
 
-  test.skip("variant applies custom theme variables", async ({ page, initTestBed }) => {
+  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" variant="CustomVariant" itemCount="100" />`, {
       testThemeVars: {
         "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
@@ -1352,7 +1349,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
-  test.skip("tooltip with markdown content", async ({ page, initTestBed }) => {
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(
       `<Pagination testId="test" tooltipMarkdown="**Bold text**" itemCount="100" />`,
     );
@@ -1365,14 +1362,14 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip.locator("strong")).toHaveText("Bold text");
   });
 
-  test.skip("animation behavior", async ({ page, initTestBed }) => {
+  test("animation behavior", async ({ page, initTestBed }) => {
     await initTestBed(`<Pagination testId="test" animation="fadeIn" itemCount="100" />`);
 
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
   });
 
-  test.skip("combined tooltip and animation", async ({ page, initTestBed }) => {
+  test("combined tooltip and animation", async ({ page, initTestBed }) => {
     await initTestBed(
       `<Pagination testId="test" tooltip="Tooltip text" animation="fadeIn" itemCount="100" />`,
     );
@@ -1386,24 +1383,39 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("combines animation behavior with parts", async ({ page, initTestBed }) => {
+  test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <Pagination
         testId="test"
+        variant="CustomVariant"
         itemCount="100"
         showPageInfo="true"
         animation="fadeIn"
+        tooltip="Tooltip text"
       />
     `,
+      {
+        testThemeVars: {
+          "backgroundColor-Pagination-CustomVariant": "rgb(255, 0, 0)",
+        },
+      },
     );
 
     const component = page.getByTestId("test");
     const paginationControls = component.locator("[data-part-id='pagination-controls']");
     const pageInfo = component.locator("[data-part-id='page-info']");
 
+    // Verify variant applied
+    await expect(component).toHaveCSS("background-color", "rgb(255, 0, 0)");
+
     // Verify parts are visible
     await expect(paginationControls).toBeVisible();
     await expect(pageInfo).toBeVisible();
+
+    await component.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText("Tooltip text");
   });
 });
