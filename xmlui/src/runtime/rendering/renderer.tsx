@@ -18,7 +18,7 @@ export function createRenderContext(
   const context: RenderContext = {
     components,
     extensionRenderers,
-    renderElement: (node, scope) => renderElement(context, node, scope),
+    renderElement: (node, scope, layoutContext) => renderElement(context, node, scope, layoutContext),
     renderChildren: (children, scope, parentEnd, layoutContext) =>
       renderChildren(context, children, scope, parentEnd, layoutContext),
     withComponents: (childComponents) =>
@@ -36,35 +36,46 @@ export function XmluiNodeRenderer({
   scope,
   textPrefix,
   textSuffix,
+  layoutContext,
 }: {
   context: RenderContext;
   node: XmluiNode;
   scope: RuntimeScope;
   textPrefix?: string;
   textSuffix?: string;
+  layoutContext?: RuntimeRenderLayoutContext;
 }): ReactNode {
   if (node.kind === "text") {
     return <XmluiTextRenderer node={node} scope={scope} prefix={textPrefix} suffix={textSuffix} />;
   }
   if (hasConditionalProps(node.props)) {
-    return <ConditionalElementRenderer context={context} node={node} scope={scope} />;
+    return (
+      <ConditionalElementRenderer
+        context={context}
+        node={node}
+        scope={scope}
+        layoutContext={layoutContext}
+      />
+    );
   }
 
   if (Object.keys(node.vars).length > 0 && node.type !== "App") {
     return <ScopedElement context={context} node={node} parentScope={scope} props={scope.props} />;
   }
 
-  return renderElement(context, node, scope);
+  return renderElement(context, node, scope, layoutContext);
 }
 
 function ConditionalElementRenderer({
   context,
   node,
   scope,
+  layoutContext,
 }: {
   context: RenderContext;
   node: Extract<XmluiNode, { kind: "element" }>;
   scope: RuntimeScope;
+  layoutContext?: RuntimeRenderLayoutContext;
 }) {
   const binding = node.parsed?.props?.when;
   useBindingRevision(binding, scope);
@@ -76,24 +87,45 @@ function ConditionalElementRenderer({
   if (!visible) {
     return null;
   }
-  return <>{renderElement(context, node, scope)}</>;
+  return <>{renderElement(context, node, scope, layoutContext)}</>;
 }
 
-function renderElement(context: RenderContext, node: Extract<XmluiNode, { kind: "element" }>, scope: RuntimeScope) {
+function renderElement(
+  context: RenderContext,
+  node: Extract<XmluiNode, { kind: "element" }>,
+  scope: RuntimeScope,
+  layoutContext?: RuntimeRenderLayoutContext,
+) {
   const renderer = builtInComponentRenderers[node.type];
   if (renderer) {
     const BuiltInRenderer = renderer;
-    return <BuiltInRenderer context={context} node={node} scope={scope} />;
+    return <BuiltInRenderer context={context} node={node} scope={scope} layoutContext={layoutContext} />;
   }
 
   const component = context.components[node.type];
   if (component) {
-    return <ComponentInstance component={component} context={context} node={node} scope={scope} />;
+    return (
+      <ComponentInstance
+        component={component}
+        context={context}
+        node={node}
+        scope={scope}
+        layoutContext={layoutContext}
+      />
+    );
   }
 
   const extensionRenderer = context.extensionRenderers[node.type];
   if (extensionRenderer) {
-    return <ExtensionComponentInstance renderer={extensionRenderer} context={context} node={node} scope={scope} />;
+    return (
+      <ExtensionComponentInstance
+        renderer={extensionRenderer}
+        context={context}
+        node={node}
+        scope={scope}
+        layoutContext={layoutContext}
+      />
+    );
   }
 
   throw new XmluiRenderError(`Unknown XMLUI component: ${node.type}`, node);
@@ -124,7 +156,7 @@ export function renderChildren(
 
     const renderedChild =
       layoutContext?.wrapChild && child.kind === "element"
-        ? renderElement(context, child, scope)
+        ? renderElement(context, child, scope, layoutContext)
         : (
           <XmluiNodeRenderer
             context={context}
@@ -132,6 +164,7 @@ export function renderChildren(
             scope={scope}
             textPrefix={needsBoundarySpace ? " " : undefined}
             textSuffix={needsTrailingBoundarySpace ? " " : undefined}
+            layoutContext={layoutContext}
           />
         );
     const wrappedChild =

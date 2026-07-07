@@ -350,7 +350,7 @@ export class DropdownMenuDriver extends ComponentDriver {
 
 export class ExpandableItemDriver extends ComponentDriver {
   getSummary(): Locator {
-    return this.getByPartName("summary");
+    return this.component.locator(`[data-part-id="summary"], [data-xmlui-part="summary"]`);
   }
 
   getSummaryContent(): Locator {

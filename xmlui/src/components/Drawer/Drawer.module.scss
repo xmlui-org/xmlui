@@ -1,147 +1,228 @@
-// Drawer.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old Drawer component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "Drawer";
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-Drawer: createThemeVar("backgroundColor-Drawer");
-$backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-Drawer");
-$borderRadius-Drawer: createThemeVar("borderRadius-Drawer");
-$boxShadow-Drawer: createThemeVar("boxShadow-Drawer");
-$padding-Drawer: createThemeVar("padding-Drawer");
-$paddingHorizontal-Drawer: createThemeVar("paddingHorizontal-Drawer");
-$paddingVertical-Drawer: createThemeVar("paddingVertical-Drawer");
-$paddingTop-Drawer: createThemeVar("paddingTop-Drawer");
-$paddingRight-Drawer: createThemeVar("paddingRight-Drawer");
-$paddingBottom-Drawer: createThemeVar("paddingBottom-Drawer");
-$paddingLeft-Drawer: createThemeVar("paddingLeft-Drawer");
-$width-Drawer: createThemeVar("width-Drawer");
-$maxWidth-Drawer: createThemeVar("maxWidth-Drawer");
-$height-Drawer: createThemeVar("height-Drawer");
-$maxHeight-Drawer: createThemeVar("maxHeight-Drawer");
-$zIndex-Drawer: createThemeVar("zIndex-Drawer");
-$gap-Drawer: createThemeVar("gap-Drawer");
-$animationDuration-Drawer: createThemeVar("animationDuration-Drawer");
-$animationEasing-Drawer: createThemeVar("animationEasing-Drawer");
-$top-closeButton-Drawer: createThemeVar("top-closeButton-Drawer");
-$right-closeButton-Drawer: createThemeVar("right-closeButton-Drawer");
+$backgroundColor-Drawer: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-#{$component}");
+$borderRadius-Drawer: createThemeVar("borderRadius-#{$component}");
+$boxShadow-Drawer: createThemeVar("boxShadow-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$paddingTop-Drawer:    createThemeVar("paddingTop-#{$component}");
+$paddingRight-Drawer:  createThemeVar("paddingRight-#{$component}");
+$paddingBottom-Drawer: createThemeVar("paddingBottom-#{$component}");
+$paddingLeft-Drawer:   createThemeVar("paddingLeft-#{$component}");
+$width-Drawer: createThemeVar("width-#{$component}");
+$maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
+$height-Drawer: createThemeVar("height-#{$component}");
+$maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
+$zIndex-Drawer: createThemeVar("zIndex-#{$component}");
+$gap-Drawer: createThemeVar("gap-#{$component}");
+$animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
+$animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
+$top-closeButton-Drawer: createThemeVar("top-closeButton-#{$component}");
+$right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
-@layer components {
-  .root {
-    position: fixed;
-    inset: 0;
-    z-index: var(--xmlui-zIndex-Drawer);
-    pointer-events: none;
+// Slide animations
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slideOutToLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slideOutToRight {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+@keyframes slideInFromTop {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes slideOutToTop {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+@keyframes slideInFromBottom {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes slideOutToBottom {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes backdropFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+// Backdrop overlay
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: $backgroundColor-backdrop-Drawer;
+  z-index: $zIndex-Drawer;
+  pointer-events: auto;
+
+  &[data-state="open"] {
+    animation: backdropFadeIn $animationDuration-Drawer $animationEasing-Drawer;
   }
-
-  .backdrop {
-    position: absolute;
-    inset: 0;
-    background-color: var(--xmlui-backgroundColor-backdrop-Drawer);
-    pointer-events: auto;
+  &[data-state="closed"] {
+    animation: backdropFadeOut $animationDuration-Drawer $animationEasing-Drawer forwards;
   }
+}
 
-  .drawer {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
-    pointer-events: auto;
-    background-color: var(--xmlui-backgroundColor-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer);
-    box-shadow: var(--xmlui-boxShadow-Drawer);
-  }
+// Drawer panel
+.drawer {
+  position: absolute;
+  background-color: $backgroundColor-Drawer;
+  border-radius: $borderRadius-Drawer;
+  box-shadow: $boxShadow-Drawer;
+  z-index: calc($zIndex-Drawer + 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
 
-  .left {
+  // --- Side variants
+  &.left {
     top: 0;
+    left: 0; // @rtl-intentional: side="left" always anchors to physical left
     bottom: 0;
-    left: 0;
-    width: var(--xmlui-width-Drawer);
-    max-width: var(--xmlui-maxWidth-Drawer);
-    border-radius: 0 var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer) 0;
+    width: $width-Drawer;
+    max-width: $maxWidth-Drawer;
+    border-radius: 0 $borderRadius-Drawer $borderRadius-Drawer 0;
+
+    &[data-state="open"]   { animation: slideInFromLeft  $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToLeft   $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
-  .right {
+  &.right {
     top: 0;
-    right: 0;
+    right: 0; // @rtl-intentional: side="right" always anchors to physical right
     bottom: 0;
-    width: var(--xmlui-width-Drawer);
-    max-width: var(--xmlui-maxWidth-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer) 0 0 var(--xmlui-borderRadius-Drawer);
+    width: $width-Drawer;
+    max-width: $maxWidth-Drawer;
+    border-radius: $borderRadius-Drawer 0 0 $borderRadius-Drawer;
+
+    &[data-state="open"]   { animation: slideInFromRight $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToRight  $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
-  .top {
+  &.top {
     top: 0;
-    left: 0;
-    right: 0;
-    height: var(--xmlui-height-Drawer);
-    max-height: var(--xmlui-maxHeight-Drawer);
-    border-radius: 0 0 var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer);
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
+    border-radius: 0 0 $borderRadius-Drawer $borderRadius-Drawer;
+
+    &[data-state="open"]   { animation: slideInFromTop   $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToTop    $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
-  .bottom {
-    right: 0;
+  &.bottom {
     bottom: 0;
-    left: 0;
-    height: var(--xmlui-height-Drawer);
-    max-height: var(--xmlui-maxHeight-Drawer);
-    border-radius: var(--xmlui-borderRadius-Drawer) var(--xmlui-borderRadius-Drawer) 0 0;
-  }
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
+    border-radius: $borderRadius-Drawer $borderRadius-Drawer 0 0;
 
-  .header {
-    flex-shrink: 0;
-    padding:
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
-      0
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
+    &[data-state="open"]   { animation: slideInFromBottom $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToBottom  $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
+}
 
-  .headerContent {
-    width: 100%;
-  }
+// Portal target for content that child components (e.g. Select dropdowns)
+// render via useTheme().root.  It must stack above the drawer panel so
+// portalled overlays are not hidden behind the slide-in panel.
+.childPortal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: calc($zIndex-Drawer + 2);
+}
 
-  .body {
-    flex: 1;
-    overflow: auto;
-    margin-top: var(--xmlui-gap-Drawer);
-    padding:
-      0
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingRight-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingBottom-Drawer))
-      var(--xmlui-padding-Drawer, var(--xmlui-paddingLeft-Drawer));
-  }
+// Visually hidden but accessible to screen readers
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
 
-  .bodyNoHeader {
-    margin-top: 0;
-    padding-top: calc(var(--xmlui-top-closeButton-Drawer) + var(--xmlui-padding-Drawer, var(--xmlui-paddingTop-Drawer)) + 0.75rem);
-  }
+// Sticky header: outer padding (top + horizontal), no bottom — gap handles spacing
+.header {
+  flex-shrink: 0;
+  padding: $paddingTop-Drawer $paddingRight-Drawer 0 $paddingLeft-Drawer;
+}
 
-  .closeButton {
-    position: absolute;
-    top: var(--xmlui-top-closeButton-Drawer);
-    right: var(--xmlui-right-closeButton-Drawer);
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    border-radius: 4px;
-    padding: 0.25rem;
-    line-height: 1;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    opacity: 0.7;
-  }
+.headerContent {
+  width: 100%;
+}
 
-  .closeButton:hover {
+// Scrollable body: outer padding (bottom + horizontal), gap-driven top margin
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: 0 $paddingRight-Drawer $paddingBottom-Drawer $paddingLeft-Drawer;
+  margin-top: $gap-Drawer;
+}
+
+// When the drawer renders without a headerTemplate, the body becomes the first
+// element. The floating close button sits at top:$top-closeButton-Drawer with a
+// ~1.5rem button area, so without explicit clearance it overlaps the first row
+// of body content (e.g. a TextBox label).
+.bodyNoHeader {
+  margin-top: 0;
+  padding-top: calc(#{$top-closeButton-Drawer} + #{$paddingTop-Drawer} + t.$space-3);
+}
+
+// Close button (×) - floats at top-right
+.closeButton {
+  position: absolute;
+  top: $top-closeButton-Drawer;
+  right: $right-closeButton-Drawer; // @rtl-intentional: close button is always top-right regardless of direction
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  // Reset inherited line-height so the button height equals icon + padding
+  // (the bodyNoHeader top-padding formula assumes this predictable size).
+  line-height: 1;
+  border: 0;
+  border-radius: t.$borderRadius;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 150ms ease;
+  z-index: 10;
+
+  &:hover {
     opacity: 1;
   }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

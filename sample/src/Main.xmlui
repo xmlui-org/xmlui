@@ -1,12 +1,25 @@
 <App>
-  <FlowLayout rowGap="2px">
-    <Stack width="25%" height="32px" backgroundColor="red" />
-    <Stack width="25%" height="32px" backgroundColor="blue" />
-    <Stack width="25%" height="32px" backgroundColor="green" />
-    <Stack width="25%" height="32px" backgroundColor="yellow" />
-    <Stack width="25%" height="32px" backgroundColor="maroon" />
-    <Stack width="25%" height="32px" backgroundColor="teal" />
-    <Stack width="25%" height="32px" backgroundColor="seagreen" />
-    <Stack width="25%" height="32px" backgroundColor="olive" />
-  </FlowLayout>
+  <VStack var.messageStatus="Ready to send" gap="$space-2">
+    <Button
+      label="Send Message to IFrame"
+      onClick="
+        myIframe.postMessage({type: 'greeting', text: 'Hello from parent!'}, '*');
+        messageStatus = 'Message sent!';
+      " />
+    <Card title="Status: {messageStatus}" />
+    <IFrame
+      id="myIframe"
+      srcdoc="
+        <script>
+          window.addEventListener('message', (event) => \{
+            console.log('Received message:', event.data);
+            document.body.innerHTML =
+              '<h1>Message: ' + JSON.stringify(event.data) + '</h1>';
+          });
+        </script>
+        <h1>Waiting for message...</h1>
+      "
+      width="100%"
+      height="200px" />
+  </VStack>
 </App>

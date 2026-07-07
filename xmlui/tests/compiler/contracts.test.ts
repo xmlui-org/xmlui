@@ -177,6 +177,21 @@ describe("Managed React contracts in compileXmluiModule", () => {
     ).not.toThrow();
   });
 
+  it("accepts Text size and weight aliases used by copied component docs", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App>
+            <Drawer id="drawer" position="right">
+              <Text weight="bold" size="lg">Navigation</Text>
+            </Drawer>
+          </App>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
   it("uses sibling component names as user-defined contracts", () => {
     const dir = path.join(tmpdir(), `xmlui-rs-contracts-${Date.now()}`);
     mkdirSync(dir, { recursive: true });

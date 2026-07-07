@@ -52,7 +52,7 @@ export class XmluiParseError extends Error {
 
 export function parseXmlui(source: string, options: ParseXmluiOptions = {}): XmluiDocument {
   const sourceId = options.sourceId ?? "anonymous.xmlui";
-  const normalizedSource = normalizeImplicitBooleanAttributes(source);
+  const normalizedSource = normalizeImplicitBooleanAttributes(normalizeCdataSections(source));
   const parsed = parseMarkup(normalizedSource, sourceId);
   if (parsed.diagnostics.length > 0) {
     throw diagnosticToError(parsed.diagnostics[0]);
@@ -142,6 +142,19 @@ function findTagEnd(source: string, start: number): number {
     }
   }
   return -1;
+}
+
+function normalizeCdataSections(source: string): string {
+  return source.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_match, content: string) =>
+    encodeTextEntities(content),
+  );
+}
+
+function encodeTextEntities(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function normalizeTagBooleanAttributes(tag: string): string {
@@ -659,7 +672,7 @@ function contentChildren(
     if (child.kind === MarkupSyntaxKind.Text) {
       const rawText = getNodeText(child, source);
       if (parentType === "Markdown") {
-        const value = rawText.replace(/\r\n?/g, "\n");
+        const value = decodeEntities(rawText).replace(/\r\n?/g, "\n");
         if (!value.trim()) {
           continue;
         }
@@ -909,7 +922,7 @@ function rangeOf(node: MarkupSyntaxNode): SourceRange {
 }
 
 function normalizeText(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return decodeEntities(text).replace(/\s+/g, " ").trim();
 }
 
 function decodeEntities(value: string): string {

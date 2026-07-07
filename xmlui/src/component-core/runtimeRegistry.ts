@@ -21,7 +21,7 @@ import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
-import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
+import { drawerRenderer } from "../components/Drawer/Drawer";
 import {
   dropdownMenuRenderer,
   menuItemRuntimeRenderer as menuItemRenderer,
@@ -29,12 +29,12 @@ import {
   subMenuItemRuntimeRenderer as subMenuItemRenderer,
 } from "../components/DropdownMenu/DropdownMenu";
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
-import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
+import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
-import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
+import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
-import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
+import { focusScopeRenderer } from "../components/FocusScope/FocusScope";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";
 import { formValidatorRenderer } from "../components/Form/FormValidator";
@@ -53,7 +53,7 @@ import {
 } from "../components/Heading/Heading";
 import { htmlTagRenderers } from "../components/HtmlTags/HtmlTags";
 import { iconRenderer } from "../components/Icon/Icon";
-import { iframeRenderer } from "../components/IFrame/IFrame.renderer";
+import { iframeRenderer } from "../components/IFrame/IFrame";
 import { imageRenderer } from "../components/Image/Image.renderer";
 import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
 import { inspectorRenderer } from "../components/Inspector/Inspector";

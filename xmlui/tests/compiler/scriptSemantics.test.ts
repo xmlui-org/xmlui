@@ -372,7 +372,7 @@ describe("XMLUI expression JavaScript compilation", () => {
     );
     expect(compileXmluiExpression(local.ir, local.dependencies).execute(context)).toBe(11);
     expect(compileXmluiExpression(global.ir, global.dependencies).source).toBe(
-      `return ctx.readGlobal("globalCount");`,
+      `return (ctx.readGlobal("globalCount") ?? ctx.readReference?.("globalCount"));`,
     );
     expect(compileXmluiExpression(global.ir, global.dependencies).execute(context)).toBe(22);
   });

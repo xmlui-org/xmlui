@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1"
+    "dev": "vite --host localhost"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.0",

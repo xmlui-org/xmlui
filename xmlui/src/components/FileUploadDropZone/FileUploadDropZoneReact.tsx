@@ -1,208 +1,201 @@
-import type { ClipboardEvent, CSSProperties, DragEvent, ReactNode } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import type * as React from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
+import { forwardRef, memo, useCallback, useEffect, useRef } from "react";
+import * as dropzone from "react-dropzone";
 
-import { defaultProps } from "./FileUploadDropZone.defaults";
 import styles from "./FileUploadDropZone.module.scss";
+import classnames from "classnames";
 
-export type FileUploadDropZoneApi = {
-  open: () => void;
-};
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import { asyncNoop } from "../../components-core/constants";
+import { ThemedIcon } from "../Icon/Icon";
+import { getComposedRef } from "../component-utils";
 
-export type FileUploadDropZoneProps = {
-  children?: ReactNode;
+// https://github.com/react-dropzone/react-dropzone/issues/1259
+const { useDropzone } = dropzone;
+
+// =====================================================================================================================
+// React FileUploadDropZone component implementation
+
+type Props = {
+  children: ReactNode;
+  onUpload?: (files: File[]) => void;
+  uid?: string;
+  registerComponentApi?: RegisterComponentApiFn;
+  style?: CSSProperties;
+  className?: string;
+  allowPaste?: boolean;
   text?: string;
   icon?: string;
-  allowPaste?: boolean;
-  enabled?: boolean;
   disabled?: boolean;
+  updateState?: UpdateStateFn;
   acceptedFileTypes?: string;
   maxFiles?: number;
-  className?: string;
-  style?: CSSProperties;
-  onUpload?: (files: File[]) => void | Promise<void>;
-  registerApi?: (api: FileUploadDropZoneApi) => void;
-  "data-testid"?: string;
 };
 
-export const FileUploadDropZoneNative = memo(forwardRef<FileUploadDropZoneApi, FileUploadDropZoneProps>(
-  function FileUploadDropZoneNative(
-    {
-      children,
-      text = defaultProps.text,
-      icon = defaultProps.icon,
-      allowPaste = defaultProps.allowPaste,
-      enabled = defaultProps.enabled,
-      disabled,
-      acceptedFileTypes,
-      maxFiles,
-      className,
-      style,
-      onUpload,
-      registerApi,
-      "data-testid": dataTestId,
-      ...rest
+import { defaultProps } from "./FileUploadDropZone.defaults";
+
+export const FileUploadDropZone = memo(forwardRef(function FileUploadDropZone(
+  {
+    children,
+    onUpload,
+    uid = defaultProps.uid,
+    registerComponentApi,
+    style,
+    className,
+    allowPaste = defaultProps.allowPaste,
+    text = defaultProps.text,
+    disabled = defaultProps.disabled,
+    updateState,
+    acceptedFileTypes,
+    maxFiles,
+    icon = defaultProps.icon,
+    ...rest
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
+  //accept is in the format {'image/*': [], 'video/*': []} see https://react-dropzone.js.org/#section-accepting-specific-file-types
+  const accept = acceptedFileTypes
+    ? acceptedFileTypes.split(",").reduce((acc, type) => ({ ...acc, [type.trim()]: [] }), {})
+    : undefined;
+
+  // Store the trace ID that was active when the file picker was opened
+  // so we can restore it when onDrop fires (which happens asynchronously after the user selects files)
+  const pendingTraceIdRef = useRef<string | undefined>(undefined);
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (!acceptedFiles.length) {
+        return;
+      }
+
+      // Restore the trace ID that was active when open() was called
+      let prevTrace: string | undefined;
+      if (typeof window !== "undefined" && pendingTraceIdRef.current) {
+        const w = window as any;
+        prevTrace = w._xsCurrentTrace;
+        w._xsCurrentTrace = pendingTraceIdRef.current;
+      }
+
+      try {
+        updateState?.({
+          value: acceptedFiles,
+        });
+        // Must await onUpload since it's an async handler - otherwise our finally
+        // block runs before the handler code executes
+        await onUpload?.(acceptedFiles);
+      } finally {
+        // Restore the previous trace
+        if (typeof window !== "undefined" && pendingTraceIdRef.current) {
+          const w = window as any;
+          w._xsCurrentTrace = prevTrace;
+          pendingTraceIdRef.current = undefined;
+        }
+      }
     },
-    ref,
-  ) {
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const [dragActive, setDragActive] = useState(false);
-    const interactive = enabled && disabled !== true;
-    const accept = normalizeAccept(acceptedFileTypes);
-
-    const commitFiles = useCallback((incomingFiles: File[]) => {
-      if (!interactive) {
-        return;
-      }
-      const acceptedFiles = filterAcceptedFiles(incomingFiles, accept);
-      const limitedFiles = typeof maxFiles === "number" && maxFiles > 0
-        ? acceptedFiles.slice(0, maxFiles)
-        : acceptedFiles;
-      if (limitedFiles.length > 0) {
-        void onUpload?.(limitedFiles);
-      }
-    }, [accept, interactive, maxFiles, onUpload]);
-
-    const open = useCallback(() => {
-      if (interactive) {
-        inputRef.current?.click();
-      }
-    }, [interactive]);
-
-    useImperativeHandle(ref, () => ({ open }), [open]);
-    useEffect(() => {
-      registerApi?.({ open });
-    }, [open, registerApi]);
-
-    const handleDrop = useCallback((event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setDragActive(false);
-      commitFiles(Array.from(event.dataTransfer.files ?? []));
-    }, [commitFiles]);
-
-    const handleDragEnter = useCallback((event: DragEvent<HTMLDivElement>) => {
-      if (!interactive) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      setDragActive(true);
-    }, [interactive]);
-
-    const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
-      if (!interactive) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      setDragActive(true);
-    }, [interactive]);
-
-    const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setDragActive(false);
-    }, []);
-
-    const handleInputChange = useCallback(() => {
-      commitFiles(Array.from(inputRef.current?.files ?? []));
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
-    }, [commitFiles]);
-
-    const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement>) => {
-      if (!allowPaste || !interactive || isTextEditingTarget(event.target)) {
-        return;
-      }
-      const files = filesFromClipboard(event);
-      if (files.length === 0) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      commitFiles(files);
-    }, [allowPaste, commitFiles, interactive]);
-
-    const hasChildren = Array.isArray(children)
-      ? children.length > 0
-      : children !== undefined && children !== null;
-
-    return (
-      <div
-        {...rest}
-        data-drop-enabled={String(interactive)}
-        data-testid={dataTestId}
-        className={cx(styles.fileUploadDropZoneRoot, className)}
-        style={style}
-        onDrop={handleDrop}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onPaste={handlePaste}
-      >
-        <input
-          ref={inputRef}
-          className={styles.fileUploadDropZoneInput}
-          type="file"
-          accept={acceptedFileTypes}
-          multiple={maxFiles !== 1}
-          disabled={!interactive}
-          onChange={handleInputChange}
-        />
-        {children}
-        {!hasChildren ? (
-          <div
-            data-part-id="dropPlaceholder"
-            data-xmlui-part="dropPlaceholder"
-            className={cx(
-              styles.fileUploadDropZonePlaceholder,
-              dragActive ? styles.fileUploadDropZoneDropping : undefined,
-            )}
-          >
-            {icon ? <span aria-hidden="true" data-icon={icon} className={styles.fileUploadDropZoneIcon} /> : null}
-            {text}
-          </div>
-        ) : null}
-      </div>
-    );
-  },
-));
-
-function normalizeAccept(value: string | undefined): string[] {
-  return value?.split(",").map((entry) => entry.trim()).filter(Boolean) ?? [];
-}
-
-function filterAcceptedFiles(files: File[], accept: string[]): File[] {
-  if (accept.length === 0) {
-    return files;
-  }
-  return files.filter((file) =>
-    accept.some((entry) =>
-      entry.endsWith("/*")
-        ? file.type.startsWith(entry.slice(0, -1))
-        : entry.startsWith(".")
-          ? file.name.toLowerCase().endsWith(entry.toLowerCase())
-          : file.type === entry,
-    ),
+    [onUpload, updateState],
   );
-}
 
-function isTextEditingTarget(target: EventTarget | null): boolean {
-  return target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    (target instanceof HTMLElement && target.isContentEditable);
-}
+  const { getRootProps, getInputProps, isDragActive, open, inputRef, isDragAccept } = useDropzone({
+    onDrop,
+    noClick: true,
+    noKeyboard: true,
+    noDragEventsBubbling: true,
+    disabled,
+    accept,
+    maxFiles,
+  });
 
-function filesFromClipboard(event: ClipboardEvent): File[] {
-  const items = Array.from(event.clipboardData?.items ?? []);
-  const files = items
-    .filter((item) => item.kind === "file")
-    .map((item) => item.getAsFile())
-    .filter((file): file is File => file !== null);
-  return files.length > 0 ? files : Array.from(event.clipboardData?.files ?? []);
-}
+  const doOpen = useEvent(() => {
+    // Capture the current trace ID before opening the file picker
+    // The file picker is async - onDrop will fire later when the user selects files
+    if (typeof window !== "undefined") {
+      pendingTraceIdRef.current = (window as any)._xsCurrentTrace;
+    }
+    open();
+  });
 
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+  const handleOnPaste = useCallback(
+    (event: React.ClipboardEvent) => {
+      if (!allowPaste) {
+        return;
+      }
+      // Ignore paste events originating from text inputs to avoid interfering
+      // with normal text paste operations (e.g., search boxes, text fields)
+      const target = event.target as HTMLElement;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      if (!inputRef.current) {
+        return;
+      }
+      if (event.clipboardData?.files) {
+        const items = event.clipboardData?.items || [];
+        const files: File[] = [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            if (file !== null) {
+              files.push(file);
+            }
+          }
+        }
+        if (files.length > 0) {
+          //the clipboardData.files doesn't necessarily contains files... so we have to double check it
+          event.stopPropagation(); //it's for nested file upload dropzones
+          event.preventDefault(); // and this one is for preventing to paste in the file name, if we a have stored file on the clipboard (copied from finder/windows explorer for example)
+
+          // Capture any active trace before dispatching the change event
+          // The change event may be handled asynchronously by react-dropzone
+          if (typeof window !== "undefined") {
+            pendingTraceIdRef.current = (window as any)._xsCurrentTrace;
+          }
+
+          //stolen from here: https://github.com/react-dropzone/react-dropzone/issues/1210#issuecomment-1537862105
+          (inputRef.current as unknown as HTMLInputElement).files = event.clipboardData.files;
+          inputRef.current.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+    },
+    [allowPaste, inputRef],
+  );
+
+  useEffect(() => {
+    registerComponentApi({
+      open: doOpen,
+    });
+  }, [doOpen, registerComponentApi, uid]);
+
+  const { ref, ...rootProps } = getRootProps({
+    ...rest,
+    style,
+    className: classnames(styles.wrapper, className),
+    onPaste: handleOnPaste,
+  } as React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>);
+
+  const rootRef = getComposedRef(ref, forwardedRef);
+  return (
+    <div {...rootProps} data-drop-enabled={!disabled} ref={rootRef}>
+      <input {...getInputProps()} />
+      {children}
+      {!children && !isDragActive && (
+        <div className={classnames(styles.dropPlaceholder)}>
+          <ThemedIcon name={icon}></ThemedIcon>
+          {text}
+        </div>
+      )}
+      {isDragActive && isDragAccept && (
+        <div className={classnames(styles.dropPlaceholder, styles.onDragActive)}>
+          <ThemedIcon name={icon}></ThemedIcon>
+          {text}
+        </div>
+      )}  
+    </div>
+  );
+}));

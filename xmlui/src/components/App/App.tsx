@@ -467,6 +467,18 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
     const contentLayoutContext = !scrollWholePage
       ? { type: "Stack" as const, orientation: "vertical" as const }
       : undefined;
+    const i18nConfigSignatureRef = useRef<string>();
+    const i18nConfigSignature = runtimeI18nConfigSignature(
+      adapter.stringProp("locale"),
+      adapter.prop("localeBundles"),
+    );
+    if (adapter.scope.i18n && i18nConfigSignatureRef.current !== i18nConfigSignature) {
+      i18nConfigSignatureRef.current = i18nConfigSignature;
+      adapter.scope.i18n.setConfig({
+        locale: adapter.stringProp("locale"),
+        bundles: adapter.prop("localeBundles"),
+      });
+    }
 
     const renderChild = (
       child?: XmluiNode | XmluiNode[],
@@ -536,6 +548,14 @@ function RuntimeAppProviders({ children }: { children: React.ReactNode }) {
   const isInRouterContext = useInRouterContext();
   const app = <HelmetProvider>{children}</HelmetProvider>;
   return isInRouterContext ? app : <BrowserRouter>{app}</BrowserRouter>;
+}
+
+function runtimeI18nConfigSignature(locale: string | undefined, localeBundles: unknown): string {
+  try {
+    return JSON.stringify([locale, localeBundles]);
+  } catch {
+    return `${locale ?? ""}:${String(localeBundles)}`;
+  }
 }
 
 function applyRuntimeLayoutContext(

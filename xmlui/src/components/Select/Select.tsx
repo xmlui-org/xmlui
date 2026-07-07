@@ -637,9 +637,16 @@ function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps 
   const rootStyle = rootAttrs.style as React.CSSProperties | undefined;
   const authoredWidth = adapter.stringProp("width");
   const hasAuthoredWidth = Object.prototype.hasOwnProperty.call(adapter.node.props, "width");
+  const layoutContext = adapter.props.layoutContext as
+    | { orientation?: string; itemWidth?: React.CSSProperties["width"] }
+    | undefined;
+  const stackItemWidth =
+    !hasAuthoredWidth && layoutContext?.orientation === "vertical"
+      ? layoutContext.itemWidth
+      : undefined;
   const runtimeWidth = hasAuthoredWidth
     ? normalizeSelectRuntimeWidth(authoredWidth ?? rootStyle?.width)
-    : undefined;
+    : stackItemWidth;
   const selectStyle = rootStyle ? { ...rootStyle } : undefined;
   if (!hasAuthoredWidth && selectStyle) {
     delete selectStyle.width;

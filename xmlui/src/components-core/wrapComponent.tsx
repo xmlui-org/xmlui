@@ -10,7 +10,7 @@ type ExtractValueCompat = ((value: unknown) => any) & {
   asDisplayText(value: unknown): string;
   asOptionalBoolean(value: unknown, fallback?: boolean): boolean;
   asOptionalNumber(value: unknown, fallback?: number): number | undefined;
-  asOptionalString(value: unknown, fallback?: string): string | undefined;
+  asOptionalString(value: unknown, fallback?: string): any;
   asSize(value: unknown, fallback?: string): any;
 };
 
@@ -19,6 +19,7 @@ type WrapComponentOptions = {
   booleans?: readonly string[];
   numbers?: readonly string[];
   strings?: readonly string[];
+  resourceUrls?: readonly string[];
   rename?: Record<string, string>;
   exclude?: readonly string[];
   passUid?: boolean;
@@ -77,6 +78,12 @@ export function wrapComponent(
       const [state, setState] = useState<Record<string, any>>({});
       for (const name of options.exclude ?? []) {
         delete props[name];
+      }
+      for (const name of options.resourceUrls ?? []) {
+        const value = props[name];
+        if (typeof value === "string" && value.length > 0 && !/^(?:[a-z][a-z\d+.-]*:|\/)/i.test(value)) {
+          props[name] = `/${value}`;
+        }
       }
       if (options.customRender) {
         const extractValue = ((value: unknown) => value) as ExtractValueCompat;

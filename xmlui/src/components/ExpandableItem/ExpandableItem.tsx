@@ -1,47 +1,29 @@
-import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
-import { defaultProps } from "./ExpandableItem.defaults";
-import { PART_CONTENT, PART_SUMMARY } from "./ExpandableItem.constants";
+import styles from "./ExpandableItem.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { iconPositionMd } from "../abstractions";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
+import {
+  defaultExpandableItemProps,
+  ExpandableItem,
+  PART_CONTENT,
+  PART_SUMMARY,
+} from "./ExpandableItemReact";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { CSSProperties } from "react";
+import { nonPropertyChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "ExpandableItem";
-const expandableItemStylesSource = `
-  createThemeVar("backgroundColor-ExpandableItem");
-  createThemeVar("backgroundColor-ExpandableItem--hover");
-  createThemeVar("backgroundColor-ExpandableItem--active");
-  createThemeVar("backgroundColor-summary-ExpandableItem");
-  createThemeVar("backgroundColor-summary-ExpandableItem--hover");
-  createThemeVar("backgroundColor-summary-ExpandableItem--active");
-  createThemeVar("borderRadius-summary-ExpandableItem");
-  createThemeVar("color-ExpandableItem");
-  createThemeVar("color-ExpandableItem--disabled");
-  createThemeVar("fontFamily-ExpandableItem");
-  createThemeVar("fontSize-ExpandableItem");
-  createThemeVar("fontWeight-ExpandableItem");
-  createThemeVar("borderColor-ExpandableItem");
-  createThemeVar("borderWidth-ExpandableItem");
-  createThemeVar("borderBottomWidth-ExpandableItem");
-  createThemeVar("borderStyle-ExpandableItem");
-  createThemeVar("borderRadius-ExpandableItem");
-  createThemeVar("paddingTop-ExpandableItem");
-  createThemeVar("paddingBottom-ExpandableItem");
-  createThemeVar("paddingLeft-ExpandableItem");
-  createThemeVar("paddingRight-ExpandableItem");
-  createThemeVar("padding-summary-ExpandableItem");
-  createThemeVar("paddingVertical-summary-ExpandableItem");
-  createThemeVar("paddingHorizontal-summary-ExpandableItem");
-  createThemeVar("paddingLeft-content-ExpandableItem");
-  createThemeVar("paddingRight-content-ExpandableItem");
-  createThemeVar("paddingVertical-content-ExpandableItem");
-  createThemeVar("gap-ExpandableItem");
-  createThemeVar("transition-summary-ExpandableItem");
-  createThemeVar("animation-content-ExpandableItem");
-  createThemeVar("animationDuration-content-ExpandableItem");
-`;
 
 export const ExpandableItemMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
-    "`ExpandableItem` creates an expandable/collapsible section, similar to the HTML details disclosure element.",
+    "`ExpandableItem` creates expandable/collapsible section, similar to the HTML " +
+    "details disclosure element. When the user clicks on the `summary` the content " +
+    "expands or collapses.",
   parts: {
     [PART_SUMMARY]: {
       description: "The summary section that is always visible and acts as the trigger.",
@@ -55,77 +37,78 @@ export const ExpandableItemMd = createMetadata({
     initiallyExpanded: {
       description: "Determines if the component is initially expanded when rendered.",
       valueType: "boolean",
-      defaultValue: defaultProps.initiallyExpanded,
+      defaultValue: defaultExpandableItemProps.initiallyExpanded,
     },
     enabled: {
-      description: "When true, the expandable item can be opened and closed.",
+      description:
+        "When true, the expandable item can be opened and closed. When false, it cannot be toggled.",
       valueType: "boolean",
-      defaultValue: defaultProps.enabled,
+      defaultValue: defaultExpandableItemProps.enabled,
     },
     iconCollapsed: {
       description: "The icon to display when the item is collapsed.",
       valueType: "string",
-      defaultValue: defaultProps.iconCollapsed,
+      defaultValue: defaultExpandableItemProps.iconCollapsed,
     },
     iconExpanded: {
       description: "The icon to display when the item is expanded.",
       valueType: "string",
-      defaultValue: defaultProps.iconExpanded,
+      defaultValue: defaultExpandableItemProps.iconExpanded,
     },
     iconPosition: {
-      description: "Determines the position of the icon.",
+      description: "Determines the position of the icon (start or end).",
       valueType: "string",
-      availableValues: ["start", "end"],
-      defaultValue: defaultProps.iconPosition,
+      availableValues: iconPositionMd,
+      defaultValue: defaultExpandableItemProps.iconPosition,
     },
     withSwitch: {
       description: "When true, a switch is used instead of an icon to toggle the expanded state.",
       valueType: "boolean",
-      defaultValue: defaultProps.withSwitch,
+      defaultValue: defaultExpandableItemProps.withSwitch,
     },
     contentWidth: {
-      description: "Sets the width of the expanded content area.",
+      description:
+        "Sets the width of the expanded content area. Defaults to 100% to fill the parent container.",
       valueType: "string",
-      defaultValue: defaultProps.contentWidth,
+      defaultValue: defaultExpandableItemProps.contentWidth,
     },
     fullWidthSummary: {
-      description: "When true, the summary section takes the full width of the parent container.",
+      description:
+        "When true, the summary section takes the full width of the parent container. When combined with iconPosition='end', the icon is aligned to the far edge.",
       valueType: "boolean",
-      defaultValue: defaultProps.fullWidthSummary,
-    },
-    testId: {
-      description: "Adds a test identifier to the ExpandableItem root.",
-      valueType: "string",
+      defaultValue: defaultExpandableItemProps.fullWidthSummary,
     },
   },
   events: {
     expandedChange: {
-      description: "This event fires when the expandable item is expanded or collapsed.",
+      description: `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
       signature: "expandedChange(isExpanded: boolean): void",
       parameters: {
-        isExpanded: "A boolean indicating whether the item is now expanded.",
+        isExpanded:
+          "A boolean indicating whether the item is now expanded (true) or collapsed (false).",
       },
     },
   },
   apis: {
     expand: {
-      description: "This method expands the item.",
+      description: `This method expands the item.`,
       signature: "expand(): void",
     },
     collapse: {
-      description: "This method collapses the item.",
+      description: `This method collapses the item.`,
       signature: "collapse(): void",
     },
     toggle: {
-      description: "This method toggles the item's expanded state.",
+      description: `This method toggles the item's expanded state.`,
       signature: "toggle(): void",
     },
     isExpanded: {
-      description: "This method returns whether the item is currently expanded.",
+      description: `This method returns a boolean indicating whether the item is currently expanded.`,
       signature: "isExpanded(): boolean",
     },
   },
-  themeVars: extractScssThemeVars(expandableItemStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
     [`backgroundColor-summary-${COMP}--hover`]: "$color-secondary-100",
@@ -143,8 +126,6 @@ export const ExpandableItemMd = createMetadata({
     [`paddingLeft-${COMP}`]: "$space-0",
     [`paddingRight-${COMP}`]: "$space-0",
     [`padding-summary-${COMP}`]: "$space-2 $space-4",
-    [`paddingVertical-summary-${COMP}`]: "$space-2",
-    [`paddingHorizontal-summary-${COMP}`]: "$space-4",
     [`borderRadius-summary-${COMP}`]: "$borderRadius",
     [`transition-summary-${COMP}`]: "color 0.2s, background 0.2s",
     [`gap-${COMP}`]: "$space-2",
@@ -155,3 +136,150 @@ export const ExpandableItemMd = createMetadata({
     [`animation-content-${COMP}`]: "ease-out",
   },
 });
+
+type ThemedExpandableItemProps = React.ComponentPropsWithoutRef<typeof ExpandableItem>;
+
+export const ThemedExpandableItem = React.forwardRef<
+  React.ElementRef<typeof ExpandableItem>,
+  ThemedExpandableItemProps
+>(function ThemedExpandableItem({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(ExpandableItemMd);
+  return (
+    <ExpandableItem
+      {...props}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
+      ref={ref}
+    />
+  );
+});
+
+export const expandableItemComponentRenderer = wrapComponent(
+  COMP,
+  ExpandableItem,
+  ExpandableItemMd,
+  {
+    exposeRegisterApi: true,
+    exclude: ["summary"],
+    customRender: (
+      _props,
+      { node, renderChild, lookupEventHandler, registerComponentApi, extractValue, classes },
+    ) => {
+      // summary can be a ComponentDef (render via renderChild) or a plain value (extract as string)
+      const summaryProp = node.props?.summary;
+      const summaryContent = summaryProp
+        ? typeof summaryProp === "object" && summaryProp.type
+          ? renderChild(summaryProp)
+          : extractValue(summaryProp)
+        : undefined;
+
+      return (
+        <ExpandableItem
+          summary={summaryContent}
+          initiallyExpanded={extractValue.asOptionalBoolean(
+            node.props.initiallyExpanded,
+            defaultExpandableItemProps.initiallyExpanded,
+          )}
+          enabled={extractValue.asOptionalBoolean(
+            node.props.enabled,
+            defaultExpandableItemProps.enabled,
+          )}
+          iconExpanded={
+            extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded
+          }
+          iconCollapsed={
+            extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed
+          }
+          iconPosition={
+            extractValue.asOptionalString(node.props.iconPosition) ??
+            defaultExpandableItemProps.iconPosition
+          }
+          withSwitch={extractValue.asOptionalBoolean(
+            node.props.withSwitch,
+            defaultExpandableItemProps.withSwitch,
+          )}
+          contentWidth={
+            extractValue.asOptionalString(node.props.contentWidth) ??
+            defaultExpandableItemProps.contentWidth
+          }
+          fullWidthSummary={extractValue.asOptionalBoolean(
+            node.props.fullWidthSummary,
+            defaultExpandableItemProps.fullWidthSummary,
+          )}
+          onExpandedChange={lookupEventHandler("expandedChange")}
+          classes={classes}
+          registerComponentApi={registerComponentApi}
+        >
+          {renderChild(node.children)}
+        </ExpandableItem>
+      );
+    },
+  },
+);
+
+export const expandableItemRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: ExpandableItemMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const hasSummaryTemplate = adapter.node.children.some(
+      (child) => child.kind === "element" &&
+        child.type === "property" &&
+        child.props.name === "summary",
+    );
+    const summary = hasSummaryTemplate
+      ? adapter.renderTemplate("summary")
+      : adapter.prop("summary", undefined);
+    return (
+      <RuntimeExpandableItem
+        {...rootAttrs}
+        style={expandableItemRuntimeStyle(rootAttrs.style)}
+        summary={summary}
+        initiallyExpanded={adapter.booleanProp(
+          "initiallyExpanded",
+          defaultExpandableItemProps.initiallyExpanded,
+        )}
+        enabled={adapter.booleanProp("enabled", defaultExpandableItemProps.enabled)}
+        iconExpanded={adapter.stringProp("iconExpanded", defaultExpandableItemProps.iconExpanded)}
+        iconCollapsed={adapter.stringProp(
+          "iconCollapsed",
+          defaultExpandableItemProps.iconCollapsed,
+        )}
+        iconPosition={
+          adapter.stringProp(
+            "iconPosition",
+            defaultExpandableItemProps.iconPosition,
+          ) as "start" | "end"
+        }
+        withSwitch={adapter.booleanProp("withSwitch", defaultExpandableItemProps.withSwitch)}
+        contentWidth={adapter.stringProp("contentWidth", defaultExpandableItemProps.contentWidth)}
+        fullWidthSummary={adapter.booleanProp(
+          "fullWidthSummary",
+          defaultExpandableItemProps.fullWidthSummary,
+        )}
+        onExpandedChange={(value) => { void adapter.event("expandedChange")(value); }}
+        registerComponentApi={adapter.registerApi}
+      >
+        {adapter.context.renderChildren(nonPropertyChildren(adapter.node.children), adapter.scope)}
+      </RuntimeExpandableItem>
+    );
+  },
+});
+
+function expandableItemRuntimeStyle(style: unknown): CSSProperties {
+  return {
+    ...(style as CSSProperties | undefined),
+    "--xmlui-borderBottomWidth-ExpandableItem": "0",
+  } as CSSProperties;
+}
+
+function RuntimeExpandableItem(props: React.ComponentPropsWithoutRef<typeof ExpandableItem>) {
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useLayoutEffect(() => {
+    rootRef.current
+      ?.querySelectorAll('[data-part-id="content"], [data-xmlui-part="content"]')
+      .forEach((element) => element.classList.add("_content_compat"));
+  });
+
+  return <ExpandableItem {...props} ref={rootRef} />;
+}

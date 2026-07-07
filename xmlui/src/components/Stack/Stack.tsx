@@ -193,6 +193,7 @@ function createStackRenderer(
     renderer: ({ adapter }) => {
       const rootAttrs = adapter.rootAttrs();
       const gap = adapter.stringProp("gap");
+      const resolvedGap = resolveGapSize(gap) ?? (isBareThemeToken(gap) ? undefined : gap);
       const style = { ...(rootAttrs.style as CSSProperties | undefined) };
       const actualOrientation = orientation ?? adapter.stringProp("orientation", defaultProps.orientation) ?? defaultProps.orientation;
       const horizontalAlignment = fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment");
@@ -205,8 +206,8 @@ function createStackRenderer(
       delete style.flexDirection;
       delete style.alignItems;
       delete style.justifyContent;
-      if (gap) {
-        (style as Record<string, string>)["--xmlui-gap-Stack"] = gap;
+      if (resolvedGap) {
+        (style as Record<string, string>)["--xmlui-gap-Stack"] = resolvedGap;
       }
       const children = nonPropertyChildren(adapter.node.children);
       const scrollStyle = adapter.stringProp("scrollStyle", defaultProps.scrollStyle);
@@ -227,8 +228,8 @@ function createStackRenderer(
           <FlowLayout
             {...rootAttrs}
             style={style}
-            columnGap={gap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
-            rowGap={gap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
+            columnGap={resolvedGap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
+            rowGap={resolvedGap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
             itemWidth={resolvedItemWidth}
             verticalAlignment={verticalAlignment || "start"}
             onContextMenu={() => void adapter.event("contextMenu")()}
@@ -295,21 +296,22 @@ function renderStackChildren(
   const normalizedChildren = children.map((child) =>
     normalizeStackChild(child, orientation, preserveHorizontalOverflow),
   );
+  const layoutContext = { type: "Stack", orientation, itemWidth };
   if (!hasExplicitItemWidth) {
-    return adapter.context.renderChildren(normalizedChildren, adapter.scope);
+    return adapter.context.renderChildren(normalizedChildren, adapter.scope, undefined, layoutContext);
   }
   return normalizedChildren.map((child, index) => {
     if (itemWidth && /^\d*\*$/.test(itemWidth)) {
       const flex = itemWidth === "*" ? 1 : Number.parseInt(itemWidth.slice(0, -1), 10);
       return (
         <div key={index} style={{ flex, flexShrink: 1 }}>
-          {adapter.context.renderChildren([child], adapter.scope)}
+          {adapter.context.renderChildren([child], adapter.scope, undefined, layoutContext)}
         </div>
       );
     }
     return (
       <div key={index} style={{ width: itemWidth, flexShrink: 0 }}>
-        {adapter.context.renderChildren([child], adapter.scope)}
+        {adapter.context.renderChildren([child], adapter.scope, undefined, layoutContext)}
       </div>
     );
   });
@@ -386,6 +388,21 @@ function resolveCssSize(value: unknown): string | undefined {
     }
   }
   return String(resolveThemeReferences(value));
+}
+
+function resolveGapSize(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value.startsWith("$")) {
+    return undefined;
+  }
+  const resolved = resolveThemeVariable(
+    value.slice(1),
+    [rootThemeVariables],
+  );
+  return resolved === undefined ? undefined : String(resolveThemeReferences(resolved));
+}
+
+function isBareThemeToken(value: unknown): boolean {
+  return typeof value === "string" && resolveThemeVariable(value, [rootThemeVariables]) !== undefined;
 }
 
 function renderDockStack({

@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import styles from "./Toggle.module.scss";
 
 export type ToggleApi = {
   focus: () => void;
@@ -24,6 +26,53 @@ export type ToggleController = {
   focus: () => void;
   api: ToggleApi;
 };
+
+export type ToggleProps = {
+  value?: unknown;
+  enabled?: boolean;
+  variant?: "switch" | "checkbox" | string;
+  className?: string;
+  style?: CSSProperties;
+  onDidChange?: (value: boolean) => void | Promise<void>;
+};
+
+export const Toggle = memo(forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
+  {
+    value,
+    enabled = true,
+    variant = "checkbox",
+    className,
+    style,
+    onDidChange,
+  },
+  forwardedRef,
+) {
+  const { inputRef, checked, updateValue } = useToggleController({
+    value,
+    enabled,
+    onDidChange,
+  });
+
+  useImperativeHandle(forwardedRef, () => inputRef.current as HTMLInputElement, [inputRef]);
+
+  return (
+    <input
+      ref={inputRef}
+      className={[
+        styles.resetAppearance,
+        variant === "switch" ? styles.switch : styles.checkbox,
+        className,
+      ].filter(Boolean).join(" ")}
+      style={style}
+      type="checkbox"
+      role={variant === "switch" ? "switch" : undefined}
+      checked={checked}
+      disabled={!enabled}
+      aria-checked={checked}
+      onChange={(event) => updateValue(event.currentTarget.checked)}
+    />
+  );
+}));
 
 export function useToggleController({
   value,

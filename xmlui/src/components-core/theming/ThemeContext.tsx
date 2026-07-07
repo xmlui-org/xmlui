@@ -21,7 +21,7 @@ const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   favicon: "/resources/favicon.ico",
 };
 
-const LegacyThemeContext = createContext<LegacyThemeContextValue>({
+export const ThemeContext = createContext<LegacyThemeContextValue>({
   activeThemeTone: "light",
   activeThemeId: "default",
   root: typeof document === "undefined" ? null : document.body,
@@ -79,9 +79,9 @@ export function LegacyThemeProvider({
   }), [resources, runtimeTheme.tone, themeVars]);
 
   return (
-    <LegacyThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={value}>
       {children}
-    </LegacyThemeContext.Provider>
+    </ThemeContext.Provider>
   );
 }
 
@@ -93,7 +93,7 @@ function legacyThemeVarValue(value: unknown): string {
 }
 
 export function useTheme(): LegacyThemeContextValue {
-  return useContext(LegacyThemeContext);
+  return useContext(ThemeContext);
 }
 
 export function useThemes(): LegacyThemeContextValue {

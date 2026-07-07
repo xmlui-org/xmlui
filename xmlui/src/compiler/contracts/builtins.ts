@@ -273,13 +273,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       click: "onClick",
     },
   }),
-  contractFromMetadata(IFrameMd, {
-    name: "IFrame",
-    includeLayoutProps: true,
-    eventAttributes: {
-      load: "onLoad",
-    },
-  }),
+  withExtraProps(
+    contractFromMetadata(IFrameMd, {
+      name: "IFrame",
+      includeLayoutProps: true,
+      eventAttributes: {
+        load: "onLoad",
+      },
+    }),
+    ["title"],
+  ),
   {
     name: "App",
     kind: "builtin",
@@ -898,6 +901,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       id: { name: "id" },
       value: { name: "value" },
       variant: { name: "variant" },
+      size: { name: "size" },
+      weight: { name: "weight" },
       maxLines: { name: "maxLines" },
       preserveLinebreaks: { name: "preserveLinebreaks" },
       ellipses: { name: "ellipses" },
@@ -1812,6 +1817,19 @@ function withLayoutProps(
     animation: { name: "animation" },
     animationOptions: { name: "animationOptions" },
     ...props,
+  };
+}
+
+function withExtraProps(
+  contract: XmluiComponentContract,
+  names: readonly string[],
+): XmluiComponentContract {
+  return {
+    ...contract,
+    props: {
+      ...contract.props,
+      ...Object.fromEntries(names.map((name) => [name, { name }])),
+    },
   };
 }
 

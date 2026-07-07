@@ -14,19 +14,19 @@ export function parseMixedTextSegments(
   let cursor = 0;
 
   while (cursor < value.length) {
-    const open = value.indexOf("{", cursor);
+    const open = findUnescaped(value, "{", cursor);
     if (open < 0) {
-      pushLiteral(segments, value.slice(cursor), offsetRange(range, cursor, value.length));
+      pushLiteral(segments, unescapeLiteralBraces(value.slice(cursor)), offsetRange(range, cursor, value.length));
       break;
     }
 
     if (open > cursor) {
-      pushLiteral(segments, value.slice(cursor, open), offsetRange(range, cursor, open));
+      pushLiteral(segments, unescapeLiteralBraces(value.slice(cursor, open)), offsetRange(range, cursor, open));
     }
 
-    const close = value.indexOf("}", open + 1);
+    const close = findUnescaped(value, "}", open + 1);
     if (close < 0) {
-      pushLiteral(segments, value.slice(open), offsetRange(range, open, value.length));
+      pushLiteral(segments, unescapeLiteralBraces(value.slice(open)), offsetRange(range, open, value.length));
       break;
     }
 
@@ -86,4 +86,24 @@ function offsetRange(range: SourceRange, start: number, end: number): SourceRang
 
 function leadingWhitespace(value: string): number {
   return value.length - value.trimStart().length;
+}
+
+function findUnescaped(value: string, needle: "{" | "}", start: number): number {
+  let index = value.indexOf(needle, start);
+  while (index >= 0 && isEscaped(value, index)) {
+    index = value.indexOf(needle, index + 1);
+  }
+  return index;
+}
+
+function isEscaped(value: string, index: number): boolean {
+  let backslashes = 0;
+  for (let cursor = index - 1; cursor >= 0 && value[cursor] === "\\"; cursor--) {
+    backslashes++;
+  }
+  return backslashes % 2 === 1;
+}
+
+function unescapeLiteralBraces(value: string): string {
+  return value.replace(/\\([{}])/g, "$1");
 }

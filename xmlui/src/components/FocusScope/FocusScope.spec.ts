@@ -64,29 +64,29 @@ test.describe("FocusScope", () => {
   test("traps focus inside an xmlui-pg nested app", async ({ page, initTestBed }) => {
     const source = [
       "```xmlui-pg copy display height=\"320px\" name=\"Example: trap focus in a panel\"",
-      "&lt;App&gt;",
-      "  &lt;VStack gap=\"$space-4\"&gt;",
-      "    &lt;FocusScope&gt;",
-      "      &lt;VStack padding=\"$space-4\" gap=\"$space-3\" border=\"1px solid $borderColor\"&gt;",
-      "        &lt;H3&gt;Edit status&lt;/H3&gt;",
-      "        &lt;Select initialValue=\"open\"&gt;",
-      "          &lt;Option value=\"open\" label=\"Open\" /&gt;",
-      "          &lt;Option value=\"closed\" label=\"Closed\" /&gt;",
-      "        &lt;/Select&gt;",
-      "        &lt;HStack&gt;",
-      "          &lt;Button label=\"Cancel\" /&gt;",
-      "          &lt;Button label=\"Save\" /&gt;",
-      "        &lt;/HStack&gt;",
-      "      &lt;/VStack&gt;",
-      "    &lt;/FocusScope&gt;",
+      "<App>",
+      "  <VStack gap=\"$space-4\">",
+      "    <FocusScope>",
+      "      <VStack padding=\"$space-4\" gap=\"$space-3\" border=\"1px solid $borderColor\">",
+      "        <H3>Edit status</H3>",
+      "        <Select initialValue=\"open\">",
+      "          <Option value=\"open\" label=\"Open\" />",
+      "          <Option value=\"closed\" label=\"Closed\" />",
+      "        </Select>",
+      "        <HStack>",
+      "          <Button label=\"Cancel\" />",
+      "          <Button label=\"Save\" />",
+      "        </HStack>",
+      "      </VStack>",
+      "    </FocusScope>",
       "",
-      "    &lt;Button label=\"Outside scope\" /&gt;",
-      "  &lt;/VStack&gt;",
-      "&lt;/App&gt;",
+      "    <Button label=\"Outside scope\" />",
+      "  </VStack>",
+      "</App>",
       "```",
     ].join("\n");
 
-    await initTestBed(`<Markdown>${source}</Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[${source}]]></Markdown>`);
 
     await page.getByRole("button", { name: "Save" }).focus();
     await page.keyboard.press("Tab");

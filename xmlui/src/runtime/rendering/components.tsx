@@ -4,7 +4,7 @@ import { isEqual } from "lodash-es";
 import { initializeStateValuesIntoStore, createRuntimeOwnerId, createRuntimeScope, type RuntimeScope } from "../state";
 import type { XmluiComponentModule } from "../types";
 import { evaluateExpressionOrText, evaluateProps, normalizeDependencies, runEvent } from "./bindings";
-import type { RenderContext } from "./types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 import { useBindingRevision } from "./reactive";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
@@ -111,11 +111,13 @@ export function ComponentInstance({
   context,
   node,
   scope,
+  layoutContext,
 }: {
   component: XmluiComponentModule;
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  layoutContext?: RuntimeRenderLayoutContext;
 }) {
   const propDependencies = Object.values(node.parsed?.props ?? {}).flatMap((parsed) =>
     Array.isArray(parsed)
@@ -232,7 +234,7 @@ export function ComponentInstance({
     };
   }, [api, props.id, scope.references]);
 
-  return <>{componentContext.renderChildren(component.root.children, componentScope)}</>;
+  return <>{componentContext.renderChildren(component.root.children, componentScope, undefined, layoutContext)}</>;
 }
 
 function createSlots(node: XmluiElement, scope: RuntimeScope): Record<string, RenderFragment> {

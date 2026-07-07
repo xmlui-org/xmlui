@@ -11,7 +11,7 @@ import { cardRenderer } from "../components/Card/Card";
 import { codeBlockRenderer } from "../components/CodeBlock/CodeBlock";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
-import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem.renderer";
+import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import {
   headingRenderer,
@@ -30,7 +30,7 @@ import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
 import { imageRenderer } from "../components/Image/Image.renderer";
-import { iframeRenderer } from "../components/IFrame/IFrame.renderer";
+import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
 import { linkRenderer } from "../components/Link/Link.renderer";
@@ -68,7 +68,7 @@ import { sliderRenderer } from "../components/Slider/Slider";
 import { colorPickerRenderer } from "../components/ColorPicker/ColorPicker";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
-import { drawerRenderer } from "../components/Drawer/Drawer.renderer";
+import { drawerRenderer } from "../components/Drawer/Drawer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
@@ -80,8 +80,8 @@ import {
 } from "../components/DropdownMenu/DropdownMenu";
 import { autoCompleteRenderer } from "../components/AutoComplete/AutoComplete";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
-import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone.renderer";
-import { focusScopeRenderer } from "../components/FocusScope/FocusScope.renderer";
+import { fileUploadDropZoneRenderer } from "../components/FileUploadDropZone/FileUploadDropZone";
+import { focusScopeRenderer } from "../components/FocusScope/FocusScope";
 import { flowLayoutRenderer } from "../components/FlowLayout/FlowLayout";
 import { footerRuntimeRenderer } from "../components/Footer/Footer";
 import { formRenderer } from "../components/Form/Form.renderer";

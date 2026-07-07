@@ -1,131 +1,248 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  type CSSProperties,
+  type ReactNode,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import classnames from "classnames";
 
-import { defaultProps } from "./Drawer.defaults";
 import styles from "./Drawer.module.scss";
 
-export type DrawerProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "onClose" | "onOpen"> & {
-  children?: ReactNode;
-  closeButtonVisible?: boolean;
-  closeOnClickAway?: boolean;
-  hasBackdrop?: boolean;
-  headerTemplate?: ReactNode;
-  initiallyOpen?: boolean;
-  onClose?: () => void | Promise<void>;
-  onOpen?: () => void | Promise<void>;
-  position?: "left" | "right" | "top" | "bottom";
-  registerComponentApi?: (api: Record<string, unknown>) => void;
-};
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { ThemeContext } from "../../components-core/theming/ThemeContext";
+import { useEvent } from "../../components-core/utils/misc";
+import { Icon } from "../Icon/IconReact";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useAppContext } from "../../components-core/AppContext";
+import { defaultProps } from "./Drawer.defaults";
 
-export const DrawerComponent = forwardRef<HTMLDivElement, DrawerProps>(function DrawerComponent(
-  {
-    children,
-    className,
-    closeButtonVisible = defaultProps.closeButtonVisible,
-    closeOnClickAway = defaultProps.closeOnClickAway,
-    hasBackdrop = defaultProps.hasBackdrop,
-    headerTemplate,
-    initiallyOpen = defaultProps.initiallyOpen,
-    onClose,
-    onOpen,
-    position = defaultProps.position,
-    registerComponentApi,
-    style,
-    ...rest
-  },
-  ref,
+// =============================================================================
+// Types
+// =============================================================================
+
+export type DrawerPosition = "left" | "right" | "top" | "bottom";
+
+export interface DrawerProps {
+  /** Which edge the drawer slides out from */
+  position?: DrawerPosition;
+  /** Whether to show a backdrop overlay behind the drawer */
+  hasBackdrop?: boolean;
+  /** Whether the drawer is open on first render */
+  initiallyOpen?: boolean;
+  /** Show the ✕ close button in the top-right corner */
+  closeButtonVisible?: boolean;
+  /** Close the drawer when the user clicks outside of it */
+  closeOnClickAway?: boolean;
+  /** Custom content rendered in the sticky header (next to the close button) */
+  headerTemplate?: ReactNode;
+  /** Callback fired when the drawer opens */
+  onOpen?: () => void;
+  /** Callback fired when the drawer closes */
+  onClose?: () => void;
+  /** Register imperative API (open / close / isOpen) */
+  registerComponentApi?: RegisterComponentApiFn;
+  children?: ReactNode;
+  className?: string;
+  classes?: Record<string, string>;
+  /** Inline styles applied directly to the drawer panel (overrides theme vars) */
+  style?: CSSProperties;
+}
+
+// =============================================================================
+// Hook – manages open/closed state with stable callbacks
+// =============================================================================
+
+function useDrawerOpenState(
+  initiallyOpen: boolean,
+  onOpen?: () => void,
+  onClose?: () => void,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const open = useCallback(() => {
-    if (!isOpen) {
-      void onOpen?.();
-    }
+  const doOpen = useEvent(() => {
     setIsOpen(true);
-  }, [isOpen, onOpen]);
+    onOpen?.();
+  });
 
-  const close = useCallback(() => {
-    if (isOpen) {
-      void onClose?.();
-    }
+  const doClose = useEvent(() => {
     setIsOpen(false);
-  }, [isOpen, onClose]);
+    onClose?.();
+  });
 
-  const isOpenApi = useCallback(() => isOpen, [isOpen]);
+  return useMemo(() => ({ isOpen, doOpen, doClose }), [isOpen, doOpen, doClose]);
+}
+
+// =============================================================================
+// Native React component
+// =============================================================================
+
+export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(function DrawerNative(
+  {
+    position = defaultProps.position,
+    hasBackdrop = defaultProps.hasBackdrop,
+    initiallyOpen = defaultProps.initiallyOpen,
+    closeButtonVisible = defaultProps.closeButtonVisible,
+    closeOnClickAway = defaultProps.closeOnClickAway,
+    headerTemplate,
+    onOpen,
+    onClose,
+    registerComponentApi,
+    children,
+    className,
+    classes,
+    style,
+  },
+  _ref,
+) {
+  const theme = useTheme();
+  const { root } = theme;
+  const appContext = useAppContext();
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  // --- Create a scoped portal container appended to root. It uses
+  // --- position:absolute + inset:0 so it is a containing block for the
+  // --- drawer's own position:absolute children, and overflow:hidden clips
+  // --- the exit animation to the root's bounds (stops the flash).
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+
+  // --- Create a secondary portal container for child portalled content
+  // --- (e.g. Select dropdowns, tooltips). This container sits as a sibling
+  // --- of the main portal container in `root` and has a z-index above the
+  // --- drawer panel so that overlays from components inside the drawer are
+  // --- not hidden behind it.
+  const [childPortalContainer, setChildPortalContainer] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    registerComponentApi?.({ open, close, isOpen: isOpenApi });
-  }, [close, isOpenApi, open, registerComponentApi]);
+    if (!root) return;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+    if (className || classes?.[COMPONENT_PART_KEY]) el.className = classnames(classes?.[COMPONENT_PART_KEY], className);
+    (root as HTMLElement).appendChild(el);
+    setPortalContainer(el);
+
+    const childEl = document.createElement('div');
+    childEl.className = styles.childPortal;
+    (root as HTMLElement).appendChild(childEl);
+    setChildPortalContainer(childEl);
+
+    return () => {
+      (root as HTMLElement).removeChild(el);
+      setPortalContainer(null);
+      (root as HTMLElement).removeChild(childEl);
+      setChildPortalContainer(null);
+    };
+  }, [root, className, classes]);
+
+  // Override the theme context's portal root for children inside the drawer
+  // so that portalled content (Select dropdowns, tooltips, etc.) renders into
+  // the child portal container which stacks above the drawer panel.
+  const childTheme = useMemo(() => ({
+    ...theme,
+    root: childPortalContainer ?? root,
+  }), [theme, childPortalContainer, root]);
+
+  const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
+
+  // --- Prevent scrollbars while the drawer slides out. Radix releases the body
+  // --- scroll-lock before the close animation completes, so we re-apply it on
+  // --- the body and html elements and clear it only when animationend fires.
+  const animatingRef = useRef(false);
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        close();
+    if (!isOpen || !root) return;
+    // Lock horizontal overflow for horizontal-sliding drawers
+    (root as HTMLElement).style.overflowX = 'hidden';
+    return () => {
+      // Keep locked while the exit animation plays; cleared in handlePanelAnimationEnd.
+      animatingRef.current = true;
+    };
+  }, [isOpen, root]);
+
+  // Safety-net: always clear on unmount.
+  useEffect(() => {
+    return () => {
+      if (root) {
+        (root as HTMLElement).style.overflowX = '';
       }
     };
-    if (isOpen) {
-      window.addEventListener("keydown", onKeyDown);
-    }
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close, isOpen]);
+  }, [root]);
 
+  const handlePanelAnimationEnd = useCallback(() => {
+    if (animatingRef.current) {
+      animatingRef.current = false;
+      if (root) {
+        (root as HTMLElement).style.overflowX = '';
+      }
+    }
+  }, [root]);
+
+  // Register imperative API
   useEffect(() => {
-    if (isOpen && closeButtonVisible) {
-      closeButtonRef.current?.focus();
-    }
-  }, [closeButtonVisible, isOpen]);
+    registerComponentApi?.({
+      open: doOpen,
+      close: doClose,
+      isOpen: () => isOpen,
+    });
+  }, [registerComponentApi, doOpen, doClose, isOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!root || !portalContainer) return null;
 
   return (
-    <div className={styles.root} data-xmlui-component="DrawerPortal">
-      {hasBackdrop ? (
-        <div
-          aria-hidden="true"
-          className={styles.backdrop}
-          data-state="open"
-          onClick={closeOnClickAway ? close : undefined}
-        />
-      ) : null}
-      {!hasBackdrop && closeOnClickAway ? (
-        <div aria-hidden="true" className={styles.backdrop} onClick={close} />
-      ) : null}
-      <div
-        {...rest}
-        ref={ref}
-        aria-label="Drawer"
-        className={cx(styles.drawer, styles[position], className)}
-        data-state="open"
-        role="dialog"
-        style={style as CSSProperties}
-      >
-        {closeButtonVisible ? (
-          <button
-            ref={closeButtonRef}
-            aria-label="Close"
-            className={styles.closeButton}
-            onClick={close}
-            type="button"
-          >
-            x
-          </button>
-        ) : null}
-        {headerTemplate ? (
-          <div className={styles.header}>
-            <div className={styles.headerContent}>{headerTemplate}</div>
-          </div>
-        ) : null}
-        <div className={cx(styles.body, !headerTemplate && styles.bodyNoHeader)}>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-});
+    <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) doClose(); }}>
+      <Dialog.Portal container={portalContainer}>
+        {/* Backdrop */}
+        {hasBackdrop && (
+          <Dialog.Overlay className={classnames(styles.backdrop, className)} />
+        )}
 
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+        {/* Drawer panel */}
+        <Dialog.Content
+          ref={drawerRef}
+          className={classnames(styles.drawer, {
+            [styles.left]:   position === "left",
+            [styles.right]:  position === "right",
+            [styles.top]:    position === "top",
+            [styles.bottom]: position === "bottom",
+          }, classes?.[COMPONENT_PART_KEY], className)}
+          style={style}
+          aria-label={appContext.App.translate("xmlui.drawer.ariaLabel")}
+          onAnimationEnd={handlePanelAnimationEnd}
+          onPointerDownOutside={(e) => { if (closeOnClickAway) doClose(); else e.preventDefault(); }}
+          onEscapeKeyDown={() => doClose()}
+        >
+          <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>
+          {/* Close button - floats at top-right */}
+          {closeButtonVisible && (
+            <Dialog.Close asChild>
+              <button className={styles.closeButton} aria-label={appContext.App.translate("xmlui.drawer.closeAriaLabel")}>
+                <Icon name="close" size="sm" />
+              </button>
+            </Dialog.Close>
+          )}
+          {/* Header with template content - full width */}
+          {!!headerTemplate && (
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                {headerTemplate}
+              </div>
+            </div>
+          )}
+          <ThemeContext.Provider value={childTheme}>
+            <div className={classnames(styles.body, {
+              [styles.bodyNoHeader]: !headerTemplate,
+            })}>
+              {children}
+            </div>
+          </ThemeContext.Provider>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}));

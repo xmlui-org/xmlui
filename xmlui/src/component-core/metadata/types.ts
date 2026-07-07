@@ -50,7 +50,7 @@ export type ComponentPropertyMetadata = {
   readonly description: string;
   readonly valueType?: PropertyValueType;
   readonly isResourceUrl?: boolean;
-  readonly availableValues?: readonly PropertyValueDescription[];
+  readonly availableValues?: readonly PropertyValueDescription[] | null;
   readonly isStrictEnum?: boolean;
   defaultValue?: unknown;
   isValid?: IsValidFunction<unknown>;

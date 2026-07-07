@@ -9,7 +9,11 @@ import type { XmluiExtensionComponent } from "../../extensions";
 export type RenderContext = {
   components: Record<string, XmluiComponentModule>;
   extensionRenderers: Record<string, XmluiExtensionComponent>;
-  renderElement(node: XmluiElement, scope: RuntimeScope): ReactNode;
+  renderElement(
+    node: XmluiElement,
+    scope: RuntimeScope,
+    layoutContext?: RuntimeRenderLayoutContext,
+  ): ReactNode;
   renderChildren(
     children: XmluiNode[],
     scope: RuntimeScope,
@@ -32,6 +36,7 @@ export type XmluiRendererProps = {
   context: RenderContext;
   node: XmluiElement;
   scope: RuntimeScope;
+  layoutContext?: RuntimeRenderLayoutContext;
 };
 
 export type XmluiBuiltInRenderer = (props: XmluiRendererProps) => ReactNode;

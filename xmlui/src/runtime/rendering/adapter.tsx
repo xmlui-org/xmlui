@@ -89,6 +89,7 @@ export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrapp
       componentName: options.name,
       metadata: options.metadata,
       props: adapter.props,
+      layoutContext: extraProps.layoutContext as Record<string, unknown> | undefined,
     }, rendered)}</>;
   }
   return WrappedXmluiComponent;
@@ -417,6 +418,7 @@ function externalRootAttrs(
     ...supportedResponsiveLayoutPropNames,
     "children",
     "className",
+    "layoutContext",
     "style",
   ]);
   return Object.fromEntries(
