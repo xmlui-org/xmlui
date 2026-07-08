@@ -19,6 +19,7 @@ const universalFrameworkProps = new Set([
   "ref",
   "testId",
   "when",
+  "if",
   "when-xs",
   "when-sm",
   "when-md",

@@ -214,6 +214,7 @@ function hasConditionalProps(props?: Record<string, string>): boolean {
     return false;
   }
   return Object.prototype.hasOwnProperty.call(props, "when") ||
+    Object.prototype.hasOwnProperty.call(props, "if") ||
     responsiveWhenPropNames.some((name) => Object.prototype.hasOwnProperty.call(props, name));
 }
 
@@ -229,7 +230,9 @@ function resolveResponsiveWhen(
   ) as Partial<Record<BreakpointName, boolean>>;
 
   if (Object.keys(responsiveValues).length === 0) {
-    return evaluateWhenValue(node, scope, "when") ?? true;
+    return evaluateWhenValue(node, scope, "when") ??
+      evaluateWhenValue(node, scope, "if") ??
+      true;
   }
 
   const currentIndex = breakpointOrder.indexOf(breakpoint);
@@ -242,6 +245,8 @@ function resolveResponsiveWhen(
 
   const baseValue = Object.prototype.hasOwnProperty.call(node.props, "when")
     ? evaluateWhenValue(node, scope, "when")
+    : Object.prototype.hasOwnProperty.call(node.props, "if")
+      ? evaluateWhenValue(node, scope, "if")
     : undefined;
   if (baseValue !== undefined) {
     return baseValue;
@@ -256,7 +261,7 @@ function resolveResponsiveWhen(
 function evaluateWhenValue(
   node: Extract<XmluiNode, { kind: "element" }>,
   scope: RuntimeScope,
-  name: "when" | ResponsiveWhenPropName,
+  name: "when" | "if" | ResponsiveWhenPropName,
 ): boolean | undefined {
   if (!Object.prototype.hasOwnProperty.call(node.props, name)) {
     return undefined;

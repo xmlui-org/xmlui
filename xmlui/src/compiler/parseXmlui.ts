@@ -458,7 +458,9 @@ function transformElement(
       globals,
       events,
       methods,
-      children: rawScriptChildren(node, source),
+      children: type === "event"
+        ? eventChildren(node, source, sourceId, namespaces)
+        : rawScriptChildren(node, source),
       range: rangeOf(node),
       ...(hasParsedBindings(parsed) ? { parsed } : {}),
     };
@@ -486,7 +488,7 @@ function transformElement(
         throw new Error("<event> requires a name attribute.");
       }
       const eventSource = child.children
-        .map((eventChild) => eventChild.kind === "text" ? eventChild.value : "")
+        .map(eventChildSource)
         .join(" ")
         .trim();
       const range = child.children[0]?.range ?? child.range;
@@ -698,6 +700,125 @@ function contentChildren(
   }
 
   return result;
+}
+
+function eventChildSource(child: XmluiNode): string {
+  if (child.kind === "text") {
+    return child.value;
+  }
+  if (child.type === "APICall") {
+    return apiCallEventSource(child);
+  }
+  return "";
+}
+
+function eventChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  namespaces: Record<string, string>,
+): XmluiNode[] {
+  const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
+  const children = content?.children ?? [];
+  const result: XmluiNode[] = [];
+
+  for (const child of children) {
+    if (child.kind === MarkupSyntaxKind.Text) {
+      const rawText = getNodeText(child, source);
+      const value = normalizeText(rawText);
+      if (!value) {
+        continue;
+      }
+      result.push({
+        kind: "text",
+        value,
+        range: rangeOf(child),
+      });
+      continue;
+    }
+    if (child.kind === MarkupSyntaxKind.Element) {
+      result.push(transformElement(child, source, sourceId, namespaces));
+    }
+  }
+
+  return result;
+}
+
+function apiCallEventSource(child: XmluiElement): string {
+  const resultName = "__xmluiApiResult";
+  const mockExecute = child.events.mockExecute;
+  const invocation = mockExecute
+    ? `${resultName} = ${inlineZeroArgHandlerExpression(mockExecute)}`
+    : `${resultName} = Actions.callApi(${objectLiteralFromProps(child.props, [
+      "url",
+      "method",
+      "body",
+      "rawBody",
+      "queryParams",
+      "headers",
+      "credentials",
+      "invalidates",
+      "inProgressNotificationMessage",
+      "completedNotificationMessage",
+      "errorNotificationMessage",
+    ])})`;
+  return [
+    `let ${resultName}`,
+    invocation,
+    inlineArrowHandlerStatement(child.events.success, resultName),
+  ].filter(Boolean).join("; ");
+}
+
+function objectLiteralFromProps(props: Record<string, string>, names: string[]): string {
+  const entries = names
+    .filter((name) => Object.prototype.hasOwnProperty.call(props, name))
+    .map((name) => `${name}: ${propValueSource(props[name])}`);
+  return `{ ${entries.join(", ")} }`;
+}
+
+function propValueSource(value: string): string {
+  const expression = unwrapExpression(value);
+  return expression ?? JSON.stringify(decodeEntities(value));
+}
+
+function inlineZeroArgHandlerExpression(source: string): string {
+  const arrow = parseArrowSource(source);
+  if (!arrow) {
+    return source;
+  }
+  return arrow.body;
+}
+
+function inlineArrowHandlerStatement(source: string | undefined, argumentSource: string): string {
+  if (!source) {
+    return "";
+  }
+  const arrow = parseArrowSource(source);
+  if (!arrow) {
+    return "";
+  }
+  if (!arrow.param) {
+    return arrow.body;
+  }
+  return arrow.body.replace(new RegExp(`\\b${escapeRegExp(arrow.param)}\\b`, "g"), argumentSource);
+}
+
+function parseArrowSource(source: string): { param?: string; body: string } | undefined {
+  const arrowIndex = source.indexOf("=>");
+  if (arrowIndex < 0) {
+    return undefined;
+  }
+  const rawParam = source.slice(0, arrowIndex).trim();
+  const param = rawParam === "()" ? undefined : rawParam.replace(/^\((.*)\)$/, "$1").trim();
+  let body = source.slice(arrowIndex + 2).trim();
+  if (body.startsWith("(") && body.endsWith(")")) {
+    body = body.slice(1, -1).trim();
+  }
+  return { param: param || undefined, body };
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function rawScriptChildren(

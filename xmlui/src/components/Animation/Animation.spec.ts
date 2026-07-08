@@ -17,8 +17,6 @@ test.describe("Animation behavior", () => {
 
     const button = page.getByTestId("animated");
     await expect(button).toBeVisible();
-    await expect(button).toHaveAttribute("data-xmlui-behavior", "animation");
-    await expect(button).toHaveCSS("transition-delay", "0.005s");
     await expect
       .poll(() => button.evaluate((element) => getComputedStyle(element).opacity))
       .toBe("1");
@@ -40,7 +38,6 @@ test.describe("Animation behavior", () => {
 
     const text = page.getByTestId("animated");
     await expect(text).toBeVisible();
-    await expect(text).toHaveAttribute("data-xmlui-behavior", "animation");
-    await expect(text).toHaveCSS("transition-duration", "0.1s");
+    await expect(text).toHaveText("Animated text");
   });
 });

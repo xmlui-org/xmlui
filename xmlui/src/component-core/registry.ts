@@ -29,7 +29,7 @@ import {
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
-import { imageRenderer } from "../components/Image/Image.renderer";
+import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
@@ -70,7 +70,7 @@ import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
-import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
+import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import {
   dropdownMenuRenderer,
@@ -110,13 +110,13 @@ import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
-import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
-import { apiCallRenderer } from "../components/APICall/APICall.renderer";
+import { dataSourceRenderer } from "../components/DataSource/DataSource";
+import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appStateRenderer } from "../components/AppState/AppState";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
-import { timerRenderer } from "../components/Timer/Timer.renderer";
-import { queueRenderer } from "../components/Queue/Queue.renderer";
+import { timerRenderer } from "../components/Timer/Timer";
+import { queueRenderer } from "../components/Queue/Queue";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
 import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
 import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
@@ -132,7 +132,7 @@ import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneC
 import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
 import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
-import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
@@ -384,7 +384,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
   NavPanel: navPanelRuntimeRenderer,
   DataSource: dataSourceRenderer,
-  APICall: apiCallRenderer,
+  APICall: apiCallRuntimeRenderer,
   AppState: appStateRenderer,
   ChangeListener: changeListenerRenderer,
   Lifecycle: lifecycleRenderer,
@@ -949,9 +949,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (spaceFillerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpaceFillerReact.tsx`);
     } else if (dataSourceTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DataSource.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DataSource.tsx`);
     } else if (apiCallTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.tsx`);
     } else if (appStateTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.tsx`);
     } else if (changeListenerTransferred) {
@@ -959,9 +959,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (lifecycleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
     } else if (timerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Timer.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimerReact.tsx`);
     } else if (queueTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Queue.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Queue.tsx`);
     } else if (eventSourceTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/EventSource.renderer.tsx`);
     } else if (messageListenerTransferred) {

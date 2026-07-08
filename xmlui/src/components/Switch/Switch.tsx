@@ -159,11 +159,6 @@ export const switchRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
       bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}
       initialValue={adapter.prop("initialValue", defaultProps.initialValue)}
-      label={adapter.prop("label")}
-      labelPosition={adapter.stringProp("labelPosition") as any}
-      labelBreak={adapter.booleanProp("labelBreak", false)}
-      labelWidth={adapter.prop("labelWidth") as any}
-      requireLabelMode={adapter.stringProp("requireLabelMode")}
       direction={adapter.stringProp("direction")}
       enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
       readOnly={adapter.booleanProp("readOnly", false)}
@@ -183,6 +178,7 @@ export const switchRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
       onBlur={() => {
         void adapter.event("lostFocus")();
       }}
+      registerComponentApi={adapter.registerApi}
     />
   ),
 });

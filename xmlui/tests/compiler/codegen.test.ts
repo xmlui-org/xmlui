@@ -158,6 +158,20 @@ describe("script function generation", () => {
     })).toBe(11);
   });
 
+  it("generates executable expression functions for template literals", () => {
+    const document = parseXmlui(`<App var.loadCount="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(
+      parseScriptExpression("`Project A (load #${loadCount})`").node,
+      scope,
+    );
+    const generated = generateExpressionFunction(lowered.ir);
+
+    expect(runGeneratedExpression(generated.functionSource, {
+      locals: { loadCount: 4 },
+    })).toBe("Project A (load #4)");
+  });
+
   it("generates executable event functions for local, global, and shadowed writes", async () => {
     const localEvent = eventFrom(`<App var.count="{0}"><Button onClick="count++" /></App>`);
     const localGenerated = generateEventHandlerFunction(localEvent.ir!, localEvent.writes);
@@ -315,6 +329,25 @@ describe("script function generation", () => {
         index: 1,
       },
     })).toBe("One, Two");
+  });
+
+  it("generates quiet member calls for component API references", () => {
+    const document = parseXmlui(
+      `<App><Timer id="timer" /></App>`,
+      { sourceId: "Main.xmlui" },
+    );
+    const scope = createXmluiScope(document.root, { sourceId: "Main.xmlui" });
+    const existingMethod = lowerScriptExpression(parseScriptExpression("timer.isPaused()").node, scope);
+    const missingMethod = lowerScriptExpression(parseScriptExpression("timer.notARealMethod()").node, scope);
+
+    expect(existingMethod.diagnostics).toEqual([]);
+    expect(missingMethod.diagnostics).toEqual([]);
+    expect(runGeneratedExpression(generateExpressionFunction(existingMethod.ir).functionSource, {
+      references: { timer: { isPaused: () => true } },
+    })).toBe(true);
+    expect(runGeneratedExpression(generateExpressionFunction(missingMethod.ir).functionSource, {
+      references: { timer: { isPaused: () => true } },
+    })).toBeUndefined();
   });
 
   it("rejects invalid event write targets during generation", () => {
@@ -484,7 +517,12 @@ function eventFrom(source: string) {
 
 function runGeneratedExpression(
   functionSource: string,
-  options: { props?: Record<string, unknown>; locals?: Record<string, unknown>; globals?: Record<string, unknown> },
+  options: {
+    props?: Record<string, unknown>;
+    locals?: Record<string, unknown>;
+    globals?: Record<string, unknown>;
+    references?: Record<string, unknown>;
+  },
 ): unknown {
   const fn = evaluateGeneratedFunction(functionSource) as (ctx: ReturnType<typeof fakeContext>) => unknown;
   return fn(fakeContext(options));
@@ -506,11 +544,13 @@ function fakeContext({
   props = {},
   locals = {},
   globals = {},
+  references = {},
   debug,
 }: {
   props?: Record<string, unknown>;
   locals?: Record<string, unknown>;
   globals?: Record<string, unknown>;
+  references?: Record<string, unknown>;
   debug?: {
     version: 1;
     subscribe(listener: (event: any) => void): () => void;
@@ -522,6 +562,7 @@ function fakeContext({
     debug,
     readLocal: (name: string) => locals[name],
     readGlobal: (name: string) => globals[name],
+    readReference: (name: string) => references[name],
     writeLocal: (name: string, value: unknown) => {
       locals[name] = value;
     },

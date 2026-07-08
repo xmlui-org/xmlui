@@ -1,4 +1,5 @@
 import { createMetadata } from "../../component-core/metadata/helpers";
+import { Fragment, type ReactNode } from "react";
 
 const COMP = "Markdown";
 
@@ -67,3 +68,29 @@ export const MarkdownMd = createMetadata({
     [`fontFamily-Text-codefence`]: "$fontFamily-monospace",
   },
 });
+
+export function Markdown({ children }: { children?: ReactNode }) {
+  return <Fragment>{renderInlineMarkdown(String(children ?? ""))}</Fragment>;
+}
+
+function renderInlineMarkdown(source: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const pattern = /(`([^`]+)`)|\*([^*]+)\*/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(source)) !== null) {
+    if (match.index > cursor) {
+      nodes.push(source.slice(cursor, match.index));
+    }
+    if (match[2] !== undefined) {
+      nodes.push(<code key={nodes.length}>{match[2]}</code>);
+    } else {
+      nodes.push(<em key={nodes.length}>{match[3]}</em>);
+    }
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < source.length) {
+    nodes.push(source.slice(cursor));
+  }
+  return nodes;
+}

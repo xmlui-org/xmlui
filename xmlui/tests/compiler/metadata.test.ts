@@ -17,6 +17,7 @@ describe("XMLUI unified metadata", () => {
     const dataSource = metadata.components.find((component) => component.name === "DataSource");
     const dropdownMenu = metadata.components.find((component) => component.name === "DropdownMenu");
     const page = metadata.components.find((component) => component.name === "Page");
+    const tree = metadata.components.find((component) => component.name === "Tree");
 
     expect(metadata.schemaVersion).toBe(1);
     expect(metadata.generatedAt).toBe("1970-01-01T00:00:00.000Z");
@@ -34,6 +35,9 @@ describe("XMLUI unified metadata", () => {
     expect(dropdownMenu?.parts.map((part) => part.name)).toEqual(["content"]);
     expect(dataSource?.apis.map((api) => api.name)).toEqual(expect.arrayContaining(["value", "refetch"]));
     expect(page?.contextVariables.map((item) => item.name)).toEqual(expect.arrayContaining(["$routeParams"]));
+    expect(tree?.props.map((prop) => prop.name)).toEqual(
+      expect.arrayContaining(["animateExpand", "expandRotation", "fixedItemSize", "iconSize"]),
+    );
     expect(metadata.examples.every((example) => example.demonstratesMutation)).toBe(true);
     expect(JSON.parse(metadataToJson(metadata)).source.contractHash).toBe(metadata.source.contractHash);
   });

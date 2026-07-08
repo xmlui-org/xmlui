@@ -1,81 +1,362 @@
-import {
-  forwardRef,
-  memo,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
+import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { Virtualizer, type VirtualizerHandle } from "virtua";
+import classnames from "classnames";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedScroller as Scroller } from "../ScrollViewer/ScrollViewer";
 
-import { defaultProps } from "./Tree.defaults";
 import styles from "./TreeComponent.module.scss";
-import { Icon } from "../Icon/IconReact";
 
-export type TreeItem = {
-  id: unknown;
-  name: string;
-  source: unknown;
-  children: TreeItem[];
-  parentId?: unknown;
-  dynamic: boolean;
-  loaded: boolean;
-};
+import type {
+  FlatTreeNode,
+  TreeNode,
+  UnPackedTreeData,
+  TreeFieldConfig,
+  TreeSelectionEvent,
+  TreeDataFormat,
+  DefaultExpansion,
+  NodeLoadingState,
+  FlatTreeNodeWithState,
+} from "../../components-core/abstractions/treeAbstractions";
+import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-core/utils/treeUtils";
+import { defaultProps } from "./Tree.defaults";
 
-export type VisibleTreeItem = TreeItem & {
-  depth: number;
+/**
+ * Describes the data attached to a particular tree row
+ */
+interface RowContext {
+  nodes: FlatTreeNode[];
+  toggleNode: (node: FlatTreeNode) => void;
+  itemRenderer: (item: any) => ReactNode;
+  itemClickExpands: boolean;
+  onItemClick?: (item: FlatTreeNode) => void;
+  onSelection: (node: FlatTreeNode) => void;
+  lookupEventHandler?: any;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+  treeContainerRef: React.RefObject<HTMLDivElement>;
+  iconCollapsed: string;
+  iconExpanded: string;
+  iconSize: string;
+  animateExpand: boolean;
+  expandRotation: number;
+  spinnerDelay: number;
+}
+
+interface TreeRowProps {
   index: number;
-  hasChildren: boolean;
-  key: unknown;
-  displayName: string;
-  selectable: boolean;
-  expanded: boolean;
+  data: RowContext;
+  isSelected: boolean;
+  isFocused: boolean;
+}
+
+const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
+  const {
+    nodes,
+    toggleNode,
+    itemRenderer,
+    itemClickExpands,
+    onItemClick,
+    onSelection,
+    lookupEventHandler,
+    treeContainerRef,
+    iconCollapsed,
+    iconExpanded,
+    iconSize,
+    animateExpand,
+    expandRotation,
+    spinnerDelay,
+  } = data;
+  const treeItem = nodes[index];
+
+  // Track whether the spinner delay has expired for this loading node
+  const nodeWithState = treeItem as FlatTreeNodeWithState;
+  const isLoading = nodeWithState.loadingState === "loading";
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  // Manage spinner delay: show expand icon during delay, then show spinner
+  useEffect(() => {
+    if (isLoading) {
+      if (spinnerDelay === 0) {
+        // No delay - show spinner immediately
+        setShowSpinner(true);
+      } else {
+        // Delay showing the spinner
+        const timer = setTimeout(() => {
+          setShowSpinner(true);
+        }, spinnerDelay);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      // Not loading - reset spinner state
+      setShowSpinner(false);
+    }
+  }, [isLoading, spinnerDelay]);
+
+  const onToggleNode = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      // Prevent toggling if node is in loading state
+      if (isLoading) {
+        return;
+      }
+      toggleNode(treeItem);
+    },
+    [toggleNode, treeItem, isLoading],
+  );
+
+  const onGutterMouseDownHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Handle selection on mouse down in gutter area (for right-click context menu)
+      // Only select, don't toggle expansion
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+        // Ensure tree container maintains focus after mouse selection
+        setTimeout(() => {
+          treeContainerRef.current?.focus({ preventScroll: true });
+        }, 0);
+      }
+    },
+    [onSelection, treeItem, treeContainerRef],
+  );
+
+  const onItemMouseDownHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Handle selection immediately on mouse down for immediate visual feedback
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+        // Ensure tree container maintains focus after mouse selection
+        setTimeout(() => {
+          treeContainerRef.current?.focus({ preventScroll: true });
+        }, 0);
+      }
+    },
+    [onSelection, treeItem, treeContainerRef],
+  );
+
+  const onItemClickHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Selection is already handled in onMouseDown, so we skip it here
+
+      // Call optional onItemClick callback
+      if (onItemClick) {
+        onItemClick(treeItem);
+      }
+
+      // If itemClickExpands is enabled and item has children, also toggle
+      // But prevent toggling if node is in loading state
+      if (itemClickExpands && treeItem.hasChildren && !isLoading) {
+        toggleNode(treeItem);
+      }
+    },
+    [onItemClick, itemClickExpands, treeItem, toggleNode, isLoading],
+  );
+
+  const onContextMenuHandler = useCallback(
+    (e: React.MouseEvent) => {
+      // Prevent default browser context menu
+      e.preventDefault();
+
+      // Focus the item when context menu is triggered
+      if (treeItem.selectable) {
+        onSelection(treeItem);
+        // Ensure tree container maintains focus after mouse selection
+        setTimeout(() => {
+          treeContainerRef.current?.focus({ preventScroll: true });
+        }, 0);
+      }
+
+      // Use lookupEventHandler with context containing item variables
+      if (lookupEventHandler) {
+        const handler = lookupEventHandler("contextMenu", {
+          context: {
+            $item: {
+              id: treeItem.id,
+              name: treeItem.displayName,
+              depth: treeItem.depth,
+              isExpanded: treeItem.isExpanded,
+              hasChildren: treeItem.hasChildren,
+              ...treeItem,
+            },
+          },
+          ephemeral: true, // Don't cache this handler since context changes per row
+        });
+
+        handler?.(e);
+      }
+    },
+    [lookupEventHandler, treeItem, onSelection, treeContainerRef],
+  );
+
+  return (
+    <div style={{ width: "100%", display: "flex" }}>
+      <div
+        className={classnames(styles.rowWrapper, {
+          [styles.selected]: isSelected,
+          [styles.focused]: isFocused,
+        })}
+        role="treeitem"
+        aria-level={treeItem.depth + 1}
+        aria-expanded={treeItem.hasChildren ? treeItem.isExpanded : undefined}
+        aria-selected={isSelected}
+        aria-label={treeItem.displayName}
+        aria-busy={isLoading}
+        tabIndex={isFocused ? 0 : -1}
+        onContextMenu={onContextMenuHandler}
+      >
+        <div
+          onClick={onToggleNode}
+          onMouseDown={onGutterMouseDownHandler}
+          className={styles.gutter}
+          style={{ cursor: isLoading ? "default" : "pointer" }}
+        >
+          <div style={{ width: treeItem.depth * 10 }} className={styles.depthPlaceholder} />
+          <div
+            className={classnames(styles.toggleWrapper, {
+              [styles.expanded]: treeItem.isExpanded,
+              [styles.hidden]: !treeItem.hasChildren,
+            })}
+          >
+            {treeItem.hasChildren && (
+              <>
+                {/* Show spinner only after delay expires, otherwise show expand icon */}
+                {isLoading && showSpinner ? (
+                  <Spinner data-tree-node-spinner delay={0} style={{ width: 24, height: 24 }} />
+                ) : (
+                  <ThemedIcon
+                    data-tree-expand-icon
+                    name={
+                      animateExpand
+                        ? treeItem.iconCollapsed || iconCollapsed
+                        : treeItem.isExpanded
+                          ? treeItem.iconExpanded || iconExpanded
+                          : treeItem.iconCollapsed || iconCollapsed
+                    }
+                    size={iconSize}
+                    className={classnames(styles.toggleIcon, {
+                      [styles.rotated]: animateExpand && treeItem.isExpanded,
+                    })}
+                    style={
+                      animateExpand && treeItem.isExpanded
+                        ? {
+                            transform: `rotate(${expandRotation}deg)`,
+                          }
+                        : undefined
+                    }
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
+        <div
+          className={styles.labelWrapper}
+          onMouseDown={onItemMouseDownHandler}
+          onClick={onItemClickHandler}
+          style={{ cursor: "pointer" }}
+        >
+          {itemRenderer(treeItem)}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+/**
+ * T3: Memoized wrapper for TreeRow with a custom comparator.
+ * `data` (RowContext) is stable across selection/focus changes — only `isSelected`
+ * and `isFocused` change per-click, so only the affected rows re-render.
+ */
+const TreeMemoizedRow = memo(
+  ({ index, data, isSelected, isFocused }: TreeRowProps) => (
+    <TreeRow index={index} data={data} isSelected={isSelected} isFocused={isFocused} />
+  ),
+  (prev, next) => {
+    if (prev.data !== next.data) return false;
+    if (prev.index !== next.index) return false;
+    if (prev.isSelected !== next.isSelected) return false;
+    if (prev.isFocused !== next.isFocused) return false;
+    return true;
+  },
+);
+
+const emptyTreeData: UnPackedTreeData = {
+  treeData: [],
+  treeItemsById: {},
 };
 
-export type TreeApi = {
-  selectedId: unknown;
-  expandAll: () => void;
-  collapseAll: () => void;
-  selectId: (id: unknown) => void;
-  selectNode: (id: unknown) => void;
-  clearSelection: () => void;
-  expandNode: (id: unknown) => void;
-  collapseNode: (id: unknown) => void;
-  expandToLevel: (level: number) => void;
-  getExpandedNodes: () => unknown[];
-  getSelectedNode: () => unknown;
-  getVisibleItems: () => unknown[];
-  scrollIntoView: (id: unknown) => void;
-  scrollToItem: (id: unknown) => void;
-  appendNode: (parentId: unknown, nodeData: Record<string, unknown>) => void;
-  removeNode: (id: unknown) => void;
-  removeChildren: (id: unknown) => void;
-  insertNodeBefore: (beforeId: unknown, nodeData: Record<string, unknown>) => void;
-  insertNodeAfter: (afterId: unknown, nodeData: Record<string, unknown>) => void;
-  replaceNode: (id: unknown, nodeData: Record<string, unknown>) => void;
-  replaceChildren: (id: unknown, newChildren: unknown[]) => void;
-  refreshData: () => void;
-  getNodeById: (id: unknown) => unknown;
-  getDynamic: (id: unknown) => boolean;
-  setDynamic: (id: unknown, dynamic: boolean | undefined) => void;
-  getNodeLoadingState: (id: unknown) => "unloaded" | "loading" | "loaded";
-  setNodeLoaded: (id: unknown, loaded: boolean) => void;
-  markNodeLoaded: (id: unknown) => void;
-  markNodeUnloaded: (id: unknown) => void;
-  getExpandedTimestamp: (id: unknown) => number | undefined;
-  setAutoLoadAfter: (id: unknown, milliseconds: number | null | undefined) => void;
-  getAutoLoadAfter: (id: unknown) => number | null | undefined;
-  getNodeAutoLoadAfter: (id: unknown) => number | null | undefined;
+/**
+ * Find all parent node IDs for a given node ID by traversing up the tree structure
+ * @param nodeId The target node ID to find parents for
+ * @param treeItemsById Map of all tree nodes by their ID
+ * @returns Array of parent node IDs from immediate parent to root
+ */
+const findAllParentIds = (
+  nodeId: string | number,
+  treeItemsById: Record<string, TreeNode>,
+): (string | number)[] => {
+  const parentIds: (string | number)[] = [];
+  const targetNode = treeItemsById[String(nodeId)];
+
+  if (!targetNode) {
+    return parentIds;
+  }
+
+  // Walk up the tree using parentIds property which contains the path from root to parent
+  if (targetNode.parentIds && targetNode.parentIds.length > 0) {
+    parentIds.push(...targetNode.parentIds);
+  }
+
+  return parentIds;
 };
 
-export type TreeNativeProps = {
-  id?: string;
-  data: unknown[];
-  dataFormat?: "flat" | "hierarchy";
+/**
+ * Collect descendant node IDs for a given node.
+ * @param treeNode Root node
+ * @param includeSelf Whether to include the root node in the result
+ */
+const collectDescendantIds = (treeNode: TreeNode, includeSelf = false): Set<string> => {
+  const ids = new Set<string>();
+
+  const visit = (node: TreeNode, isRoot: boolean) => {
+    if (!isRoot || includeSelf) {
+      ids.add(String(node.key));
+    }
+    if (node.children) {
+      node.children.forEach((child) => visit(child, false));
+    }
+  };
+
+  visit(treeNode, true);
+  return ids;
+};
+
+/**
+ * Expand all parent paths for an array of node IDs to ensure they are visible
+ * @param nodeIds Array of node IDs that should be expanded
+ * @param treeItemsById Map of all tree nodes by their ID
+ * @returns Array containing original node IDs plus all necessary parent IDs
+ */
+const expandParentPaths = (
+  nodeIds: (string | number)[],
+  treeItemsById: Record<string, TreeNode>,
+): (string | number)[] => {
+  const allExpandedIds = new Set<string | number>(nodeIds);
+
+  // For each target node, find and add all its parent IDs
+  nodeIds.forEach((nodeId) => {
+    const parentIds = findAllParentIds(nodeId, treeItemsById);
+    parentIds.forEach((parentId) => allExpandedIds.add(parentId));
+  });
+
+  return Array.from(allExpandedIds);
+};
+
+interface TreeComponentProps {
+  registerComponentApi?: (api: any) => void;
+  data?: any; // Raw data in flat array or hierarchy format
+  dataFormat?: TreeDataFormat;
   idField?: string;
   nameField?: string;
   iconField?: string;
@@ -84,41 +365,46 @@ export type TreeNativeProps = {
   parentIdField?: string;
   childrenField?: string;
   selectableField?: string;
+  selectedValue?: string | number;
+  selectedId?: string | number;
+  defaultExpanded?: DefaultExpansion;
+  autoExpandToSelection?: boolean;
+  itemClickExpands?: boolean;
   dynamicField?: string;
   loadedField?: string;
-  dynamic?: boolean;
   autoLoadAfterField?: string;
-  autoLoadAfter?: number;
-  spinnerDelay?: number;
+  dynamic?: boolean;
   iconCollapsed?: string;
   iconExpanded?: string;
   iconSize?: string;
-  selectedId?: unknown;
-  selectedValue?: unknown;
-  defaultExpanded?: "none" | "all" | "first-level" | unknown[];
-  autoExpandToSelection?: boolean;
-  itemClickExpands?: boolean;
   itemHeight?: number;
+  fixedItemSize?: boolean;
+  animateExpand?: boolean;
+  expandRotation?: number;
   scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
   showScrollerFade?: boolean;
   overflow?: string;
+  autoLoadAfter?: number;
+  spinnerDelay?: number;
+  onItemClick?: (node: FlatTreeNode) => void;
+  onSelectionChanged?: (event: TreeSelectionEvent) => void;
+  onNodeExpanded?: (node: FlatTreeNode) => void;
+  onNodeCollapsed?: (node: FlatTreeNode) => void;
+  loadChildren?: (node: FlatTreeNode) => Promise<any[]>;
+  onCutAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onCopyAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onPasteAction?: (node: FlatTreeNode) => void | Promise<void>;
+  onDeleteAction?: (node: FlatTreeNode) => void | Promise<void>;
+  lookupEventHandler?: any;
+  itemRenderer: (item: any) => ReactNode;
   className?: string;
-  style?: CSSProperties;
-  renderItem?: (item: unknown, visibleItem: VisibleTreeItem) => ReactNode;
-  onItemClick?: (item: unknown) => void | Promise<void>;
-  onSelectionDidChange?: (item: unknown) => void | Promise<void>;
-  onNodeDidExpand?: (item: unknown) => void | Promise<void>;
-  onNodeDidCollapse?: (item: unknown) => void | Promise<void>;
-  onLoadChildren?: (item: unknown) => unknown[] | Promise<unknown[] | undefined> | undefined;
-  onContextMenu?: (item: unknown, event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
-  registerApi?: (api: Record<string, unknown>) => void;
-  "data-testid"?: string;
-};
+  classes?: Record<string, string>;
+}
 
-export const TreeNative = memo(forwardRef<TreeApi, TreeNativeProps>(function TreeNative(
-  {
-    id,
-    data,
+export const TreeComponent = memo((props: TreeComponentProps) => {
+  const {
+    registerComponentApi,
+    data = emptyTreeData,
     dataFormat = defaultProps.dataFormat,
     idField = defaultProps.idField,
     nameField = defaultProps.nameField,
@@ -128,1113 +414,2136 @@ export const TreeNative = memo(forwardRef<TreeApi, TreeNativeProps>(function Tre
     parentIdField = defaultProps.parentIdField,
     childrenField = defaultProps.childrenField,
     selectableField = defaultProps.selectableField,
-    dynamicField = defaultProps.dynamicField,
-    loadedField = defaultProps.loadedField,
-    dynamic = defaultProps.dynamic,
-    autoLoadAfterField = defaultProps.autoLoadAfterField,
-    autoLoadAfter = defaultProps.autoLoadAfter,
-    spinnerDelay = defaultProps.spinnerDelay,
-    iconCollapsed = defaultProps.iconCollapsed,
-    iconExpanded = defaultProps.iconExpanded,
-    iconSize = defaultProps.iconSize,
-    selectedId,
     selectedValue,
+    selectedId,
     defaultExpanded = defaultProps.defaultExpanded,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
+    dynamicField = defaultProps.dynamicField,
+    loadedField = defaultProps.loadedField,
+    autoLoadAfterField = defaultProps.autoLoadAfterField,
+    dynamic = defaultProps.dynamic,
+    iconCollapsed = defaultProps.iconCollapsed,
+    iconExpanded = defaultProps.iconExpanded,
+    iconSize = defaultProps.iconSize,
     itemHeight = defaultProps.itemHeight,
+    fixedItemSize,
+    animateExpand = defaultProps.animateExpand,
+    expandRotation = defaultProps.expandRotation,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
-    overflow,
-    className,
-    style,
-    renderItem,
+    autoLoadAfter = defaultProps.autoLoadAfter,
+    spinnerDelay = defaultProps.spinnerDelay,
     onItemClick,
-    onSelectionDidChange,
-    onNodeDidExpand,
-    onNodeDidCollapse,
-    onLoadChildren,
-    onContextMenu,
-    registerApi,
-    "data-testid": dataTestId,
-    ...rest
-  },
-  ref,
-) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const viewportProxyRef = useRef<HTMLDivElement | null>(null);
-  const [internalData, setInternalData] = useState<unknown[] | undefined>(undefined);
+    onSelectionChanged,
+    onNodeExpanded,
+    onNodeCollapsed,
+    loadChildren,
+    onCutAction,
+    onCopyAction,
+    onPasteAction,
+    onDeleteAction,
+    lookupEventHandler,
+    itemRenderer,
+    className,
+    classes,
+    overflow,
+  } = props;
+  // Internal selection state for uncontrolled usage
+  // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
+  const [internalSelectedId, setInternalSelectedId] = useState<string | number | undefined>(() => {
+    return !onSelectionChanged && selectedValue ? selectedValue : undefined;
+  });
+
+  // Internal data state for API methods that modify the tree structure
+  const [internalData, setInternalData] = useState<any>(undefined);
+  const [dataRevision, setDataRevision] = useState(0);
+
+  // Use internal data if available, otherwise use props data
   const effectiveData = internalData ?? data;
-  const dataSignature = useMemo(() => stableDataSignature(data), [data]);
-  const roots = useMemo(
-    () => dataFormat === "hierarchy"
-      ? hierarchyItems(effectiveData, idField, nameField, childrenField, dynamicField, loadedField, dynamic)
-      : flatItems(effectiveData, idField, nameField, parentIdField, childrenField, dynamicField, loadedField, dynamic),
-    [childrenField, dynamic, dynamicField, effectiveData, dataFormat, idField, loadedField, nameField, parentIdField],
-  );
-  const allIds = useMemo(() => flattenItems(roots).map((item) => item.id), [roots]);
-  const [expandedIds, setExpandedIds] = useState<unknown[]>(() => initialExpandedIds(roots, defaultExpanded));
-  const [currentSelectedId, setCurrentSelectedId] = useState<unknown>(selectedId ?? selectedValue);
-  const [focusedId, setFocusedId] = useState<unknown>(undefined);
-  const [loadingIds, setLoadingIds] = useState<unknown[]>([]);
-  const [spinnerIds, setSpinnerIds] = useState<unknown[]>([]);
-  const [expandedTimestamps, setExpandedTimestamps] = useState<Map<string, number>>(() => new Map());
-  const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string, number>>(() => new Map());
-  const [autoLoadAfterOverrides, setAutoLoadAfterOverrides] = useState<Map<string, number | null>>(() => new Map());
-  const [scrollTop, setScrollTop] = useState(0);
-  const [viewportHeight, setViewportHeight] = useState(0);
-  const visibleItems = useMemo(() => visibleTreeItems(roots, expandedIds), [expandedIds, roots]);
-  const allItems = useMemo(() => flattenItems(roots), [roots]);
 
-  useEffect(() => {
-    setInternalData(undefined);
-  }, [dataSignature]);
-
-  useEffect(() => {
-    const node = rootRef.current;
-    if (!node) {
-      return;
-    }
-    const updateViewport = () => setViewportHeight(node.clientHeight);
-    updateViewport();
-    if (typeof ResizeObserver === "undefined") {
-      return;
-    }
-    const observer = new ResizeObserver(updateViewport);
-    observer.observe(node);
-    return () => observer.disconnect();
+  // Helper function to update internal data and force re-render
+  const updateInternalData = useCallback((updater: (prevData: any) => any) => {
+    setInternalData(updater);
+    setDataRevision((prev) => prev + 1);
   }, []);
 
-  useEffect(() => {
-    setCurrentSelectedId(selectedId ?? selectedValue);
-  }, [selectedId, selectedValue]);
+  // Build field configuration
+  const fieldConfig = useMemo<TreeFieldConfig>(
+    () => ({
+      idField: idField || "id",
+      labelField: nameField || "name",
+      iconField,
+      iconExpandedField,
+      iconCollapsedField,
+      parentField: parentIdField,
+      childrenField,
+      selectableField,
+      dynamicField,
+      loadedField,
+      autoLoadAfterField,
+    }),
+    [
+      idField,
+      nameField,
+      iconField,
+      iconExpandedField,
+      iconCollapsedField,
+      parentIdField,
+      childrenField,
+      selectableField,
+      dynamicField,
+      loadedField,
+      autoLoadAfterField,
+    ],
+  );
 
-  useEffect(() => {
-    setExpandedIds(initialExpandedIds(roots, defaultExpanded));
-  }, [dataFormat, defaultExpanded, idField, parentIdField, childrenField]);
+  // Steps 3a & 3b: Transform data based on format
+  // Enhanced data transformation pipeline with validation and error handling
+  const transformedData = useMemo(() => {
+    // Return empty data if no data provided
+    if (!effectiveData) {
+      return emptyTreeData;
+    }
 
-  useEffect(() => {
-    if (autoExpandToSelection && currentSelectedId !== undefined && currentSelectedId !== null) {
-      setExpandedIds((current) => mergeIds(current, parentPathIds(roots, currentSelectedId)));
-    }
-  }, [autoExpandToSelection, currentSelectedId, roots]);
-
-  const selectId = (nextId: unknown) => {
-    const previous = currentSelectedId === undefined || currentSelectedId === null
-      ? null
-      : toTemplateItem(flattenItems(roots).find((item) => idsEqual(item.id, currentSelectedId)), expandedIds, selectableField);
-    setCurrentSelectedId(nextId);
-    setFocusedId(nextId);
-    const sourceItem = toTemplateItem(flattenItems(roots).find((item) => idsEqual(item.id, nextId)), expandedIds, selectableField);
-    void onSelectionDidChange?.(selectionEvent(sourceItem, previous));
-  };
-
-  const clearSelection = () => {
-    const previous = currentSelectedId === undefined || currentSelectedId === null
-      ? null
-      : toTemplateItem(flattenItems(roots).find((item) => idsEqual(item.id, currentSelectedId)), expandedIds, selectableField);
-    setCurrentSelectedId(undefined);
-    void onSelectionDidChange?.(selectionEvent(null, previous));
-  };
-
-  const expandNode = (id: unknown, emit = true) => {
-    const item = allItems.find((candidate) => idsEqual(candidate.id, id));
-    if (!item) {
-      return;
-    }
-    setExpandedTimestamps((current) => new Map(current).set(String(item.id), Date.now()));
-    const expandable = item.children.length > 0 || !item.loaded || item.dynamic;
-    if (!expandable) {
-      return;
-    }
-    setCollapsedTimestamps((current) => {
-      const next = new Map(current);
-      next.delete(String(item.id));
-      return next;
-    });
-    setExpandedIds((current) => current.some((value) => idsEqual(value, id)) ? current : [...current, item.id]);
-    if (emit) {
-      void onNodeDidExpand?.(toTemplateItem(item, [...expandedIds, item.id], selectableField));
-    }
-    const shouldLoad = shouldLoadChildren(item, loadingIds, autoLoadAfterOverrides, collapsedTimestamps, autoLoadAfterField, autoLoadAfter);
-    if (shouldLoad && onLoadChildren) {
-      void loadChildrenForItem(item);
-    }
-  };
-
-  const collapseNode = (id: unknown, emit = true, manual = false) => {
-    const item = allItems.find((candidate) => idsEqual(candidate.id, id));
-    if (!item) {
-      return;
-    }
-    const descendantIds = flattenItems(item.children).map((child) => child.id);
-    const nextExpandedIds = expandedIds.filter((value) => !idsEqual(value, id) && !descendantIds.some((descendantId) => idsEqual(value, descendantId)));
-    setExpandedIds((current) => current.filter((value) => !idsEqual(value, id) && !descendantIds.some((descendantId) => idsEqual(value, descendantId))));
-    const collapsedAt = Date.now();
-    setCollapsedTimestamps((current) => new Map(current).set(String(id), collapsedAt));
-    if (emit) {
-      void onNodeDidCollapse?.(toTemplateItem(item, nextExpandedIds, selectableField));
-    }
-    const reloadAfter = effectiveAutoLoadAfter(item, autoLoadAfterOverrides, autoLoadAfterField, autoLoadAfter);
-    if (reloadAfter === 0 || (typeof reloadAfter === "number" && Number.isFinite(reloadAfter) && reloadAfter > 0 && !manual)) {
-      setInternalData((current) => replaceNodeData(current ?? data, id, { [loadedField]: false }, dataFormat, idField, parentIdField, childrenField));
-    } else if (typeof reloadAfter === "number" && Number.isFinite(reloadAfter) && reloadAfter > 0) {
-      window.setTimeout(() => {
-        setCollapsedTimestamps((current) => {
-          if (current.get(String(id)) !== collapsedAt) {
-            return current;
-          }
-          setInternalData((currentData) => replaceNodeData(currentData ?? data, id, { [loadedField]: false }, dataFormat, idField, parentIdField, childrenField));
-          return current;
-        });
-      }, reloadAfter);
-    }
-  };
-
-  const loadChildrenForItem = async (item: TreeItem) => {
-    if (loadingIds.some((id) => idsEqual(id, item.id))) {
-      return;
-    }
-    setLoadingIds((current) => current.some((id) => idsEqual(id, item.id)) ? current : [...current, item.id]);
-    const delay = Math.max(0, Number(spinnerDelay) || 0);
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    if (delay === 0) {
-      setSpinnerIds((current) => current.some((id) => idsEqual(id, item.id)) ? current : [...current, item.id]);
-    } else {
-      timer = setTimeout(() => {
-        setSpinnerIds((current) => current.some((id) => idsEqual(id, item.id)) ? current : [...current, item.id]);
-      }, delay);
-    }
     try {
-      const loaded = await onLoadChildren?.(toTemplateItem(item, expandedIds, selectableField));
-      const children = Array.isArray(loaded) ? loaded : [];
-      setInternalData((current) => mergeLoadedChildren(current ?? data, item.id, children, dataFormat, idField, parentIdField, childrenField, loadedField, dynamicField));
-    } catch {
-      setExpandedIds((current) => current.filter((id) => !idsEqual(id, item.id)));
-    } finally {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      setLoadingIds((current) => current.filter((id) => !idsEqual(id, item.id)));
-      setSpinnerIds((current) => current.filter((id) => !idsEqual(id, item.id)));
-    }
-  };
-
-  const toggleNode = (item: VisibleTreeItem, emit = true) => {
-    if (expandedIds.some((value) => idsEqual(value, item.id))) {
-      if (loadingIds.some((id) => idsEqual(id, item.id))) {
-        return;
-      }
-      collapseNode(item.id, emit, true);
-    } else {
-      expandNode(item.id, emit);
-    }
-  };
-
-  const api = useMemo<TreeApi>(() => ({
-    get selectedId() {
-      return currentSelectedId;
-    },
-    expandAll: () => setExpandedIds(allIds),
-    collapseAll: () => setExpandedIds([]),
-    selectId,
-    selectNode: selectId,
-    clearSelection,
-    expandNode,
-    collapseNode,
-    expandToLevel: (level: number) => setExpandedIds(
-      flattenItems(roots)
-        .filter((item) => itemDepth(roots, item.id) < level)
-        .map((item) => item.id),
-    ),
-    getExpandedNodes: () => expandedIds,
-    getSelectedNode: () => toTemplateItem(allItems.find((item) => idsEqual(item.id, currentSelectedId)), expandedIds, selectableField),
-    getVisibleItems: () => visibleItemsInViewport(rootRef.current, visibleItems, itemHeight)
-      .map((item) => toTemplateItem(item, expandedIds, selectableField)),
-    scrollIntoView: (id: unknown) => {
-      setExpandedIds((current) => mergeIds(current, parentPathIds(roots, id)));
-      window.setTimeout(() => {
-        const nextVisible = visibleTreeItems(roots, mergeIds(expandedIds, parentPathIds(roots, id)));
-        const index = nextVisible.findIndex((item) => idsEqual(item.id, id));
-        if (index >= 0) {
-          setScrollTop(index * itemHeight);
-          rootRef.current?.scrollTo({ top: index * itemHeight });
+      if (dataFormat === "flat") {
+        // Validation: Flat format requires array
+        if (!Array.isArray(effectiveData)) {
+          throw new Error(
+            `TreeComponent: dataFormat='flat' requires array data, received: ${typeof effectiveData}`,
+          );
         }
-      }, 0);
-    },
-    scrollToItem: (id: unknown) => {
-      const index = visibleItems.findIndex((item) => idsEqual(item.id, id));
-      if (index >= 0) {
-        setScrollTop(index * itemHeight);
-        rootRef.current?.scrollTo({ top: index * itemHeight });
-      }
-    },
-    appendNode: (parentId: unknown, nodeData: Record<string, unknown>) => {
-      setInternalData((current) => appendNodeData(current ?? data, parentId, nodeData, dataFormat, idField, parentIdField, childrenField));
-      if (parentId !== undefined && parentId !== null) {
-        setExpandedIds((current) => current.some((id) => idsEqual(id, parentId)) ? current : [...current, parentId]);
-      }
-    },
-    removeNode: (id: unknown) => {
-      setInternalData((current) => removeNodeData(current ?? data, id, dataFormat, idField, parentIdField, childrenField));
-      setExpandedIds((current) => current.filter((value) => !idsEqual(value, id)));
-      if (idsEqual(currentSelectedId, id)) {
-        setCurrentSelectedId(undefined);
-      }
-    },
-    removeChildren: (id: unknown) => {
-      setInternalData((current) => removeChildrenData(current ?? data, id, dataFormat, idField, parentIdField, childrenField));
-    },
-    insertNodeBefore: (beforeId: unknown, nodeData: Record<string, unknown>) => {
-      setInternalData((current) => insertNodeData(current ?? data, beforeId, nodeData, "before", dataFormat, idField, parentIdField, childrenField));
-    },
-    insertNodeAfter: (afterId: unknown, nodeData: Record<string, unknown>) => {
-      setInternalData((current) => insertNodeData(current ?? data, afterId, nodeData, "after", dataFormat, idField, parentIdField, childrenField));
-    },
-    replaceNode: (id: unknown, nodeData: Record<string, unknown>) => {
-      setInternalData((current) => replaceNodeData(current ?? data, id, nodeData, dataFormat, idField, parentIdField, childrenField));
-      const nextId = nodeData[idField];
-      if (nextId !== undefined && !idsEqual(nextId, id)) {
-        setExpandedIds((current) => current.map((value) => idsEqual(value, id) ? nextId : value));
-        if (idsEqual(currentSelectedId, id)) {
-          setCurrentSelectedId(nextId);
+
+        // Validation: Check for required fields in sample data
+        if (effectiveData.length > 0) {
+          const sampleItem = effectiveData[0];
+          if (typeof sampleItem !== "object" || sampleItem === null) {
+            throw new Error("TreeComponent: Flat data items must be objects");
+          }
+          if (!(fieldConfig.idField in sampleItem)) {
+            throw new Error(
+              `TreeComponent: Required field '${fieldConfig.idField}' not found in flat data items`,
+            );
+          }
+          if (!(fieldConfig.labelField in sampleItem)) {
+            throw new Error(
+              `TreeComponent: Required field '${fieldConfig.labelField}' not found in flat data items`,
+            );
+          }
         }
-      }
-    },
-    replaceChildren: (id: unknown, newChildren: unknown[]) => {
-      setInternalData((current) => replaceChildrenData(current ?? data, id, newChildren, dataFormat, idField, parentIdField, childrenField));
-    },
-    refreshData: () => {
-      setInternalData((current) => Array.isArray(current) ? [...current] : [...data]);
-    },
-    getNodeById: (id: unknown) => toTemplateItem(allItems.find((item) => idsEqual(item.id, id)), expandedIds, selectableField),
-    getDynamic: (id: unknown) => Boolean(allItems.find((item) => idsEqual(item.id, id))?.dynamic),
-    setDynamic: (id: unknown, value: boolean | undefined) => {
-      setInternalData((current) => replaceNodeData(current ?? data, id, { [dynamicField]: value }, dataFormat, idField, parentIdField, childrenField));
-    },
-    getNodeLoadingState: (id: unknown) => {
-      const item = allItems.find((candidate) => idsEqual(candidate.id, id));
-      if (!item) {
-        return "loaded";
-      }
-      if (loadingIds.some((candidate) => idsEqual(candidate, id))) {
-        return "loading";
-      }
-      return item.loaded ? "loaded" : "unloaded";
-    },
-    setNodeLoaded: (id: unknown, loaded: boolean) => {
-      setInternalData((current) => replaceNodeData(current ?? data, id, { [loadedField]: loaded }, dataFormat, idField, parentIdField, childrenField));
-    },
-    markNodeLoaded: (id: unknown) => {
-      setInternalData((current) => replaceNodeData(current ?? data, id, { [loadedField]: true }, dataFormat, idField, parentIdField, childrenField));
-    },
-    markNodeUnloaded: (id: unknown) => {
-      setInternalData((current) => replaceNodeData(current ?? data, id, { [loadedField]: false }, dataFormat, idField, parentIdField, childrenField));
-    },
-    getExpandedTimestamp: (id: unknown) => expandedTimestamps.get(String(id)),
-    setAutoLoadAfter: (id: unknown, milliseconds: number | null | undefined) => {
-      setAutoLoadAfterOverrides((current) => {
-        const next = new Map(current);
-        if (milliseconds === undefined || milliseconds === null) {
-          next.set(String(id), null);
+
+        return flatToNative(effectiveData, fieldConfig);
+      } else if (dataFormat === "hierarchy") {
+        // Validation: Hierarchy format requires object or array
+        if (!effectiveData || typeof effectiveData !== "object") {
+          throw new Error(
+            `TreeComponent: dataFormat='hierarchy' requires object or array data, received: ${typeof effectiveData}`,
+          );
+        }
+
+        // Validation: Check for required fields in hierarchy data
+        const checkHierarchyData = (item: any): void => {
+          if (typeof item !== "object" || item === null) {
+            throw new Error("TreeComponent: Hierarchy data items must be objects");
+          }
+          if (!(fieldConfig.idField in item)) {
+            throw new Error(
+              `TreeComponent: Required field '${fieldConfig.idField}' not found in hierarchy data`,
+            );
+          }
+          if (!(fieldConfig.labelField in item)) {
+            throw new Error(
+              `TreeComponent: Required field '${fieldConfig.labelField}' not found in hierarchy data`,
+            );
+          }
+        };
+
+        if (Array.isArray(effectiveData)) {
+          if (effectiveData.length > 0) {
+            checkHierarchyData(effectiveData[0]);
+          }
         } else {
-          next.set(String(id), milliseconds);
+          checkHierarchyData(effectiveData);
         }
-        return next;
+
+        return hierarchyToNative(effectiveData, fieldConfig);
+      } else {
+        throw new Error(
+          `TreeComponent: Unsupported dataFormat '${dataFormat}'. Use 'flat' or 'hierarchy'.`,
+        );
+      }
+    } catch (error) {
+      // Return empty data on error to prevent crashes
+      return emptyTreeData;
+    }
+  }, [effectiveData, dataFormat, fieldConfig]);
+
+  const { treeData, treeItemsById } = transformedData;
+
+  // Use selectedValue (source ID) directly since TreeNode.key is the source ID
+  const mappedSelectedId = useMemo(() => {
+    if (selectedValue) {
+      // For flat/hierarchy formats, selectedValue is already the source ID (matches TreeNode.key)
+      return selectedValue;
+    }
+    return selectedId;
+  }, [selectedValue, selectedId]);
+
+  // Determine if we're in controlled mode (has onSelectionChanged handler) or uncontrolled mode
+  const isControlledMode = !!onSelectionChanged;
+
+  // Use mapped selectedValue/selectedId if in controlled mode and provided,
+  // otherwise use internal state (uncontrolled mode or controlled mode without selectedValue)
+  const effectiveSelectedId =
+    isControlledMode && mappedSelectedId !== undefined ? mappedSelectedId : internalSelectedId;
+
+  // Initialize expanded IDs based on defaultExpanded prop
+  const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() => {
+    // Helper function to check if a node is unloaded (should not be auto-expanded)
+    const isUnloaded = (node: TreeNode): boolean => {
+      return node.loaded === false;
+    };
+
+    if (defaultExpanded === "first-level") {
+      return treeData.filter((node) => !isUnloaded(node)).map((node) => node.key);
+    } else if (defaultExpanded === "all") {
+      const allIds: (string | number)[] = [];
+      const collectIds = (nodes: TreeNode[]) => {
+        nodes.forEach((node) => {
+          if (!isUnloaded(node)) {
+            allIds.push(node.key);
+          }
+          if (node.children) {
+            collectIds(node.children);
+          }
+        });
+      };
+      collectIds(treeData);
+      return allIds;
+    } else if (Array.isArray(defaultExpanded)) {
+      // Expand full paths to specified nodes by including all parent nodes
+      // But exclude unloaded nodes from the expansion
+      const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
+      return expandedPaths.filter((nodeId) => {
+        const node = treeItemsById[String(nodeId)];
+        return !node || !isUnloaded(node);
+      });
+    }
+    return [];
+  });
+
+  // Node loading states management for dynamic loading
+  const [nodeStates, setNodeStates] = useState<Map<string | number, NodeLoadingState>>(new Map());
+
+  // Expanded timestamps for tracking when nodes were expanded (Step 1: Auto-load feature)
+  const [expandedTimestamps, setExpandedTimestamps] = useState<Map<string | number, number>>(
+    new Map(),
+  );
+
+  // Auto-load after values for tracking per-node autoload thresholds (Step 2: Auto-load feature)
+  const [autoLoadAfterMap, setAutoLoadAfterMap] = useState<
+    Map<string | number, number | null>
+  >(new Map());
+
+  // Dynamic state for tracking per-node dynamic values
+  const [dynamicStateMap, setDynamicStateMap] = useState<Map<string | number, boolean>>(
+    new Map(),
+  );
+
+  // Collapsed timestamps for tracking when nodes were collapsed (Step 4: Auto-load feature)
+  const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string | number, number>>(
+    new Map(),
+  );
+
+  // Helper functions for managing node loading states
+  const getNodeState = useCallback(
+    (nodeId: string | number): NodeLoadingState => {
+      return nodeStates.get(nodeId) || "loaded";
+    },
+    [nodeStates],
+  );
+
+  const setNodeState = useCallback((nodeId: string | number, state: NodeLoadingState) => {
+    setNodeStates((prev) => {
+      const newStates = new Map(prev);
+      newStates.set(nodeId, state);
+      return newStates;
+    });
+  }, []);
+
+  // Simplified focus management
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const treeContainerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<VirtualizerHandle>(null);
+
+  // State and ref for measuring first item size when fixedItemSize is enabled
+  const firstItemRef = useRef<HTMLDivElement>(null);
+  const [measuredItemSize, setMeasuredItemSize] = useState<number | undefined>(undefined);
+
+  const flatTreeData = useMemo(() => {
+    return toFlatTree(treeData, expandedIds, fieldConfig.dynamicField, nodeStates, dynamic);
+  }, [expandedIds, treeData, nodeStates, fieldConfig.dynamicField, dynamic]);
+
+  // Enhanced flat tree with timestamps and autoLoadAfter values
+  const enhancedFlatTreeData: FlatTreeNodeWithState[] = useMemo(() => {
+    return flatTreeData.map((node) => {
+      const nodeId = node.key;
+      const timestamp = expandedTimestamps.get(nodeId);
+      const collapsedTime = collapsedTimestamps.get(nodeId);
+      const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
+
+      return {
+        ...node,
+        expandedTimestamp: timestamp,
+        collapsedTimestamp: collapsedTime,
+        autoLoadAfter: explicitAutoLoadAfter !== undefined ? explicitAutoLoadAfter : autoLoadAfter,
+      };
+    });
+  }, [flatTreeData, expandedTimestamps, collapsedTimestamps, autoLoadAfterMap, autoLoadAfter]);
+
+  // Measure first item size when fixedItemSize is enabled
+  useEffect(() => {
+    if (fixedItemSize && firstItemRef.current && !measuredItemSize && flatTreeData.length > 0) {
+      // Add a small delay to ensure the item is rendered
+      requestAnimationFrame(() => {
+        if (firstItemRef.current) {
+          const height = firstItemRef.current.offsetHeight;
+          if (height > 0) {
+            setMeasuredItemSize(height);
+          }
+        }
+      });
+    }
+  }, [fixedItemSize, measuredItemSize, flatTreeData.length]);
+
+  // Tree node utilities for consistent ID mapping
+  const findNodeById = useCallback(
+    (nodeId: string | number): FlatTreeNode | null => {
+      return flatTreeData.find((n) => String(n.key) === String(nodeId)) || null;
+    },
+    [flatTreeData],
+  );
+
+  const findNodeIndexById = useCallback(
+    (nodeId: string | number): number => {
+      return flatTreeData.findIndex((item) => String(item.key) === String(nodeId));
+    },
+    [flatTreeData],
+  );
+
+  // Tree validation utilities
+  const nodeExists = useCallback(
+    (nodeId: string | number): boolean => {
+      return Object.values(treeItemsById).some((n) => String(n.key) === String(nodeId));
+    },
+    [treeItemsById],
+  );
+
+  /**
+   * Centralized selection handler - handles all selection logic consistently
+   * @param nodeId - The node key (source ID) to select, or undefined to clear selection
+   */
+  const setSelectedNodeById = useCallback(
+    (nodeId: string | number | undefined) => {
+      // Find the node if nodeId is provided
+      const node = nodeId
+        ? Object.values(treeItemsById).find((n) => String(n.key) === String(nodeId))
+        : null;
+
+      const nodeKey = node?.key;
+
+      // Get previous selection for event
+      const previousNode = effectiveSelectedId ? findNodeById(effectiveSelectedId) : null;
+
+      // Always update internal state (this provides visual feedback)
+      setInternalSelectedId(nodeKey);
+
+      // Update focused index to match the selected item
+      if (nodeKey) {
+        const nodeIndex = flatTreeData.findIndex((item) => String(item.key) === String(nodeKey));
+        if (nodeIndex >= 0) {
+          setFocusedIndex(nodeIndex);
+        }
+      }
+
+      // Fire selection event if handler is provided
+      if (onSelectionChanged) {
+        const newNode = node
+          ? ({
+              ...node,
+              isExpanded: expandedIds.includes(node.key),
+              depth: node.parentIds.length,
+              hasChildren: !!(node.children && node.children.length > 0),
+            } as FlatTreeNode)
+          : null;
+
+        onSelectionChanged({
+          previousNode,
+          newNode,
+        });
+      }
+
+      // Emit selection:change trace event
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "selection:change",
+        component: "Tree",
+        ariaName: node ? node.name : undefined,
+        displayLabel: node ? node.name : null,
+        selectedId: node ? String(node.key) : null,
+        selectedName: node ? node.name : null,
       });
     },
-    getAutoLoadAfter: (id: unknown) => {
-      const key = String(id);
-      if (autoLoadAfterOverrides.has(key)) {
-        return autoLoadAfterOverrides.get(key);
-      }
-      const item = allItems.find((candidate) => idsEqual(candidate.id, id));
-      return effectiveAutoLoadAfter(item, autoLoadAfterOverrides, autoLoadAfterField, autoLoadAfter);
-    },
-    getNodeAutoLoadAfter: (id: unknown) => {
-      const key = String(id);
-      if (autoLoadAfterOverrides.has(key)) {
-        return autoLoadAfterOverrides.get(key);
-      }
-      const item = allItems.find((candidate) => idsEqual(candidate.id, id));
-      return effectiveAutoLoadAfter(item, autoLoadAfterOverrides, autoLoadAfterField, autoLoadAfter);
-    },
-  }), [allIds, allItems, autoLoadAfter, autoLoadAfterField, autoLoadAfterOverrides, currentSelectedId, data, dataFormat, dynamicField, expandedIds, expandedTimestamps, idField, itemHeight, loadedField, loadingIds, parentIdField, childrenField, roots, selectableField, visibleItems]);
-  useImperativeHandle(ref, () => api, [api]);
-  useEffect(() => {
-    registerApi?.(api as unknown as Record<string, unknown>);
-  }, [api, registerApi]);
+    [
+      treeItemsById,
+      effectiveSelectedId,
+      flatTreeData,
+      expandedIds,
+      onSelectionChanged,
+      internalSelectedId,
+    ],
+  );
 
-  const focusedIndex = Math.max(0, visibleItems.findIndex((item) => idsEqual(item.id, focusedId)));
-  const rootStyle: CSSProperties = {
-    ...style,
-    overflow,
-    ["--xmlui-tree-item-height" as string]: `${itemHeight}px`,
-  };
-  const totalHeight = visibleItems.length * itemHeight;
-  const shouldVirtualize = viewportHeight > 0 && totalHeight > viewportHeight + itemHeight;
-  const overscan = 2;
-  const startIndex = shouldVirtualize
-    ? Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
-    : 0;
-  const endIndex = shouldVirtualize
-    ? Math.min(visibleItems.length, Math.ceil((scrollTop + viewportHeight) / itemHeight) + overscan)
-    : visibleItems.length;
-  const renderedItems = visibleItems.slice(startIndex, endIndex);
-  const topSpacerHeight = shouldVirtualize ? startIndex * itemHeight : 0;
-  const bottomSpacerHeight = shouldVirtualize ? Math.max(0, totalHeight - endIndex * itemHeight) : 0;
+  // Simple tree API method implementations
+  const getExpandedNodes = useCallback((): (string | number)[] => {
+    return expandedIds;
+  }, [expandedIds]);
+
+  const getSelectedNode = useCallback(() => {
+    if (!effectiveSelectedId) return null;
+    return (
+      Object.values(treeItemsById).find(
+        (node) => String(node.key) === String(effectiveSelectedId),
+      ) || null
+    );
+  }, [effectiveSelectedId, treeItemsById]);
+
+  const getNodeById = useCallback(
+    (nodeId: string | number) => {
+      return Object.values(treeItemsById).find((n) => String(n.key) === String(nodeId)) || null;
+    },
+    [treeItemsById],
+  );
+
+  const clearSelection = useCallback(() => {
+    setSelectedNodeById(undefined);
+  }, [setSelectedNodeById]);
+
+  // Initialize selection based on selectedValue prop - only on mount
+  useEffect(() => {
+    if (selectedValue !== undefined && !onSelectionChanged) {
+      // Uncontrolled mode: set initial selection based on selectedValue
+      setInternalSelectedId(selectedValue);
+    }
+  }, []); // Only run on mount
+
+  /**
+   * ensure the selected item's parents are expanded when selection changes
+   */
+  useEffect(() => {
+    if (autoExpandToSelection && effectiveSelectedId) {
+      // Find node by key (source ID) since treeItemsById is indexed by id
+      const treeItem = Object.values(treeItemsById).find(
+        (node) => node.key === effectiveSelectedId,
+      );
+      if (treeItem) {
+        setExpandedIds((prev) => [...prev, ...treeItem.parentIds]);
+      }
+    }
+  }, [autoExpandToSelection, effectiveSelectedId, treeItemsById]);
+
+  const toggleNode = useCallback(
+    async (node: FlatTreeNode) => {
+      if (!node.isExpanded) {
+        // Expanding the node
+        setExpandedIds((prev) => [...prev, node.key]);
+
+        // Record timestamp when node expands
+        setExpandedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
+
+        // Always fire nodeDidExpand event
+        if (onNodeExpanded) {
+          onNodeExpanded({ ...node, isExpanded: true });
+        }
+
+        // Check if we need to auto-reload (Step 4: Auto-load feature)
+        // Only apply autoLoadAfter to dynamic nodes
+        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+        const collapsedTime = collapsedTimestamps.get(node.key);
+        const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
+        const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+        const nodeAutoLoadAfter = autoLoadAfterFieldName in node
+          ? (node as any)[autoLoadAfterFieldName]
+          : undefined;
+        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+          ? explicitAutoLoadAfter
+          : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+
+        // Step 3: Check if this node is dynamic (loads children asynchronously)
+        const isDynamic = (() => {
+          // Check if there's an explicit value set via setDynamic
+          const explicitValue = dynamicStateMap.get(node.key);
+          if (explicitValue !== undefined) {
+            return explicitValue;
+          }
+
+          // Check node data for dynamic field
+          const dynamicFieldName = fieldConfig.dynamicField || "dynamic";
+          if (dynamicFieldName in node) {
+            return Boolean((node as any)[dynamicFieldName]);
+          }
+
+          // If node has loadedField=false, it needs async loading, so treat as dynamic
+          if (loadedField && loadedField in node && !(node as any)[loadedField]) {
+            return true;
+          }
+
+          // If node was previously loaded and has autoLoadAfter configured, treat as dynamic
+          // (allows auto-reload to work even after the loaded field is set to true)
+          if (currentLoadingState === "loaded") {
+            return effectiveAutoLoadAfter !== undefined && effectiveAutoLoadAfter !== null;
+          }
+
+          // Fall back to component-level default
+          return dynamic ?? false;
+        })();
+
+        const shouldAutoReload =
+          isDynamic && // Only auto-reload dynamic nodes
+          currentLoadingState === "loaded" && // Node was previously loaded
+          loadChildren && // loadChildren handler exists
+          collapsedTime !== undefined && // Node was previously collapsed
+          effectiveAutoLoadAfter !== undefined && // Auto-load is configured
+          effectiveAutoLoadAfter !== null && // Auto-load is not disabled
+          (Date.now() - collapsedTime) > effectiveAutoLoadAfter; // Threshold exceeded
+
+        // Check if we need to load children dynamically
+        // Only load if node is marked as dynamic
+        if (isDynamic && currentLoadingState === "unloaded" && loadChildren) {
+          const nodeToLoad = Object.values(treeItemsById).find(
+            (n) => String(n.key) === String(node.key),
+          );
+
+          const descendantIdsToClear = nodeToLoad
+            ? collectDescendantIds(nodeToLoad, false)
+            : new Set<string>();
+
+          // Set loading state and clear descendant load states
+          setNodeStates((prev) => {
+            const newMap = new Map(prev);
+            if (descendantIdsToClear.size > 0) {
+              const keyLookup = new Map<string, string | number>();
+              for (const key of newMap.keys()) {
+                keyLookup.set(String(key), key);
+              }
+              descendantIdsToClear.forEach((id) => {
+                const keyToDelete = keyLookup.get(id);
+                if (keyToDelete !== undefined) {
+                  newMap.delete(keyToDelete);
+                }
+              });
+            }
+            newMap.set(node.key, "loading");
+            return newMap;
+          });
+
+          // Immediately remove existing children so node appears empty while loading
+          updateInternalData((prevData) => {
+            const currentData = prevData ?? data;
+
+            if (dataFormat === "flat" && Array.isArray(currentData)) {
+              // Remove existing children of this node
+              return currentData.filter(
+                (item) => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+              );
+            } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+              // For hierarchy format, clear children array
+              const clearChildren = (nodes: any[]): any[] => {
+                return nodes.map((n) => {
+                  if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: [],
+                    };
+                  } else if (n[fieldConfig.childrenField || "children"]) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: clearChildren(
+                        n[fieldConfig.childrenField || "children"],
+                      ),
+                    };
+                  }
+                  return n;
+                });
+              };
+              return clearChildren(currentData);
+            }
+
+            return currentData;
+          });
+
+          try {
+            // Load the children data
+            const loadedData = await loadChildren({ ...node, isExpanded: true });
+
+            // Update the tree data with loaded children (even if empty)
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
+
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                // Remove existing children of this node
+                const filteredData = currentData.filter(
+                  (item) =>
+                    String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+                );
+
+                // Add new children if any
+                const newItems =
+                  loadedData && Array.isArray(loadedData)
+                    ? loadedData.map((item) => ({
+                        ...item,
+                        [fieldConfig.parentField || "parentId"]: String(node.key),
+                      }))
+                    : [];
+
+                // Mark parent node as loaded
+                const updatedData = filteredData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...item,
+                      [fieldConfig.loadedField || "loaded"]: true,
+                    };
+                  }
+                  return item;
+                });
+
+                return [...updatedData, ...newItems];
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                // For hierarchy format, we need to find the node and add children
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]:
+                          loadedData && Array.isArray(loadedData) ? loadedData : [],
+                        [fieldConfig.loadedField || "loaded"]: true,
+                      };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
+
+              return currentData;
+            });
+
+            // Set loaded state
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
+          } catch (error) {
+            console.error("Error loading tree node data:", error);
+            // Set back to unloaded state on error
+            setNodeStates((prev) => {
+              const newMap = new Map(prev);
+              newMap.delete(node.key);
+              return newMap;
+            });
+            // Collapse the node since loading failed
+            setExpandedIds((prev) => prev.filter((id) => id !== node.key));
+          }
+        } else if (shouldAutoReload) {
+          // Auto-reload: Node was loaded before, threshold exceeded, reload children
+          // Set loading state
+          setNodeStates((prev) => new Map(prev).set(node.key, "loading"));
+
+          // Clear existing children
+          updateInternalData((prevData) => {
+            const currentData = prevData ?? data;
+
+            if (dataFormat === "flat" && Array.isArray(currentData)) {
+              return currentData.filter(
+                (item) => String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+              );
+            } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+              const clearChildren = (nodes: any[]): any[] => {
+                return nodes.map((n) => {
+                  if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: [],
+                    };
+                  } else if (n[fieldConfig.childrenField || "children"]) {
+                    return {
+                      ...n,
+                      [fieldConfig.childrenField || "children"]: clearChildren(
+                        n[fieldConfig.childrenField || "children"],
+                      ),
+                    };
+                  }
+                  return n;
+                });
+              };
+              return clearChildren(currentData);
+            }
+
+            return currentData;
+          });
+
+          try {
+            // Reload the children data
+            const loadedData = await loadChildren({ ...node, isExpanded: true });
+
+            // Update the tree data with reloaded children
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
+
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                const filteredData = currentData.filter(
+                  (item) =>
+                    String(item[fieldConfig.parentField || "parentId"]) !== String(node.key),
+                );
+
+                const newItems =
+                  loadedData && Array.isArray(loadedData)
+                    ? loadedData.map((item) => ({
+                        ...item,
+                        [fieldConfig.parentField || "parentId"]: String(node.key),
+                      }))
+                    : [];
+
+                const updatedData = filteredData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return {
+                      ...item,
+                      [fieldConfig.loadedField || "loaded"]: true,
+                    };
+                  }
+                  return item;
+                });
+
+                return [...updatedData, ...newItems];
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]:
+                          loadedData && Array.isArray(loadedData) ? loadedData : [],
+                        [fieldConfig.loadedField || "loaded"]: true,
+                      };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
+
+              return currentData;
+            });
+
+            // Set loaded state
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
+          } catch (error) {
+            console.error("Error auto-reloading tree node data:", error);
+            // Keep loaded state even on reload error
+            setNodeStates((prev) => new Map(prev).set(node.key, "loaded"));
+          }
+        }
+      } else {
+        // Collapsing the node
+        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+
+        // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
+        if (currentLoadingState === "loaded" && loadChildren) {
+          setCollapsedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
+
+          // Check if autoLoadAfter is 0, mark node as unloaded immediately
+          const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
+          const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+          const nodeAutoLoadAfter = autoLoadAfterFieldName in node
+            ? (node as any)[autoLoadAfterFieldName]
+            : undefined;
+          const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+            ? explicitAutoLoadAfter
+            : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+
+          // If autoLoadAfter is 0, immediately mark node as unloaded
+          if (effectiveAutoLoadAfter === 0) {
+            setNodeStates((prev) => new Map(prev).set(node.key, "unloaded"));
+
+            // Update the loaded field in source data
+            updateInternalData((prevData) => {
+              const currentData = prevData ?? data;
+              const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+              if (dataFormat === "flat" && Array.isArray(currentData)) {
+                return currentData.map((item) => {
+                  if (String(item[fieldConfig.idField || "id"]) === String(node.key)) {
+                    return { ...item, [loadedFieldName]: false };
+                  }
+                  return item;
+                });
+              } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                const updateHierarchy = (nodes: any[]): any[] => {
+                  return nodes.map((n) => {
+                    if (String(n[fieldConfig.idField || "id"]) === String(node.key)) {
+                      return { ...n, [loadedFieldName]: false };
+                    } else if (n[fieldConfig.childrenField || "children"]) {
+                      return {
+                        ...n,
+                        [fieldConfig.childrenField || "children"]: updateHierarchy(
+                          n[fieldConfig.childrenField || "children"],
+                        ),
+                      };
+                    }
+                    return n;
+                  });
+                };
+                return updateHierarchy(currentData);
+              }
+
+              return currentData;
+            });
+          }
+        }
+
+        const nodeToCollapse = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(node.key),
+        );
+
+        if (nodeToCollapse) {
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
+
+          setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+        } else {
+          setExpandedIds((prev) => prev.filter((id) => id !== node.key));
+        }
+
+        // Fire nodeDidCollapse event
+        if (onNodeCollapsed) {
+          onNodeCollapsed({ ...node, isExpanded: false });
+        }
+      }
+    },
+    [
+      onNodeExpanded,
+      onNodeCollapsed,
+      loadChildren,
+      data,
+      dataFormat,
+      fieldConfig,
+      setNodeStates,
+      nodeStates,
+      treeItemsById,
+      collapsedTimestamps,
+      autoLoadAfterMap,
+      autoLoadAfter,
+      dynamicStateMap,
+      dynamic,
+    ],
+  );
+
+  // Simplified keyboard navigation handler
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (flatTreeData.length === 0) return;
+
+      const currentIndex = focusedIndex >= 0 ? focusedIndex : 0;
+      const currentNode = currentIndex >= 0 ? flatTreeData[currentIndex] : null;
+      let newIndex = currentIndex;
+      let handled = false;
+
+      // Check for keyboard actions (cut, copy, paste, delete)
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+
+      if (currentNode && isCtrlOrCmd && e.key === "x" && onCutAction) {
+        // Cut action (Ctrl/Cmd+X)
+        e.preventDefault();
+        e.stopPropagation();
+        onCutAction(currentNode);
+        return;
+      }
+
+      if (currentNode && isCtrlOrCmd && e.key === "c" && onCopyAction) {
+        // Copy action (Ctrl/Cmd+C)
+        e.preventDefault();
+        e.stopPropagation();
+        onCopyAction(currentNode);
+        return;
+      }
+
+      if (currentNode && isCtrlOrCmd && e.key === "v" && onPasteAction) {
+        // Paste action (Ctrl/Cmd+V)
+        e.preventDefault();
+        e.stopPropagation();
+        onPasteAction(currentNode);
+        return;
+      }
+
+      if (currentNode && e.key === "Delete" && onDeleteAction) {
+        // Delete action
+        e.preventDefault();
+        e.stopPropagation();
+        onDeleteAction(currentNode);
+        return;
+      }
+
+      // Navigation keys
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          newIndex = Math.min(currentIndex + 1, flatTreeData.length - 1);
+          handled = true;
+          break;
+
+        case "ArrowUp":
+          e.preventDefault();
+          newIndex = Math.max(currentIndex - 1, 0);
+          handled = true;
+          break;
+
+        case "ArrowRight":
+          e.preventDefault();
+          if (currentIndex >= 0) {
+            if (currentNode!.hasChildren && !currentNode!.isExpanded) {
+              // Expand node
+              void toggleNode(currentNode!);
+            } else if (
+              currentNode!.hasChildren &&
+              currentNode!.isExpanded &&
+              currentIndex + 1 < flatTreeData.length
+            ) {
+              // Move to first child
+              newIndex = currentIndex + 1;
+            }
+          }
+          handled = true;
+          break;
+
+        case "ArrowLeft":
+          e.preventDefault();
+          if (currentIndex >= 0) {
+            if (currentNode!.hasChildren && currentNode!.isExpanded) {
+              // Collapse node
+              void toggleNode(currentNode!);
+            } else if (currentNode!.depth > 0) {
+              // Move to parent - find previous node with smaller depth
+              for (let i = currentIndex - 1; i >= 0; i--) {
+                if (flatTreeData[i].depth < currentNode!.depth) {
+                  newIndex = i;
+                  break;
+                }
+              }
+            }
+          }
+          handled = true;
+          break;
+
+        case "Home":
+          e.preventDefault();
+          newIndex = 0;
+          handled = true;
+          break;
+
+        case "End":
+          e.preventDefault();
+          newIndex = flatTreeData.length - 1;
+          handled = true;
+          break;
+
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          if (currentIndex >= 0) {
+            // Handle selection
+            if (currentNode!.selectable) {
+              setSelectedNodeById(currentNode!.key);
+              // Ensure focus stays on the current item after selection
+              newIndex = currentIndex;
+            }
+            // Handle expansion for Enter key
+            if (e.key === "Enter" && currentNode!.hasChildren) {
+              void toggleNode(currentNode!);
+            }
+          }
+          handled = true;
+          break;
+      }
+
+      if (handled) {
+        e.stopPropagation();
+        setFocusedIndex(newIndex);
+      }
+    },
+    [focusedIndex, flatTreeData, toggleNode, setSelectedNodeById, onCutAction, onCopyAction, onPasteAction, onDeleteAction],
+  );
+
+  const itemData = useMemo(() => {
+    return {
+      nodes: flatTreeData,
+      toggleNode,
+      itemRenderer,
+      itemClickExpands,
+      onItemClick,
+      onSelection: (node: FlatTreeNode) => setSelectedNodeById(node.key),
+      lookupEventHandler,
+      onKeyDown: handleKeyDown,
+      treeContainerRef,
+      iconCollapsed,
+      iconExpanded,
+      iconSize,
+      animateExpand,
+      expandRotation,
+      spinnerDelay,
+    };
+  }, [
+    flatTreeData,
+    toggleNode,
+    itemRenderer,
+    itemClickExpands,
+    onItemClick,
+    setSelectedNodeById,
+    lookupEventHandler,
+    handleKeyDown,
+    iconCollapsed,
+    iconExpanded,
+    iconSize,
+    animateExpand,
+    expandRotation,
+    spinnerDelay,
+  ]);
+
+  // Shared API implementation to avoid duplication between ref and component APIs
+  const treeApiMethods = useMemo(() => {
+    return {
+      // Expansion methods
+      expandAll: () => {
+        const allIds: (string | number)[] = [];
+        const collectIds = (nodes: TreeNode[]) => {
+          nodes.forEach((node) => {
+            allIds.push(node.key);
+            if (node.children) {
+              collectIds(node.children);
+            }
+          });
+        };
+        collectIds(treeData);
+        setExpandedIds(allIds);
+      },
+
+      collapseAll: () => {
+        setExpandedIds([]);
+      },
+
+      expandToLevel: (level: number) => {
+        const levelIds: (string | number)[] = [];
+        const collectIdsToLevel = (nodes: TreeNode[], currentLevel: number = 0) => {
+          if (currentLevel >= level) return;
+          nodes.forEach((node) => {
+            levelIds.push(node.key);
+            if (node.children && currentLevel < level - 1) {
+              collectIdsToLevel(node.children, currentLevel + 1);
+            }
+          });
+        };
+        collectIdsToLevel(treeData);
+        setExpandedIds(levelIds);
+      },
+
+      expandNode: async (nodeId: string | number) => {
+        // nodeId is source ID, which matches TreeNode.key
+        const wasExpanded = expandedIds.includes(nodeId);
+        if (!wasExpanded) {
+          setExpandedIds((prev) => [...prev, nodeId]);
+
+          // Record timestamp when node expands (Step 1: Auto-load feature)
+          setExpandedTimestamps((prev) => new Map(prev).set(nodeId, Date.now()));
+
+          // Always fire nodeDidExpand event
+          const node = getNodeById(nodeId);
+          if (node && onNodeExpanded) {
+            // Convert TreeNode to FlatTreeNode format for the event
+            const flatNode: FlatTreeNode = {
+              ...node,
+              isExpanded: true,
+              depth: node.parentIds.length,
+              hasChildren: !!(node.children && node.children.length > 0),
+            };
+            onNodeExpanded(flatNode);
+          }
+
+          // Check if we need to load children dynamically
+          if (node && loadChildren) {
+            // Set loading state
+            setNodeStates((prev) => new Map(prev).set(nodeId, "loading"));
+
+            try {
+              // Convert TreeNode to FlatTreeNode format for loadChildren
+              const flatNode: FlatTreeNode = {
+                ...node,
+                isExpanded: true,
+                depth: node.parentIds.length,
+                hasChildren: !!(node.children && node.children.length > 0),
+              };
+
+              // Load the children data
+              const loadedData = await loadChildren(flatNode);
+
+              // Update the tree data with loaded children
+              if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
+                updateInternalData((prevData) => {
+                  const currentData = prevData ?? data;
+
+                  if (dataFormat === "flat" && Array.isArray(currentData)) {
+                    // Replace existing children with newly loaded data
+
+                    // Remove existing children of this node
+                    const filteredData = currentData.filter(
+                      (item) =>
+                        String(item[fieldConfig.parentField || "parentId"]) !== String(nodeId),
+                    );
+
+                    // Add new children
+                    const newItems = loadedData.map((item) => ({
+                      ...item,
+                      [fieldConfig.parentField || "parentId"]: String(nodeId),
+                    }));
+
+                    return [...filteredData, ...newItems];
+                  } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                    // For hierarchy format, we need to find the node and add children
+                    const updateHierarchy = (nodes: any[]): any[] => {
+                      return nodes.map((n) => {
+                        if (String(n[fieldConfig.idField || "id"]) === String(nodeId)) {
+                          return {
+                            ...n,
+                            [fieldConfig.childrenField || "children"]: loadedData,
+                          };
+                        } else if (n[fieldConfig.childrenField || "children"]) {
+                          return {
+                            ...n,
+                            [fieldConfig.childrenField || "children"]: updateHierarchy(
+                              n[fieldConfig.childrenField || "children"],
+                            ),
+                          };
+                        }
+                        return n;
+                      });
+                    };
+                    return updateHierarchy(currentData);
+                  }
+
+                  return currentData;
+                });
+              }
+
+              // Set loaded state
+              setNodeStates((prev) => new Map(prev).set(nodeId, "loaded"));
+            } catch (error) {
+              console.error("Error loading tree node data:", error);
+              // Set back to unloaded state on error
+              setNodeStates((prev) => {
+                const newMap = new Map(prev);
+                newMap.delete(nodeId);
+                return newMap;
+              });
+              // Collapse the node since loading failed
+              setExpandedIds((prev) => prev.filter((id) => id !== nodeId));
+            }
+          }
+        }
+      },
+
+      collapseNode: (nodeId: string | number) => {
+        // nodeId is source ID, which matches TreeNode.key
+        const wasExpanded = expandedIds.includes(nodeId);
+        if (!wasExpanded) return; // Nothing to collapse
+
+        // Find the node and collect all its descendants
+        const nodeToCollapse = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(nodeId),
+        );
+        if (nodeToCollapse) {
+          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
+
+          // Remove all descendant IDs from expanded list
+          setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+
+          // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
+          const currentLoadingState = nodeStates.get(nodeId) || "unloaded";
+          if (currentLoadingState === "loaded" && loadChildren) {
+            setCollapsedTimestamps((prev) => new Map(prev).set(nodeId, Date.now()));
+
+            // Issue #2786 fix: Check if autoLoadAfter is 0, mark node as unloaded immediately
+            const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
+            const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
+            const nodeData = flatTreeData.find((n) => String(n.key) === String(nodeId));
+            const nodeAutoLoadAfter = nodeData && autoLoadAfterFieldName in nodeData
+              ? (nodeData as any)[autoLoadAfterFieldName]
+              : undefined;
+            const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+              ? explicitAutoLoadAfter
+              : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+
+            // If autoLoadAfter is 0, immediately mark node as unloaded
+            if (effectiveAutoLoadAfter === 0) {
+              setNodeStates((prev) => new Map(prev).set(nodeId, "unloaded"));
+
+              // Update the loaded field in source data
+              setInternalData((prevData) => {
+                const currentData = prevData ?? data;
+                const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+                if (dataFormat === "flat" && Array.isArray(currentData)) {
+                  return currentData.map((item) => {
+                    if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                      return { ...item, [loadedFieldName]: false };
+                    }
+                    return item;
+                  });
+                } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+                  const updateHierarchy = (nodes: any[]): any[] => {
+                    return nodes.map((node) => {
+                      if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                        return { ...node, [loadedFieldName]: false };
+                      } else if (node[fieldConfig.childrenField || "children"]) {
+                        return {
+                          ...node,
+                          [fieldConfig.childrenField || "children"]: updateHierarchy(
+                            node[fieldConfig.childrenField || "children"],
+                          ),
+                        };
+                      }
+                      return node;
+                    });
+                  };
+                  return updateHierarchy(currentData);
+                }
+
+                return currentData;
+              });
+            }
+          }
+
+          // Fire nodeDidCollapse event
+          if (nodeToCollapse && onNodeCollapsed) {
+            // Convert to FlatTreeNode format for the event
+            const flatNode: FlatTreeNode = {
+              ...nodeToCollapse,
+              isExpanded: false,
+              depth: nodeToCollapse.parentIds.length,
+              hasChildren: !!(nodeToCollapse.children && nodeToCollapse.children.length > 0),
+            };
+            onNodeCollapsed(flatNode);
+          }
+        }
+      },
+
+      // Selection methods
+      selectNode: (nodeId: string | number) => {
+        // Check if node exists before calling setSelectedNodeById
+        if (nodeExists(nodeId)) {
+          return setSelectedNodeById(nodeId);
+        } else {
+          return setSelectedNodeById(undefined);
+        }
+      },
+
+      clearSelection,
+
+      // Utility methods
+      getNodeById,
+
+      getExpandedNodes,
+
+      getSelectedNode,
+
+      scrollIntoView: (nodeId: string | number, options?: ScrollIntoViewOptions) => {
+        // Find the target node
+        const targetNode = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(nodeId),
+        );
+        if (!targetNode) {
+          return; // Node not found
+        }
+
+        // Collect all parent IDs that need to be expanded
+        const parentsToExpand: (string | number)[] = [];
+        const collectParents = (node: TreeNode) => {
+          if (node.parentIds && node.parentIds.length > 0) {
+            // Add all parent IDs to expansion list
+            parentsToExpand.push(...node.parentIds);
+          }
+        };
+
+        collectParents(targetNode);
+
+        // Calculate the new expanded IDs including parents
+        const newExpandedIds = [...new Set([...expandedIds, ...parentsToExpand])];
+
+        // Expand all parent nodes if they aren't already expanded
+        if (parentsToExpand.length > 0) {
+          setExpandedIds(newExpandedIds);
+        }
+
+        // Use setTimeout to ensure DOM is updated after expansion state change
+        setTimeout(() => {
+          // Generate the flat tree data with the new expanded state to find the correct index
+          const updatedFlatTreeData = toFlatTree(
+            treeData,
+            newExpandedIds,
+            fieldConfig.dynamicField,
+            nodeStates,
+            dynamic,
+          );
+          const nodeIndex = updatedFlatTreeData.findIndex(
+            (item) => String(item.key) === String(nodeId),
+          );
+
+          if (nodeIndex >= 0 && listRef.current) {
+            // Scroll to the item using virtua's scrollToIndex method
+            listRef.current.scrollToIndex(nodeIndex, { align: "center" });
+          }
+        }, 0);
+      },
+
+      scrollToItem: (nodeId: string | number) => {
+        // Simple scroll without expanding - just scroll to the item if it's visible
+        const nodeIndex = findNodeIndexById(nodeId);
+
+        if (nodeIndex >= 0 && listRef.current) {
+          listRef.current.scrollToIndex(nodeIndex, { align: "center" });
+        }
+      },
+
+      appendNode: (parentNodeId: string | number | undefined | null, nodeData: any) => {
+        // Generate a new ID if not provided
+        const nodeId = nodeData[fieldConfig.idField] || Date.now();
+
+        // Create the new node with proper field mapping
+        const newNode = {
+          ...nodeData,
+          [fieldConfig.idField]: nodeId,
+        };
+
+        // For flat data format, set the parent ID field
+        if (dataFormat === "flat") {
+          newNode[fieldConfig.parentField || "parentId"] = parentNodeId || null;
+        }
+
+        // Update the internal data state
+        updateInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat") {
+            // For flat format, just append to the array
+            return Array.isArray(currentData) ? [...currentData, newNode] : [newNode];
+          } else if (dataFormat === "hierarchy") {
+            // For hierarchy format, we need to find the parent and add to its children
+            const addToHierarchy = (nodes: any[]): any[] => {
+              if (!parentNodeId) {
+                // Add to root level
+                return [...nodes, { ...newNode, [fieldConfig.childrenField || "children"]: [] }];
+              }
+
+              return nodes.map((node) => {
+                if (node[fieldConfig.idField] === parentNodeId) {
+                  const children = node[fieldConfig.childrenField || "children"] || [];
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: [
+                      ...children,
+                      { ...newNode, [fieldConfig.childrenField || "children"]: [] },
+                    ],
+                  };
+                }
+
+                // Recursively check children
+                const childrenField = fieldConfig.childrenField || "children";
+                if (node[childrenField] && Array.isArray(node[childrenField])) {
+                  return {
+                    ...node,
+                    [childrenField]: addToHierarchy(node[childrenField]),
+                  };
+                }
+
+                return node;
+              });
+            };
+
+            if (Array.isArray(currentData)) {
+              return addToHierarchy(currentData);
+            } else {
+              return currentData;
+            }
+          }
+
+          return currentData;
+        });
+      },
+
+      removeNode: (nodeId: string | number) => {
+        // Helper function to recursively find and remove a node and its descendants
+        const removeFromFlat = (data: any[]): any[] => {
+          const nodeIdToRemove = String(nodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldParent = fieldConfig.parentField || "parentId";
+
+          // First, collect all descendant IDs recursively
+          const getDescendantIds = (parentId: string): string[] => {
+            const descendants: string[] = [];
+            for (const item of data) {
+              if (String(item[fieldParent]) === parentId) {
+                const itemId = String(item[fieldId]);
+                descendants.push(itemId);
+                descendants.push(...getDescendantIds(itemId));
+              }
+            }
+            return descendants;
+          };
+
+          // Get all IDs to remove (node itself + all descendants)
+          const idsToRemove = new Set([nodeIdToRemove, ...getDescendantIds(nodeIdToRemove)]);
+
+          // Filter out all nodes with IDs in the removal set
+          return data.filter((item) => !idsToRemove.has(String(item[fieldId])));
+        };
+
+        const removeFromHierarchy = (nodes: any[]): any[] => {
+          const fieldId = fieldConfig.idField || "id";
+          const fieldChildren = fieldConfig.childrenField || "children";
+
+          return nodes.reduce((acc: any[], node: any) => {
+            // If this is the node to remove, don't include it (and its descendants)
+            if (String(node[fieldId]) === String(nodeId)) {
+              return acc;
+            }
+
+            // Otherwise, include the node but recursively process its children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              acc.push({
+                ...node,
+                [fieldChildren]: removeFromHierarchy(children),
+              });
+            } else {
+              acc.push(node);
+            }
+
+            return acc;
+          }, []);
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return removeFromFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return removeFromHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      removeChildren: (nodeId: string | number) => {
+        // Helper function to remove only the children of a node in flat format
+        const removeChildrenFromFlat = (data: any[]): any[] => {
+          const parentNodeId = String(nodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldParent = fieldConfig.parentField || "parentId";
+
+          // First, collect all descendant IDs recursively (but not the parent node itself)
+          const getDescendantIds = (parentId: string): string[] => {
+            const descendants: string[] = [];
+            for (const item of data) {
+              if (String(item[fieldParent]) === parentId) {
+                const itemId = String(item[fieldId]);
+                descendants.push(itemId);
+                descendants.push(...getDescendantIds(itemId));
+              }
+            }
+            return descendants;
+          };
+
+          // Get all descendant IDs to remove (children and their descendants)
+          const idsToRemove = new Set(getDescendantIds(parentNodeId));
+
+          // Filter out all descendant nodes but keep the parent node
+          return data.filter((item) => !idsToRemove.has(String(item[fieldId])));
+        };
+
+        const removeChildrenFromHierarchy = (nodes: any[]): any[] => {
+          const fieldId = fieldConfig.idField || "id";
+          const fieldChildren = fieldConfig.childrenField || "children";
+
+          return nodes.map((node: any) => {
+            // If this is the target node, remove all its children
+            if (String(node[fieldId]) === String(nodeId)) {
+              return {
+                ...node,
+                [fieldChildren]: [],
+              };
+            }
+
+            // Otherwise, recursively process children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              return {
+                ...node,
+                [fieldChildren]: removeChildrenFromHierarchy(children),
+              };
+            }
+
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return removeChildrenFromFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return removeChildrenFromHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      insertNodeBefore: (beforeNodeId: string | number, nodeData: any) => {
+        // Generate a new ID if not provided
+        const nodeId = nodeData[fieldConfig.idField] || Date.now();
+
+        // Create the new node with proper field mapping
+        const newNode = {
+          ...nodeData,
+          [fieldConfig.idField]: nodeId,
+        };
+
+        // Helper function to insert before a node in flat format
+        const insertBeforeInFlat = (data: any[]): any[] => {
+          const beforeNodeIdStr = String(beforeNodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldParent = fieldConfig.parentField || "parentId";
+
+          // Find the target node to get its parent
+          const targetNode = data.find((item) => String(item[fieldId]) === beforeNodeIdStr);
+          if (!targetNode) {
+            // If target node not found, just append to root level
+            return [...data, { ...newNode, [fieldParent]: null }];
+          }
+
+          // Set the same parent as the target node
+          const parentId = targetNode[fieldParent];
+          newNode[fieldParent] = parentId;
+
+          // Find the index of the target node and insert before it
+          const targetIndex = data.findIndex((item) => String(item[fieldId]) === beforeNodeIdStr);
+          const result = [...data];
+          result.splice(targetIndex, 0, newNode);
+          return result;
+        };
+
+        const insertBeforeInHierarchy = (nodes: any[]): any[] => {
+          const beforeNodeIdStr = String(beforeNodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldChildren = fieldConfig.childrenField || "children";
+
+          // Check if the target node is at this level
+          const targetIndex = nodes.findIndex((node) => String(node[fieldId]) === beforeNodeIdStr);
+          if (targetIndex >= 0) {
+            // Insert before the target node at this level
+            const result = [...nodes];
+            const nodeWithChildren = { ...newNode, [fieldChildren]: [] };
+            result.splice(targetIndex, 0, nodeWithChildren);
+            return result;
+          }
+
+          // Otherwise, recursively search in children
+          return nodes.map((node: any) => {
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              const updatedChildren = insertBeforeInHierarchy(children);
+              if (updatedChildren !== children) {
+                return {
+                  ...node,
+                  [fieldChildren]: updatedChildren,
+                };
+              }
+            }
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return insertBeforeInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return insertBeforeInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      insertNodeAfter: (afterNodeId: string | number, nodeData: any) => {
+        // Generate a new ID if not provided
+        const nodeId = nodeData[fieldConfig.idField] || Date.now();
+
+        // Create the new node with proper field mapping
+        const newNode = {
+          ...nodeData,
+          [fieldConfig.idField]: nodeId,
+        };
+
+        // Helper function to insert after a node in flat format
+        const insertAfterInFlat = (data: any[]): any[] => {
+          const afterNodeIdStr = String(afterNodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldParent = fieldConfig.parentField || "parentId";
+
+          // Find the target node to get its parent
+          const targetNode = data.find((item) => String(item[fieldId]) === afterNodeIdStr);
+          if (!targetNode) {
+            // If target node not found, just append to root level
+            return [...data, { ...newNode, [fieldParent]: null }];
+          }
+
+          // Set the same parent as the target node
+          const parentId = targetNode[fieldParent];
+          newNode[fieldParent] = parentId;
+
+          // Find the index of the target node and insert after it
+          const targetIndex = data.findIndex((item) => String(item[fieldId]) === afterNodeIdStr);
+          const result = [...data];
+          result.splice(targetIndex + 1, 0, newNode);
+          return result;
+        };
+
+        const insertAfterInHierarchy = (nodes: any[]): any[] => {
+          const afterNodeIdStr = String(afterNodeId);
+          const fieldId = fieldConfig.idField || "id";
+          const fieldChildren = fieldConfig.childrenField || "children";
+
+          // Check if the target node is at this level
+          const targetIndex = nodes.findIndex((node) => String(node[fieldId]) === afterNodeIdStr);
+          if (targetIndex >= 0) {
+            // Insert after the target node at this level
+            const result = [...nodes];
+            const nodeWithChildren = { ...newNode, [fieldChildren]: [] };
+            result.splice(targetIndex + 1, 0, nodeWithChildren);
+            return result;
+          }
+
+          // Otherwise, recursively search in children
+          return nodes.map((node: any) => {
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              const updatedChildren = insertAfterInHierarchy(children);
+              if (updatedChildren !== children) {
+                return {
+                  ...node,
+                  [fieldChildren]: updatedChildren,
+                };
+              }
+            }
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return insertAfterInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return insertAfterInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      replaceNode: (nodeId: string | number, nodeData: any) => {
+        const nodeIdStr = String(nodeId);
+        const fieldId = fieldConfig.idField || "id";
+        const fieldChildren = fieldConfig.childrenField || "children";
+        const fieldParent = fieldConfig.parentField || "parentId";
+
+        // Check if we're changing the node's ID
+        const newId = nodeData[fieldId];
+        const isIdChanging = newId !== undefined && String(newId) !== nodeIdStr;
+
+        // Helper function to replace node properties in flat format
+        const replaceNodeInFlat = (data: any[]): any[] => {
+          return data.map((item) => {
+            if (String(item[fieldId]) === nodeIdStr) {
+              // Merge properties: nodeData overrides existing properties
+              // Allow ID to be updated if provided in nodeData
+              return {
+                ...item,
+                ...nodeData,
+              };
+            }
+            // If ID is changing, update children's parent references
+            if (isIdChanging && String(item[fieldParent]) === nodeIdStr) {
+              return {
+                ...item,
+                [fieldParent]: newId,
+              };
+            }
+            return item;
+          });
+        };
+
+        // Helper function to replace node properties in hierarchy format
+        const replaceNodeInHierarchy = (nodes: any[]): any[] => {
+          return nodes.map((node: any) => {
+            if (String(node[fieldId]) === nodeIdStr) {
+              // Merge properties: nodeData overrides existing properties
+              // Allow ID to be updated if provided in nodeData
+              const updatedNode = {
+                ...node,
+                ...nodeData,
+              };
+
+              // If nodeData doesn't specify children, preserve existing children
+              if (!(fieldChildren in nodeData) && node[fieldChildren]) {
+                updatedNode[fieldChildren] = node[fieldChildren];
+              }
+
+              return updatedNode;
+            }
+
+            // Recursively process children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              return {
+                ...node,
+                [fieldChildren]: replaceNodeInHierarchy(children),
+              };
+            }
+
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return replaceNodeInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return replaceNodeInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+
+        // If the ID is changing, also update the expansion state
+        if (isIdChanging) {
+          setExpandedIds((prev) => {
+            // Check if the old ID was expanded
+            const wasExpanded = prev.some((id) => String(id) === nodeIdStr);
+            if (wasExpanded) {
+              // Replace old ID with new ID in the expansion list
+              return prev.map((id) => (String(id) === nodeIdStr ? newId : id));
+            }
+            return prev;
+          });
+        }
+      },
+
+      replaceChildren: (nodeId: string | number, newChildren: any[]) => {
+        const nodeIdStr = String(nodeId);
+        const fieldId = fieldConfig.idField || "id";
+        const fieldChildren = fieldConfig.childrenField || "children";
+        const fieldParent = fieldConfig.parentField || "parentId";
+
+        // Helper function to replace children in flat format
+        const replaceChildrenInFlat = (data: any[]): any[] => {
+          // First, collect all descendant IDs recursively
+          const getDescendantIds = (parentId: string): string[] => {
+            const descendants: string[] = [];
+            for (const item of data) {
+              if (String(item[fieldParent]) === parentId) {
+                const itemId = String(item[fieldId]);
+                descendants.push(itemId);
+                descendants.push(...getDescendantIds(itemId));
+              }
+            }
+            return descendants;
+          };
+
+          // Get all descendant IDs to remove
+          const idsToRemove = new Set(getDescendantIds(nodeIdStr));
+
+          // Filter out all descendant nodes
+          const filteredData = data.filter((item) => !idsToRemove.has(String(item[fieldId])));
+
+          // Add new children with proper parent reference
+          const newChildNodes = newChildren.map((childData) => ({
+            ...childData,
+            [fieldParent]: nodeId,
+          }));
+
+          return [...filteredData, ...newChildNodes];
+        };
+
+        // Helper function to replace children in hierarchy format
+        const replaceChildrenInHierarchy = (nodes: any[]): any[] => {
+          return nodes.map((node: any) => {
+            if (String(node[fieldId]) === nodeIdStr) {
+              // Replace children array - preserve nested structure
+              return {
+                ...node,
+                [fieldChildren]: newChildren,
+              };
+            }
+
+            // Recursively process children
+            const children = node[fieldChildren];
+            if (children && Array.isArray(children)) {
+              return {
+                ...node,
+                [fieldChildren]: replaceChildrenInHierarchy(children),
+              };
+            }
+
+            return node;
+          });
+        };
+
+        // Update the internal data state
+        setInternalData((prevData) => {
+          const currentData = prevData ?? data;
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            return replaceChildrenInFlat(currentData);
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            return replaceChildrenInHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      // Node state management methods
+
+      getNodeLoadingState: (nodeId: string | number) => {
+        // First check nodeStates Map (active loading state)
+        const activeState = nodeStates.get(nodeId);
+        if (activeState) {
+          return activeState;
+        }
+
+        // Fallback to checking loaded field from source data
+        const node = getNodeById(nodeId);
+        if (node && node.loaded === false) {
+          return "unloaded";
+        }
+
+        // Default to loaded
+        return "loaded";
+      },
+
+      markNodeLoaded: (nodeId: string | number) => {
+        setNodeState(nodeId, "loaded");
+
+        // Also update the loaded field in source data
+        updateInternalData((prevData) => {
+          const currentData = prevData ?? data;
+          const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            // Update in flat format
+            return currentData.map((item) => {
+              if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                return { ...item, [loadedFieldName]: true };
+              }
+              return item;
+            });
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            // Update in hierarchy format
+            const updateHierarchy = (nodes: any[]): any[] => {
+              return nodes.map((node) => {
+                if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                  return { ...node, [loadedFieldName]: true };
+                } else if (node[fieldConfig.childrenField || "children"]) {
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: updateHierarchy(
+                      node[fieldConfig.childrenField || "children"],
+                    ),
+                  };
+                }
+                return node;
+              });
+            };
+            return updateHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      markNodeUnloaded: (nodeId: string | number) => {
+        setNodeState(nodeId, "unloaded");
+        treeApiMethods.collapseNode(nodeId);
+
+        // Also update the loaded field in source data
+        updateInternalData((prevData) => {
+          const currentData = prevData ?? data;
+          const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+          if (dataFormat === "flat" && Array.isArray(currentData)) {
+            // Update in flat format
+            return currentData.map((item) => {
+              if (String(item[fieldConfig.idField || "id"]) === String(nodeId)) {
+                return { ...item, [loadedFieldName]: false };
+              }
+              return item;
+            });
+          } else if (dataFormat === "hierarchy" && Array.isArray(currentData)) {
+            // Update in hierarchy format
+            const updateHierarchy = (nodes: any[]): any[] => {
+              return nodes.map((node) => {
+                if (String(node[fieldConfig.idField || "id"]) === String(nodeId)) {
+                  return { ...node, [loadedFieldName]: false };
+                } else if (node[fieldConfig.childrenField || "children"]) {
+                  return {
+                    ...node,
+                    [fieldConfig.childrenField || "children"]: updateHierarchy(
+                      node[fieldConfig.childrenField || "children"],
+                    ),
+                  };
+                }
+                return node;
+              });
+            };
+            return updateHierarchy(currentData);
+          }
+
+          return currentData;
+        });
+      },
+
+      getVisibleItems: () => {
+        if (!listRef.current) {
+          return [];
+        }
+
+        const virtualizer = listRef.current;
+        const scrollOffset = virtualizer.scrollOffset;
+        const viewportSize = virtualizer.viewportSize;
+
+        // Calculate the visible range
+        const startOffset = scrollOffset;
+        const endOffset = scrollOffset + viewportSize;
+
+        // Find items within the visible range
+        const visibleItems: FlatTreeNode[] = [];
+
+        for (let i = 0; i < flatTreeData.length; i++) {
+          const itemOffset = virtualizer.getItemOffset(i);
+          const itemSize = virtualizer.getItemSize(i);
+          const itemEnd = itemOffset + itemSize;
+
+          // Check if item is at least partially visible in the viewport
+          if (itemEnd > startOffset && itemOffset < endOffset) {
+            visibleItems.push(flatTreeData[i]);
+          }
+
+          // Stop if we've passed the visible range
+          if (itemOffset >= endOffset) {
+            break;
+          }
+        }
+
+        return visibleItems;
+      },
+
+      getExpandedTimestamp: (nodeId: string | number): number | undefined => {
+        return expandedTimestamps.get(nodeId);
+      },
+
+      setAutoLoadAfter: (
+        nodeId: string | number,
+        milliseconds: number | null | undefined,
+      ): void => {
+        if (milliseconds === null || milliseconds === undefined) {
+          // Clear autoLoadAfter for this node
+          setAutoLoadAfterMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(nodeId);
+            return newMap;
+          });
+        } else {
+          // Set autoLoadAfter for this node
+          setAutoLoadAfterMap((prev) => new Map(prev).set(nodeId, milliseconds));
+        }
+      },
+
+      getNodeAutoLoadAfter: (nodeId: string | number): number | null | undefined => {
+        const explicitValue = autoLoadAfterMap.get(nodeId);
+        if (explicitValue !== undefined) {
+          return explicitValue;
+        }
+        // Fall back to component-level default
+        return autoLoadAfter;
+      },
+
+      getDynamic: (nodeId: string | number): boolean => {
+        // Check if there's an explicit value set via setDynamic
+        const explicitValue = dynamicStateMap.get(nodeId);
+        if (explicitValue !== undefined) {
+          return explicitValue;
+        }
+
+        // Check node data for dynamic field
+        const node = Object.values(treeItemsById).find(
+          (n) => String(n.key) === String(nodeId),
+        );
+        if (node) {
+          const dynamicFieldName = fieldConfig.dynamicField || "dynamic";
+          // TreeNode has data fields directly copied from source data
+          if (dynamicFieldName in node) {
+            return Boolean((node as any)[dynamicFieldName]);
+          }
+        }
+
+        // Fall back to component-level default
+        return dynamic ?? false;
+      },
+
+      setDynamic: (nodeId: string | number, value: boolean | undefined): void => {
+        if (value === undefined) {
+          // Clear explicit dynamic value for this node
+          setDynamicStateMap((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(nodeId);
+            return newMap;
+          });
+        } else {
+          // Set explicit dynamic value for this node
+          setDynamicStateMap((prev) => new Map(prev).set(nodeId, value));
+        }
+      },
+    };
+  }, [
+    treeData,
+    treeItemsById,
+    expandedIds,
+    effectiveSelectedId,
+    flatTreeData,
+    onNodeExpanded,
+    onNodeCollapsed,
+    setSelectedNodeById,
+    nodeExists,
+    fieldConfig,
+    dataFormat,
+    data,
+    setInternalData,
+    expandedTimestamps,
+    autoLoadAfterMap,
+    autoLoadAfter,
+    dynamicStateMap,
+    dynamic,
+    dynamicField,
+    nodeStates,
+    setNodeStates,
+    loadChildren,
+    setCollapsedTimestamps,
+  ]);
+
+  // Register component API methods for external access
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi(treeApiMethods);
+    }
+  }, [registerComponentApi, treeApiMethods]);
+
+  // Simplified focus management for the tree container
+  const handleTreeFocus = useCallback(() => {
+    if (flatTreeData.length > 0 && focusedIndex === -1) {
+      // Initialize to selected item or first item on focus
+      const selectedIndex = findNodeIndexById(effectiveSelectedId);
+      const targetIndex = selectedIndex >= 0 ? selectedIndex : 0;
+      setFocusedIndex(targetIndex);
+    }
+  }, [focusedIndex, flatTreeData, effectiveSelectedId]);
+
+  const handleTreeBlur = useCallback((e: React.FocusEvent) => {
+    // Check if focus is moving to another element within the tree
+    const isMovingWithinTree = e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node);
+
+    if (!isMovingWithinTree) {
+      // Clear focus when tree loses focus completely
+      setFocusedIndex(-1);
+    }
+  }, []);
+
 
   return (
-    <div
-      {...rest}
-      id={id}
-      ref={rootRef}
-      className={[styles.root, showScrollerFade ? styles.withFade : "", className].filter(Boolean).join(" ")}
-      style={rootStyle}
-      data-testid={dataTestId}
-      data-scroll-style={scrollStyle}
+    <Scroller
+      ref={treeContainerRef}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className)}
       role="tree"
       aria-label="Tree navigation"
       aria-multiselectable="false"
       tabIndex={0}
-      onFocus={() => {
-        if (focusedId === undefined && visibleItems.length > 0) {
-          setFocusedId(visibleItems[0].id);
-        }
-      }}
-      onKeyDown={(event) => handleKeyDown(event, {
-        visibleItems,
-        focusedIndex,
-        setFocusedId,
-        selectId,
-        toggleNode,
-        expandNode,
-        collapseNode,
-        hasNodeDidExpandHandler: Boolean(onNodeDidExpand),
-      })}
-      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+      onFocus={handleTreeFocus}
+      onBlur={handleTreeBlur}
+      onKeyDown={handleKeyDown}
+      style={{ height: overflow ? "auto" : "100%", overflow: overflow ?? "auto" }}
+      scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
     >
-      <div
-        data-overlayscrollbars-viewport
-        ref={(node) => {
-          viewportProxyRef.current = node;
-          if (node) {
-            node.scrollTo = ((xOrOptions?: number | ScrollToOptions, y?: number) => {
-              const top = typeof xOrOptions === "object" ? xOrOptions.top ?? 0 : y ?? 0;
-              setScrollTop(top);
-              rootRef.current?.scrollTo(typeof xOrOptions === "object" ? xOrOptions : { top });
-            }) as HTMLDivElement["scrollTo"];
-          }
-        }}
-        style={{ display: "contents" }}
-      >
-      {topSpacerHeight > 0 ? <div aria-hidden="true" style={{ height: topSpacerHeight }} /> : null}
-      {renderedItems.map((item) => {
-        const expandable = item.children.length > 0 || !item.loaded || item.dynamic;
-        const expanded = expandedIds.some((idValue) => idsEqual(idValue, item.id));
-        const selectable = fieldValue(item.source, selectableField) !== false;
-        const selected = idsEqual(currentSelectedId, item.id);
-        const focused = idsEqual(focusedId, item.id);
-        const isLoading = loadingIds.some((id) => idsEqual(id, item.id));
-        const showSpinner = spinnerIds.some((id) => idsEqual(id, item.id));
-        const templateItem = {
-          ...toTemplateItem(item, expandedIds, selectableField),
-          loadingState: isLoading ? "loading" : item.loaded ? "loaded" : "unloaded",
-        };
-        return (
-          <div
-            key={String(item.id)}
-            role="treeitem"
-            data-tree-node-id={String(item.id)}
-            aria-expanded={expandable ? expanded : undefined}
-            aria-selected={selected ? "true" : "false"}
-            aria-level={item.depth + 1}
-            aria-label={item.name}
-            className={[styles.item, selected ? styles.selected : "", focused ? styles.focused : ""].filter(Boolean).join(" ")}
-            style={{ paddingLeft: `${item.depth * 18 + 6}px` }}
-            onContextMenu={(event) => {
-              setFocusedId(item.id);
-              if (selectable) {
-                setCurrentSelectedId(item.id);
-              }
-              void onContextMenu?.(templateItem, event);
-            }}
-            onClick={(event) => {
-              if (event.button !== 0) {
-                return;
-              }
-              void onItemClick?.(templateItem);
-              if (itemClickExpands && expandable) {
-                toggleNode(item);
-              }
-              if (selectable) {
-                selectId(item.id);
-              }
-            }}
-          >
-            {expandable ? (
-              <button
-                type="button"
-                data-tree-expand-icon
-                className={styles.toggle}
-                aria-label={expanded ? "Collapse" : "Expand"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  toggleNode(item);
-                }}
-                onContextMenu={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setFocusedId(item.id);
-                  if (selectable) {
-                    setCurrentSelectedId(item.id);
-                  }
-                  void onContextMenu?.(templateItem, event as unknown as MouseEvent<HTMLDivElement>);
-                }}
-              >
-                {showSpinner ? (
-                  <span data-tree-node-spinner className={styles.spinner} />
-                ) : (
-                  <TreeToggleIcon
-                    name={String(resolveToggleIcon(item, expanded, iconExpanded, iconCollapsed, iconExpandedField, iconCollapsedField))}
-                    size={String(iconSize)}
-                  />
-                )}
-              </button>
-            ) : <span className={styles.togglePlaceholder} />}
-            <span className={styles.label}>{renderItem?.(templateItem, item) ?? item.name}</span>
-          </div>
-        );
-      })}
-      {bottomSpacerHeight > 0 ? <div aria-hidden="true" style={{ height: bottomSpacerHeight }} /> : null}
-      </div>
-      {showScrollerFade ? (
-        <>
-          <div className={[styles.fadeOverlay, styles.fadeTop, scrollTop > 0 ? styles.fadeVisible : ""].filter(Boolean).join(" ")} />
-          <div className={[styles.fadeOverlay, styles.fadeBottom, styles.fadeVisible].join(" ")} />
-        </>
-      ) : null}
-    </div>
+      <Virtualizer ref={listRef} itemSize={measuredItemSize || itemHeight}>
+        {flatTreeData.map((node, index) => {
+          const isFirstItem = index === 0;
+          const shouldMeasure = isFirstItem && fixedItemSize;
+          const isSelected = String(effectiveSelectedId) === String(node.key);
+          const isFocused = focusedIndex === index && focusedIndex >= 0;
+
+          return shouldMeasure ? (
+            <div key={node.key} ref={firstItemRef}>
+              <TreeMemoizedRow index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
+            </div>
+          ) : (
+            <TreeMemoizedRow key={node.key} index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
+          );
+        })}
+      </Virtualizer>
+    </Scroller>
   );
-}));
-
-function flatItems(
-  data: unknown[],
-  idField: string,
-  nameField: string,
-  parentIdField: string,
-  childrenField: string,
-  dynamicField: string,
-  loadedField: string,
-  dynamicDefault: boolean,
-): TreeItem[] {
-  const byId = new Map<unknown, TreeItem>();
-  const roots: TreeItem[] = [];
-  for (const source of flattenFlatSources(data, childrenField)) {
-    if (!source || typeof source !== "object") {
-      continue;
-    }
-    const id = fieldValue(source, idField);
-    if (id === undefined || id === null) {
-      continue;
-    }
-    const parentId = fieldValue(source, parentIdField);
-    if (!byId.has(id)) {
-      byId.set(id, {
-      id,
-      name: String(fieldValue(source, nameField) ?? id ?? ""),
-      source,
-      children: [],
-      parentId,
-      dynamic: resolveDynamic(source, dynamicField, loadedField, dynamicDefault),
-      loaded: resolveLoaded(source, loadedField, dynamicField, dynamicDefault),
-    });
-    }
-  }
-  for (const item of byId.values()) {
-    const parentId = fieldValue(item.source, parentIdField);
-    const parent = byId.get(parentId);
-    if (parent) {
-      parent.children.push(item);
-    } else {
-      roots.push(item);
-    }
-  }
-  return roots;
-}
-
-function flattenFlatSources(data: unknown[], childrenField: string): unknown[] {
-  return data.flatMap((source) => {
-    if (!source || typeof source !== "object") {
-      return [source];
-    }
-    const children = fieldValue(source, childrenField);
-    return Array.isArray(children)
-      ? [source, ...flattenFlatSources(children, childrenField)]
-      : [source];
-  });
-}
-
-function hierarchyItems(
-  data: unknown[],
-  idField: string,
-  nameField: string,
-  childrenField: string,
-  dynamicField: string,
-  loadedField: string,
-  dynamicDefault: boolean,
-): TreeItem[] {
-  return data.flatMap((source): TreeItem[] => {
-    if (!source || typeof source !== "object") {
-      return [];
-    }
-    const id = fieldValue(source, idField);
-    if (id === undefined || id === null) {
-      return [];
-    }
-    return [{
-      id,
-      name: String(fieldValue(source, nameField) ?? fieldValue(source, idField) ?? ""),
-      source,
-      children: Array.isArray(fieldValue(source, childrenField))
-        ? hierarchyItems(fieldValue(source, childrenField) as unknown[], idField, nameField, childrenField, dynamicField, loadedField, dynamicDefault)
-        : [],
-      dynamic: resolveDynamic(source, dynamicField, loadedField, dynamicDefault),
-      loaded: resolveLoaded(source, loadedField, dynamicField, dynamicDefault),
-    }];
-  });
-}
-
-function visibleTreeItems(items: TreeItem[], expandedIds: unknown[], depth = 0): VisibleTreeItem[] {
-  return items.flatMap((item, localIndex) => {
-    const expanded = expandedIds.some((id) => idsEqual(id, item.id));
-    const current = {
-      ...item,
-      depth,
-      index: localIndex,
-      key: item.id,
-      displayName: item.name,
-      hasChildren: item.children.length > 0,
-      selectable: true,
-      expanded,
-    };
-    if (!expanded) {
-      return [current];
-    }
-    return [current, ...visibleTreeItems(item.children, expandedIds, depth + 1)];
-  });
-}
-
-function flattenItems(items: TreeItem[]): TreeItem[] {
-  return items.flatMap((item) => [item, ...flattenItems(item.children)]);
-}
-
-function initialExpandedIds(items: TreeItem[], defaultExpanded: TreeNativeProps["defaultExpanded"]): unknown[] {
-  if (Array.isArray(defaultExpanded)) {
-    return mergeIds(defaultExpanded, defaultExpanded.flatMap((id) => parentPathIds(items, id)));
-  }
-  if (defaultExpanded === "all") {
-    return flattenItems(items).map((item) => item.id);
-  }
-  if (defaultExpanded === "first-level") {
-    return items.map((item) => item.id);
-  }
-  return [];
-}
-
-function toggleId(ids: unknown[], id: unknown): unknown[] {
-  return ids.some((value) => idsEqual(value, id))
-    ? ids.filter((value) => !idsEqual(value, id))
-    : [...ids, id];
-}
-
-function fieldValue(item: unknown, field: string): unknown {
-  return item && typeof item === "object" ? (item as Record<string, unknown>)[field] : undefined;
-}
-
-function idsEqual(left: unknown, right: unknown): boolean {
-  return Object.is(left, right) || String(left) === String(right);
-}
-
-function stableDataSignature(data: unknown[]): string {
-  try {
-    return JSON.stringify(data);
-  } catch {
-    return String(data.length);
-  }
-}
-
-function mergeIds(left: unknown[], right: unknown[]): unknown[] {
-  const merged = [...left];
-  for (const id of right) {
-    if (!merged.some((value) => idsEqual(value, id))) {
-      merged.push(id);
-    }
-  }
-  return merged;
-}
-
-function parentPathIds(items: TreeItem[], targetId: unknown, path: unknown[] = []): unknown[] {
-  for (const item of items) {
-    if (idsEqual(item.id, targetId)) {
-      return path;
-    }
-    const childPath = parentPathIds(item.children, targetId, [...path, item.id]);
-    if (childPath.length > 0) {
-      return childPath;
-    }
-  }
-  return [];
-}
-
-function itemDepth(items: TreeItem[], targetId: unknown, depth = 0): number {
-  for (const item of items) {
-    if (idsEqual(item.id, targetId)) {
-      return depth;
-    }
-    const childDepth = itemDepth(item.children, targetId, depth + 1);
-    if (childDepth >= 0) {
-      return childDepth;
-    }
-  }
-  return -1;
-}
-
-function toTemplateItem(item: TreeItem | VisibleTreeItem | undefined, expandedIds: unknown[], selectableField: string): Record<string, unknown> | null {
-  if (!item) {
-    return null;
-  }
-  const source = item.source && typeof item.source === "object" ? item.source as Record<string, unknown> : {};
-  const depth = "depth" in item ? item.depth : 0;
-  const selectable = fieldValue(item.source, selectableField) !== false;
-  return {
-    ...source,
-    id: item.id,
-    key: item.id,
-    name: item.name,
-    displayName: item.name,
-    depth,
-    selectable,
-    hasChildren: item.children.length > 0,
-    expanded: expandedIds.some((id) => idsEqual(id, item.id)),
-    dynamic: item.dynamic,
-    loaded: item.loaded,
-    loadingState: item.loaded ? "loaded" : "unloaded",
-  };
-}
-
-function resolveLoaded(source: unknown, loadedField: string, dynamicField: string, dynamicDefault: boolean): boolean {
-  const value = fieldValue(source, loadedField);
-  if (value !== undefined) {
-    return Boolean(value);
-  }
-  return !resolveDynamic(source, dynamicField, loadedField, dynamicDefault);
-}
-
-function resolveDynamic(source: unknown, dynamicField: string, loadedField: string, dynamicDefault: boolean): boolean {
-  const value = fieldValue(source, dynamicField);
-  if (value !== undefined) {
-    return Boolean(value);
-  }
-  if (fieldValue(source, loadedField) === false) {
-    return true;
-  }
-  return Boolean(dynamicDefault);
-}
-
-function resolveToggleIcon(
-  item: TreeItem | VisibleTreeItem,
-  expanded: boolean,
-  defaultExpandedIcon: string,
-  defaultCollapsedIcon: string,
-  iconExpandedField: string,
-  iconCollapsedField: string,
-): string {
-  const source = item.source;
-  if (expanded) {
-    return String(fieldValue(source, iconExpandedField) ?? fieldValue(source, "iconExpanded") ?? defaultExpandedIcon);
-  }
-  return String(fieldValue(source, iconCollapsedField) ?? fieldValue(source, "iconCollapsed") ?? defaultCollapsedIcon);
-}
-
-function shouldLoadChildren(
-  item: TreeItem,
-  loadingIds: unknown[],
-  overrides: Map<string, number | null>,
-  collapsedTimestamps: Map<string, number>,
-  autoLoadAfterField: string,
-  autoLoadAfter: number | undefined,
-): boolean {
-  if (loadingIds.some((id) => idsEqual(id, item.id))) {
-    return false;
-  }
-  if (!item.dynamic && item.loaded) {
-    return false;
-  }
-  if (!item.loaded) {
-    return item.dynamic;
-  }
-  const threshold = effectiveAutoLoadAfter(item, overrides, autoLoadAfterField, autoLoadAfter);
-  const collapsed = collapsedTimestamps.get(String(item.id));
-  return item.dynamic && threshold !== undefined && threshold !== null && collapsed !== undefined && Date.now() - collapsed > threshold;
-}
-
-function effectiveAutoLoadAfter(
-  item: TreeItem | undefined,
-  overrides: Map<string, number | null>,
-  autoLoadAfterField: string,
-  autoLoadAfter: number | undefined,
-): number | null | undefined {
-  if (!item) {
-    return autoLoadAfter;
-  }
-  const key = String(item.id);
-  if (overrides.has(key)) {
-    return overrides.get(key);
-  }
-  const sourceValue = fieldValue(item.source, autoLoadAfterField);
-  return sourceValue === undefined ? autoLoadAfter : sourceValue as number | null;
-}
-
-function mergeLoadedChildren(
-  data: unknown[],
-  id: unknown,
-  children: unknown[],
-  dataFormat: "flat" | "hierarchy",
-  idField: string,
-  parentIdField: string,
-  childrenField: string,
-  loadedField: string,
-  dynamicField: string,
-): unknown[] {
-  if (dataFormat === "hierarchy") {
-    return data.map((node) => {
-      if (!node || typeof node !== "object") {
-        return node;
-      }
-      const record = node as Record<string, unknown>;
-      if (idsEqual(record[idField], id)) {
-        return { ...record, [childrenField]: children, [loadedField]: true, [dynamicField]: true };
-      }
-      const childNodes = record[childrenField];
-      return Array.isArray(childNodes)
-        ? { ...record, [childrenField]: mergeLoadedChildren(childNodes, id, children, dataFormat, idField, parentIdField, childrenField, loadedField, dynamicField) }
-        : node;
-    });
-  }
-  const withoutOldChildren = data.filter((node) => {
-    if (!node || typeof node !== "object") {
-      return true;
-    }
-    return !idsEqual((node as Record<string, unknown>)[parentIdField], id);
-  });
-  const patchedParent = withoutOldChildren.map((node) => {
-    if (!node || typeof node !== "object") {
-      return node;
-    }
-    const record = node as Record<string, unknown>;
-    return idsEqual(record[idField], id) ? { ...record, [loadedField]: true, [dynamicField]: true } : node;
-  });
-  const normalizedChildren = children.map((child) => {
-    if (!child || typeof child !== "object") {
-      return child;
-    }
-    const record = child as Record<string, unknown>;
-    return { ...record, [parentIdField]: record[parentIdField] ?? id };
-  });
-  return [...patchedParent, ...normalizedChildren];
-}
-
-function appendNodeData(
-  data: unknown[],
-  parentId: unknown,
-  nodeData: Record<string, unknown>,
-  dataFormat: "flat" | "hierarchy",
-  idField: string,
-  parentIdField: string,
-  childrenField: string,
-): unknown[] {
-  const nextId = nodeData[idField] ?? Date.now();
-  const newNode = { ...nodeData, [idField]: nextId };
-  if (dataFormat === "flat") {
-    return [...data, { ...newNode, [parentIdField]: parentId ?? null }];
-  }
-  const hierarchyNode = { ...newNode, [childrenField]: Array.isArray(newNode[childrenField]) ? newNode[childrenField] : [] };
-  if (parentId === undefined || parentId === null) {
-    return [...data, hierarchyNode];
-  }
-  return data.map((node) => {
-    if (!node || typeof node !== "object") {
-      return node;
-    }
-    const record = node as Record<string, unknown>;
-    if (idsEqual(record[idField], parentId)) {
-      const children = Array.isArray(record[childrenField]) ? record[childrenField] as unknown[] : [];
-      return { ...record, [childrenField]: [...children, hierarchyNode] };
-    }
-    const children = record[childrenField];
-    return Array.isArray(children)
-      ? { ...record, [childrenField]: appendNodeData(children, parentId, nodeData, dataFormat, idField, parentIdField, childrenField) }
-      : node;
-  });
-}
-
-function removeNodeData(
-  data: unknown[],
-  id: unknown,
-  dataFormat: "flat" | "hierarchy",
-  idField: string,
-  parentIdField: string,
-  childrenField: string,
-): unknown[] {
-  if (dataFormat === "hierarchy") {
-    return data.flatMap((node) => {
-      if (!node || typeof node !== "object") {
-        return [node];
-      }
-      const record = node as Record<string, unknown>;
-      if (idsEqual(record[idField], id)) {
-        return [];
-      }
-      const children = record[childrenField];
-      return [Array.isArray(children)
-        ? { ...record, [childrenField]: removeNodeData(children, id, dataFormat, idField, parentIdField, childrenField) }
-        : node];
-    });
-  }
-  const idsToRemove = new Set<string>([String(id)]);
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const node of data) {
-      if (node && typeof node === "object") {
-        const record = node as Record<string, unknown>;
-        if (idsToRemove.has(String(record[parentIdField])) && !idsToRemove.has(String(record[idField]))) {
-          idsToRemove.add(String(record[idField]));
-          changed = true;
-        }
-      }
-    }
-  }
-  return data.filter((node) => !node || typeof node !== "object" || !idsToRemove.has(String((node as Record<string, unknown>)[idField])));
-}
-
-function removeChildrenData(
-  data: unknown[],
-  id: unknown,
-  dataFormat: "flat" | "hierarchy",
-  idField: string,
-  parentIdField: string,
-  childrenField: string,
-): unknown[] {
-  if (dataFormat === "hierarchy") {
-    return data.map((node) => {
-      if (!node || typeof node !== "object") {
-        return node;
-      }
-      const record = node as Record<string, unknown>;
-      if (idsEqual(record[idField], id)) {
-        return { ...record, [childrenField]: [] };
-      }
-      const children = record[childrenField];
-      return Array.isArray(children)
-        ? { ...record, [childrenField]: removeChildrenData(children, id, dataFormat, idField, parentIdField, childrenField) }
-        : node;
-    });
-  }
-  const descendants = removeNodeData(data, id, dataFormat, idField, parentIdField, childrenField);
-  return data.filter((node) => {
-    if (!node || typeof node !== "object") {
-      return true;
-    }
-    const nodeId = (node as Record<string, unknown>)[idField];
-    return idsEqual(nodeId, id) || descendants.some((candidate) => candidate && typeof candidate === "object" && idsEqual((candidate as Record<string, unknown>)[idField], nodeId));
-  });
-}
-
-function insertNodeData(
-  data: unknown[],
-  targetId: unknown,
-  nodeData: Record<string, unknown>,
-  position: "before" | "after",
-  dataFormat: "flat" | "hierarchy",
-  idField: string,
-  parentIdField: string,
-  childrenField: string,
-): unknown[] {
-  const nextId = nodeData[idField] ?? Date.now();
-  const newNode = { ...nodeData, [idField]: nextId };
-  if (dataFormat === "flat") {
-    const index = data.findIndex((node) => node && typeof node === "object" && idsEqual((node as Record<string, unknown>)[idField], targetId));
-    if (index < 0) {
-      return [...data, { ...newNode, [parentIdField]: null }];
-    }
-    const target = data[index] as Record<string, unknown>;
-    const result = [...data];
-    result.splice(position === "before" ? index : index + 1, 0, { ...newNode, [parentIdField]: target[parentIdField] ?? null });
-    return result;
-  }
-  const hierarchyNode = { ...newNode, [childrenField]: Array.isArray(newNode[childrenField]) ? newNode[childrenField] : [] };
-  const targetIndex = data.findIndex((node) => node && typeof node === "object" && idsEqual((node as Record<string, unknown>)[idField], targetId));
-  if (targetIndex >= 0) {
-    const result = [...data];
-    result.splice(position === "before" ? targetIndex : targetIndex + 1, 0, hierarchyNode);
-    return result;
-  }
-  return data.map((node) => {
-    if (!node || typeof node !== "object") {
-      return node;
-    }
-    const record = node as Record<string, unknown>;
-    const children = record[childrenField];
-    return Array.isArray(children)
-      ? { ...record, [childrenField]: insertNodeData(children, targetId, nodeData, position, dataFormat, idField, parentIdField, childrenField) }
-      : node;
-  });
-}
-
-function selectionEvent(selectedNode: Record<string, unknown> | null, previousNode: Record<string, unknown> | null): Record<string, unknown> {
-  return {
-    ...(selectedNode ?? {}),
-    newNode: selectedNode,
-    selectedNode,
-    previousNode,
-  };
-}
-
-function TreeToggleIcon({ name, size }: { name: string; size: string }) {
-  return (
-    <span data-tree-expand-icon data-icon-name={name} className={styles.toggleIcon} aria-hidden="true">
-      <Icon name={name} size={size.endsWith("px") ? size : `${size}px`} />
-      <span className={styles.toggleIconFallback}>›</span>
-    </span>
-  );
-}
-
-function handleKeyDown(event: KeyboardEvent<HTMLDivElement>, helpers: {
-  visibleItems: VisibleTreeItem[];
-  focusedIndex: number;
-  setFocusedId: (id: unknown) => void;
-  selectId: (id: unknown) => void;
-  toggleNode: (item: VisibleTreeItem) => void;
-  expandNode: (id: unknown) => void;
-  collapseNode: (id: unknown) => void;
-  hasNodeDidExpandHandler: boolean;
-}) {
-  const { visibleItems, focusedIndex, setFocusedId, selectId, toggleNode, expandNode, collapseNode, hasNodeDidExpandHandler } = helpers;
-  const focused = visibleItems[focusedIndex] ?? visibleItems[0];
-  if (!focused) {
-    return;
-  }
-  if (event.key === "ArrowDown") {
-    event.preventDefault();
-    setFocusedId(visibleItems[Math.min(focusedIndex + 1, visibleItems.length - 1)].id);
-  } else if (event.key === "ArrowUp") {
-    event.preventDefault();
-    setFocusedId(visibleItems[Math.max(focusedIndex - 1, 0)].id);
-  } else if (event.key === "Home") {
-    event.preventDefault();
-    setFocusedId(visibleItems[0].id);
-  } else if (event.key === "End") {
-    event.preventDefault();
-    setFocusedId(visibleItems[visibleItems.length - 1].id);
-  } else if (event.key === "Enter") {
-    event.preventDefault();
-    if (focused.hasChildren && !focused.expanded && hasNodeDidExpandHandler) {
-      expandNode(focused.id);
-      return;
-    }
-    selectId(focused.id);
-  } else if (event.key === " ") {
-    event.preventDefault();
-    selectId(focused.id);
-  } else if (event.key === "ArrowRight") {
-    event.preventDefault();
-    expandNode(focused.id);
-  } else if (event.key === "ArrowLeft") {
-    event.preventDefault();
-    const parent = visibleItems.slice(0, focusedIndex).reverse().find((item) => item.depth === focused.depth - 1);
-    if (focused.depth > 0 && parent) {
-      setFocusedId(parent.id);
-      return;
-    }
-    if (focused.expanded) {
-      collapseNode(focused.id);
-    }
-  }
-}
-
-function visibleItemsInViewport(root: HTMLDivElement | null, items: VisibleTreeItem[], itemHeight: number): VisibleTreeItem[] {
-  if (!root || root.clientHeight <= 0 || root.scrollHeight <= root.clientHeight + 1) {
-    return items;
-  }
-  const start = Math.max(0, Math.floor(root.scrollTop / itemHeight));
-  const count = Math.max(1, Math.ceil(root.clientHeight / itemHeight) + 1);
-  return items.slice(start, start + count);
-}
-
-function replaceNodeData(data: unknown[], id: unknown, nodeData: Record<string, unknown>, dataFormat: "flat" | "hierarchy", idField: string, parentIdField: string, childrenField: string): unknown[] {
-  if (dataFormat === "hierarchy") {
-    return data.map((node) => {
-      if (!node || typeof node !== "object") {
-        return node;
-      }
-      const record = node as Record<string, unknown>;
-      if (idsEqual(record[idField], id)) {
-        return { ...record, ...nodeData, [childrenField]: childrenField in nodeData ? nodeData[childrenField] : record[childrenField] };
-      }
-      const children = record[childrenField];
-      return Array.isArray(children)
-        ? { ...record, [childrenField]: replaceNodeData(children, id, nodeData, dataFormat, idField, parentIdField, childrenField) }
-        : node;
-    });
-  }
-  const newId = nodeData[idField];
-  return data.map((node) => {
-    if (!node || typeof node !== "object") {
-      return node;
-    }
-    const record = node as Record<string, unknown>;
-    if (idsEqual(record[idField], id)) {
-      return { ...record, ...nodeData };
-    }
-    if (newId !== undefined && idsEqual(record[parentIdField], id)) {
-      return { ...record, [parentIdField]: newId };
-    }
-    return node;
-  });
-}
-
-function replaceChildrenData(data: unknown[], id: unknown, newChildren: unknown[], dataFormat: "flat" | "hierarchy", idField: string, parentIdField: string, childrenField: string): unknown[] {
-  if (dataFormat === "hierarchy") {
-    return data.map((node) => {
-      if (!node || typeof node !== "object") {
-        return node;
-      }
-      const record = node as Record<string, unknown>;
-      if (idsEqual(record[idField], id)) {
-        return { ...record, [childrenField]: newChildren };
-      }
-      const children = record[childrenField];
-      return Array.isArray(children)
-        ? { ...record, [childrenField]: replaceChildrenData(children, id, newChildren, dataFormat, idField, parentIdField, childrenField) }
-        : node;
-    });
-  }
-  const descendantIds = new Set<string>();
-  const collect = (parent: unknown) => {
-    for (const node of data) {
-      if (node && typeof node === "object" && idsEqual((node as Record<string, unknown>)[parentIdField], parent)) {
-        const nodeId = (node as Record<string, unknown>)[idField];
-        descendantIds.add(String(nodeId));
-        collect(nodeId);
-      }
-    }
-  };
-  collect(id);
-  const filtered = data.filter((node) => !node || typeof node !== "object" || !descendantIds.has(String((node as Record<string, unknown>)[idField])));
-  return [
-    ...filtered,
-    ...newChildren.map((child) => child && typeof child === "object" ? { ...child as Record<string, unknown>, [parentIdField]: id } : child),
-  ];
-}
+});

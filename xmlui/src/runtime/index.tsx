@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
+import hotToast, { Toaster } from "react-hot-toast";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
@@ -17,6 +17,9 @@ import { createToastService, ToastHost, type ToastService } from "./services/toa
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
 import { LegacyThemeProvider } from "../components-core/theming/ThemeContext";
+import { ThemedButton as Button } from "../components/Button/Button";
+import { Dialog } from "../components/ModalDialog/Dialog";
+import { ThemedStack as Stack } from "../components/Stack/Stack";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
@@ -152,7 +155,7 @@ export function XmluiRoot({
   const updateLoggedInUser = useCallback((user: unknown) => {
     setLoggedInUser((current) => areContextValuesEqual(current, user) ? current : user);
   }, []);
-  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
     toastRef.current = createToastService();
@@ -180,15 +183,26 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
-  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown) => {
-    setConfirmDialog({
-      title: String(title ?? "Confirm"),
-      message: message == null ? undefined : String(message),
-      okLabel: okLabel == null ? undefined : String(okLabel),
+  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown, cancelLabel?: unknown) => {
+    return new Promise<boolean>((resolve) => {
+      setConfirmDialog({
+        title: String(title ?? "Confirm"),
+        message: message == null ? undefined : String(message),
+        okLabel: okLabel == null ? undefined : String(okLabel),
+        cancelLabel: cancelLabel == null ? undefined : String(cancelLabel),
+        resolve,
+      });
     });
-    return true;
   }, []);
-  referencesRef.current.confirm = confirm;
+  const signError = useCallback((error: unknown) => {
+    const message = errorMessage(error);
+    hotToast.error(message);
+    console.error("[xmlui]", message);
+  }, []);
+  const appContextValues = useMemo(
+    () => ({ appGlobals, $appGlobals: appGlobals, loggedInUser, confirm, signError }),
+    [appGlobals, confirm, loggedInUser, signError],
+  );
   useEffect(() => {
     testProbe?.({
       hasLocal: (name) => store.hasLocal(rootOwnerId, name),
@@ -205,7 +219,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
+      contextValues: appContextValues,
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -238,7 +252,7 @@ export function XmluiRoot({
       store,
       localOwnerId: rootOwnerId,
       props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
+      contextValues: appContextValues,
       references: referencesRef.current,
       routing: routingRef.current,
       toast: toastRef.current,
@@ -248,7 +262,7 @@ export function XmluiRoot({
         ...normalizedExtensions.functions,
       },
     }),
-    [appGlobals, loggedInUser, module.extensionFunctions, normalizedExtensions.functions, store],
+    [appContextValues, module.extensionFunctions, normalizedExtensions.functions, store],
   );
   const context = useMemo(
     () => createRenderContext(module.components, {
@@ -261,20 +275,47 @@ export function XmluiRoot({
 
   return (
     <StyleProvider>
-      <XmluiAppContextProvider value={{ appGlobals, loggedInUser, setLoggedInUser: updateLoggedInUser, mediaSize }}>
+      <XmluiAppContextProvider value={{
+        appGlobals,
+        loggedInUser,
+        setLoggedInUser: updateLoggedInUser,
+        confirm,
+        signError,
+        mediaSize,
+      }}>
         <IconProvider icons={{}}>
           <XmluiThemeRoot tone={defaultTone}>
             <LegacyThemeProvider resources={resources}>
               <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-              {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+              {renderConfirmDialog(confirmDialog, (confirmed) => {
+                confirmDialog?.resolve(confirmed);
+                setConfirmDialog(undefined);
+              })}
               <GlobalLiveRegion />
               <ToastHost service={toastRef.current} />
+              <Toaster position="top-right" />
             </LegacyThemeProvider>
           </XmluiThemeRoot>
         </IconProvider>
       </XmluiAppContextProvider>
     </StyleProvider>
   );
+}
+
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message || "Something went wrong";
+  }
+  if (typeof error === "string") {
+    return error || "Something went wrong";
+  }
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null && String(message)) {
+      return String(message);
+    }
+  }
+  return "Something went wrong";
 }
 
 type RuntimeMediaSize = XmluiAppContextValue["mediaSize"];
@@ -353,57 +394,49 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
+type ConfirmDialogState = {
+  title: string;
+  message?: string;
+  okLabel?: string;
+  cancelLabel?: string;
+  resolve: (value: boolean) => void;
+};
+
 function renderConfirmDialog(
-  confirmDialog: { title: string; message?: string; okLabel?: string } | undefined,
-  close: () => void,
+  confirmDialog: ConfirmDialogState | undefined,
+  close: (confirmed: boolean) => void,
 ) {
   if (!confirmDialog) {
     return null;
   }
-  const dialog = (
-    <div
-      data-xmlui-confirm-layer=""
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 2147483647,
-        background: "rgba(0, 0, 0, 0.2)",
-        pointerEvents: "auto",
-      }}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-        close();
-      }}
-      onMouseDown={(event) => {
-        event.stopPropagation();
-        close();
-      }}
-    >
-      <div
-        role="dialog"
-        aria-label={confirmDialog.title}
-        style={{
-          position: "fixed",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          minWidth: "18rem",
-          padding: "1rem",
-          borderRadius: "4px",
-          background: "var(--xmlui-color-surface-0, #fff)",
-          boxShadow: "var(--xmlui-boxShadow-md, 0 8px 24px rgba(0, 0, 0, 0.18))",
-        }}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <div>{confirmDialog.title}</div>
-        {confirmDialog.message ? <div>{confirmDialog.message}</div> : null}
-        <button type="button" onClick={close}>
-          {confirmDialog.okLabel ?? "OK"}
-        </button>
-      </div>
-    </div>
+  return (
+    <Dialog
+      title={confirmDialog.title}
+      description={confirmDialog.message}
+      isOpen={true}
+      onClose={() => close(false)}
+      buttons={
+        <Stack
+          orientation="horizontal"
+          horizontalAlignment="end"
+          style={{ width: "100%", gap: "1em" }}
+        >
+          <Button variant="ghost" themeColor="secondary" size="sm" onClick={() => close(false)}>
+            {confirmDialog.cancelLabel ?? "Cancel"}
+          </Button>
+          <Button
+            variant="solid"
+            themeColor="attention"
+            size="sm"
+            type="submit"
+            onClick={() => close(true)}
+          >
+            {confirmDialog.okLabel ?? "OK"}
+          </Button>
+        </Stack>
+      }
+    />
   );
-  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }
 
 export type { XmluiDocumentInput, XmluiModule } from "./types";

@@ -407,7 +407,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               <label
                 htmlFor={inputId}
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={onLabelClick || (() => focusLabeledControl(inputId))}
+                onClick={onLabelClick || ((event) => {
+                  event.preventDefault();
+                  focusLabeledControl(inputId);
+                })}
                 style={{
                   ...labelStyle,
                   display:

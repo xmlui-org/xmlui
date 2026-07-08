@@ -12,6 +12,9 @@
   "Option": [
     "OptionTypeProvider.tsx"
   ],
+  "Queue": [
+    "queueActions.ts"
+  ],
   "Select": [
     "HiddenOption.tsx",
     "MultiSelectOption.tsx",
@@ -23,5 +26,8 @@
   "Table": [
     "react-table-config.d.ts",
     "useRowSelection.tsx"
+  ],
+  "Tree": [
+    "testData.ts"
   ]
 }

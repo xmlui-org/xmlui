@@ -31,6 +31,12 @@ export function isComponentDefChildren(children?: unknown): boolean {
   return typeof children !== "string";
 }
 
+let lastGeneratedId = 1;
+
+export function generatedId(): string {
+  return `$qid_${lastGeneratedId++}`;
+}
+
 export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
   func: F,
   wait?: number,

@@ -18,6 +18,9 @@ import {
   type PrefixExpressionNode,
   type ProgramNode,
   type ScriptNode,
+  type SequenceExpressionNode,
+  type TemplateLiteralNode,
+  type ThrowStatementNode,
   type UnaryExpressionNode,
   type VariableDeclarationNode,
   type WhileStatementNode,
@@ -119,6 +122,55 @@ describe("ScriptParser expression mode", () => {
       kind: "Identifier",
       name: "switchData",
     });
+  });
+
+  it("parses throw statements in event-handler blocks", () => {
+    const result = parseScriptEventHandler("if (count > 2) { throw 'too many'; }");
+
+    expect(result.diagnostics).toEqual([]);
+    const program = result.node as ProgramNode;
+    const statement = program.body[0] as IfStatementNode;
+    const block = statement.consequent as BlockStatementNode;
+    const throwStatement = block.body[0] as ThrowStatementNode;
+
+    expect(throwStatement).toMatchObject({
+      kind: "ThrowStatement",
+      argument: {
+        kind: "Literal",
+        value: "too many",
+      },
+    });
+  });
+
+  it("parses grouped comma expressions as sequence expressions", () => {
+    const result = parseScriptExpression("toProcess.item < 0.5 ? (skipped++, false) : true");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.node.kind).toBe("ConditionalExpression");
+    const conditional = result.node as ConditionalExpressionNode;
+    const sequence = conditional.consequent as SequenceExpressionNode;
+
+    expect(sequence).toMatchObject({
+      kind: "SequenceExpression",
+      expressions: [
+        { kind: "PostfixExpression", operator: "++" },
+        { kind: "Literal", value: false },
+      ],
+    });
+  });
+
+  it("parses template literals with embedded expressions", () => {
+    const result = parseScriptExpression("`Project A (load #${loadCount})`");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(result.node.kind).toBe("TemplateLiteral");
+    const template = result.node as TemplateLiteralNode;
+    expect(template.parts[0]).toBe("Project A (load #");
+    expect(template.parts[1]).toMatchObject({
+      kind: "Identifier",
+      name: "loadCount",
+    });
+    expect(template.parts[2]).toBe(")");
   });
 
   it("parses arrays, objects, index access, optional members, and arrows", () => {

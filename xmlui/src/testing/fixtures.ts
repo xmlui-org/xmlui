@@ -779,6 +779,7 @@ async function initTestBed(
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
     await replayInitScripts(page);
+    await clearManagedFetchCache(page);
     await page.evaluate(installTestBedSource, testBedPayload);
     try {
       await page.evaluate(async (xmluiSource) => {
@@ -817,10 +818,20 @@ async function navigateWithTestBedSource(
     typeof window.__xmluiTestBedReinit === "function" ||
     !!document.querySelector('[data-testid="xmlui-testbed-error"]'),
   );
+  await clearManagedFetchCache(page);
   await page.evaluate(installTestBedSource, testBedPayload);
   await page.evaluate(async (xmluiSource) => {
     await window.__xmluiTestBedReinit?.(xmluiSource);
   }, testBedPayload.source);
+}
+
+async function clearManagedFetchCache(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const data = await import("/src/runtime/data/managedFetch.ts");
+    data.managedFetchService.clear();
+    const dataSource = await import("/src/components/DataSource/DataSource.tsx");
+    dataSource.clearDataSourceFetchEventCache?.();
+  }).catch(() => undefined);
 }
 
 async function moveMouseAwayFromOrigin(page: Page): Promise<void> {
@@ -848,25 +859,43 @@ async function installApiInterceptor(
     runApiHandler(apiInterceptor.initialize, { $state: state });
   }
   for (const operation of Object.values(operations)) {
-    await page.route(`**${routeGlob(operation.url)}`, async (route) => {
+    await page.route(`**${routeGlob(operation.url)}**`, async (route) => {
+      if (
+        operation.method &&
+        route.request().method().toLowerCase() !== operation.method.toLowerCase()
+      ) {
+        await route.fallback();
+        return;
+      }
       let body: unknown = { success: true };
       let status = operation.status ?? 200;
       if (operation.handler) {
-	        try {
-	          const apiContext = {
-	            $state: state,
-	            $requestBody: requestBody(route.request()),
-	            $pathParams: pathParams(operation.url, new URL(route.request().url()).pathname),
-	            $delayMs: 0,
-	          };
-	          body = runApiHandler(operation.handler, apiContext);
-	          if (apiContext.$delayMs > 0) {
-	            await new Promise((resolve) => setTimeout(resolve, apiContext.$delayMs));
-	          }
-	        } catch (error) {
+        try {
+          const requestUrl = new URL(route.request().url());
+          const apiContext = {
+            $state: state,
+            $requestBody: requestBody(route.request()),
+            $pathParams: pathParams(operation.url, requestUrl.pathname),
+            $queryParams: Object.fromEntries(requestUrl.searchParams.entries()),
+            $requestHeaders: normalizedHeaders(route.request().headers()),
+            $delayMs: 0,
+          };
+          body = runApiHandler(operation.handler, apiContext);
+          if (apiContext.$delayMs > 0) {
+            await new Promise((resolve) => setTimeout(resolve, apiContext.$delayMs));
+          }
+        } catch (error) {
           if (isHttpError(error)) {
             status = error.status;
             body = error.body;
+          } else if (error && typeof error === "object") {
+            const apiError = error as Record<string, unknown>;
+            status = typeof apiError.statusCode === "number" ? apiError.statusCode : 500;
+            body = {
+              ...apiError,
+              message: apiError.message ?? "Error without message",
+              details: apiError.details ?? {},
+            };
           } else {
             status = 500;
             body = { error: String(error) };
@@ -875,8 +904,8 @@ async function installApiInterceptor(
       }
       await route.fulfill({
         status,
-        contentType: "application/json",
-        body: JSON.stringify(body),
+        contentType: typeof body === "string" ? "text/plain" : "application/json",
+        body: typeof body === "string" ? body : JSON.stringify(body),
       });
     });
   }
@@ -888,17 +917,19 @@ function routeGlob(pattern: string): string {
 
 function runApiHandler(source: string, context: Record<string, unknown>): unknown {
   const handler = createApiHandler(source);
-	  return handler(
-	    context.$state,
-	    context.$requestBody,
-	    context.$pathParams,
-	    context.$pathParams,
-	    (ms: number) => {
-	      context.$delayMs = Math.max(Number(context.$delayMs) || 0, Math.max(0, Number(ms) || 0));
-	    },
-	    {
-	      HttpError: (status: number, body: unknown) => {
-	        throw { __xmluiHttpError: true, status, body };
+  return handler(
+    context.$state,
+    context.$requestBody,
+    context.$pathParams,
+    context.$queryParams,
+    context.$requestHeaders,
+    { message: "Error without message" },
+    (ms: number) => {
+      context.$delayMs = Math.max(Number(context.$delayMs) || 0, Math.max(0, Number(ms) || 0));
+    },
+    {
+      HttpError: (status: number, body: unknown) => {
+        throw { __xmluiHttpError: true, status, body };
       },
     },
   );
@@ -908,16 +939,28 @@ function createApiHandler(source: string): Function {
   const trimmed = source.trim();
   if (trimmed.startsWith("(") || trimmed.includes("=>")) {
     return new Function(
-	      "$state",
-	      "$requestBody",
-	      "$pathParams",
-	      "$params",
-	      "delay",
-	      "Errors",
-	      `return (${source})();`,
-	    );
-	  }
-	  return new Function("$state", "$requestBody", "$pathParams", "$params", "delay", "Errors", source);
+      "$state",
+      "$requestBody",
+      "$pathParams",
+      "$queryParams",
+      "$requestHeaders",
+      "$error",
+      "delay",
+      "Errors",
+      `return (${source})();`,
+    );
+  }
+  return new Function(
+    "$state",
+    "$requestBody",
+    "$pathParams",
+    "$queryParams",
+    "$requestHeaders",
+    "$error",
+    "delay",
+    "Errors",
+    source,
+  );
 }
 
 function requestBody(request: import("@playwright/test").Request): unknown {
@@ -939,6 +982,12 @@ function pathParams(pattern: string, pathname: string): Record<string, string> {
     patternParts.flatMap((part, index) =>
       part.startsWith(":") ? [[part.slice(1), pathParts[index] ?? ""]] : [],
     ),
+  );
+}
+
+function normalizedHeaders(headers: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
   );
 }
 

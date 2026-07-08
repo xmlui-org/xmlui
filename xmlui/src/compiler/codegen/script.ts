@@ -9,6 +9,7 @@ import type {
   XmluiPostfixUpdateIr,
   XmluiPrefixUpdateIr,
   XmluiScriptIr,
+  XmluiThrowStatementIr,
   XmluiVariableDeclarationIr,
   XmluiWhileStatementIr,
 } from "../scriptSemantics";
@@ -135,6 +136,12 @@ function collectStatementSourceSpans(statements: readonly XmluiHandlerStatementI
         spans.push(statement.test.span);
         visit(statement.body);
         break;
+      case "ReturnStatement":
+        spans.push(statement.argument?.span ?? statement.span);
+        break;
+      case "ThrowStatement":
+        spans.push(statement.argument.span);
+        break;
       case "BlockStatement":
         statement.body.forEach(visit);
         break;
@@ -150,7 +157,8 @@ function isMappableGeneratedEventLine(line: string): boolean {
     (trimmed.startsWith("let ") && !trimmed.startsWith("let __xmlui")) ||
     (trimmed.startsWith("const ") && !trimmed.startsWith("const __xmlui")) ||
     (trimmed.startsWith("if (") && !trimmed.includes("__xmluiLoopCheckpoint")) ||
-    trimmed.startsWith("while (");
+    trimmed.startsWith("while (") ||
+    trimmed.startsWith("throw ");
 }
 
 type EventCodegenContext = {
@@ -246,6 +254,10 @@ function emitExpression(ir: XmluiScriptIr): string {
   switch (ir.kind) {
     case "LiteralExpression":
       return JSON.stringify(ir.value);
+    case "TemplateLiteralExpression":
+      return `[${ir.parts.map((part) =>
+        typeof part === "string" ? JSON.stringify(part) : emitExpression(part)
+      ).join(", ")}].join("")`;
     case "IdentifierRead":
       return emitRead(ir.dependency, ir.name);
     case "ScopedMemberRead":
@@ -268,6 +280,8 @@ function emitExpression(ir: XmluiScriptIr): string {
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
+    case "SequenceExpression":
+      return `(${ir.expressions.map(emitExpression).join(", ")})`;
     case "ArrayExpression":
       return `[${ir.elements.map((element) =>
         element.kind === "ArraySpreadElement"
@@ -331,6 +345,9 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
     return "undefined";
   }
   const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    return `new Date(${args})`;
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
@@ -346,7 +363,7 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
   ) {
     return `((__xmluiLocalFn) => typeof __xmluiLocalFn === "function" ? __xmluiLocalFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
   }
-  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+  if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot generate unsupported XMLUI expression call target.");
   }
   const objectSource = emitExpression(ir.callee.object);
@@ -375,6 +392,12 @@ function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: Eve
       return emitIfStatement(statement, context);
     case "WhileStatement":
       return emitWhileStatement(statement, context);
+    case "ReturnStatement":
+      return statement.argument
+        ? `return ${emitAsyncExpression(statement.argument)};`
+        : "return;";
+    case "ThrowStatement":
+      return emitThrowStatement(statement);
   }
 }
 
@@ -411,6 +434,14 @@ function emitAsyncExpression(expression: XmluiScriptIr): string {
   if (expression.kind === "CallExpression") {
     return emitAsyncCallExpression(expression);
   }
+  if (expression.kind === "SequenceExpression") {
+    return `(${expression.expressions.map(emitAsyncExpression).join(", ")})`;
+  }
+  if (expression.kind === "TemplateLiteralExpression") {
+    return `[${expression.parts.map((part) =>
+      typeof part === "string" ? JSON.stringify(part) : emitAsyncExpression(part)
+    ).join(", ")}].join("")`;
+  }
   return emitExpression(expression);
 }
 
@@ -438,6 +469,9 @@ function emitAsyncCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpress
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = ir.args.map(emitAsyncExpression);
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    return `new Date(${args})`;
   }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
@@ -517,6 +551,14 @@ function emitWhileStatement(statement: XmluiWhileStatementIr, context: EventCode
   return `{\nlet ${checkpointName} = 0;\nwhile (${emitAsyncExpression(statement.test)}) {\n${emitEventStatement(statement.body, context)}\nif (((++${checkpointName}) & 255) === 0) {\n${context.checkpointCall}\n}\n}\n}`;
 }
 
+function emitThrowStatement(statement: XmluiThrowStatementIr): string {
+  return `throw ${emitThrowStatementError(emitAsyncExpression(statement.argument))};`;
+}
+
+function emitThrowStatementError(argumentSource: string): string {
+  return `((__xmluiThrown) => __xmluiThrown instanceof Error ? __xmluiThrown : Object.assign(new Error(typeof __xmluiThrown === "string" ? __xmluiThrown : (__xmluiThrown?.message || "Error without message")), { name: "ThrowStatementError", errorObject: __xmluiThrown }))(${argumentSource})`;
+}
+
 function emitStatementBlock(statement: XmluiHandlerStatementIr, context: EventCodegenContext): string {
   return statement.kind === "BlockStatement" ? emitBlockStatement(statement, context) : `{\n${emitEventStatement(statement, context)}\n}`;
 }
@@ -542,7 +584,9 @@ function emitUpdateExpression(expression: XmluiPrefixUpdateIr | XmluiPostfixUpda
     return `${expression.kind === "PrefixUpdate" ? expression.operator : ""}${target.name}${expression.kind === "PostfixUpdate" ? expression.operator : ""}`;
   }
   const delta = expression.operator === "--" ? "- 1" : "+ 1";
-  return emitTargetWrite(target, `Number(${emitTargetRead(target)}) ${delta}`);
+  const current = emitTargetRead(target);
+  const result = expression.kind === "PrefixUpdate" ? "__xmluiNext" : "__xmluiCurrent";
+  return `((__xmluiCurrent) => { const __xmluiNext = Number(__xmluiCurrent) ${delta}; ${emitTargetWrite(target, "__xmluiNext")}; return ${result}; })(${current})`;
 }
 
 function emitTargetRead(target: BoundWriteTarget): string {
@@ -626,71 +670,8 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
   }
 }
 
-function isAllowedMethodName(name: string): boolean {
-  return [
-    "push",
-    "pop",
-    "shift",
-    "unshift",
-    "splice",
-    "sort",
-    "reverse",
-    "fill",
-    "copyWithin",
-    "map",
-    "filter",
-    "find",
-    "from",
-    "isArray",
-    "concat",
-    "some",
-    "every",
-    "includes",
-    "join",
-    "toLowerCase",
-    "toUpperCase",
-    "startsWith",
-    "endsWith",
-    "stringify",
-    "now",
-    "log",
-    "callApi",
-    "getFields",
-    "getData",
-    "getValue",
-    "hasOverflow",
-    "open",
-    "close",
-    "isOpen",
-    "setLocale",
-    "translate",
-    "openAt",
-    "setValue",
-    "scrollToTop",
-    "scrollToBottom",
-    "scrollToStart",
-    "scrollToEnd",
-    "getVisibleItems",
-    "getExpandedNodes",
-    "getSelectedNode",
-    "getNodeById",
-    "scrollIntoView",
-    "appendNode",
-    "removeNode",
-    "removeChildren",
-    "insertNodeBefore",
-    "insertNodeAfter",
-    "refreshData",
-    "getDynamic",
-    "getNodeLoadingState",
-    "getExpandedTimestamp",
-    "getAutoLoadAfter",
-    "getNodeAutoLoadAfter",
-  ].includes(name);
-}
-
 function isAllowedBuiltInCallName(name: string): boolean {
-  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
+  return name === "Date" || name === "getDate" || name === "Symbol" || name === "BigInt";
 }
 
 function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]): Set<string> {
@@ -713,6 +694,10 @@ function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]
         break;
       case "WhileStatement":
         visit(statement.body);
+        break;
+      case "ReturnStatement":
+        break;
+      case "ThrowStatement":
         break;
       case "ExpressionStatement":
         break;

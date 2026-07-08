@@ -1,106 +1,109 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
-import type { XmluiNode } from "../../compiler/ir";
-import { parseXmlui } from "../../compiler/parseXmlui";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 
-export type IncludeMarkupComponentProps = {
+// Detects a CompoundComponentDef (i.e. the result of parsing <Component name="...">)
+function isCompoundComponentDef(
+  c: ComponentDef | CompoundComponentDef,
+): c is CompoundComponentDef {
+  return "component" in c && "name" in c && !("type" in c);
+}
+
+// =====================================================================================================================
+// Types
+
+type RenderFn = (def: ComponentDef | ComponentDef[]) => ReactNode;
+
+type Props = {
   url?: string;
   loadingContent?: ReactNode;
-  renderIncludedMarkup: (nodes: XmluiNode[]) => ReactNode;
   onDidLoad?: () => void;
   onDidFail?: (message: string) => void;
+  renderComponent: RenderFn;
 };
 
-type IncludeMarkupState =
-  | { status: "idle"; nodes: XmluiNode[] }
-  | { status: "loading"; nodes: XmluiNode[] }
-  | { status: "loaded"; nodes: XmluiNode[] }
-  | { status: "failed"; nodes: XmluiNode[]; message: string };
+// =====================================================================================================================
+// React IncludeMarkup component implementation
 
-export function IncludeMarkupComponent({
+export function IncludeMarkupReact({
   url,
   loadingContent,
-  renderIncludedMarkup,
   onDidLoad,
   onDidFail,
-}: IncludeMarkupComponentProps) {
-  const [state, setState] = useState<IncludeMarkupState>({ status: "idle", nodes: [] });
-  const callbacksRef = useRef({ onDidLoad, onDidFail });
-  callbacksRef.current = { onDidLoad, onDidFail };
+  renderComponent,
+}: Props) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [componentDef, setComponentDef] = useState<ComponentDef | CompoundComponentDef | ComponentDef[] | null>(null);
 
   useEffect(() => {
     if (!url) {
-      setState({ status: "idle", nodes: [] });
+      setIsLoading(false);
+      setComponentDef(null);
       return;
     }
 
-    const controller = new AbortController();
-    let active = true;
-    setState({ status: "loading", nodes: [] });
+    let cancelled = false;
+    setIsLoading(true);
+    setComponentDef(null);
 
-    void (async () => {
+    (async () => {
       try {
-        const response = await fetch(url, { signal: controller.signal });
+        const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status} ${response.statusText}`.trim());
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
         }
         const markup = await response.text();
-        const nodes = parseIncludedMarkup(markup, url);
-        if (!active) {
-          return;
+        if (cancelled) return;
+
+        const { errors, component, erroneousCompoundComponentName } =
+          xmlUiMarkupToComponent(markup);
+
+        if (errors.length > 0) {
+          // Show the inline error report and fire didFail
+          setComponentDef(
+            errReportComponent(errors, url, erroneousCompoundComponentName) as ComponentDef,
+          );
+          setIsLoading(false);
+          onDidFail?.(errors.map((e) => e.message).join("; "));
+        } else {
+          setComponentDef(component as ComponentDef | CompoundComponentDef | ComponentDef[]);
+          setIsLoading(false);
+          onDidLoad?.();
         }
-        setState({ status: "loaded", nodes });
-        callbacksRef.current.onDidLoad?.();
-      } catch (error) {
-        if (!active || controller.signal.aborted) {
-          return;
-        }
-        const message = error instanceof Error ? error.message : String(error);
-        setState({ status: "failed", nodes: [], message });
-        callbacksRef.current.onDidFail?.(message);
+      } catch (err) {
+        if (cancelled) return;
+        const message = err instanceof Error ? err.message : String(err);
+        setIsLoading(false);
+        setComponentDef(null);
+        onDidFail?.(message);
       }
     })();
 
     return () => {
-      active = false;
-      controller.abort();
+      cancelled = true;
     };
   }, [url]);
 
-  const content = useMemo(
-    () => (state.nodes.length > 0 ? renderIncludedMarkup(state.nodes) : null),
-    [renderIncludedMarkup, state.nodes],
-  );
-
-  if (state.status === "loading") {
-    return <>{loadingContent}</>;
-  }
-  return <>{content}</>;
-}
-
-function parseIncludedMarkup(markup: string, sourceId: string): XmluiNode[] {
-  const trimmed = markup.trim();
-  if (!trimmed) {
-    return [];
+  if (isLoading) {
+    return <>{loadingContent ?? null}</>;
   }
 
-  const document = trimmed.startsWith("<Component")
-    ? parseXmlui(trimmed, { sourceId })
-    : parseXmlui(`<Component name="IncludedMarkup">${trimmed}</Component>`, { sourceId });
-
-  if (document.root.children.length === 1) {
-    const onlyChild = document.root.children[0];
-    if (onlyChild.kind === "element" && onlyChild.type === "Fragment" && isBareFragment(onlyChild)) {
-      return onlyChild.children;
-    }
+  if (componentDef === null) {
+    return null;
   }
-  return document.root.children;
-}
 
-function isBareFragment(node: Extract<XmluiNode, { kind: "element" }>): boolean {
-  return Object.keys(node.props).length === 0 &&
-    Object.keys(node.vars).length === 0 &&
-    Object.keys(node.globals).length === 0 &&
-    Object.keys(node.events).length === 0 &&
-    Object.keys(node.methods).length === 0;
+  // If the parsed result is a CompoundComponentDef (<Component name="...">),
+  // render its inner component so the children appear inline.
+  const defToRender = isCompoundComponentDef(componentDef as ComponentDef | CompoundComponentDef)
+    ? (componentDef as CompoundComponentDef).component
+    : (componentDef as ComponentDef | ComponentDef[]);
+
+  const rendered = renderComponent(defToRender as ComponentDef | ComponentDef[]);
+  // renderChild may return an array; wrap in a Fragment if needed
+  if (Array.isArray(rendered)) {
+    return <Fragment>{rendered}</Fragment>;
+  }
+  return <>{rendered}</>;
 }

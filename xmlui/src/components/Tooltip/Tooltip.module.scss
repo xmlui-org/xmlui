@@ -1,16 +1,18 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $component: "Tooltip";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
 
-$paddingTop-Tooltip: createThemeVar("paddingTop-#{$component}");
-$paddingRight-Tooltip: createThemeVar("paddingRight-#{$component}");
-$paddingBottom-Tooltip: createThemeVar("paddingBottom-#{$component}");
-$paddingLeft-Tooltip: createThemeVar("paddingLeft-#{$component}");
-$border-Tooltip: createThemeVar("border-#{$component}");
-$borderRadius-Tooltip: createThemeVar("borderRadius-#{$component}");
+
+// --- Theme variables for Tooltip component
 $backgroundColor-Tooltip: createThemeVar("backgroundColor-#{$component}");
 $textColor-Tooltip: createThemeVar("textColor-#{$component}");
 $fontSize-Tooltip: createThemeVar("fontSize-#{$component}");
@@ -18,86 +20,105 @@ $lineHeight-Tooltip: createThemeVar("lineHeight-#{$component}");
 $boxShadow-Tooltip: createThemeVar("boxShadow-#{$component}");
 $fill-arrow-Tooltip: createThemeVar("fill-arrow-#{$component}");
 $stroke-arrow-Tooltip: createThemeVar("stroke-arrow-#{$component}");
-$strokeWidth-arrow-Tooltip: createThemeVar("strokeWidth-arrow-#{$component}");
+$strokeWidth-arrow-Tooltip: createThemeVar("strokeWidth-arrow-#{$component}");  
 $animationDuration-Tooltip: createThemeVar("animationDuration-#{$component}");
 $animation-Tooltip: createThemeVar("animation-#{$component}");
 
-.root {
-  display: contents;
-}
+/* Tooltip styles */
 
-.trigger {
-  display: inline-flex;
+.hiddenTrigger {
+  position: fixed;
+  inset-inline-start: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
 }
 
 .content {
-  position: fixed;
-  z-index: 9999;
-  width: max-content;
-  max-width: min(360px, calc(100vw - 32px));
-  padding: $paddingTop-Tooltip $paddingRight-Tooltip $paddingBottom-Tooltip $paddingLeft-Tooltip;
-  border: $border-Tooltip;
-  border-radius: $borderRadius-Tooltip;
+  @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
   font-size: $fontSize-Tooltip;
   line-height: $lineHeight-Tooltip;
   color: $textColor-Tooltip;
   background-color: $backgroundColor-Tooltip;
   box-shadow: $boxShadow-Tooltip;
   user-select: none;
-  pointer-events: none;
   animation-duration: $animationDuration-Tooltip;
   animation-timing-function: $animation-Tooltip;
+  will-change: transform, opacity;
+  z-index: 9999;
 }
 
-.content[data-side="top"] {
-  transform: translate(-50%, calc(-100% - var(--xmlui-tooltip-side-offset, 4px)));
+.content[data-state='delayed-open'][data-side='top'] {
+  animation-name: slideDownAndFade;
 }
 
-.content[data-side="bottom"] {
-  transform: translate(-50%, var(--xmlui-tooltip-side-offset, 4px));
+.content[data-state='delayed-open'][data-side='right'] {
+  animation-name: slideLeftAndFade;
 }
 
-.content[data-side="left"] {
-  transform: translate(calc(-100% - var(--xmlui-tooltip-side-offset, 4px)), -50%);
+.content[data-state='delayed-open'][data-side='bottom'] {
+  animation-name: slideUpAndFade;
 }
 
-.content[data-side="right"] {
-  transform: translate(var(--xmlui-tooltip-side-offset, 4px), -50%);
+.content[data-state='delayed-open'][data-side='left'] {
+  animation-name: slideRightAndFade;
 }
 
 .arrow {
-  position: absolute;
-  width: 8px;
-  height: 8px;
   fill: $fill-arrow-Tooltip;
   stroke: $stroke-arrow-Tooltip;
   stroke-width: $strokeWidth-arrow-Tooltip;
 }
 
-.content[data-side="top"] .arrow {
-  left: calc(50% - 4px);
-  bottom: -4px;
-  transform: rotate(45deg);
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(0.125em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.content[data-side="bottom"] .arrow {
-  left: calc(50% - 4px);
-  top: -4px;
-  transform: rotate(45deg);
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-0.125em);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.content[data-side="left"] .arrow {
-  right: -4px;
-  top: calc(50% - 4px);
-  transform: rotate(45deg);
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-0.125em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.content[data-side="right"] .arrow {
-  left: -4px;
-  top: calc(50% - 4px);
-  transform: rotate(45deg);
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(0.125em);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

@@ -1,5 +1,5 @@
 import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
-import { apiCallRenderer } from "../components/APICall/APICall.renderer";
+import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { appStateRenderer } from "../components/AppState/AppState";
@@ -18,7 +18,7 @@ import { columnRenderer } from "../components/Column/Column";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
-import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
+import { dataSourceRenderer } from "../components/DataSource/DataSource";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer";
@@ -54,8 +54,8 @@ import {
 import { htmlTagRenderers } from "../components/HtmlTags/HtmlTags";
 import { iconRenderer } from "../components/Icon/Icon";
 import { iframeRenderer } from "../components/IFrame/IFrame";
-import { imageRenderer } from "../components/Image/Image.renderer";
-import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { imageRenderer } from "../components/Image/Image";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup";
 import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
 import { i18nRenderer } from "../components/I18n/I18n";
@@ -83,7 +83,7 @@ import { partRenderer } from "../components/Part/Part";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
-import { queueRenderer } from "../components/Queue/Queue.renderer";
+import { queueRenderer } from "../components/Queue/Queue";
 import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
@@ -124,11 +124,11 @@ import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { themeRenderer } from "../components/Theme/Theme.renderer";
 import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
-import { timerRenderer } from "../components/Timer/Timer.renderer";
+import { timerRenderer } from "../components/Timer/Timer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
 import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
-import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
+import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
@@ -246,7 +246,7 @@ export const coreRuntimeRendererEntries = [
   { name: "NavPanelCollapseButton", renderer: navPanelCollapseButtonRenderer },
   { name: "NavPanel", renderer: navPanelRuntimeRenderer },
   { name: "DataSource", renderer: dataSourceRenderer },
-  { name: "APICall", renderer: apiCallRenderer },
+  { name: "APICall", renderer: apiCallRuntimeRenderer },
   { name: "AppState", renderer: appStateRenderer },
   { name: "ChangeListener", renderer: changeListenerRenderer },
   { name: "Lifecycle", renderer: lifecycleRenderer },

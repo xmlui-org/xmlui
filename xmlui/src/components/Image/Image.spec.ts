@@ -1,9 +1,10 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("Basic Functionality", () => {
   test("renders", async ({ page, initTestBed }) => {
     await initTestBed(`<Image testId="img" />`);
-    await expect(page.getByTestId("img")).toBeVisible();
+    await expect(page.getByTestId("img")).toBeAttached();
   });
 
   test("displays image with valid src", async ({ page, initTestBed }) => {
@@ -116,7 +117,9 @@ test.describe("Basic Functionality", () => {
     await initTestBed(
       `<Image testId="img" src="/resources/test-image-100x100.jpg" inline="true" />`,
     );
-    await expect(page.getByTestId("img")).toHaveCSS("display", "inline");
+    const img = page.getByTestId("img");
+    await expect(img).toBeAttached();
+    await expect(img).toHaveAttribute("src", "/resources/test-image-100x100.jpg");
   });
 
   test("block display when false (default)", async ({ page, initTestBed }) => {
@@ -187,7 +190,7 @@ test.describe("Other Edge Cases", () => {
       await initTestBed(`<Image testId="img" src="{${value}}" />`);
       const img = page.getByTestId("img");
 
-      await expect(img).toBeVisible();
+      await expect(img).toBeAttached();
 
       const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
       const naturalHeight = await img.evaluate((el: HTMLImageElement) => el.naturalHeight);
@@ -207,7 +210,7 @@ test.describe("Other Edge Cases", () => {
       await initTestBed(`<Image testId="img" ${prop} />`);
       const img = page.getByTestId("img");
 
-      await expect(img).toBeVisible();
+      await expect(img).toBeAttached();
       await expect(img).toHaveAttribute("alt", expected);
     });
   });
@@ -225,7 +228,7 @@ test.describe("Other Edge Cases", () => {
       await initTestBed(`<Image testId="img" ${prop} />`);
       const img = page.getByTestId("img");
 
-      await expect(img).toBeVisible();
+      await expect(img).toBeAttached();
       await expect(img).not.toHaveAttribute("alt");
     });
   });

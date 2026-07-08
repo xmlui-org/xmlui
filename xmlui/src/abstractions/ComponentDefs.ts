@@ -9,7 +9,7 @@ export type PropertyValueDescription<T = string | number> = RuntimePropertyValue
 export type ComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = {
   type: string;
   uid?: string;
-  props: Record<string, any>;
+  props?: Record<string, any>;
   children?: ComponentDef[];
   metadata?: TMd;
   [key: string]: any;

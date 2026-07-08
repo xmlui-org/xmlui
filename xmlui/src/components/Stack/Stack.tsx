@@ -198,6 +198,7 @@ function createStackRenderer(
       const actualOrientation = orientation ?? adapter.stringProp("orientation", defaultProps.orientation) ?? defaultProps.orientation;
       const horizontalAlignment = fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment");
       const verticalAlignment = fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment");
+      const layoutContext = adapter.props.layoutContext as { orientation?: string } | undefined;
       const itemWidth = adapter.stringProp(
         "itemWidth",
         actualOrientation === "vertical" ? "100%" : "fit-content",
@@ -208,6 +209,10 @@ function createStackRenderer(
       delete style.justifyContent;
       if (resolvedGap) {
         (style as Record<string, string>)["--xmlui-gap-Stack"] = resolvedGap;
+      }
+      if (name === "VStack" && layoutContext?.orientation === "horizontal" && adapter.node.props.width == null) {
+        style.width = "100%";
+        style.flexShrink = 1;
       }
       const children = nonPropertyChildren(adapter.node.children);
       const scrollStyle = adapter.stringProp("scrollStyle", defaultProps.scrollStyle);

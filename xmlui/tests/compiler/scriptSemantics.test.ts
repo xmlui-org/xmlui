@@ -344,6 +344,28 @@ describe("XMLUI expression and event semantic IR", () => {
     );
     expect(lowered.ir.kind).toBe("LogicalExpression");
   });
+
+  it("lowers template literals with dependencies", () => {
+    const document = parseXmlui(`<App var.loadCount="{2}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(
+      parseScriptExpression("`Project A (load #${loadCount})`").node,
+      scope,
+    );
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(lowered.dependencies).toEqual([
+      expect.objectContaining({ kind: "local", name: "loadCount", path: ["loadCount"] }),
+    ]);
+    expect(lowered.ir).toMatchObject({
+      kind: "TemplateLiteralExpression",
+      parts: [
+        "Project A (load #",
+        { kind: "IdentifierRead", name: "loadCount" },
+        ")",
+      ],
+    });
+  });
 });
 
 describe("XMLUI expression JavaScript compilation", () => {
@@ -375,6 +397,29 @@ describe("XMLUI expression JavaScript compilation", () => {
       `return (ctx.readGlobal("globalCount") ?? ctx.readReference?.("globalCount"));`,
     );
     expect(compileXmluiExpression(global.ir, global.dependencies).execute(context)).toBe(22);
+  });
+
+  it("compiles template literals into interpolated strings", () => {
+    const document = parseXmlui(`<App var.loadCount="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(
+      parseScriptExpression("`Project A (load #${loadCount})`").node,
+      scope,
+    );
+    const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
+
+    expect(compiled.execute(testContext({ locals: { loadCount: 3 } }))).toBe("Project A (load #3)");
+  });
+
+  it("compiles Date calls as XMLUI Date objects", () => {
+    const document = parseXmlui(`<App />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptExpression(parseScriptExpression("Date(0).getUTCFullYear()").node, scope);
+    const compiled = compileXmluiExpression(lowered.ir, lowered.dependencies);
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(compiled.source).toContain("new Date(0)");
+    expect(compiled.execute(testContext())).toBe(1970);
   });
 
   it("compiles $props fallback expressions with XMLUI optional member reads", () => {
@@ -455,6 +500,25 @@ describe("XMLUI expression JavaScript compilation", () => {
     );
   });
 
+  it("compiles component API member calls without a method-name whitelist", () => {
+    const document = parseXmlui(`<App><Timer id="timer" /></App>`);
+    const scope = createXmluiScope(document.root);
+    const existingMethod = lowerScriptExpression(parseScriptExpression("timer.isPaused()").node, scope);
+    const missingMethod = lowerScriptExpression(parseScriptExpression("timer.notARealMethod()").node, scope);
+    const existingCompiled = compileXmluiExpression(existingMethod.ir, existingMethod.dependencies);
+    const missingCompiled = compileXmluiExpression(missingMethod.ir, missingMethod.dependencies);
+    const context = testContext({
+      references: {
+        timer: { isPaused: () => true },
+      },
+    });
+
+    expect(existingMethod.diagnostics).toEqual([]);
+    expect(missingMethod.diagnostics).toEqual([]);
+    expect(existingCompiled.execute(context)).toBe(true);
+    expect(missingCompiled.execute(context)).toBeUndefined();
+  });
+
   it("rejects unresolved expression reads during compilation", () => {
     const document = parseXmlui(`<App />`);
     const scope = createXmluiScope(document.root);
@@ -479,7 +543,7 @@ describe("XMLUI event-handler JavaScript compilation", () => {
       executionMode: "async",
       schedulingPolicy: "queue",
     });
-    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeLocal("count", __xmluiNext);`);
     expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.options).toEqual(lowered.ir.options);
   });
@@ -519,7 +583,7 @@ describe("XMLUI event-handler JavaScript compilation", () => {
 
     expect(lowered.diagnostics).toEqual([]);
     expect(lowered.ir.options.executionMode).toBe("sync");
-    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeLocal("count", __xmluiNext);`);
     expect(compiled.source).not.toContain("__xmluiYieldIfNeeded");
     await compiled.execute(context);
     expect(context.locals.count).toBe(1);
@@ -547,7 +611,7 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
     const context = testContext({ locals: { count: 0 } });
 
-    expect(compiled.source).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeLocal("count", __xmluiNext);`);
     expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.invalidates).toEqual([{ kind: "local", name: "count" }]);
     await compiled.execute(context);
@@ -561,7 +625,7 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
     const context = testContext({ globals: { count: 5 } });
 
-    expect(compiled.source).toContain(`ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`);
+    expect(compiled.source).toContain(`ctx.writeGlobal("count", __xmluiNext);`);
     expect(compiled.source).toContain("__xmluiYieldIfNeeded");
     expect(compiled.invalidates).toEqual([{ kind: "global", name: "count" }]);
     await compiled.execute(context);
@@ -713,6 +777,21 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     expect(context.locals.count).toBe(1);
   });
 
+  it("returns prefix update values from generated handlers", async () => {
+    const document = parseXmlui(`<App var.count="{0}" var.item="{null}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("item = { file: ++count, conflict: 'deny' }").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 0, item: null } });
+
+    await compiled.execute(context);
+    expect(context.locals.count).toBe(1);
+    expect(context.locals.item).toEqual({ file: 1, conflict: "deny" });
+  });
+
   it("keeps handler-local block shadowing separate during IR execution", async () => {
     const document = parseXmlui(`<App var.total="{0}" />`);
     const scope = createXmluiScope(document.root);
@@ -761,6 +840,42 @@ describe("XMLUI event-handler JavaScript compilation", () => {
     await compiled.execute(context);
     expect(calls).toEqual([5]);
     expect(context.locals.count).toBe(1);
+  });
+
+  it("throws authored values from event handlers", async () => {
+    const document = parseXmlui(`<App var.count="{0}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("if (count === 0) { throw 'Item cannot be processed'; } count++").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { count: 0 } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    expect(compiled.source).toContain("throw");
+    await expect(compiled.execute(context)).rejects.toMatchObject({
+      name: "ThrowStatementError",
+      message: "Item cannot be processed",
+      errorObject: "Item cannot be processed",
+    });
+    expect(context.locals.count).toBe(0);
+  });
+
+  it("executes sequence expressions left to right and returns the last value", async () => {
+    const document = parseXmlui(`<App var.skipped="{0}" var.result="{true}" />`);
+    const scope = createXmluiScope(document.root);
+    const lowered = lowerScriptEventHandler(
+      parseScriptEventHandler("skipped = 0; result = (skipped++, false)").node,
+      scope,
+    );
+    const compiled = compileXmluiEventHandler(lowered.ir, lowered.dependencies, lowered.writes);
+    const context = testContext({ locals: { skipped: 10, result: true } });
+
+    expect(lowered.diagnostics).toEqual([]);
+    await compiled.execute(context);
+    expect(context.locals.skipped).toBe(1);
+    expect(context.locals.result).toBe(false);
   });
 
   it("recursively completes promise-valued call results in handlers", async () => {
@@ -942,11 +1057,13 @@ function testContext({
   locals = {},
   globals = {},
   props = {},
+  references = {},
   navigate,
 }: {
   locals?: Record<string, unknown>;
   globals?: Record<string, unknown>;
   props?: Record<string, unknown>;
+  references?: Record<string, unknown>;
   navigate?: CompiledEventContext["navigate"];
 } = {}): CompiledEventContext & {
   locals: Record<string, unknown>;
@@ -964,6 +1081,7 @@ function testContext({
     writeGlobal: (name: string, value: unknown) => {
       globals[name] = value;
     },
+    readReference: (name: string) => references[name],
     navigate,
   };
 }

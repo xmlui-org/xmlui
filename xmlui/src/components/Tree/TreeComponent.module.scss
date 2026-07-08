@@ -1,125 +1,148 @@
-.root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  overflow: auto;
-  color: var(--xmlui-textColor-Tree);
-  background: var(--xmlui-backgroundColor-Tree);
-  border: var(--xmlui-border-Tree);
-  border-radius: var(--xmlui-borderRadius-Tree);
-  padding: var(--xmlui-padding-Tree);
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.item {
-  display: flex;
-  align-items: center;
-  min-height: var(--xmlui-tree-item-height, var(--xmlui-itemHeight-Tree));
-  gap: 6px;
-  padding: 2px 6px;
-  border-radius: var(--xmlui-borderRadius-item-Tree);
-  cursor: default;
-}
+$component: "Tree";
 
-.item:hover {
-  color: var(--xmlui-textColor-Tree--hover, var(--xmlui-textColor-Tree));
-  background: var(--xmlui-backgroundColor-Tree-row--hover, var(--xmlui-backgroundColor-item-Tree--hover));
-}
+// Tree component theme variables
+$backgroundColor-Tree-row--selected: createThemeVar("backgroundColor-#{$component}-row--selected");
+$backgroundColor-Tree-row--hover: createThemeVar("backgroundColor-#{$component}-row--hover");
+$textColor-Tree: createThemeVar("textColor-#{$component}");
+$textColor-Tree--selected: createThemeVar("textColor-#{$component}--selected");
+$textColor-Tree--hover: createThemeVar("textColor-#{$component}--hover");
+$borderColor-Tree-row--focus: createThemeVar("borderColor-#{$component}-row--focus");
+$outlineColor-Tree--focus: createThemeVar("outlineColor-#{$component}--focus");
+$outlineWidth-Tree--focus: createThemeVar("outlineWidth-#{$component}--focus");
+$outlineStyle-Tree--focus: createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus");
 
-.selected {
-  color: var(--xmlui-textColor-Tree--selected, var(--xmlui-textColor-selected-Tree));
-  background: var(--xmlui-backgroundColor-Tree-row--selected, var(--xmlui-backgroundColor-selected-Tree));
-}
+@layer components {
+  .wrapper {
+    flex: 1;
+    // Add small padding to provide breathing room for focus indicators
+    padding: 1px 2px;
+    // Remove focus outline since individual tree items handle focus styling
+    outline: none;
+    
+    &:focus {
+      outline: none;
+    }
+  }
 
-.selected:hover {
-  color: var(--xmlui-textColor-Tree--selected, var(--xmlui-textColor-selected-Tree));
-  background: var(--xmlui-backgroundColor-Tree-row--selected, var(--xmlui-backgroundColor-selected-Tree));
-}
+  .rowWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    color: $textColor-Tree;
+    position: relative;
+    // Add small margin to ensure focus ring has space
+    margin: 0 1px;
+    // Use border-radius to make focus ring more polished
+    border-radius: 2px;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    // Remove browser default focus outline since we handle focus styling with CSS classes
+    outline: none;
+    
+    &:focus {
+      outline: none;
+    }
 
-.focused {
-  box-shadow: var(--xmlui-outlineColor-Tree--focus) 0 0 0 2px inset;
-}
+    &.selected {
+      background-color: $backgroundColor-Tree-row--selected;
+      color: $textColor-Tree--selected;
+      
+      &:focus-visible {
+        // Use inset box-shadow to stay within bounds
+        box-shadow: inset 0 0 0 2px $outlineColor-Tree--focus;
+      }
+    }
 
-.toggle {
-  width: 20px;
-  height: 20px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+    &.focused {
+      // Use inset box-shadow to stay within row bounds and avoid clipping
+      box-shadow: inset 0 0 0 2px $outlineColor-Tree--focus;
+    }
 
-.toggleIcon {
-  display: inline-flex;
-  width: 16px;
-  height: 16px;
-  align-items: center;
-  justify-content: center;
-}
+    &:hover:not(.selected) {
+      background-color: $backgroundColor-Tree-row--hover;
+      color: $textColor-Tree--hover;
+    }
 
-.toggleIconFallback {
-  display: inline-flex;
-  width: 16px;
-  height: 16px;
-  align-items: center;
-  justify-content: center;
-  line-height: 16px;
-}
+    &:hover {
+      .addButton {
+        opacity: 1;
+      }
+    }
+  }
 
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: xmlui-tree-spin 0.8s linear infinite;
-}
+  .gutter {
+    flex-direction: row;
+    flex-shrink: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 
-@keyframes xmlui-tree-spin {
-  to {
-    transform: rotate(360deg);
+  .toggleWrapper {
+    width: 40px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &.hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  .toggleIcon {
+    transition: transform 0.2s ease-in-out;
+    color: currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .depthPlaceholder {
+    flex-shrink: 0;
+  }
+
+  .labelWrapper{
+    white-space: nowrap;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 0;
+    min-width: fit-content;
+    user-select: none;
+  }
+
+  .addButton {
+    height: 100%;
+    width: 32px;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    opacity: 0;
+    flex-shrink: 0;
   }
 }
 
-.togglePlaceholder {
-  width: 20px;
-  height: 20px;
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
 
-.label {
-  flex: 1;
-  min-width: 0;
-}
-
-.withFade {
-  overflow: auto;
-}
-
-.fadeOverlay {
-  position: sticky;
-  left: 0;
-  right: 0;
-  height: 18px;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 1;
-}
-
-.fadeTop {
-  top: 0;
-  margin-bottom: -18px;
-  background: linear-gradient(var(--xmlui-backgroundColor-Tree), transparent);
-}
-
-.fadeBottom {
-  bottom: 0;
-  margin-top: -18px;
-  background: linear-gradient(transparent, var(--xmlui-backgroundColor-Tree));
-}
-
-.fadeVisible {
-  opacity: 1;
-}

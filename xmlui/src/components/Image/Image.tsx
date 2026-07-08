@@ -1,75 +1,74 @@
 import React from "react";
-import { extractScssThemeVars } from "../../styling/theme";
-import {
-  createMetadata,
-  dClick,
-} from "../../component-core/metadata/helpers";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import styles from "./Image.module.scss";
+
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { createMetadata, dClick, dInternal } from "../metadata-helpers";
 import { defaultProps } from "./Image.defaults";
 import { Image } from "./ImageReact";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
 
 const COMP = "Image";
-const imageStylesSource = `
-$borderRadius-Image: createThemeVar("borderRadius-Image");
-$borderColor-Image: createThemeVar("borderColor-Image");
-`;
 
 export const ImageMd = createMetadata({
   status: "stable",
   description:
-    "`Image` displays pictures from URLs or local sources with responsive sizing, aspect-ratio control, accessibility attributes, lazy loading, and click interactions.",
+    "`Image` displays pictures from URLs or local sources with built-in responsive " +
+    "sizing, aspect ratio control, and accessibility features. It handles different " +
+    "image formats and provides options for lazy loading and click interactions.",
   props: {
     src: {
-      description: "The source path or URL of the image to display.",
+      description:
+        "This property is used to indicate the source (path) of the image to display. " +
+        "When not defined, no image is displayed.",
       valueType: "string",
       isResourceUrl: true,
     },
     data: {
-      description: "Binary data that represents the image.",
+      description: `This property contains the binary data that represents the image.`,
     },
     alt: {
-      description: "Alternate text for the image.",
-      valueType: "string",
+      description: `This optional property specifies an alternate text for the image.`,
     },
     fit: {
-      description: "Controls how the image content is resized to fit its container.",
+      description:
+        "This property sets how the image content should be resized to fit its container.",
       valueType: "string",
-      availableValues: ["contain", "cover"],
       defaultValue: defaultProps.fit,
     },
     lazyLoad: {
-      description: "When true, asks the browser to lazy-load the image.",
+      description:
+        `Lazy loading instructs the browser to load the image only when it is imminently needed ` +
+        `(e.g. user scrolls to it).`,
       valueType: "boolean",
       defaultValue: defaultProps.lazyLoad,
     },
     aspectRatio: {
-      description: "Preferred image aspect ratio, such as `1.5` or `16/9`.",
+      description:
+        "This property sets a preferred aspect ratio for the image, which will be used in " +
+        "calculating auto sizes and other layout functions. If this value is not used, the " +
+        'original aspect ratio is kept. The value can be a number of a string (such as "16/9").',
       valueType: "string",
     },
     inline: {
-      description: "When true, renders the image as an inline element.",
+      description: `When set to true, the image will be displayed as an inline element instead of a block element.`,
       valueType: "boolean",
       defaultValue: defaultProps.inline,
     },
     grayscale: {
-      description: "When true, renders the image in grayscale.",
+      description: `When set to true, the image will be displayed in grayscale.`,
       valueType: "boolean",
       defaultValue: defaultProps.grayscale,
     },
-    testId: {
-      description: "Adds a test identifier to the image element.",
-      valueType: "string",
-    },
+    animation: dInternal(`The optional animation object to be applied to the component`),
   },
   events: {
     click: dClick(COMP),
   },
-  themeVars: extractScssThemeVars(imageStylesSource),
-  defaultThemeVars: {
-    [`borderRadius-${COMP}`]: "$borderRadius",
-    [`borderColor-${COMP}`]: "transparent",
-  },
+  themeVars: parseScssVar(styles.themeVars),
 });
 
 type ThemedImageProps = React.ComponentPropsWithoutRef<typeof Image> & { classes?: Record<string, string> };
@@ -87,3 +86,95 @@ export const ThemedImage = React.forwardRef<React.ElementRef<typeof Image>, Them
     );
   },
 );
+
+export const imageComponentRenderer = wrapComponent(
+  COMP,
+  ThemedImage,
+  ImageMd,
+  {
+    rename: { data: "imageData" },
+    deriveAriaLabel: (props) => props.alt,
+  },
+);
+
+type RuntimeImageProps = {
+  adapter: XmluiComponentAdapter;
+};
+
+function RuntimeImage({ adapter }: RuntimeImageProps) {
+  const data = adapter.prop("data");
+  const src = adapter.resourceUrl(adapter.prop("src"));
+  const dataUrl = typeof data === "string" ? adapter.resourceUrl(data) : undefined;
+  const [dataSrc, setDataSrc] = React.useState<string | undefined>();
+
+  React.useEffect(() => {
+    if (data instanceof Blob) {
+      const url = URL.createObjectURL(data);
+      setDataSrc(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+    if (src || !dataUrl) {
+      setDataSrc(undefined);
+      return;
+    }
+    const controller = new AbortController();
+    let objectUrl: string | undefined;
+    let active = true;
+    void fetch(dataUrl, { signal: controller.signal })
+      .then((response) => response.ok ? response.blob() : undefined)
+      .then((blob) => {
+        if (blob) {
+          objectUrl = URL.createObjectURL(blob);
+        }
+        if (active) {
+          setDataSrc(objectUrl);
+        } else if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
+      })
+      .catch(() => {
+        if (active && !controller.signal.aborted) {
+          setDataSrc(undefined);
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [data, dataUrl, src]);
+
+  const rawAlt = adapter.node.props.alt;
+  const evaluatedAlt = adapter.prop("alt");
+  const inline = adapter.node.props.inline ?? adapter.prop("inline", defaultProps.inline);
+  const inlineDisplay = inline === true || inline === "true" || inline === "";
+  const rootAttrs = adapter.rootAttrs();
+  return (
+    <ThemedImage
+      {...rootAttrs}
+      style={{
+        ...(rootAttrs.style as React.CSSProperties),
+        ...(inlineDisplay ? { display: "inline" } : {}),
+      }}
+      src={src ?? dataSrc}
+      alt={rawAlt === "" ? "" : evaluatedAlt}
+      fit={adapter.stringProp("fit", defaultProps.fit) as "cover" | "contain"}
+      lazyLoad={adapter.booleanProp("lazyLoad", defaultProps.lazyLoad)}
+      aspectRatio={adapter.stringProp("aspectRatio")}
+      inline={inlineDisplay}
+      grayscale={adapter.booleanProp("grayscale", defaultProps.grayscale)}
+      onClick={(event) => void adapter.event("click")(event)}
+    />
+  );
+}
+
+export const imageRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: ImageMd as ComponentMetadata,
+  renderer: ({ adapter }) => <RuntimeImage adapter={adapter} />,
+});

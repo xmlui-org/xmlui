@@ -4,6 +4,14 @@ export type XmluiAppContextValue = {
   appGlobals: Record<string, unknown>;
   loggedInUser: unknown;
   setLoggedInUser: (user: unknown) => void;
+  confirm: (
+    title?: unknown,
+    message?: unknown,
+    okLabel?: unknown,
+    cancelLabel?: unknown,
+    width?: unknown,
+  ) => Promise<boolean>;
+  signError: (error: unknown) => void;
   mediaSize: {
     sizeIndex: number;
     size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
@@ -22,6 +30,8 @@ const defaultAppContext: XmluiAppContextValue = {
   appGlobals: {},
   loggedInUser: undefined,
   setLoggedInUser: () => {},
+  confirm: () => Promise.resolve(false),
+  signError: () => {},
   mediaSize: {
     size: "xl",
     sizeIndex: 4,

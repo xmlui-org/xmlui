@@ -117,6 +117,17 @@ describe("ScriptScanner", () => {
     ]);
   });
 
+  it("tokenizes template literals with interpolation as script literals", () => {
+    const result = tokenizeScript("`Project A (load #${loadCount})`");
+
+    expect(result.diagnostics).toEqual([]);
+    expect(project(result.tokens)).toEqual([
+      ["TemplateLiteral", "`Project A (load #${loadCount})`", "string"],
+      ["EndOfFile", "", "punctuation"],
+    ]);
+    expect(result.tokens[0].value).toBe("Project A (load #${loadCount})");
+  });
+
   it("maps embedded script spans back to the containing xmlui source span", () => {
     const result = tokenizeScript("count++", {
       originSpan: {
@@ -147,6 +158,7 @@ describe("ScriptScanner", () => {
     const comments = tokenizeScript("count // note\n/* block */");
     const unknown = tokenizeScript("count @");
     const unterminatedString = tokenizeScript("'oops");
+    const unterminatedTemplate = tokenizeScript("`oops");
     const unterminatedComment = tokenizeScript("/* nope");
 
     expect(project(comments.tokens)).toEqual([
@@ -168,6 +180,10 @@ describe("ScriptScanner", () => {
 
     expect(unterminatedString.diagnostics[0]).toMatchObject({
       code: "XS002",
+      span: { sourceId: "anonymous.xmlui", start: 0, end: 5 },
+    });
+    expect(unterminatedTemplate.diagnostics[0]).toMatchObject({
+      code: "XS004",
       span: { sourceId: "anonymous.xmlui", start: 0, end: 5 },
     });
     expect(unterminatedComment.diagnostics[0]).toMatchObject({

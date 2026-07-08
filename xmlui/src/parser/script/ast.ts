@@ -8,10 +8,13 @@ export type ScriptNodeKind =
   | "BlockStatement"
   | "IfStatement"
   | "WhileStatement"
+  | "ReturnStatement"
+  | "ThrowStatement"
   | "VariableDeclaration"
   | "VariableDeclarator"
   | "Identifier"
   | "Literal"
+  | "TemplateLiteral"
   | "MemberExpression"
   | "IndexExpression"
   | "CallExpression"
@@ -19,6 +22,7 @@ export type ScriptNodeKind =
   | "UnaryExpression"
   | "BinaryExpression"
   | "ConditionalExpression"
+  | "SequenceExpression"
   | "AssignmentExpression"
   | "PrefixExpression"
   | "PostfixExpression"
@@ -65,6 +69,16 @@ export type WhileStatementNode = ScriptNodeBase & {
   body: ScriptNode;
 };
 
+export type ReturnStatementNode = ScriptNodeBase & {
+  kind: "ReturnStatement";
+  argument?: ScriptNode;
+};
+
+export type ThrowStatementNode = ScriptNodeBase & {
+  kind: "ThrowStatement";
+  argument: ScriptNode;
+};
+
 export type VariableDeclarationNode = ScriptNodeBase & {
   kind: "VariableDeclaration";
   declarationKind: "let" | "const";
@@ -85,6 +99,12 @@ export type IdentifierNode = ScriptNodeBase & {
 export type LiteralNode = ScriptNodeBase & {
   kind: "Literal";
   value: string | number | boolean | null | undefined;
+  raw: string;
+};
+
+export type TemplateLiteralNode = ScriptNodeBase & {
+  kind: "TemplateLiteral";
+  parts: Array<string | ScriptNode>;
   raw: string;
 };
 
@@ -133,6 +153,11 @@ export type ConditionalExpressionNode = ScriptNodeBase & {
   test: ScriptNode;
   consequent: ScriptNode;
   alternate: ScriptNode;
+};
+
+export type SequenceExpressionNode = ScriptNodeBase & {
+  kind: "SequenceExpression";
+  expressions: ScriptNode[];
 };
 
 export type AssignmentExpressionNode = ScriptNodeBase & {
@@ -191,10 +216,13 @@ export type ScriptNode =
   | BlockStatementNode
   | IfStatementNode
   | WhileStatementNode
+  | ReturnStatementNode
+  | ThrowStatementNode
   | VariableDeclarationNode
   | VariableDeclaratorNode
   | IdentifierNode
   | LiteralNode
+  | TemplateLiteralNode
   | MemberExpressionNode
   | IndexExpressionNode
   | CallExpressionNode
@@ -202,6 +230,7 @@ export type ScriptNode =
   | UnaryExpressionNode
   | BinaryExpressionNode
   | ConditionalExpressionNode
+  | SequenceExpressionNode
   | AssignmentExpressionNode
   | PrefixExpressionNode
   | PostfixExpressionNode

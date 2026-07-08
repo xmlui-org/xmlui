@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useState, type CSSProperties, type ReactNode } from "react";
+import { cloneElement, isValidElement, type CSSProperties, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -10,6 +10,7 @@ import {
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { useFormContextPart } from "../../components/Form/FormContext";
+import { parseTooltipOptions, ThemedTooltip as Tooltip } from "../../components/Tooltip/Tooltip";
 import { useComponentThemeClass } from "../../runtime/rendering/theme";
 
 const responsiveWhenProps = {
@@ -86,6 +87,7 @@ export const tooltipBehavior: Behavior = {
     <TooltipBehavior
       tooltip={stringValue(context.props.tooltip)}
       tooltipMarkdown={stringValue(context.props.tooltipMarkdown)}
+      tooltipOptions={context.props.tooltipOptions}
     >
       {node}
     </TooltipBehavior>
@@ -149,7 +151,6 @@ export const labelBehavior: Behavior = {
   attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
   canAttach: (context) =>
     context.componentName !== "Text" &&
-    context.componentName !== "Switch" &&
     context.componentName !== "RadioGroup" &&
     canAttachWhenTriggered("label")(context),
 };
@@ -205,7 +206,7 @@ export const animationBehavior: Behavior = {
     canBehaviorAttachToComponent(animationBehavior.metadata, context.metadata, context.componentName) &&
     hasTriggeredBehaviorProp(animationBehavior.metadata, context.props),
   attach: (context, node) => {
-    const animation = parseAnimation(context.props.animation);
+    const animation = parseAnimation(context.props.animation as string | object);
     const options = parseAnimationOptions(context.props.animationOptions);
     return (
       <Animation animation={animation} {...options}>
@@ -451,38 +452,19 @@ function TooltipBehavior({
   children,
   tooltip,
   tooltipMarkdown,
-  ...rest
+  tooltipOptions,
 }: {
   children: ReactNode;
   tooltip?: string;
   tooltipMarkdown?: string;
-} & Record<string, unknown>) {
-  const [visible, setVisible] = useState(false);
-  const content = tooltipMarkdown || tooltip;
+  tooltipOptions?: unknown;
+}) {
+  const parsedOptions = parseTooltipOptions(tooltipOptions);
   return (
-    <span
-      {...rest}
-      data-xmlui-behavior="tooltip"
-      title={tooltip}
-      data-xmlui-tooltip-markdown={tooltipMarkdown}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-      onFocus={() => setVisible(true)}
-      onBlur={() => setVisible(false)}
-    >
+    <Tooltip text={tooltip ?? ""} markdown={tooltipMarkdown} {...parsedOptions}>
       {children}
-      {visible && content ? (
-        <span role="tooltip">
-          {tooltipMarkdown ? renderTinyMarkdown(tooltipMarkdown) : content}
-        </span>
-      ) : null}
-    </span>
+    </Tooltip>
   );
-}
-
-function renderTinyMarkdown(markdown: string) {
-  const strongMatch = /^\*\*(.*)\*\*$/.exec(markdown.trim());
-  return strongMatch ? <strong>{strongMatch[1]}</strong> : markdown;
 }
 
 function stringValue(value: unknown): string | undefined {

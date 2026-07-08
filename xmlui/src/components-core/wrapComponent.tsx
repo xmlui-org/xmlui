@@ -39,7 +39,11 @@ type WrapComponentOptions = {
       extractResourceUrl: (url?: string) => string | undefined;
       state?: Record<string, any>;
       updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
-      lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
+      uid: symbol;
+      lookupEventHandler: (
+        name: string,
+        options?: Record<string, unknown>,
+      ) => ((...args: any[]) => any) | undefined;
       lookupAction: (expression: string, options?: Record<string, unknown>) => ((...args: unknown[]) => unknown) | undefined;
       lookupSyncCallback: (expression: unknown) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
@@ -121,6 +125,7 @@ export function wrapComponent(
           state,
           updateState: (nextState) => setState((prevState) => ({ ...prevState, ...nextState })),
           lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+          uid: Symbol(String(runtimeProps.props.id ?? name)),
           lookupAction: () => undefined,
           lookupSyncCallback: (expression) => typeof expression === "function" ? expression as (...args: unknown[]) => unknown : undefined,
           registerComponentApi: (api) => {

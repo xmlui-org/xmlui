@@ -192,6 +192,28 @@ describe("Managed React contracts in compileXmluiModule", () => {
     ).not.toThrow();
   });
 
+  it("accepts Tree icon animation props used by copied component docs", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App>
+            <Tree
+              testId="tree"
+              iconSize="24"
+              animateExpand
+              dataFormat="flat"
+              defaultExpanded="all"
+              data='{[
+                { id: 1, name: "Root Item 1", parentId: null },
+                { id: 2, name: "Child Item 1.1", parentId: 1 },
+              ]}' />
+          </App>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
   it("uses sibling component names as user-defined contracts", () => {
     const dir = path.join(tmpdir(), `xmlui-rs-contracts-${Date.now()}`);
     mkdirSync(dir, { recursive: true });

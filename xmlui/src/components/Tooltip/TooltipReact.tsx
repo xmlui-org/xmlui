@@ -1,227 +1,239 @@
-import type { CSSProperties, HTMLAttributes, ReactElement, ReactNode, Ref } from "react";
-import { Children, cloneElement, forwardRef, isValidElement, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { type ForwardedRef, forwardRef, memo } from "react";
+import type React from "react";
+import * as RadixTooltip from "@radix-ui/react-tooltip";
+import { isPlainObject } from "lodash-es";
+import classnames from "classnames";
 
-import { useTheme } from "../../components-core/theming/ThemeContext";
-import { defaultProps } from "./Tooltip.defaults";
 import styles from "./Tooltip.module.scss";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Markdown } from "../Markdown/Markdown";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./Tooltip.defaults";
 
-export type TooltipSide = "top" | "right" | "bottom" | "left";
-export type TooltipAlign = "start" | "center" | "end";
-
-export type TooltipOptions = {
+type TooltipOptions = {
+  /**
+   * The duration from when the mouse enters a tooltip trigger until the tooltip opens
+   */
   delayDuration?: number;
+
+  /**
+   * How much time a user has to enter another trigger without incurring a delay again
+   */
   skipDelayDuration?: number;
+
+  /**
+   * The open state of the tooltip when it is initially rendered
+   */
   defaultOpen?: boolean;
+
+  /**
+   * Whether to show the arrow pointing to the trigger element
+   */
   showArrow?: boolean;
-  side?: TooltipSide;
-  align?: TooltipAlign;
+
+  /**
+   * The preferred side of the trigger to render against when open
+   */
+  side?: "top" | "right" | "bottom" | "left";
+
+  /**
+   * The preferred alignment against the trigger
+   */
+  align?: "start" | "center" | "end";
+
+  /**
+   * The distance in pixels from the trigger
+   */
   sideOffset?: number;
+
+  /**
+   * An offset in pixels from the "start" or "end" alignment options
+   */
   alignOffset?: number;
+
+  /**
+   * When true, overrides the side and align preferences to prevent collisions with boundary edges
+   */
   avoidCollisions?: boolean;
 };
 
-export type TooltipProps = TooltipOptions & Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  children?: ReactNode;
-  markdown?: string;
+type TooltipProps = TooltipOptions & React.HTMLAttributes<HTMLDivElement> & {
+  /**
+   * The open state of the tooltip externally controlled
+   */
   open?: boolean;
-  text?: string;
-  tooltipTemplate?: ReactNode;
+
+  /**
+   * The text content to display in the tooltip
+   */
+  text: string;
+
+  /**
+   * The markdown content to display in the tooltip
+   */
+  markdown?: string;
+
+  /**
+   * The template for the tooltip content
+   */
+  tooltipTemplate?: React.ReactNode;
+
+  classes?: Record<string, string>;
 };
 
-export const TooltipComponent = forwardRef<HTMLDivElement, TooltipProps>(function TooltipComponent(
-  {
-    align = defaultProps.align,
-    alignOffset = defaultProps.alignOffset,
-    children,
-    className,
-    defaultOpen = defaultProps.defaultOpen,
-    delayDuration = defaultProps.delayDuration,
-    skipDelayDuration: _skipDelayDuration = defaultProps.skipDelayDuration,
-    avoidCollisions: _avoidCollisions = defaultProps.avoidCollisions,
-    markdown,
-    open,
-    showArrow = defaultProps.showArrow,
-    side = defaultProps.side,
-    sideOffset = defaultProps.sideOffset,
-    style,
-    text,
-    tooltipTemplate,
-    ...rest
-  },
-  ref,
-) {
+export type { TooltipProps, TooltipOptions };
+
+export const Tooltip = memo(forwardRef(function Tooltip({
+  text,
+  markdown,
+  tooltipTemplate,
+  delayDuration = defaultProps.delayDuration,
+  skipDelayDuration = defaultProps.skipDelayDuration,
+  defaultOpen = defaultProps.defaultOpen,
+  showArrow = defaultProps.showArrow,
+  side = defaultProps.side,
+  align = defaultProps.align,
+  sideOffset = defaultProps.sideOffset,
+  alignOffset = defaultProps.alignOffset,
+  avoidCollisions = defaultProps.avoidCollisions,
+  children,
+  open,
+  className,
+  classes,
+}: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
   const { root } = useTheme();
-  const triggerRef = useRef<HTMLElement | null>(null);
-  const [hoverOpen, setHoverOpen] = useState(defaultOpen);
-  const [coords, setCoords] = useState({ left: 0, top: 0 });
-  const visible = open ?? hoverOpen;
-  const content = tooltipTemplate ?? (markdown ? renderTinyMarkdown(markdown) : text);
-  const hasTooltip = content !== undefined && content !== null && content !== "";
-  const child = Children.count(children) === 1 && isValidElement(children)
-    ? children as ReactElement<Record<string, unknown>>
-    : null;
-
-  const triggerHandlers = {
-    onBlur: composeEventHandlers(child?.props.onBlur, () => setHoverOpen(false)),
-    onFocus: composeEventHandlers(child?.props.onFocus, () => setHoverOpen(true)),
-    onMouseEnter: composeEventHandlers(child?.props.onMouseEnter, () => {
-      window.setTimeout(() => setHoverOpen(true), Number(delayDuration) || 0);
-    }),
-    onMouseLeave: composeEventHandlers(child?.props.onMouseLeave, () => setHoverOpen(false)),
-  };
-
-  const trigger = child ? (
-    cloneElement(child, {
-      ...triggerHandlers,
-      ref: composeRefs((child as ReactElement & { ref?: Ref<HTMLElement> }).ref, triggerRef),
-    })
-  ) : (
-    <span
-      className={styles.trigger}
-      {...triggerHandlers}
-      ref={triggerRef}
-    >
-      {children}
-    </span>
-  );
-
-  const tooltip = visible && hasTooltip ? (
-    <div
-      {...rest}
-      ref={ref}
-      className={[styles.content, className].filter(Boolean).join(" ")}
-      data-side={side}
-      data-tooltip-container
-      role="tooltip"
-      style={{
-        ...(style as CSSProperties),
-        left: coords.left,
-        top: coords.top,
-        "--xmlui-tooltip-side-offset": `${Number(sideOffset) || 0}px`,
-      } as CSSProperties}
-    >
-      {content}
-      {showArrow ? <span aria-hidden="true" className={styles.arrow} /> : null}
-    </div>
-  ) : null;
-  const portalRoot = root ?? (typeof document === "undefined" ? null : document.body);
-
-  useEffect(() => {
-    if (!visible || !triggerRef.current) {
-      return;
-    }
-    const rect = triggerRef.current.getBoundingClientRect();
-    const offset = Number(sideOffset) || 0;
-    const alignDelta = align === "start" ? -rect.width / 4 : align === "end" ? rect.width / 4 : 0;
-    const next = side === "left" || side === "right"
-      ? {
-          left: side === "left" ? rect.left - offset : rect.right + offset,
-          top: rect.top + rect.height / 2 + alignDelta + Number(alignOffset || 0),
-        }
-      : {
-          left: rect.left + rect.width / 2 + alignDelta + Number(alignOffset || 0),
-          top: side === "top" ? rect.top - offset : rect.bottom + offset,
-        };
-    setCoords(next);
-  }, [align, alignOffset, side, sideOffset, visible]);
+  const showTooltip = !!(text || markdown || tooltipTemplate);
 
   return (
-    <span className={styles.root} data-xmlui-component="TooltipTrigger">
-      {trigger}
-      {portalRoot && tooltip ? createPortal(tooltip, portalRoot) : tooltip}
-    </span>
+    <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
+      <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Portal container={root}>
+          {showTooltip && (
+            <RadixTooltip.Content
+              ref={ref}
+              className={classnames(styles.content, classes?.[COMPONENT_PART_KEY], className)}
+              side={side}
+              align={align}
+              sideOffset={sideOffset}
+              alignOffset={alignOffset}
+              avoidCollisions={avoidCollisions}
+              data-tooltip-container
+            >
+              {tooltipTemplate ? (
+                tooltipTemplate
+              ) : markdown ? (
+                <Markdown>{markdown}</Markdown>
+              ) : (
+                text
+              )}
+              {showArrow && <RadixTooltip.Arrow className={styles.arrow} />}
+            </RadixTooltip.Content>
+          )}
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
   );
-});
+}));
 
-function composeRefs<T>(...refs: Array<Ref<T> | undefined>) {
-  return (node: T | null) => {
-    for (const ref of refs) {
-      if (typeof ref === "function") {
-        ref(node);
-      } else if (ref && typeof ref === "object") {
-        (ref as { current: T | null }).current = node;
-      }
-    }
-  };
-}
-
-function composeEventHandlers(
-  originalHandler: unknown,
-  ourHandler: () => void,
-) {
-  return (event: unknown) => {
-    if (typeof originalHandler === "function") {
-      originalHandler(event);
-    }
-    ourHandler();
-  };
-}
-
-export function parseTooltipOptions(input: unknown): Partial<TooltipOptions> {
-  if (input && typeof input === "object" && !Array.isArray(input)) {
+/**
+ * Parses tooltip options from any input and returns an object containing only the option properties
+ * of Tooltip (excludes non-option properties like text, triggerRef, and children)
+ */
+export function parseTooltipOptions(input: any): Partial<TooltipOptions> {
+  // If input is a plain object, return it as TooltipOptions
+  if (isPlainObject(input)) {
     return input as Partial<TooltipOptions>;
   }
-  if (typeof input !== "string") {
-    return {};
-  }
-  const options: Partial<TooltipOptions> = {};
-  for (const value of input.split(";").map((item) => item.trim()).filter(Boolean)) {
-    const separator = value.indexOf(":");
-    if (separator >= 0) {
-      const name = value.slice(0, separator).trim();
-      const rawValue = value.slice(separator + 1).trim();
-      const parsed = parseOptionValue(name, rawValue);
-      if (parsed !== undefined) {
-        (options as Record<string, unknown>)[name] = parsed;
+
+  // If input is a string, split by semicolon
+  if (typeof input === "string") {
+    const values = input
+      .split(";")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+    const options: Partial<TooltipOptions> = {};
+
+    for (const value of values) {
+      // Check if it's a name-value pair (contains colon)
+      if (value.includes(":")) {
+        const [name, val] = value.split(":").map((part) => part.trim());
+        if (name && val) {
+          // Parse the value based on the property type
+          const parsedValue = parseOptionValue(name, val);
+          if (parsedValue !== undefined) {
+            (options as any)[name] = parsedValue;
+          }
+        }
+      } else {
+        // Single value case - check various option types
+        const sideValues = ["top", "right", "bottom", "left"];
+        const alignValues = ["start", "center", "end"];
+        const booleanOptions = ["defaultOpen", "showArrow", "avoidCollisions"];
+
+        if (sideValues.includes(value)) {
+          options.side = value as "top" | "right" | "bottom" | "left";
+        } else if (alignValues.includes(value)) {
+          options.align = value as "start" | "center" | "end";
+        } else if (booleanOptions.includes(value)) {
+          // Boolean option with true value
+          (options as any)[value] = true;
+        } else if (value.startsWith("!") && value.length > 1) {
+          // Boolean option with false value (negated with !)
+          const optionName = value.substring(1);
+          if (booleanOptions.includes(optionName)) {
+            (options as any)[optionName] = false;
+          }
+        }
+        // If it doesn't match any known values, ignore it
       }
-      continue;
     }
-    if (["top", "right", "bottom", "left"].includes(value)) {
-      options.side = value as TooltipSide;
-    } else if (["start", "center", "end"].includes(value)) {
-      options.align = value as TooltipAlign;
-    } else if (["defaultOpen", "showArrow", "avoidCollisions"].includes(value)) {
-      (options as Record<string, unknown>)[value] = true;
-    } else if (value.startsWith("!") && ["defaultOpen", "showArrow", "avoidCollisions"].includes(value.slice(1))) {
-      (options as Record<string, unknown>)[value.slice(1)] = false;
-    }
+
+    return options;
   }
-  return options;
+
+  // For any other type, return empty object
+  return {};
 }
 
-function parseOptionValue(name: string, value: string): unknown {
-  if (["delayDuration", "skipDelayDuration", "sideOffset", "alignOffset"].includes(name)) {
-    const parsed = Number.parseInt(value, 10);
-    return Number.isNaN(parsed) ? undefined : parsed;
-  }
-  if (["defaultOpen", "showArrow", "avoidCollisions"].includes(name)) {
-    if (/^(true|1|yes)$/i.test(value)) {
-      return true;
-    }
-    if (/^(false|0|no)$/i.test(value)) {
-      return false;
-    }
-    return undefined;
-  }
-  if (name === "side" && ["top", "right", "bottom", "left"].includes(value)) {
-    return value;
-  }
-  if (name === "align" && ["start", "center", "end"].includes(value)) {
-    return value;
-  }
-  return undefined;
-}
+/**
+ * Helper function to parse option values based on the property name
+ */
+function parseOptionValue(name: string, value: string): any {
+  switch (name) {
+    case "delayDuration":
+    case "skipDelayDuration":
+    case "sideOffset":
+    case "alignOffset":
+      // Parse as number
+      const num = parseInt(value, 10);
+      return isNaN(num) ? undefined : num;
 
-function renderTinyMarkdown(markdown: string): ReactNode {
-  const parts = markdown.split(/(`[^`]+`|\*[^*]+\*|_[^_]+_)/g).filter(Boolean);
-  return parts.map((part, index) => {
-    if (part.startsWith("`") && part.endsWith("`")) {
-      return <code key={index}>{part.slice(1, -1)}</code>;
-    }
-    if ((part.startsWith("*") && part.endsWith("*")) || (part.startsWith("_") && part.endsWith("_"))) {
-      return <em key={index}>{part.slice(1, -1)}</em>;
-    }
-    return <span key={index}>{part}</span>;
-  });
+    case "defaultOpen":
+    case "showArrow":
+    case "avoidCollisions":
+      // Parse as boolean
+      const lowerVal = value.toLowerCase();
+      if (lowerVal === "true" || lowerVal === "1" || lowerVal === "yes") return true;
+      if (lowerVal === "false" || lowerVal === "0" || lowerVal === "no") return false;
+      return undefined;
+
+    case "side":
+      // Validate side values
+      if (["top", "right", "bottom", "left"].includes(value)) {
+        return value as "top" | "right" | "bottom" | "left";
+      }
+      return undefined;
+
+    case "align":
+      // Validate align values
+      if (["start", "center", "end"].includes(value)) {
+        return value as "start" | "center" | "end";
+      }
+      return undefined;
+
+    default:
+      // Unknown property, return undefined
+      return undefined;
+  }
 }

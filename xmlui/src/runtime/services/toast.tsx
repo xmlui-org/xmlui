@@ -155,7 +155,9 @@ export function ToastHost({ service }: { service: ToastService }) {
             lineHeight: 1.35,
           }}
         >
-          {toast.message}
+          <div>
+            <div>{toast.message}</div>
+          </div>
         </div>
       ))}
     </div>

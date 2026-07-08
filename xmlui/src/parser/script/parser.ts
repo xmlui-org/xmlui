@@ -24,9 +24,13 @@ import {
   type PostfixExpressionNode,
   type PrefixExpressionNode,
   type ProgramNode,
+  type ReturnStatementNode,
   type ScriptNode,
   type ScriptNodeKind,
   type ScriptSourceInput,
+  type SequenceExpressionNode,
+  type TemplateLiteralNode,
+  type ThrowStatementNode,
   type UnaryExpressionNode,
   type VariableDeclarationNode,
   type VariableDeclaratorNode,
@@ -104,12 +108,13 @@ class ScriptParser {
         return this.parseIfStatement();
       case ScriptTokenKind.WhileKeyword:
         return this.parseWhileStatement();
+      case ScriptTokenKind.ReturnKeyword:
+        return this.parseReturnStatement();
+      case ScriptTokenKind.ThrowKeyword:
+        return this.parseThrowStatement();
       case ScriptTokenKind.LetKeyword:
       case ScriptTokenKind.ConstKeyword:
         return this.parseVariableDeclaration();
-      case ScriptTokenKind.ReturnKeyword:
-        this.consume();
-        return this.createExpressionStatement(this.parseExpression());
       default:
         return this.createExpressionStatement(this.parseExpression());
     }
@@ -165,6 +170,29 @@ class ScriptParser {
       test,
       body,
     }) as WhileStatementNode;
+  }
+
+  private parseThrowStatement(): ThrowStatementNode {
+    const keyword = this.consume(ScriptTokenKind.ThrowKeyword);
+    const argument = this.parseExpression();
+    return this.node("ThrowStatement", keyword, argument.endToken, [argument], {
+      argument,
+    }) as ThrowStatementNode;
+  }
+
+  private parseReturnStatement(): ReturnStatementNode {
+    const keyword = this.consume(ScriptTokenKind.ReturnKeyword);
+    if (
+      this.at(ScriptTokenKind.Semicolon) ||
+      this.at(ScriptTokenKind.CloseBrace) ||
+      this.at(ScriptTokenKind.EndOfFile)
+    ) {
+      return this.node("ReturnStatement", keyword, keyword, [], {}) as ReturnStatementNode;
+    }
+    const argument = this.parseExpression();
+    return this.node("ReturnStatement", keyword, argument.endToken, [argument], {
+      argument,
+    }) as ReturnStatementNode;
   }
 
   private parseParenthesizedStatementExpression(keyword: string): ScriptNode {
@@ -402,6 +430,8 @@ class ScriptParser {
       case ScriptTokenKind.NullKeyword:
       case ScriptTokenKind.UndefinedKeyword:
         return this.createLiteral(this.consume());
+      case ScriptTokenKind.TemplateLiteral:
+        return this.createTemplateLiteral(this.consume());
       case ScriptTokenKind.Exclamation:
       case ScriptTokenKind.Plus:
       case ScriptTokenKind.Minus:
@@ -424,9 +454,16 @@ class ScriptParser {
 
   private parseGroupedExpression(): ScriptNode {
     const open = this.consume(ScriptTokenKind.OpenParen);
-    const expression = this.parseExpression();
+    const expressions = [this.parseExpression()];
+    while (this.at(ScriptTokenKind.Comma)) {
+      this.consume();
+      expressions.push(this.parseExpression());
+    }
     if (this.at(ScriptTokenKind.CloseParen)) {
       const close = this.consume(ScriptTokenKind.CloseParen);
+      const expression = expressions.length === 1
+        ? expressions[0]
+        : this.createSequenceExpression(open, close, expressions);
       return {
         ...expression,
         span: this.span(open, close),
@@ -435,7 +472,7 @@ class ScriptParser {
       };
     }
     this.report("XS106", "Expected ')' to close grouped expression.", this.current());
-    return expression;
+    return expressions.length === 1 ? expressions[0] : this.createSequenceExpression(open, expressions.at(-1)?.endToken, expressions);
   }
 
   private parseArrayExpression(): ArrayExpressionNode {
@@ -679,6 +716,47 @@ class ScriptParser {
     }) as LiteralNode;
   }
 
+  private createTemplateLiteral(token: ScriptToken): TemplateLiteralNode {
+    const raw = token.value ?? "";
+    const parts: Array<string | ScriptNode> = [];
+    let cursor = 0;
+
+    while (cursor < raw.length) {
+      const interpolationStart = findTemplateInterpolationStart(raw, cursor);
+      if (interpolationStart < 0) {
+        parts.push(raw.slice(cursor));
+        break;
+      }
+      if (interpolationStart > cursor) {
+        parts.push(raw.slice(cursor, interpolationStart));
+      }
+      const expressionStart = interpolationStart + 2;
+      const expressionEnd = findTemplateInterpolationEnd(raw, expressionStart);
+      if (expressionEnd < 0) {
+        parts.push(raw.slice(interpolationStart));
+        break;
+      }
+      const expressionSource = raw.slice(expressionStart, expressionEnd);
+      const originStart = token.span.start + 1 + expressionStart;
+      const parsed = parseScriptExpression(expressionSource, {
+        sourceId: token.span.sourceId,
+        originSpan: {
+          sourceId: token.span.sourceId,
+          start: originStart,
+          end: originStart + expressionSource.length,
+        },
+      });
+      this.diagnostics.push(...parsed.diagnostics);
+      parts.push(parsed.node);
+      cursor = expressionEnd + 1;
+    }
+
+    return this.node("TemplateLiteral", token, token, parts.filter(isScriptNodePart), {
+      raw,
+      parts,
+    }) as TemplateLiteralNode;
+  }
+
   private createUnaryExpression(operator: ScriptToken, argument: ScriptNode): UnaryExpressionNode {
     return this.node("UnaryExpression", operator, argument.endToken, [argument], {
       operator: operator.text,
@@ -751,6 +829,16 @@ class ScriptParser {
       consequent,
       alternate,
     }) as ConditionalExpressionNode;
+  }
+
+  private createSequenceExpression(
+    open: ScriptToken,
+    close: ScriptToken | undefined,
+    expressions: ScriptNode[],
+  ): SequenceExpressionNode {
+    return this.node("SequenceExpression", open, close ?? expressions.at(-1)?.endToken, expressions, {
+      expressions,
+    }) as SequenceExpressionNode;
   }
 
   private createArrowFunctionExpression(
@@ -913,4 +1001,54 @@ function literalValue(token: ScriptToken): string | number | boolean | null | un
     default:
       return token.text;
   }
+}
+
+function findTemplateInterpolationStart(raw: string, start: number): number {
+  for (let index = start; index < raw.length - 1; index++) {
+    if (raw[index] === "\\") {
+      index++;
+      continue;
+    }
+    if (raw[index] === "$" && raw[index + 1] === "{") {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function findTemplateInterpolationEnd(raw: string, start: number): number {
+  let depth = 0;
+  let quote: string | undefined;
+  for (let index = start; index < raw.length; index++) {
+    const ch = raw[index];
+    if (quote) {
+      if (ch === "\\") {
+        index++;
+        continue;
+      }
+      if (ch === quote) {
+        quote = undefined;
+      }
+      continue;
+    }
+    if (ch === `"` || ch === "'" || ch === "`") {
+      quote = ch;
+      continue;
+    }
+    if (ch === "{") {
+      depth++;
+      continue;
+    }
+    if (ch === "}") {
+      if (depth === 0) {
+        return index;
+      }
+      depth--;
+    }
+  }
+  return -1;
+}
+
+function isScriptNodePart(part: string | ScriptNode): part is ScriptNode {
+  return typeof part !== "string";
 }

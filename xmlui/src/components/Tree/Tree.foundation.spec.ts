@@ -24,7 +24,7 @@ test.describe("Tree foundation", () => {
         <Tree
           testId="tree"
           defaultExpanded="all"
-          onSelectionDidChange="item => selected = item.name"
+          onSelectionDidChange="event => selected = event.newNode.name"
           data="{[
             { id: 'root', name: 'Root' },
             { id: 'child', parentId: 'root', name: 'Child' }
@@ -89,5 +89,48 @@ test.describe("Tree foundation", () => {
     await expect(page.getByRole("treeitem", { name: /New A/ })).toBeVisible();
     await expect(page.getByRole("treeitem", { name: /New B/ })).toBeVisible();
     await expect(page.getByRole("treeitem", { name: /Renamed Child/ })).not.toBeVisible();
+  });
+
+  test("autoLoadAfterField reloads loaded nodes without a dynamic field", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.fastReloads="{0}" var.slowReloads="{0}">
+        <Tree
+          testId="tree"
+          itemClickExpands
+          autoLoadAfterField="reloadDelay"
+          data="{[
+            { id: 1, name: 'Fast Updates', parentId: null, loaded: false, reloadDelay: 50 },
+            { id: 2, name: 'Slow Updates', parentId: null, loaded: false, reloadDelay: 5000 },
+          ]}"
+          onLoadChildren="(node) => {
+            if (node.id === 1) fastReloads++;
+            if (node.id === 2) slowReloads++;
+            delay(10);
+            const count = node.id === 1 ? fastReloads : slowReloads;
+            return [
+              { id: node.id + '-child-' + count, name: 'Load #' + count, parentId: node.id },
+            ];
+          }" />
+        <Text testId="fastReloads">{fastReloads}</Text>
+        <Text testId="slowReloads">{slowReloads}</Text>
+      </App>
+    `);
+
+    await page.getByRole("treeitem", { name: /Fast Updates/ }).click();
+    await expect(page.getByTestId("fastReloads")).toHaveText("1");
+    await page.getByRole("treeitem", { name: /Fast Updates/ }).click();
+    await page.waitForTimeout(75);
+    await page.getByRole("treeitem", { name: /Fast Updates/ }).click();
+    await expect(page.getByTestId("fastReloads")).toHaveText("2");
+
+    await page.getByRole("treeitem", { name: /Slow Updates/ }).click();
+    await expect(page.getByTestId("slowReloads")).toHaveText("1");
+    await page.getByRole("treeitem", { name: /Slow Updates/ }).click();
+    await page.waitForTimeout(75);
+    await page.getByRole("treeitem", { name: /Slow Updates/ }).click();
+    await expect(page.getByTestId("slowReloads")).toHaveText("1");
   });
 });

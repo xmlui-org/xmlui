@@ -24,6 +24,14 @@ export function useAppContext(): {
   appGlobals: Record<string, any>;
   loggedInUser: unknown;
   xmluiConfig: Record<string, any>;
+  confirm: (
+    title?: unknown,
+    message?: unknown,
+    okLabel?: unknown,
+    cancelLabel?: unknown,
+    width?: unknown,
+  ) => Promise<boolean>;
+  signError: (error: unknown) => void;
   navigate: (...args: any[]) => void;
   setLoggedInUser: (user: unknown) => void;
   setNavigationHandlers: (handlers: unknown) => void;

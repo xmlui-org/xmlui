@@ -49,12 +49,12 @@ test.describe("Basic Functionality", () => {
 
     const container = page.getByTestId("container");
     await expect(container).toBeVisible();
-
+    
     // Should contain the text we added to make container visible
     await expect(container).toContainText("Container Content");
-
-    // Container should show only the surrounding text, not an item rendered by Items.
-    const textElements = page.getByText("Container Content");
+    
+    // Container should have exactly one child (our text element, not the empty Items)
+    const textElements = container.locator("div").filter({ hasText: "Container Content" });
     await expect(textElements).toHaveCount(1);
   });
 
@@ -70,12 +70,12 @@ test.describe("Basic Functionality", () => {
 
     const container = page.getByTestId("container");
     await expect(container).toBeVisible();
-
+    
     // Should contain the text we added to make container visible
     await expect(container).toContainText("Container Content");
-
-    // Container should show only the surrounding text, not an item rendered by Items.
-    const textElements = page.getByText("Container Content");
+    
+    // Container should have exactly one child (our text element, not the null Items)
+    const textElements = container.locator("div").filter({ hasText: "Container Content" });
     await expect(textElements).toHaveCount(1);
   });
 
@@ -91,12 +91,12 @@ test.describe("Basic Functionality", () => {
 
     const container = page.getByTestId("container");
     await expect(container).toBeVisible();
-
+    
     // Should contain the text we added to make container visible
     await expect(container).toContainText("Container Content");
-
-    // Container should show only the surrounding text, not an item rendered by Items.
-    const textElements = page.getByText("Container Content");
+    
+    // Container should have exactly one child (our text element, not the undefined Items)
+    const textElements = container.locator("div").filter({ hasText: "Container Content" });
     await expect(textElements).toHaveCount(1);
   });
 
@@ -260,7 +260,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByTestId("item-0")).toBeVisible();
       await expect(page.getByTestId("item-1")).toBeVisible();
       await expect(page.getByTestId("item-2")).toBeVisible();
-
+      
       // Check that values from the object are rendered
       const items = page.locator('[data-testid^="item-"]');
       await expect(items).toHaveCount(3);
@@ -324,7 +324,7 @@ test.describe("Basic Functionality", () => {
           { name: 'object' }
         ]}">
           <Text testId="mixed-{$itemIndex}">
-            {$item.name || $item}
+            {typeof $item === 'object' && $item !== null ? $item.name || 'object' : $item}
           </Text>
         </Items>
       `);
@@ -354,11 +354,11 @@ test.describe("Other Edge Cases", () => {
 
     const container = page.getByTestId("container");
     await expect(container).toBeVisible();
-
+    
     // Should still render the surrounding text elements
     await expect(container).toContainText("Before Items");
     await expect(container).toContainText("After Items");
-
+    
     // Items with no template should not render anything
     const beforeText = page.getByText("Before Items");
     const afterText = page.getByText("After Items");
@@ -382,7 +382,7 @@ test.describe("Other Edge Cases", () => {
     await expect(parent).toContainText("Before Items");
     await expect(parent).toContainText("Test Item");
     await expect(parent).toContainText("After Items");
-
+    
     // The item should be rendered directly
     await expect(page.getByTestId("item-content")).toContainText("Test Item");
   });
@@ -412,7 +412,7 @@ test.describe("Other Edge Cases", () => {
   test("handles deeply nested data structures", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Items data="{[
-        {
+        { 
           user: { profile: { name: 'John', details: { age: 30 } } },
           settings: { theme: 'dark' }
         },
@@ -443,12 +443,12 @@ test.describe("Other Edge Cases", () => {
 
     const container = page.getByTestId("container");
     await expect(container).toBeVisible();
-
+    
     // Should contain the text we added to make container visible
     await expect(container).toContainText("Container Content");
-
+    
     // Non-array data should result in no items rendered, but container should still be visible
-    const textElements = page.getByText("Container Content");
+    const textElements = container.locator("div").filter({ hasText: "Container Content" });
     await expect(textElements).toHaveCount(1);
   });
 });

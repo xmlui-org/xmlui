@@ -28,7 +28,8 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('const __xmluiCreateYieldState');
     expect(code).toContain('const __xmluiYieldIfNeeded');
     expect(code).toContain('"compiledSource": "const __xmluiYieldState = __xmluiCreateYieldState');
-    expect(code).toContain('__xmluiResult = ctx.writeGlobal');
+    expect(code).toContain('__xmluiResult = ((__xmluiCurrent)');
+    expect(code).toContain('ctx.writeGlobal("count", __xmluiNext)');
     expect(code).toContain('"evaluate": function expr_');
     expect(code).toContain('"execute": async function event_');
     expect(code).toContain('"invalidates"');
@@ -44,7 +45,8 @@ describe("compileXmluiModule", () => {
     expect(code).toContain('"dedicatedYield"');
     expect(code).toContain('"compiledSource": "const __xmluiNow');
     expect(code).toContain('await __xmluiYieldIfNeeded();');
-    expect(code).toContain('__xmluiResult = ctx.writeLocal');
+    expect(code).toContain('__xmluiResult = ((__xmluiCurrent)');
+    expect(code).toContain('ctx.writeLocal("count", __xmluiNext)');
   });
 
   it("emits the shared yield helper when any handler uses default async yield", () => {
@@ -155,6 +157,61 @@ describe("compileXmluiModule", () => {
     ).not.toThrow();
   });
 
+  it("accepts template literals in Tree loadChildren handlers", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: [
+          `<App var.loadCount="{0}">`,
+          `  <Tree`,
+          `    testId="tree"`,
+          `    itemClickExpands`,
+          `    data='{[{ id: 1, name: "Projects", parentId: null, dynamic: true }]}'`,
+          `    onLoadChildren="(node) => {`,
+          `      if (node.id !== 1) return;`,
+          `      loadCount++;`,
+          `      delay(500);`,
+          "      return [{ id: 3, name: `Project A (load #${loadCount})`, parentId: node.id }];",
+          `    }" />`,
+          `</App>`,
+        ].join("\n"),
+      }),
+    ).not.toThrow();
+  });
+
+  it("accepts Date calls in Tree autoLoadAfter loadChildren handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: [
+        `<App var.reloadCount="{0}">`,
+        `  <VStack gap="$space-2">`,
+        `    <Text variant="strong">Instructions:</Text>`,
+        `    <Tree`,
+        `      testId="tree"`,
+        `      itemClickExpands`,
+        `      autoLoadAfter="2000"`,
+        `      data='{[`,
+        `        { id: 1, name: "Server Data", parentId: null, loaded: false },`,
+        `        { id: 2, name: "Database Records", parentId: null, loaded: false },`,
+        `      ]}'`,
+        `      onLoadChildren="(node) => {`,
+        `        reloadCount++;`,
+        `        delay(400);`,
+        `        const timestamp = Date().toLocaleTimeString();`,
+        `        return [`,
+        "          { id: `${node.id}-${Date.now()}`, name: `Data loaded at ${timestamp} (#${reloadCount})`, parentId: node.id },",
+        `        ];`,
+        `      }">`,
+        `    </Tree>`,
+        `  </VStack>`,
+        `</App>`,
+      ].join("\n"),
+    });
+
+    expect(code).toContain("new Date()");
+    expect(code).toContain(`?.["now"]`);
+  });
+
   it("surfaces semantic diagnostics during compilation", () => {
     expect(() =>
       compileXmluiModule({
@@ -190,6 +247,166 @@ describe("compileXmluiModule", () => {
     expect(code).toContain(`"type": "AppState"`);
     expect(code).toContain(`"update"`);
     expect(code).toContain(`ctx.call`);
+  });
+
+  it("compiles number formatting method calls in bindings", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `<App var.result="{0}"><Text value="{result.toFixed(4)}" /></App>`,
+    });
+
+    expect(code).toContain(`"toFixed"`);
+    expect(code).toContain(`?.["toFixed"]?.(4)`);
+  });
+
+  it("compiles Queue sample number formatting", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App
+            var.queued="{0}"
+            var.queueLength="{0}"
+            var.processed="{0}"
+            var.result="{0}">
+            <Button
+              label="Add a new item to the queue"
+              onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
+            <Queue id="myQueue"
+              onProcess="processing =>
+                {
+                    result += processing.item;
+                    delay(1000);
+                    processed++;
+                    processing.onProgress(processed)
+                }
+              ">
+              <property name="progressFeedback">
+                <Text value="{processed} / {queued}" />
+              </property>
+              <property name="resultFeedback">
+                <Text value="{result.toFixed(4)}" />
+              </property>
+            </Queue>
+            <ChangeListener
+              listenTo="{myQueue.getQueueLength()}"
+              onDidChange="l => queueLength = l.newValue;"/>
+            <Text>Items queued: {queued}</Text>
+            <Text>Current queue length: {queueLength}</Text>
+            <Text>Current result: {result.toFixed(4)}</Text>
+          </App>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
+  it("compiles Queue process handlers that throw authored errors", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App
+            var.queued="{0}"
+            var.progressLine=""
+            var.result="{0}">
+            <Button
+              label="Add a new item to the queue"
+              onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
+            <Queue id="myQueue"
+              onProcess="processing => {
+                if (progressLine.length % 4 === 3) {
+                  throw 'Item cannot be processed';
+                }
+                result += processing.item;
+                delay(1000);
+              }"
+              onDidProcess="progressLine += ' ok!'"
+              onProcessError="progressLine += ' canceled'" >
+              <property name="resultFeedback">
+                <Text value="{result.toFixed(4)}" />
+              </property>
+            </Queue>
+            <Text>Items queued: {queued}</Text>
+            <Text>Current result: {result.toFixed(4)}</Text>
+            <Text>Progress: {progressLine}</Text>
+          </App>
+        `,
+      }),
+    ).not.toThrow();
+  });
+
+  it("compiles Queue processError confirmation retry handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `
+        <App var.queued="{0}" var.processed="">
+          <Button
+            label="Add a new file to the queue"
+            onClick="{myQueue.enqueueItem({file: ++queued, conflict: 'deny'})}" />
+          <Queue id="myQueue"
+            onProcess="processing => {
+              delay(100);
+              if (processing.item.conflict === 'deny') {
+                throw 'Conflict';
+              }
+              processed += processing.item.file + ', ';
+            }"
+            onProcessError="(error, processing) => {
+              if (error.message === 'Conflict') {
+                console.log(error);
+                const result = confirm(
+                  'Do you want to overwrite?',
+                  'File ' + processing.item.file + ' already exists',
+                  'Overwrite'
+                );
+                $this.remove(processing.actionItemId);
+                if (result) {
+                  $this.enqueueItems([{...processing.item, conflict: 'accept'}]);
+                }
+                return false;
+              }
+            }" />
+          <Text>Items queued: {queued}</Text>
+          <Text>Processed: {processed}</Text>
+        </App>
+      `,
+    });
+
+    expect(code).toContain("Do you want to overwrite?");
+    expect(code).toContain("ctx.readContext?.(\\\"confirm\\\")");
+    expect(code).toContain("ctx.readContext?.(\\\"$this\\\")");
+    expect(code).toContain("enqueueItems");
+  });
+
+  it("compiles Queue willProcess handlers with grouped comma expressions", () => {
+    expect(() =>
+      compileXmluiModule({
+        id: "/tmp/Main.xmlui",
+        source: `
+          <App
+            var.queued="{0}"
+            var.skipped="{0}"
+            var.result="{0}">
+            <Button
+              label="Add a new item to the queue"
+              onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
+            <Queue id="myQueue"
+              onWillProcess="toProcess => toProcess.item < 0.5 ? (skipped++, false) : true"
+              onProcess="processing => {
+                result += processing.item;
+                delay(1000);
+              }">
+              <property name="resultFeedback">
+                <Text value="{result.toFixed(4)}" />
+              </property>
+            </Queue>
+            <Text>Items queued: {queued}</Text>
+            <Text>Items skipped: {skipped}</Text>
+            <Text>Current result: {result.toFixed(4)}</Text>
+          </App>
+        `,
+      }),
+    ).not.toThrow();
   });
 
   it("binds static component ids as references inside component files", () => {

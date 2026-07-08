@@ -1,5 +1,4 @@
 import { expect, test } from "../../testing/fixtures";
-
 import {
   flatTreeData,
   hierarchyTreeData,

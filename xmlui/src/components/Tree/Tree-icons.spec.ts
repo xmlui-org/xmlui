@@ -1,11 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
-import {
-  flatTreeData,
-  flatTreeDataWithIcons1,
-  flatTreeDataWithIcons2,
-  flatTreeDataWithIconsAndAlias1,
-  flatTreeDataWithIconsAndAlias2,
-} from "./testData";
+import { flatTreeData, flatTreeDataWithIcons1, flatTreeDataWithIcons2, flatTreeDataWithIconsAndAlias1 } from "./testData";
 
 test("default collapsed icon appears", async ({ initTestBed, createTreeDriver }) => {
   await initTestBed(`
@@ -215,7 +209,7 @@ test("iconCollapsed fields (with alias) are used", async ({ initTestBed, page, c
           id="tree"
           iconCollapsedField="iconColl"
           defaultExpanded="none"
-          data='{${JSON.stringify(flatTreeDataWithIconsAndAlias2)}}' />
+          data='{${JSON.stringify(flatTreeDataWithIcons2)}}' />
         <Button testId="expand1" onClick="tree.expandNode(1)">Expand Node 1</Button>
         <Button testId="expand2" onClick="tree.expandNode(2)">Expand Node 2</Button>
       </VStack>
