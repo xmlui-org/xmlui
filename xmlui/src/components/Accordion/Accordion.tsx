@@ -1,70 +1,68 @@
-import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./Accordion.module.scss";
+
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { createMetadata, dFocus } from "../../components/metadata-helpers";
+import { triggerPositionNames } from "../../components/abstractions";
 import { defaultProps } from "./Accordion.defaults";
+import { AccordionComponent } from "./AccordionReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { CSSProperties } from "react";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { nonPropertyChildren, wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { AccordionItemMd } from "./AccordionItem";
 import { defaultProps as accordionItemDefaultProps } from "./AccordionItem.defaults";
+import { AccordionItemComponent } from "./AccordionItemReact";
+import React from "react";
+export { AccordionItemMd } from "./AccordionItem";
 
 const COMP = "Accordion";
-const ITEM_COMP = "AccordionItem";
-const accordionStylesSource = `
-  createThemeVar("borderRadius-Accordion");
-  createThemeVar("border-Accordion");
-  createThemeVar("padding-Accordion");
-  createThemeVar("paddingHorizontal-header-Accordion");
-  createThemeVar("paddingVertical-header-Accordion");
-  createThemeVar("verticalAlignment-header-Accordion");
-  createThemeVar("fontSize-header-Accordion");
-  createThemeVar("fontWeight-header-Accordion");
-  createThemeVar("fontFamily-header-Accordion");
-  createThemeVar("fontStyle-header-Accordion");
-  createThemeVar("backgroundColor-header-Accordion");
-  createThemeVar("backgroundColor-header-Accordion-hover");
-  createThemeVar("color-header-Accordion");
-  createThemeVar("color-content-Accordion");
-  createThemeVar("backgroundColor-content-Accordion");
-  createThemeVar("color-icon-Accordion");
-  createThemeVar("padding-content-Accordion");
-  createThemeVar("width-icon-Accordion");
-  createThemeVar("height-icon-Accordion");
-`;
+
+// See reference implementation here: https://getbootstrap.com/docs/5.3/components/accordion/
+// Make the header focusable, handle ARIA attributes, and manage the state of the accordion.
 
 export const AccordionMd = createMetadata({
   status: "in progress",
   description:
-    `The \`${COMP}\` component is a collapsible container that toggles the display of content sections.`,
+    `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component is a collapsible container that toggles ` +
+    `the display of content sections. It helps organize information by expanding or collapsing it ` +
+    `based on user interaction.`,
   props: {
     triggerPosition: {
-      description: "This property indicates the position where the trigger icon should be displayed.",
+      description:
+        `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
+        `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
+        `follows the header.`,
       defaultValue: defaultProps.triggerPosition,
       valueType: "string",
-      availableValues: ["start", "end"],
+      availableValues: triggerPositionNames,
     },
     collapsedIcon: {
-      description: "This property is the icon name displayed when the accordion is collapsed.",
+      description:
+        "This property is the name of the icon that is displayed when the accordion is " +
+        "collapsed. This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-down icon is used.",
       valueType: "string",
       defaultValue: defaultProps.collapsedIcon,
     },
     expandedIcon: {
-      description: "This property is the icon name displayed when the accordion is expanded.",
+      description:
+        "This property is the name of the icon that is displayed when the accordion is " +
+        "expanded. If not provided, a chevron-up icon is used.",
       valueType: "string",
     },
     hideIcon: {
-      description: "This property indicates that the trigger icon is not displayed.",
+      description: `This property indicates that the trigger icon is not displayed (\`true\`).`,
       defaultValue: defaultProps.hideIcon,
       valueType: "boolean",
     },
     rotateExpanded: {
-      description: "This optional property defines the rotation angle of the expanded icon.",
+      description: `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
       valueType: "string",
       defaultValue: defaultProps.rotateExpanded,
-    },
-    testId: {
-      description: "Adds a test identifier to the Accordion root.",
-      valueType: "string",
     },
   },
   events: {
     displayDidChange: {
-      description: `This event fires when the displayed state of the ${COMP} changes.`,
+      description: `This event fires when the displayed state of the ${COMP} changes (items are expanded or collapsed).`,
       signature: "(changedValue: string[]) => void",
       parameters: {
         changedValue: "An array of IDs representing the currently expanded accordion items.",
@@ -73,27 +71,24 @@ export const AccordionMd = createMetadata({
   },
   apis: {
     expanded: {
-      description: "Returns true if an accordion item is expanded.",
+      description: `This method returns \`true\` if the accordion is expanded, and \`false\` if it is collapsed.`,
       signature: "get expanded(): boolean",
     },
     expand: {
-      description: "Expands the accordion item.",
+      description: `This method expands the accordion, making its content visible.`,
       signature: "expand()",
     },
     collapse: {
-      description: "Collapses the accordion item.",
+      description: `This method collapses the accordion, hiding its content.`,
       signature: "collapse()",
     },
     toggle: {
-      description: "Toggles the state of the accordion item.",
+      description: `This method toggles the state of the ${COMP} between expanded and collapsed.`,
       signature: "toggle()",
     },
-    focus: {
-      description: `Focus the ${COMP} component.`,
-      signature: "focus(): void",
-    },
+    focus: dFocus(COMP),
   },
-  themeVars: extractScssThemeVars(accordionStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`paddingHorizontal-header-${COMP}`]: "$space-3",
     [`paddingVertical-header-${COMP}`]: "$space-3",
@@ -114,28 +109,59 @@ export const AccordionMd = createMetadata({
   },
 });
 
-export const AccordionItemMd = createMetadata({
-  status: "in progress",
-  description: `\`${ITEM_COMP}\` describes a collapsible item inside an Accordion.`,
-  props: {
-    header: {
-      description: "This property declares the text used in the component's header.",
-      valueType: "string",
-    },
-    id: {
-      description: "This property identifies the accordion item in expanded state APIs and events.",
-      valueType: "string",
-    },
-    headerTemplate: dComponent("This property describes the template to use as the component's header."),
-    initiallyExpanded: {
-      description: `This property indicates if the ${ITEM_COMP} is expanded.`,
-      valueType: "boolean",
-      defaultValue: accordionItemDefaultProps.initiallyExpanded,
-    },
-    testId: {
-      description: "Adds a test identifier to the AccordionItem root.",
-      valueType: "string",
-    },
-  },
+export const accordionComponentRenderer = wrapComponent(COMP, AccordionComponent, AccordionMd);
+
+export const accordionRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: AccordionMd as ComponentMetadata,
+  renderer: ({ adapter }) => <RuntimeAccordion adapter={adapter} />,
 });
 
+function RuntimeAccordion({ adapter }: { adapter: XmluiComponentAdapter }) {
+  const rootAttrs = adapter.rootAttrs();
+  const adapterRef = React.useRef(adapter);
+  adapterRef.current = adapter;
+  const displayDidChange = React.useCallback((value: string[]) => {
+    void adapterRef.current.event("displayDidChange")(value);
+  }, []);
+  return (
+    <AccordionComponent
+      {...rootAttrs}
+      style={rootAttrs.style as CSSProperties}
+      triggerPosition={adapter.stringProp("triggerPosition", defaultProps.triggerPosition) as "start" | "end"}
+      collapsedIcon={adapter.stringProp("collapsedIcon", defaultProps.collapsedIcon)}
+      expandedIcon={adapter.stringProp("expandedIcon")}
+      hideIcon={adapter.booleanProp("hideIcon", defaultProps.hideIcon)}
+      rotateExpanded={adapter.stringProp("rotateExpanded", defaultProps.rotateExpanded)}
+      onDisplayDidChange={displayDidChange}
+      registerComponentApi={adapter.registerApi}
+    >
+      {adapter.renderChildren()}
+    </AccordionComponent>
+  );
+}
+
+export const accordionItemRenderer = wrapRuntimeComponent({
+  name: "AccordionItem",
+  metadata: AccordionItemMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const hasHeaderTemplate = adapter.node.children.some(
+      (child) => child.kind === "element" &&
+        child.type === "property" &&
+        child.props.name === "headerTemplate",
+    );
+    const header = adapter.stringProp("header", "");
+    return (
+      <AccordionItemComponent
+        {...rootAttrs}
+        style={rootAttrs.style as CSSProperties}
+        id={typeof adapter.props.id === "string" ? adapter.props.id : undefined}
+        header={header}
+        headerRenderer={hasHeaderTemplate ? () => adapter.renderTemplate("headerTemplate") : undefined}
+        initiallyExpanded={adapter.booleanProp("initiallyExpanded", accordionItemDefaultProps.initiallyExpanded)}
+        content={adapter.context.renderChildren(nonPropertyChildren(adapter.node.children), adapter.scope)}
+      />
+    );
+  },
+});

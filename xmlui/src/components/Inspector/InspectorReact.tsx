@@ -1,154 +1,112 @@
+import React, { useEffect, useRef, useState, forwardRef, memo, type ForwardedRef } from "react";
 import { createPortal } from "react-dom";
-import { forwardRef, memo, useEffect, useMemo, useState, type CSSProperties, type ForwardedRef } from "react";
+import classnames from "classnames";
 
-import type { XmluiDebugEvent } from "../../compiler/scriptSemantics";
-import { getXmluiDebugBridge } from "../../runtime/debug";
-import { defaultProps } from "./Inspector.defaults";
+import styles from "./Inspector.module.scss";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { normalizePath } from "../../components-core/utils/misc";
+import SearchCodeIcon from "../Icon/svg/l-search-code.svg?react";
 
-export type InspectorApi = {
-  open: () => void;
-  close: () => void;
-  isOpen: () => boolean;
-};
-
-export type InspectorProps = {
+type Props = {
   src?: string;
   tooltip?: string;
   dialogTitle?: string;
   dialogWidth?: string;
   dialogHeight?: string;
-  className?: string;
-  style?: CSSProperties;
-  testId?: string;
-  registerApi?: (api: Record<string, unknown>) => void;
+  classes?: Record<string, string>;
+  registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const InspectorComponent = memo(forwardRef(function InspectorComponent(
+import { defaultProps } from "./Inspector.defaults";
+
+export const Inspector = memo(forwardRef(function Inspector(
   {
     src = defaultProps.src,
     tooltip = defaultProps.tooltip,
     dialogTitle = defaultProps.dialogTitle,
     dialogWidth = defaultProps.dialogWidth,
     dialogHeight = defaultProps.dialogHeight,
-    className,
-    style,
-    testId,
-    registerApi,
-  }: InspectorProps,
-  forwardedRef: ForwardedRef<HTMLButtonElement>,
+    classes,
+    registerComponentApi,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLSpanElement>,
 ) {
-  const [openState, setOpenState] = useState(false);
-  const [events, setEvents] = useState<XmluiDebugEvent[]>([]);
+  const [open, setOpen] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
-    const bridge = getXmluiDebugBridge();
-    return bridge?.subscribe((event) => {
-      setEvents((previous) => [...previous.slice(-19), event]);
-    });
-  }, []);
-
-  const api = useMemo<InspectorApi>(() => ({
-    open: () => {
-      setOpenState(true);
-    },
-    close: () => {
-      setOpenState(false);
-    },
-    isOpen: () => openState,
-  }), [openState]);
-
-  useEffect(() => {
-    registerApi?.(api as unknown as Record<string, unknown>);
-  }, [api, registerApi]);
-
-  useEffect(() => {
-    if (!openState) {
-      return;
+  const setButtonRef = (node: HTMLSpanElement | null) => {
+    buttonRef.current = node;
+    if (typeof forwardedRef === "function") {
+      forwardedRef(node);
+    } else if (forwardedRef) {
+      forwardedRef.current = node;
     }
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpenState(false);
-      }
+  };
+
+  useEffect(() => {
+    registerComponentApi?.({
+      open: () => setOpen(true),
+      close: () => setOpen(false),
+    });
+  }, [registerComponentApi]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [openState]);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === overlayRef.current) setOpen(false);
+  };
+
+  const ownerDocument = buttonRef.current?.ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+  const dialog = (
+    <div
+      ref={overlayRef}
+      className={styles.overlay}
+      onClick={handleOverlayClick}
+      data-testid="InspectorDialog"
+    >
+      <div
+        className={styles.dialog}
+        style={{ minWidth: dialogWidth, minHeight: dialogHeight }}
+      >
+        <div className={styles.header}>
+          <span className={styles.title}>{dialogTitle}</span>
+          <button className={styles.closeButton} onClick={() => setOpen(false)}>
+            &times;
+          </button>
+        </div>
+        <iframe
+          src={normalizePath(src)}
+          className={styles.iframe}
+          data-testid="InspectorFrame"
+        />
+      </div>
+    </div>
+  );
 
   return (
     <>
-      <button
-        ref={forwardedRef}
-        aria-label="Inspector"
-        className={["xmluiInspectorIconButton", className].filter(Boolean).join(" ")}
-        data-testid={testId ?? "Inspector"}
-        data-xmlui-component="Inspector"
-        onClick={() => setOpenState(true)}
-        role="button"
-        style={style}
+      <span
+        ref={setButtonRef}
+        className={classnames(styles.iconButton, classes?.[COMPONENT_PART_KEY])}
+        onClick={() => setOpen(true)}
         title={tooltip}
-        type="button"
+        role="button"
+        aria-label="Inspector"
+        data-testid="Inspector"
       >
-        <span aria-hidden="true" className="xmluiInspectorIcon">i</span>
-      </button>
-      {openState && typeof document !== "undefined"
-        ? createPortal(
-          <div
-            className="xmluiInspectorOverlay"
-            data-testid="InspectorDialog"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                setOpenState(false);
-              }
-            }}
-          >
-            <div
-              aria-label={dialogTitle}
-              aria-modal="true"
-              className="xmluiInspectorDialog"
-              role="dialog"
-              style={{ minWidth: dialogWidth, minHeight: dialogHeight }}
-              onMouseDown={(event) => event.stopPropagation()}
-            >
-              <header className="xmluiInspectorHeader">
-                <span className="xmluiInspectorTitle">{dialogTitle}</span>
-                <button aria-label="Close" className="xmluiInspectorCloseButton" onClick={() => setOpenState(false)} type="button">x</button>
-              </header>
-              <div className="xmluiInspectorDialogBody">
-                <iframe className="xmluiInspectorFrame" data-testid="InspectorFrame" src={normalizePath(src)} title={dialogTitle} />
-                <section className="xmluiInspectorEvents" data-testid="InspectorEvents" aria-label="Inspector debug events">
-                  {events.length === 0 ? (
-                    <p className="xmluiInspectorEventItem">No debug events captured.</p>
-                  ) : events.map((event, index) => (
-                    <pre className="xmluiInspectorEventItem" key={`${event.metadata.timestamp}-${index}`}>
-                      {formatEvent(event)}
-                    </pre>
-                  ))}
-                </section>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )
-        : null}
+        <SearchCodeIcon className={styles.icon} />
+      </span>
+      {open && ownerDocument?.body && createPortal(dialog, ownerDocument.body)}
     </>
   );
 }));
-
-function normalizePath(src: string | undefined): string {
-  const value = src || defaultProps.src;
-  return value.startsWith("/") ? value : `/${value}`;
-}
-
-function formatEvent(event: XmluiDebugEvent): string {
-  const label = event.label === undefined ? "" : ` ${String(event.label)}`;
-  const value = event.value === undefined ? "" : ` = ${safeJson(event.value)}`;
-  return `${event.kind}${label}${value}`;
-}
-
-function safeJson(value: unknown): string {
-  try {
-    return typeof value === "string" ? value : JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}

@@ -158,8 +158,7 @@ test.describe("FormItem label click focuses the input", () => {
       </Form>
     `);
     const label = page.locator("label", { hasText: "Dark" });
-    const forId = await label.getAttribute("for");
-    const sw = page.locator(`[id="${forId}"]`);
+    const sw = page.getByRole("switch");
     await expect(sw).not.toBeChecked();
     await label.click();
     await expect(sw).toBeChecked();
@@ -457,8 +456,7 @@ test.describe("bindTo on core component directly (no FormItem wrapper)", () => {
       </Form>
     `);
     const label = page.locator("label", { hasText: "Dark" });
-    const forId = await label.getAttribute("for");
-    const sw = page.locator(`[id="${forId}"]`);
+    const sw = page.getByRole("switch");
     await expect(sw).not.toBeChecked();
     await label.click();
     await expect(sw).toBeChecked();

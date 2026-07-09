@@ -282,6 +282,7 @@ type RuntimeTextBoxProps = React.ComponentProps<typeof TextBox> & {
   forcedType?: "password";
 };
 
+const RuntimeTextBoxShell = React.forwardRef<HTMLDivElement, RuntimeTextBoxProps>(
 function RuntimeTextBoxShell({
   adapter,
   bindTo,
@@ -296,7 +297,7 @@ function RuntimeTextBoxShell({
   onDidChange,
   forcedType,
   ...props
-}: RuntimeTextBoxProps) {
+}: RuntimeTextBoxProps, ref) {
   const form = useFormContext();
   const defaultId = React.useId();
   const { parentFormItemId } = React.useContext(FormItemContext);
@@ -392,6 +393,7 @@ function RuntimeTextBoxShell({
       validationStatus={effectiveValidationStatus}
       invalidMessages={effectiveInvalidMessages}
       verboseValidationFeedback={effectiveVerboseValidationFeedback}
+      ref={ref}
       onDidChange={(newValue) => {
         onDidChange?.(newValue);
         void adapter.event("didChange")(newValue);
@@ -415,7 +417,7 @@ function RuntimeTextBoxShell({
   }
 
   return renderedTextBox;
-}
+});
 
 function runtimeTextBoxProps(adapter: XmluiComponentAdapter) {
   const rootAttrs = adapter.rootAttrs("input") as React.HTMLAttributes<HTMLDivElement>;

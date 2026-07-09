@@ -1,59 +1,115 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useState, type ForwardedRef } from "react";
+import * as RAccordion from "@radix-ui/react-accordion";
+import classnames from "classnames";
 
-import { AccordionContext } from "./AccordionContext";
 import styles from "./Accordion.module.scss";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { AccordionContext } from "../../components/Accordion/AccordionContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { defaultProps } from "./Accordion.defaults";
 
-export type AccordionProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  children?: ReactNode;
+type Props = {
+  className?: string;
+  classes?: Record<string, string>;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+  triggerPosition?: "start" | "end";
   collapsedIcon?: string;
   expandedIcon?: string;
   hideIcon?: boolean;
-  onDisplayDidChange?: (changedValue: string[]) => void | Promise<void>;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
   rotateExpanded?: string;
-  triggerPosition?: "start" | "end";
+  registerComponentApi?: RegisterComponentApiFn;
+  onDisplayDidChange?: (changedValue: string[]) => void;
 };
 
-export const AccordionComponent = forwardRef<HTMLDivElement, AccordionProps>(function AccordionComponent(
+export const AccordionComponent = memo(forwardRef(function AccordionComponent(
   {
-    children,
     className,
-    collapsedIcon = defaultProps.collapsedIcon,
-    expandedIcon,
+    classes,
+    style,
+    children,
     hideIcon = defaultProps.hideIcon,
-    onDisplayDidChange,
+    expandedIcon,
+    collapsedIcon = defaultProps.collapsedIcon,
+    triggerPosition = defaultProps.triggerPosition,
+    onDisplayDidChange = noop,
     registerComponentApi,
     rotateExpanded = defaultProps.rotateExpanded,
-    triggerPosition = defaultProps.triggerPosition,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [itemElements, setItemElements] = useState<Set<string>>(new Set());
 
-  const expandItem = useCallback((id: string) => {
-    setExpandedItems((items) => items.includes(id) ? items : [...items, id]);
-  }, []);
-  const collapseItem = useCallback((id: string) => {
-    setExpandedItems((items) => items.filter((item) => item !== id));
-  }, []);
-  const toggleItem = useCallback((id: string) => {
-    setExpandedItems((items) => items.includes(id)
-      ? items.filter((item) => item !== id)
-      : [...items, id]);
-  }, []);
-  const isExpanded = useCallback((id: string) => expandedItems.includes(id), [expandedItems]);
-  const registerItem = useCallback((id: string, initiallyExpanded: boolean) => {
-    if (initiallyExpanded) {
-      expandItem(id);
-    }
-  }, [expandItem]);
+  const collapseItem = useCallback(
+    (id: string) => {
+      setExpandedItems((prev) => prev.filter((item) => item !== `${id}`));
+    },
+    [setExpandedItems],
+  );
 
-  useEffect(() => {
-    void onDisplayDidChange?.(expandedItems);
-  }, [expandedItems, onDisplayDidChange]);
+  const expandItem = useCallback(
+    (id: string) => {
+      if (!expandedItems.includes(`${id}`)) {
+        setExpandedItems((prev) => [...prev, `${id}`]);
+      }
+    },
+    [setExpandedItems, expandedItems],
+  );
+
+  const toggleItem = useCallback(
+    (id: string) => {
+      if (expandedItems.includes(`${id}`)) {
+        collapseItem(id);
+      } else {
+        expandItem(id);
+      }
+    },
+    [collapseItem, expandItem, expandedItems],
+  );
+
+  const register = useCallback(
+    (id: string) => {
+      setItemElements((prev) => {
+        prev.add(id);
+        return prev;
+      });
+    },
+    [setItemElements],
+  );
+
+  const unRegister = useCallback(
+    (id: string) => {
+      setItemElements((prev) => {
+        prev.delete(id);
+        return prev;
+      });
+    },
+    [setItemElements],
+  );
+
+  const focusItem = useCallback(
+    (id: string) => {
+      if (itemElements.has(`trigger_${id}`)) {
+        const trigger = document.getElementById(`trigger_${id}`);
+        if (trigger) {
+          trigger.focus();
+        }
+      }
+    },
+    [itemElements],
+  );
+
+  const isExpanded = useCallback(
+    (id: string) => {
+      return expandedItems.includes(`${id}`);
+    },
+    [expandedItems],
+  );
 
   useEffect(() => {
     registerComponentApi?.({
@@ -61,43 +117,64 @@ export const AccordionComponent = forwardRef<HTMLDivElement, AccordionProps>(fun
       expand: expandItem,
       collapse: collapseItem,
       toggle: toggleItem,
-      focus: (id: string) => document.getElementById(`trigger_${id}`)?.focus(),
+      focus: focusItem,
     });
-  }, [collapseItem, expandItem, isExpanded, registerComponentApi, toggleItem]);
+  }, [registerComponentApi, expandItem, collapseItem, toggleItem, focusItem, isExpanded]);
 
-  const contextValue = useMemo(() => ({
-    collapsedIcon,
-    expandedIcon,
-    expandedItems,
-    expandItem,
-    hideIcon,
-    isExpanded,
-    registerItem,
-    rotateExpanded,
-    toggleItem,
-    triggerPosition,
-  }), [
-    collapsedIcon,
-    expandedIcon,
-    expandedItems,
-    expandItem,
-    hideIcon,
-    isExpanded,
-    registerItem,
-    rotateExpanded,
-    toggleItem,
-    triggerPosition,
-  ]);
+  const contextValue = useMemo(
+    () => ({
+      register,
+      unRegister,
+      expandItem,
+      expandedItems,
+      hideIcon,
+      expandedIcon,
+      collapsedIcon,
+      triggerPosition,
+      rotateExpanded,
+    }),
+    [
+      register,
+      unRegister,
+      expandedItems,
+      hideIcon,
+      expandedIcon,
+      collapsedIcon,
+      triggerPosition,
+      expandItem,
+      rotateExpanded,
+    ],
+  );
+
+  useEffect(() => {
+    onDisplayDidChange?.(expandedItems);
+  }, [expandedItems, onDisplayDidChange]);
 
   return (
     <AccordionContext.Provider value={contextValue}>
-      <div {...rest} ref={ref} className={cx(styles.root, className)}>
+      <RAccordion.Root
+        {...rest}
+        style={style}
+        ref={forwardedRef}
+        value={expandedItems}
+        type="multiple"
+        className={classnames(styles.root, classes?.[COMPONENT_PART_KEY], className)}
+        onValueChange={(value) => {
+          setExpandedItems(value);
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+            kind: "focus:change",
+            component: "Accordion",
+            ariaName: Array.isArray(value) ? value.join(", ") : String(value),
+            displayLabel: Array.isArray(value) ? value.join(", ") : String(value),
+            expandedItems: value,
+          });
+        }}
+      >
         {children}
-      </div>
+      </RAccordion.Root>
     </AccordionContext.Provider>
   );
-});
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

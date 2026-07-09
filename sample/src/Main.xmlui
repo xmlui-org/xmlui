@@ -1,28 +1,5 @@
 <App>
-  <VStack gap="$space-2">
-    <Tree
-      id="tree"
-      testId="tree"
-      defaultExpanded="all"
-      data='{[
-        { id: 1, name: "Project Files", parentId: null, icon: "folder" },
-        { id: 2, name: "draft.txt", parentId: 1, icon: "warning", status: "draft" },
-        { id: 3, name: "notes.txt", parentId: 1, icon: "list" },
-      ]}'>
-      <property name="itemTemplate">
-        <HStack testId="{$item.id}" gap="$space-2">
-          <Icon name="{$item.icon}" />
-          <Text>{$item.name}</Text>
-          <Badge when="{$item.status}">{$item.status}</Badge>
-        </HStack>
-      </property>
-    </Tree>
-    <Button onClick="tree.replaceNode(2, { 
-      name: 'final.txt', 
-      icon: 'checkmark', 
-      status: 'published' 
-    })">
-      Publish Draft
-    </Button>
-  </VStack>
+  <Link to="https://docs.xmlui.org/" target="_blank">
+    Open XMLUI overview in a new tab
+  </Link>
 </App>

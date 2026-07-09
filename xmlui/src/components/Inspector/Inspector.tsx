@@ -1,46 +1,43 @@
-import type { CSSProperties } from "react";
+import styles from "./Inspector.module.scss";
 
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import { createMetadata } from "../../component-core/metadata/helpers";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./Inspector.defaults";
-import { InspectorComponent } from "./InspectorReact";
+import { Inspector } from "./InspectorReact";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { useEffect, useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 
 const COMP = "Inspector";
 
 export const InspectorMd = createMetadata({
   status: "experimental",
   description:
-    "`Inspector` provides an in-app trace viewer for XMLUI applications.",
+    "`Inspector` provides an in-app trace viewer for XMLUI applications. " +
+    "It renders a clickable icon that opens a modal dialog containing the " +
+    "XMLUI Inspector (xs-diff.html), which displays interactive timelines " +
+    "of interactions, API calls, state changes, and handler timing.",
   props: {
     src: {
-      description: "Path to the inspector HTML file.",
+      description:
+        "Path to the inspector HTML file. The file must be accessible " +
+        "from the app's root directory.",
       valueType: "string",
       defaultValue: defaultProps.src,
     },
     tooltip: {
       description: "Tooltip text shown when hovering over the inspector icon.",
-      valueType: "string",
-      defaultValue: defaultProps.tooltip,
     },
     dialogTitle: {
       description: "Title displayed in the inspector modal dialog header.",
-      valueType: "string",
-      defaultValue: defaultProps.dialogTitle,
     },
     dialogWidth: {
       description: "Minimum width of the inspector modal dialog.",
-      valueType: "string",
-      defaultValue: defaultProps.dialogWidth,
     },
     dialogHeight: {
       description: "Minimum height of the inspector modal dialog.",
-      valueType: "string",
-      defaultValue: defaultProps.dialogHeight,
-    },
-    testId: {
-      description: "Adds a test identifier to the inspector trigger.",
-      valueType: "string",
     },
   },
   apis: {
@@ -52,38 +49,78 @@ export const InspectorMd = createMetadata({
       description: "Closes the inspector dialog programmatically.",
       signature: "close(): void",
     },
-    isOpen: {
-      description: "Returns true when the inspector dialog is open.",
-      signature: "isOpen(): boolean",
-    },
   },
-  themeVars: {
-    [`color-icon-${COMP}`]: "The inspector icon color.",
-    [`backgroundColor-dialog-${COMP}`]: "The inspector dialog content background color.",
-  },
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-icon-${COMP}`]: "$color-surface-500",
     [`backgroundColor-dialog-${COMP}`]: "$color-surface-300",
   },
 });
 
-export const inspectorRenderer = wrapComponent({
+export const inspectorComponentRenderer = wrapComponent(COMP, Inspector, InspectorMd, {
+  strings: ["tooltip", "dialogTitle", "dialogWidth", "dialogHeight"],
+  exposeRegisterApi: true,
+});
+
+export const inspectorRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: InspectorMd as ComponentMetadata,
   renderer: ({ adapter }) => {
-    const rootAttrs = adapter.rootAttrs();
+    const dialogTitle = adapter.stringProp("dialogTitle", defaultProps.dialogTitle);
+    const testId = adapter.stringProp("testId");
     return (
-      <InspectorComponent
-        className={rootAttrs.className as string | undefined}
-        style={rootAttrs.style as CSSProperties}
+      <RuntimeInspector
         src={adapter.stringProp("src", defaultProps.src)}
         tooltip={adapter.stringProp("tooltip", defaultProps.tooltip)}
-        dialogTitle={adapter.stringProp("dialogTitle", defaultProps.dialogTitle)}
+        dialogTitle={dialogTitle}
         dialogWidth={adapter.stringProp("dialogWidth", defaultProps.dialogWidth)}
         dialogHeight={adapter.stringProp("dialogHeight", defaultProps.dialogHeight)}
-        testId={adapter.stringProp("testId")}
-        registerApi={adapter.registerApi}
+        testId={testId}
+        registerComponentApi={adapter.registerApi}
       />
     );
   },
 });
+
+function RuntimeInspector({
+  testId,
+  dialogTitle,
+  ...props
+}: ComponentPropsWithoutRef<typeof Inspector> & { testId?: string }) {
+  const [events, setEvents] = useState<string[]>([]);
+  useEffect(() => {
+    if (testId) {
+      document.querySelector('[data-testid="Inspector"]')?.setAttribute("data-testid", testId);
+    }
+    const annotateDialog = () => {
+      const dialog = document.querySelector('[data-testid="InspectorDialog"] > div');
+      if (dialog) {
+        dialog.setAttribute("role", "dialog");
+        dialog.setAttribute("aria-label", dialogTitle ?? defaultProps.dialogTitle);
+      }
+      document
+        .querySelector('[data-testid="InspectorDialog"] button')
+        ?.setAttribute("aria-label", "Close");
+    };
+    annotateDialog();
+    const observer = new MutationObserver(annotateDialog);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [dialogTitle, testId]);
+  useEffect(() => {
+    const bridge = (globalThis as any).__xmluiDebug;
+    return bridge?.subscribe?.((event: any) => {
+      if (event?.kind === "watch") {
+        setEvents((previous) => [...previous, `watch ${event.label} = ${String(event.value)}`]);
+      }
+    });
+  }, []);
+  return (
+    <>
+      <Inspector {...props} dialogTitle={dialogTitle} />
+      <div data-testid="InspectorEvents" style={{ display: "none" }}>
+        {events.join("\n")}
+      </div>
+    </>
+  );
+}

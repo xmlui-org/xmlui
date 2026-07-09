@@ -949,7 +949,8 @@ function setParsedEventSource(
   sourceId: string,
 ): void {
   const events = (parsed[bucket] ??= {});
-  const result = parseScriptEventHandler(eventSource, {
+  const normalizedEventSource = rewriteSimpleForLoops(eventSource);
+  const result = parseScriptEventHandler(normalizedEventSource, {
     originSpan: {
       sourceId,
       start: range.start,
@@ -960,10 +961,36 @@ function setParsedEventSource(
     throw diagnosticToError(result.diagnostics[0]);
   }
   events[name] = {
-    source: eventSource,
+    source: normalizedEventSource,
     ast: result.node,
     range,
   } satisfies ParsedEvent;
+}
+
+function rewriteSimpleForLoops(source: string): string {
+  let result = "";
+  let cursor = 0;
+  const pattern = /for\s*\(\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;]+);\s*([^;]+);\s*\1\+\+\s*\)\s*\{/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(source)) !== null) {
+    const bodyStart = pattern.lastIndex - 1;
+    const bodyEnd = findMatchingBrace(source, bodyStart);
+    if (bodyEnd < 0) {
+      break;
+    }
+    const variableName = match[1];
+    const initialValue = match[2].trim();
+    const condition = match[3].trim();
+    const upperBound = condition.match(new RegExp(`^${variableName}\\s*<\\s*(.+)$`))?.[1]?.trim();
+    const body = upperBound
+      ? source.slice(bodyStart + 1, bodyEnd).replace(/\bbreak\s*;/g, `${variableName} = (${upperBound});`)
+      : source.slice(bodyStart + 1, bodyEnd);
+    result += source.slice(cursor, match.index);
+    result += `{ let ${variableName} = ${initialValue}; while (${condition}) {${body}\n${variableName}++; } };`;
+    cursor = bodyEnd + 1;
+    pattern.lastIndex = cursor;
+  }
+  return cursor === 0 ? source : result + source.slice(cursor);
 }
 
 function rootElement(node: MarkupSyntaxNode): MarkupSyntaxNode | undefined {

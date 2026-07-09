@@ -155,7 +155,7 @@ export const checkboxRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
     return (
       <CheckboxNative
         {...adapter.rootAttrs("input")}
-        ref={(api: CheckboxApi | null) => {
+        registerComponentApi={(api: CheckboxApi) => {
           if (api) {
             adapter.registerApi(api as unknown as Record<string, unknown>);
           }

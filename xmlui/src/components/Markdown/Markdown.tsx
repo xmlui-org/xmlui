@@ -75,7 +75,7 @@ export function Markdown({ children }: { children?: ReactNode }) {
 
 function renderInlineMarkdown(source: string): ReactNode[] {
   const nodes: ReactNode[] = [];
-  const pattern = /(`([^`]+)`)|\*([^*]+)\*/g;
+  const pattern = /(`([^`]+)`)|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)/g;
   let cursor = 0;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(source)) !== null) {
@@ -84,8 +84,10 @@ function renderInlineMarkdown(source: string): ReactNode[] {
     }
     if (match[2] !== undefined) {
       nodes.push(<code key={nodes.length}>{match[2]}</code>);
+    } else if (match[4] !== undefined) {
+      nodes.push(<strong key={nodes.length}>{match[4]}</strong>);
     } else {
-      nodes.push(<em key={nodes.length}>{match[3]}</em>);
+      nodes.push(<em key={nodes.length}>{match[6]}</em>);
     }
     cursor = match.index + match[0].length;
   }

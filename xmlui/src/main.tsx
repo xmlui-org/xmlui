@@ -13,8 +13,6 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import type { Extension } from "./extensions";
-import "./components/Inspector/Inspector.scss";
-import "./components/InspectButton/InspectButton.scss";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";

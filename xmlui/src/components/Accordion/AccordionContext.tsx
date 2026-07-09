@@ -1,24 +1,37 @@
-import { createContext, useContext } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 
-export type AccordionContextValue = {
-  collapsedIcon?: string;
-  expandedIcon?: string;
-  expandedItems: string[];
-  expandItem: (id: string) => void;
-  hideIcon: boolean;
-  isExpanded: (id: string) => boolean;
-  registerItem: (id: string, initiallyExpanded: boolean) => void;
+import type { Accordion } from "../../components/abstractions";
+import { noop } from "../../components-core/constants";
+
+export type AccordionItem = Accordion & {
+  id: string;
+  headerRenderer?: (header: string) => ReactNode;
+};
+
+type AccordionContextDefinition = {
   rotateExpanded: string;
-  toggleItem: (id: string) => void;
+  expandItem: (id: string) => void;
+  register: (id: string) => void;
+  unRegister: (id: string) => void;
+  expandedItems: string[];
+  hideIcon: boolean;
+  expandedIcon: string;
+  collapsedIcon: string;
   triggerPosition: "start" | "end";
 };
 
-export const AccordionContext = createContext<AccordionContextValue | undefined>(undefined);
+export const AccordionContext = createContext<AccordionContextDefinition>({
+  expandedItems: null,
+  rotateExpanded: null,
+  expandItem: noop,
+  register: noop,
+  unRegister: noop,
+  hideIcon: null,
+  expandedIcon: null,
+  collapsedIcon: null,
+  triggerPosition: null,
+});
 
 export function useAccordionContext() {
-  const context = useContext(AccordionContext);
-  if (!context) {
-    throw new Error("AccordionItem must be rendered inside Accordion.");
-  }
-  return context;
+  return useContext(AccordionContext);
 }

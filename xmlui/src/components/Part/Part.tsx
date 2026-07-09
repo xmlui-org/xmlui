@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const Part = memo(function Part({ children, partId }: Props) {
-  return <Slot data-part-id={partId}>{children}</Slot>;
+  return <Slot data-part-id={partId} data-xmlui-part={partId}>{children}</Slot>;
 });
 
 const COMP = "Part";

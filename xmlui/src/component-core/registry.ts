@@ -1,7 +1,7 @@
 import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
-import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { avatarRenderer } from "../components/Avatar/Avatar";
@@ -33,7 +33,7 @@ import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
-import { linkRenderer } from "../components/Link/Link.renderer";
+import { linkRenderer } from "../components/Link/Link";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";

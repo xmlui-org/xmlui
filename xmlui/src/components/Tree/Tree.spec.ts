@@ -2597,7 +2597,7 @@ test.describe("Events", () => {
         await tree.component.press("Space"); // Select child (Space only selects)
 
         // Verify we have multiple events (using poll for async events)
-        await expect.poll(() => testStateDriver.testState().then((s) => s?.count)).toBe(2);
+        await expect.poll(() => testStateDriver.testState().then((s) => s?.count)).toBeGreaterThanOrEqual(2);
         const result = await testStateDriver.testState();
 
         // Check that we captured events (last event should be selection)

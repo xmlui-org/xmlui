@@ -486,6 +486,16 @@ type RuntimeSelectProps = React.ComponentProps<typeof Select> & {
   bindTo?: string;
 };
 
+const RuntimeSelectWithOptionClass = React.forwardRef<HTMLDivElement, RuntimeSelectProps>(
+function RuntimeSelectWithOptionClass(props, ref) {
+  return (
+    <RuntimeOptionClassContext.Provider value={props.adapter.className}>
+      <RuntimeSelectShell {...props} ref={ref} />
+    </RuntimeOptionClassContext.Provider>
+  );
+});
+
+const RuntimeSelectShell = React.forwardRef<HTMLDivElement, RuntimeSelectProps>(
 function RuntimeSelectShell({
   adapter,
   bindTo,
@@ -499,7 +509,7 @@ function RuntimeSelectShell({
   verboseValidationFeedback,
   onDidChange,
   ...props
-}: RuntimeSelectProps) {
+}: RuntimeSelectProps, ref) {
   const form = useFormContext();
   const defaultId = React.useId();
   const { parentFormItemId } = React.useContext(FormItemContext);
@@ -607,6 +617,7 @@ function RuntimeSelectShell({
       validationStatus={effectiveValidationStatus}
       invalidMessages={effectiveInvalidMessages}
       verboseValidationFeedback={effectiveVerboseValidationFeedback}
+      ref={ref}
       onDidChange={(newValue) => {
         setLocalValue(newValue);
         onDidChange?.(newValue);
@@ -635,7 +646,7 @@ function RuntimeSelectShell({
       {renderedWithValidation}
     </div>
   ) : renderedWithValidation;
-}
+});
 
 function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps {
   const rootAttrs = adapter.rootAttrs(COMPONENT_PART_KEY) as React.HTMLAttributes<HTMLDivElement>;
@@ -898,11 +909,7 @@ export const selectRenderer = wrapRuntimeComponent({
       required: adapter.booleanProp("required", defaultProps.required),
       requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
     };
-    const shell = (
-      <RuntimeOptionClassContext.Provider value={adapter.className}>
-        <RuntimeSelectShell adapter={adapter} {...props} />
-      </RuntimeOptionClassContext.Provider>
-    );
+    const shell = <RuntimeSelectWithOptionClass adapter={adapter} {...props} />;
     return validations.required ? (
       <ValidationWrapper
         bindTo={props.bindTo}

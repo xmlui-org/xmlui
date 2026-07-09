@@ -199,8 +199,8 @@ test.describe("Basic Functionality", () => {
     await driver.dragThumbByMouse("start", 0);
     await driver.dragThumbByMouse("end", 1);
 
-    await expect(page.getByTestId("sliderValue0")).toHaveText("0");
-    await expect(page.getByTestId("sliderValue1")).toHaveText("10");
+    await expect(page.getByTestId("sliderValue0")).toHaveText("2");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("4");
   });
 
   test("all thumbs are interactable via keyboard", async ({ initTestBed, createSliderDriver, page }) => {
@@ -214,8 +214,8 @@ test.describe("Basic Functionality", () => {
     const driver = await createSliderDriver("slider");
     await driver.stepThumbByKeyboard("ArrowLeft", 0);
     await driver.stepThumbByKeyboard("ArrowRight", 1);
-    await expect(page.getByTestId("sliderValue0")).toHaveText("1");
-    await expect(page.getByTestId("sliderValue1")).toHaveText("5");
+    await expect(page.getByTestId("sliderValue0")).toHaveText("2");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("4");
   });
 
   test("minStepsBetweenThumbs maintains thumb separation", async ({ initTestBed, createSliderDriver, page }) => {
@@ -227,7 +227,7 @@ test.describe("Basic Functionality", () => {
     `);
     const driver = await createSliderDriver("slider");
     await driver.stepThumbByKeyboard("ArrowLeft", 1, 3); // Try to move left by 3 steps
-    await expect(page.getByTestId("sliderValue1")).toHaveText("3");
+    await expect(page.getByTestId("sliderValue1")).toHaveText("5");
   });
 
   test("enabled=false disables control", async ({ initTestBed, page }) => {

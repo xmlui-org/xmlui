@@ -1,4 +1,4 @@
-import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
 import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
@@ -61,7 +61,7 @@ import { inspectButtonRenderer } from "../components/InspectButton/InspectButton
 import { i18nRenderer } from "../components/I18n/I18n";
 import { itemsRenderer } from "../components/Items/Items";
 import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
-import { linkRenderer } from "../components/Link/Link.renderer";
+import { linkRenderer } from "../components/Link/Link";
 import { listRenderer } from "../components/List/List";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
 import { logoRenderer } from "../components/Logo/Logo";

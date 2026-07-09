@@ -150,11 +150,6 @@ export const switchRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
   renderer: ({ adapter }) => (
     <SwitchNative
       {...adapter.rootAttrs("input")}
-      ref={(api: SwitchApi | null) => {
-        if (api) {
-          adapter.registerApi(api as unknown as Record<string, unknown>);
-        }
-      }}
       id={adapter.stringProp("id")}
       bindTo={adapter.stringProp("bindTo")}
       value={adapter.prop("value")}

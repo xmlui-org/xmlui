@@ -1,5 +1,5 @@
 import type { CSSProperties, FocusEvent, ReactNode } from "react";
-import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
+import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
@@ -106,9 +106,15 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     },
   });
 
-  useImperativeHandle(ref, () => api, [api]);
+  useImperativeHandle(ref, () => inputRef.current as unknown as CheckboxApi, [inputRef]);
 
-  void registerComponentApi;
+  useEffect(() => {
+    registerComponentApi?.(api);
+  }, [api, registerComponentApi]);
+
+  const setInputRef = useCallback((element: HTMLInputElement | null) => {
+    inputRef.current = element;
+  }, [inputRef]);
 
   useEffect(() => {
     if (
@@ -149,7 +155,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     <input
       {...rest}
       id={inputId}
-      ref={inputRef}
+      ref={setInputRef}
       data-part-id="input"
       data-xmlui-part="input"
       data-testid={!hasLabel && !inputRenderer && !needsVariantWrapper ? effectiveTestId : undefined}

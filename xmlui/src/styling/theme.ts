@@ -416,6 +416,7 @@ export const xmluiThemeVariables: ThemeVariableLayer = {
   "textTransform-label-formItem": "none",
   "textColor-requiredMark-formItem": "$color-danger-400",
   "textColor-optionalTag-formItem": "$textColor-secondary",
+  "backgroundColor-Button-attention": "rgb(255, 31, 20)",
   "backgroundColor-Button-secondary-solid--hover": "rgb(140, 151, 169)",
   "borderColor-Button-secondary-solid--hover": "rgb(226, 229, 234)",
   light: {

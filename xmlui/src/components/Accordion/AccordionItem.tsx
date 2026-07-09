@@ -1,0 +1,61 @@
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
+import { MemoizedItem } from "../../components/container-helpers";
+import { defaultProps } from "../../components/Accordion/AccordionItem.defaults";
+import { AccordionItemComponent } from "../../components/Accordion/AccordionItemReact";
+
+const COMP = "AccordionItem";
+
+export const AccordionItemMd = createMetadata({
+  status: "in progress",
+  description:
+    `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
+    `${COMP} instances from which the user can select.`,
+  props: {
+    header: {
+      description:
+        "This property declares the text used in the component's header. If not provided, the header will be empty.",
+      valueType: "string",
+    },
+    headerTemplate: dComponent(
+      "This property describes the template to use as the component's header.",
+    ),
+    initiallyExpanded: {
+      description: `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
+      valueType: "boolean",
+      defaultValue: defaultProps.initiallyExpanded,
+    },
+  },
+});
+
+export const accordionItemComponentRenderer = wrapComponent(
+  COMP,
+  AccordionItemComponent,
+  AccordionItemMd,
+  {
+    customRender: (_props, { node, renderChild, extractValue, classes }) => {
+      return (
+        <AccordionItemComponent
+          classes={classes}
+          id={extractValue(node.uid)}
+          header={extractValue(node.props.header)}
+          initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
+          headerRenderer={
+            node.props.headerTemplate
+              ? (item) => (
+                  <MemoizedItem
+                    node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
+                    contextVars={{
+                      $item: item,
+                    }}
+                    renderChild={renderChild}
+                  />
+                )
+              : undefined
+          }
+          content={renderChild(node.children)}
+        />
+      );
+    },
+  },
+);

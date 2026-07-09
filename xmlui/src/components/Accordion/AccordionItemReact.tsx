@@ -1,95 +1,127 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useEffect, useMemo } from "react";
+import {
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import * as RAccordion from "@radix-ui/react-accordion";
+import classnames from "classnames";
 
-import { useAccordionContext } from "./AccordionContext";
-import styles from "./Accordion.module.scss";
+import styles from "../../components/Accordion/Accordion.module.scss";
+
+import { useAccordionContext } from "../../components/Accordion/AccordionContext";
+import { ThemedIcon } from "../../components/Icon/Icon";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { defaultProps } from "./AccordionItem.defaults";
 
-export type AccordionItemProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "content"> & {
-  content?: ReactNode;
-  header?: ReactNode;
-  id?: string;
+function defaultRenderer(header: string) {
+  return <div>{header}</div>;
+}
+
+type Props = {
+  id: string;
+  header: string;
+  headerRenderer?: (header: string) => ReactNode;
+  content: ReactNode;
   initiallyExpanded?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
 };
 
-export const AccordionItemComponent = forwardRef<HTMLDivElement, AccordionItemProps>(function AccordionItemComponent(
+export const AccordionItemComponent = memo(forwardRef(function AccordionItemComponent(
   {
-    className,
-    content,
-    header,
     id,
+    header,
+    headerRenderer = defaultRenderer,
+    content,
     initiallyExpanded = defaultProps.initiallyExpanded,
     style,
+    className,
+    classes,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const generatedId = useMemo(() => `accordion-item-${Math.random().toString(36).slice(2)}`, []);
-  const itemId = id || generatedId;
-  const triggerId = `trigger_${itemId}`;
-  const contentId = `content_${itemId}`;
+  const generatedId = useId();
+  const itemId = useMemo(() => (id ? `${id}` : generatedId), [id, generatedId]);
+  const triggerId = useMemo(() => `trigger_${itemId}`, [itemId]);
   const {
-    collapsedIcon,
-    expandedIcon,
-    hideIcon,
-    isExpanded,
-    registerItem,
     rotateExpanded,
-    toggleItem,
+    expandedItems,
+    hideIcon,
+    expandedIcon,
+    collapsedIcon,
     triggerPosition,
+    expandItem,
+    register,
+    unRegister,
   } = useAccordionContext();
-  const expanded = isExpanded(itemId);
+  const expanded = useMemo(() => (expandedItems ?? []).includes(itemId), [itemId, expandedItems]);
+  const iconStyle = useMemo(
+    () => ({
+      transform: expanded && !expandedIcon ? `rotate(${rotateExpanded})` : "rotate(0deg)",
+      transition: "transform 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+    }),
+    [expanded, expandedIcon, rotateExpanded],
+  );
+  const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {
-    registerItem(itemId, initiallyExpanded);
-  }, [initiallyExpanded, itemId, registerItem]);
+    if (!initialised) {
+      setInitialised(true);
+      if (initiallyExpanded) {
+        expandItem(itemId);
+      }
+    }
+  }, [expandItem, itemId, initiallyExpanded, initialised]);
+
+  useEffect(() => {
+    register(triggerId);
+  }, [register, triggerId]);
+
+  useEffect(() => {
+    return () => {
+      unRegister(triggerId);
+    };
+  }, [triggerId, unRegister]);
 
   return (
-    <div
-      {...rest}
-      ref={ref}
+    <RAccordion.Item
       id={itemId}
-      className={cx(styles.item, className)}
-      style={style as CSSProperties}
-      data-state={expanded ? "open" : "closed"}
+      key={itemId}
+      value={itemId}
+      className={classnames(styles.item, classes?.[COMPONENT_PART_KEY], className)}
+      ref={forwardedRef}
+      style={style}
     >
-      <h3 className={styles.header}>
-        <button
-          aria-controls={contentId}
-          aria-expanded={expanded}
-          className={cx(styles.trigger, triggerPosition === "start" && styles.triggerStart)}
+      <RAccordion.Header className={styles.header}>
+        <RAccordion.Trigger
+          {...rest}
           id={triggerId}
-          type="button"
-          onClick={() => toggleItem(itemId)}
+          className={classnames(styles.trigger, {
+            [styles.triggerStart]: triggerPosition === "start",
+          })}
         >
-          <span>{header}</span>
-          {!hideIcon ? (
-            <span
-              aria-hidden="true"
-              className={styles.chevron}
-              style={{
-                transform: expanded && !expandedIcon ? `rotate(${rotateExpanded})` : "rotate(0deg)",
-              }}
-            >
-              {expanded ? expandedIcon || collapsedIcon : collapsedIcon}
+          {headerRenderer(header)}
+          {!hideIcon && (
+            <span style={iconStyle}>
+              <ThemedIcon
+                name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
+                className={styles.chevron}
+                aria-hidden="true"
+              />
             </span>
-          ) : null}
-        </button>
-      </h3>
-      <div
-        aria-labelledby={triggerId}
-        className={styles.contentWrapper}
-        data-state={expanded ? "open" : "closed"}
-        hidden={!expanded}
-        id={contentId}
-        role="region"
-      >
+          )}
+        </RAccordion.Trigger>
+      </RAccordion.Header>
+      <RAccordion.Content className={styles.contentWrapper}>
         <div className={styles.content}>{content}</div>
-      </div>
-    </div>
+      </RAccordion.Content>
+    </RAccordion.Item>
   );
-});
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

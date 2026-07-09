@@ -85,6 +85,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+  const labelTargetId = componentName === "Switch" ? `${inputId}__input` : inputId;
 
   const formItemLabelPosition = useFormContextPart<LabelPosition | undefined>(
     (value) => value?.itemLabelPosition as LabelPosition | undefined,
@@ -405,11 +406,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           >
             <Part partId={PART_LABEL}>
               <label
-                htmlFor={inputId}
+                htmlFor={labelTargetId}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={onLabelClick || ((event) => {
                   event.preventDefault();
-                  focusLabeledControl(inputId);
+                  focusLabeledControl(labelTargetId);
                 })}
                 style={{
                   ...labelStyle,
@@ -470,7 +471,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 });
 
 function focusLabeledControl(inputId: string) {
-  const target = document.getElementById(inputId);
+  const target = document.getElementById(inputId) ?? getNormalizedSwitchLabelTarget(inputId);
   if (!target) {
     return;
   }
@@ -484,6 +485,12 @@ function focusLabeledControl(inputId: string) {
   if (nested) {
     clickLabelActivatedControl(nested);
   }
+}
+
+function getNormalizedSwitchLabelTarget(inputId: string) {
+  return inputId.endsWith("__input")
+    ? document.getElementById(inputId.slice(0, -"__input".length))
+    : null;
 }
 
 function isFocusableControl(element: HTMLElement): element is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement {
