@@ -232,6 +232,7 @@ export const hSplitterComponentRenderer = wrapComponent("HSplitter", Splitter, H
 
 import type { CSSProperties } from "react";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useEvent } from "../../components-core/utils/misc";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiNode } from "../../compiler/ir";
 import { responsiveBreakpoints } from "../../styling";
@@ -258,9 +259,9 @@ function splitterRuntimeRendererFor(
       const visibleChildren = useVisibleSplitterChildren(adapter.node.children, adapter.scope);
       const rootStyle = splitterRootStyle(rootAttrs.style as CSSProperties | undefined);
       const resizeEvent = adapter.events.resize;
-      const resizeHandler = React.useCallback((primarySize: number) => {
+      const resizeHandler = useEvent((primarySize: number) => {
         void resizeEvent?.(primarySize);
-      }, [resizeEvent]);
+      });
       return (
         <Splitter
           {...rootAttrs}
