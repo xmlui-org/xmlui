@@ -1,97 +1,84 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useRef } from "react";
-
-import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
+import React, { forwardRef, memo, type CSSProperties } from "react";
+import classnames from "classnames";
+import { Scroller, type ScrollStyle } from "./Scroller";
 import styles from "./ScrollViewer.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { defaultProps } from "./ScrollViewer.defaults";
 
-export type ScrollViewerProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & {
-  className?: string;
-  style?: CSSProperties;
-  children?: ReactNode;
-  header?: ReactNode;
-  footer?: ReactNode;
+type Props = {
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  classes?: Record<string, string>;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
-  registerComponentApi?: (api: Record<string, unknown>) => void;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export const ScrollViewer = forwardRef<HTMLDivElement, ScrollViewerProps>(function ScrollViewer(
+export const ScrollViewer = memo(forwardRef<HTMLDivElement, Props>(function ScrollViewer(
   {
     children,
     header,
     footer,
     className,
+    classes,
+    style,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
-    registerComponentApi,
     ...rest
   },
-  ref,
+  ref
 ) {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const hasHeaderOrFooter = !!header || !!footer;
 
-  const setScrollNode = useCallback((node: HTMLDivElement | null) => {
-    scrollRef.current = node;
-    if (typeof ref === "function") {
-      ref(node);
-    } else if (ref) {
-      ref.current = node;
-    }
-  }, [ref]);
-
-  const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
-    scrollRef.current?.scrollTo({ top: 0, behavior });
-  }, []);
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
-    const node = scrollRef.current;
-    node?.scrollTo({ top: node.scrollHeight, behavior });
-  }, []);
-
-  useEffect(() => {
-    registerComponentApi?.({ scrollToTop, scrollToBottom });
-  }, [registerComponentApi, scrollToBottom, scrollToTop]);
-
-  const scrollClassName = cx(
-    scrollStyleClass(scrollStyle),
-    showScrollerFade ? styles.showScrollerFade : undefined,
-  );
-
-  if (header || footer) {
+  if (hasHeaderOrFooter) {
+    // Wrap in a flex-column container so header/footer stick outside the scroll area.
+    // No inline height is imposed here — XMLUI's className (layoutCss) is solely responsible
+    // for sizing this element so that flex: 1 / min-height: 0 on the inner Scroller works.
+    //
+    // IMPORTANT: ref must be on the OUTER wrapper div, not on the inner Scroller.
+    // ComponentDecorator uses the ref to imperatively setAttribute("data-testid") on the
+    // resolved DOM node. Forwarding ref to the inner Scroller would put data-testid there,
+    // causing duplicate testId matches in tests.
+    //
+    // Also strip data-testid / data-component-type from rest so they are not duplicated
+    // as HTML attributes on the inner Scroller via prop spreading.
+    const { "data-testid": _testId, "data-component-type": _compType, ...scrollerRest } = rest as Record<string, any>;
+    const scrollerStyle: CSSProperties = {
+      overflow: "auto",
+    };
     return (
-      <div {...rest} className={cx(styles.headerFooterWrapper, className)}>
-        {header ? <div className={styles.stickyHeader}>{header}</div> : null}
-        <div ref={setScrollNode} className={cx(styles.scrollerFlex, scrollClassName)}>
+      <div ref={ref} className={classnames(styles.headerFooterWrapper, classes?.[COMPONENT_PART_KEY], className)} style={style}>
+        {header && <div className={styles.stickyHeader}>{header}</div>}
+        <Scroller
+          className={styles.scrollerFlex}
+          style={scrollerStyle}
+          scrollStyle={scrollStyle}
+          showScrollerFade={showScrollerFade}
+          {...scrollerRest}
+        >
           {children}
-        </div>
-        {footer ? <div className={styles.stickyFooter}>{footer}</div> : null}
+        </Scroller>
+        {footer && <div className={styles.stickyFooter}>{footer}</div>}
       </div>
     );
   }
 
+  const containerStyle: CSSProperties = {
+    width: "100%",
+    height: "100%",
+    overflow: "auto",
+    ...style,
+  };
+
   return (
-    <div
+    <Scroller
+      ref={ref}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+      style={containerStyle}
+      scrollStyle={scrollStyle}
+      showScrollerFade={showScrollerFade}
       {...rest}
-      ref={setScrollNode}
-      className={cx(styles.wrapper, scrollClassName, className)}
     >
       {children}
-    </div>
+    </Scroller>
   );
-});
-
-function scrollStyleClass(scrollStyle: ScrollStyle): string | undefined {
-  if (scrollStyle === "overlay") {
-    return styles.overlay;
-  }
-  if (scrollStyle === "whenMouseOver") {
-    return styles.whenMouseOver;
-  }
-  if (scrollStyle === "whenScrolling") {
-    return styles.whenScrolling;
-  }
-  return undefined;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

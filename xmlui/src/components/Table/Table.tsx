@@ -1057,17 +1057,25 @@ export const tableRenderer = wrapRuntimeComponent({
     const noDataTemplateProp = adapter.prop("noDataTemplate");
     const syncWithVar = adapter.stringProp("syncWithVar");
     const idKey = adapter.stringProp("idKey", defaultProps.idKey) ?? defaultProps.idKey;
+    const tableRows = Array.isArray(items) ? items : [];
+    const rawSyncValue = syncWithVar && validRuntimeIdentifier(syncWithVar) && hasRuntimeSyncTarget(adapter.scope, syncWithVar)
+      ? readLocal(adapter.scope, syncWithVar)
+      : undefined;
+    const syncValue = normalizeRuntimeSelectionValue(rawSyncValue, tableRows, idKey);
     const syncAdapter = syncWithVar && validRuntimeIdentifier(syncWithVar) && hasRuntimeSyncTarget(adapter.scope, syncWithVar)
       ? {
-          value: readLocal(adapter.scope, syncWithVar),
+          value: syncValue,
           update: ({ selectedIds }: { selectedIds: string[] }) => {
             writeLocal(adapter.scope, syncWithVar, { selectedIds });
           },
         }
       : undefined;
     const selectionContext = useSelectionContext();
-    const syncValue = syncAdapter?.value;
+    const suppressInitialEmptySyncWriteRef = useRef(true);
     const pendingEmptySyncMaterializationRef = useRef<unknown>(null);
+    const initialSyncSelectedIds = syncValue && typeof syncValue === "object" && Array.isArray((syncValue as { selectedIds?: unknown }).selectedIds)
+      ? (syncValue as { selectedIds: unknown[] }).selectedIds
+      : undefined;
     if (
       adapter.booleanProp("rowsSelectable", defaultProps.rowsSelectable) &&
       syncWithVar &&
@@ -1124,7 +1132,7 @@ export const tableRenderer = wrapRuntimeComponent({
         className={rootAttrs.className as string | undefined}
         style={tableStyle}
         classes={{ root: adapter.className }}
-        data={Array.isArray(items) ? items : []}
+        data={tableRows}
         columns={columns}
         pageSizeOptions={arrayRuntimeValue(adapter.prop("pageSizeOptions")) as number[]}
         pageSize={optionalRuntimeNumber(adapter.prop("pageSize"))}
@@ -1152,7 +1160,17 @@ export const tableRenderer = wrapRuntimeComponent({
         onSelectionDidChange={(selectedItems: unknown[]) => {
           if (syncWithVar && validRuntimeIdentifier(syncWithVar) && hasRuntimeSyncTarget(adapter.scope, syncWithVar)) {
             const selectedIds = selectedItems.map((item) => runtimeRowId(item, idKey));
-            writeLocal(adapter.scope, syncWithVar, { selectedIds });
+            if (
+              suppressInitialEmptySyncWriteRef.current &&
+              selectedIds.length === 0 &&
+              initialSyncSelectedIds &&
+              initialSyncSelectedIds.length > 0
+            ) {
+              suppressInitialEmptySyncWriteRef.current = false;
+            } else {
+              suppressInitialEmptySyncWriteRef.current = false;
+              writeLocal(adapter.scope, syncWithVar, { selectedIds });
+            }
           }
           return adapter.event("selectionDidChange")(selectedItems);
         }}
@@ -1410,4 +1428,15 @@ function runtimeRowId(item: unknown, idKey: string): unknown {
     }
     return (current as Record<string, unknown>)[part];
   }, item) ?? item;
+}
+
+function normalizeRuntimeSelectionValue(value: unknown, rows: unknown[], idKey: string): unknown {
+  if (!value || typeof value !== "object" || !Array.isArray((value as { selectedIds?: unknown }).selectedIds)) {
+    return value;
+  }
+  const selectedIds = (value as { selectedIds: unknown[] }).selectedIds.map((id) => {
+    const row = rows.find((item) => String(runtimeRowId(item, idKey)) === String(id));
+    return row === undefined ? id : runtimeRowId(row, idKey);
+  });
+  return { ...(value as Record<string, unknown>), selectedIds };
 }

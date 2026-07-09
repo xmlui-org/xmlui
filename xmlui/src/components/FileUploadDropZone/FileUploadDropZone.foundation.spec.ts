@@ -6,10 +6,7 @@ test.describe("FileUploadDropZone foundation", () => {
       <App>
         <FileUploadDropZone
           height="100px"
-          onUpload="
-            (files) => {
-              console.log(files);
-              files.map(file => toast('file ' + file.path + ' uploaded'))}" />
+        />
       </App>
     `);
 

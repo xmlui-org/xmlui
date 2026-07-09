@@ -1,74 +1,115 @@
 import { expect, test } from "../../testing/fixtures";
 
-test.describe("SkipLink foundation", () => {
-  test("renders with the default accessible label and target", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <SkipLink testId="skip" />
-      <Text testId="main">Main content</Text>
-    `);
+test.describe("SkipLink", () => {
+  test("renders offscreen until keyboard focus", async ({ page, initTestBed }) => {
+    await initTestBed(`<SkipLink target="main" />`);
 
-    const skip = page.getByTestId("skip");
-    await expect(skip).toHaveAttribute("href", "#main");
-    await expect(skip).toHaveText("Skip to main content");
-  });
-
-  test("focuses target by test id", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <SkipLink testId="skip" target="main-panel" label="Skip" />
-      <VStack testId="main-panel">
-        <Button testId="target-button">Target</Button>
-      </VStack>
-    `);
-
-    await page.getByTestId("skip").focus();
-    await page.keyboard.press("Enter");
-    await expect(page.getByTestId("target-button")).toBeFocused();
-  });
-
-  test("is visually hidden until keyboard focus", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <SkipLink testId="skip" />
-      <Text testId="main">Main content</Text>
-    `);
-
-    const skip = page.getByTestId("skip");
-    await expect(skip).toHaveCSS("top", "-999px");
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await expect(link).toBeAttached();
+    await expect(link).toHaveCSS("top", "-999px");
 
     await page.keyboard.press("Tab");
 
-    await expect(skip).toBeFocused();
-    await expect(skip).toHaveCSS("top", "16px");
+    await expect(link).toBeFocused();
+    await expect(link).toBeVisible();
   });
 
-  test("focuses XMLUI id targets without changing location hash", async ({ initTestBed, page }) => {
+  test("moves focus to the target when activated", async ({ page, initTestBed }) => {
+    await initTestBed(`<SkipLink target="main" />`);
+    await page.evaluate(() => {
+      const target = document.createElement("button");
+      target.id = "main";
+      target.textContent = "Main target";
+      document.body.append(target);
+    });
+
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await link.focus();
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByRole("button", { name: "Main target" })).toBeFocused();
+    await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("");
+  });
+
+  test("moves focus to an XMLUI component target", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <SkipLink testId="skip" target="searchBox" />
-      <TextBox id="searchBox" label="Search" />
+      <Fragment>
+        <SkipLink target="mainAction" />
+        <Button id="mainAction" label="Main action" />
+      </Fragment>
     `);
 
-    await page.getByTestId("skip").focus();
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await link.focus();
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByRole("button", { name: "Main action" })).toBeFocused();
+    await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("");
+  });
+
+  test("moves focus to a focusable descendant inside a XMLUI component target", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <SkipLink target="searchBox" />
+        <TextBox id="searchBox" label="Search" />
+      </Fragment>
+    `);
+
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await expect(page.locator('[data-xmlui-id="searchBox"]')).toBeAttached();
+    await link.focus();
     await page.keyboard.press("Enter");
 
     await expect(page.getByRole("textbox", { name: "Search" })).toBeFocused();
     await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("");
   });
 
-  test("activates with Space and respects custom labels", async ({ initTestBed, page }) => {
+  test("resolves XMLUI component ids without relying on test ids", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <SkipLink testId="skip" target="main-panel" label="Skip filters" />
-      <VStack testId="main-panel">
-        <Button testId="main-action">Main action</Button>
-      </VStack>
+      <Fragment>
+        <SkipLink target="searchBox" />
+        <TextBox id="searchBox" label="Search" />
+      </Fragment>
     `);
 
-    const skip = page.getByTestId("skip");
-    await expect(skip).toHaveAttribute("href", "#main-panel");
-    await expect(skip).toHaveText("Skip filters");
+    await page.evaluate(() => {
+      document.querySelectorAll('[data-testid="searchBox"]').forEach((element) => {
+        element.removeAttribute("data-testid");
+      });
+    });
 
-    await skip.focus();
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await link.focus();
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByRole("textbox", { name: "Search" })).toBeFocused();
+    await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("");
+  });
+
+  test("activates with Space without changing the hash", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <SkipLink target="searchBox" />
+        <TextBox id="searchBox" label="Search" />
+      </Fragment>
+    `);
+
+    const link = page.getByRole("link", { name: "Skip to main content" });
+    await link.focus();
     await page.keyboard.press(" ");
 
-    await expect(page.getByTestId("main-action")).toBeFocused();
+    await expect(page.getByRole("textbox", { name: "Search" })).toBeFocused();
     await expect.poll(() => page.evaluate(() => window.location.hash)).toBe("");
+  });
+
+  test("uses custom target and label", async ({ page, initTestBed }) => {
+    await initTestBed(`<SkipLink target="content" label="Skip navigation" />`);
+
+    const link = page.getByRole("link", { name: "Skip navigation" });
+
+    await expect(link).toHaveAttribute("href", "#content");
   });
 });

@@ -1,14 +1,17 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./SkipLink.defaults";
+import { SkipLink } from "./SkipLinkReact";
 
-export const defaultProps = {
-  target: "main",
-  label: "Skip to main content",
-};
+const COMP = "SkipLink";
 
 export const SkipLinkMd = createMetadata({
   status: "stable",
   description:
-    "`SkipLink` renders a keyboard-first link that jumps directly to the main content region.",
+    "`SkipLink` renders a keyboard-first link that jumps directly to the main " +
+    "content region. It stays visually hidden until focused.",
   props: {
     target: {
       description: "The DOM id, XMLUI component id, or test id of the element to focus and scroll to.",
@@ -20,14 +23,26 @@ export const SkipLinkMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.label,
     },
-    testId: {
-      description: "Adds a test identifier to the skip link.",
-      valueType: "string",
-    },
   },
   a11y: {
     role: "link",
     accessibleNameProps: ["label", "aria-label", "title"],
     requiresAccessibleName: true,
   },
+});
+
+export const skipLinkComponentRenderer = wrapComponent(COMP, SkipLink, SkipLinkMd, {
+  strings: ["target", "label"],
+});
+
+export const skipLinkRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: SkipLinkMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <SkipLink
+      {...adapter.rootAttrs()}
+      target={adapter.stringProp("target", defaultProps.target)}
+      label={adapter.stringProp("label", defaultProps.label)}
+    />
+  ),
 });

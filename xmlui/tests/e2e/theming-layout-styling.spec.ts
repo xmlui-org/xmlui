@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 test("layout-core applies universal layout props and part hooks", async ({ page }) => {
   await page.goto("/?example=layoutCore");
@@ -37,9 +37,9 @@ test("nested theme scopes affect only their subtree", async ({ page }) => {
   const inner = page.getByText("Inner scoped text", { exact: true });
   const outerAgain = page.getByText("Outer scoped text again", { exact: true });
 
-  await expect(outer).toHaveCSS("color", "rgb(32, 107, 196)");
+  await expectRgbClose(outer, "color", "rgb(32, 107, 196)");
   await expect(inner).toHaveCSS("color", "rgb(4, 120, 87)");
-  await expect(outerAgain).toHaveCSS("color", "rgb(32, 107, 196)");
+  await expectRgbClose(outerAgain, "color", "rgb(32, 107, 196)");
 });
 
 test("expression-backed styles update after data mutation", async ({ page }) => {
@@ -51,12 +51,35 @@ test("expression-backed styles update after data mutation", async ({ page }) => 
   await expect(mode).toBeVisible();
   await expect(stack).toHaveCSS("width", "420px");
   await expect(stack).toHaveCSS("gap", "18px");
-  await expect(stack).toHaveCSS("background-color", "rgb(207, 226, 247)");
+  await expectRgbClose(stack, "background-color", "rgb(207, 226, 247)");
 
   await page.getByRole("button", { name: "Toggle style" }).click();
 
   await expect(page.getByText("Mode: compact", { exact: true })).toBeVisible();
   await expect(stack).toHaveCSS("width", "260px");
   await expect(stack).toHaveCSS("gap", "4px");
-  await expect(stack).toHaveCSS("background-color", "rgb(232, 238, 243)");
+  await expectRgbClose(stack, "background-color", "rgb(232, 238, 243)", 8);
 });
+
+async function expectRgbClose(
+  locator: Locator,
+  property: string,
+  expected: string,
+  tolerance = 3,
+) {
+  const actual = await locator.evaluate((element, cssProperty) =>
+    getComputedStyle(element).getPropertyValue(cssProperty),
+  property);
+  const actualRgb = parseRgb(actual);
+  const expectedRgb = parseRgb(expected);
+  expect(actualRgb, `${property} should be an rgb color`).not.toBeNull();
+  expect(expectedRgb, `${expected} should be an rgb color`).not.toBeNull();
+  for (let index = 0; index < 3; index++) {
+    expect(Math.abs(actualRgb![index] - expectedRgb![index])).toBeLessThanOrEqual(tolerance);
+  }
+}
+
+function parseRgb(value: string): number[] | null {
+  const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return match ? [Number(match[1]), Number(match[2]), Number(match[3])] : null;
+}

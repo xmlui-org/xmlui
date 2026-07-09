@@ -1,4 +1,4 @@
-export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
+import type { ScrollStyle } from "./Scroller";
 
 export const defaultProps: {
   scrollStyle: ScrollStyle;

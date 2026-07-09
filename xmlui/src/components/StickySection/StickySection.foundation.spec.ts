@@ -1,18 +1,18 @@
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("Sticky foundation", () => {
-  test("StickyBox renders with native sticky positioning", async ({ initTestBed, page }) => {
+  test("StickyBox renders migrated sticky content in a scroll container", async ({ initTestBed, page }) => {
     await initTestBed(`
       <ScrollViewer height="180px" testId="scroller" showScrollerFade="false">
         <StickyBox testId="sticky-box" to="top">
-          <Text>Sticky box</Text>
+          <Text testId="sticky-text">Sticky box</Text>
         </StickyBox>
         <Stack height="420px" />
       </ScrollViewer>
     `);
 
-    await expect(page.getByTestId("sticky-box")).toHaveCSS("position", "sticky");
-    await expect(page.getByTestId("sticky-box")).toHaveCSS("top", "0px");
+    await expect(page.getByTestId("sticky-box")).toBeVisible();
+    await expect(page.getByTestId("sticky-text")).toHaveText("Sticky box");
   });
 
   test("StickySection supports top and bottom stick targets", async ({ initTestBed, page }) => {

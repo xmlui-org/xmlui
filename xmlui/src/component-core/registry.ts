@@ -46,7 +46,7 @@ import {
   splitterRenderer,
   vSplitterRenderer,
 } from "../components/Splitter/Splitter";
-import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
+import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
 import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
@@ -95,7 +95,7 @@ import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
-import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
+import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { tableRenderer } from "../components/Table/Table";
@@ -122,7 +122,7 @@ import { eventSourceRenderer } from "../components/EventSource/EventSource.rende
 import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
-import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
+import { skipLinkRenderer } from "../components/SkipLink/SkipLink";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
 import { themeRenderer } from "../components/Theme/Theme";
 import { slotRenderer } from "../components/Slot/Slot";

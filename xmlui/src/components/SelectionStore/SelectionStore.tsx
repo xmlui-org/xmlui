@@ -1,7 +1,10 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { wrapComponent } from "../../runtime/rendering/adapter";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import React, { useEffect, useState } from "react";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
 import { defaultProps } from "./SelectionStore.defaults";
-import { SelectionStoreNative } from "./SelectionStoreReact";
+import { SelectionStore } from "./SelectionStoreReact";
 
 const COMP = "SelectionStore";
 
@@ -9,47 +12,64 @@ export const SelectionStoreMd = createMetadata({
   status: "deprecated",
   deprecationMessage: `The \`${COMP}\` component is deprecated and will be removed in a future release.`,
   description:
-    `The \`${COMP}\` is a non-visual component that may wrap selection-aware components and manage their selection state.`,
+    `The \`${COMP}\` is a non-visual component that may wrap components (items) and manage ` +
+    `their selection state to accommodate the usage of other actions.`,
   props: {
-    id: { description: "The component id.", valueType: "string" },
     idKey: {
-      description: "The property that uniquely identifies selected object items.",
+      description: `The selected items in the selection store needs to have a unique ID to use as an ` +
+        `unambiguous key for that particular item. This property uniquely identifies the ` +
+        `selected object item via a given property. By default, the key attribute is \`"id"\`.`,
       valueType: "string",
       defaultValue: defaultProps.idKey,
     },
-    value: {
-      description: "Selected items tracked by the store.",
-      valueType: "any",
-    },
-  },
-  apis: {
-    clearSelection: { description: "Clears the current selection.", signature: "clearSelection(): void" },
-    setSelectedRowIds: {
-      description: "Sets selected rows by their IDs.",
-      signature: "setSelectedRowIds(rowIds: any[]): void",
-    },
-    refreshSelection: {
-      description: "Refreshes selection from the current item set.",
-      signature: "refreshSelection(allItems?: any[]): void",
-    },
-    value: { description: "Returns selected items." },
   },
 });
 
-export const selectionStoreRenderer = wrapComponent({
-  name: COMP,
-  metadata: SelectionStoreMd,
-  renderer: ({ adapter }) => (
-    <SelectionStoreNative
-      idKey={adapter.stringProp("idKey", defaultProps.idKey)}
-      selectedItems={arrayValue(adapter.prop("value"))}
-      registerApi={adapter.registerApi}
+export const selectionStoreComponentRenderer = wrapComponent(COMP, SelectionStore, SelectionStoreMd, {
+  customRender: (_props, { node, state, updateState, extractValue, renderChild, registerComponentApi }) => (
+    <SelectionStore
+      updateState={updateState}
+      idKey={extractValue.asOptionalString(node.props.idKey)}
+      selectedItems={state?.value}
+      registerComponentApi={registerComponentApi}
     >
-      {adapter.renderChildren()}
-    </SelectionStoreNative>
+      {renderChild(node.children)}
+    </SelectionStore>
   ),
 });
 
-function arrayValue(value: unknown): unknown[] {
+export const selectionStoreRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: SelectionStoreMd as ComponentMetadata,
+  renderer: ({ adapter }) => <SelectionStoreRuntime adapter={adapter} />,
+});
+
+function SelectionStoreRuntime({ adapter }: { adapter: XmluiComponentAdapter }) {
+  const [state, setState] = useState(() => ({
+    value: arrayValue(adapter.prop("value", defaultProps.selectedItems)),
+  }));
+  const selectedItems = arrayValue(state.value);
+
+  useEffect(() => {
+    setState({ value: arrayValue(adapter.prop("value", defaultProps.selectedItems)) });
+  }, [adapter.props.value]);
+
+  useEffect(() => {
+    adapter.registerApi({ value: selectedItems });
+  }, [adapter, selectedItems]);
+
+  return (
+    <SelectionStore
+      updateState={setState}
+      idKey={adapter.stringProp("idKey", defaultProps.idKey)}
+      selectedItems={selectedItems}
+      registerComponentApi={adapter.registerApi}
+    >
+      {adapter.renderChildren()}
+    </SelectionStore>
+  );
+}
+
+function arrayValue(value: unknown): any[] {
   return Array.isArray(value) ? value : defaultProps.selectedItems;
 }

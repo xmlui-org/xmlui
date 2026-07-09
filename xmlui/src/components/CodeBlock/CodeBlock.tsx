@@ -97,6 +97,12 @@ function RuntimeCodeBlock(props: React.ComponentPropsWithoutRef<typeof ThemedCod
       node.textContent = decodeCodeText(node.textContent ?? "");
       node = walker.nextNode();
     }
+    root.querySelectorAll<HTMLElement>("[data-part-id]").forEach((element) => {
+      const partId = element.getAttribute("data-part-id");
+      if (partId) {
+        element.setAttribute("data-xmlui-part", partId);
+      }
+    });
   });
   return <ThemedCodeBlock {...props} ref={rootRef} />;
 }

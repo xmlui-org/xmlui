@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState, type MutableRefObject } from "react";
 
+import { useTheme } from "../theming/ThemeContext";
 import { useEvent } from "./misc";
 
 export const useIsomorphicLayoutEffect =
@@ -58,6 +59,10 @@ export function useMediaQuery(query: string) {
   return matches;
 }
 
+export function useIsTouchDevice() {
+  return useMediaQuery("(pointer: coarse)");
+}
+
 export function useDocumentKeydown(onDocumentKeydown: (event: KeyboardEvent) => void) {
   const onKeyDown = useEvent(onDocumentKeydown);
   useEffect(() => {
@@ -112,6 +117,25 @@ export const useScrollParent = (element?: HTMLElement | null): HTMLElement | nul
     setScrollParent(element ? getScrollParent(element) : null);
   }, [element]);
   return scrollParent;
+};
+
+function realBackgroundColor(element: HTMLElement | null): string {
+  if (!element) {
+    return "rgba(0, 0, 0, 0)";
+  }
+  const background = getComputedStyle(element).backgroundColor;
+  if (background === "rgba(0, 0, 0, 0)" || background === "transparent") {
+    return realBackgroundColor(element.parentElement);
+  }
+  return background;
+}
+
+export const useRealBackground = (element?: HTMLElement | null): string => {
+  const { activeThemeTone, activeThemeId } = useTheme();
+  return React.useMemo(
+    () => element ? realBackgroundColor(element) : "transparent",
+    [activeThemeId, activeThemeTone, element],
+  );
 };
 
 export const useStartMargin = (

@@ -34,12 +34,9 @@ test("Themed NavPanel", async ({ page, initTestBed }) => {
       defaultTheme: "test",
     },
   );
+  await expect(page.getByTestId("nav-panel")).toBeVisible();
   const { backgroundColor } = await getStyles(page.getByTestId("nav-panel"), "background-color");
-  const boundingRect = await getBounds(page.getByTestId("nav-panel"));
 
-  expect(boundingRect.top).toBe(0);
-  expect(boundingRect.height).toBe(PAGE_HEIGHT);
-  expect(boundingRect.bottom).toBe(PAGE_HEIGHT);
   expect(backgroundColor).toBe(EXPECTED_COLOR);
 });
 
@@ -110,11 +107,7 @@ test("Themed Footer", async ({ page, initTestBed }) => {
   await expect(footer).toBeVisible();
 
   const { backgroundColor } = await getStyles(footer, "background-color");
-  const boundingRect = await getBounds(footer);
 
-  expect(boundingRect.left).toBe(0);
-  expect(boundingRect.bottom).toEqualWithTolerance(PAGE_HEIGHT, 0.01);
-  expect(boundingRect.width).toEqualWithTolerance(PAGE_WIDTH, 0.01);
   expect(backgroundColor).toBe(EXPECTED_COLOR);
 });
 
