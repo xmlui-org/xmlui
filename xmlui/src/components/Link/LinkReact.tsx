@@ -35,6 +35,7 @@ type Props = {
   horizontalAlignment?: string;
   verticalAlignment?: string;
   onClick?: () => void;
+  onContextMenu?: React.MouseEventHandler;
   style?: CSSProperties;
   className?: string;
   classes?: Record<string, string>;
@@ -64,6 +65,7 @@ export const LinkNative = memo(forwardRef(function LinkNative(
     icon,
     active = defaultProps.active,
     onClick,
+    onContextMenu,
     target,
     enabled = defaultProps.enabled,
     horizontalAlignment,
@@ -185,6 +187,7 @@ export const LinkNative = memo(forwardRef(function LinkNative(
       to={smartTo}
       target={target}
       onClick={onClick}
+      onContextMenu={onContextMenu}
       className={classnames(
         styles.container,
         classes?.[COMPONENT_PART_KEY],

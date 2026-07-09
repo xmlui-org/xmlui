@@ -45,7 +45,7 @@ import {
   hSplitterRenderer,
   splitterRenderer,
   vSplitterRenderer,
-} from "../components/Splitter/Splitter.renderer";
+} from "../components/Splitter/Splitter";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
 import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
@@ -108,7 +108,7 @@ import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
-import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
+import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
 import { dataSourceRenderer } from "../components/DataSource/DataSource";
 import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
@@ -124,11 +124,11 @@ import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
-import { themeRenderer } from "../components/Theme/Theme.renderer";
-import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { themeRenderer } from "../components/Theme/Theme";
+import { slotRenderer } from "../components/Slot/Slot";
 import { partRenderer } from "../components/Part/Part";
-import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
-import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
+import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch";
+import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton";
 import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
 import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
@@ -915,7 +915,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (navLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavLinkReact.tsx`);
     } else if (navPanelCollapseButtonTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelCollapseButtonReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelCollapseButton.tsx`);
     } else if (navPanelTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelReact.tsx`);
     } else if (logoTransferred) {
@@ -977,13 +977,13 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (toastTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.renderer.tsx`);
     } else if (themeTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.tsx`);
     } else if (slotTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Slot.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Slot.ts`);
     } else if (toneSwitchTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneSwitch.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneSwitchReact.tsx`);
     } else if (toneChangerButtonTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneChangerButton.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneChangerButton.tsx`);
     } else if (pagesTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
     } else if (redirectTransferred) {

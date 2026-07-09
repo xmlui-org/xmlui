@@ -140,6 +140,13 @@ export const LinkMd = createMetadata({
         event: "The mouse event that triggered the click.",
       },
     },
+    contextMenu: {
+      description: "This event is triggered when the link is right-clicked.",
+      signature: "contextMenu(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event that triggered the context menu.",
+      },
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
@@ -208,6 +215,7 @@ export const linkRenderer = wrapRuntimeComponent({
     const rootAttrs = adapter.rootAttrs();
     const to = adapter.prop("to");
     const hasClickEvent = Object.prototype.hasOwnProperty.call(adapter.node.events, "click");
+    const hasContextMenuEvent = Object.prototype.hasOwnProperty.call(adapter.node.events, "contextMenu");
     const needsRuntimeNavigation =
       typeof to === "string" &&
       (to.startsWith("#") ||
@@ -255,6 +263,7 @@ export const linkRenderer = wrapRuntimeComponent({
               }
             : undefined
         }
+        onContextMenu={hasContextMenuEvent ? (event) => void adapter.event("contextMenu")(event) : undefined}
       >
         {adapter.renderChildren()}
       </ThemedLinkNative>

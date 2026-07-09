@@ -1736,9 +1736,14 @@ function isAllowedBuiltInCallName(name: string): boolean {
 
 function isBuiltInReferenceName(name: string): boolean {
   return name === "App" ||
+    name === "Actions" ||
     name === "Array" ||
     name === "Date" ||
+    name === "JSON" ||
     name === "Math" ||
+    name === "Object" ||
+    name === "toast" ||
+    name === "window" ||
     name === "getDate" ||
     name === "Symbol" ||
     name === "BigInt";

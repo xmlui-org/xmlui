@@ -23,6 +23,15 @@
     "SelectOption.tsx",
     "SimpleSelect.tsx"
   ],
+  "Slot": [
+    "Slot.ts"
+  ],
+  "Splitter": [
+    "utils.ts"
+  ],
+  "Theme": [
+    "NotificationToast.tsx"
+  ],
   "Table": [
     "react-table-config.d.ts",
     "useRowSelection.tsx"

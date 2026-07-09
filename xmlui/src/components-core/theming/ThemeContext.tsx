@@ -1,18 +1,20 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
+import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useThemeRuntime } from "../../runtime/rendering/theme";
+import {
+  XmlUiBlogThemeDefinition,
+  XmlUiCyanThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiRedThemeDefinition,
+  XmlUiThemeDefinition,
+  XmlUiWebThemeDefinition,
+} from "./themes/xmlui";
 
-type LegacyThemeContextValue = {
-  activeThemeTone: string;
-  activeThemeId?: string;
-  root?: HTMLElement | null;
-  themeVars?: Record<string, string>;
-  themes?: Record<string, unknown>;
-  getThemeVar: (name: string) => string | undefined;
-  getResourceUrl: (name: string) => string | undefined;
-  setActiveThemeTone?: (tone: string) => void;
-  setActiveThemeId?: (themeId: string) => void;
-};
+type ResourceMap = Record<string, string | FontDef>;
 
 const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   logo: "/resources/xmlui-logo.svg",
@@ -21,26 +23,64 @@ const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   favicon: "/resources/favicon.ico",
 };
 
-export const ThemeContext = createContext<LegacyThemeContextValue>({
+export const builtInThemes: Array<ThemeDefinition> = [
+  XmlUiThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiCyanThemeDefinition,
+  XmlUiRedThemeDefinition,
+  XmlUiBlogThemeDefinition,
+  XmlUiWebThemeDefinition,
+];
+
+const defaultThemeScope: ThemeScope = {
   activeThemeTone: "light",
-  activeThemeId: "default",
-  root: typeof document === "undefined" ? null : document.body,
+  activeThemeId: "xmlui",
+  root: typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body,
+  setRoot: () => undefined,
+  activeTheme: builtInThemes[0],
+  themeStyles: {},
   themeVars: {},
-  themes: {},
   getThemeVar: () => undefined,
   getResourceUrl: () => undefined,
+};
+
+const defaultAppThemes: AppThemes = {
+  activeThemeTone: "light",
+  activeThemeId: "xmlui",
+  themes: builtInThemes,
+  resources: DEFAULT_RESOURCE_URLS,
+  resourceMap: {},
+  availableThemeIds: builtInThemes.map((theme) => theme.id),
+  activeTheme: builtInThemes[0],
   setActiveThemeTone: () => undefined,
   setActiveThemeId: () => undefined,
-});
+  toggleThemeTone: () => undefined,
+};
+
+export const ThemeContext = createContext<ThemeScope>(defaultThemeScope);
+const ThemesContext = createContext<AppThemes>(defaultAppThemes);
 
 export function LegacyThemeProvider({
   resources = {},
+  resourceMap = {},
+  themes = [],
+  defaultTheme,
   children,
 }: {
   resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
   children: ReactNode;
 }) {
   const runtimeTheme = useThemeRuntime();
+  const allThemes = useMemo(() => mergeThemes(themes), [themes]);
+  const [activeThemeId, setActiveThemeIdState] = useState(() =>
+    defaultTheme && allThemes.some((theme) => theme.id === defaultTheme) ? defaultTheme : "xmlui",
+  );
   const themeVars = useMemo<Record<string, string>>(() => {
     const vars = Object.fromEntries(
       Object.entries(runtimeTheme.variables).map(([name, value]) => [
@@ -55,12 +95,49 @@ export function LegacyThemeProvider({
       "right-closeButton-App": vars["right-closeButton-App"] ?? "var(--xmlui-space-2)",
     };
   }, [runtimeTheme.variables]);
-  const value = useMemo<LegacyThemeContextValue>(() => ({
-    activeThemeTone: runtimeTheme.tone,
-    activeThemeId: "default",
-    root: typeof document === "undefined" ? null : document.body,
+  const resourceDefinitions = useMemo<ResourceMap>(
+    () => ({
+      ...DEFAULT_RESOURCE_URLS,
+      ...resources,
+    }),
+    [resources],
+  );
+  const activeTheme = allThemes.find((theme) => theme.id === activeThemeId) ?? allThemes[0];
+  const activeThemeTone = runtimeTheme.tone;
+
+  const appThemes = useMemo<AppThemes>(() => ({
+    activeThemeTone,
+    activeThemeId: activeTheme.id,
+    themes: allThemes,
+    resources: resourceDefinitions,
+    resourceMap,
+    availableThemeIds: allThemes.map((theme) => theme.id),
+    activeTheme,
+    setActiveThemeTone: (tone: ThemeTone) => {
+      if (tone === "light" || tone === "dark") {
+        runtimeTheme.setTone(tone);
+      }
+    },
+    setActiveThemeId: (themeId: string) => {
+      if (themeId && allThemes.some((theme) => theme.id === themeId)) {
+        setActiveThemeIdState(themeId);
+      }
+    },
+    toggleThemeTone: () => {
+      runtimeTheme.setTone(activeThemeTone === "dark" ? "light" : "dark");
+    },
+  }), [activeTheme, activeThemeId, activeThemeTone, allThemes, resourceDefinitions, resourceMap, runtimeTheme.setTone]);
+
+  const themeScope = useMemo<ThemeScope>(() => ({
+    activeThemeTone,
+    activeThemeId: activeTheme.id,
+    root: typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body,
+    setRoot: () => undefined,
+    activeTheme,
+    themeStyles: Object.fromEntries(
+      Object.entries(themeVars).map(([name, value]) => [`--xmlui-${name}`, value]),
+    ),
     themeVars,
-    themes: {},
     getThemeVar: (name: string) => {
       const themeVarName = name.startsWith("$") ? name.slice(1) : name;
       return (
@@ -68,22 +145,57 @@ export function LegacyThemeProvider({
         legacyThemeVarFromDocument(themeVarName)
       );
     },
-    getResourceUrl: (name: string) => {
-      if (!name.startsWith("resource:")) {
-        return undefined;
-      }
-      const resourceName = name.slice("resource:".length);
-      return resources[resourceName] ?? DEFAULT_RESOURCE_URLS[resourceName];
-    },
-    setActiveThemeTone: () => undefined,
-    setActiveThemeId: () => undefined,
-  }), [resources, runtimeTheme.tone, themeVars]);
+    getResourceUrl: (name?: string) => getResourceUrl(name, resourceDefinitions, resourceMap),
+  }), [activeTheme, activeThemeTone, resourceDefinitions, resourceMap, runtimeTheme.variables, themeVars]);
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemesContext.Provider value={appThemes}>
+      <ThemeContext.Provider value={themeScope}>
+        {children}
+      </ThemeContext.Provider>
+    </ThemesContext.Provider>
   );
+}
+
+export function useTheme(): ThemeScope {
+  return useContext(ThemeContext);
+}
+
+export function useThemes(): AppThemes {
+  return useContext(ThemesContext);
+}
+
+function mergeThemes(themes: Array<ThemeDefinition>): Array<ThemeDefinition> {
+  const merged = new Map<string, ThemeDefinition>();
+  for (const theme of builtInThemes) {
+    merged.set(theme.id, theme);
+  }
+  for (const theme of themes) {
+    merged.set(theme.id, theme);
+  }
+  return Array.from(merged.values());
+}
+
+function getResourceUrl(
+  resourceString: string | undefined,
+  resources: ResourceMap,
+  resourceMap: Record<string, string>,
+): string | undefined {
+  if (!resourceString) {
+    return undefined;
+  }
+  const resourceName = resourceString.startsWith("resource:")
+    ? resourceString.slice("resource:".length)
+    : resourceString;
+  const mappedName = resourceMap[resourceName] ?? resourceName;
+  const resource = resources[mappedName] ?? resources[resourceName];
+  if (typeof resource === "string") {
+    return resource;
+  }
+  if (resource && typeof resource === "object" && typeof resource.src === "string") {
+    return resource.src;
+  }
+  return resourceString.startsWith("resource:") ? undefined : resourceString;
 }
 
 function legacyThemeVarValue(value: unknown): string {
@@ -142,12 +254,4 @@ function normalizeLegacyThemeLength(value: string): string {
     return value;
   }
   return `${Number(calcMatch[1]) * Number(calcMatch[2])}${calcMatch[3]}`;
-}
-
-export function useTheme(): LegacyThemeContextValue {
-  return useContext(ThemeContext);
-}
-
-export function useThemes(): LegacyThemeContextValue {
-  return useTheme();
 }

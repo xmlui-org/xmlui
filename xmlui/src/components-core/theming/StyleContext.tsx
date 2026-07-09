@@ -34,13 +34,14 @@ export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CS
   return entry?.className;
 }
 
-export function useStyles(styles?: StyleObjectType) {
+export function useStyles(styles?: StyleObjectType, options: { layer?: string } = {}) {
+  const layer = options.layer ?? "dynamic";
   const entry = useMemo(() => {
     if (!styles || Object.keys(styles).length === 0) {
       return undefined;
     }
-    return registerDynamicStyleObject(styles);
-  }, [styles]);
+    return registerDynamicStyleObject(styles, layer);
+  }, [layer, styles]);
 
   useInsertionEffect(() => {
     if (!entry || typeof document === "undefined") {
@@ -51,17 +52,30 @@ export function useStyles(styles?: StyleObjectType) {
     }
     const style = document.createElement("style");
     style.setAttribute("data-xmlui-style-hash", entry.hash);
-    style.textContent = `@layer dynamic {${entry.css}}`;
+    style.textContent = `@layer ${entry.layer} {${entry.css}}`;
     document.head.appendChild(style);
   }, [entry]);
 
   return entry?.className;
 }
 
+const rootStyleRegistry = {
+  addRootClasses: (_classNames: Array<string | undefined>) => undefined,
+};
+
+export function useStyleRegistry() {
+  return rootStyleRegistry;
+}
+
+export function useDomRoot(): Document | ShadowRoot | undefined {
+  return typeof document === "undefined" ? undefined : document;
+}
+
 type DynamicStyleEntry = {
   className: string;
   hash: string;
   css: string;
+  layer: string;
 };
 
 const dynamicStyleCache = new Map<string, DynamicStyleEntry>();
@@ -78,13 +92,13 @@ function registerDynamicStyle(styles: Record<string, CSSProperties[keyof CSSProp
   if (!css) {
     return undefined;
   }
-  const entry = { className, hash, css };
+  const entry = { className, hash, css, layer: "dynamic" };
   dynamicStyleCache.set(hash, entry);
   return entry;
 }
 
-function registerDynamicStyleObject(styles: StyleObjectType): DynamicStyleEntry | undefined {
-  const key = stableJSONStringify(styles);
+function registerDynamicStyleObject(styles: StyleObjectType, layer: string): DynamicStyleEntry | undefined {
+  const key = stableJSONStringify({ layer, styles });
   const hash = hashString(key);
   const cached = dynamicStyleCache.get(hash);
   if (cached) {
@@ -95,7 +109,7 @@ function registerDynamicStyleObject(styles: StyleObjectType): DynamicStyleEntry 
   if (!css) {
     return undefined;
   }
-  const entry = { className, hash, css };
+  const entry = { className, hash, css, layer };
   dynamicStyleCache.set(hash, entry);
   return entry;
 }

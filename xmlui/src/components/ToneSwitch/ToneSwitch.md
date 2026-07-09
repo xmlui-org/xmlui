@@ -1,6 +1,16 @@
-# ToneSwitch
+%-DESC-START
 
-`ToneSwitch` toggles the current theme tone between light and dark.
+```xmlui-pg {4} copy display name="Example: using ToneSwitch"
+<App>
+  <AppHeader>
+    <SpaceFiller />
+    <ToneSwitch />
+  </AppHeader>
+  <Card
+    title="Tone Switch"
+    subtitle="Toggle the switch to change the tone."
+  />
+</App>
+```
 
-The foundation renderer exposes a compact two-button control. Exact old visual
-parity with the toggle/icon implementation is deferred.
+%-DESC-END

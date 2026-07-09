@@ -47,6 +47,7 @@ import {
   TextBoxDriver,
   TreeDriver,
 } from "./ComponentDrivers";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 
 const e2eDevPort = process.env.XMLUI_E2E_DEV_PORT ?? "5173";
 
@@ -56,6 +57,8 @@ export type InitTestBedOptions = {
   extensionIds?: string | string[];
   mainXs?: string;
   resources?: Record<string, string>;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
   apiInterceptor?: {
     initialize?: string;
     operations?: Record<string, {
@@ -750,7 +753,7 @@ async function initTestBed(
     "icon.txt": "/resources/txt.svg",
     "icon.bell": "/resources/bell.svg",
   };
-  const testBedPayload = {
+  const testBedPayload: TestBedPayload = {
     source,
     components: options.components ?? [],
     extensionIds: normalizeExtensionIds(options.extensionIds),
@@ -758,9 +761,11 @@ async function initTestBed(
       ...defaultTestResources,
       ...(options.resources ?? {}),
     },
+    themes: options.themes ?? [],
+    defaultTheme: options.defaultTheme,
   };
   await installApiInterceptor(page, options.apiInterceptor);
-  const installTestBedSource = (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => {
+  const installTestBedSource = (payload: TestBedPayload) => {
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -775,6 +780,12 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
     window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
     window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
+    window.sessionStorage.setItem("__xmluiTestBedThemes", JSON.stringify(payload.themes));
+    if (payload.defaultTheme) {
+      window.sessionStorage.setItem("__xmluiTestBedDefaultTheme", payload.defaultTheme);
+    } else {
+      window.sessionStorage.removeItem("__xmluiTestBedDefaultTheme");
+    }
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -810,8 +821,8 @@ async function initTestBed(
 
 async function navigateWithTestBedSource(
   page: Page,
-  installTestBedSource: (payload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> }) => void,
-  testBedPayload: { source: string; components: string[]; extensionIds: string[]; resources: Record<string, string> },
+  installTestBedSource: (payload: TestBedPayload) => void,
+  testBedPayload: TestBedPayload,
 ): Promise<void> {
   await page.goto("/?__xmluiTestBed=1");
   await page.waitForFunction(() =>
@@ -824,6 +835,15 @@ async function navigateWithTestBedSource(
     await window.__xmluiTestBedReinit?.(xmluiSource);
   }, testBedPayload.source);
 }
+
+type TestBedPayload = {
+  source: string;
+  components: string[];
+  extensionIds: string[];
+  resources: Record<string, string>;
+  themes: Array<ThemeDefinition>;
+  defaultTheme?: string;
+};
 
 async function clearManagedFetchCache(page: Page): Promise<void> {
   await page.evaluate(async () => {

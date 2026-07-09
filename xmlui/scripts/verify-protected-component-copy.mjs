@@ -45,7 +45,7 @@ for (const file of files) {
     console.log(`${file}: identical`);
     continue;
   }
-  if (file === `${componentName}.tsx`) {
+  if (file === `${componentName}.tsx` || file === `${componentName}.ts`) {
     const normalizedOriginalEntry = normalizeEntryFile(original);
     const normalizedRewriteEntry = normalizeEntryFile(rewrite);
     if (
@@ -85,6 +85,7 @@ async function protectedFiles(componentDir, component, manifestEntry) {
 function isProtectedFile(name, component) {
   return name.endsWith("React.tsx") ||
     name === `${component}.tsx` ||
+    name === `${component}.ts` ||
     name.endsWith(".module.scss") ||
     (name.endsWith(".scss") && !name.endsWith(".module.scss")) ||
     name.endsWith(".defaults.ts") ||

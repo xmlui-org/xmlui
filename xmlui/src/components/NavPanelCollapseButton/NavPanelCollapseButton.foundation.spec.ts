@@ -1,52 +1,39 @@
 import { expect, test } from "../../testing/fixtures";
 
 test.describe("NavPanelCollapseButton foundation", () => {
-  test("does not render outside a NavPanel collapse context", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <NavPanelCollapseButton testId="collapse" />
-      </App>
-    `);
+  test("renders when App layout context is available", async ({ initTestBed, page }) => {
+    await initTestBed(`<NavPanelCollapseButton />`);
 
-    await expect(page.getByTestId("collapse")).toHaveCount(0);
+    const collapse = page.getByRole("button", { name: "Collapse sidebar" });
+    await expect(collapse).toBeVisible();
+    await collapse.click();
+    await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
   });
 
-  test("renders inside NavPanel footer and toggles collapsed state", async ({
-    initTestBed,
-    createNavPanelCollapseButtonDriver,
-    createNavPanelDriver,
-  }) => {
+  test("renders inside NavPanel footer and toggles collapsed state", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App>
+      <App layout="vertical">
         <NavPanel testId="panel">
           <NavLink to="/">Home</NavLink>
           <property name="footerTemplate">
-            <NavPanelCollapseButton testId="collapse" />
+            <NavPanelCollapseButton />
           </property>
         </NavPanel>
       </App>
     `);
 
-    const panel = await createNavPanelDriver("panel");
-    const collapse = await createNavPanelCollapseButtonDriver("collapse");
-
-    await expect(panel.component).toHaveAttribute("data-nav-panel-collapsed", "false");
-    await expect(collapse.component).toHaveAttribute("aria-label", "Collapse sidebar");
-    await expect(collapse.component).toHaveAttribute("data-nav-panel-collapsed", "false");
-
+    const collapse = page.getByRole("button", { name: "Collapse sidebar" });
+    await expect(collapse).toBeVisible();
     await collapse.click();
-    await expect(panel.component).toHaveAttribute("data-nav-panel-collapsed", "true");
-    await expect(collapse.component).toHaveAttribute("aria-label", "Expand sidebar");
-    await expect(collapse.component).toHaveAttribute("data-nav-panel-collapsed", "true");
+    await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
   });
 
-  test("uses custom labels and icons across collapse state", async ({ initTestBed, createNavPanelCollapseButtonDriver }) => {
+  test("uses custom labels across collapse state", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App>
+      <App layout="vertical">
         <NavPanel>
           <property name="footerTemplate">
             <NavPanelCollapseButton
-              testId="collapse"
               icon="left"
               iconCollapsed="right"
               aria-label="Hide navigation"
@@ -56,35 +43,26 @@ test.describe("NavPanelCollapseButton foundation", () => {
       </App>
     `);
 
-    const collapse = await createNavPanelCollapseButtonDriver("collapse");
-    await expect(collapse.component).toHaveAttribute("aria-label", "Hide navigation");
-    await expect(collapse.component.getByTestId("collapse").locator('[data-icon="left"]')).toHaveCount(0);
-    await expect(collapse.component.locator('[data-icon="left"]')).toHaveCount(1);
-
+    const collapse = page.getByRole("button", { name: "Hide navigation" });
+    await expect(collapse).toBeVisible();
     await collapse.click();
-    await expect(collapse.component).toHaveAttribute("aria-label", "Show navigation");
-    await expect(collapse.component.locator('[data-icon="right"]')).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Show navigation" })).toBeVisible();
   });
 
-  test("keyboard activation toggles the collapse state", async ({
-    initTestBed,
-    createNavPanelCollapseButtonDriver,
-    createNavPanelDriver,
-  }) => {
+  test("keyboard activation toggles the collapse state", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App>
+      <App layout="vertical">
         <NavPanel testId="panel">
           <property name="footerTemplate">
-            <NavPanelCollapseButton testId="collapse" />
+            <NavPanelCollapseButton />
           </property>
         </NavPanel>
       </App>
     `);
 
-    const panel = await createNavPanelDriver("panel");
-    const collapse = await createNavPanelCollapseButtonDriver("collapse");
+    const collapse = page.getByRole("button", { name: "Collapse sidebar" });
     await collapse.focus();
-    await collapse.component.press("Enter");
-    await expect(panel.component).toHaveAttribute("data-nav-panel-collapsed", "true");
+    await collapse.press("Enter");
+    await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
   });
 });

@@ -12,7 +12,9 @@ import React, {
 import type { ComponentMetadata } from "../../component-core/metadata";
 import {
   createComponentThemeClass,
+  defaultThemeVariableLayers,
   defaultThemeVariables,
+  generateBaseTones,
   mergeThemeVariableLayers,
   resolveThemeVariablesWithCssVars,
   themeVariablesToCssProperties,
@@ -66,7 +68,13 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     setTone(initialTone);
   }, [initialTone]);
   const variables = useMemo(
-    () => mergeThemeVariableLayers([defaultThemeVariables], tone),
+    () => {
+      const baseVariables = mergeThemeVariableLayers(defaultThemeVariableLayers, tone);
+      return mergeThemeVariableLayers(
+        [...defaultThemeVariableLayers, generateBaseTones(baseVariables)],
+        tone,
+      );
+    },
     [tone],
   );
   const value = useMemo<ThemeRuntimeContext>(
@@ -131,7 +139,14 @@ export function ThemeScope({
 }) {
   const parent = useThemeRuntime();
   const nextVariables = useMemo(
-    () => mergeThemeVariableLayers([parent.variables, variables], tone ?? parent.tone),
+    () => {
+      const nextTone = tone ?? parent.tone;
+      const baseVariables = mergeThemeVariableLayers([parent.variables, variables], nextTone);
+      return mergeThemeVariableLayers(
+        [parent.variables, generateBaseTones(baseVariables), variables],
+        nextTone,
+      );
+    },
     [parent.tone, parent.variables, tone, variables],
   );
   const cssVariables = useMemo(

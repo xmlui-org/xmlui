@@ -396,11 +396,11 @@ export class ExpandableItemDriver extends ComponentDriver {
 
 export class SplitterDriver extends ComponentDriver {
   getResizer(): Locator {
-    return this.component.locator('[data-xmlui-part="resizer"], .resizer').first();
+    return this.component.locator('[data-xmlui-part="resizer"], [class*="resizer"]').first();
   }
 
   getFloatingResizer(): Locator {
-    return this.component.locator(".floatingResizer").first();
+    return this.component.locator('[class*="floatingResizer"]').first();
   }
 
   async hoverNearResizer() {

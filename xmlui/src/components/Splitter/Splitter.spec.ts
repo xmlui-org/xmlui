@@ -1,4 +1,4 @@
-import { getBounds } from "../../testing/component-test-helpers";
+import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 import { parseSize, toPercentage } from "./utils";
 
@@ -31,7 +31,7 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("single-child")).toBeVisible();
   });
 
-  test.describe.skip("conditional rendering behavior", () => {
+  test.describe("conditional rendering behavior", () => {
     test("hides resizer and stretches single panel when second child has when=false", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Splitter height="200px" width="400px" testId="splitter">
@@ -517,7 +517,7 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe.skip("resize functionality", () => {
+  test.describe("resize functionality", () => {
     test("drag resizer changes panel sizes in horizontal orientation", async ({ initTestBed, page, createSplitterDriver }) => {
       await initTestBed(`
         <Splitter height="200px" width="400px" orientation="horizontal" testId="splitter">
@@ -651,7 +651,7 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe.skip("size constraint properties", () => {
+  test.describe("size constraint properties", () => {
     test("minPrimarySize constrains minimum size", async ({ initTestBed, page, createSplitterDriver }) => {
       await initTestBed(`
         <Splitter height="200px" width="400px" orientation="horizontal" minPrimarySize="100px" testId="splitter">
@@ -753,7 +753,7 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe.skip("resize event", () => {
+  test.describe("resize event", () => {
     test("fires resize event when dragging", async ({ initTestBed, page, createSplitterDriver }) => {
       const { testStateDriver } = await initTestBed(`
         <Splitter height="200px" width="400px" orientation="horizontal" onResize="arg => testState = arg" testId="splitter">
@@ -1034,7 +1034,7 @@ test.describe("Other Edge Cases", () => {
     }
   });
 
-  test.skip("handles rapid resize operations", async ({ initTestBed, page, createSplitterDriver }) => {
+  test("handles rapid resize operations", async ({ initTestBed, page, createSplitterDriver }) => {
     await initTestBed(`
       <Splitter height="200px" width="400px" orientation="horizontal" testId="splitter">
         <Stack backgroundColor="lightblue" height="100%" testId="primary"/>
@@ -1056,7 +1056,7 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByTestId("secondary")).toBeVisible();
   });
 
-  test.skip("conditional rendering works with different child component types", async ({ initTestBed, page }) => {
+  test("conditional rendering works with different child component types", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Splitter height="200px" width="400px" testId="splitter">
         <VStack when="{false}" backgroundColor="lightblue" height="100%" testId="vstack">

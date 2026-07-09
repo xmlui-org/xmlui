@@ -1,0 +1,12 @@
+<Component name="ActionBar">
+  <Card var.transformedHeader="*** {$props.header.toUpperCase()} ***">
+    <Slot name="headerTemplate" processedHeader="{transformedHeader}" >
+      <H3>{transformedHeader}</H3>
+    </Slot>
+    <HStack>
+      <Slot>
+        <Button label="Default" onClick="window.alert('Default clicked')" />
+      </Slot>
+    </HStack>
+  </Card>
+</Component>

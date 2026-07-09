@@ -11,6 +11,7 @@ export async function getBounds(locator: Locator): Promise<{
   top: number;
   bottom: number;
 }> {
+  await locator.page().evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
   const box = await locator.boundingBox();
   if (!box) {
     throw new Error("Expected locator to have bounds.");

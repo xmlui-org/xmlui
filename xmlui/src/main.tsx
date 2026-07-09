@@ -13,6 +13,7 @@ import {
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
 import counterBadgeExtension from "../../packages/xmlui-counter-badge/src";
 import type { Extension } from "./extensions";
+import type { ThemeDefinition } from "./abstractions/ThemingDefs";
 
 import asyncDirectivesApp from "./examples/async-directives/Main.xmlui";
 import asyncResponsiveLoopApp from "./examples/async-responsive-loop/Main.xmlui";
@@ -366,6 +367,28 @@ if (params.has("__xmluiTestBed")) {
     }
   };
 
+  const readTestBedThemes = (): Array<ThemeDefinition> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedThemes");
+    if (!raw) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is ThemeDefinition =>
+            item && typeof item === "object" && typeof item.id === "string",
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const readTestBedDefaultTheme = (): string | undefined => {
+    const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTheme");
+    return value || undefined;
+  };
+
   const readTestBedExtensions = async (): Promise<Extension[]> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
     if (!raw) {
@@ -414,6 +437,8 @@ if (params.has("__xmluiTestBed")) {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
     const resources = readTestBedResources();
+    const themes = readTestBedThemes();
+    const defaultTheme = readTestBedDefaultTheme();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
@@ -421,6 +446,8 @@ if (params.has("__xmluiTestBed")) {
       testBedRoot = mountXmluiApp(module, root, {
         extensions,
         resources,
+        themes,
+        defaultTheme,
         testProbe,
       });
       return;
@@ -430,6 +457,8 @@ if (params.has("__xmluiTestBed")) {
       module,
       extensions,
       resources,
+      themes,
+      defaultTheme,
       testProbe,
     }));
   };

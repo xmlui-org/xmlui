@@ -71,7 +71,7 @@ import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
-import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
+import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
@@ -95,14 +95,14 @@ import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
 import { sliderRenderer } from "../components/Slider/Slider";
-import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { slotRenderer } from "../components/Slot/Slot";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
 import {
   hSplitterRenderer,
   splitterRenderer,
   vSplitterRenderer,
-} from "../components/Splitter/Splitter.renderer";
+} from "../components/Splitter/Splitter";
 import {
   chStackRenderer,
   cvStackRenderer,
@@ -121,13 +121,13 @@ import { tableRenderer } from "../components/Table/Table";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { textRenderer } from "../components/Text/Text";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
-import { themeRenderer } from "../components/Theme/Theme.renderer";
+import { themeRenderer } from "../components/Theme/Theme";
 import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
 import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
 import { timerRenderer } from "../components/Timer/Timer";
 import { toastRenderer } from "../components/Toast/Toast.renderer";
-import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
-import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
+import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton";
+import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch";
 import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
