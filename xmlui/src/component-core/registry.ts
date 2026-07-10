@@ -39,7 +39,7 @@ import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
-import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import {
   hSplitterRenderer,
@@ -47,9 +47,10 @@ import {
   vSplitterRenderer,
 } from "../components/Splitter/Splitter";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
-import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
+import { stickySectionRenderer } from "../components/StickySection/StickySection";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
-import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
+import { stepRenderer } from "../components/Stepper/Step";
+import { stepperRenderer } from "../components/Stepper/Stepper";
 import {
   chStackRenderer,
   cvStackRenderer,
@@ -90,7 +91,7 @@ import { formValidatorRenderer } from "../components/Form/FormValidator";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
 import { formSectionRenderer } from "../components/FormSection/FormSection.renderer";
-import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
+import { stepperFormRenderer } from "../components/StepperForm/StepperForm";
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
@@ -115,13 +116,13 @@ import { dataSourceRenderer } from "../components/DataSource/DataSource";
 import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appStateRenderer } from "../components/AppState/AppState";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
-import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
+import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle";
 import { timerRenderer } from "../components/Timer/Timer";
 import { queueRenderer } from "../components/Queue/Queue";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
-import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
-import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
-import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
+import { eventSourceRenderer } from "../components/EventSource/EventSource";
+import { webSocketRenderer } from "../components/WebSocket/WebSocket";
+import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink";
 import { toastRenderer } from "../components/Toast/Toast";
@@ -968,7 +969,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (messageListenerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListenerReact.tsx`);
     } else if (webSocketTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocket.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocketReact.tsx`);
     } else if (liveRegionTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LiveRegion.renderer.tsx`);
     } else if (bookmarkTransferred) {

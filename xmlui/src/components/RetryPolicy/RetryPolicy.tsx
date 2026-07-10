@@ -1,136 +1,118 @@
-import { useMemo, useRef } from "react";
-
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import {
-  createCircuitState,
-  RetryPolicyContext,
-  type RetryErrorCategory,
-  type RetryPolicySpec,
-} from "../../runtime/retryPolicy";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./RetryPolicy.defaults";
+import { RetryPolicy } from "./RetryPolicyReact";
 
 const COMP = "RetryPolicy";
-
-export const defaultProps = {
-  attempts: 3,
-  backoff: "exponential" as const,
-  delayMs: 500,
-  jitter: true,
-  honourRetryAfter: true,
-};
 
 export const RetryPolicyMd = createMetadata({
   status: "experimental",
   description:
-    "`RetryPolicy` is a non-visual wrapper that applies retry, backoff, and circuit-breaker behavior to eligible descendants such as `DataSource` and `APICall`.",
+    `\`${COMP}\` is a non-visual wrapper that applies a retry / backoff / ` +
+    `circuit-breaker policy to its eligible descendants (currently ` +
+    `\`DataSource\` and any \`Loader\`-backed component). Failures bubble ` +
+    `up to the structured \`AppError\` channel; retries happen ` +
+    `transparently before \`$error\` fires.`,
   props: {
     attempts: {
-      description: "Total number of attempts, including the first try. Must be at least 1.",
+      description:
+        `Total number of attempts, including the first try. Must be at least 1.`,
       valueType: "number",
       defaultValue: defaultProps.attempts,
     },
     backoff: {
-      description: "The delay algorithm between retries.",
+      description:
+        `Algorithm used to compute the delay between retries: \`fixed\` ` +
+        `keeps the delay constant, \`linear\` multiplies by attempt index, ` +
+        `\`exponential\` doubles each time.`,
       valueType: "string",
       availableValues: ["fixed", "linear", "exponential"],
       isStrictEnum: true,
       defaultValue: defaultProps.backoff,
     },
     delayMs: {
-      description: "Base delay between retries in milliseconds.",
+      description: `Base delay between retries in milliseconds.`,
       valueType: "number",
       defaultValue: defaultProps.delayMs,
     },
     jitter: {
-      description: "When true, random jitter is added to each retry delay.",
+      description:
+        `When \`true\` (default), a random ±25% jitter is added to each ` +
+        `delay to spread out retries across concurrent callers.`,
       valueType: "boolean",
       defaultValue: defaultProps.jitter,
     },
     onlyCategories: {
-      description: "Comma-separated list or array of error categories that should be retried.",
+      description:
+        `Comma-separated list (or array) of \`AppError\` categories that ` +
+        `should be retried. Errors whose category is not listed are ` +
+        `rethrown immediately. Example: \`"network,server"\`.`,
       valueType: "any",
     },
     timeoutMs: {
-      description: "Per-attempt timeout in milliseconds. Zero disables the timeout.",
+      description:
+        `Hard ceiling per attempt in milliseconds. \`0\` (default) ` +
+        `disables the per-attempt timeout.`,
       valueType: "number",
     },
     honourRetryAfter: {
-      description: "When true, retry-after metadata overrides the computed backoff delay.",
+      description:
+        `When \`true\` (default), an HTTP \`Retry-After\` value carried in ` +
+        `\`AppError.data.retryAfterMs\` overrides the computed backoff delay ` +
+        `(capped at 60s).`,
       valueType: "boolean",
       defaultValue: defaultProps.honourRetryAfter,
     },
     circuitBreaker: {
-      description: "Optional object `{ failureThreshold, resetMs }` controlling circuit-breaker behavior.",
+      description:
+        `Optional object \`{ failureThreshold, resetMs }\` that opens a ` +
+        `circuit after \`failureThreshold\` consecutive failures and fails ` +
+        `fast for \`resetMs\` milliseconds before probing once.`,
       valueType: "any",
     },
   },
 });
 
-export const retryPolicyRenderer = wrapComponent({
+export const retryPolicyComponentRenderer = wrapComponent(
+  COMP,
+  RetryPolicy,
+  RetryPolicyMd,
+  {
+    stateful: false,
+    customRender: (_props, { node, extractValue, renderChild }) => (
+      <RetryPolicy
+        attempts={extractValue.asOptionalNumber(node.props.attempts)}
+        backoff={extractValue.asOptionalString(node.props.backoff) as any}
+        delayMs={extractValue.asOptionalNumber(node.props.delayMs)}
+        jitter={extractValue.asOptionalBoolean(node.props.jitter)}
+        onlyCategories={extractValue(node.props.onlyCategories)}
+        timeoutMs={extractValue.asOptionalNumber(node.props.timeoutMs)}
+        honourRetryAfter={extractValue.asOptionalBoolean(node.props.honourRetryAfter)}
+        circuitBreaker={extractValue(node.props.circuitBreaker)}
+      >
+        {renderChild(node.children)}
+      </RetryPolicy>
+    ),
+  },
+);
+
+export const retryPolicyRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: RetryPolicyMd as ComponentMetadata,
-  renderer: ({ adapter }) => {
-    const circuitStateRef = useRef(createCircuitState());
-    const value = useMemo(
-      () => ({
-        spec: {
-          attempts: Math.max(1, Math.trunc(adapter.numberProp("attempts", defaultProps.attempts))),
-          backoff: normalizeBackoff(adapter.stringProp("backoff", defaultProps.backoff)),
-          delayMs: Math.max(0, Math.trunc(adapter.numberProp("delayMs", defaultProps.delayMs))),
-          jitter: adapter.booleanProp("jitter", defaultProps.jitter),
-          onlyCategories: normalizeCategories(adapter.prop("onlyCategories")),
-          timeoutMs: Math.max(0, Math.trunc(adapter.numberProp("timeoutMs", 0))),
-          honourRetryAfter: adapter.booleanProp("honourRetryAfter", defaultProps.honourRetryAfter),
-          circuitBreaker: normalizeCircuitBreaker(adapter.prop("circuitBreaker")),
-        } satisfies RetryPolicySpec,
-        circuitState: circuitStateRef.current,
-      }),
-      [adapter],
-    );
-
-    return (
-      <RetryPolicyContext.Provider value={value}>
-        {adapter.renderChildren(nonPropertyChildren(adapter.node.children))}
-      </RetryPolicyContext.Provider>
-    );
-  },
+  renderer: ({ adapter }) => (
+    <RetryPolicy
+      attempts={adapter.numberProp("attempts", defaultProps.attempts)}
+      backoff={adapter.stringProp("backoff", defaultProps.backoff) as any}
+      delayMs={adapter.numberProp("delayMs", defaultProps.delayMs)}
+      jitter={adapter.booleanProp("jitter", defaultProps.jitter)}
+      onlyCategories={adapter.prop("onlyCategories") as any}
+      timeoutMs={adapter.numberProp("timeoutMs", 0)}
+      honourRetryAfter={adapter.booleanProp("honourRetryAfter", defaultProps.honourRetryAfter)}
+      circuitBreaker={adapter.prop("circuitBreaker") as any}
+    >
+      {adapter.renderChildren()}
+    </RetryPolicy>
+  ),
 });
-
-function normalizeBackoff(value: string | undefined): RetryPolicySpec["backoff"] {
-  return value === "fixed" || value === "linear" || value === "exponential"
-    ? value
-    : defaultProps.backoff;
-}
-
-function normalizeCategories(value: unknown): RetryErrorCategory[] | undefined {
-  if (Array.isArray(value)) {
-    const categories = value.map(String).filter(Boolean) as RetryErrorCategory[];
-    return categories.length > 0 ? categories : undefined;
-  }
-  if (typeof value === "string") {
-    const categories = value.split(",").map((item) => item.trim()).filter(Boolean) as RetryErrorCategory[];
-    return categories.length > 0 ? categories : undefined;
-  }
-  return undefined;
-}
-
-function normalizeCircuitBreaker(value: unknown): RetryPolicySpec["circuitBreaker"] {
-  if (!value || typeof value !== "object") {
-    return undefined;
-  }
-  const source = value as Record<string, unknown>;
-  const failureThreshold = Number(source.failureThreshold);
-  const resetMs = Number(source.resetMs);
-  if (!Number.isFinite(failureThreshold) || !Number.isFinite(resetMs)) {
-    return undefined;
-  }
-  return {
-    failureThreshold: Math.max(1, Math.trunc(failureThreshold)),
-    resetMs: Math.max(0, Math.trunc(resetMs)),
-  };
-}
-
-function nonPropertyChildren(children: Array<any>) {
-  return children.filter((child) => !(child.kind === "element" && child.type === "property"));
-}

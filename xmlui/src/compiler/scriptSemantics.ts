@@ -1742,7 +1742,6 @@ function isBuiltInReferenceName(name: string): boolean {
     name === "JSON" ||
     name === "Math" ||
     name === "Object" ||
-    name === "toast" ||
     name === "window" ||
     name === "getDate" ||
     name === "Symbol" ||

@@ -34,10 +34,15 @@ export function resolveLayoutStyle(
 ): CSSProperties {
   const style: CSSProperties = { boxSizing: "border-box" };
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
+  const parentOrientation = parentLayoutOrientation(props.layoutContext);
 
   if (orientation) {
     style.display = "flex";
     style.flexDirection = orientation === "horizontal" ? "row" : "column";
+  }
+
+  if (parentOrientation) {
+    style.flexShrink = 0;
   }
 
   assignSize(style, "width", props.width, orientation === "horizontal");
@@ -357,6 +362,13 @@ function parseStarSize(value: unknown): { grow: number } | undefined {
 
 function orientationFromProp(value: unknown): LayoutOrientation | undefined {
   return value === "horizontal" || value === "vertical" ? value : undefined;
+}
+
+function parentLayoutOrientation(value: unknown): LayoutOrientation | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+  return orientationFromProp((value as { orientation?: unknown }).orientation);
 }
 
 function alignment(value: unknown): CSSProperties["alignItems"] {

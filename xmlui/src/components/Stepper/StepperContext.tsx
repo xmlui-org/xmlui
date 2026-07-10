@@ -1,4 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import produce from "immer";
+
+import { EMPTY_ARRAY } from "../../components-core/constants";
 
 export type StepItem = {
   innerId: string;
@@ -14,7 +17,7 @@ export type StepItem = {
 
 export type StepperOrientation = "horizontal" | "vertical";
 
-type StepperContextValue = {
+interface IStepperContext {
   register: (item: StepItem) => void;
   unRegister: (innerId: string) => void;
   getStepItems: () => StepItem[];
@@ -24,9 +27,9 @@ type StepperContextValue = {
   stackedLabel: boolean;
   nonLinear: boolean;
   onStepClick: (innerId: string) => void;
-};
+}
 
-export const StepperContext = createContext<StepperContextValue>({
+export const StepperContext = createContext<IStepperContext>({
   register: () => {},
   unRegister: () => {},
   getStepItems: () => [],
@@ -46,49 +49,57 @@ export function useStepperContextValue(
   activeIndex: number,
   onStepClick: (innerId: string) => void,
 ) {
-  const [stepItems, setStepItems] = useState<StepItem[]>([]);
-  const stepItemsRef = useRef<StepItem[]>([]);
+  const [stepItems, setStepItems] = useState<StepItem[]>(EMPTY_ARRAY);
+  const stepItemsRef = useRef<StepItem[]>(EMPTY_ARRAY);
   stepItemsRef.current = stepItems;
 
   const register = useCallback((item: StepItem) => {
-    setStepItems((items) => {
-      const existing = items.findIndex((step) => step.innerId === item.innerId);
-      if (existing < 0) {
-        return [...items, item];
-      }
-      const next = [...items];
-      next[existing] = item;
-      return next;
-    });
+    setStepItems(
+      produce((draft) => {
+        const existing = draft.findIndex((s) => s.innerId === item.innerId);
+        if (existing < 0) {
+          draft.push(item);
+        } else {
+          draft[existing] = item;
+        }
+      }),
+    );
   }, []);
 
   const unRegister = useCallback((innerId: string) => {
-    setStepItems((items) => items.filter((step) => step.innerId !== innerId));
+    setStepItems(
+      produce((draft) => {
+        return draft.filter((s) => s.innerId !== innerId);
+      }),
+    );
   }, []);
 
   const getStepItems = useCallback(() => stepItemsRef.current, []);
 
-  const contextValue = useMemo<StepperContextValue>(() => ({
-    register,
-    unRegister,
-    getStepItems,
-    activeStepId,
-    activeIndex,
-    orientation,
-    stackedLabel,
-    nonLinear,
-    onStepClick,
-  }), [
-    activeIndex,
-    activeStepId,
-    getStepItems,
-    nonLinear,
-    onStepClick,
-    orientation,
-    register,
-    stackedLabel,
-    unRegister,
-  ]);
+  const contextValue = useMemo<IStepperContext>(
+    () => ({
+      register,
+      unRegister,
+      getStepItems,
+      activeStepId,
+      activeIndex,
+      orientation,
+      stackedLabel,
+      nonLinear,
+      onStepClick,
+    }),
+    [
+      register,
+      unRegister,
+      getStepItems,
+      activeStepId,
+      activeIndex,
+      orientation,
+      stackedLabel,
+      nonLinear,
+      onStepClick,
+    ],
+  );
 
   return { stepItems, contextValue };
 }

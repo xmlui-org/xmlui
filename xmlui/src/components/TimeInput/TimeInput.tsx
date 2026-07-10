@@ -1,4 +1,5 @@
 import styles from "./TimeInput.module.scss";
+import compatStyles from "./TimeInputCompat.module.scss";
 
 import React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -227,6 +228,9 @@ export const timeInputComponentRenderer = wrapComponent(COMP, TimeInputNative, T
 });
 
 const timeInputThemeAliases = {
+  [`padding-button-${COMP}`]: "1.5px 6px",
+  [`minHeight-${COMP}`]: "2.5rem",
+  [`gap-adornment-${COMP}`]: "$space-2",
   [`borderRadius-${COMP}`]: "$borderRadius",
   [`borderColor-${COMP}`]: "$borderColor-Input-default",
   [`borderWidth-${COMP}`]: "1px",
@@ -395,7 +399,7 @@ function RuntimeTimeInput({ adapter, className, style, onFocus, onBlur, ...trigg
       {...rootAttrs}
       {...forwardedTriggerProps}
       ref={forwardedRef}
-      className={[rootAttrs.className, className].filter(Boolean).join(" ") || undefined}
+      className={[rootAttrs.className, compatStyles.equalClearableVerticalSizing, className].filter(Boolean).join(" ") || undefined}
       style={{
         ...(rootAttrs.style as React.CSSProperties | undefined),
         ...style,

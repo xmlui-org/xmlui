@@ -395,6 +395,10 @@ function arbitraryRootAttrs(
     "tooltip",
     "tooltipMarkdown",
     "tooltipOptions",
+    "withLiveRegion",
+    "liveRegion",
+    "liveRegionMessage",
+    "liveRegionPoliteness",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>
@@ -420,6 +424,13 @@ function externalRootAttrs(
     "className",
     "layoutContext",
     "style",
+    "tooltip",
+    "tooltipMarkdown",
+    "tooltipOptions",
+    "withLiveRegion",
+    "liveRegion",
+    "liveRegionMessage",
+    "liveRegionPoliteness",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>

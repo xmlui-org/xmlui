@@ -105,8 +105,7 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
   }
 
   .checkboxRoot {
-    display: inline-grid;
-    vertical-align: top;
+    display: grid;
     place-content: center;
     min-width: min(1em, 1rem);
     min-height: min(1em, 1rem);

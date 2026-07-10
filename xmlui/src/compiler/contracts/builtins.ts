@@ -55,7 +55,8 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
 import { SpinnerMd } from "../../components/Spinner/Spinner";
-import { StepMd, StepperMd } from "../../components/Stepper/Stepper";
+import { StepMd } from "../../components/Stepper/Step";
+import { StepperMd } from "../../components/Stepper/Stepper";
 import { TabsMd } from "../../components/Tabs/Tabs";
 import { TabItemMd } from "../../components/Tabs/TabItem";
 import { DataSourceMd } from "../../components/DataSource/DataSource";
@@ -911,6 +912,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       overflowMode: { name: "overflowMode" },
       breakMode: { name: "breakMode" },
       lang: { name: "lang" },
+      withLiveRegion: { name: "withLiveRegion" },
+      liveRegion: { name: "liveRegion" },
+      liveRegionMessage: { name: "liveRegionMessage" },
+      liveRegionPoliteness: { name: "liveRegionPoliteness" },
       testId: { name: "testId" },
     }),
     events: {

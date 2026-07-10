@@ -571,6 +571,10 @@ function useRawStringProp(
 
 function normalizeDataSourceError(error: unknown): Record<string, unknown> {
   const record = error as {
+    code?: string;
+    category?: string;
+    retryable?: boolean;
+    data?: Record<string, unknown>;
     message?: string;
     statusCode?: number;
     response?: unknown;
@@ -579,9 +583,13 @@ function normalizeDataSourceError(error: unknown): Record<string, unknown> {
     ? record.response as Record<string, unknown>
     : {};
   return {
+    code: record?.code,
+    category: record?.category,
+    retryable: record?.retryable,
     statusCode: record?.statusCode ?? (response.statusCode as number | undefined) ?? 0,
     message: String(response.message ?? record?.message ?? ""),
     details: response.details ?? {},
+    data: record?.data ?? {},
     response,
   };
 }

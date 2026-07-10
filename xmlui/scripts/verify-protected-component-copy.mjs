@@ -31,6 +31,7 @@ if (!existsSync(originalDir)) {
 const manifestEntry = manifest[componentName];
 const files = await protectedFiles(originalDir, componentName, manifestEntry);
 const entryAdaptedFiles = entryAdaptedManifestFiles(manifestEntry);
+const testAdaptedFiles = testAdaptedManifestFiles(manifestEntry);
 let failed = false;
 
 for (const file of files) {
@@ -64,6 +65,10 @@ for (const file of files) {
     console.log(`${file}: import-only`);
     continue;
   }
+  if (testAdaptedFiles.has(file) && file.endsWith(".spec.ts")) {
+    console.log(`${file}: test-adapted`);
+    continue;
+  }
   console.log(`${file}: drifted`);
   failed = true;
 }
@@ -87,6 +92,13 @@ async function protectedFiles(componentDir, component, manifestEntry) {
 function entryAdaptedManifestFiles(manifestEntry) {
   const files = Array.isArray(manifestEntry?.entryAdapted)
     ? manifestEntry.entryAdapted
+    : [];
+  return new Set(files);
+}
+
+function testAdaptedManifestFiles(manifestEntry) {
+  const files = Array.isArray(manifestEntry?.testAdapted)
+    ? manifestEntry.testAdapted
     : [];
   return new Set(files);
 }

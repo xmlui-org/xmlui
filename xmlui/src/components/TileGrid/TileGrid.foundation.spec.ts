@@ -29,4 +29,53 @@ test.describe("TileGrid foundation", () => {
     await expect(page.getByText("2: Gamma")).toBeVisible();
     await expect(page.getByTestId("grid")).toHaveCSS("gap", "6px");
   });
+
+  test("syncWithVar synchronizes selection across component instances", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+        <App global.selState="{{}}">
+          <MyGrid />
+          <Text testId="selection">Selection: {JSON.stringify(selState)}</Text>
+          <MyGrid />
+        </App>
+      `,
+      {
+        components: [
+          `
+          <Component name="MyGrid">
+            <TileGrid
+              syncWithVar="selState"
+              itemsSelectable="true"
+              data="{[
+                {id: 1, name: 'Apples'},
+                {id: 2, name: 'Bananas'},
+                {id: 3, name: 'Carrots'}
+              ]}"
+              itemWidth="120px"
+              itemHeight="80px"
+            >
+              <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+                <Text fontWeight="bold">{$item.name}</Text>
+              </VStack>
+            </TileGrid>
+          </Component>
+          `,
+        ],
+      },
+    );
+
+    const firstGrid = page.getByRole("grid").nth(0);
+    const secondGrid = page.getByRole("grid").nth(1);
+
+    await firstGrid.getByRole("checkbox", { name: "Select 1" }).click();
+    await firstGrid.getByRole("checkbox", { name: "Select 2" }).click();
+
+    await expect(page.getByTestId("selection")).toContainText('"selectedIds":[1,2]');
+    await expect(firstGrid.getByRole("gridcell").nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(firstGrid.getByRole("gridcell").nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(secondGrid.getByRole("gridcell").nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(secondGrid.getByRole("gridcell").nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(secondGrid.getByRole("checkbox", { name: "Select 1" })).toBeChecked();
+    await expect(secondGrid.getByRole("checkbox", { name: "Select 2" })).toBeChecked();
+  });
 });

@@ -226,7 +226,7 @@ export const scrollViewerRenderer = wrapRuntimeComponent({
         header={hasHeaderTemplate ? adapter.renderTemplate("headerTemplate") : undefined}
         footer={hasFooterTemplate ? adapter.renderTemplate("footerTemplate") : undefined}
       >
-        {adapter.renderChildren()}
+        {adapter.renderChildren(undefined, { type: "ScrollViewer", orientation: "vertical" })}
       </ScrollViewer>
     );
   },

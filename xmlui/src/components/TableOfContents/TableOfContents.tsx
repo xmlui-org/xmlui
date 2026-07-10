@@ -1,8 +1,10 @@
 import { createMetadata, dContextMenu } from "../../component-core/metadata/helpers";
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./TableOfContents.defaults";
 import { TableOfContents } from "./TableOfContentsReact";
+import styles from "./TableOfContents.module.scss";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -73,7 +75,10 @@ export const TableOfContentsMd = createMetadata({
   events: {
     contextMenu: dContextMenu(COMP),
   },
-  themeVars: extractScssThemeVars(tocStylesSource),
+  themeVars: {
+    ...extractScssThemeVars(tocStylesSource),
+    ...parseScssVar(styles.themeVars),
+  },
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
     [`width-${COMP}`]: "auto",
@@ -86,7 +91,7 @@ export const TableOfContentsMd = createMetadata({
     [`backgroundColor-${COMP_CHILD}--active`]: "transparent",
     [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
     [`textColor-${COMP_CHILD}--hover`]: "$textColor-primary",
-    [`textColor-${COMP_CHILD}--active`]: "$textColor-primary",
+    [`textColor-${COMP_CHILD}--active`]: "$color-primary-400",
     [`fontSize-${COMP_CHILD}`]: "$fontSize-sm",
     [`wordWrap-${COMP_CHILD}`]: "break-word",
     [`paddingVertical-${COMP_CHILD}`]: "$space-1",
@@ -121,6 +126,8 @@ export const tableOfContentsRenderer = wrapComponent({
       smoothScrolling={adapter.booleanProp("smoothScrolling", defaultProps.smoothScrolling)}
       maxHeadingLevel={adapter.numberProp("maxHeadingLevel", defaultProps.maxHeadingLevel)}
       omitH1={adapter.booleanProp("omitH1", defaultProps.omitH1)}
+      scrollStyle={adapter.stringProp("scrollStyle", defaultProps.scrollStyle) as any}
+      showScrollerFade={adapter.booleanProp("showScrollerFade", defaultProps.showScrollerFade)}
     />
   ),
 });

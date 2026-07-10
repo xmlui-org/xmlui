@@ -98,7 +98,6 @@ export const TableOfContents = memo(forwardRef(function TableOfContents(
 
       if (!shouldAllowDefault) {
         event.preventDefault();
-        setActiveId(anchorId);
         scrollToAnchor(anchorId, smoothScrolling);
       }
     },

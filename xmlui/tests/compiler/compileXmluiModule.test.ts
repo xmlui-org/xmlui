@@ -231,6 +231,46 @@ describe("compileXmluiModule", () => {
     expect(code).toContain("Button clicked");
   });
 
+  it("compiles notification toast demo event handlers", () => {
+    const code = compileXmluiModule({
+      id: "/tmp/Main.xmlui",
+      source: `
+        <App>
+          <VStack>
+            <H4>Notification demos</H4>
+            <HStack wrapContent>
+              <Button
+                label="Success"
+                onClick="toast.success('Changes saved successfully.')" />
+              <Button
+                label="Error"
+                themeColor="attention"
+                onClick="toast.error('Failed to delete the record.')" />
+              <Button
+                label="Info"
+                variant="outlined"
+                onClick="toast('Sync started in the background.')" />
+              <Button
+                label="Loading"
+                variant="outlined"
+                onClick="() => {
+                  const id = toast.loading('Uploading file...');
+                  delay(2000);
+                  toast.success('Upload complete!', { id });
+                }" />
+            </HStack>
+            <Text variant="caption">Click a button to see the notification.</Text>
+          </VStack>
+        </App>
+      `,
+    });
+
+    expect(code).toContain(`ctx.readContext?.("toast")`);
+    expect(code).toContain("Sync started in the background.");
+    expect(code).toContain("Uploading file...");
+    expect(code).toContain("Upload complete!");
+  });
+
   it("compiles AppState API calls from event handlers", () => {
     const code = compileXmluiModule({
       id: "/tmp/Main.xmlui",

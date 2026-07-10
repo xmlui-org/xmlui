@@ -1,36 +1,95 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, memo, useEffect, useRef } from "react";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+
+import styles from "./StickySection.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+// =====================================================================================================================
+// StickySection React component
 
 import { defaultProps } from "./StickySection.defaults";
-import styles from "./StickySection.module.scss";
+
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+  stickTo?: "top" | "bottom";
+  uid?: string;
+  classes?: Record<string, string>;
+};
 
 const DATA_ATTR_TOP = "data-sticky-section-top";
 const DATA_ATTR_BOTTOM = "data-sticky-section-bottom";
 
-export type StickySectionProps = Omit<HTMLAttributes<HTMLDivElement>, "children"> & {
-  children?: ReactNode;
-  stickTo?: "top" | "bottom";
-};
+/**
+ * Finds the nearest scrollable ancestor of an element.
+ */
+function findScrollParent(el: HTMLElement): HTMLElement {
+  const overflowRegex = /(auto|scroll)/;
+  let parent = el.parentElement;
+  while (parent && parent !== document.documentElement) {
+    const { overflow, overflowY } = getComputedStyle(parent);
+    if (overflowRegex.test(overflow + overflowY)) return parent;
+    parent = parent.parentElement;
+  }
+  return document.documentElement as HTMLElement;
+}
 
-export const StickySection = forwardRef<HTMLDivElement, StickySectionProps>(function StickySection(
-  { children, className, stickTo = defaultProps.stickTo, style, ...rest },
+/**
+ * Recomputes z-indices for all sticky sections of a given direction within a scroll parent.
+ *
+ * For `top`:  later DOM elements (scrolled past most recently) get higher z-index — natural
+ *             paint order already achieves this, but we make it explicit for robustness.
+ * For `bottom`: earlier DOM elements (next upcoming section) must win, so they get higher
+ *               z-index. Without this the last DOM element would always paint on top, showing
+ *               the furthest-away section instead of the nearest one.
+ */
+function recomputeZIndices(attr: string, scrollParent: HTMLElement) {
+  const els = Array.from(
+    scrollParent.querySelectorAll<HTMLElement>(`[${attr}]`),
+  );
+  if (els.length === 0) return;
+
+  // Sort by natural page position (offsetTop ascending = DOM order for our use-cases)
+  els.sort((a, b) => a.offsetTop - b.offsetTop);
+  const n = els.length;
+
+  if (attr === DATA_ATTR_TOP) {
+    // Later element → higher z-index (first = 1, last = n)
+    els.forEach((el, i) => {
+      el.style.zIndex = String(i + 1);
+    });
+  } else {
+    // Earlier element → higher z-index (first = n, last = 1)
+    els.forEach((el, i) => {
+      el.style.zIndex = String(n - i);
+    });
+  }
+}
+
+export const StickySection = memo(forwardRef<HTMLDivElement, Props>(function StickySection(
+  { children, stickTo = defaultProps.stickTo, uid, style, className, classes, ...rest },
   ref,
 ) {
-  const innerRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, innerRef);
 
   useEffect(() => {
     const el = innerRef.current;
-    if (!el) {
-      return;
-    }
+    if (!el) return;
+
     const attr = stickTo === "top" ? DATA_ATTR_TOP : DATA_ATTR_BOTTOM;
     el.setAttribute(attr, "true");
+
     const scrollParent = findScrollParent(el);
-    const timer = window.setTimeout(() => recomputeZIndices(attr, scrollParent), 0);
+
+    // Defer so all sibling StickySection instances have had a chance to mount and
+    // register their data attributes first.
+    const timer = setTimeout(() => recomputeZIndices(attr, scrollParent), 0);
+
     return () => {
-      window.clearTimeout(timer);
+      clearTimeout(timer);
       el.removeAttribute(attr);
       el.style.zIndex = "";
+      // Re-balance remaining siblings after this one unmounts
       recomputeZIndices(attr, scrollParent);
     };
   }, [stickTo]);
@@ -38,51 +97,17 @@ export const StickySection = forwardRef<HTMLDivElement, StickySectionProps>(func
   return (
     <div
       {...rest}
-      ref={(node) => {
-        innerRef.current = node;
-        if (typeof ref === "function") {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      }}
-      className={cx(
+      ref={composedRef}
+      data-uid={uid}
+      className={classnames(
         styles.stickySection,
         stickTo === "top" ? styles.stickToTop : styles.stickToBottom,
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
-      style={style as CSSProperties}
+      style={style}
     >
       {children}
     </div>
   );
-});
-
-function findScrollParent(el: HTMLElement): HTMLElement {
-  const overflowRegex = /(auto|scroll)/;
-  let parent = el.parentElement;
-  while (parent && parent !== document.documentElement) {
-    const { overflow, overflowY } = getComputedStyle(parent);
-    if (overflowRegex.test(`${overflow}${overflowY}`)) {
-      return parent;
-    }
-    parent = parent.parentElement;
-  }
-  return document.documentElement;
-}
-
-function recomputeZIndices(attr: string, scrollParent: HTMLElement) {
-  const els = Array.from(scrollParent.querySelectorAll<HTMLElement>(`[${attr}]`));
-  if (els.length === 0) {
-    return;
-  }
-  els.sort((a, b) => a.offsetTop - b.offsetTop);
-  const count = els.length;
-  els.forEach((el, index) => {
-    el.style.zIndex = attr === DATA_ATTR_TOP ? String(index + 1) : String(count - index);
-  });
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

@@ -1,19 +1,19 @@
 <App scrollWholePage="false">
-  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
-    <property name="headerTemplate">
-      <HStack 
-        padding="$space-2" 
-        backgroundColor="$color-surface-200" 
-        borderBottom="1px solid $color-border-default"
-      >
-        <H4 value="Sticky Header" />
-      </HStack>
-    </property>
-    <Items
-      id="myList"
-      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
-    >
-      <Text value="{$item}" padding="$space-2" />
+  <ScrollViewer backgroundColor="lightyellow" showScrollerFade="false">
+    <Items data="{[1,2,3,4,5]}">
+      <StickySection stickTo="bottom" backgroundColor="lightgreen">
+        <H2>Item #{$item}</H2>
+      </StickySection>
+      <Items data="{[1,2,3,4,5]}">
+        <Stack
+          height="30px"
+          backgroundColor="lightyellow"
+        >
+          <H4>
+            Nested #{$item}
+          </H4>
+        </Stack>
+      </Items>
     </Items>
   </ScrollViewer>
 </App>

@@ -178,37 +178,39 @@ export const pagesRuntimeRenderer = wrapRuntimeComponent({
     }, [adapter.scope.routing, fallbackPath, matched, snapshot.pathname]);
 
     const pageContent = matched ? (
-      <div
-        {...adapter.rootAttrs()}
-        className={classnames(adapter.className, styles.pageWrapper, "xmlui-page-root")}
-        data-xmlui-component="Page"
-        data-xmlui-page-url={matched.url}
-      >
-        {adapter.context.renderChildren(
-          matched.page.children,
-          createRuntimeScope({
-            store: adapter.scope.store,
-            parent: adapter.scope,
-            props: adapter.scope.props,
-            references: adapter.scope.references,
-            slots: adapter.scope.slots,
-            routing: adapter.scope.routing,
-            contextValues: {
-              $routeParams: matched.params ?? {},
-              $queryParams: snapshot.queryParams,
-              $queryString: snapshot.search,
-              $pathname: snapshot.pathname,
-            },
-            emitEvent: adapter.scope.emitEvent,
-          }),
-        )}
-      </div>
+      <TableOfContentsProvider preserveAppRouteHash>
+        <div
+          {...adapter.rootAttrs()}
+          className={classnames(adapter.className, styles.pageWrapper, "xmlui-page-root")}
+          data-xmlui-component="Page"
+          data-xmlui-page-url={matched.url}
+        >
+          {adapter.context.renderChildren(
+            matched.page.children,
+            createRuntimeScope({
+              store: adapter.scope.store,
+              parent: adapter.scope,
+              props: adapter.scope.props,
+              references: adapter.scope.references,
+              slots: adapter.scope.slots,
+              routing: adapter.scope.routing,
+              contextValues: {
+                $routeParams: matched.params ?? {},
+                $queryParams: snapshot.queryParams,
+                $queryString: snapshot.search,
+                $pathname: snapshot.pathname,
+              },
+              emitEvent: adapter.scope.emitEvent,
+            }),
+          )}
+        </div>
+      </TableOfContentsProvider>
     ) : null;
 
     const rootAttrs = adapter.rootAttrs();
     return (
       <div
-        className={classnames(adapter.className, rootAttrs.className)}
+        className={classnames(adapter.className, rootAttrs.className as string | undefined)}
         style={{ ...(rootAttrs.style as React.CSSProperties | undefined), display: "contents" }}
       >
         {pageContent}
@@ -222,12 +224,14 @@ export const pageRuntimeRenderer = wrapRuntimeComponent({
   name: PAGE,
   metadata: PageMd as ComponentMetadata,
   renderer: ({ adapter }) => (
-    <div
-      {...adapter.rootAttrs()}
-      className={classnames(adapter.className, styles.pageWrapper, "xmlui-page-root")}
-    >
-      {adapter.renderChildren()}
-    </div>
+    <TableOfContentsProvider>
+      <div
+        {...adapter.rootAttrs()}
+        className={classnames(adapter.className, styles.pageWrapper, "xmlui-page-root")}
+      >
+        {adapter.renderChildren()}
+      </div>
+    </TableOfContentsProvider>
   ),
 });
 

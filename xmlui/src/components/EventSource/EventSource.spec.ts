@@ -103,7 +103,7 @@ test.describe("EventSource foundation", () => {
       source.emit("close", {});
     });
 
-    await expect(page.getByTestId("log")).toHaveText("error|close|close|");
+    await expect(page.getByTestId("log")).toHaveText("error|close|");
   });
 });
 

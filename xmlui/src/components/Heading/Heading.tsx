@@ -667,6 +667,10 @@ function runtimeArbitraryAttrs(
     "tooltip",
     "tooltipMarkdown",
     "tooltipOptions",
+    "withLiveRegion",
+    "liveRegion",
+    "liveRegionMessage",
+    "liveRegionPoliteness",
   ]);
 
   return Object.fromEntries(

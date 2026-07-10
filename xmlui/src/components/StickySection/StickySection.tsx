@@ -1,33 +1,61 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./StickySection.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { StickySection } from "./StickySectionReact";
 import { defaultProps } from "./StickySection.defaults";
+import { createMetadata } from "../metadata-helpers";
+import type { CSSProperties } from "react";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "StickySection";
-const stickySectionStylesSource = `
-  createThemeVar("zIndex-StickySection");
-`;
 
 export const StickySectionMd = createMetadata({
   status: "stable",
   description:
-    "`StickySection` is a container that keeps itself visible at the edge of the scrollable area while the user scrolls.",
+    "`StickySection` is a container that keeps itself visible at the edge of the " +
+    "scrollable area while the user scrolls. When multiple `StickySection` components " +
+    "share the same `stickTo` direction and would all have scrolled out of view, only " +
+    "the last one (the one closest to the current scroll position) remains visible — " +
+    "earlier ones are hidden beneath it. This makes `StickySection` ideal for " +
+    "implementing scrollable content with persistent section headers or footers.",
   props: {
     stickTo: {
       description:
-        "Determines the edge of the visible area the section sticks to while scrolling.",
+        "Determines the edge of the visible area the section sticks to while scrolling. " +
+        "Use `\"top\"` to keep the section anchored to the top of the scrollable area and " +
+        "`\"bottom\"` to keep it anchored to the bottom.",
       availableValues: ["top", "bottom"],
       isStrictEnum: true,
       valueType: "string",
       defaultValue: defaultProps.stickTo,
     },
-    testId: {
-      description: "Adds a test identifier to the StickySection root.",
-      valueType: "string",
-    },
   },
-  themeVars: extractScssThemeVars(stickySectionStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`zIndex-${COMP}`]: "1",
   },
 });
 
+export const stickySectionComponentRenderer = wrapComponent(COMP, StickySection, StickySectionMd, {
+  passUid: true,
+});
+
+export const stickySectionRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: StickySectionMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const stickTo = adapter.stringProp("stickTo", defaultProps.stickTo);
+    return (
+      <StickySection
+        {...rootAttrs}
+        style={rootAttrs.style as CSSProperties}
+        stickTo={stickTo === "bottom" ? "bottom" : "top"}
+      >
+        {adapter.renderChildren()}
+      </StickySection>
+    );
+  },
+});

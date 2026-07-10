@@ -28,7 +28,7 @@ import {
   menuSeparatorRuntimeRenderer as menuSeparatorRenderer,
   subMenuItemRuntimeRenderer as subMenuItemRenderer,
 } from "../components/DropdownMenu/DropdownMenu";
-import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
+import { eventSourceRenderer } from "../components/EventSource/EventSource";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
@@ -60,10 +60,10 @@ import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
 import { i18nRenderer } from "../components/I18n/I18n";
 import { itemsRenderer } from "../components/Items/Items";
-import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
+import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle";
 import { linkRenderer } from "../components/Link/Link";
 import { listRenderer } from "../components/List/List";
-import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
+import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion";
 import { logoRenderer } from "../components/Logo/Logo";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
@@ -88,7 +88,7 @@ import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
 import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
-import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
 import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
 import { selectRenderer } from "../components/Select/Select";
@@ -110,10 +110,11 @@ import {
   stackRenderer,
   vStackRenderer,
 } from "../components/Stack/Stack";
-import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
-import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
+import { stepRenderer } from "../components/Stepper/Step";
+import { stepperRenderer } from "../components/Stepper/Stepper";
+import { stepperFormRenderer } from "../components/StepperForm/StepperForm";
 import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
-import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
+import { stickySectionRenderer } from "../components/StickySection/StickySection";
 import { switchRenderer } from "../components/Switch/Switch";
 import { tabsRenderer } from "../components/Tabs/Tabs";
 import { tabItemRenderer } from "../components/Tabs/TabItem";
@@ -133,7 +134,7 @@ import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
-import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
+import { webSocketRenderer } from "../components/WebSocket/WebSocket";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 

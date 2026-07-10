@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
-import hotToast, { Toaster } from "react-hot-toast";
+import hotToast from "react-hot-toast";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
@@ -13,13 +13,15 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
 import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
-import { createToastService, ToastHost, type ToastService } from "./services/toast";
+import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
 import { LegacyThemeProvider, useThemes } from "../components-core/theming/ThemeContext";
 import { ThemedButton as Button } from "../components/Button/Button";
 import { Dialog } from "../components/ModalDialog/Dialog";
 import { ThemedStack as Stack } from "../components/Stack/Stack";
+import { NotificationToast } from "../components/Theme/NotificationToast";
+import { defaultProps as themeDefaultProps } from "../components/Theme/Theme.defaults";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
@@ -170,6 +172,14 @@ export function XmluiRoot({
   if (!toastRef.current) {
     toastRef.current = createToastService();
   }
+  useEffect(() => {
+    hotToast.dismiss();
+    hotToast.remove();
+    return () => {
+      hotToast.dismiss();
+      hotToast.remove();
+    };
+  }, []);
   const i18nRef = useRef<RuntimeI18n>();
   if (!i18nRef.current) {
     i18nRef.current = createRuntimeI18n();
@@ -263,8 +273,10 @@ export function XmluiRoot({
                 setConfirmDialog(undefined);
               })}
               <GlobalLiveRegion />
-              <ToastHost service={toastRef.current} />
-              <Toaster position="top-right" />
+              <NotificationToast
+                toastDuration={themeDefaultProps.toastDuration}
+                notificationPosition={themeDefaultProps.notificationPosition}
+              />
             </LegacyThemeProvider>
           </XmluiThemeRoot>
         </IconProvider>

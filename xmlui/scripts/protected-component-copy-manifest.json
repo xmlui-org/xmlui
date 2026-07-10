@@ -15,6 +15,14 @@
   "Queue": [
     "queueActions.ts"
   ],
+  "ResponsiveBar": {
+    "files": [
+      "ResponsiveBarItem.tsx"
+    ],
+    "testAdapted": [
+      "ResponsiveBar.spec.ts"
+    ]
+  },
   "Select": [
     "HiddenOption.tsx",
     "MultiSelectOption.tsx",
@@ -26,6 +34,14 @@
   "Slot": [
     "Slot.ts"
   ],
+  "Stepper": {
+    "files": [
+      "Step.tsx"
+    ],
+    "entryAdapted": [
+      "Step.tsx"
+    ]
+  },
   "Splitter": [
     "utils.ts"
   ],

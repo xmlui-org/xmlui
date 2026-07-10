@@ -258,6 +258,7 @@ export const liveRegionBehavior: Behavior = {
     condition: { type: "visual" },
   },
   canAttach: (context) =>
+    context.componentName !== "Text" &&
     canBehaviorAttachToComponent(liveRegionBehavior.metadata, context.metadata, context.componentName) &&
     (isTruthyWhenValue(context.props.withLiveRegion) || context.props.liveRegion !== undefined),
   attach: (context, node) => (
@@ -270,7 +271,7 @@ export const liveRegionBehavior: Behavior = {
         aria-atomic="true"
         style={hiddenLiveRegionStyle}
       >
-        {liveRegionMessage(context)}
+        {liveRegionMessage(context, node)}
       </span>
     </>
   ),
@@ -491,10 +492,16 @@ function liveRegionPoliteness(props: Record<string, unknown>): "polite" | "asser
   return explicit === "assertive" ? "assertive" : "polite";
 }
 
-function liveRegionMessage(context: BehaviorAttachContext): string {
+function liveRegionMessage(context: BehaviorAttachContext, node: ReactNode): string {
   const explicit = stringValue(context.props.liveRegionMessage);
   if (explicit !== undefined) {
     return explicit;
+  }
+  if (context.componentName === "ProgressBar") {
+    const value = numberValue(context.props.value);
+    if (value !== undefined) {
+      return `${Math.round(value * 100)}%`;
+    }
   }
   for (const name of ["value", "label", "message", "title"]) {
     const value = stringValue(context.props[name]);
@@ -502,5 +509,38 @@ function liveRegionMessage(context: BehaviorAttachContext): string {
       return value;
     }
   }
+  const childText = textFromReactNode(node);
+  if (childText !== undefined) {
+    return childText;
+  }
   return "";
+}
+
+function textFromReactNode(node: ReactNode): string | undefined {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (!isValidElement(node)) {
+    return undefined;
+  }
+  const children = (node.props as { children?: ReactNode }).children;
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+  if (Array.isArray(children)) {
+    const text = children.map(textFromReactNode).filter((value): value is string => value !== undefined).join("");
+    return text === "" ? undefined : text;
+  }
+  return textFromReactNode(children);
+}
+
+function numberValue(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
 }
