@@ -1,0 +1,122 @@
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { TabItemComponent } from "./TabItemReact";
+import { createMetadata, dComponent, dLabel } from "../metadata-helpers";
+import { MemoizedItem } from "../container-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { nonPropertyChildren, templateChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { renderTabsTemplate } from "./Tabs";
+
+const COMP = "TabItem";
+
+export const TabItemMd = createMetadata({
+  status: "stable",
+  description:
+    "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, " +
+    "providing both the tab header label and the content that displays when the tab " +
+    "is selected. As a non-visual structural component, it serves as a container that " +
+    "organizes content into distinct, switchable sections.",
+  docFolder: "Tabs",
+  props: {
+    label: dLabel(),
+    headerTemplate: dComponent("This property allows the customization of the TabItem header."),
+  },
+  events: {
+    activated: {
+      description: "This event is triggered when the tab is activated.",
+      signature: "activated(): void",
+      parameters: {},
+    },
+  },
+  contextVars: {
+    $header: {
+      description:
+        "This context value represents the header context with props: id (optional), index, label, isActive.",
+    },
+  },
+});
+
+type ThemedTabItemProps = React.ComponentPropsWithoutRef<typeof TabItemComponent>;
+
+export const ThemedTabItem = React.forwardRef<
+  React.ElementRef<typeof TabItemComponent>,
+  ThemedTabItemProps
+>(function ThemedTabItem({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(TabItemMd);
+  return (
+    <TabItemComponent
+      {...props}
+      className={`${themeClass}${className ? ` ${className}` : ""}`}
+      ref={ref}
+    />
+  );
+});
+
+export const tabItemComponentRenderer = wrapComponent(COMP, TabItemComponent, TabItemMd, {
+  exclude: ["label", "headerTemplate"],
+  events: [],
+  customRender(_props, { node, renderChild, extractValue, lookupEventHandler, classes }) {
+    return (
+      <TabItemComponent
+        classes={classes}
+        id={extractValue(node.uid)}
+        label={extractValue(node.props.label)}
+        activated={lookupEventHandler("activated")}
+        headerRenderer={
+          node.props.headerTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.headerTemplate}
+                    contextVars={{
+                      $header: {
+                        id: item.id,
+                        index: item.index,
+                        label: item.label,
+                        isActive: item.isActive,
+                      },
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
+      >
+        {renderChild(node.children)}
+      </TabItemComponent>
+    );
+  },
+});
+
+export const tabItemRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: TabItemMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const headerTemplate = templateChildren(adapter.node, "headerTemplate");
+    return (
+      <TabItemComponent
+        {...rootAttrs}
+        id={adapter.stringProp("id")}
+        label={adapter.stringProp("label", "") ?? ""}
+        activated={() => { void adapter.event("activated")(); }}
+        headerRenderer={
+          headerTemplate?.length
+            ? (item) => renderTabsTemplate(adapter, headerTemplate, {
+                $header: {
+                  id: item.id,
+                  index: item.index,
+                  label: item.label,
+                  isActive: item.isActive,
+                },
+              })
+            : undefined
+        }
+      >
+        {adapter.renderChildren(nonPropertyChildren(adapter.node.children))}
+      </TabItemComponent>
+    );
+  },
+});

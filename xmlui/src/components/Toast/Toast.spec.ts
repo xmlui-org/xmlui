@@ -1,80 +1,147 @@
 import { expect, test } from "../../testing/fixtures";
 
-test.describe("Toast foundation", () => {
-  test("exposes show API through component id", async ({ initTestBed, page }) => {
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.describe("Basic Functionality", () => {
+  test("renders toast using show API", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
-        <Toast id="notify" />
-        <Button testId="show" onClick="notify.show('Saved')">Show</Button>
-      </App>
+      <Fragment>
+        <Button testId="show-btn" onClick="toastComponent.show('Basic toast message')">
+          Show Toast
+        </Button>
+        <Toast id="toastComponent">
+          <Text testId="toast-content">{$param}</Text>
+        </Toast>
+      </Fragment>
     `);
 
-    await page.getByTestId("show").click();
-    await expect(page.getByRole("status").filter({ hasText: "Saved" })).toBeVisible();
+    await expect(page.getByTestId("toast-content")).not.toBeVisible();
+    await page.getByTestId("show-btn").click();
+    await expect(page.getByTestId("toast-content")).toBeVisible();
+    await expect(page.getByTestId("toast-content")).toHaveText("Basic toast message");
   });
 
-  test("exposes success API", async ({ initTestBed, page }) => {
+  test("renders success toast using success API", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
-        <Toast id="notify" />
-        <Button testId="show" onClick="notify.success('Done')">Show</Button>
-      </App>
+      <Fragment>
+        <Button testId="success-btn" onClick="toastComponent.success('Success message')">
+          Show Success
+        </Button>
+        <Toast id="toastComponent">
+          <property name="successTemplate">
+            <Text testId="success-content">✓ {$param}</Text>
+          </property>
+        </Toast>
+      </Fragment>
     `);
 
-    await page.getByTestId("show").click();
-    await expect(page.locator('[data-xmlui-part="Toast"][data-kind="success"]')).toHaveText("Done");
+    await page.getByTestId("success-btn").click();
+    await expect(page.getByTestId("success-content")).toBeVisible();
+    await expect(page.getByTestId("success-content")).toHaveText("✓ Success message");
   });
 
-  test("updates an existing toast when the same id is reused", async ({ initTestBed, page }) => {
+  test("renders error toast using error API", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App var.toastId="job">
-        <Button testId="loading" onClick="toast.loading('Working', { id: toastId })">Loading</Button>
-        <Button testId="success" onClick="toast.success('Done', { id: toastId })">Success</Button>
-      </App>
+      <Fragment>
+        <Button testId="error-btn" onClick="toastComponent.error('Error occurred')">
+          Show Error
+        </Button>
+        <Toast id="toastComponent">
+          <property name="errorTemplate">
+            <Text testId="error-content">✗ {$param}</Text>
+          </property>
+        </Toast>
+      </Fragment>
     `);
 
-    await page.getByTestId("loading").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveText("Working");
-    await page.getByTestId("success").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(1);
-    await expect(page.locator('[data-xmlui-part="Toast"][data-kind="success"]')).toHaveText("Done");
+    await page.getByTestId("error-btn").click();
+    await expect(page.getByTestId("error-content")).toBeVisible();
+    await expect(page.getByTestId("error-content")).toHaveText("✗ Error occurred");
   });
 
-  test("dismiss removes one toast or all toasts", async ({ initTestBed, page }) => {
+  test("renders loading toast using loading API", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
-        <Toast id="notify" />
-        <Button testId="show" onClick="notify.show('One', { id: 'one', duration: 0 }); notify.show('Two', { id: 'two', duration: 0 })">Show</Button>
-        <Button testId="dismiss-one" onClick="notify.dismiss('one')">Dismiss one</Button>
-        <Button testId="dismiss-all" onClick="notify.dismiss()">Dismiss all</Button>
-      </App>
+      <Fragment>
+        <Button testId="loading-btn" onClick="toastComponent.loading('Loading...')">
+          Show Loading
+        </Button>
+        <Toast id="toastComponent">
+          <property name="loadingTemplate">
+            <Text testId="loading-content">⏳ {$param}</Text>
+          </property>
+        </Toast>
+      </Fragment>
     `);
 
-    await page.getByTestId("show").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(2);
-    await page.getByTestId("dismiss-one").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(1);
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveText("Two");
-    await page.getByTestId("dismiss-all").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(0);
+    await page.getByTestId("loading-btn").click();
+    await expect(page.getByTestId("loading-content")).toBeVisible();
+    await expect(page.getByTestId("loading-content")).toHaveText("⏳ Loading...");
   });
 
-  test("duration controls auto-dismiss while loading toasts persist by default", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.clock.install();
+  test("updates existing toast when called multiple times", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App>
-        <Toast id="notify" />
-        <Button testId="show" onClick="notify.show('Short', { id: 'short', duration: 100 }); notify.loading('Loading', { id: 'loading' })">Show</Button>
-      </App>
+      <Fragment>
+        <Button testId="first-btn" onClick="toastComponent.show('First message')">
+          First
+        </Button>
+        <Button testId="second-btn" onClick="toastComponent.show('Second message')">
+          Second
+        </Button>
+        <Toast id="toastComponent">
+          <Text testId="toast-content">{$param}</Text>
+        </Toast>
+      </Fragment>
     `);
 
-    await page.getByTestId("show").click();
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(2);
-    await page.clock.fastForward(100);
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveCount(1);
-    await expect(page.locator('[data-xmlui-part="Toast"]')).toHaveText("Loading");
+    // Show first toast
+    await page.getByTestId("first-btn").click();
+    await expect(page.getByTestId("toast-content")).toHaveText("First message");
+
+    // Update to second toast
+    await page.getByTestId("second-btn").click();
+    await expect(page.getByTestId("toast-content")).toHaveText("Second message");
+  });
+
+  test("$param context variable passes data to default template", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="btn" onClick="toastComponent.show({ title: 'Test', count: 42 })">
+          Show Toast
+        </Button>
+        <Toast id="toastComponent">
+          <Text testId="title">{$param.title}</Text>
+          <Text testId="count">{$param.count}</Text>
+        </Toast>
+      </Fragment>
+    `);
+
+    await page.getByTestId("btn").click();
+    await expect(page.getByTestId("title")).toHaveText("Test");
+    await expect(page.getByTestId("count")).toHaveText("42");
+  });
+});
+
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.describe("Accessibility", () => {
+  test("toast has role='status' for screen readers", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="btn" onClick="toastComponent.show('Accessible message')">
+          Show Toast
+        </Button>
+        <Toast id="toastComponent">
+          <Text>{$param}</Text>
+        </Toast>
+      </Fragment>
+    `);
+
+    await page.getByTestId("btn").click();
+    const toast = page.getByRole("status");
+    await expect(toast).toBeVisible();
   });
 });

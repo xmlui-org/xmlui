@@ -1,24 +1,6 @@
 import { getBounds } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-const TABS_OLD_SUITE_PENDING =
-  "The literal old Tabs suite is copied for compatibility tracking, but full Radix-level keyboard behavior, header templates with $header context, accordion view parity, form keepMounted defaults, theme variable coverage, and API parity are not complete yet. Re-enable cases feature-by-feature.";
-
-const ACTIVE_TABS_TESTS = new Set([
-  "component renders",
-  "renders tab labels correctly",
-  "shows first tab content by default",
-  "switches tabs when clicked",
-  "activeTab prop sets initial active tab",
-  "orientation prop changes tab layout",
-]);
-
-test.beforeEach(({}, testInfo) => {
-  if (!ACTIVE_TABS_TESTS.has(testInfo.title)) {
-    test.skip(true, TABS_OLD_SUITE_PENDING);
-  }
-});
-
 // =============================================================================
 // SMOKE TESTS
 // =============================================================================

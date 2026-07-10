@@ -1,106 +1,165 @@
-import { memo, useEffect, useState, type CSSProperties } from "react";
+import React, {
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Link } from "react-router-dom";
+import scrollIntoView from "./scrollIntoViewIfNeeded";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import classnames from "classnames";
 
-import { defaultProps } from "./TableOfContents.defaults";
 import styles from "./TableOfContents.module.scss";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
+import { useTableOfContents } from "../../components-core/TableOfContentsContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIndicatorPosition } from "./useIndicatorPosition";
 
-export type TocHeading = {
-  id: string;
-  text: string;
-  level: number;
-};
+// Scroll options for smooth/auto scrolling behavior
+const SCROLL_OPTIONS = {
+  block: "center" as const,
+  inline: "center" as const,
+  scrollMode: "always" as const,
+} as const;
 
-export type TableOfContentsProps = {
+type Props = Omit<React.HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
   omitH1?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  "data-testid"?: string;
+  onContextMenu?: any;
+  scrollStyle?: ScrollStyle;
+  showScrollerFade?: boolean;
 };
 
-export const TableOfContentsNative = memo(function TableOfContentsNative({
-  smoothScrolling = defaultProps.smoothScrolling,
-  maxHeadingLevel = defaultProps.maxHeadingLevel,
-  omitH1 = defaultProps.omitH1,
-  className,
-  style,
-  "data-testid": dataTestId,
-  ...rest
-}: TableOfContentsProps) {
-  const [headings, setHeadings] = useState<TocHeading[]>([]);
-  const [activeId, setActiveId] = useState<string | undefined>(undefined);
+import { defaultProps } from "./TableOfContents.defaults";
+
+export const TableOfContents = memo(forwardRef(function TableOfContents(
+  {
+    style,
+    smoothScrolling = defaultProps.smoothScrolling,
+    maxHeadingLevel = defaultProps.maxHeadingLevel,
+    omitH1 = defaultProps.omitH1,
+    className,
+    onContextMenu,
+    scrollStyle = defaultProps.scrollStyle,
+    showScrollerFade = defaultProps.showScrollerFade,
+    ...rest
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const {
+    headings,
+    scrollToAnchor,
+    subscribeToActiveAnchorChange,
+    activeAnchorId: initialActiveAnchorId,
+  } = useTableOfContents();
+  const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
+
+  const ref = useComposedRefs(wrapperRef, forwardedRef);
+
+  const filteredHeadings = useMemo(
+    () =>
+      headings.filter(
+        (heading) =>
+          heading.level <= maxHeadingLevel && (!omitH1 || heading.level !== 1),
+      ),
+    [headings, maxHeadingLevel, omitH1],
+  );
+
+  // If we navigate to a page where the previous active heading no longer
+  // exists, reset the active state so the indicator and aria attributes
+  // don't refer to a non-existent item.
   useEffect(() => {
-    const nodes = Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,h6,[data-anchor='true'][data-bookmark-title],[data-anchor='true'][data-bookmark-level]"));
-    setHeadings(nodes.flatMap((node, index) => {
-      if (node instanceof HTMLElement && node.dataset.bookmarkOmitFromToc === "true") {
-        return [];
+    if (!activeAnchorId) return;
+    const stillExists = filteredHeadings.some((h) => h.id === activeAnchorId);
+    if (!stillExists) {
+      setActiveId(null);
+    }
+  }, [activeAnchorId, filteredHeadings]);
+
+  useIsomorphicLayoutEffect(() => {
+    return subscribeToActiveAnchorChange((id) => {
+      const foundHeading = filteredHeadings.find((heading) => heading.id === id);
+      if (foundHeading) {
+        setActiveId(id);
       }
-      const level = Number(node.tagName.slice(1));
-      const bookmarkLevel = node instanceof HTMLElement && node.dataset.bookmarkLevel
-        ? Number(node.dataset.bookmarkLevel)
-        : undefined;
-      const effectiveLevel = Number.isFinite(level) ? level : bookmarkLevel ?? 1;
-      const isHeading = /^H[1-6]$/.test(node.tagName);
-      const isBookmark = !isHeading;
-      const omitFromToc = node instanceof HTMLElement && node.dataset.xmluiOmitFromToc === "true";
-      if (omitFromToc) {
-        return [];
+    });
+  }, [filteredHeadings, subscribeToActiveAnchorChange]);
+
+  const handleLinkClick = useCallback(
+    (anchorId: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      const shouldAllowDefault = event.ctrlKey || event.metaKey;
+
+      if (!shouldAllowDefault) {
+        event.preventDefault();
+        setActiveId(anchorId);
+        scrollToAnchor(anchorId, smoothScrolling);
       }
-      if (effectiveLevel > maxHeadingLevel || (omitH1 && effectiveLevel === 1)) {
-        return [];
-      }
-      if (isBookmark && !node.id) {
-        return [];
-      }
-      if (!node.id) {
-        node.id = isHeading ? `xmlui-heading-${index}` : `xmlui-bookmark-${index}`;
-      }
-      const title = node instanceof HTMLElement ? node.dataset.bookmarkTitle : undefined;
-      const text = title || node.textContent?.trim() || node.id;
-      return [{
-        id: node.id,
-        text,
-        level: effectiveLevel,
-      }];
-    }));
-  }, [maxHeadingLevel, omitH1]);
+    },
+    [scrollToAnchor, smoothScrolling],
+  );
+
+  useEffect(() => {
+    if (!activeAnchorId || !wrapperRef.current) return;
+
+    const activeAnchor = wrapperRef.current.querySelector(
+      `[id="${CSS.escape(activeAnchorId)}"]`,
+    );
+    if (!activeAnchor) return;
+
+    scrollIntoView(activeAnchor, {
+      ...SCROLL_OPTIONS,
+      behavior: smoothScrolling ? "smooth" : "auto",
+      boundary: wrapperRef.current,
+    });
+  }, [activeAnchorId, smoothScrolling]);
+
+  useIndicatorPosition(activeAnchorId, wrapperRef, indicatorRef, styles.active);
 
   return (
-    <nav {...rest} className={[styles.root, className].filter(Boolean).join(" ")} style={style} data-testid={dataTestId}>
-      {headings.map((heading, index) => (
-        <div
-          key={`${heading.id}-${index}`}
-          className={[styles.itemWrapper, activeId === heading.id ? styles.active : ""].filter(Boolean).join(" ")}
-          style={activeId === heading.id ? { backgroundColor: "var(--xmlui-backgroundColor-TableOfContentsItem--active, rgb(150, 150, 255))" } : undefined}
-        >
-          <a
-            className={[styles.item, levelClass(heading.level)].filter(Boolean).join(" ")}
-            href={`#${heading.id}`}
-            aria-current={activeId === heading.id ? "page" : undefined}
-            onClick={(event) => {
-              setActiveId(heading.id);
-              if (!smoothScrolling) {
-                return;
-              }
-              event.preventDefault();
-              document.getElementById(heading.id)?.scrollIntoView({ behavior: "smooth" });
-              window.history.replaceState(null, "", `#${heading.id}`);
-            }}
-          >
-            {heading.text}
-          </a>
-        </div>
-      ))}
+    <nav
+      {...rest}
+      aria-label="Table of Contents"
+      className={classnames(styles.wrapper, className)}
+      ref={ref}
+      style={style}
+      onContextMenu={onContextMenu}
+    >
+      <div className={styles.indicator} ref={indicatorRef} />
+      <Scroller
+        className={styles.wrapperInner}
+        style={style}
+        scrollStyle={scrollStyle}
+        showScrollerFade={showScrollerFade}
+      >
+        <ul className={styles.list}>
+          {filteredHeadings.map((value) => (
+            <li
+              key={value.id}
+              className={classnames(styles.listItem, {
+                [styles.active]: value.id === activeAnchorId,
+              })}
+            >
+              <Link
+                aria-current={value.id === activeAnchorId ? "page" : "false"}
+                className={styles.link}
+                data-level={value.level}
+                to={`#${value.id}`}
+                onClick={handleLinkClick(value.id)}
+                id={value.id}
+              >
+                {value.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Scroller>
     </nav>
   );
-});
-
-function levelClass(level: number): string | undefined {
-  if (level === 1) return styles.level1;
-  if (level === 2) return styles.level2;
-  if (level === 3) return styles.level3;
-  if (level === 4) return styles.level4;
-  if (level === 5) return styles.level5;
-  if (level === 6) return styles.level6;
-  return undefined;
-}
+}));

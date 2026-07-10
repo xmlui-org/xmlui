@@ -28,7 +28,9 @@ if (!existsSync(originalDir)) {
   process.exit(2);
 }
 
-const files = await protectedFiles(originalDir, componentName, manifest[componentName]);
+const manifestEntry = manifest[componentName];
+const files = await protectedFiles(originalDir, componentName, manifestEntry);
+const entryAdaptedFiles = entryAdaptedManifestFiles(manifestEntry);
 let failed = false;
 
 for (const file of files) {
@@ -45,7 +47,7 @@ for (const file of files) {
     console.log(`${file}: identical`);
     continue;
   }
-  if (file === `${componentName}.tsx` || file === `${componentName}.ts`) {
+  if (file === `${componentName}.tsx` || file === `${componentName}.ts` || entryAdaptedFiles.has(file)) {
     const normalizedOriginalEntry = normalizeEntryFile(original);
     const normalizedRewriteEntry = normalizeEntryFile(rewrite);
     if (
@@ -80,6 +82,13 @@ async function protectedFiles(componentDir, component, manifestEntry) {
       ? manifestEntry.files
       : [];
   return Array.from(new Set([...fileNames, ...extra])).sort();
+}
+
+function entryAdaptedManifestFiles(manifestEntry) {
+  const files = Array.isArray(manifestEntry?.entryAdapted)
+    ? manifestEntry.entryAdapted
+    : [];
+  return new Set(files);
 }
 
 function isProtectedFile(name, component) {

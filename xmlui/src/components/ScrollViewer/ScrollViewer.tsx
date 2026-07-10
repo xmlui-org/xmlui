@@ -211,12 +211,17 @@ export const scrollViewerRenderer = wrapRuntimeComponent({
     const { style: _style, ...rootProps } = rootAttrs;
     const hasHeaderTemplate = hasTemplate(adapter.node.children, "headerTemplate");
     const hasFooterTemplate = hasTemplate(adapter.node.children, "footerTemplate");
+    const hasHeaderOrFooter = hasHeaderTemplate || hasFooterTemplate;
+    const scrollStyle = adapter.stringProp("scrollStyle", defaultProps.scrollStyle) as ScrollStyle;
+    const scrollViewerProps = scrollStyle === "normal"
+      ? rootProps
+      : { ...rootProps, containerClassName: adapter.className };
     return (
       <ScrollViewer
-        {...rootProps}
+        {...scrollViewerProps}
         ref={rootRef}
-        style={rootStyle}
-        scrollStyle={adapter.stringProp("scrollStyle", defaultProps.scrollStyle) as ScrollStyle}
+        style={hasHeaderOrFooter ? rootStyle : plainScrollerStyle(rootStyle)}
+        scrollStyle={scrollStyle}
         showScrollerFade={adapter.booleanProp("showScrollerFade", defaultProps.showScrollerFade)}
         header={hasHeaderTemplate ? adapter.renderTemplate("headerTemplate") : undefined}
         footer={hasFooterTemplate ? adapter.renderTemplate("footerTemplate") : undefined}
@@ -247,6 +252,16 @@ function visibleScrollViewerStyle(
     return style;
   }
   return { ...style, minHeight: 1 };
+}
+
+function plainScrollerStyle(
+  style: React.CSSProperties | undefined,
+): React.CSSProperties | undefined {
+  if (style?.width === undefined && style?.height === undefined) {
+    return style;
+  }
+  const { width: _width, height: _height, ...rest } = style;
+  return rest;
 }
 
 function applyImperativeRootAttrs(

@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
-import { RenderPropSticky } from "react-sticky-el";
+import { RenderPropSticky } from "../../compat/reactStickyEl";
 import styles from "./StickyBox.module.scss";
 import { useRealBackground, useScrollParent } from "../../components-core/utils/hooks";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";

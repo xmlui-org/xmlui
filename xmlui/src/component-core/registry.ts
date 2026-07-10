@@ -57,7 +57,8 @@ import {
   stackRenderer,
   vStackRenderer,
 } from "../components/Stack/Stack";
-import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
+import { tabsRenderer } from "../components/Tabs/Tabs";
+import { tabItemRenderer } from "../components/Tabs/TabItem";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
@@ -104,7 +105,7 @@ import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
-import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
+import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
@@ -123,7 +124,7 @@ import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
 import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
 import { skipLinkRenderer } from "../components/SkipLink/SkipLink";
-import { toastRenderer } from "../components/Toast/Toast.renderer";
+import { toastRenderer } from "../components/Toast/Toast";
 import { themeRenderer } from "../components/Theme/Theme";
 import { slotRenderer } from "../components/Slot/Slot";
 import { partRenderer } from "../components/Part/Part";
@@ -975,7 +976,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (skipLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
     } else if (toastTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.tsx`);
     } else if (themeTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.tsx`);
     } else if (slotTransferred) {

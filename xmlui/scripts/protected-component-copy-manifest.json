@@ -29,8 +29,20 @@
   "Splitter": [
     "utils.ts"
   ],
+  "Tabs": {
+    "files": [
+      "TabContext.tsx",
+      "TabItem.tsx"
+    ],
+    "entryAdapted": [
+      "TabItem.tsx"
+    ]
+  },
   "Theme": [
     "NotificationToast.tsx"
+  ],
+  "TimeInput": [
+    "utils.ts"
   ],
   "Table": [
     "react-table-config.d.ts",

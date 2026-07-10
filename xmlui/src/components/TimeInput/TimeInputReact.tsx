@@ -1,76 +1,102 @@
-import type { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent } from "react";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-
-import { defaultProps } from "./TimeInput.defaults";
+import { type CSSProperties } from "react";
+import { type ForwardedRef, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./TimeInput.module.scss";
-import { useFormContext } from "../Form/FormContext";
+import { PartialInput } from "../Input/PartialInput";
+import { InputDivider } from "../Input/InputDivider";
 
-export type TimeInputApi = {
-  focus: () => void;
-  setValue: (value: unknown) => void;
-  isoValue: () => string | null;
-  value: string | undefined;
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import { defaultProps } from "./TimeInput.defaults";
+import { Adornment } from "../Input/InputAdornment";
+import { ThemedIcon } from "../Icon/Icon";
+
+// Import utilities and types from merged utils file
+import {
+  getHours,
+  getMinutes,
+  getSeconds,
+  convert24to12,
+  getAmPmLabels,
+  safeMax,
+  safeMin,
+  type AmPmType,
+} from "./utils";
+import { Part } from "../Part/Part";
+
+// Component part names
+/* const PART_HOUR = "hour";
+const PART_MINUTE = "minute";
+const PART_SECOND = "second";
+const PART_AMPM = "ampm";
+const PART_CLEAR_BUTTON = "clearButton"; */
+
+// Browser compatibility checks
+// Time format configuration flags
+export type TimeInputConfig = {
+  hour24: boolean;
+  seconds: boolean;
 };
 
-export type TimeInputProps = {
+type Props = {
   id?: string;
-  bindTo?: string;
-  value?: unknown;
-  initialValue?: unknown;
+  initialValue?: string;
+  value?: string;
   enabled?: boolean;
-  validationStatus?: string;
+  updateState?: UpdateStateFn;
+  style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
+  onDidChange?: (newValue: string | null) => void;
+  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
+  onInvalidChange?: () => void;
+  validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
+  registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
   seconds?: boolean;
-  minTime?: string | null;
-  maxTime?: string | null;
+  minTime?: string;
+  maxTime?: string;
   clearable?: boolean;
-  clearIcon?: string | null;
+  clearIcon?: string;
   clearToInitialValue?: boolean;
   required?: boolean;
-  startText?: unknown;
-  startIcon?: unknown;
-  endText?: unknown;
-  endIcon?: unknown;
+  startText?: string;
+  startIcon?: string;
+  endText?: string;
+  endIcon?: string;
   gap?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
-  label?: unknown;
-  labelWidth?: string;
-  labelPosition?: string;
-  className?: string;
-  style?: CSSProperties;
-  onDidChange?: (value: string | null) => void | Promise<void>;
-  onFocus?: () => void | Promise<void>;
-  onBlur?: () => void | Promise<void>;
-  onInvalidChange?: (value?: string) => void | Promise<void>;
-  "aria-label"?: string;
-  "data-testid"?: string;
+  ariaLabel?: string;
 };
 
-type FieldName = "hour" | "minute" | "second";
-type AmPm = "AM" | "PM";
-type TimeParts = {
-  hour: string;
-  minute: string;
-  second: string;
-  ampm: AmPm | null;
-};
-
-const emptyParts: TimeParts = { hour: "", minute: "", second: "", ampm: null };
-
-export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(function TimeInputNative(
+export const TimeInputNative = memo(forwardRef<HTMLDivElement, Props>(function TimeInput(
   {
     id,
-    bindTo,
-    value,
     initialValue,
+    value: controlledValue,
     enabled = defaultProps.enabled,
+    updateState,
+    style,
+    className,
+    classes,
+    onDidChange,
+    onFocus,
+    onBlur,
+    onInvalidChange,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages: _invalidMessages,
+    registerComponentApi,
     hour24 = defaultProps.hour24,
     seconds = defaultProps.seconds,
-    minTime: _minTime,
-    maxTime: _maxTime,
+    minTime,
+    maxTime,
     clearable = defaultProps.clearable,
     clearIcon,
     clearToInitialValue = defaultProps.clearToInitialValue,
@@ -83,494 +109,1161 @@ export const TimeInputNative = memo(forwardRef<TimeInputApi, TimeInputProps>(fun
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
-    label,
-    labelWidth,
-    labelPosition = "top",
-    className,
-    style,
-    onDidChange,
-    onFocus,
-    onBlur,
-    onInvalidChange,
-    "aria-label": ariaLabel,
-    "data-testid": dataTestId,
+    ariaLabel,
     ...rest
   },
-  ref,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const form = useFormContext();
-  const getFormValue = form?.getValue;
-  const setFormValue = form?.setValue;
-  const registerFormItem = form?.registerItem;
-  const fieldName = bindTo !== undefined ? resolveFieldName(bindTo, form?.fieldPrefix) : undefined;
-  const formValue = getFormValue && fieldName !== undefined ? getFormValue(fieldName) : undefined;
-  const effectiveValue = formValue ?? value;
-  const controlled = effectiveValue !== undefined;
-  const [parts, setParts] = useState<TimeParts>(() => parseTimeParts(controlled ? effectiveValue : initialValue, hour24, seconds));
-  const [invalidFields, setInvalidFields] = useState<Partial<Record<FieldName, boolean>>>({});
-  const [hasFocusInside, setHasFocusInside] = useState(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const inputRefs = {
-    hour: useRef<HTMLInputElement | null>(null),
-    minute: useRef<HTMLInputElement | null>(null),
-    second: useRef<HTMLInputElement | null>(null),
-  };
-  const ampmRef = useRef<HTMLButtonElement | null>(null);
+  const timeInputRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(timeInputRef, forwardedRef);
 
-  const orderedFields = useMemo<FieldName[]>(() => seconds ? ["hour", "minute", "second"] : ["hour", "minute"], [seconds]);
-  const interactive = enabled && !readOnly;
-  const currentValue = useMemo(() => formatTimeParts(parts, hour24, seconds), [hour24, parts, seconds]);
-  const placeholder = repeatChar(emptyCharacter, 2);
+  // Refs for auto-tabbing between inputs
+  const hourInputRef = useRef<HTMLInputElement>(null);
+  const minuteInputRef = useRef<HTMLInputElement>(null);
+  const secondInputRef = useRef<HTMLInputElement>(null);
+  const amPmButtonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (controlled) {
-      setParts(parseTimeParts(effectiveValue, hour24, seconds));
-      setInvalidFields({});
+  // Process emptyCharacter according to requirements
+  const processedEmptyCharacter = useMemo(() => {
+    if (!emptyCharacter || emptyCharacter.length === 0) {
+      return "-";
     }
-  }, [controlled, effectiveValue, hour24, seconds]);
-
-  useEffect(() => {
-    if (!controlled) {
-      setParts(parseTimeParts(initialValue, hour24, seconds));
-      setInvalidFields({});
+    if (emptyCharacter.length > 1) {
+      return emptyCharacter.charAt(0);
     }
-  }, [controlled, hour24, initialValue, seconds]);
+    return emptyCharacter;
+  }, [emptyCharacter]);
 
-  useEffect(() => {
-    if (autoFocus && enabled) {
-      const timeoutId = setTimeout(() => inputRefs.hour.current?.focus(), 0);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [autoFocus, enabled, inputRefs.hour]);
+  // Stabilize initialValue to prevent unnecessary re-renders
+  const stableInitialValue = useMemo(() => {
+    return initialValue;
+  }, [initialValue]);
 
-  useEffect(() => {
-    if (
-      !getFormValue ||
-      !setFormValue ||
-      fieldName === undefined ||
-      getFormValue(fieldName) != null ||
-      initialValue === undefined
-    ) {
-      return;
-    }
-    setFormValue(fieldName, formatTimeParts(parseTimeParts(initialValue, hour24, seconds), hour24, seconds));
-  }, [fieldName, getFormValue, hour24, initialValue, seconds, setFormValue]);
+  // Local state management - sync with value prop (like TextBox and NumberBox)
+  const [localValue, setLocalValue] = useState<string | null>(() => {
+    const initial = controlledValue || stableInitialValue || null;
+    return initial;
+  });
+
+  // Parse current value into individual components
+  const [amPm, setAmPm] = useState<AmPmType | null>(null);
+  const [hour, setHour] = useState<string | null>(null);
+  const [minute, setMinute] = useState<string | null>(null);
+  const [second, setSecond] = useState<string | null>(null);
+
+  // Track whether the component currently has focus
+  const [componentHasFocus, setComponentHasFocus] = useState(false);
+
+  // State to track invalid status for visual feedback
+  const [isHourCurrentlyInvalid, setIsHourCurrentlyInvalid] = useState(false);
+  const [isMinuteCurrentlyInvalid, setIsMinuteCurrentlyInvalid] = useState(false);
+  const [isSecondCurrentlyInvalid, setIsSecondCurrentlyInvalid] = useState(false);
 
   useEffect(() => {
-    if (!registerFormItem || fieldName === undefined) {
-      return;
+    // Initialize XMLUI state with initial value on first mount
+    if (updateState && stableInitialValue !== undefined && controlledValue === undefined) {
+      updateState({ value: stableInitialValue }, { initial: true });
+      return; // Don't sync on this first run, let the state update trigger a re-render
     }
-    return registerFormItem({
-      name: fieldName,
-      label: stringifyLabel(label),
-      required,
-    });
-  }, [fieldName, label, registerFormItem, required]);
 
-  const emitParts = useCallback((nextParts: TimeParts) => {
-    setParts(nextParts);
-    const nextValue = formatTimeParts(nextParts, hour24, seconds);
-    if (setFormValue && fieldName !== undefined) {
-      setFormValue(fieldName, nextValue);
-    }
-    void onDidChange?.(nextValue);
-  }, [fieldName, hour24, onDidChange, seconds, setFormValue]);
+    // Sync with controlled value - always sync when controlledValue changes
+    const newLocalValue = controlledValue || null;
+    setLocalValue(newLocalValue);
+  }, [controlledValue, stableInitialValue, updateState]);
 
-  const updateField = useCallback((field: FieldName, rawValue: string) => {
-    if (!interactive) {
-      return;
+  // Determine what components to show based on flags
+  const is12HourFormat = !hour24;
+  const showSeconds = seconds;
+  const showLeadingZeros = hour24; // Always show leading zeros in 24-hour format
+
+  // Parse value into individual components
+  useEffect(() => {
+    if (localValue) {
+      const {
+        amPm: parsedAmPm,
+        hour: hourStr,
+        minute: minuteStr,
+        second: secondStr,
+      } = parseTimeString(localValue, is12HourFormat);
+
+      setAmPm(parsedAmPm);
+      setHour(hourStr);
+      setMinute(minuteStr);
+      setSecond(secondStr);
+    } else {
+      setAmPm(null);
+      setHour(null);
+      setMinute(null);
+      setSecond(null);
     }
-    const cleanValue = rawValue.replace(/\D/g, "").slice(0, 2);
-    const nextParts = { ...parts, [field]: cleanValue };
-    const nextInvalid = computeInvalidFields(nextParts, hour24, seconds);
-    setInvalidFields(nextInvalid);
-    if (nextInvalid[field]) {
-      void onInvalidChange?.(cleanValue);
+  }, [localValue, is12HourFormat]);
+
+  // Event handlers
+  const handleChange = useEvent((newValue: string | null) => {
+    // Update local state immediately for immediate UI feedback
+    setLocalValue(newValue);
+
+    // Also update the XMLUI state
+    if (updateState) {
+      updateState({ value: newValue });
     }
-    emitParts(nextParts);
-    if (!nextInvalid[field] && cleanValue.length === 2) {
-      const nextField = orderedFields[orderedFields.indexOf(field) + 1];
-      setTimeout(() => {
-        if (nextField) {
-          inputRefs[nextField].current?.focus();
-          inputRefs[nextField].current?.select();
-        } else if (!hour24) {
-          ampmRef.current?.focus();
+    onDidChange?.(newValue);
+  });
+
+  // Helper function to format the complete time value
+  const formatTimeValue = useCallback(
+    (
+      h: string | null,
+      m: string | null,
+      s: string | null,
+      ap: AmPmType | null,
+      is12Hour: boolean,
+    ): string | null => {
+      if (!h || !m) {
+        return null;
+      }
+
+      let formattedTime = "";
+
+      if (is12Hour) {
+        // 12-hour format
+        const hour12 = h.padStart(2, "0");
+        const minute12 = m.padStart(2, "0");
+        formattedTime = `${hour12}:${minute12}`;
+
+        if (s && showSeconds) {
+          formattedTime += `:${s.padStart(2, "0")}`;
         }
-      }, 0);
-    }
-  }, [emitParts, hour24, inputRefs, interactive, onInvalidChange, orderedFields, parts, seconds]);
 
-  const normalizeField = useCallback((field: FieldName) => {
-    const normalized = normalizeFieldValue(field, parts[field], hour24);
-    const nextParts = { ...parts, [field]: normalized };
-    const nextInvalid = computeInvalidFields(nextParts, hour24, seconds);
-    setInvalidFields(nextInvalid);
-    if (nextInvalid[field]) {
-      void onInvalidChange?.(normalized);
-    }
-    emitParts(nextParts);
-  }, [emitParts, hour24, onInvalidChange, parts, seconds]);
+        if (ap) {
+          formattedTime += ` ${ap}`;
+        }
+      } else {
+        // 24-hour format
+        const hour24 = h.padStart(2, "0");
+        const minute24 = m.padStart(2, "0");
+        formattedTime = `${hour24}:${minute24}`;
 
-  const setValue = useCallback((nextValue: unknown) => {
-    const nextParts = parseTimeParts(nextValue, hour24, seconds);
-    setInvalidFields({});
-    emitParts(nextParts);
-  }, [emitParts, hour24, seconds]);
+        if (s && showSeconds) {
+          formattedTime += `:${s.padStart(2, "0")}`;
+        }
+      }
+
+      return formattedTime;
+    },
+    [showSeconds],
+  );
+
+  // Generic handlers for input change and blur
+  const createInputChangeHandler = useCallback(
+    (
+      field: "hour" | "minute" | "second",
+      setValue: (value: string) => void,
+      setInvalid: (invalid: boolean) => void,
+      validateFn: (value: string) => boolean,
+    ) =>
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = event.target.value;
+        setValue(newValue);
+        // Update invalid state immediately for visual feedback
+        const isInvalid = validateFn(newValue);
+        setInvalid(isInvalid);
+        // Fire invalidTime event if the value is invalid
+        if (isInvalid) {
+          onInvalidChange?.();
+        }
+        // Don't format/normalize during typing - only on blur
+      },
+    [onInvalidChange],
+  );
+
+  const createInputBlurHandler = useCallback(
+    (
+      field: "hour" | "minute" | "second",
+      setValue: (value: string) => void,
+      setInvalid: (invalid: boolean) => void,
+      normalizeFn: (value: string) => string | null,
+    ) =>
+      (event: React.FocusEvent<HTMLInputElement>) => {
+        const currentValue = event.target.value;
+        const normalizedValue = normalizeFn(currentValue);
+
+        // Check if the current value was invalid (needed normalization or couldn't be normalized)
+        const wasInvalid =
+          currentValue !== "" && (normalizedValue === null || normalizedValue !== currentValue);
+
+        if (normalizedValue !== null && normalizedValue !== currentValue) {
+          setValue(normalizedValue);
+          setInvalid(false); // Clear invalid state after normalization
+
+          // Always call handleChange to update the time value
+          const timeValues = { hour, minute, second };
+          timeValues[field] = normalizedValue;
+          const timeString = formatTimeValue(
+            timeValues.hour,
+            timeValues.minute,
+            timeValues.second,
+            amPm,
+            is12HourFormat,
+          );
+          handleChange(timeString);
+        } else if (normalizedValue === null && currentValue !== "") {
+          // Reset to previous valid value or clear
+          setValue("");
+          setInvalid(false); // Clear invalid state
+          // Always call handleChange to update the time value (likely to null)
+          const timeValues = { hour, minute, second };
+          timeValues[field] = "";
+          const timeString = formatTimeValue(
+            timeValues.hour,
+            timeValues.minute,
+            timeValues.second,
+            amPm,
+            is12HourFormat,
+          );
+          handleChange(timeString);
+        } else if (normalizedValue !== null) {
+          // Value didn't need normalization, but still update the complete time
+          const timeValues = { hour, minute, second };
+          timeValues[field] = normalizedValue;
+          const timeString = formatTimeValue(
+            timeValues.hour,
+            timeValues.minute,
+            timeValues.second,
+            amPm,
+            is12HourFormat,
+          );
+          handleChange(timeString);
+        }
+      },
+    [hour, minute, second, formatTimeValue, amPm, is12HourFormat, handleChange],
+  );
+
+  // Handle changes from individual inputs
+  const handleHourChange = useMemo(
+    () =>
+      createInputChangeHandler("hour", setHour, setIsHourCurrentlyInvalid, (value) =>
+        isHourInvalid(value, !is12HourFormat),
+      ),
+    [createInputChangeHandler, is12HourFormat],
+  );
+
+  const handleHourBlur = useMemo(
+    () =>
+      createInputBlurHandler("hour", setHour, setIsHourCurrentlyInvalid, (value) =>
+        normalizeHour(value, !is12HourFormat),
+      ),
+    [createInputBlurHandler, is12HourFormat],
+  );
+
+  const handleMinuteChange = useMemo(
+    () =>
+      createInputChangeHandler(
+        "minute",
+        setMinute,
+        setIsMinuteCurrentlyInvalid,
+        isMinuteOrSecondInvalid,
+      ),
+    [createInputChangeHandler],
+  );
+
+  const handleMinuteBlur = useMemo(
+    () =>
+      createInputBlurHandler(
+        "minute",
+        setMinute,
+        setIsMinuteCurrentlyInvalid,
+        normalizeMinuteOrSecond,
+      ),
+    [createInputBlurHandler],
+  );
+
+  const handleSecondChange = useMemo(
+    () =>
+      createInputChangeHandler(
+        "second",
+        setSecond,
+        setIsSecondCurrentlyInvalid,
+        isMinuteOrSecondInvalid,
+      ),
+    [createInputChangeHandler],
+  );
+
+  const handleSecondBlur = useMemo(
+    () =>
+      createInputBlurHandler(
+        "second",
+        setSecond,
+        setIsSecondCurrentlyInvalid,
+        normalizeMinuteOrSecond,
+      ),
+    [createInputBlurHandler],
+  );
+
+  const handleAmPmToggle = useCallback(() => {
+    const newAmPm: AmPmType = amPm === "am" ? "pm" : "am";
+    setAmPm(newAmPm);
+
+    // Always call handleChange to update the time value
+    const timeString = formatTimeValue(hour, minute, second, newAmPm, is12HourFormat);
+    handleChange(timeString);
+  }, [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange]);
+
+  const handleAmPmSet = useCallback(
+    (targetAmPm: AmPmType) => {
+      if (amPm === targetAmPm) return; // No change needed
+
+      setAmPm(targetAmPm);
+
+      // Always call handleChange to update the time value
+      const timeString = formatTimeValue(hour, minute, second, targetAmPm, is12HourFormat);
+      handleChange(timeString);
+    },
+    [amPm, formatTimeValue, hour, minute, second, is12HourFormat, handleChange],
+  );
+
+  // Focus method
+  const focus = useCallback(() => {
+    const input = timeInputRef.current?.querySelector(
+      'input[type="time"], input[name*="hour"], input[name*="minute"]',
+    ) as HTMLInputElement;
+    input?.focus();
+  }, []);
+
+  // Custom focus handler that fires gotFocus when component gains focus
+  const handleComponentFocus = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      // If component didn't have focus before, fire gotFocus
+      if (!componentHasFocus) {
+        setComponentHasFocus(true);
+        onFocus?.(event);
+      }
+    },
+    [componentHasFocus, onFocus],
+  );
+
+  // Custom blur handler that only fires lostFocus when focus leaves the entire component
+  const handleComponentBlur = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      // Check if the new focus target is still within this TimeInput component
+      const relatedTarget = event.relatedTarget as HTMLElement;
+      const currentTarget = event.currentTarget;
+
+      // If there's no related target, or the related target is not within this component, fire lostFocus
+      if (!relatedTarget || !currentTarget.contains(relatedTarget)) {
+        setComponentHasFocus(false);
+        onBlur?.(event);
+      }
+    },
+    [onBlur],
+  );
+
+  // Arrow key navigation handler
+  const createArrowKeyHandler = useCallback(() => {
+    return (event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) => {
+      const { key } = event;
+
+      if (key === "ArrowRight") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
+
+        // Determine next input based on current input
+        if (currentTarget === hourInputRef.current && minuteInputRef.current) {
+          minuteInputRef.current.focus();
+          minuteInputRef.current.select();
+        } else if (currentTarget === minuteInputRef.current) {
+          if (showSeconds && secondInputRef.current) {
+            secondInputRef.current.focus();
+            secondInputRef.current.select();
+          } else if (!showSeconds && is12HourFormat && amPmButtonRef.current) {
+            amPmButtonRef.current.focus();
+          }
+        } else if (
+          currentTarget === secondInputRef.current &&
+          is12HourFormat &&
+          amPmButtonRef.current
+        ) {
+          amPmButtonRef.current.focus();
+        }
+      } else if (key === "ArrowLeft") {
+        event.preventDefault();
+        const currentTarget = event.target as HTMLInputElement | HTMLButtonElement;
+
+        // Determine previous input based on current input
+        if (currentTarget === minuteInputRef.current && hourInputRef.current) {
+          hourInputRef.current.focus();
+          hourInputRef.current.select();
+        } else if (currentTarget === secondInputRef.current && minuteInputRef.current) {
+          minuteInputRef.current.focus();
+          minuteInputRef.current.select();
+        } else if (currentTarget === amPmButtonRef.current) {
+          if (showSeconds && secondInputRef.current) {
+            secondInputRef.current.focus();
+            secondInputRef.current.select();
+          } else if (!showSeconds && minuteInputRef.current) {
+            minuteInputRef.current.focus();
+            minuteInputRef.current.select();
+          }
+        }
+      }
+    };
+  }, [showSeconds, is12HourFormat]);
+
+  // Create the arrow key handler instance
+  const handleArrowKeys = useMemo(() => createArrowKeyHandler(), [createArrowKeyHandler]);
 
   const clear = useCallback(() => {
-    setValue(clearToInitialValue ? initialValue : null);
-    setTimeout(() => inputRefs.hour.current?.focus(), 0);
-  }, [clearToInitialValue, initialValue, inputRefs.hour, setValue]);
+    // Reset to initial value if provided, otherwise null
+    let valueToReset = clearToInitialValue
+      ? stableInitialValue !== undefined
+        ? stableInitialValue
+        : null
+      : null;
 
-  const focus = useCallback(() => {
-    inputRefs.hour.current?.focus();
-  }, [inputRefs.hour]);
+    if (valueToReset) {
+      const {
+        amPm: amPmValue,
+        hour: hourStr,
+        minute: minuteStr,
+        second: secondStr,
+      } = parseTimeString(String(valueToReset), is12HourFormat);
 
-  const isoValue = useCallback(() => partsToIso(parts, hour24, seconds), [hour24, parts, seconds]);
-
-  useImperativeHandle(ref, () => ({
-    focus,
-    setValue,
-    isoValue,
-    get value() {
-      return formatTimeParts(parts, hour24, seconds) ?? undefined;
-    },
-  }), [focus, hour24, isoValue, parts, seconds, setValue]);
-
-  const handleFocusCapture = useCallback(() => {
-    if (!hasFocusInside) {
-      setHasFocusInside(true);
-      void onFocus?.();
+      setHour(hourStr);
+      setMinute(minuteStr);
+      setSecond(secondStr);
+      setAmPm(amPmValue);
+    } else {
+      // Clear all fields
+      setHour(null);
+      setMinute(null);
+      setSecond(null);
+      setAmPm(null);
     }
-  }, [hasFocusInside, onFocus]);
 
-  const handleBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const relatedTarget = event.relatedTarget as Node | null;
-    if (!relatedTarget || !event.currentTarget.contains(relatedTarget)) {
-      setHasFocusInside(false);
-      void onBlur?.();
-    }
-  }, [onBlur]);
+    handleChange(valueToReset);
 
-  const toggleAmPm = useCallback(() => {
-    if (!interactive) {
-      return;
-    }
-    emitParts({ ...parts, ampm: parts.ampm === "AM" ? "PM" : "AM" });
-  }, [emitParts, interactive, parts]);
+    // Focus the component after clearing
+    setTimeout(() => {
+      focus();
+    }, 0);
+  }, [clearToInitialValue, stableInitialValue, handleChange, is12HourFormat, focus]);
 
-  const handleAmPmKeyDown = useCallback((event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key.toLowerCase() === "a") {
-      event.preventDefault();
-      emitParts({ ...parts, ampm: "AM" });
-      return;
-    }
-    if (event.key.toLowerCase() === "p") {
-      event.preventDefault();
-      emitParts({ ...parts, ampm: "PM" });
-      return;
-    }
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      const previous = orderedFields[orderedFields.length - 1];
-      inputRefs[previous].current?.focus();
-      inputRefs[previous].current?.select();
-      return;
-    }
-    if (event.key === " " || event.key === "Enter" || event.key === "ArrowUp" || event.key === "ArrowDown") {
-      event.preventDefault();
-      toggleAmPm();
-    }
-  }, [emitParts, inputRefs, orderedFields, parts, toggleAmPm]);
+  function stopPropagation(event: React.FocusEvent) {
+    event.stopPropagation();
+  }
 
-  const handleInputKeyDown = useCallback((field: FieldName, event: KeyboardEvent<HTMLInputElement>) => {
-    const currentIndex = orderedFields.indexOf(field);
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      const nextField = orderedFields[currentIndex + 1];
-      if (nextField) {
-        inputRefs[nextField].current?.focus();
-        inputRefs[nextField].current?.select();
-      } else if (!hour24) {
-        ampmRef.current?.focus();
+  const setValue = useEvent((newValue: string | null) => {
+    handleChange(newValue);
+  });
+
+  // Function to get ISO formatted time value (HH:MM:SS in 24-hour format)
+  const getIsoValue = useCallback((): string | null => {
+    if (!hour || !minute) {
+      return null;
+    }
+
+    // Convert to 24-hour format if currently in 12-hour format
+    let hour24: number;
+    if (is12HourFormat && amPm) {
+      const hourInt = parseInt(hour, 10);
+      if (amPm === "am") {
+        hour24 = hourInt === 12 ? 0 : hourInt;
+      } else {
+        // pm
+        hour24 = hourInt === 12 ? 12 : hourInt + 12;
       }
-    } else if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      const previousField = orderedFields[currentIndex - 1];
-      if (previousField) {
-        inputRefs[previousField].current?.focus();
-        inputRefs[previousField].current?.select();
-      }
+    } else {
+      hour24 = parseInt(hour, 10);
     }
-  }, [hour24, inputRefs, orderedFields]);
 
-  const hasLabel = label !== undefined && label !== null && label !== "";
-  const rootStyle = useMemo<CSSProperties>(() => ({
-    ...(hasLabel ? undefined : style),
-    ...(gap ? { "--xmlui-runtime-gap-TimeInput": gap } as CSSProperties : undefined),
-  }), [gap, hasLabel, style]);
-  const labeledItemStyle = useMemo<CSSProperties>(() => ({
-    width: "100%",
-    ...(gap ? { "--xmlui-runtime-gap-TimeInput": gap } as CSSProperties : undefined),
-  }), [gap]);
-  const labelStyle = useMemo<CSSProperties | undefined>(() => labelWidth ? ({ width: labelWidth }) : undefined, [labelWidth]);
+    // Format as ISO time string (HH:MM:SS)
+    const h24 = hour24.toString().padStart(2, "0");
+    const m24 = minute.padStart(2, "0");
+    const s24 = (second || "00").padStart(2, "0");
 
-  const inputRoot = (
+    return `${h24}:${m24}:${s24}`;
+  }, [hour, minute, second, amPm, is12HourFormat]);
+
+  // Component API registration
+  useEffect(() => {
+    if (registerComponentApi) {
+      registerComponentApi({
+        focus,
+        setValue,
+        isoValue: getIsoValue,
+      });
+    }
+  }, [registerComponentApi, focus, setValue, getIsoValue]);
+
+  // Custom clear icon
+  const clearIconElement = useMemo(() => {
+    if (clearIcon === null || clearIcon === "null") return null;
+    if (clearIcon) return <ThemedIcon name={clearIcon} />;
+    // Default clear icon
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={19}
+        height={19}
+        viewBox="0 0 19 19"
+        stroke="currentColor"
+        strokeWidth={2}
+        aria-hidden="true"
+        className={classnames(styles.clearButtonIcon, styles.buttonIcon)}
+      >
+        <line x1="4" x2="15" y1="4" y2="15" />
+        <line x1="15" x2="4" y1="4" y2="15" />
+      </svg>
+    );
+  }, [clearIcon]);
+
+  // Adornments
+  const startAdornment = useMemo(() => {
+    if (startIcon || startText) {
+      return <Adornment iconName={startIcon} text={startText} className={styles.adornment} />;
+    }
+    return null;
+  }, [startIcon, startText]);
+
+  const endAdornment = useMemo(() => {
+    if (endIcon || endText) {
+      return <Adornment iconName={endIcon} text={endText} className={styles.adornment} />;
+    }
+    return null;
+  }, [endIcon, endText]);
+
+  const timeInputComponent = (
     <div
-      {...rest}
-      ref={rootRef}
-      data-xmlui-component="TimeInput"
-      data-validation-status={validationStatus}
-      data-testid={hasLabel ? undefined : dataTestId}
-      role="group"
-      aria-label={ariaLabel}
-      className={cx(
+      ref={composedRef}
+      className={classnames(
         styles.timeInputWrapper,
-        validationStatus === "error" ? styles.timeInputError : undefined,
-        validationStatus === "warning" ? styles.timeInputWarning : undefined,
-        validationStatus === "valid" ? styles.timeInputValid : undefined,
-        !enabled ? styles.disabled : undefined,
-        readOnly ? styles.readOnly : undefined,
+        {
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+          [styles.disabled]: !enabled,
+          [styles.readOnly]: readOnly,
+        },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
-      style={rootStyle}
-      onFocusCapture={handleFocusCapture}
-      onBlur={handleBlur}
-      tabIndex={-1}
+      style={{ ...style, gap }}
+      onFocusCapture={handleComponentFocus}
+      onBlur={handleComponentBlur}
+      data-validation-status={validationStatus}
+      aria-label={ariaLabel}
+      {...rest}
     >
-      <Adornment text={startText} icon={startIcon} />
+      {startAdornment}
       <div className={styles.wrapper}>
         <div className={styles.inputGroup}>
-          {orderedFields.map((field, index) => (
-            <span key={field}>
-              <input
-                id={index === 0 ? id : undefined}
-                ref={inputRefs[field]}
-                data-part-id={field}
-                data-xmlui-part={field}
-                aria-label={field}
-                autoComplete="off"
-                autoFocus={autoFocus && index === 0}
-                className={cx(styles.input, invalidFields[field] ? styles.invalid : undefined)}
+          {/* Hour input */}
+          <HourInput
+            id={id}
+            amPm={amPm}
+            autoFocus={autoFocus}
+            disabled={!enabled}
+            inputRef={hourInputRef}
+            nextInputRef={minuteInputRef}
+            maxTime={maxTime}
+            minTime={minTime}
+            onChange={handleHourChange}
+            onBlur={handleHourBlur}
+            onKeyDown={handleArrowKeys}
+            readOnly={readOnly}
+            required={required}
+            value={hour}
+            isInvalid={isHourCurrentlyInvalid}
+            is24Hour={!is12HourFormat}
+            emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} hour` : "hour"}
+          />
+
+          <InputDivider separator=":" />
+
+          {/* Minute input */}
+          <MinuteInput
+            disabled={!enabled}
+            hour={hour}
+            inputRef={minuteInputRef}
+            nextInputRef={showSeconds ? secondInputRef : undefined}
+            nextButtonRef={showSeconds ? undefined : is12HourFormat ? amPmButtonRef : undefined}
+            maxTime={maxTime}
+            minTime={minTime}
+            onChange={handleMinuteChange}
+            onBlur={handleMinuteBlur}
+            onKeyDown={handleArrowKeys}
+            readOnly={readOnly}
+            required={required}
+            showLeadingZeros={showLeadingZeros}
+            value={minute}
+            isInvalid={isMinuteCurrentlyInvalid}
+            emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} minute` : "minute"}
+          />
+
+          {/* Second input (if needed) */}
+          {showSeconds && (
+            <>
+              <InputDivider separator=":" className={styles.divider} />
+              <SecondInput
                 disabled={!enabled}
-                inputMode="numeric"
-                maxLength={2}
-                name={field}
-                placeholder={placeholder}
+                hour={hour}
+                inputRef={secondInputRef}
+                nextButtonRef={is12HourFormat ? amPmButtonRef : undefined}
+                maxTime={maxTime}
+                minTime={minTime}
+                minute={minute}
+                onChange={handleSecondChange}
+                onBlur={handleSecondBlur}
+                onKeyDown={handleArrowKeys}
                 readOnly={readOnly}
                 required={required}
-                type="text"
-                value={parts[field]}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => updateField(field, event.currentTarget.value)}
-                onBlur={() => normalizeField(field)}
-                onFocus={(event: FocusEvent<HTMLInputElement>) => {
-                  handleFocusCapture();
-                  event.currentTarget.select();
-                }}
-                onKeyDown={(event) => handleInputKeyDown(field, event)}
+                showLeadingZeros={showLeadingZeros}
+                value={second}
+                isInvalid={isSecondCurrentlyInvalid}
+                emptyCharacter={processedEmptyCharacter}
+                ariaLabel={ariaLabel ? `${ariaLabel} second` : "second"}
               />
-              {index < orderedFields.length - 1 ? <span className={styles.divider}>:</span> : null}
-            </span>
-          ))}
-          {!hour24 ? (
-            <button
-              ref={ampmRef}
-              type="button"
-              role="switch"
-              aria-checked={parts.ampm === "PM"}
-              data-part-id="ampm"
-              data-xmlui-part="ampm"
-              className={styles.ampm}
+            </>
+          )}
+
+          {/* AM/PM selector (if 12-hour format) */}
+          {is12HourFormat && (
+            <AmPmButton
+              className="timeinput"
               disabled={!enabled}
-              onClick={toggleAmPm}
-              onKeyDown={handleAmPmKeyDown}
-            >
-              {parts.ampm ?? "AM"}
-            </button>
-          ) : null}
+              buttonRef={amPmButtonRef}
+              maxTime={maxTime}
+              minTime={minTime}
+              onClick={handleAmPmToggle}
+              onAmPmSet={handleAmPmSet}
+              onKeyDown={handleArrowKeys}
+              value={amPm}
+              ariaLabel={ariaLabel ? `${ariaLabel} AM/PM` : "AM/PM"}
+            />
+          )}
         </div>
-        {clearable ? (
-          <button
-            type="button"
-            aria-label="Clear"
-            data-part-id="clearButton"
-            data-xmlui-part="clearButton"
-            className={styles.clearButton}
-            disabled={!enabled}
-            onClick={clear}
-          >
-            {clearIcon ? String(clearIcon) : "×"}
-          </button>
-        ) : null}
+
+        {clearable && (
+          <Part partId="clearButton">
+            <button
+              className={classnames(styles.clearButton, styles.button)}
+              disabled={!enabled}
+              onClick={clear}
+              onFocus={stopPropagation}
+              type="button"
+            >
+              {clearIconElement}
+            </button>
+          </Part>
+        )}
       </div>
-      <Adornment text={endText} icon={endIcon} />
+      {endAdornment}
     </div>
   );
 
-  if (!hasLabel) {
-    return inputRoot;
-  }
-
-  return (
-    <div data-testid={dataTestId} style={style}>
-      <label
-        data-part-id="label"
-        data-xmlui-part="label"
-        data-xmlui-label-position={labelPosition}
-        style={{ display: "inline-block", ...labelStyle }}
-        onClick={() => focus()}
-        onFocus={handleFocusCapture}
-      >
-        {String(label)}
-      </label>
-      <div data-part-id="labeledItem" data-xmlui-part="labeledItem" style={labeledItemStyle}>
-        {inputRoot}
-      </div>
-    </div>
-  );
+  return timeInputComponent;
 }));
 
-function Adornment({ text, icon }: { text?: unknown; icon?: unknown }) {
-  if (text === undefined && icon === undefined) {
-    return null;
-  }
+// AmPm component types and implementation
+type AmPmProps = {
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  className: string;
+  disabled?: boolean;
+  locale?: string;
+  maxTime?: string;
+  minTime?: string;
+  onClick?: () => void;
+  onAmPmSet?: (amPm: AmPmType) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  buttonRef?: React.RefObject<HTMLButtonElement | null>;
+  required?: boolean;
+  value?: string | null;
+};
+
+function AmPmButton({
+  ariaLabel,
+  autoFocus,
+  className,
+  disabled,
+  locale,
+  maxTime,
+  minTime,
+  onClick,
+  onAmPmSet,
+  onKeyDown,
+  buttonRef,
+  value,
+}: AmPmProps): React.ReactElement {
+  const amDisabled = minTime ? convert24to12(getHours(minTime))[1] === "pm" : false;
+  const pmDisabled = maxTime ? convert24to12(getHours(maxTime))[1] === "am" : false;
+
+  const [amLabel, pmLabel] = getAmPmLabels(locale);
+
+  // Determine if the button should be disabled based on time constraints
+  const isDisabled = disabled || (value === "am" && pmDisabled) || (value === "pm" && amDisabled);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      // First call the external key handler (for arrow navigation)
+      if (onKeyDown) {
+        onKeyDown(event);
+      }
+
+      // If the event was handled (preventDefault called), don't process further
+      if (event.defaultPrevented || disabled) return;
+
+      const key = event.key.toLowerCase();
+
+      // Handle 'a' or 'A' to set AM
+      if (key === "a" && !amDisabled && value !== "am" && onAmPmSet) {
+        event.preventDefault();
+        onAmPmSet("am");
+      }
+      // Handle 'p' or 'P' to set PM
+      else if (key === "p" && !pmDisabled && value !== "pm" && onAmPmSet) {
+        event.preventDefault();
+        onAmPmSet("pm");
+      }
+    },
+    [onKeyDown, disabled, onAmPmSet, value, amDisabled, pmDisabled],
+  );
+
   return (
-    <span className={styles.adornment}>
-      {icon !== undefined ? <span role="img" aria-label={String(icon)} data-icon={String(icon)}>{String(icon)}</span> : null}
-      {text !== undefined ? <span>{String(text)}</span> : null}
-    </span>
+    <Part partId="ampm">
+      <button
+        type="button"
+        aria-label={ariaLabel || "Toggle AM/PM (Press A for AM, P for PM)"}
+        autoFocus={autoFocus}
+        className={classnames(styles.amPmButton, styles.button, className)}
+        disabled={isDisabled}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        ref={buttonRef as React.RefObject<HTMLButtonElement>}
+      >
+        <span className={styles.amPmValue}>
+          {value ? (value === "am" ? amLabel : pmLabel) : "--"}
+        </span>
+      </button>
+    </Part>
   );
 }
 
-function parseTimeParts(value: unknown, hour24: boolean, seconds: boolean): TimeParts {
-  const source = stringifyTimeValue(value);
-  if (source === null) {
-    return emptyParts;
-  }
-  const match = /^(\d{1,2})(?::(\d{1,2}))?(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i.exec(source.trim());
-  if (!match || match[2] === undefined) {
-    return source === "" ? emptyParts : { hour: "00", minute: "00", second: seconds ? "00" : "", ampm: hour24 ? null : "AM" };
-  }
-  let hour = Number(match[1]);
-  const minute = Number(match[2]);
-  const second = match[3] === undefined ? 0 : Number(match[3]);
-  let ampm = normalizeAmPm(match[4]);
-  if (!hour24) {
-    if (hour === 0) {
-      hour = 12;
-      ampm = "AM";
-    } else if (hour > 12) {
-      ampm = "PM";
-      hour -= 12;
+// HourInput component (unified for both 12-hour and 24-hour formats)
+// Generic input properties used by time input components
+type TimeInputElementProps = {
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  disabled?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+  nextInputRef?: React.RefObject<HTMLInputElement | null>;
+  nextButtonRef?: React.RefObject<HTMLButtonElement | null>;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }) => void;
+  placeholder?: string;
+  readOnly?: boolean;
+  required?: boolean;
+  step?: number;
+};
+
+// HourInput component
+type HourInputProps = {
+  id?: string;
+  amPm?: AmPmType | null;
+  maxTime?: string;
+  minTime?: string;
+  value?: string | null;
+  isInvalid?: boolean;
+  is24Hour?: boolean; // true for 24-hour format, false for 12-hour format
+  emptyCharacter?: string;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "nameForClass" | "value">;
+
+function HourInput({
+  id,
+  amPm,
+  maxTime,
+  minTime,
+  value,
+  isInvalid = false,
+  is24Hour = false,
+  emptyCharacter = "-",
+  ...otherProps
+}: HourInputProps): React.ReactElement {
+  // Calculate min/max based on format
+  const { minHour, maxHour } = (() => {
+    if (is24Hour) {
+      // 24-hour format: 0-23
+      return {
+        maxHour: safeMin(23, maxTime && getHours(maxTime)),
+        minHour: safeMax(0, minTime && getHours(minTime)),
+      };
     } else {
-      ampm ??= "AM";
+      // 12-hour format: 1-12
+      const maxHour = safeMin(
+        12,
+        maxTime &&
+          (() => {
+            const [maxHourResult, maxAmPm] = convert24to12(getHours(maxTime));
+
+            if (maxAmPm !== amPm) {
+              // pm is always after am, so we should ignore validation
+              return null;
+            }
+
+            return maxHourResult;
+          })(),
+      );
+
+      const minHour = safeMax(
+        1,
+        minTime &&
+          (() => {
+            const [minHourResult, minAmPm] = convert24to12(getHours(minTime));
+
+            if (
+              // pm is always after am, so we should ignore validation
+              minAmPm !== amPm ||
+              // If minHour is 12 am/pm, user should be able to enter 12, 1, ..., 11.
+              minHourResult === 12
+            ) {
+              return null;
+            }
+
+            return minHourResult;
+          })(),
+      );
+
+      return { maxHour, minHour };
+    }
+  })();
+
+  // Always show the raw value during typing, no conversion
+  // This allows users to see invalid input like "23" before it gets normalized on blur
+  const displayValue = value || "";
+
+  return (
+    <Part partId="hour">
+      <PartialInput
+        id={id}
+        value={displayValue}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        max={maxHour}
+        min={minHour}
+        maxLength={2}
+        validateFn={(val) => isHourInvalid(val, is24Hour)}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.hour)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        name={is24Hour ? "hour24" : "hour12"}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
+  );
+}
+
+// MinuteInput component
+type MinuteInputProps = {
+  hour?: string | null;
+  maxTime?: string;
+  minTime?: string;
+  showLeadingZeros?: boolean;
+  value?: string | null;
+  isInvalid?: boolean;
+  emptyCharacter?: string;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
+
+function MinuteInput({
+  hour,
+  maxTime,
+  minTime,
+  showLeadingZeros = true,
+  value,
+  isInvalid = false,
+  emptyCharacter = "-",
+  ...otherProps
+}: MinuteInputProps): React.ReactElement {
+  function isSameHour(date: string | Date) {
+    return hour === getHours(date).toString();
+  }
+
+  const maxMinute = safeMin(59, maxTime && isSameHour(maxTime) && getMinutes(maxTime));
+  const minMinute = safeMax(0, minTime && isSameHour(minTime) && getMinutes(minTime));
+
+  return (
+    <Part partId="minute">
+      <PartialInput
+        max={maxMinute}
+        min={minMinute}
+        name="minute"
+        value={value}
+        validateFn={isMinuteOrSecondInvalid}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        maxLength={2}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.minute)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
+  );
+}
+
+// SecondInput component
+type SecondInputProps = {
+  hour?: string | null;
+  maxTime?: string;
+  minTime?: string;
+  minute?: string | null;
+  showLeadingZeros?: boolean;
+  value?: string | null;
+  isInvalid?: boolean;
+  emptyCharacter?: string;
+} & Omit<TimeInputElementProps, "max" | "min" | "name" | "value">;
+
+function SecondInput({
+  hour,
+  maxTime,
+  minTime,
+  minute,
+  showLeadingZeros = true,
+  value,
+  isInvalid = false,
+  emptyCharacter = "-",
+  ...otherProps
+}: SecondInputProps): React.ReactElement {
+  function isSameMinute(date: string | Date) {
+    return hour === getHours(date).toString() && minute === getMinutes(date).toString();
+  }
+
+  const maxSecond = safeMin(59, maxTime && isSameMinute(maxTime) && getSeconds(maxTime));
+  const minSecond = safeMax(0, minTime && isSameMinute(minTime) && getSeconds(minTime));
+
+  return (
+    <Part partId="second">
+      <PartialInput
+        max={maxSecond}
+        min={minSecond}
+        name="second"
+        value={value}
+        validateFn={isMinuteOrSecondInvalid}
+        emptyCharacter={emptyCharacter}
+        placeholderLength={2}
+        maxLength={2}
+        onChange={otherProps.onChange}
+        onBlur={(direction, event) => {
+          // PartialInput provides direction, but the current onBlur expects just the event
+          if (otherProps.onBlur) {
+            otherProps.onBlur(event);
+          }
+        }}
+        onKeyDown={otherProps.onKeyDown}
+        className={classnames(styles.input, styles.second)}
+        invalidClassName={styles.invalid}
+        disabled={otherProps.disabled}
+        readOnly={otherProps.readOnly}
+        required={otherProps.required}
+        autoFocus={otherProps.autoFocus}
+        inputRef={otherProps.inputRef}
+        nextInputRef={otherProps.nextInputRef}
+        nextButtonRef={otherProps.nextButtonRef}
+        ariaLabel={otherProps.ariaLabel}
+        isInvalid={isInvalid}
+      />
+    </Part>
+  );
+}
+
+// Utility function to parse time string into components
+function parseTimeString(timeValue: any, targetIs12Hour: boolean = false) {
+  // Handle non-string values gracefully
+  if (timeValue == null || timeValue === undefined) {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  // If not a string, return empty values for type safety
+  if (typeof timeValue !== "string") {
+    return {
+      amPm: null,
+      hour: "",
+      minute: "",
+      second: "",
+    };
+  }
+
+  const timeString = timeValue;
+  const normalizedTimeString = timeString.toLowerCase();
+
+  // Check if the time string contains AM/PM
+  const hasAmPm = normalizedTimeString.includes("am") || normalizedTimeString.includes("pm");
+  const isAmPmPm = normalizedTimeString.includes("pm");
+
+  // Extract just the time part (remove AM/PM suffix)
+  const timePart = normalizedTimeString.replace(/\s*(am|pm)\s*$/i, "").trim();
+
+  let parsedHour = getHours(timePart);
+  let parsedMinute = getMinutes(timePart);
+  let parsedSecond = getSeconds(timePart);
+
+  // If parsing with the current format fails (all zeros), try ISO time format
+  if (
+    parsedHour === 0 &&
+    parsedMinute === 0 &&
+    parsedSecond === 0 &&
+    timePart !== "00:00:00" &&
+    timePart !== "00:00"
+  ) {
+    try {
+      // Try parsing as ISO time format using Date constructor
+      const isoDate = new Date(`1970-01-01T${timePart}`);
+      if (!isNaN(isoDate.getTime())) {
+        parsedHour = isoDate.getHours();
+        parsedMinute = isoDate.getMinutes();
+        parsedSecond = isoDate.getSeconds();
+      }
+    } catch {
+      // If ISO parsing fails, keep the original parsed values (zeros)
     }
   }
+
+  // Set AM/PM based on the actual string content or convert from 24-hour
+  let amPmValue: AmPmType | null = null;
+  let displayHour = parsedHour;
+
+  if (hasAmPm) {
+    // String already has AM/PM, use the hour as-is (should be 1-12)
+    amPmValue = isAmPmPm ? "pm" : "am";
+  } else {
+    // If no AM/PM in string, derive it from 24-hour format
+    const [hour12, amPm12] = convert24to12(parsedHour);
+    amPmValue = amPm12;
+
+    // If target format is 12-hour, convert the hour value
+    if (targetIs12Hour) {
+      displayHour = hour12;
+    }
+  }
+
+  // Format hour value appropriately
+  const hourStr = displayHour.toString().padStart(2, "0");
+  const minuteStr = parsedMinute.toString().padStart(2, "0");
+  const secondStr = parsedSecond.toString().padStart(2, "0");
+
   return {
-    hour: pad2(hour),
-    minute: pad2(minute),
-    second: seconds ? pad2(second) : "",
-    ampm: hour24 ? null : ampm,
+    amPm: amPmValue,
+    hour: hourStr,
+    minute: minuteStr,
+    second: secondStr,
   };
 }
 
-function stringifyTimeValue(value: unknown): string | null {
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  if (typeof value === "string") {
-    return value;
-  }
-  return null;
-}
+// Normalize the hour value based on 12/24 hour format
+function normalizeHour(value: string | null, is24Hour: boolean): string | null {
+  if (!value || value === "") return null;
 
-function stringifyLabel(value: unknown): string {
-  return value === undefined || value === null ? "" : String(value);
-}
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
 
-function resolveFieldName(bindTo: string, fieldPrefix?: string): string {
-  if (!fieldPrefix) {
-    return bindTo;
-  }
-  return bindTo ? `${fieldPrefix}.${bindTo}` : fieldPrefix;
-}
-
-function formatTimeParts(parts: TimeParts, hour24: boolean, seconds: boolean): string | null {
-  if (!parts.hour || !parts.minute) {
-    return null;
-  }
-  const suffix = !hour24 ? ` ${parts.ampm ?? "AM"}` : "";
-  const second = seconds ? `:${(parts.second || "00").padStart(2, "0")}` : "";
-  return `${parts.hour.padStart(2, "0")}:${parts.minute.padStart(2, "0")}${second}${suffix}`;
-}
-
-function partsToIso(parts: TimeParts, hour24: boolean, seconds: boolean): string | null {
-  if (!parts.hour || !parts.minute) {
-    return null;
-  }
-  let hour = Number(parts.hour);
-  if (!hour24) {
-    if (parts.ampm === "PM" && hour < 12) {
-      hour += 12;
+  if (is24Hour) {
+    // 24-hour format: 0-23
+    if (num >= 0 && num <= 23) {
+      return num.toString().padStart(2, "0");
+    } else {
+      // For out-of-range values, use value % 10
+      const corrected = num % 10;
+      return corrected.toString().padStart(2, "0");
     }
-    if (parts.ampm === "AM" && hour === 12) {
-      hour = 0;
+  } else {
+    // 12-hour format: 1-12
+    if (num >= 1 && num <= 12) {
+      return num.toString().padStart(2, "0");
+    } else if (num === 0) {
+      return "12"; // 0 becomes 12 in 12-hour format
+    } else {
+      // For out-of-range values, use value % 10, but ensure it's 1-12
+      let corrected = num % 10;
+      if (corrected === 0) corrected = 12; // 0 becomes 12 in 12-hour format
+      return corrected.toString().padStart(2, "0");
     }
   }
-  return `${pad2(hour)}:${pad2(Number(parts.minute))}:${pad2(seconds ? Number(parts.second || 0) : 0)}`;
 }
 
-function normalizeFieldValue(field: FieldName, value: string, hour24: boolean): string {
-  if (!value) {
-    return "";
+// Normalize the minute or second value
+function normalizeMinuteOrSecond(value: string | null): string | null {
+  if (!value || value === "") return null;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) return null;
+
+  if (num >= 0 && num <= 59) {
+    return num.toString().padStart(2, "0");
+  } else {
+    // For out-of-range values, use value % 10
+    const corrected = num % 10;
+    return corrected.toString().padStart(2, "0");
   }
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) {
-    return value;
-  }
-  if (field === "hour") {
-    if (hour24) {
-      return pad2(Math.max(0, Math.min(23, numeric)));
-    }
-    return pad2(Math.max(1, Math.min(12, numeric)));
-  }
-  return pad2(Math.max(0, Math.min(59, numeric)));
 }
 
-function computeInvalidFields(parts: TimeParts, hour24: boolean, seconds: boolean): Partial<Record<FieldName, boolean>> {
-  return {
-    hour: parts.hour !== "" && isInvalidField("hour", parts.hour, hour24),
-    minute: parts.minute !== "" && isInvalidField("minute", parts.minute, hour24),
-    second: seconds && parts.second !== "" && isInvalidField("second", parts.second, hour24),
-  };
-}
+// Helper functions to check if values are currently invalid (need normalization)
+function isHourInvalid(value: string | null, is24Hour: boolean): boolean {
+  if (!value || value === "") return false;
 
-function isInvalidField(field: FieldName, value: string, hour24: boolean): boolean {
-  if (!/^\d{1,2}$/.test(value)) {
+  const num = parseInt(value, 10);
+  if (isNaN(num)) {
     return true;
   }
-  const numeric = Number(value);
-  if (field === "hour") {
-    return hour24 ? numeric > 23 : numeric < 1 || numeric > 12;
+
+  const invalid = is24Hour ? num < 0 || num > 23 : num < 1 || num > 12;
+  return invalid;
+}
+
+function isMinuteOrSecondInvalid(value: string | null): boolean {
+  if (!value || value === "") return false;
+
+  const num = parseInt(value, 10);
+  if (isNaN(num)) {
+    return true;
   }
-  return numeric > 59;
-}
 
-function normalizeAmPm(value: string | undefined): AmPm | null {
-  const upper = value?.toUpperCase();
-  return upper === "AM" || upper === "PM" ? upper : null;
-}
-
-function pad2(value: number): string {
-  return Math.max(0, value).toString().padStart(2, "0").slice(-2);
-}
-
-function repeatChar(value: string | undefined, count: number): string {
-  const char = value && value.length > 0 ? value[0] : "-";
-  return char.repeat(count);
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
+  const invalid = num < 0 || num > 59;
+  return invalid;
 }

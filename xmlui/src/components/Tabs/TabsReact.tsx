@@ -1,229 +1,315 @@
-import type { CSSProperties, HTMLAttributes } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { ForwardedRef } from "react";
+import React, {
+  forwardRef,
+  memo,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Root as RTabsRoot,
+  List as RTabsList,
+  Trigger as RTabsTrigger,
+} from "@radix-ui/react-tabs";
 
-import { defaultProps } from "./Tabs.defaults";
 import styles from "./Tabs.module.scss";
-import { TabsContext, type RegisteredTab } from "./TabContext";
 
-export type TabsProps = Omit<HTMLAttributes<HTMLDivElement>, "children" | "onChange" | "onContextMenu"> & {
-  accordionView?: boolean;
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import { TabContext, useTabContextValue } from "./TabContext";
+import classnames from "classnames";
+import { noop } from "../../components-core/constants";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { useIsInsideForm } from "../Form/FormContext";
+
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onContextMenu"> & {
+  id?: string;
   activeTab?: number;
-  children?: ReactNode;
-  distributeEvenly?: boolean;
-  gap?: string;
-  keepMounted?: boolean;
-  onContextMenu?: HTMLAttributes<HTMLDivElement>["onContextMenu"];
-  onDidChange?: (index: number, id: string, label: string) => void | Promise<void>;
   orientation?: "horizontal" | "vertical";
-  registerComponentApi?: (api: Record<string, unknown>) => void;
   tabAlignment?: "start" | "end" | "center" | "stretch";
+  accordionView?: boolean;
+  headerRenderer?: (item: {
+    id?: string;
+    index: number;
+    label: string;
+    isActive: boolean;
+  }) => ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
+  classes?: Record<string, string>;
+  distributeEvenly?: boolean;
+  onDidChange?: (index: number, id: string, label: string) => void;
+  onContextMenu?: any;
+  keepMounted?: boolean;
+  gap?: string;
 };
 
-export const TabsComponent = forwardRef<HTMLDivElement, TabsProps>(function TabsComponent(
+import { defaultProps } from "./Tabs.defaults";
+
+export const Tabs = memo(forwardRef(function Tabs(
   {
-    accordionView = defaultProps.accordionView,
     activeTab = defaultProps.activeTab,
-    children,
-    className,
-    distributeEvenly = defaultProps.distributeEvenly,
-    gap,
-    keepMounted = defaultProps.keepMounted,
-    onContextMenu,
-    onDidChange,
     orientation = defaultProps.orientation,
-    registerComponentApi,
-    style,
     tabAlignment = defaultProps.tabAlignment,
+    accordionView = defaultProps.accordionView,
+    headerRenderer,
+    style,
+    children,
+    id,
+    registerComponentApi,
+    className,
+    classes,
+    distributeEvenly = defaultProps.distributeEvenly,
+    onDidChange = noop,
+    onContextMenu,
+    keepMounted = defaultProps.keepMounted,
+    gap,
     ...rest
-  },
-  ref,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [tabs, setTabs] = useState<RegisteredTab[]>([]);
-  const [activeIndex, setActiveIndex] = useState(activeTab);
-  const sortedTabs = useMemo(() => [...tabs].sort((a, b) => a.index - b.index), [tabs]);
-  const normalizedActiveIndex = sortedTabs.length === 0
-    ? 0
-    : activeIndex < 0 || activeIndex >= sortedTabs.length
-      ? 0
-      : activeIndex;
-  const activeTabItem = sortedTabs[normalizedActiveIndex];
-  const resolvedKeepMounted = keepMounted ?? false;
-  const resolvedOrientation = accordionView ? "horizontal" : orientation;
+  const isInsideForm = useIsInsideForm();
+  const resolvedKeepMounted = keepMounted ?? isInsideForm;
+  const { tabItems, tabContextValue } = useTabContextValue(resolvedKeepMounted);
+  const _id = useId();
+  const tabsId = id || _id;
+
+  // Ensure activeTab is within valid bounds
+  const validActiveTab = useMemo(() => {
+    if (tabItems.length === 0) return 0;
+    if (activeTab < 0) return 0;
+    if (activeTab >= tabItems.length) return 0; // Default to first tab if out of bounds
+    return activeTab;
+  }, [activeTab, tabItems.length]);
+
+  const [activeIndex, setActiveIndex] = useState(validActiveTab);
+  const currentTab = useMemo(() => {
+    return tabItems[activeIndex]?.innerId;
+  }, [activeIndex, tabItems]);
 
   useEffect(() => {
-    setActiveIndex(activeTab);
-  }, [activeTab]);
+    tabContextValue.setActiveTabId(currentTab);
+  }, [currentTab, tabContextValue]);
 
-  const register = useCallback((tab: RegisteredTab) => {
-    setTabs((current) => {
-      const next = current.filter((candidate) => candidate.innerId !== tab.innerId);
-      next.push(tab);
-      return next;
+  useEffect(() => {
+    if (activeTab !== undefined) {
+      setActiveIndex(() => {
+        const maxIndex = tabItems.length - 1;
+        const newIndex = activeTab; // activeTab should be 0-based index
+        return newIndex < 0 ? 0 : newIndex > maxIndex ? 0 : newIndex; // Default to first tab (0) when out of bounds
+      });
+    }
+  }, [activeTab, tabItems.length]);
+
+  const next = useEvent(() => {
+    setActiveIndex((prevIndex) => {
+      const maxIndex = tabItems.length - 1;
+      return prevIndex >= maxIndex ? 0 : prevIndex + 1;
     });
-  }, []);
+  });
 
-  const unregister = useCallback((innerId: string) => {
-    setTabs((current) => current.filter((candidate) => candidate.innerId !== innerId));
-  }, []);
+  const prev = useEvent(() => {
+    setActiveIndex((prevIndex) => {
+      const maxIndex = tabItems.length - 1;
+      return prevIndex <= 0 ? maxIndex : prevIndex - 1;
+    });
+  });
 
-  const selectIndex = useCallback((index: number) => {
-    if (index < 0 || index >= sortedTabs.length) {
-      return;
+  const setActiveTabIndex = useEvent((index: number) => {
+    if (index >= 0 && index < tabItems.length) {
+      setActiveIndex(index);
     }
-    setActiveIndex(index);
-    const tab = sortedTabs[index];
-    if (tab) {
-      tab.activated?.();
-      void onDidChange?.(index, tab.id || tab.innerId, tab.label);
-    }
-  }, [onDidChange, sortedTabs]);
+  });
 
-  const next = useCallback(() => {
-    if (sortedTabs.length === 0) {
-      return;
+  const setActiveTabById = useEvent((tabId: string) => {
+    // First try to find by external id, then by innerId
+    let index = tabItems.findIndex((item) => item.id === tabId);
+    if (index === -1) {
+      index = tabItems.findIndex((item) => item.innerId === tabId);
     }
-    selectIndex(normalizedActiveIndex >= sortedTabs.length - 1 ? 0 : normalizedActiveIndex + 1);
-  }, [normalizedActiveIndex, selectIndex, sortedTabs.length]);
-
-  const prev = useCallback(() => {
-    if (sortedTabs.length === 0) {
-      return;
+    if (index !== -1) {
+      setActiveIndex(index);
     }
-    selectIndex(normalizedActiveIndex <= 0 ? sortedTabs.length - 1 : normalizedActiveIndex - 1);
-  }, [normalizedActiveIndex, selectIndex, sortedTabs.length]);
-
-  const setActiveTabIndex = useCallback((index: number) => {
-    selectIndex(index);
-  }, [selectIndex]);
-
-  const setActiveTabById = useCallback((id: string) => {
-    const index = sortedTabs.findIndex((tab) => tab.id === id || tab.innerId === id);
-    if (index >= 0) {
-      selectIndex(index);
-    }
-  }, [selectIndex, sortedTabs]);
+  });
 
   useEffect(() => {
-    registerComponentApi?.({ next, prev, setActiveTabIndex, setActiveTabById });
-  }, [next, prev, registerComponentApi, setActiveTabById, setActiveTabIndex]);
+    registerComponentApi?.({
+      next,
+      prev,
+      setActiveTabIndex,
+      setActiveTabById,
+    });
+  }, [next, prev, setActiveTabIndex, setActiveTabById, registerComponentApi]);
 
-  const contextValue = useMemo(() => ({
-    activeId: activeTabItem?.innerId,
-    keepMounted: resolvedKeepMounted,
-    register,
-    unregister,
-  }), [activeTabItem?.innerId, register, resolvedKeepMounted, unregister]);
+  const gapStyle = useMemo(
+    () => ({ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }),
+    [style, gap],
+  );
 
-  const mergedStyle = {
-    ...(style as CSSProperties),
-    ...(gap !== undefined ? { "--xmlui-paddingTop-TabItem": gap } as CSSProperties : {}),
-  };
-
-  return (
-    <TabsContext.Provider value={contextValue}>
-      <div
-        {...rest}
-        ref={ref}
-        className={cx(
-          styles.tabs,
-          styles[resolvedOrientation],
-          accordionView && styles.accordionView,
-          className,
-        )}
-        data-orientation={resolvedOrientation}
-        onContextMenu={onContextMenu}
-        style={mergedStyle}
-      >
-        <div hidden aria-hidden="true">{children}</div>
-        {accordionView ? (
-          <div className={styles.tabsList} role="tablist" aria-orientation="vertical">
-            {sortedTabs.map((tab, index) => renderAccordionTab(tab, index, normalizedActiveIndex, selectIndex))}
-          </div>
-        ) : (
-          <>
-            <div
-              className={cx(
-                styles.tabsList,
-                tabAlignment === "start" && styles.alignStart,
-                tabAlignment === "end" && styles.alignEnd,
-                tabAlignment === "center" && styles.alignCenter,
-                tabAlignment === "stretch" && styles.alignStretch,
-              )}
-              role="tablist"
-              aria-orientation={resolvedOrientation}
-            >
-              {sortedTabs.map((tab, index) =>
-                renderTabTrigger(tab, index, normalizedActiveIndex, selectIndex, distributeEvenly || tabAlignment === "stretch"),
-              )}
+  // Accordion view: render tabs with interleaved headers and content
+  if (accordionView) {
+    return (
+      <TabContext.Provider value={tabContextValue}>
+        <div
+          {...rest}
+          id={tabsId}
+          ref={forwardedRef}
+          className={classnames(styles.tabs, styles.accordionView, classes?.[COMPONENT_PART_KEY], className)}
+          style={gapStyle}
+        >
+          <RTabsRoot
+            value={`${currentTab}`}
+            onValueChange={(tab) => {
+              const tabItem = tabItems.find((item) => item.innerId === tab);
+              const newIndex = tabItems.findIndex((item) => item.innerId === tab);
+              if (newIndex !== activeIndex) {
+                tabContextValue.setActiveTabId(tab);
+                setActiveIndex(newIndex);
+                onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+                pushXsLog({
+                  ts: Date.now(),
+                  perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                  traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+                  kind: "focus:change",
+                  component: "Tabs",
+                  ariaName: tabItem?.label,
+                  displayLabel: tabItem?.label,
+                  tabIndex: newIndex,
+                  tabId: tabItem.id || tabItem.innerId,
+                  tabLabel: tabItem?.label,
+                });
+              }
+            }}
+            orientation="vertical"
+            className={styles.accordionRoot}
+          >
+            <div className={styles.accordionInterleaved}>
+              <RTabsList className={styles.accordionList}>
+                {tabItems.map((tab, index) => (
+                  <RTabsTrigger 
+                    key={tab.innerId} 
+                    value={tab.innerId} 
+                    asChild
+                    style={{ order: index * 2 }}
+                  >
+                    <div
+                      role="tab"
+                      aria-label={tab.label}
+                      className={classnames(styles.tabTrigger, styles.accordionTrigger)}
+                    >
+                      {tab.headerRenderer
+                        ? tab.headerRenderer({
+                            ...(tab.id !== undefined && { id: tab.id }),
+                            index,
+                            label: tab.label,
+                            isActive: tab.innerId === currentTab,
+                          })
+                        : headerRenderer
+                          ? headerRenderer({
+                              ...(tab.id !== undefined && { id: tab.id }),
+                              index,
+                              label: tab.label,
+                              isActive: tab.innerId === currentTab,
+                            })
+                          : tab.label}
+                    </div>
+                  </RTabsTrigger>
+                ))}
+              </RTabsList>
+              {children}
             </div>
-            {sortedTabs.map((tab, index) => renderPanel(tab, index, normalizedActiveIndex, resolvedKeepMounted))}
-          </>
-        )}
-      </div>
-    </TabsContext.Provider>
-  );
-});
-
-function renderTabTrigger(
-  tab: RegisteredTab,
-  index: number,
-  activeIndex: number,
-  selectIndex: (index: number) => void,
-  stretch: boolean,
-) {
-  const active = index === activeIndex;
-  return (
-    <button
-      aria-controls={`${tab.innerId}-panel`}
-      aria-selected={active}
-      className={cx(styles.tabTrigger, stretch && styles.distributeEvenly)}
-      data-state={active ? "active" : "inactive"}
-      id={`${tab.innerId}-trigger`}
-      key={tab.innerId}
-      onClick={() => selectIndex(index)}
-      role="tab"
-      type="button"
-    >
-      {tab.header ?? tab.label}
-    </button>
-  );
-}
-
-function renderPanel(tab: RegisteredTab, index: number, activeIndex: number, keepMounted: boolean) {
-  const active = index === activeIndex;
-  if (!active && !keepMounted) {
-    return null;
+          </RTabsRoot>
+        </div>
+      </TabContext.Provider>
+    );
   }
-  return (
-    <div
-      aria-labelledby={`${tab.innerId}-trigger`}
-      className={cx(styles.tabsContent, !active && styles.hiddenContent)}
-      data-state={active ? "active" : "inactive"}
-      hidden={!active && keepMounted}
-      id={`${tab.innerId}-panel`}
-      key={`${tab.innerId}-panel`}
-      role="tabpanel"
-    >
-      {tab.content}
-    </div>
-  );
-}
 
-function renderAccordionTab(
-  tab: RegisteredTab,
-  index: number,
-  activeIndex: number,
-  selectIndex: (index: number) => void,
-) {
+  // Standard tabs view
   return (
-    <div className={styles.accordionItem} key={tab.innerId}>
-      {renderTabTrigger(tab, index, activeIndex, selectIndex, true)}
-      {renderPanel(tab, index, activeIndex, false)}
-    </div>
+    <TabContext.Provider value={tabContextValue}>
+      <RTabsRoot
+        {...(rest as any)}
+        id={tabsId}
+        ref={forwardedRef as React.Ref<HTMLDivElement>}
+        className={classnames(styles.tabs, classes?.[COMPONENT_PART_KEY], className)}
+        value={`${currentTab}`}
+        onContextMenu={onContextMenu}
+        onValueChange={(tab) => {
+          const tabItem = tabItems.find((item) => item.innerId === tab);
+          const newIndex = tabItems.findIndex((item) => item.innerId === tab);
+          if (newIndex !== activeIndex) {
+            tabContextValue.setActiveTabId(tab);
+            setActiveIndex(newIndex);
+            onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+              kind: "focus:change",
+              component: "Tabs",
+              ariaName: tabItem?.label,
+              componentLabel: tabItem?.label,
+              displayLabel: tabItem?.label,
+              tabIndex: newIndex,
+              tabId: tabItem.id || tabItem.innerId,
+              tabLabel: tabItem?.label,
+            });
+          }
+        }}
+        orientation={orientation}
+        style={gapStyle}
+      >
+        <RTabsList
+          className={classnames(styles.tabsList, {
+            [styles.alignStart]: tabAlignment === "start",
+            [styles.alignEnd]: tabAlignment === "end",
+            [styles.alignCenter]: tabAlignment === "center",
+            [styles.alignStretch]: tabAlignment === "stretch",
+          })}
+          role="tablist"
+        >
+          {!distributeEvenly && !headerRenderer && tabAlignment === "end" && (
+            <div className={styles.filler} data-orientation={orientation} />
+          )}
+          {!distributeEvenly && !headerRenderer && tabAlignment === "center" && (
+            <div className={styles.filler} data-orientation={orientation} />
+          )}
+          {tabItems.map((tab, index) => (
+            <RTabsTrigger key={tab.innerId} value={tab.innerId} asChild>
+              <div
+                role="tab"
+                aria-label={tab.label}
+                className={classnames(styles.tabTrigger, {
+                  [styles.distributeEvenly]: distributeEvenly || tabAlignment === "stretch",
+                })}
+              >
+                {tab.headerRenderer
+                  ? tab.headerRenderer({
+                      ...(tab.id !== undefined && { id: tab.id }),
+                      index,
+                      label: tab.label,
+                      isActive: tab.innerId === currentTab,
+                    })
+                  : headerRenderer
+                    ? headerRenderer({
+                        ...(tab.id !== undefined && { id: tab.id }),
+                        index,
+                        label: tab.label,
+                        isActive: tab.innerId === currentTab,
+                      })
+                    : tab.label}
+              </div>
+            </RTabsTrigger>
+          ))}
+          {!distributeEvenly && !headerRenderer && tabAlignment !== "stretch" && (tabAlignment === "start" || tabAlignment === "center") && (
+            <div className={styles.filler} data-orientation={orientation} />
+          )}
+        </RTabsList>
+        {children}
+      </RTabsRoot>
+    </TabContext.Provider>
   );
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
-}
+}));

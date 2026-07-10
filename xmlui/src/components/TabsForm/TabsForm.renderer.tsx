@@ -32,7 +32,7 @@ export const tabsFormRenderer = wrapComponent({
         tabsDistributeEvenly={adapter.booleanProp("tabsDistributeEvenly", false)}
         tabsActiveTab={adapter.numberProp("tabsActiveTab", 0)}
         segments={segments}
-        onSubmit={(values) => adapter.event("submit")(values)}
+        onSubmit={async (values) => { await adapter.event("submit")(values); }}
         onSubmitFailed={(errors) => adapter.event("submitFailed")(errors)}
         onCancel={() => adapter.event("cancel")()}
         registerComponentApi={adapter.registerApi}

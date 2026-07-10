@@ -7,8 +7,8 @@ export const defaultProps = {
   itemsSelectable: false,
   enableMultiSelection: true,
   toggleSelectionOnClick: false,
-  checkboxPosition: "topStart",
+  checkboxPosition: "topStart" as "topStart" | "topEnd" | "bottomStart" | "bottomEnd",
   hideSelectionCheckboxes: false,
   idKey: "id",
   itemUserSelect: "none",
-} as const;
+};

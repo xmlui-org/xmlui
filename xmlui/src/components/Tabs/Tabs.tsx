@@ -1,130 +1,255 @@
-import { createMetadata, dComponent } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
-import { defaultProps } from "./Tabs.defaults";
+import styles from "./Tabs.module.scss";
 
-const TABS_COMP = "Tabs";
-const TAB_ITEM_COMP = "TabItem";
-const tabsStylesSource = `
-  createThemeVar("backgroundColor-Tabs");
-  createThemeVar("borderColor-Tabs");
-  createThemeVar("borderWidth-Tabs");
-  createThemeVar("borderColor-active-Tabs");
-  createThemeVar("backgroundColor-trigger-Tabs");
-  createThemeVar("borderRadius-trigger-Tabs");
-  createThemeVar("border-trigger-Tabs");
-  createThemeVar("textColor-trigger-Tabs");
-  createThemeVar("textColor-trigger-Tabs--active");
-  createThemeVar("textColor-trigger-Tabs--hover");
-  createThemeVar("backgroundColor-trigger-Tabs--hover");
-  createThemeVar("backgroundColor-trigger-Tabs--active");
-  createThemeVar("backgroundColor-list-Tabs");
-  createThemeVar("borderRadius-list-Tabs");
-  createThemeVar("border-list-Tabs");
-  createThemeVar("gap-list-Tabs");
-  createThemeVar("padding-trigger-Tabs");
-  createThemeVar("paddingTop-TabItem");
-`;
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { wrapComponent } from "../../components-core/wrapComponent";
+
+import { MemoizedItem } from "../container-helpers";
+import { Tabs } from "./TabsReact";
+import { defaultProps } from "./Tabs.defaults";
+import { createMetadata, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
+import React, { type ReactNode } from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { templateChildren, wrapComponent as wrapRuntimeComponent, type XmluiComponentAdapter } from "../../runtime/rendering/adapter";
+import { createRuntimeScope } from "../../runtime/state";
+import type { XmluiNode } from "../../compiler/ir";
+
+const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
-  status: "in progress",
-  description: "`Tabs` enables users to switch among content panels using clickable tab headers.",
+  status: "experimental",
+  description:
+    "`Tabs` enables users to switch among content panels using clickable tab headers. " +
+    "It provides an efficient way to present multiple related sections in a single " +
+    "interface area, with each tab containing distinct content defined by " +
+    "[TabItem](/components/TabItem) components.",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
   contextVars: {
-    $header: { description: "The tab's header context." },
+    $header: { description: "The tab's header context (matches TabItem's `$header`)." },
   },
   props: {
     activeTab: {
-      description: "This property indicates the index of the active tab. Indexing starts from 0.",
+      description:
+        `This property indicates the index of the active tab. The indexing starts from 0, ` +
+        `representing the starting (leftmost) tab. If not set, the first tab is selected by default.`,
       valueType: "number",
-      defaultValue: defaultProps.activeTab,
     },
     orientation: {
-      description: "This property indicates the orientation of the component.",
+      description:
+        `This property indicates the orientation of the component. In horizontal orientation, ` +
+        `the tab sections are laid out on the left side of the content panel, while in vertical ` +
+        `orientation, the buttons are at the top. Note: This property is ignored when ` +
+        `accordionView is set to true.`,
       availableValues: ["horizontal", "vertical"],
+      isStrictEnum: true,
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
     tabAlignment: {
-      description: "This property controls how tabs are aligned within the tab header container.",
+      description:
+        `This property controls how tabs are aligned within the tab header container in ` +
+        `horizontal orientation. Use 'start' to align tabs to the left, 'end' to align to the ` +
+        `right, 'center' to center the tabs, and 'stretch' to make tabs fill the full width ` +
+        `of the header. Note: This property is ignored when orientation is set to 'vertical' ` +
+        `or when accordionView is enabled.`,
       availableValues: ["start", "end", "center", "stretch"],
+      isStrictEnum: true,
       defaultValue: defaultProps.tabAlignment,
       valueType: "string",
     },
     accordionView: {
-      description: "When enabled, displays tabs in an accordion-like view.",
+      description:
+        `When enabled, displays tabs in an accordion-like view where tab headers are stacked ` +
+        `vertically and only the active tab's content is visible. Each tab header remains visible ` +
+        `and clicking a header opens its content while closing others. When enabled, the ` +
+        `orientation property is ignored.`,
       defaultValue: defaultProps.accordionView,
       valueType: "boolean",
     },
-    headerTemplate: dComponent("This property declares the template for the clickable tab area."),
+    headerTemplate: {
+      ...dComponent(`This property declares the template for the clickable tab area.`),
+    },
     keepMounted: {
-      description: "When enabled, all tab panels remain mounted in the DOM even when not active.",
+      description:
+        `When enabled, all tab panels remain mounted in the DOM even when not active — ` +
+        `inactive panels are hidden with \`display: none\`. This ensures that form fields ` +
+        `inside non-visible tabs stay registered with an enclosing Form. ` +
+        `Defaults to \`true\` when the Tabs component is inside a Form, \`false\` otherwise.`,
       valueType: "boolean",
     },
     gap: {
-      description: "Sets the gap between the tab header strip and the active tab panel content.",
+      description:
+        `Sets the gap (padding) between the tab header strip and the active tab panel content. ` +
+        `Accepts any valid CSS length (e.g. \`"8px"\`, \`"1rem"\`). ` +
+        `When set, this overrides the \`paddingTop-TabItem\` theme variable.`,
       valueType: "string",
     },
     distributeEvenly: {
-      description: "When enabled, all tabs are distributed evenly across the full width of the tab strip.",
+      description:
+        `When enabled, all tabs are distributed evenly across the full width of the tab strip, ` +
+        `each taking equal horizontal space. Equivalent to setting \`tabAlignment\` to \`"stretch"\`.`,
       valueType: "boolean",
       defaultValue: defaultProps.distributeEvenly,
     },
-    testId: {
-      description: "Adds a test identifier to the Tabs root.",
-      valueType: "string",
-    },
   },
   events: {
-    didChange: {
-      description: "This event fires when the active tab changes.",
-      signature: "didChange(index: number, id: string, label: string): void",
-    },
-    contextMenu: {
-      description: "This event fires when the context menu is requested.",
-      signature: "contextMenu(event: MouseEvent): void",
-    },
+    contextMenu: dContextMenu(COMP),
+    didChange: dDidChange(COMP),
   },
   apis: {
-    next: { description: "Selects the next tab.", signature: "next(): void" },
-    prev: { description: "Selects the previous tab.", signature: "prev(): void" },
-    setActiveTabIndex: { description: "Sets the active tab by index.", signature: "setActiveTabIndex(index: number): void" },
-    setActiveTabById: { description: "Sets the active tab by ID.", signature: "setActiveTabById(id: string): void" },
+    next: {
+      description: `This method selects the next tab. If the current tab is the last one, it wraps around to the first tab.`,
+      signature: "next(): void",
+    },
+    prev: {
+      description: `This method selects the previous tab. If the current tab is the first one, it wraps around to the last tab.`,
+      signature: "prev(): void",
+    },
+    setActiveTabIndex: {
+      description: `This method sets the active tab by index (0-based).`,
+      signature: "setActiveTabIndex(index: number): void",
+    },
+    setActiveTabById: {
+      description: `This method sets the active tab by its ID.`,
+      signature: "setActiveTabById(id: string): void",
+    },
   },
-  themeVars: extractScssThemeVars(tabsStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`borderStyle-${TABS_COMP}`]: "solid",
-    [`borderColor-${TABS_COMP}`]: "$borderColor",
-    [`borderColor-active-${TABS_COMP}`]: "$color-primary",
-    [`borderWidth-${TABS_COMP}`]: "2px",
-    [`backgroundColor-trigger-${TABS_COMP}--hover`]: "$color-surface-100",
-    [`padding-trigger-${TABS_COMP}`]: "$space-4",
-    [`textColor-trigger-${TABS_COMP}`]: "$color-primary-600",
-    [`textColor-trigger-${TABS_COMP}--active`]: "$color-primary-900",
-    [`textColor-trigger-${TABS_COMP}--hover`]: "$color-primary-900",
-    [`gap-list-${TABS_COMP}`]: "0px",
-    "paddingTop-TabItem": "$gap-normal",
+    // [`backgroundColor-${COMP}`]: "transparent",
+    [`borderStyle-${COMP}`]: "solid",
+    [`borderColor-${COMP}`]: "$borderColor",
+    [`borderColor-active-${COMP}`]: "$color-primary",
+    [`borderWidth-${COMP}`]: "2px",
+    // [`backgroundColor-trigger-${COMP}`]: "transparent",
+    [`backgroundColor-trigger-${COMP}--hover`]: "$color-surface-100",
+    [`padding-trigger-${COMP}`]: "$space-4",
+    // [`backgroundColor-list-${COMP}`]: "$color-primary-50",
+    [`textColor-trigger-${COMP}`]: "$color-primary-600",
+    [`textColor-trigger-${COMP}--active`]: "$color-primary-900",
+    [`textColor-trigger-${COMP}--hover`]: "$color-primary-900",
+    [`gap-list-${COMP}`]: "0px",
+    [`paddingTop-TabItem`]: "$gap-normal",
   },
 });
 
-export const TabItemMd = createMetadata({
-  status: "in progress",
-  description: "`TabItem` defines individual tabs within a Tabs component.",
-  docFolder: "Tabs",
-  props: {
-    id: {
-      description: "Optional tab identifier used by APIs.",
-      valueType: "string",
-    },
-    label: {
-      description: "The tab header label.",
-      valueType: "string",
-    },
-    headerTemplate: dComponent("This property allows customization of the TabItem header."),
+type ThemedTabsProps = React.ComponentPropsWithoutRef<typeof Tabs>;
+
+export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, ThemedTabsProps>(
+  function ThemedTabs({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TabsMd);
+    return (
+      <Tabs {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
+    );
   },
-  events: {
-    activated: {
-      description: "This event is triggered when the tab is activated.",
-      signature: "activated(): void",
-    },
+);
+
+export const tabsComponentRenderer = wrapComponent(COMP, Tabs, TabsMd, {
+  exposeRegisterApi: true,
+  exclude: [
+    "activeTab",
+    "orientation",
+    "tabAlignment",
+    "accordionView",
+    "headerTemplate",
+    "keepMounted",
+    "gap",
+  ],
+  events: [],
+  customRender(
+    _props,
+    { extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler },
+  ) {
+    return (
+      <Tabs
+        id={node?.uid}
+        classes={classes}
+        headerRenderer={
+          node?.props?.headerTemplate
+            ? (item) => (
+                <MemoizedItem
+                  node={node.props.headerTemplate! as any}
+                  contextVars={{
+                    $header: item,
+                  }}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+        }
+        activeTab={extractValue(node.props?.activeTab)}
+        orientation={extractValue(node.props?.orientation)}
+        tabAlignment={extractValue(node.props?.tabAlignment)}
+        accordionView={extractValue(node.props?.accordionView)}
+        keepMounted={extractValue.asOptionalBoolean(node.props?.keepMounted)}
+        gap={extractValue.asOptionalString(node.props?.gap)}
+        onDidChange={lookupEventHandler("didChange")}
+        onContextMenu={lookupEventHandler("contextMenu")}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderChild(node.children)}
+      </Tabs>
+    );
   },
 });
 
+export const tabsRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: TabsMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const headerTemplate = templateChildren(adapter.node, "headerTemplate");
+    return (
+      <Tabs
+        {...rootAttrs}
+        id={adapter.stringProp("id")}
+        headerRenderer={
+          headerTemplate?.length
+            ? (item) => renderTabsTemplate(adapter, headerTemplate, { $header: item })
+            : undefined
+        }
+        activeTab={adapter.numberProp("activeTab", defaultProps.activeTab)}
+        orientation={adapter.stringProp("orientation", defaultProps.orientation) as "horizontal" | "vertical"}
+        tabAlignment={adapter.stringProp("tabAlignment", defaultProps.tabAlignment) as "start" | "end" | "center" | "stretch"}
+        accordionView={adapter.booleanProp("accordionView", defaultProps.accordionView)}
+        keepMounted={
+          Object.prototype.hasOwnProperty.call(adapter.props, "keepMounted")
+            ? adapter.booleanProp("keepMounted")
+            : undefined
+        }
+        gap={adapter.stringProp("gap")}
+        distributeEvenly={adapter.booleanProp("distributeEvenly", defaultProps.distributeEvenly)}
+        onDidChange={(index, id, label) => { void adapter.event("didChange")(index, id, label); }}
+        onContextMenu={(event) => { void adapter.event("contextMenu")(event); }}
+        registerComponentApi={adapter.registerApi}
+      >
+        {adapter.renderChildren()}
+      </Tabs>
+    );
+  },
+});
+
+export function renderTabsTemplate(
+  adapter: XmluiComponentAdapter,
+  children: XmluiNode[] | undefined,
+  contextValues: Record<string, unknown>,
+): ReactNode {
+  if (!children?.length) {
+    return undefined;
+  }
+  const templateScope = createRuntimeScope({
+    store: adapter.scope.store,
+    parent: adapter.scope,
+    props: adapter.scope.props,
+    contextValues,
+    references: adapter.scope.references,
+    slots: adapter.scope.slots,
+    routing: adapter.scope.routing,
+    toast: adapter.scope.toast,
+    emitEvent: adapter.scope.emitEvent,
+    extensionFunctions: adapter.scope.extensionFunctions,
+  });
+  return adapter.context.renderChildren(children, templateScope, adapter.node.range.end);
+}

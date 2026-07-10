@@ -6,6 +6,7 @@ import { createRuntimeScope } from "../../runtime/state";
 import { TileGridMd } from "./TileGrid";
 import { defaultProps } from "./TileGrid.defaults";
 import { TileGridNative } from "./TileGridReact";
+import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreReact";
 
 const COMP = "TileGrid";
 
@@ -18,6 +19,7 @@ export const tileGridRenderer = wrapComponent({
     const itemTemplate = templateChildren(adapter.node, "itemTemplate") ?? nonPropertyChildren(adapter.node.children);
     const rootAttrs = adapter.rootAttrs();
     return (
+      <StandaloneSelectionStore idKey={idKey}>
       <TileGridNative
         {...rootAttrs}
         style={rootAttrs.style as CSSProperties}
@@ -26,8 +28,9 @@ export const tileGridRenderer = wrapComponent({
         gap={adapter.stringProp("gap", defaultProps.gap)}
         stretchItems={adapter.booleanProp("stretchItems", defaultProps.stretchItems)}
         loading={adapter.booleanProp("loading", defaultProps.loading)}
-        items={data.map((item, index) => {
-          const selected = false;
+        testId={adapter.stringProp("testId")}
+        data={data}
+        itemRenderer={(item, index, _count, selected) => {
           const itemScope = createRuntimeScope({
             store: adapter.scope.store,
             parent: adapter.scope,
@@ -43,18 +46,15 @@ export const tileGridRenderer = wrapComponent({
             slots: adapter.scope.slots,
             emitEvent: adapter.scope.emitEvent,
           });
-          return {
-            key: itemKey(item, idKey, index),
-            selected,
-            content: adapter.context.renderChildren(itemTemplate, itemScope),
-            onDoubleClick: () => void adapter.event("itemDoubleClick")(item, index),
-            onContextMenu: (event) => {
-              event.preventDefault();
-              void adapter.event("contextMenu")(item, index, event);
-            },
-          };
-        })}
+          return adapter.context.renderChildren(itemTemplate, itemScope);
+        }}
+        onItemDoubleClick={async (item, index) => { await adapter.event("itemDoubleClick")(item, index); }}
+        onContextMenuItem={(item, index, event) => {
+          event.preventDefault();
+          void adapter.event("contextMenu")(item, index, event);
+        }}
       />
+      </StandaloneSelectionStore>
     );
   },
 });

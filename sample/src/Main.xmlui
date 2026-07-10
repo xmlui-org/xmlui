@@ -1,8 +1,19 @@
-<App height="200px" var.counter="{0}">
-  <Splitter onResize="counter++" height="200px">
-    <Stack backgroundColor="lightblue" height="100%">
-      <Text value="Resize event called {counter} number of times" />
-    </Stack>
-    <Stack backgroundColor="darksalmon" height="100%" />
-  </Splitter>
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <property name="headerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderBottom="1px solid $color-border-default"
+      >
+        <H4 value="Sticky Header" />
+      </HStack>
+    </property>
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+  </ScrollViewer>
 </App>

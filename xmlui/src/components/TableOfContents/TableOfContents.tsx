@@ -2,7 +2,7 @@ import { createMetadata, dContextMenu } from "../../component-core/metadata/help
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./TableOfContents.defaults";
-import { TableOfContentsNative } from "./TableOfContentsReact";
+import { TableOfContents } from "./TableOfContentsReact";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -97,7 +97,18 @@ export const TableOfContentsMd = createMetadata({
     [`paddingLeft-${COMP_CHILD}-level-5`]: "$space-6",
     [`paddingLeft-${COMP_CHILD}-level-6`]: "$space-6",
     [`fontWeight-${COMP_CHILD}`]: "$fontWeight-bold",
+    [`fontWeight-${COMP_CHILD}-level-2`]: "$fontWeight-medium",
+    [`fontWeight-${COMP_CHILD}-level-3`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-4`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-5`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}-level-6`]: "$fontWeight-normal",
+    [`fontWeight-${COMP_CHILD}--hover`]: "$fontWeight-bold",
+    [`fontWeight-${COMP_CHILD}--active`]: "$fontWeight-bold",
+    [`borderLeft-${COMP_CHILD}`]: "2px solid $color-surface-100",
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
+    [`width-indicator-${COMP}`]: "2px",
+    [`color-indicator-${COMP}`]: "$color-surface-100",
+    [`color-indicator-${COMP}--active`]: "$color-surface-900",
   },
 });
 
@@ -105,7 +116,7 @@ export const tableOfContentsRenderer = wrapComponent({
   name: COMP,
   metadata: TableOfContentsMd,
   renderer: ({ adapter }) => (
-    <TableOfContentsNative
+    <TableOfContents
       {...adapter.rootAttrs()}
       smoothScrolling={adapter.booleanProp("smoothScrolling", defaultProps.smoothScrolling)}
       maxHeadingLevel={adapter.numberProp("maxHeadingLevel", defaultProps.maxHeadingLevel)}
