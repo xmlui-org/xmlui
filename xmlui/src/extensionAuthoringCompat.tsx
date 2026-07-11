@@ -59,8 +59,14 @@ export type SearchItemData = {
 type OldWrapOptions = {
   booleans?: readonly string[];
   numbers?: readonly string[];
+  strings?: readonly string[];
   rename?: Record<string, string>;
+  exclude?: readonly string[];
   exposeRegisterApi?: boolean;
+  customRender?: (
+    props: Record<string, unknown>,
+    args: OldComponentRenderArgs,
+  ) => ReactNode;
 };
 
 type OldWrapCompoundOptions = OldWrapOptions & {
@@ -126,20 +132,32 @@ export function wrapComponent(
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
       Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
       const themeClass = useRuntimeComponentThemeClass(name, metadata);
+      for (const propName of options.exclude ?? []) {
+        delete normalizedProps[propName];
+      }
+      const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+        const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+        if (id) {
+          runtimeProps.scope.references[id] = api;
+          runtimeProps.scope.store.invalidateReference(id);
+        }
+      }, [runtimeProps.props.id, runtimeProps.scope]);
+      if (options.customRender) {
+        return options.customRender(normalizedProps, {
+          className: themeClass.className,
+          classes: { [COMPONENT_PART_KEY]: themeClass.className },
+          node: { ...runtimeProps.node, props: runtimeProps.props },
+          extractValue: createExtractValueCompat(),
+          lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+          registerComponentApi,
+          renderChild: (child) => renderChildCompat(child, runtimeProps),
+        });
+      }
       const registerApiProp = options.exposeRegisterApi
-        ? (() => {
-            const register = (api: Record<string, unknown>) => {
-              const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
-              if (id) {
-                runtimeProps.scope.references[id] = api;
-                runtimeProps.scope.store.invalidateReference(id);
-              }
-            };
-            return {
-              registerApi: register,
-              registerComponentApi: register,
-            };
-          })()
+        ? {
+            registerApi: registerComponentApi,
+            registerComponentApi,
+          }
         : {};
       return (
         <Component
@@ -462,6 +480,22 @@ function renderNonPropertyChildren(runtimeProps: XmluiExtensionComponentProps): 
     (child) => !(child.kind === "element" && child.type === "property"),
   );
   return runtimeProps.context.renderChildren(children, runtimeProps.scope);
+}
+
+function renderChildCompat(child: unknown, runtimeProps: XmluiExtensionComponentProps): ReactNode {
+  if (child === undefined || child === null) {
+    return runtimeProps.children;
+  }
+  if (Array.isArray(child)) {
+    return runtimeProps.context.renderChildren(child, runtimeProps.scope);
+  }
+  if (typeof child === "object" && "kind" in child) {
+    const node = child as XmluiNode;
+    return node.kind === "element"
+      ? runtimeProps.context.renderElement(node, runtimeProps.scope)
+      : runtimeProps.context.renderChildren([node], runtimeProps.scope);
+  }
+  return child as ReactNode;
 }
 
 function findPropertyChild(node: XmluiElement, propName: string): XmluiElement | undefined {

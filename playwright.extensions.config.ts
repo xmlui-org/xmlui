@@ -21,6 +21,7 @@ export default defineConfig({
     "packages/xmlui-calendar/src/Calendar.spec.ts",
     "packages/xmlui-grid-layout/src/GridLayout.spec.ts",
     "packages/xmlui-ai-blocks/src/AiConversation.spec.ts",
+    "packages/xmlui-animations/src/Animation.spec.ts",
   ],
   fullyParallel: true,
   workers: process.env.CI ? "80%" : "75%",

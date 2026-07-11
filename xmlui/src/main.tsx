@@ -270,6 +270,7 @@ if (!root) {
 
 const TESTBED_EXTENSION_PATHS: Record<string, string> = {
   "xmlui-ai-blocks": "../../packages/xmlui-ai-blocks/src/index.tsx",
+  "xmlui-animations": "../../packages/xmlui-animations/src/index.tsx",
   "xmlui-calendar": "../../packages/xmlui-calendar/src/index.tsx",
   "xmlui-docs-blocks": "../../packages/xmlui-docs-blocks/src/index.tsx",
   "xmlui-echart": "../../packages/xmlui-echart/src/index.tsx",
@@ -282,7 +283,7 @@ const TESTBED_EXTENSION_PATHS: Record<string, string> = {
 };
 
 const TESTBED_EXTENSION_MODULES = import.meta.glob<{ default: Extension }>(
-  "../../packages/xmlui-{ai-blocks,calendar,docs-blocks,echart,gauge,grid-layout,masonry,search,tiptap-editor,website-blocks}/src/index.{ts,tsx}",
+  "../../packages/xmlui-{ai-blocks,animations,calendar,docs-blocks,echart,gauge,grid-layout,masonry,search,tiptap-editor,website-blocks}/src/index.{ts,tsx}",
 );
 
 const params = new URLSearchParams(window.location.search);
