@@ -1,19 +1,0 @@
-
-
-> xmlui-calendar@0.1.1 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (9) [2m../../node_modules/prop-typ[2Ktransforming (154) [2m../../node_modules/react-[2Ktransforming (290) [2m../../node_modules/@poppe[2Ktransforming (291) [2m../../node_modules/lodash[2K[32m✓[39m 371 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-calendar.js  [39m[2m[1m209.58 kB[0m[0m[2m │ gzip: 64.05 kB[0m
-
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (112) [2m../../node_modules/@babel[2Ktransforming (113) [2m../../node_modules/react-[2Ktransforming (369) [2m../../node_modules/@poppe[2K[32m✓[39m 371 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css           [39m[2m[1m 10.82 kB[0m[0m[2m │ gzip:  2.49 kB[0m
-[2mdist/[0m[36mxmlui-calendar.mjs  [39m[2m[1m270.39 kB[0m[0m[2m │ gzip: 70.43 kB[0m
-
-[32m✓ built in 1.37s[39m
-[1G[0K⠙[1G[0K

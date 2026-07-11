@@ -16,8 +16,8 @@
     "paths": {
       "xmlui": ["src/xmlui-public.d.ts"]
     },
-    "types": ["./src/vite-env"]
+    "types": ["./src/vite-env", "node"]
   },
   "include": ["src", "index.ts"],
-  "exclude": ["dist", "dist-metadata", "tests"]
+  "exclude": ["dist", "dist-metadata", "tests", "src/**/*.spec.ts", "src/**/*.spec.tsx"]
 }

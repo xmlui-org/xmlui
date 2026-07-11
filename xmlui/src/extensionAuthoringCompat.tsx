@@ -14,15 +14,28 @@ import { TableOfContents } from "./components/TableOfContents/TableOfContentsRea
 import { Tabs as TabsComponent } from "./components/Tabs/TabsReact";
 import { TabItemComponent } from "./components/Tabs/TabItemReact";
 import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutReact";
+import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./components/App/LinkInfoContext";
+import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
+import { useLayoutStyle } from "./runtime/rendering/props";
+import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
+import { useInspectMode } from "./components-core/InspectorContext";
+import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
+import { createXmluiModule } from "./runtime";
+import { ComponentInstance } from "./runtime/rendering/components";
+import type { XmluiComponentModule } from "./runtime/types";
 
 export type { ComponentMetadata };
 export type { PropertyValueDescription } from "./component-core/metadata/types";
 export type CompoundComponentRendererInfo = ComponentExtension;
 export type RegisterComponentApiFn = (api: Record<string, unknown>) => void;
+
+const UNINITIALIZED_API_VALUE = Symbol("uninitialized-api-value");
+const ExtensionRuntimeScopeContext = React.createContext<XmluiExtensionComponentProps["scope"] | undefined>(undefined);
+
 export {
   createMetadata,
   Button,
@@ -59,8 +72,23 @@ export type SearchItemData = {
 type OldWrapOptions = {
   booleans?: readonly string[];
   numbers?: readonly string[];
+  strings?: readonly string[];
   rename?: Record<string, string>;
+  exclude?: readonly string[];
+  callbacks?: readonly string[];
+  renderers?: Record<string, OldRendererConfig>;
   exposeRegisterApi?: boolean;
+  captureNativeEvents?: boolean;
+  deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
+  customRender?: (
+    props: Record<string, unknown>,
+    args: OldComponentRenderArgs,
+  ) => ReactNode;
+};
+
+type OldRendererConfig = {
+  reactProp?: string;
+  contextVars: readonly (string | null)[] | ((...args: any[]) => Record<string, unknown>);
 };
 
 type OldWrapCompoundOptions = OldWrapOptions & {
@@ -72,9 +100,11 @@ type OldComponentRenderArgs = {
   className?: string;
   classes: Record<string, string>;
   node: unknown;
+  state?: Record<string, unknown>;
   extractValue: ExtractValueCompat;
   lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
   registerComponentApi: (api: Record<string, unknown>) => void;
+  updateState: (state: Record<string, unknown>, options?: { initial?: boolean }) => void;
   renderChild: (child: unknown) => ReactNode;
 };
 
@@ -125,31 +155,90 @@ export function wrapComponent(
     component: (runtimeProps) => {
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
       Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
+      Object.assign(normalizedProps, rendererProps(runtimeProps, options));
       const themeClass = useRuntimeComponentThemeClass(name, metadata);
+      for (const propName of options.exclude ?? []) {
+        delete normalizedProps[propName];
+      }
+      const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+        const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+        if (id) {
+          runtimeProps.scope.references[id] = api;
+          runtimeProps.scope.store.invalidateReference(id);
+        }
+      }, [runtimeProps.props.id, runtimeProps.scope]);
+      if (options.customRender) {
+        const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
+        const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
+        const componentStyle = mergeStyles(rootAttrs.style, normalizedProps.style);
+        return (
+          <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+            <div {...rootAttrs}>
+              {options.customRender({ ...normalizedProps, style: componentStyle }, {
+                className: themeClass.className,
+                classes: { [COMPONENT_PART_KEY]: themeClass.className },
+                node: { ...runtimeProps.node, props: runtimeProps.props },
+                extractValue: createExtractValueCompat(),
+                lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+                registerComponentApi,
+                updateState: () => undefined,
+                renderChild: (child) => renderChildCompat(child, runtimeProps),
+              })}
+            </div>
+          </ExtensionRuntimeScopeContext.Provider>
+        );
+      }
       const registerApiProp = options.exposeRegisterApi
-        ? (() => {
-            const register = (api: Record<string, unknown>) => {
-              const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
-              if (id) {
-                runtimeProps.scope.references[id] = api;
-                runtimeProps.scope.store.invalidateReference(id);
-              }
-            };
-            return {
-              registerApi: register,
-              registerComponentApi: register,
-            };
-          })()
+        ? {
+            registerComponentApi,
+          }
         : {};
+      const nativeEventProp = options.captureNativeEvents
+        ? {
+            onNativeEvent: (event: Record<string, unknown>) => {
+              const eventType = typeof event?.type === "string" ? event.type : "unknown";
+              void runtimeProps.events[eventType]?.(event);
+            },
+          }
+        : {};
+      const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
+      const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
+      const componentIsExtensionRoot = usesComponentAsExtensionRoot(name);
+      const layoutStyle = componentIsExtensionRoot
+        ? useLayoutStyle(runtimeProps.node, runtimeProps.scope)
+        : undefined;
+      const componentStyle = mergeStyles(
+        rootAttrs.style,
+        compatibilityRootStyle(name, normalizedProps),
+        layoutStyle,
+        normalizedProps.style,
+        themeClass.style,
+      );
+      const componentProps = {
+        ...withoutKeys(normalizedProps, ["data-testid", "aria-label"]),
+        ...registerApiProp,
+        ...nativeEventProp,
+        classes: { [COMPONENT_PART_KEY]: themeClass.className },
+        className: themeClass.className,
+        style: componentStyle,
+      };
+      if (componentIsExtensionRoot) {
+        return (
+          <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+            <Component {...rootAttrs} {...componentProps}>
+              {renderNonPropertyChildren(runtimeProps, metadata)}
+            </Component>
+          </ExtensionRuntimeScopeContext.Provider>
+        );
+      }
       return (
-        <Component
-          {...normalizedProps}
-          {...registerApiProp}
-          className={themeClass.className}
-          style={themeClass.style}
-        >
-          {renderNonPropertyChildren(runtimeProps)}
-        </Component>
+        <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+          <div {...rootAttrs}>
+            <Component {...componentProps}>
+              {renderNonPropertyChildren(runtimeProps, metadata)}
+            </Component>
+          </div>
+        </ExtensionRuntimeScopeContext.Provider>
       );
     },
   };
@@ -188,48 +277,189 @@ export function createComponentRenderer(
   return {
     name,
     description: metadata.description,
-    props: Object.keys(metadata.props ?? {}),
+    props: [...new Set([...Object.keys(metadata.props ?? {}), "bindTo", "value"])],
     events: Object.keys(metadata.events ?? {}),
+    apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
-    component: (runtimeProps) => {
-      const themeClass = useRuntimeComponentThemeClass(name, metadata);
-      return render({
-        className: themeClass.className,
-        classes: { [COMPONENT_PART_KEY]: themeClass.className },
-        node: { ...runtimeProps.node, props: runtimeProps.props },
-        extractValue: createExtractValueCompat(),
-        lookupEventHandler: (eventName) => runtimeProps.events[eventName],
-        registerComponentApi: (api) => {
-          const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
-          if (id) {
-            runtimeProps.scope.references[id] = api;
-            runtimeProps.scope.store.invalidateReference(id);
-          }
-        },
-        renderChild: () => runtimeProps.children,
-      });
-    },
+    component: (runtimeProps) => (
+      <OldComponentRendererCompat
+        name={name}
+        metadata={metadata}
+        render={render}
+        runtimeProps={runtimeProps}
+      />
+    ),
   };
+}
+
+function OldComponentRendererCompat({
+  name,
+  metadata,
+  render,
+  runtimeProps,
+}: {
+  name: string;
+  metadata: ComponentMetadata;
+  render: (args: OldComponentRenderArgs) => ReactNode;
+  runtimeProps: XmluiExtensionComponentProps;
+}) {
+  const form = useFormContext();
+  const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+  const bindTo = typeof runtimeProps.props.bindTo === "string" ? runtimeProps.props.bindTo : undefined;
+  const formValue = bindTo ? form?.getValue(bindTo) : undefined;
+  const [state, setState] = React.useState<Record<string, unknown>>(() => {
+    if (formValue !== undefined) {
+      return { value: formValue };
+    }
+    if (runtimeProps.props.value !== undefined) {
+      return { value: runtimeProps.props.value };
+    }
+    if (runtimeProps.props.initialValue !== undefined) {
+      return { value: runtimeProps.props.initialValue };
+    }
+    return {};
+  });
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const registeredApiRef = React.useRef<Record<string, unknown> | undefined>(undefined);
+  const lastInvalidatedApiValueRef = React.useRef<unknown>(UNINITIALIZED_API_VALUE);
+  const formRef = React.useRef(form);
+  formRef.current = form;
+
+  React.useEffect(() => {
+    if (!bindTo) {
+      return;
+    }
+    return formRef.current?.registerItem({ name: bindTo });
+  }, [bindTo]);
+
+  React.useEffect(() => {
+    if (formValue !== undefined) {
+      setState((current) => current.value === formValue ? current : { ...current, value: formValue });
+    }
+  }, [formValue]);
+
+  const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    if (id) {
+      if (registeredApiRef.current && shallowEqualRecords(registeredApiRef.current, api)) {
+        return;
+      }
+      registeredApiRef.current = api;
+      runtimeProps.scope.references[id] = api;
+      if (
+        Object.prototype.hasOwnProperty.call(api, "value") &&
+        !Object.is(lastInvalidatedApiValueRef.current, api.value)
+      ) {
+        lastInvalidatedApiValueRef.current = api.value;
+        runtimeProps.scope.store.invalidateReference(id);
+      }
+    }
+  }, [id, runtimeProps.scope]);
+
+  const updateState = React.useCallback((nextState: Record<string, unknown>, options?: { initial?: boolean }) => {
+    setState((current) => ({ ...current, ...nextState }));
+    if (
+      bindTo &&
+      Object.prototype.hasOwnProperty.call(nextState, "value") &&
+      !options?.initial
+    ) {
+      formRef.current?.setValue(bindTo, nextState.value);
+      void formRef.current?.validateField(bindTo, nextState.value);
+    }
+    if (id && Object.prototype.hasOwnProperty.call(nextState, "value")) {
+      const nextApi = {
+        ...apiRef.current,
+        value: nextState.value,
+      };
+      if (!registeredApiRef.current || !shallowEqualRecords(registeredApiRef.current, nextApi)) {
+        registeredApiRef.current = nextApi;
+        runtimeProps.scope.references[id] = nextApi;
+        runtimeProps.scope.store.invalidateReference(id);
+      }
+    }
+  }, [bindTo, id, runtimeProps.scope]);
+
+  return render({
+    className: themeClass.className,
+    classes: { [COMPONENT_PART_KEY]: themeClass.className },
+    node: { ...runtimeProps.node, props: runtimeProps.props },
+    state,
+    extractValue: createExtractValueCompat(),
+    lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+    registerComponentApi,
+    updateState,
+    renderChild: () => runtimeProps.children,
+  });
+}
+
+function shallowEqualRecords(
+  left: Record<string, unknown> | undefined,
+  right: Record<string, unknown> | undefined,
+): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+  return leftKeys.every((key) => left[key] === right[key]);
 }
 
 export function createUserDefinedComponentRenderer(
   metadata: ComponentMetadata,
   componentSource: string,
 ): ComponentExtension {
+  const compiledComponent = compileUserDefinedComponent(componentSource);
   return {
-    name: extractUserComponentName(componentSource) ?? "UserDefinedComponent",
+    name: compiledComponent?.name ?? extractUserComponentName(componentSource) ?? "UserDefinedComponent",
     description: metadata.description,
     props: Object.keys(metadata.props ?? {}),
     events: Object.keys(metadata.events ?? {}),
     allowsChildren: true,
     component: (runtimeProps) => (
-      <UserDefinedComponentFallback
-        metadata={metadata}
-        source={componentSource}
-        runtimeProps={runtimeProps}
-      />
+      compiledComponent ? (
+        <ComponentInstance
+          component={compiledComponent}
+          context={runtimeProps.context}
+          node={runtimeProps.node}
+          scope={runtimeProps.scope}
+        />
+      ) : (
+        <UserDefinedComponentFallback
+          metadata={metadata}
+          source={componentSource}
+          runtimeProps={runtimeProps}
+        />
+      )
     ),
   };
+}
+
+function compileUserDefinedComponent(componentSource: string): XmluiComponentModule | undefined {
+  try {
+    const normalizedSource = normalizeUserDefinedComponentSource(componentSource);
+    const compiled = compileXmluiSource({
+      id: `extension-component:${extractUserComponentName(componentSource) ?? "UserDefinedComponent"}.xmlui`,
+      source: normalizedSource,
+      validateComponentReferences: false,
+    });
+    throwFirstCompilerDiagnostic(compiled);
+    const module = createXmluiModule(compiled.runtimeDocument);
+    return module.kind === "component" ? module : undefined;
+  } catch (error) {
+    console.error("[xmlui] Failed to compile extension user-defined component.", error);
+    return undefined;
+  }
+}
+
+function normalizeUserDefinedComponentSource(source: string): string {
+  return source.replace(/<\/([A-Za-z][\w.-]*)\s+>/g, "</$1>");
 }
 
 export function Markdown({
@@ -274,12 +504,96 @@ export function useTheme() {
   };
 }
 
+export function useDevTools() {
+  const { inspectMode, setInspectMode } = useInspectMode();
+  return {
+    projectCompilation: undefined,
+    inspectedNode: undefined,
+    sources: undefined,
+    isOpen: false,
+    setIsOpen: () => {},
+    devToolsEnabled: inspectMode,
+    mockApi: undefined,
+    clickPosition: { x: 0, y: 0 },
+    inspectMode,
+    setInspectMode,
+  };
+}
+
 export function useComponentThemeClass(metadata: ComponentMetadata): string {
   return useRuntimeComponentThemeClass("ExtensionComponent", metadata).className;
 }
 
 export function useLinkInfo(): NavHierarchyNode | undefined {
-  return undefined;
+  const scope = React.useContext(ExtensionRuntimeScopeContext);
+  const runtimeSnapshot = React.useSyncExternalStore(
+    (listener) => scope?.routing?.subscribe(listener) ?? (() => undefined),
+    () => scope?.routing?.getSnapshot(),
+    () => scope?.routing?.getSnapshot(),
+  );
+  const routerLinkInfo = useRuntimeLinkInfo();
+  const linkInfoContext = useLinkInfoContext();
+  const runtimePath = runtimeSnapshot?.pathname;
+  const mappedLinkInfo = React.useMemo(() => {
+    const linkMap = linkInfoContext?.linkMap;
+    if (!linkMap || !runtimePath) {
+      return routerLinkInfo;
+    }
+    return (
+      linkMap.get(runtimePath) ??
+      linkMap.get(`#${runtimePath}`) ??
+      [...linkMap.values()].find((node) => normalizeLinkInfoPath(node.to) === runtimePath) ??
+      routerLinkInfo
+    );
+  }, [linkInfoContext?.linkMap, routerLinkInfo, runtimePath]);
+  const [domLinkInfo, setDomLinkInfo] = React.useState<NavHierarchyNode | undefined>();
+  React.useEffect(() => {
+    if ((mappedLinkInfo?.pathSegments?.length ?? 0) > 0 || typeof document === "undefined") {
+      setDomLinkInfo(undefined);
+      return;
+    }
+    const update = () => setDomLinkInfo(deriveLinkInfoFromNavDom(runtimePath));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    return () => observer.disconnect();
+  }, [mappedLinkInfo, runtimePath]);
+  return (mappedLinkInfo?.pathSegments?.length ?? 0) > 0 ? mappedLinkInfo : domLinkInfo ?? mappedLinkInfo;
+}
+
+function normalizeLinkInfoPath(path: string | undefined): string | undefined {
+  if (!path) {
+    return undefined;
+  }
+  return path.startsWith("#/") ? path.slice(1) : path;
+}
+
+function deriveLinkInfoFromNavDom(runtimePath: string | undefined): NavHierarchyNode | undefined {
+  const links = [...document.querySelectorAll("nav a")];
+  const link = links.find((candidate) => {
+    const href = candidate.getAttribute("href") ?? "";
+    return runtimePath
+      ? href === runtimePath || href === `#${runtimePath}` || href.endsWith(`#${runtimePath}`)
+      : href.startsWith("#/");
+  }) ?? links.find((candidate) => (candidate.getAttribute("href") ?? "").startsWith("#/"));
+  const label = link?.textContent?.trim();
+  if (!link || !label) {
+    return undefined;
+  }
+  const to = runtimePath ?? normalizeLinkInfoPath(link.getAttribute("href") ?? "") ?? "/";
+  const nav = link.closest("nav");
+  const groups = nav ? [...nav.querySelectorAll("button")].filter((button) => precedes(button, link)) : [];
+  const group = groups.at(-1);
+  const groupLabel = group?.textContent?.trim();
+  return {
+    label,
+    to,
+    pathSegments: groupLabel ? [{ label: groupLabel }] : [],
+  };
+}
+
+function precedes(left: Element, right: Element): boolean {
+  return !!(left.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING);
 }
 
 export const SEARCH_DEFAULT_CATEGORY = "General";
@@ -343,8 +657,16 @@ function CompoundComponentCompat({
   options: OldWrapCompoundOptions;
   runtimeProps: XmluiExtensionComponentProps;
 }) {
-  const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
+  const normalizedProps = React.useMemo(
+    () => normalizeProps(runtimeProps.props, options, metadata),
+    [metadata, options, runtimeProps.props],
+  );
+  const normalizedPropsRef = React.useRef(normalizedProps);
+  normalizedPropsRef.current = normalizedProps;
   const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+  const scope = runtimeProps.scope;
+  const didChange = runtimeProps.events.didChange;
   const [value, setValue] = React.useState(() => {
     const rawInitialValue = normalizedProps.initialValue;
     return options.parseInitialValue
@@ -353,36 +675,40 @@ function CompoundComponentCompat({
   });
   const valueRef = React.useRef(value);
   valueRef.current = value;
+  const registeredApiRef = React.useRef<Record<string, unknown> | undefined>(undefined);
 
   const onChange = React.useCallback(
     (newValue: unknown) => {
       const formattedValue = options.formatExternalValue
-        ? options.formatExternalValue(newValue, normalizedProps)
+        ? options.formatExternalValue(newValue, normalizedPropsRef.current)
         : newValue;
       setValue(formattedValue);
-      runtimeProps.events.didChange?.(formattedValue);
-      const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+      didChange?.(formattedValue);
       if (id) {
-        runtimeProps.scope.store.invalidateReference(id);
+        scope.store.invalidateReference(id);
       }
     },
-    [normalizedProps, options, runtimeProps],
+    [didChange, id, options, scope.store],
   );
 
   const registerApi = React.useCallback(
     (api: Record<string, unknown>) => {
-      const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
       if (id) {
-        runtimeProps.scope.references[id] = {
+        const nextApi = {
           ...api,
           get value() {
             return valueRef.current;
           },
         };
-        runtimeProps.scope.store.invalidateReference(id);
+        if (registeredApiRef.current && shallowEqualRecords(registeredApiRef.current, nextApi)) {
+          return;
+        }
+        registeredApiRef.current = nextApi;
+        scope.references[id] = nextApi;
+        scope.store.invalidateReference(id);
       }
     },
-    [runtimeProps],
+    [id, scope.references, scope.store],
   );
 
   return (
@@ -417,6 +743,7 @@ function normalizeProps(
   }
   const booleanProps = new Set(options.booleans ?? []);
   const numberProps = new Set(options.numbers ?? []);
+  const stringProps = new Set(options.strings ?? []);
   for (const [name, propMetadata] of Object.entries(metadata?.props ?? {})) {
     const targetName = options.rename?.[name] ?? name;
     const valueType = (propMetadata as { valueType?: unknown }).valueType;
@@ -425,6 +752,9 @@ function normalizeProps(
     }
     if (valueType === "number") {
       numberProps.add(targetName);
+    }
+    if (valueType === "string") {
+      stringProps.add(targetName);
     }
   }
   for (const name of booleanProps) {
@@ -437,7 +767,82 @@ function normalizeProps(
       normalized[name] = numberValue(normalized[name]);
     }
   }
+  for (const name of stringProps) {
+    if (name in normalized) {
+      normalized[name] = stringValue(normalized[name]);
+    }
+  }
   return normalized;
+}
+
+function deriveAriaLabel(
+  props: Record<string, unknown>,
+  options: OldWrapOptions,
+  metadata?: ComponentMetadata,
+): string | undefined {
+  const explicit = props["aria-label"];
+  if (explicit !== undefined && explicit !== null) {
+    return String(explicit);
+  }
+  return options.deriveAriaLabel?.(props as Record<string, any>) ??
+    metadata?.defaultAriaLabel ??
+    (props.label === undefined || props.label === null ? undefined : String(props.label));
+}
+
+function extensionRootAttrs(
+  name: string,
+  props: Record<string, unknown>,
+  ariaLabel: string | undefined,
+): Record<string, unknown> {
+  return {
+    "data-xmlui-component": name,
+    "data-xmlui-id": props.id,
+    "data-testid": props["data-testid"] ?? props.id,
+    "aria-label": ariaLabel,
+    style: rootStyleFromProps(props),
+  };
+}
+
+function rootStyleFromProps(props: Record<string, unknown>): CSSProperties | undefined {
+  const style: CSSProperties = {};
+  if (typeof props.width === "string" && props.width.length > 0) {
+    style.width = props.width;
+  }
+  if (typeof props.height === "string" && props.height.length > 0) {
+    style.height = props.height;
+  }
+  return Object.keys(style).length > 0 ? style : undefined;
+}
+
+function compatibilityRootStyle(
+  name: string,
+  props: Record<string, unknown>,
+): CSSProperties | undefined {
+  if (name === "Carousel" && props.height === undefined) {
+    return { minHeight: "1px" };
+  }
+  return undefined;
+}
+
+function usesComponentAsExtensionRoot(name: string): boolean {
+  return (
+    name === "Backdrop" ||
+    name === "Breakout" ||
+    name === "Carousel" ||
+    name === "CarouselItem"
+  );
+}
+
+function mergeStyles(
+  ...styles: Array<unknown>
+): CSSProperties | undefined {
+  const merged = Object.assign(
+    {},
+    ...styles.filter((style): style is CSSProperties =>
+      Boolean(style) && typeof style === "object" && !Array.isArray(style),
+    ),
+  );
+  return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
 function templateProps(
@@ -457,11 +862,110 @@ function templateProps(
   return result;
 }
 
-function renderNonPropertyChildren(runtimeProps: XmluiExtensionComponentProps): ReactNode {
+function rendererProps(
+  runtimeProps: XmluiExtensionComponentProps,
+  options: OldWrapOptions,
+): Record<string, (...args: unknown[]) => ReactNode> {
+  const result: Record<string, (...args: unknown[]) => ReactNode> = {};
+  for (const [propName, rendererConfig] of Object.entries(options.renderers ?? {})) {
+    const property = findPropertyChild(runtimeProps.node, propName);
+    if (!property) {
+      continue;
+    }
+    const reactProp = rendererConfig.reactProp ?? templateToRendererName(propName);
+    result[reactProp] = (...args: unknown[]) => {
+      const contextValues =
+        typeof rendererConfig.contextVars === "function"
+          ? rendererConfig.contextVars(...args)
+          : Object.fromEntries(
+              rendererConfig.contextVars
+                .map((name, index) => (name === null ? undefined : [name, args[index]] as const))
+                .filter((entry): entry is readonly [string, unknown] => Boolean(entry)),
+            );
+      const templateScope = createRuntimeScope({
+        store: runtimeProps.scope.store,
+        parent: runtimeProps.scope,
+        props: runtimeProps.scope.props,
+        contextValues,
+        references: runtimeProps.scope.references,
+        slots: runtimeProps.scope.slots,
+        routing: runtimeProps.scope.routing,
+        toast: runtimeProps.scope.toast,
+        i18n: runtimeProps.scope.i18n,
+        emitEvent: runtimeProps.scope.emitEvent,
+        extensionFunctions: runtimeProps.scope.extensionFunctions,
+      });
+      return runtimeProps.context.renderChildren(property.children, templateScope, runtimeProps.node.range.end);
+    };
+  }
+  return result;
+}
+
+function templateToRendererName(propName: string): string {
+  return propName.endsWith("Template")
+    ? `${propName.slice(0, -"Template".length)}Renderer`
+    : `${propName}Renderer`;
+}
+
+function renderNonPropertyChildren(
+  runtimeProps: XmluiExtensionComponentProps,
+  metadata?: ComponentMetadata,
+): ReactNode {
+  const childrenTemplateName = metadata?.childrenAsTemplate;
+  const data = runtimeProps.props.data;
+  if (childrenTemplateName && Array.isArray(data)) {
+    const propertyTemplate = findPropertyChild(runtimeProps.node, childrenTemplateName);
+    const templateChildren = propertyTemplate
+      ? propertyTemplate.children
+      : runtimeProps.node.children.filter(
+        (child) => !(child.kind === "element" && child.type === "property"),
+      );
+    return data.map((item, index) => {
+      const itemScope = createRuntimeScope({
+        store: runtimeProps.scope.store,
+        parent: runtimeProps.scope,
+        props: runtimeProps.scope.props,
+        contextValues: {
+          $item: item,
+          $itemIndex: index,
+          $isFirst: index === 0,
+          $isLast: index === data.length - 1,
+        },
+        references: runtimeProps.scope.references,
+        slots: runtimeProps.scope.slots,
+        routing: runtimeProps.scope.routing,
+        toast: runtimeProps.scope.toast,
+        i18n: runtimeProps.scope.i18n,
+        emitEvent: runtimeProps.scope.emitEvent,
+        extensionFunctions: runtimeProps.scope.extensionFunctions,
+      });
+      return (
+        <React.Fragment key={index}>
+          {runtimeProps.context.renderChildren(templateChildren, itemScope, runtimeProps.node.range.end)}
+        </React.Fragment>
+      );
+    });
+  }
   const children = runtimeProps.node.children.filter(
     (child) => !(child.kind === "element" && child.type === "property"),
   );
   return runtimeProps.context.renderChildren(children, runtimeProps.scope);
+}
+
+function renderChildCompat(child: unknown, runtimeProps: XmluiExtensionComponentProps): ReactNode {
+  if (child === undefined || child === null) {
+    return runtimeProps.children;
+  }
+  if (Array.isArray(child)) {
+    return runtimeProps.context.renderChildren(child, runtimeProps.scope);
+  }
+  if (typeof child === "object" && "kind" in child) {
+    const node = child as XmluiNode;
+    return node.kind === "element"
+      ? runtimeProps.context.renderElement(node, runtimeProps.scope)
+      : runtimeProps.context.renderChildren([node], runtimeProps.scope);
+  }
+  return child as ReactNode;
 }
 
 function findPropertyChild(node: XmluiElement, propName: string): XmluiElement | undefined {
@@ -500,6 +1004,13 @@ function numberValue(value: unknown): number | undefined {
     return Number.isFinite(parsed) ? parsed : undefined;
   }
   return undefined;
+}
+
+function stringValue(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  return String(value);
 }
 
 export function dInitialValue(defaultValue?: unknown, valueType = "any") {

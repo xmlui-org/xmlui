@@ -1,21 +1,0 @@
-
-
-> xmlui-search@0.1.12 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (6) [2m../../node_modules/@radix-ui/react-popover/dist[2Ktransforming (35) [2m../../node_modules/react-remove-scroll-bar/dis[2Ktransforming (62) [2m../../node_modules/react-style-singleton/dist/[2Ktransforming (70) [2msrc/Search.module.scss[0m[2K[32m✓[39m 70 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-search.js  [39m[2m[1m130.85 kB[0m[0m[2m │ gzip: 40.14 kB[0m
-
-[2K[1G[33m[33m[MIXED_EXPORTS] Warning:[0m Entry module "src/index.tsx" is using named (including "SearchMd", "ThemedSearch", "default") and default exports together. Consumers of your bundle will have to use `xmlui-search.default` to access the default export, which may not be what you want. Use `output.exports: "named"` to disable this warning.
-[39m
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (35) [2m../../node_modules/react-remove-scroll/dist/es[2K[32m✓[39m 70 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css         [39m[2m[1m 15.89 kB[0m[0m[2m │ gzip:  3.00 kB[0m
-[2mdist/[0m[36mxmlui-search.mjs  [39m[2m[1m147.83 kB[0m[0m[2m │ gzip: 42.41 kB[0m
-
-[32m✓ built in 1.46s[39m
-[1G[0K⠙[1G[0K

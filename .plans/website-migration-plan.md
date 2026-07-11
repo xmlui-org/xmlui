@@ -292,7 +292,7 @@ Verification for each package:
 
 Current automated extension package E2E verification:
 
-- `npm run test:extensions:e2e`; passing with 9 tests;
+- `npm run test:e2e:extension-packages`; passing with 9 tests;
 - package smoke coverage exists for all migrated website extension packages:
   `xmlui-docs-blocks`, `xmlui-website-blocks`, `xmlui-search`,
   `xmlui-masonry`, `xmlui-gauge`, `xmlui-echart`, `xmlui-calendar`,
@@ -791,7 +791,7 @@ Current Step 10 verification:
   warnings and Smart UI direct-eval warnings in `xmlui-gauge`;
 - `npm run build:website-extensions:metadata`; passing with known Sass
   deprecation warnings;
-- `npm run test:extensions:e2e`; passing with 9 tests. The inline
+- `npm run test:e2e:extension-packages`; passing with 9 tests. The inline
   `xmlui-search` popover path still emits console/runtime noise; this is
   tracked as `COMP-0033`, and the visible website header uses overlay mode;
 - `npm run test:website:e2e`; passing with 15 tests;
@@ -857,7 +857,7 @@ Planned slices:
    GridLayout data item-template case is explicitly skipped as `COMP-0036`
    until extension children-as-template context parity is restored.
 6. Promote passing old/new package specs into the aggregate
-   `npm run test:extensions:e2e` command, keeping explicit skips tied to
+   `npm run test:e2e:extension-packages` command, keeping explicit skips tied to
    compatibility-debt rows; complete.
 7. Run `npm run verify:website-extensions` and `npm run test:website:e2e`
    after the activated package specs to ensure the website-facing display

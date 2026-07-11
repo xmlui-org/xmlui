@@ -1,19 +1,0 @@
-
-
-> xmlui-recharts@0.1.2 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (29) [2m../../node_modules/recharts/es6/chart/AreaChar[2Ktransforming (89) [2m../../node_modules/recharts/es6/util/ChartUtil[2Ktransforming (90) [2m../../node_modules/lodash/isNaN.js[0m[2Ktransforming (91) [2m../../node_modules/recharts/es6/chart/generate[2Ktransforming (92) [2m../../node_modules/victory-vendor/es/d3-shape.[2Ktransforming (476) [2m../../node_modules/d3-array/src/rank.js[0m[2Ktransforming (575) [2m../../node_modules/d3-path/src/index.js[0m[2K[32m✓[39m 616 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-recharts.js  [39m[2m[1m486.06 kB[0m[0m[2m │ gzip: 124.51 kB[0m
-
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (97) [2m../../node_modules/react-smooth/es6/index.js[[2Ktransforming (147) [2m../../node_modules/lodash/_isIterateeCall.js[2Ktransforming (511) [2m../../node_modules/d3-array/src/threshold/fre[2K[32m✓[39m 616 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css           [39m[2m[1m  1.09 kB[0m[0m[2m │ gzip:   0.53 kB[0m
-[2mdist/[0m[36mxmlui-recharts.mjs  [39m[33m[1m636.86 kB[0m[39m[2m │ gzip: 142.49 kB[0m
-
-[32m✓ built in 2.87s[39m
-[1G[0K⠙[1G[0K

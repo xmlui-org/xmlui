@@ -7,11 +7,13 @@
     ".": "./src/index.ts",
     "./testing": "./src/testing/index.ts",
     "./themes.scss": "./src/components-core/theming/_themes.scss",
-    "./syntax/textmate": "./src/syntax/textmate.ts"
+    "./syntax/textmate": "./src/syntax/textmate.ts",
+    "./syntax/monaco": "./src/syntax/monaco/index.ts"
   },
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.build.json --noEmit && vite build",
+    "build:core": "npm run build:metadata && npm run build:standalone",
     "build:xmlui": "npm run build",
     "build:xmlui-standalone": "npm run build:standalone",
     "build:xmlui-metadata": "npm run build:metadata",

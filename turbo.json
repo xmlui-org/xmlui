@@ -1,0 +1,24 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["CI"],
+  "envMode": "loose",
+  "tasks": {
+    "build:core": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.spec.tsx", "!**/*.test.ts"],
+      "outputs": ["dist/standalone/**", "dist-metadata/**"]
+    },
+    "build:xmlui": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.spec.tsx", "!**/*.test.ts"],
+      "outputs": ["dist/**", "dist-*"]
+    },
+    "build:extension": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.spec.tsx", "!**/*.test.ts"],
+      "dependsOn": ["xmlui#build:core"],
+      "outputs": ["dist/**"]
+    },
+    "test:unit": {
+      "dependsOn": ["build:core"],
+      "outputs": []
+    }
+  }
+}

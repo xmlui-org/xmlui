@@ -1,21 +1,0 @@
-
-
-> xmlui-devtools@0.1.22 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (18) [2m../../node_modules/@radix-[2Ktransforming (208) [2m../../node_modules/motion[2Ktransforming (209) [2m../../node_modules/motion[2Ktransforming (210) [2m../../node_modules/motion[2Ktransforming (447) [2m../../node_modules/use-ca[2Ktransforming (482) [2m../../node_modules/framer[2K[32m✓[39m 499 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-devtools.js  [39m[2m[1m242.68 kB[0m[0m[2m │ gzip: 80.17 kB[0m
-
-[2K[1G[33m[33m[MIXED_EXPORTS] Warning:[0m Entry module "src/index.tsx" is using named (including "Editor", "default") and default exports together. Consumers of your bundle will have to use `xmlui-devtools.default` to access the default export, which may not be what you want. Use `output.exports: "named"` to disable this warning.
-[39m
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (121) [2m../../node_modules/@monac[2Ktransforming (283) [2m../../node_modules/motion[2Ktransforming (448) [2m../../node_modules/framer[2K[32m✓[39m 499 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css           [39m[2m[1m  3.30 kB[0m[0m[2m │ gzip:  1.08 kB[0m
-[2mdist/[0m[36mxmlui-devtools.mjs  [39m[2m[1m322.68 kB[0m[0m[2m │ gzip: 90.97 kB[0m
-
-[32m✓ built in 1.51s[39m
-[1G[0K⠙[1G[0K

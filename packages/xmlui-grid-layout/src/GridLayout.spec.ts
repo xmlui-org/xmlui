@@ -74,15 +74,13 @@ test.describe("GridLayout", () => {
   });
 
   test("renders items from data array via itemTemplate", async ({ initTestBed, page }) => {
-    test.skip(true, "COMP-0036: extension data item-template context is not restored yet");
-
     await initTestBed(
       `<GridLayout data="{items}" ${BASIC_LAYOUT}>
-        <Text testId="item-{$itemIndex}">{$item}</Text>
+        <Text>{$item}</Text>
       </GridLayout>`,
-      { ...EXT, mainXs: `var items = ["Alpha", "Beta"];` },
+      { ...EXT, mainXs: `var items = ['Alpha', 'Beta'];` },
     );
-    await expect(page.getByTestId("item-0")).toHaveText("Alpha");
-    await expect(page.getByTestId("item-1")).toHaveText("Beta");
+    await expect(page.locator(".react-grid-item").first()).toContainText("Alpha");
+    await expect(page.locator(".react-grid-item").nth(1)).toContainText("Beta");
   });
 });

@@ -63,6 +63,17 @@ Passing commands:
 - `npm --workspace xmlui-calendar run build:metadata`
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui-website run build`
+- `npm --workspace xmlui-calendar run test:e2e`
+
+2026-07-11 remigration audit:
+
+- `src/CalendarRender.tsx`, `src/CalendarWrapped.tsx`, `src/index.tsx`,
+  `src/Calendar.module.scss`, and `meta/componentsMetadata.ts` diff clean
+  against `/Users/dotneteer/source/xmlui/packages/xmlui-calendar`.
+- The package E2E spec is rewrite-added coverage because the old package has no
+  copied spec. It asserts rendered `react-big-calendar` DOM and visible
+  behavior rather than requiring `testId` forwarding from `CalendarRender`,
+  because the copied old implementation does not forward arbitrary DOM props.
 
 Manual browser smoke at `http://localhost:5173/#/docs`:
 
@@ -81,7 +92,6 @@ Known verification noise:
 
 ## Follow-Up
 
-- Add a new package E2E smoke test because no old `xmlui-calendar` spec exists.
 - Add website-level coverage for event rendering and toolbar view changes.
 - Implement and test native-event capture for calendar select/navigate/view
   events.

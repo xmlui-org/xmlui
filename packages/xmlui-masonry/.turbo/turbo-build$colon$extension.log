@@ -1,18 +1,0 @@
-
-
-> xmlui-masonry@0.1.1 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2K[32m✓[39m 4 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-masonry.js  [39m[2m[1m3.49 kB[0m[0m[2m │ gzip: 1.67 kB[0m
-
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2K[32m✓[39m 4 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-masonry.mjs  [39m[2m[1m3.24 kB[0m[0m[2m │ gzip: 1.47 kB[0m
-
-[32m✓ built in 97ms[39m
-[1G[0K⠙[1G[0K

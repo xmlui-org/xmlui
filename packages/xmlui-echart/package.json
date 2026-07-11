@@ -18,7 +18,8 @@
     "build:meta": "xmlui build-lib --mode=metadata",
     "build:metadata": "xmlui build-lib --mode=metadata",
     "prepublishOnly": "clean-package",
-    "postpublish": "clean-package restore"
+    "postpublish": "clean-package restore",
+    "test:e2e": "node ../../scripts/run-extension-e2e.mjs xmlui-echart"
   },
   "dependencies": {
     "classnames": "2.5.1",

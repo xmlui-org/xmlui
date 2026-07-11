@@ -9,10 +9,15 @@ declare module "xmlui" {
     apis?: Record<string, unknown>;
     contextVars?: Record<string, unknown>;
     childrenAsTemplate?: string;
+    themeVars?: Record<string, string>;
+    defaultThemeVars?: Record<string, unknown>;
     [key: string]: unknown;
   };
 
+  export type RegisterComponentApiFn = (api: Record<string, unknown>) => void;
+
   export function createMetadata(metadata: ComponentMetadata): ComponentMetadata;
+  export function parseScssVar(scssExports: unknown): Record<string, string>;
   export function startApp(runtime: Record<string, unknown>, extensions?: unknown): void;
   export function wrapComponent(
     name: string,

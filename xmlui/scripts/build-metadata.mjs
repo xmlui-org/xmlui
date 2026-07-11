@@ -7,7 +7,7 @@ const outFile = path.join(outDir, "xmlui-metadata.json");
 
 const server = await createServer({
   appType: "custom",
-  server: { middlewareMode: true },
+  server: { middlewareMode: true, hmr: false },
   logLevel: "silent",
 });
 

@@ -1,19 +1,0 @@
-
-
-> xmlui-react-flow@0.1.1 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (7) [2m../../node_modules/zustand/[2Ktransforming (15) [2m../../node_modules/use-syn[2K[32m✓[39m 159 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-react-flow.js  [39m[2m[1m212.69 kB[0m[0m[2m │ gzip: 65.10 kB[0m
-
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (7) [2m../../node_modules/classcat[2K[32m✓[39m 159 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css             [39m[2m[1m 15.39 kB[0m[0m[2m │ gzip:  2.55 kB[0m
-[2mdist/[0m[36mxmlui-react-flow.mjs  [39m[2m[1m260.45 kB[0m[0m[2m │ gzip: 72.92 kB[0m
-
-[32m✓ built in 965ms[39m
-[1G[0K⠙[1G[0K

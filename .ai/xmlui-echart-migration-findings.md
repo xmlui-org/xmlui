@@ -2,6 +2,8 @@
 
 Date: 2026-06-27
 
+Updated: 2026-07-11
+
 ## Source Baseline
 
 Old package: `/Users/dotneteer/source/xmlui/packages/xmlui-echart`
@@ -34,6 +36,7 @@ and native event capture options.
 - `packages/xmlui-echart/meta/componentsMetadata.ts`
 - `packages/xmlui-echart/tests/EChart.test.ts`
 - `packages/xmlui-echart/README.md`
+- `packages/xmlui-echart/CHANGELOG.md`
 
 Website wiring:
 
@@ -49,10 +52,11 @@ Website wiring:
   used by `EChartRender`.
 - The package-local `xmlui-public.d.ts` allows old authoring options such as
   `strings`, `captureNativeEvents`, and `deriveAriaLabel`.
-- Runtime support for old native EChart event capture is not complete yet:
-  `captureNativeEvents` and `deriveAriaLabel` are accepted by the migrated
-  package authoring surface but are not fully implemented by the rewrite
-  compatibility layer.
+- `xmlui/src/extensionAuthoringCompat.tsx` owns root XMLUI attributes for
+  old-style package components. This keeps `testId`, derived `aria-label`, and
+  root width/height adaptation out of the protected `EChartRender.tsx` source.
+- `captureNativeEvents` is passed through as an `onNativeEvent` callback that
+  dispatches to a registered XMLUI handler with the same native event type.
 - The focused website route uses `renderer="svg"` so chart rendering can be
   verified via DOM/SVG without relying on canvas pixel capture.
 
@@ -61,9 +65,17 @@ Website wiring:
 Passing commands:
 
 - `npm --workspace xmlui-echart run build`
+- `npm --workspace xmlui-echart run test:e2e`
 - `npm --workspace xmlui-echart run build:metadata`
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui-website run build`
+
+2026-07-11 package E2E result:
+
+- `npm --workspace xmlui-echart run test:e2e` passed all 5 copied package tests.
+- The copied upstream `BASIC_OPTION` fixture logs an ECharts `xAxis "0" not
+  found` unhandled rejection in the dev server, but the upstream scenario still
+  passes. The fixture was left intact to avoid protected test-case drift.
 
 Manual browser smoke at `http://localhost:5173/#/docs`:
 
@@ -80,8 +92,5 @@ Known verification noise:
 
 ## Follow-Up
 
-- Activate the old `src/EChart.spec.ts` coverage under the rewrite E2E harness.
-- Add or port coverage for `renderer="canvas"` and `renderer="svg"`.
-- Implement and test native event capture compatibility for EChart events.
-- Implement and test `deriveAriaLabel` behavior once the compatibility layer has
-  an accessibility pass for package wrappers.
+- User approval is still required before moving `xmlui-echart` from `In review`
+  to `Complete` in `.plans/component-remigration.md`.

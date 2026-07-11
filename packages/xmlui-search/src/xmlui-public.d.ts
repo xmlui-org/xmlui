@@ -1,5 +1,11 @@
 declare module "xmlui" {
-  import type { ComponentType, ReactNode } from "react";
+  import type {
+    ComponentType,
+    ForwardRefExoticComponent,
+    HTMLAttributes,
+    ReactNode,
+    RefAttributes,
+  } from "react";
 
   export type ComponentMetadata = {
     status?: string;
@@ -27,7 +33,17 @@ declare module "xmlui" {
   export const Icon: ComponentType<any>;
   export const LinkNative: ComponentType<any>;
   export const Text: ComponentType<any>;
-  export const TextBox: ComponentType<any>;
+  export type TextBoxProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+    id?: string;
+    type?: "text" | "password" | "search";
+    value?: string;
+    placeholder?: string;
+    startIcon?: string;
+    readOnly?: boolean;
+    onDidChange?: (value: string) => void;
+  };
+
+  export const TextBox: ForwardRefExoticComponent<TextBoxProps & RefAttributes<any>>;
   export const VisuallyHidden: ComponentType<{ children?: ReactNode }>;
   export function startApp(...args: unknown[]): void;
 }

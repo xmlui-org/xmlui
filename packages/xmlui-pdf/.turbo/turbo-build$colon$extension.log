@@ -1,33 +1,0 @@
-
-
-> xmlui-pdf@0.1.13 build:extension
-> xmlui build-lib
-
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (13) [2m../../node_modules/react-pdf/dist/Page.js[0m[2Ktransforming (35) [2msrc/hooks/useDrag.ts[0m[2Ktransforming (164) [2m../../node_modules/pdf-lib/es/core/streams/Fl[2Ktransforming (204) [2m../../node_modules/pdf-lib/es/core/annotation[2Ktransforming (231) [2msrc/components/SignatureCapture/SignatureCapt[2Ktransforming (232) [2msrc/components/AnnotationLayer/DraggableAnnot[2Ktransforming (234) [2msrc/components/AnnotationLayer/AnnotationLaye[2K[32m✓[39m 237 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-pdf.js  [39m[33m[1m2,314.48 kB[0m[39m[2m │ gzip: 773.30 kB[0m
-
-[2K[1G[33m[33m[EMPTY_IMPORT_META] Warning:[0m `import.meta` may not be a valid syntax with the `umd` output format.
-      [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m ../../node_modules/pdfjs-dist/build/pdf.mjs:8188:70 [38;5;246m][0m
-      [38;5;246m│[0m
- [38;5;246m8188 │[0m [38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249m [0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249mr[0m[38;5;249me[0m[38;5;249mq[0m[38;5;249mu[0m[38;5;249mi[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249m [0m[38;5;249m=[0m[38;5;249m [0m[38;5;249mp[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mc[0m[38;5;249me[0m[38;5;249ms[0m[38;5;249ms[0m[38;5;249m.[0m[38;5;249mg[0m[38;5;249me[0m[38;5;249mt[0m[38;5;249mB[0m[38;5;249mu[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mn[0m[38;5;249mM[0m[38;5;249mo[0m[38;5;249md[0m[38;5;249mu[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249m([0m[38;5;249m"[0m[38;5;249mm[0m[38;5;249mo[0m[38;5;249md[0m[38;5;249mu[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249m"[0m[38;5;249m)[0m[38;5;249m.[0m[38;5;249mc[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mR[0m[38;5;249me[0m[38;5;249mq[0m[38;5;249mu[0m[38;5;249mi[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249m([0mimport.meta[38;5;249m.[0m[38;5;249mu[0m[38;5;249mr[0m[38;5;249ml[0m[38;5;249m)[0m[38;5;249m;[0m
- [38;5;240m     │[0m                                                                      ─────┬─────  
- [38;5;240m     │[0m                                                                           ╰─────── This `import.meta` will be replaced with an empty object (`{}`) automatically. If this is desired, you can suppress this warning by adding `transform.define: { 'import.meta': {} }`. If `import.meta` needs to be kept as-is, you need to set the output format to `esm`.
- [38;5;240m     │[0m 
- [38;5;240m     │[0m [38;5;115mHelp[0m: If you want to polyfill `import.meta.url` like Rollup does, check out the Document: https://rolldown.rs/in-depth/non-esm-output-formats#well-known-import-meta-properties
-[38;5;246m──────╯[0m
-[39m
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (164) [2m../../node_modules/pdf-lib/es/api/form/PDFFie[2Ktransforming (235) [2msrc/components/AnnotationLayer/ResizableAnnot[2K[32m✓[39m 237 modules transformed.
-[2Krendering chunks (1)...[2Krendering chunks (2)...[2Krendering chunks (3)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mPdf.css                 [39m[2m[1m    1.16 kB[0m[0m[2m │ gzip:   0.36 kB[0m
-[2mdist/[0m[35mPdfReact.css            [39m[2m[1m   17.73 kB[0m[0m[2m │ gzip:   3.87 kB[0m
-[2mdist/[0m[36mPdf.module-Bq7KF_rU.js  [39m[2m[1m    1.43 kB[0m[0m[2m │ gzip:   0.39 kB[0m
-[2mdist/[0m[36mxmlui-pdf.mjs           [39m[2m[1m   22.75 kB[0m[0m[2m │ gzip:   6.01 kB[0m
-[2mdist/[0m[36mPdfReact-DfXCJjGc.js    [39m[33m[1m2,466.38 kB[0m[39m[2m │ gzip: 782.52 kB[0m
-
-[32m✓ built in 2.42s[39m
-✓ PDF.js WASM and decoder files copied to dist/wasm
-[1G[0K⠙[1G[0K

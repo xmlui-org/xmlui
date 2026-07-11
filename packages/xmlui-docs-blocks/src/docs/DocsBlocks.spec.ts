@@ -15,8 +15,6 @@ const attr = (value: string) =>
 // =============================================================================
 
 test.describe("TBD", () => {
-  test.skip(true, "COMP-0035: user-defined extension component rendering is not restored yet");
-
   test("renders TBD text", async ({ initTestBed, page }) => {
     await initTestBed(`<TBD />`, EXT);
     await expect(page.getByText("TBD")).toBeVisible();
@@ -28,8 +26,6 @@ test.describe("TBD", () => {
 // =============================================================================
 
 test.describe("SectionHeader", () => {
-  test.skip(true, "COMP-0035: user-defined extension component rendering is not restored yet");
-
   test("renders title text", async ({ initTestBed, page }) => {
     await initTestBed(`<SectionHeader title="My Section" />`, EXT);
     await expect(page.getByText("My Section")).toBeVisible();
@@ -46,8 +42,6 @@ test.describe("SectionHeader", () => {
 // =============================================================================
 
 test.describe("LinkButton", () => {
-  test.skip(true, "COMP-0035: user-defined extension component rendering is not restored yet");
-
   test("renders label text", async ({ initTestBed, page }) => {
     await initTestBed(`<LinkButton label="Click Me" to="/some-page" />`, EXT);
     await expect(page.getByText("Click Me")).toBeVisible();
@@ -64,8 +58,6 @@ test.describe("LinkButton", () => {
 // =============================================================================
 
 test.describe("OverviewCard", () => {
-  test.skip(true, "COMP-0035: user-defined extension component rendering is not restored yet");
-
   test("renders label text", async ({ initTestBed, page }) => {
     await initTestBed(`<OverviewCard label="My Card" to="/page" />`, EXT);
     await expect(page.getByText("My Card")).toBeVisible();
@@ -170,8 +162,6 @@ test.describe("Breadcrumbs", () => {
       initTestBed,
       page,
     }) => {
-      test.skip(true, "COMP-0035: user-defined docs route hierarchy/linkInfo parity is not restored yet");
-
       await initTestBed(
         `
         <App layout="vertical">

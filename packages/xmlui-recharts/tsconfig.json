@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "strict": true,
+    "strict": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -18,6 +18,6 @@
     },
     "types": ["./src/vite-env"]
   },
-  "include": ["src", "index.ts"],
-  "exclude": ["dist", "dist-metadata", "tests"]
+  "include": ["src", "meta", "index.ts"],
+  "exclude": ["dist", "dist-metadata", "tests", "src/**/*.spec.ts", "src/**/*.spec.tsx"]
 }

@@ -79,6 +79,7 @@ const defaultIgnoredSpecs = hasExplicitSpecArgs
 export default defineConfig({
   fullyParallel: true,
   testDir: ".",
+  timeout: 10_000,
   testMatch: [
     "tests/e2e/**/*.spec.ts",
     "src/components/**/*.spec.ts",

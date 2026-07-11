@@ -33,6 +33,7 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
+import { Popover, PopoverAnchor, PopoverContent } from "@radix-ui/react-popover";
 import { defaultProps } from "./Search.defaults";
 
 type Props = Omit<HTMLAttributes<HTMLSpanElement>, "data"> & {
@@ -557,7 +558,7 @@ export const Search = memo(function Search({
                     className={styles.overlayInput}
                     type="search"
                     placeholder={placeholder ?? "Type to search…"}
-                    onDidChange={(value: string) => setInputValue(value)}
+                    onDidChange={(value) => setInputValue(value)}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
                     aria-controls={`${inputId}-listbox`}
@@ -606,70 +607,81 @@ export const Search = memo(function Search({
 
   // --- Inline mode ---
   return (
-    <span {...rest} className={classnames(styles.inlineContainer, className)}>
-      <VisuallyHidden>
-        <label htmlFor={inputId}>Search Field</label>
-      </VisuallyHidden>
+    <span {...rest} className={className}>
+      <Popover open={show} onOpenChange={setShow}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
 
-      {collapsible && !isExpanded && animationDirection === null ? (
-        <Button
-          variant="ghost"
-          themeColor="secondary"
-          icon={<Icon name="search" aria-hidden />}
-          onClick={onSearchButtonClick}
-          contextualLabel="Open search"
-          className={styles.searchToggleButton}
-        />
-      ) : (
-        <TextBox
-          id={inputId}
-          ref={inputRef}
-          className={classnames(styles.input, {
-            [styles.active]: inputValue.length > 0 || show,
-            [styles.focused]: isFocused,
-            [styles.expanding]: animationDirection === "expanding",
-            [styles.collapsing]: animationDirection === "collapsing",
-          })}
-          type="search"
-          placeholder={placeholder ?? "Type to search"}
-          value={inputValue}
-          startIcon="search"
-          onDidChange={(value: string) => setInputValue(value)}
-          onFocus={onInputFocus}
-          onBlur={onInputBlur}
-          onKeyDown={handleKeyDown}
-          aria-autocomplete="list"
-          aria-controls={`${inputId}-listbox`}
-          aria-activedescendant={
-            activeIndex >= 0 ? `option-${activeIndex}` : undefined
-          }
-        />
-      )}
+        {collapsible && !isExpanded && animationDirection === null ? (
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            icon={<Icon name="search" aria-hidden />}
+            onClick={onSearchButtonClick}
+            contextualLabel="Open search"
+            className={styles.searchToggleButton}
+          />
+        ) : (
+          <PopoverAnchor asChild>
+            <TextBox
+              id={inputId}
+              ref={inputRef}
+              className={classnames(styles.input, {
+                [styles.active]: inputValue.length > 0 || show,
+                [styles.focused]: isFocused,
+                [styles.expanding]: animationDirection === "expanding",
+                [styles.collapsing]: animationDirection === "collapsing",
+              })}
+              type="search"
+              placeholder={placeholder ?? "Type to search"}
+              value={inputValue}
+              startIcon="search"
+              onDidChange={(value) => setInputValue(value)}
+              onFocus={onInputFocus}
+              onBlur={onInputBlur}
+              onKeyDown={handleKeyDown}
+              aria-autocomplete="list"
+              aria-controls={`${inputId}-listbox`}
+              aria-activedescendant={
+                activeIndex >= 0 ? `option-${activeIndex}` : undefined
+              }
+            />
+          </PopoverAnchor>
+        )}
 
-      {show && allResults && hasQuery && (
-        <div className={classnames(styles.listPanel, styles.inlineListPanel)}>
-          {availableCategories.length > 1 && (
-            <div className={styles.overlayControls}>
-              <OverlayCategoryTabs
-                categories={availableCategories}
-                selectedCategories={selectedCategories}
-                onSelectOne={onSelectOneCategory}
-                onClearAll={onClearAllCategories}
-              />
-            </div>
-          )}
-
-          <ul
-            id={`${inputId}-listbox`}
-            ref={listRef}
-            className={classnames(styles.list, styles.overlayList)}
-            role="listbox"
-            aria-label="Search results"
+        {show && allResults && hasQuery && (
+          <PopoverContent
+            align="end"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onEscapeKeyDown={() => setShow(false)}
+            onFocusOutside={(e) => e.preventDefault()}
+            className={classnames(styles.listPanel, className)}
           >
-            {overlayResultsListJsx}
-          </ul>
-        </div>
-      )}
+            {availableCategories.length > 1 && (
+              <div className={styles.overlayControls}>
+                <OverlayCategoryTabs
+                  categories={availableCategories}
+                  selectedCategories={selectedCategories}
+                  onSelectOne={onSelectOneCategory}
+                  onClearAll={onClearAllCategories}
+                />
+              </div>
+            )}
+
+            <ul
+              id={`${inputId}-listbox`}
+              ref={listRef}
+              className={classnames(styles.list, styles.overlayList)}
+              role="listbox"
+              aria-label="Search results"
+            >
+              {overlayResultsListJsx}
+            </ul>
+          </PopoverContent>
+        )}
+      </Popover>
     </span>
   );
 });

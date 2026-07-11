@@ -1,13 +1,15 @@
 import { startApp } from "xmlui";
-import devtools from "./src";
+import DevTools from "./src";
 
 export const runtime = import.meta.glob(`/demo/**`, { eager: true });
-startApp(runtime, [devtools]);
+startApp(runtime, DevTools);
 
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
-    startApp(newModule?.runtime, [devtools]);
+    startApp(newModule?.runtime, DevTools);
   });
 }
 
-export default devtools;
+export default DevTools;
+
+export { Editor } from "./src/editor/Editor";

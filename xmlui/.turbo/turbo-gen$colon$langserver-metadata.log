@@ -1,6 +1,0 @@
-
-
-> xmlui@0.12.21 gen:langserver-metadata
-> node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js
-
-[1G[0K[1G[0K⠙[1G[0K

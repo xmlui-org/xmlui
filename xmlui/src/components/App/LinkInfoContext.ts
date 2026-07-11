@@ -17,6 +17,15 @@ export function useLinkInfo(): NavHierarchyNode | undefined {
   const linkInfoContext = useLinkInfoContext();
   const location = useLocation();
   return useMemo(() => {
-    return linkInfoContext?.linkMap?.get(location.pathname);
-  }, [linkInfoContext?.linkMap, location.pathname]);
+    const linkMap = linkInfoContext?.linkMap;
+    if (!linkMap) {
+      return undefined;
+    }
+    const hashPath = location.hash.startsWith("#/") ? location.hash.slice(1) : undefined;
+    return (
+      linkMap.get(location.pathname) ??
+      (hashPath ? linkMap.get(hashPath) : undefined) ??
+      linkMap.get(`${location.pathname}${location.search}`)
+    );
+  }, [linkInfoContext?.linkMap, location.hash, location.pathname, location.search]);
 }

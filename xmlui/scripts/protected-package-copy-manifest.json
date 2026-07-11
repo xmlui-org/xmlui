@@ -1,0 +1,7 @@
+{
+  "xmlui-recharts": {
+    "sourceAdapted": [
+      "src/BarChart/BarChartReact.tsx"
+    ]
+  }
+}

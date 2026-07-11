@@ -8,7 +8,8 @@
     "build": "xmlui build-lib",
     "build:extension": "xmlui build-lib",
     "build:metadata": "xmlui build-lib --mode=metadata",
-    "test": "vitest run tests"
+    "test": "vitest run tests",
+    "test:e2e": "node ../../scripts/run-extension-e2e.mjs xmlui-counter-badge"
   },
   "dependencies": {
     "xmlui": "0.0.0",

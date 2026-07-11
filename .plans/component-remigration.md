@@ -457,42 +457,57 @@ Extension migration rules:
   `build:extension`, `build:meta` or `build:metadata`, package tests, demo
   smoke checks, and a consumer check that loads the built extension into an
   XMLUI app.
+- The original root extension build command is
+  `build-extensions: turbo run build:extension`, with package-level
+  `build:extension` scripts running `xmlui build-lib`. This rewrite preserves
+  that Turbo command shape with `build-extensions: turbo run build:extension
+  --filter='./packages/*'`, scoped to extension packages and package-style
+  workspaces.
+- The root regression command for migration work is `npm run check:regression`;
+  it first builds the XMLUI core artifacts currently supported by this rewrite
+  (`build:core`, metadata plus standalone) and extension packages through
+  Turbo, then runs XMLUI unit tests, XMLUI e2e tests, and extension package e2e
+  tests. The stricter `build:xmlui`/`npm run build` target remains a separate
+  migration target because it currently gates on full TypeScript/app-build
+  parity.
 - Do not flatten extension package components into `xmlui/src/components`. They
   must remain extension package components under `packages/<package>/src`.
 
 ### Extension Package Status Summary
 
 The original package inventory currently exposes 51 public component renderer
-entries across 16 extension package folders with source indexes. All are
-`Audit required` until package infrastructure, protected-copy audits, metadata
-builds, and package-level verification pass in this rewrite.
+entries across 16 extension package folders with source indexes. Package folders
+remain `Audit required` until package infrastructure, protected-copy audits,
+metadata builds, package-level verification, and user approval pass in this
+rewrite. The summary tracks both package-folder state and the public component
+renderer entries those packages expose.
 
-| State | Meaning | Public component entries |
-| --- | --- | ---: |
-| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 51 |
-| Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 0 |
+| State | Meaning | Package folders | Public component entries |
+| --- | --- | ---: | ---: |
+| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 1 | 7 |
+| Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 | 0 |
+| In review | Audit and tests passed; waiting for user approval. | 0 | 0 |
+| Complete | User approved after audit and verification. | 15 | 44 |
 
 ### Extension Package Inventory
 
 | Package | Public components from original package index | Package dependencies / infrastructure | Rewrite state |
 | --- | --- | --- | --- |
-| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Audit required. |
-| `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Audit required. |
-| `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Audit required. |
-| `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Audit required. |
-| `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Audit required. |
-| `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Audit required. |
-| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; empty target package scaffold exists for future protected-source migration. |
-| `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Audit required. |
-| `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Audit required. |
+| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Complete; protected source copied intact, metadata/build passed, package E2E smoke passed, and user approved completion. No original package-local E2E spec existed to copy. |
+| `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Complete; protected source, metadata, changelog, and copied E2E spec copied intact; package build, metadata build, protected-copy diff audit, and all 16 package E2E tests passed; user approved completion. |
+| `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Complete; source audit clean, rewrite-added package E2E passed, and user approved completion. No original package-local E2E spec existed to copy. |
+| `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Complete; protected source copied intact, extension build passed, all 50 package E2E tests passed, and user approved completion. |
+| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Complete; protected package source, metadata, entry, demo, and Monaco syntax helpers copied intact; extension build, metadata build, protected-copy diff audit, and package E2E command passed; user approved completion. No original package-local E2E spec existed to copy. Optional demo build still fails on existing core Vite plugin `/src/compiler/compileXmluiModule.ts` resolution. |
+| `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Complete; package XMLUI template components render through the extension user-defined component bridge, copied E2E skips were removed, package E2E command passes all 64 tests serially, and `BlogReact.tsx` was restored to the original protected source. Breadcrumbs route-hierarchy fallback and ReadingTime test literal rewrites remain documented compatibility exceptions until the host link-info and expression-string contracts are fully restored; user approved completion. |
+| `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Complete; protected source, metadata, README, changelog, and copied E2E spec are restored to original contents except for the copied spec's harness import rewrite; package build and all 5 package E2E tests passed; user approved completion. |
+| `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Complete; protected source, metadata, changelog, and copied E2E spec match the original package except for the copied spec's harness import rewrite; package E2E command passes all 6 tests; user approved completion. |
+| `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Complete; protected package source and changelog match the original package, rewrite-added package E2E covers DOM attachment, static children, row height/gap, state-driven rerendering, and data item-template context, package build and metadata build pass, the package E2E command passes all 5 tests, and user approved completion. No original package-local E2E spec existed to copy. |
+| `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Complete; protected source, metadata, and changelog match the original package except for the copied spec's harness import rewrite; package build and metadata build pass, all 5 copied package E2E tests pass, and user approved completion. |
+| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Complete; protected source, metadata, docs, resources, package tests, and WASM setup copied from the original package; package build, metadata build, protected-copy diff audit, and all 2 package E2E tests passed; user approved completion. Copied unit tests now run but have 4 original assertion failures around the `✍ Click to sign` placeholder text; leave them unresolved until a package-unit-test compatibility pass documents the protected-test exception or restores the original test dependency behavior. |
+| `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Complete; protected source, metadata, README, and changelog match the original package; rewrite package TypeScript shim preserves the copied source under the stricter rewrite typecheck; package build, metadata build, and all 3 rewrite-added package E2E tests pass serially; user approved completion. No original package-local E2E spec existed to copy. |
+| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Complete; protected package source, docs, metadata, demo, and copied E2E specs were copied from the original package. Copied specs have harness import rewrites only; `BarChartReact.tsx` has a documented tooltip ref source exception. Package build, metadata build, protected-copy audit, and all 322 package E2E tests passed with the default parallel package command after extension testbed warm-up, with 320 passed and 2 skipped; user approved completion for all eight public Recharts components. |
+| `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Complete; protected source and changelog restored to the original package, copied spec has harness import rewrites only, package shim now types `TextBox.onDidChange` so original callbacks compile, protected-copy audit passed, package build and metadata build passed, all 28 copied package E2E tests passed, and user approved completion. |
+| `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Complete; protected source, metadata, changelog, and copied E2E spec match the original package except for the copied spec's harness import rewrite; package build, metadata build, protected-copy audit, and all 9 copied package E2E tests passed; user approved completion. |
 | `xmlui-website-blocks` | `HeroSection`, `ScrollToTop`, `FancyButton`, `Carousel`, `CarouselItem`, `Backdrop`, `Breakout` | `@react-spring/web`, Embla carousel, compose refs, website block demos | Audit required. |
 
 Source package note: `xmlui-hello-world` exists in the original checkout only as

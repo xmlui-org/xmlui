@@ -46,6 +46,7 @@ export {
   useLinkInfo,
   useSearchContextContent,
   useTheme,
+  useDevTools,
   VisuallyHidden,
   wrapComponent,
   wrapCompound,

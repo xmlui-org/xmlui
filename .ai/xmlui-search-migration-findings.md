@@ -1,6 +1,7 @@
 # xmlui-search Migration Findings
 
 Date: 2026-06-27  
+Updated: 2026-07-11
 Plan step: `.plans/website-migration-plan.md` Step 5
 
 ## Summary
@@ -74,3 +75,37 @@ Remaining verification:
 - Activate and run old package spec.
 - Add website-level search smoke test.
 - Render the migrated website shell with search data wired into the component.
+
+## Strict Remigration Update
+
+Under `.plans/component-remigration.md`, the copied protected package files were
+restored to the original `xmlui-search` source, including the original Radix
+Popover inline path in `SearchReact.tsx`, the original `Search.module.scss`,
+the original `Search.tsx` metadata, and the package `CHANGELOG.md`.
+
+The only compile adaptation needed for the restored protected source lives in
+the rewrite-local package shim:
+
+- `packages/xmlui-search/src/xmlui-public.d.ts` now gives `TextBox` a typed
+  `onDidChange?: (value: string) => void` prop while preserving the permissive
+  extension-facing shape needed by the old source.
+
+Verification on 2026-07-11:
+
+```text
+node xmlui/scripts/verify-protected-component-copy.mjs --package xmlui-search
+npm --workspace xmlui-search run build:extension
+npm --workspace xmlui-search run build:metadata
+npm --workspace xmlui-search run test:e2e
+```
+
+Results:
+
+- protected-copy audit passed; copied source is identical except the allowed
+  package spec import rewrite;
+- extension build passed;
+- metadata build passed;
+- copied package E2E passed: 28/28 tests.
+
+The package is in review under the strict component remigration plan until the
+user approves marking `xmlui-search` complete.

@@ -38,7 +38,7 @@ Result:
 
 ## Remaining Test Debt
 
-- Package-level smoke tests now run through `npm run test:extensions:e2e`, but
+- Package-level smoke tests now run through `npm run test:e2e:extension-packages`, but
   package-local old specs that were copied or adapted during extension
   migration still need to be fully wired into the current harness.
 - `xmlui-docs-blocks` still needs deeper old-spec migration for `Share` default

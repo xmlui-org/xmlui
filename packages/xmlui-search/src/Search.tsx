@@ -60,16 +60,6 @@ export const SearchMd: ComponentMetadata = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
-    defaultSortOrder: {
-      description: `Initial result sort order. Accepted for compatibility with the original website Search markup.`,
-      valueType: "string",
-      defaultValue: "relevance",
-    },
-    enableSpellCorrection: {
-      description: `Enables search spelling suggestions. Accepted for compatibility with the original website Search markup.`,
-      valueType: "boolean",
-      defaultValue: false,
-    },
     defaultSelectedCategories: {
       description: `Initial set of selected category filters.`,
       valueType: "string[]",

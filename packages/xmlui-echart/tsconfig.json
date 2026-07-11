@@ -19,5 +19,5 @@
     "types": ["./src/vite-env"]
   },
   "include": ["src", "meta"],
-  "exclude": ["dist", "dist-metadata", "tests"]
+  "exclude": ["dist", "dist-metadata", "tests", "src/**/*.spec.ts", "src/**/*.spec.tsx"]
 }
