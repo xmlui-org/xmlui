@@ -278,14 +278,16 @@ const TESTBED_EXTENSION_PATHS: Record<string, string> = {
   "xmlui-gauge": "../../packages/xmlui-gauge/src/index.tsx",
   "xmlui-grid-layout": "../../packages/xmlui-grid-layout/src/index.tsx",
   "xmlui-masonry": "../../packages/xmlui-masonry/src/index.tsx",
+  "xmlui-pdf": "../../packages/xmlui-pdf/src/index.tsx",
   "xmlui-search": "../../packages/xmlui-search/src/index.tsx",
   "xmlui-tiptap-editor": "../../packages/xmlui-tiptap-editor/src/index.tsx",
   "xmlui-website-blocks": "../../packages/xmlui-website-blocks/src/index.tsx",
 };
 
-const TESTBED_EXTENSION_MODULES = import.meta.glob<{ default: Extension }>(
+const TESTBED_EXTENSION_MODULES = import.meta.glob<{ default: Extension }>([
   "../../packages/xmlui-{ai-blocks,animations,calendar,crm-blocks,docs-blocks,echart,gauge,grid-layout,masonry,search,tiptap-editor,website-blocks}/src/index.{ts,tsx}",
-);
+  "../../packages/xmlui-pdf/src/index.tsx",
+]);
 
 const params = new URLSearchParams(window.location.search);
 if (params.has("__xmluiTestBed")) {

@@ -1,0 +1,215 @@
+// Signature Capture Modal
+
+// -----------------------------------------------------------------------
+// Backdrop / overlay
+// -----------------------------------------------------------------------
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+// -----------------------------------------------------------------------
+// Modal box
+// -----------------------------------------------------------------------
+.modal {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// -----------------------------------------------------------------------
+// Header
+// -----------------------------------------------------------------------
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+}
+
+// -----------------------------------------------------------------------
+// Body
+// -----------------------------------------------------------------------
+.body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.instructions {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+// -----------------------------------------------------------------------
+// TypeInput sub-layout
+// -----------------------------------------------------------------------
+.typeInput {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nameInput {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+// Font picker — a row of style preview buttons
+.fontSelector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.fontOption {
+  padding: 10px 8px;
+  font-size: 22px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #111827;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+  }
+}
+
+.fontSelected {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+// Signature preview box
+.signaturePreview {
+  border: 1.5px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fafafa;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  overflow: hidden;
+}
+
+.signaturePreviewText {
+  font-size: 44px;
+  color: #11182f;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// -----------------------------------------------------------------------
+// Footer
+// -----------------------------------------------------------------------
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancelButton {
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1.5px solid #d1d5db;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.applyButton {
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) {
+    background: #1d4ed8;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}

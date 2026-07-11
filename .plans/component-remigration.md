@@ -484,9 +484,9 @@ renderer entries those packages expose.
 
 | State | Meaning | Package folders | Public component entries |
 | --- | --- | ---: | ---: |
-| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 6 | 19 |
+| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 5 | 18 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 0 | 0 |
+| In review | Audit and tests passed; waiting for user approval. | 1 | 1 |
 | Complete | User approved after audit and verification. | 10 | 32 |
 
 ### Extension Package Inventory
@@ -503,7 +503,7 @@ renderer entries those packages expose.
 | `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Complete; protected source, metadata, changelog, and copied E2E spec match the original package except for the copied spec's harness import rewrite; package E2E command passes all 6 tests; user approved completion. |
 | `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Complete; protected package source and changelog match the original package, rewrite-added package E2E covers DOM attachment, static children, row height/gap, state-driven rerendering, and data item-template context, package build and metadata build pass, the package E2E command passes all 5 tests, and user approved completion. No original package-local E2E spec existed to copy. |
 | `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Complete; protected source, metadata, and changelog match the original package except for the copied spec's harness import rewrite; package build and metadata build pass, all 5 copied package E2E tests pass, and user approved completion. |
-| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | In review; protected source, metadata, docs, resources, package tests, and WASM setup copied from the original package; package build, metadata build, protected-copy diff audit, and all 2 package E2E tests passed. Copied unit tests now run but have 4 original assertion failures around the `✍ Click to sign` placeholder text; leave them unresolved until a package-unit-test compatibility pass documents the protected-test exception or restores the original test dependency behavior. |
 | `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Audit required. |

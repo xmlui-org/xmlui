@@ -1,0 +1,12 @@
+.dragging {
+  opacity: 0.8;
+  cursor: move !important;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.2s ease;
+
+  * {
+    cursor: move !important;
+    pointer-events: none;
+  }
+}
