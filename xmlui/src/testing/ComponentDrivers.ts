@@ -828,11 +828,18 @@ export class SelectDriver extends ComponentDriver {
     if (!(await visibleOptions.count())) {
       await this.toggleOptionsVisibility();
     }
-    await this.component
+    const option = this.component
       .getByRole("option", { name: value })
       .or(this.params.page.getByRole("option", { name: value }))
-      .first()
-      .click({ force: true });
+      .first();
+    await option.waitFor({ state: "visible" });
+    const isDisabled = await option.evaluate((element) =>
+      element.matches('[aria-disabled="true"], [data-disabled], [disabled]'),
+    );
+    if (isDisabled) {
+      return;
+    }
+    await option.click();
   }
 
   async searchFor(value: string): Promise<void> {
@@ -979,26 +986,28 @@ export class SliderDriver extends ComponentDriver {
     key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
     repeat?: number;
   }) {
-    const sliderContainer = this.params.page.locator("[data-slider-container]").filter({ visible: true }).first();
-    if (await sliderContainer.count()) {
-      await sliderContainer.waitFor({ state: "attached" });
-      await this.params.page.waitForTimeout(50);
-      await sliderContainer.evaluate((element, eventDetail) => {
-        const driverSet = (element as HTMLElement & {
-          __xmluiSliderDriverSet?: (detail: typeof eventDetail) => void;
-        }).__xmluiSliderDriverSet;
-        if (typeof driverSet === "function") {
-          driverSet(eventDetail);
-          return;
-        }
-        element.dispatchEvent(new CustomEvent("xmlui-slider-driver-set", {
-          bubbles: true,
-          detail: eventDetail,
-        }));
-      }, detail);
-      await this.params.page.waitForTimeout(250);
+    const dispatched = await this.params.page.evaluate((eventDetail) => {
+      const element = document.querySelector("[data-slider-container]") as HTMLElement | null;
+      if (!element) {
+        return false;
+      }
+      const driverSet = (element as HTMLElement & {
+        __xmluiSliderDriverSet?: (detail: typeof eventDetail) => void;
+      }).__xmluiSliderDriverSet;
+      if (typeof driverSet === "function") {
+        driverSet(eventDetail);
+        return true;
+      }
+      element.dispatchEvent(new CustomEvent("xmlui-slider-driver-set", {
+        bubbles: true,
+        detail: eventDetail,
+      }));
+      return true;
+    }, detail);
+    if (dispatched) {
       return;
     }
+
     const componentId = await this.component.evaluate((element) =>
       element.getAttribute("data-xmlui-id") ?? element.getAttribute("id") ?? "",
     );
@@ -1048,11 +1057,11 @@ export class SliderDriver extends ComponentDriver {
         }
         api.setValue(current.length === 1 ? current[0] : current);
       }, { id: componentId, eventDetail: detail, min, max, step });
-      await this.params.page.waitForTimeout(250);
       return;
     }
+
+    const sliderContainer = this.params.page.locator("[data-slider-container]").filter({ visible: true }).first();
     await sliderContainer.waitFor({ state: "attached" });
-    await this.params.page.waitForTimeout(50);
     await sliderContainer.evaluate((element, eventDetail) => {
       const driverSet = (element as HTMLElement & {
         __xmluiSliderDriverSet?: (detail: typeof eventDetail) => void;
@@ -1066,7 +1075,6 @@ export class SliderDriver extends ComponentDriver {
         detail: eventDetail,
       }));
     }, detail);
-    await this.params.page.waitForTimeout(250);
   }
 
   private async getActiveThumb(thumbNumber = 0): Promise<Locator> {

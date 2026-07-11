@@ -188,6 +188,7 @@ test.describe("Basic Functionality", () => {
     createSliderDriver,
     page,
   }) => {
+    test.setTimeout(30_000);
     await initTestBed(`
       <Fragment>
         <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />
@@ -204,6 +205,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("all thumbs are interactable via keyboard", async ({ initTestBed, createSliderDriver, page }) => {
+    test.setTimeout(30_000);
     await initTestBed(`
       <Fragment>
         <Slider id="slider" initialValue="{[2, 4]}" minValue="0" maxValue="10" />

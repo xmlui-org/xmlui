@@ -729,6 +729,13 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   // this flag around our own scrollToIndex calls and ignore onScroll while set,
   // so only a real user scroll can turn off stick-to-bottom.
   const programmaticScroll = useRef(false);
+  const finishProgrammaticScroll = useCallback(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
+      });
+    });
+  }, []);
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
     setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
@@ -937,12 +944,10 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
         virtualizerRef.current?.scrollToIndex(rows.length - 1, {
           align: "end",
         });
-        requestAnimationFrame(() => {
-          programmaticScroll.current = false;
-        });
+        finishProgrammaticScroll();
       });
     }
-  }, [rows.length, scrollAnchor]);
+  }, [finishProgrammaticScroll, rows.length, scrollAnchor]);
 
   useEffect(() => {
     if (!virtualizerRef.current) return;
@@ -957,11 +962,9 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       // a hair short of the true bottom. scrollTo(scrollSize) clamps to the real
       // bottom regardless of item boundaries or trailing space.
       v.scrollTo(v.scrollSize);
-      requestAnimationFrame(() => {
-        programmaticScroll.current = false;
-      });
+      finishProgrammaticScroll();
     });
-  }, [rows]);
+  }, [finishProgrammaticScroll, rows]);
 
   // Re-assert stick-to-bottom when the content GROWS while we are following.
   // The effect above fires on `rows` (data) changes, but children that lay out
@@ -987,13 +990,11 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       // Absolute bottom (see the [rows] effect above) — robust to a still-
       // measuring trailing item, which is exactly what the observer catches.
       v.scrollTo(v.scrollSize);
-      requestAnimationFrame(() => {
-        programmaticScroll.current = false;
-      });
+      finishProgrammaticScroll();
     });
     observer.observe(container);
     return () => observer.disconnect();
-  }, [scrollAnchor, hasRows]);
+  }, [finishProgrammaticScroll, scrollAnchor, hasRows]);
 
   const isFetchingPrevPage = useRef(false);
   const tryToFetchPrevPage = useCallback(() => {

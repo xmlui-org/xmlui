@@ -243,21 +243,22 @@ type RuntimeTextAreaProps = React.ComponentProps<typeof TextArea> & {
   rootAttrs?: React.HTMLAttributes<HTMLDivElement>;
 };
 
-function RuntimeTextAreaShell({
-  adapter,
-  bindTo,
-  value,
-  initialValue,
-  invalidMessages,
-  required,
-  validationStatus,
-  validationResult: _validationResult,
-  validationInProgress: _validationInProgress,
-  verboseValidationFeedback,
-  onDidChange,
-  rootAttrs,
-  ...props
-}: RuntimeTextAreaProps) {
+const RuntimeTextAreaShell = React.forwardRef<HTMLDivElement, RuntimeTextAreaProps>(
+  function RuntimeTextAreaShell({
+    adapter,
+    bindTo,
+    value,
+    initialValue,
+    invalidMessages,
+    required,
+    validationStatus,
+    validationResult: _validationResult,
+    validationInProgress: _validationInProgress,
+    verboseValidationFeedback,
+    onDidChange,
+    rootAttrs,
+    ...props
+  }, forwardedRef) {
   const form = useFormContext();
   const defaultId = React.useId();
   const { parentFormItemId } = React.useContext(FormItemContext);
@@ -416,7 +417,7 @@ function RuntimeTextAreaShell({
 
   if (effectiveFormError && effectiveVerboseValidationFeedback) {
     return (
-      <div {...rootAttrs}>
+      <div {...rootAttrs} ref={forwardedRef}>
         {renderedTextArea}
         <div data-validation-display-severity="error">{effectiveFormError}</div>
       </div>
@@ -424,11 +425,11 @@ function RuntimeTextAreaShell({
   }
 
   return (
-    <div {...rootAttrs}>
+    <div {...rootAttrs} ref={forwardedRef}>
       {renderedTextArea}
     </div>
   );
-}
+});
 
 function runtimeTextAreaProps(adapter: XmluiComponentAdapter) {
   const rootAttrs = adapter.rootAttrs() as React.HTMLAttributes<HTMLDivElement>;

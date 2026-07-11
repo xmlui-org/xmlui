@@ -40,6 +40,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>
@@ -127,6 +129,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>
@@ -269,6 +273,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>

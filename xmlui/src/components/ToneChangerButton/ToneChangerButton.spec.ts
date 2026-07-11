@@ -124,7 +124,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByRole("button", { name: /ToneChangerButton/ });
       
       // Initially in light mode
       await expect(page.getByTestId("theme-state")).toHaveText("light");
@@ -228,7 +228,7 @@ test.describe("Basic Functionality", () => {
       
       // Should still render and be functional
       await expect(page.getByTestId("theme-state")).toHaveText("light");
-      const button = page.getByRole("button");
+      const button = page.getByRole("button", { name: /ToneChangerButton/ });
       await expect(button).toBeVisible();
       
       // Should still be able to toggle
@@ -266,7 +266,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByRole("button", { name: /ToneChangerButton/ });
       await expect(button).toBeVisible();
       
       // Should still function for toggling
@@ -406,7 +406,7 @@ test.describe("Accessibility", () => {
 
   test("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<ToneChangerButton />`);
-    const button = page.getByRole("button");
+    const button = page.getByRole("button", { name: /ToneChangerButton/ });
     
     // Should be focusable (not disabled)
     await expect(button).not.toBeDisabled();
