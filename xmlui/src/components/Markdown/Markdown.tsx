@@ -1,98 +1,607 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { Fragment, type ReactNode } from "react";
+import styles from "./Markdown.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { defaultProps } from "./Markdown.defaults";
+import { Markdown } from "./MarkdownReact";
+import React from "react";
+import { forwardRef, useMemo } from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { parseBindingExpression } from "./parse-binding-expr";
+import type { CodeHighlighter } from "../CodeBlock/highlight-code";
+import {
+  convertPlaygroundPatternToMarkdown,
+  convertTreeDisplayToMarkdown,
+  observePlaygroundPattern,
+  observeTreeDisplay,
+} from "./utils";
+import { createMetadata, dComponent } from "../metadata-helpers";
+import type { BreakMode, OverflowMode } from "../abstractions";
+import { MemoizedItem } from "../container-helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import {
+  wrapComponent as wrapRuntimeComponent,
+  type XmluiComponentAdapter,
+} from "../../runtime/rendering/adapter";
+import { useBindingRevision } from "../../runtime/rendering/reactive";
+import { readLocal, readReference, type RuntimeScope } from "../../runtime/state";
+import type { XmluiNode } from "../../compiler/ir";
 
 const COMP = "Markdown";
 
-export const defaultProps = {
-  removeIndents: true,
-  removeBr: false,
-  showHeadingAnchors: false,
-  openLinkInNewTab: false,
-};
-
 export const MarkdownMd = createMetadata({
   status: "stable",
-  description: "`Markdown` renders Markdown text, XMLUI markdown bindings, and XMLUI playground fences.",
+  description:
+    "`Markdown` renders formatted text using markdown syntax. Use " +
+    "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
+    "when you need [rich formatting](/working-with-markdown).",
+  optimization: {
+    isImplicitContainerByDefault: true,
+  },
+  contextVars: {
+    $anchorId: { description: "The generated id of the current heading anchor." },
+    $anchorHref: { description: "The href (#id) of the current heading anchor." },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
     content: {
-      description: "The Markdown source to render. Child text is used when omitted.",
+      description:
+        "This property sets the markdown content to display. Alternatively, you can nest " +
+        "the markdown content as a child in a CDATA section. In neither this property " +
+        "value nor any child is defined, empty content is displayed.",
       valueType: "string",
     },
+    codeHighlighter: {
+      description: "This property sets the code highlighter to use.",
+      isInternal: true,
+    },
     removeIndents: {
-      description: "Removes the common indentation from Markdown child text before rendering.",
+      description:
+        "This boolean property specifies whether leading indents should be " +
+        "removed from the markdown content. If set to `true`, the shortest " +
+        "indent found at the start of the content lines is removed from the " +
+        "beginning of every line.",
       valueType: "boolean",
       defaultValue: defaultProps.removeIndents,
     },
     removeBr: {
-      description: "Removes HTML br tags from the rendered Markdown.",
+      description:
+        "This boolean property specifies whether `<br>` (line break) elements should be " +
+        "omitted from the rendered output. When set to `true`, `<br/>` tags in the " +
+        "markdown content will not be rendered. When `false` (default), `<br/>` tags " +
+        "render as horizontal bars.",
       valueType: "boolean",
       defaultValue: defaultProps.removeBr,
     },
     showHeadingAnchors: {
-      description: "Adds anchor links to Markdown headings.",
+      description:
+        "This boolean property specifies whether heading anchors should be " +
+        "displayed. If set to `true`, heading anchors will be displayed on hover " +
+        "next to headings.",
       valueType: "boolean",
-      defaultValue: defaultProps.showHeadingAnchors,
     },
-    anchorTemplate: {
-      description: "Template for generated heading anchor ids.",
-      valueType: "string",
+    anchorTemplate: dComponent(
+      "An optional template to customize the anchor link rendered next to each heading. " +
+        "Requires `showHeadingAnchors` to be `true`. " +
+        "The template receives `$anchorId` and `$anchorHref` as context variables.",
+    ),
+    grayscale: {
+      description:
+        "This boolean property specifies whether images should be displayed in " +
+        "grayscale. If set to `true`, all images within the markdown will be " +
+        "rendered in grayscale.",
+      valueType: "boolean",
+    },
+    truncateLinks: {
+      description:
+        "This boolean property specifies whether long links should be " +
+        "truncated with ellipsis. If set to `true`, links will be displayed " +
+        "with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
+      valueType: "boolean",
     },
     openLinkInNewTab: {
-      description: "Opens rendered Markdown links in a new browser tab.",
+      description:
+        "This boolean property specifies whether links should open in a new tab. " +
+        "If set to `true`, all links within the markdown will open in a new tab " +
+        'with `target="_blank"`. Links that explicitly specify their own target ' +
+        "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
-      defaultValue: defaultProps.openLinkInNewTab,
     },
-    testId: {
-      description: "Adds a test identifier to the rendered Markdown container.",
+    enablePlaygroundTracing: {
+      description: "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
+      valueType: "boolean",
+      isInternal: true,
+    },
+    breakMode: {
+      description:
+        "This property controls how text breaks into multiple lines. " +
+        "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
+        "`anywhere` breaks at any character, `keep` prevents word breaking, " +
+        "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
       valueType: "string",
+      defaultValue: "normal",
+      availableValues: [
+        { value: "normal", description: "Uses standard word boundaries for breaking" },
+        { value: "word", description: "Breaks long words when necessary to prevent overflow" },
+        { value: "anywhere", description: "Breaks at any character if needed to fit content" },
+        { value: "keep", description: "Prevents breaking within words entirely" },
+        { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
+      ],
     },
-  },
-  themeVars: {
-    [`textColor-${COMP}`]: "The Markdown text color.",
-    [`fontFamily-${COMP}`]: "The Markdown font family.",
-    [`fontSize-${COMP}`]: "The Markdown font size.",
-    [`lineHeight-${COMP}`]: "The Markdown line height.",
-    "padding-CodeText": "The padding around fenced code text.",
-    "paddingLeft-CodeText-code": "The left padding of the code element inside a fenced block.",
-    "textColor-Text-codefence": "The fenced code text color.",
-    "fontFamily-Text-codefence": "The fenced code font family.",
+    overflowMode: {
+      description:
+        "This property controls how text overflow is handled. " +
+        "`none` prevents wrapping and shows no overflow indicator, " +
+        "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
+        "and `flow` allows multi-line wrapping with vertical scrolling when needed. " +
+        "When not specified, uses the default text behavior.",
+      valueType: "string",
+      defaultValue: "not specified",
+      availableValues: [
+        {
+          value: "none",
+          description: "No wrapping, text stays on a single line with no overflow indicator",
+        },
+        { value: "ellipsis", description: "Truncates with an ellipsis" },
+        {
+          value: "scroll",
+          description: "Forces single line with horizontal scrolling when content overflows",
+        },
+        {
+          value: "flow",
+          description:
+            "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained",
+        },
+      ],
+    },
   },
   defaultThemeVars: {
-    [`textColor-${COMP}`]: "$textColor",
-    [`fontFamily-${COMP}`]: "$fontFamily",
-    [`fontSize-${COMP}`]: "$fontSize",
-    [`lineHeight-${COMP}`]: "$lineHeight",
-    [`padding-CodeText`]: "$space-3",
-    [`paddingLeft-CodeText-code`]: "$space-2",
-    [`textColor-Text-codefence`]: "$textColor",
-    [`fontFamily-Text-codefence`]: "$fontFamily-monospace",
+    "marginTop-H1-markdown": "$space-4",
+    "marginBottom-H1-markdown": "$space-6",
+    "marginTop-H2-markdown": "$space-8",
+    "marginBottom-H2-markdown": "$space-5",
+    "marginTop-H3-markdown": "$space-7",
+    "marginBottom-H3-markdown": "$space-4",
+    "marginTop-H4-markdown": "$space-6",
+    "marginBottom-H4-markdown": "$space-3",
+    "marginTop-H5-markdown": "$space-5",
+    "marginBottom-H5-markdown": "$space-3",
+    "marginTop-H6-markdown": "$space-4",
+    "marginBottom-H6-markdown": "$space-2_5",
+
+    "backgroundColor-Admonition-markdown": "$color-surface-100",
+    "border-Admonition-markdown": "0px solid $color-primary-300",
+    "backgroundColor-Admonition-markdown-warning": "$color-warn-100",
+    "borderColor-Admonition-markdown-warning": "$color-warn-300",
+    "backgroundColor-Admonition-markdown-danger": "$color-danger-100",
+    "borderColor-Admonition-markdown-danger": "$color-danger-300",
+    "backgroundColor-Admonition-markdown-card": "$color-surface-50",
+    "border-Admonition-markdown-card": "1px solid $color-surface-200",
+    "backgroundColor-Admonition-markdown-feat": "$color-surface-50",
+    "border-Admonition-markdown-feat": "1px solid $color-surface-200",
+    "backgroundColor-Admonition-markdown-def": "$color-surface-50",
+    "borderRadius-Admonition-markdown": "$space-2",
+    "size-icon-Admonition-markdown": "$space-5",
+    "paddingLeft-Admonition-markdown": "$space-2",
+    "paddingRight-Admonition-markdown": "$space-6",
+    "paddingTop-Admonition-markdown": "$space-3",
+    "paddingBottom-Admonition-markdown": "$space-2",
+    "marginLeft-content-Admonition-markdown": "$space-1_5",
+    "marginTop-Admonition-markdown": "$space-6",
+    "marginBottom-Admonition-markdown": "$space-6",
+
+    "marginTop-Blockquote-markdown": "$space-6",
+    "marginBottom-Blockquote-markdown": "$space-6",
+    "paddingHorizontal-Blockquote-markdown": "$space-6",
+    "paddingTop-Blockquote-markdown": "$space-3",
+    "paddingBottom-Blockquote-markdown": "$space-2_5",
+    "backgroundColor-Blockquote-markdown": "$color-surface-100",
+    "width-accent-Blockquote-markdown": "3px",
+    "color-accent-Blockquote-markdown": "$color-surface-500",
+
+    "borderRadius-Table-markdown": "$borderRadius",
+    "textColor-Thead-markdown": "$color-surface-500",
+    "backgroundColor-Thead-markdown": "$color-surface-100",
+    "textTransform-Thead-markdown": "uppercase",
+    "fontWeight-Thead-markdown": "$fontWeight-bold",
+    "padding-Th-markdown": "$space-4 $space-6",
+    "fontSize-Th-markdown": "$fontSize-tiny",
+    "borderBottom-Tr-markdown": "1px solid $borderColor",
+    "padding-Td-markdown": "$space-2 $space-4",
+    "verticalAlignment-Td-markdown": "top",
+
+    "marginLeft-Ul-markdown": "$space-8",
+    "marginRight-Ul-markdown": "$space-0",
+    "marginTop-Ul-markdown": "$space-2_5",
+    "marginBottom-Ul-markdown": "$space-5",
+    "marginLeft-Ol-markdown": "$space-8",
+    "marginRight-Ol-markdown": "$space-0",
+    "marginTop-Ol-markdown": "$space-2_5",
+    "marginBottom-Ol-markdown": "$space-5",
+    "marginTop-Li-markdown": "$space-2_5",
+    "marginBottom-Li-markdown": "$space-2_5",
+
+    "marginTop-Image-markdown": "$space-6",
+    "marginBottom-Image-markdown": "$space-6",
+    "marginLeft-Image-markdown": "$space-0",
+    "marginRight-Image-markdown": "$space-0",
+
+    "marginTop-Text-markdown": "$space-2",
+    "marginBottom-Text-markdown": "$space-2",
+    "fontSize-Text-markdown": "$fontSize",
+    "fontWeight-Text-markdown": "$fontWeight-Text",
+
+    "borderColor-HorizontalRule-markdown": "$borderColor",
+    "borderStyle-HorizontalRule-markdown": "solid",
+    "borderWidth-HorizontalRule-markdown": "2px",
+
+    light: {
+      // --- No light-specific theme vars
+    },
+    dark: {
+      "backgroundColor-Blockquote-markdown": "$color-surface-50",
+      "backgroundColor-Admonition-markdown": "$color-primary-200",
+    },
   },
 });
 
-export function Markdown({ children }: { children?: ReactNode }) {
-  return <Fragment>{renderInlineMarkdown(String(children ?? ""))}</Fragment>;
+type ThemedMarkdownProps = React.ComponentPropsWithoutRef<typeof Markdown>;
+
+export const ThemedMarkdown = React.forwardRef<
+  React.ElementRef<typeof Markdown>,
+  ThemedMarkdownProps
+>(function ThemedMarkdown({ className, ...props }, ref) {
+  const themeClass = useComponentThemeClass(MarkdownMd);
+  return (
+    <Markdown {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />
+  );
+});
+
+export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownMd, {
+  exclude: [
+    "content",
+    "removeIndents",
+    "removeBr",
+    "codeHighlighter",
+    "showHeadingAnchors",
+    "grayscale",
+    "truncateLinks",
+    "openLinkInNewTab",
+    "overflowMode",
+    "breakMode",
+    "anchorTemplate",
+    "enablePlaygroundTracing",
+  ],
+  customRender(_props, { node, extractValue, renderChild, classes }) {
+    let renderedChildren = "";
+
+    // 1. Static content prop fallback
+    if (!renderedChildren) {
+      renderedChildren = extractValue.asString(node.props.content);
+    }
+
+    // 2. "data" property fallback
+    if (!renderedChildren && typeof (node.props as any).data === "string") {
+      renderedChildren = extractValue.asString((node.props as any).data);
+    }
+
+    // 3. Children fallback
+    if (!renderedChildren) {
+      (node.children ?? []).forEach((child) => {
+        const renderedChild = renderChild(child);
+        if (typeof renderedChild === "string") {
+          renderedChildren += renderedChild;
+        }
+      });
+    }
+
+    return (
+      <TransformedMarkdown
+        classes={classes}
+        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+        codeHighlighter={extractValue(node.props.codeHighlighter)}
+        extractValue={extractValue}
+        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
+        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+        truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
+        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
+        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+        enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
+        anchorRenderer={
+          node.props.anchorTemplate
+            ? (anchorId: string, anchorHref: string) => (
+                <MemoizedItem
+                  node={(node.props as any).anchorTemplate}
+                  contextVars={{ $anchorId: anchorId, $anchorHref: anchorHref }}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+        }
+      >
+        {renderedChildren}
+      </TransformedMarkdown>
+    );
+  },
+});
+
+type TransformedMarkdownProps = {
+  children: React.ReactNode;
+  removeIndents?: boolean;
+  removeBr?: boolean;
+  className?: string;
+  classes?: Record<string, string>;
+  extractValue: ValueExtractor;
+  codeHighlighter?: CodeHighlighter;
+  showHeadingAnchors?: boolean;
+  grayscale?: boolean;
+  truncateLinks?: boolean;
+  openLinkInNewTab?: boolean;
+  overflowMode?: OverflowMode;
+  breakMode?: BreakMode;
+  enablePlaygroundTracing?: boolean;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
+};
+
+const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
+  (
+    {
+      children,
+      removeIndents,
+      removeBr,
+      className,
+      classes,
+      extractValue,
+      codeHighlighter,
+      showHeadingAnchors,
+      grayscale,
+      truncateLinks,
+      openLinkInNewTab,
+      overflowMode,
+      breakMode,
+      enablePlaygroundTracing,
+      anchorRenderer,
+    }: TransformedMarkdownProps,
+    ref,
+  ) => {
+    const markdownContent = useMemo(() => {
+      if (typeof children !== "string") {
+        return null;
+      }
+
+      // --- Resolve binding expression values
+      // --- Resolve xmlui playground definitions
+
+      let resolvedMd = removeIndents ? removeRuntimeMarkdownIndents(children) : children;
+      while (true) {
+        const nextPlayground = observePlaygroundPattern(resolvedMd);
+        if (!nextPlayground) break;
+
+        resolvedMd =
+          resolvedMd.slice(0, nextPlayground[0]) +
+          convertPlaygroundPatternToMarkdown(nextPlayground[2], {
+            enableTracing: enablePlaygroundTracing,
+          }) +
+          resolvedMd.slice(nextPlayground[1]);
+      }
+
+      while (true) {
+        const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+        if (!nextTreeDisplay) break;
+        resolvedMd =
+          resolvedMd.slice(0, nextTreeDisplay[0]) +
+          convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+          resolvedMd.slice(nextTreeDisplay[1]);
+      }
+
+      resolvedMd = parseBindingExpression(resolvedMd, extractValue);
+      return resolvedMd;
+    }, [children, enablePlaygroundTracing, extractValue, removeIndents]);
+
+    return (
+      <Markdown
+        ref={ref}
+        removeIndents={removeIndents}
+        removeBr={removeBr}
+        codeHighlighter={codeHighlighter}
+        className={className}
+        classes={classes}
+        showHeadingAnchors={showHeadingAnchors}
+        grayscale={grayscale}
+        truncateLinks={truncateLinks}
+        openLinkInNewTab={openLinkInNewTab}
+        overflowMode={overflowMode}
+        breakMode={breakMode}
+        anchorRenderer={anchorRenderer}
+      >
+        {markdownContent}
+      </Markdown>
+    );
+  },
+);
+
+export { Markdown } from "./MarkdownReact";
+
+export const markdownRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: MarkdownMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    useBindingRevision(undefined, adapter.scope);
+    const rootAttrs = adapter.rootAttrs();
+    const removeIndents = adapter.booleanProp("removeIndents", defaultProps.removeIndents);
+    const source = markdownSource(adapter);
+    const markdownContent = resolveRuntimeMarkdown(
+      removeIndents ? removeRuntimeMarkdownIndents(source) : source,
+      adapter.scope,
+      {
+      enableTracing: adapter.booleanProp("enablePlaygroundTracing", false),
+      },
+    );
+    return (
+      <Markdown
+        {...rootAttrs}
+        removeIndents={removeIndents}
+        removeBr={adapter.booleanProp("removeBr", defaultProps.removeBr)}
+        showHeadingAnchors={adapter.booleanProp("showHeadingAnchors", false)}
+        grayscale={adapter.booleanProp("grayscale", false)}
+        truncateLinks={adapter.booleanProp("truncateLinks", false)}
+        openLinkInNewTab={adapter.booleanProp("openLinkInNewTab", false)}
+        overflowMode={adapter.prop("overflowMode") as OverflowMode | undefined}
+        breakMode={adapter.prop("breakMode") as BreakMode | undefined}
+      >
+        {markdownContent}
+      </Markdown>
+    );
+  },
+});
+
+function markdownSource(adapter: XmluiComponentAdapter): string {
+  const content = adapter.prop("content");
+  if (content !== undefined && content !== null) {
+    return String(content);
+  }
+  const nodeChildren = adapter.node.children ?? [];
+  const children = nodeChildren.filter(isTextNode);
+  if (children.length !== nodeChildren.length) {
+    return "";
+  }
+  return decodeEscapedMarkdown(children.map((child) => child.value).join(""));
 }
 
-function renderInlineMarkdown(source: string): ReactNode[] {
-  const nodes: ReactNode[] = [];
-  const pattern = /(`([^`]+)`)|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)/g;
-  let cursor = 0;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(source)) !== null) {
-    if (match.index > cursor) {
-      nodes.push(source.slice(cursor, match.index));
-    }
-    if (match[2] !== undefined) {
-      nodes.push(<code key={nodes.length}>{match[2]}</code>);
-    } else if (match[4] !== undefined) {
-      nodes.push(<strong key={nodes.length}>{match[4]}</strong>);
-    } else {
-      nodes.push(<em key={nodes.length}>{match[6]}</em>);
-    }
-    cursor = match.index + match[0].length;
+function removeRuntimeMarkdownIndents(input: string): string {
+  if (!input) {
+    return "";
   }
-  if (cursor < source.length) {
-    nodes.push(source.slice(cursor));
+  const lines = input.split("\n");
+  const indents = lines
+    .filter((line) => line.trim())
+    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const minIndent = Math.min(...indents);
+  const effectiveIndent = minIndent > 0
+    ? minIndent
+    : Math.min(...indents.filter((indent) => indent > 0));
+  if (!Number.isFinite(effectiveIndent) || effectiveIndent <= 0) {
+    return input;
   }
-  return nodes;
+  const indent = " ".repeat(effectiveIndent);
+  return lines.map((line) => line.startsWith(indent) ? line.slice(effectiveIndent) : line).join("\n");
+}
+
+function isTextNode(node: XmluiNode): node is Extract<XmluiNode, { kind: "text" }> {
+  return node.kind === "text";
+}
+
+function decodeEscapedMarkdown(value: string): string {
+  return value
+    .replaceAll("@&#123;", "@\\{")
+    .replaceAll("&#123;", "{")
+    .replaceAll("&#125;", "}")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", `"`)
+    .replaceAll("&apos;", "'")
+    .replaceAll("&amp;", "&");
+}
+
+function resolveRuntimeMarkdown(
+  content: string,
+  scope: RuntimeScope,
+  options: { enableTracing?: boolean },
+): string {
+  let resolvedMd = recoverCollapsedMarkdown(content);
+  while (true) {
+    const nextPlayground = observePlaygroundPattern(resolvedMd);
+    if (!nextPlayground) break;
+    resolvedMd =
+      resolvedMd.slice(0, nextPlayground[0]) +
+      convertPlaygroundPatternToMarkdown(nextPlayground[2], {
+        enableTracing: options.enableTracing,
+      }) +
+      resolvedMd.slice(nextPlayground[1]);
+  }
+  while (true) {
+    const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+    if (!nextTreeDisplay) break;
+    resolvedMd =
+      resolvedMd.slice(0, nextTreeDisplay[0]) +
+      convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+      resolvedMd.slice(nextTreeDisplay[1]);
+  }
+  return parseBindingExpression(resolvedMd, (expression) =>
+    evaluateMarkdownExpression(String(expression), scope),
+  );
+}
+
+function recoverCollapsedMarkdown(value: string): string {
+  return value.replace(/```([\s\S]*?)```/g, (_match, inner: string) => {
+    if (inner.includes("\n")) {
+      return `\`\`\`${inner}\`\`\``;
+    }
+    const trimmed = inner.trim();
+    const firstSpace = trimmed.search(/\s/);
+    if (firstSpace <= 0) {
+      return `\n\`\`\`\n${trimmed}\n\`\`\`\n`;
+    }
+    const info = trimmed.slice(0, firstSpace);
+    const content = trimmed.slice(firstSpace).trim();
+    return `\n\`\`\`${info}\n${content}\n\`\`\`\n`;
+  });
+}
+
+function evaluateMarkdownExpression(expression: string, scope: RuntimeScope): unknown {
+  const normalized = expression.startsWith("{") && expression.endsWith("}")
+    ? expression.slice(1, -1)
+    : expression;
+  const context = new Proxy<Record<string, unknown>>({}, {
+    has: () => true,
+    get: (_target, name) => {
+      if (typeof name !== "string") {
+        return undefined;
+      }
+      if (name === "undefined") {
+        return undefined;
+      }
+      const local = readLocal(scope, name);
+      if (local !== undefined) {
+        return local;
+      }
+      const reference = readReference(scope, name);
+      if (reference !== undefined) {
+        return reference;
+      }
+      return (globalThis as Record<string, unknown>)[name];
+    },
+  });
+  try {
+    return normalizeRuntimeMarkdownValue(
+      Function("context", `with (context) { return (${normalized}); }`)(context),
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeRuntimeMarkdownValue(value: unknown): unknown {
+  if (typeof value === "function") {
+    return {
+      type: "ArrowExpression",
+      _ARROW_EXPR_: true,
+    };
+  }
+  if (Array.isArray(value)) {
+    return value.map(normalizeRuntimeMarkdownValue);
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        normalizeRuntimeMarkdownValue(item),
+      ]),
+    );
+  }
+  return value;
 }

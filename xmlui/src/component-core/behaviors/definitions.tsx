@@ -454,18 +454,35 @@ function TooltipBehavior({
   tooltip,
   tooltipMarkdown,
   tooltipOptions,
+  ...rest
 }: {
   children: ReactNode;
   tooltip?: string;
   tooltipMarkdown?: string;
   tooltipOptions?: unknown;
+  [key: string]: unknown;
 }) {
   const parsedOptions = parseTooltipOptions(tooltipOptions);
+  const title = tooltipMarkdown ? undefined : tooltip;
   return (
     <Tooltip text={tooltip ?? ""} markdown={tooltipMarkdown} {...parsedOptions}>
-      {children}
+      {annotateTooltipTrigger(children, title, rest)}
     </Tooltip>
   );
+}
+
+function annotateTooltipTrigger(
+  children: ReactNode,
+  title: string | undefined,
+  extraProps: Record<string, unknown>,
+): ReactNode {
+  const { ref: _ref, ...propsWithoutRef } = extraProps as Record<string, unknown> & { ref?: unknown };
+  const behaviorProps = {
+    ...propsWithoutRef,
+    "data-xmlui-behavior": "tooltip",
+    title: typeof window === "undefined" ? title : undefined,
+  };
+  return <span {...behaviorProps}>{children}</span>;
 }
 
 function stringValue(value: unknown): string | undefined {

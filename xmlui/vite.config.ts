@@ -7,7 +7,7 @@ import { exampleApiMocksPlugin } from "./src/vite-plugin/exampleApiMocks";
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
-import { createXmluiLogger, xmluiCssOptions } from "./vite.shared";
+import { createXmluiLogger, styleToJsInteropPlugin, xmluiCssOptions } from "./vite.shared";
 
 export default defineConfig({
   customLogger: createXmluiLogger(),
@@ -17,10 +17,25 @@ export default defineConfig({
       invariant: fileURLToPath(new URL("./src/compat/invariant.ts", import.meta.url)),
       papaparse: fileURLToPath(new URL("./src/compat/papaParse.ts", import.meta.url)),
       "react-qr-code": fileURLToPath(new URL("./src/compat/reactQrCode.tsx", import.meta.url)),
+      "style-to-js": fileURLToPath(new URL("./src/compat/styleToJs.ts", import.meta.url)),
     },
+  },
+  optimizeDeps: {
+    include: [
+      "debug",
+      "extend",
+      "hast-util-to-jsx-runtime",
+      "micromark",
+      "react-markdown",
+      "rehype-raw",
+      "remark-gfm",
+      "style-to-js",
+      "unified",
+    ],
   },
   css: xmluiCssOptions,
   plugins: [
+    styleToJsInteropPlugin(),
     rawScssModulePlugin(),
     svgReactPlugin(),
     exampleApiMocksPlugin(),

@@ -582,16 +582,19 @@ function normalizeDataSourceError(error: unknown): Record<string, unknown> {
   const response = record?.response && typeof record.response === "object"
     ? record.response as Record<string, unknown>
     : {};
-  return {
+  const normalized: Record<string, unknown> = {
     code: record?.code,
     category: record?.category,
     retryable: record?.retryable,
     statusCode: record?.statusCode ?? (response.statusCode as number | undefined) ?? 0,
     message: String(response.message ?? record?.message ?? ""),
     details: response.details ?? {},
-    data: record?.data ?? {},
     response,
   };
+  if (record?.data && Object.keys(record.data).length > 0) {
+    normalized.data = record.data;
+  }
+  return normalized;
 }
 
 function deepEqual(left: unknown, right: unknown): boolean {

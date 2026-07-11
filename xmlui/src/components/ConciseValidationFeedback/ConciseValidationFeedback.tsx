@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import { useState, type HTMLAttributes } from "react";
 import classnames from "classnames";
 
 import { createMetadata } from "../../component-core/metadata/helpers";
@@ -56,13 +56,41 @@ export const ConciseValidationFeedback = ({
   className,
   ...rest
 }: Props) => {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
   if (validationStatus === "error") {
+    const {
+      onBlur,
+      onFocus,
+      onMouseEnter,
+      onMouseLeave,
+      ...spanProps
+    } = rest;
     return (
-      <span {...rest} className={classnames(className)}>
-        <Tooltip text={invalidMessages.join("\n")} delayDuration={100}>
+      <Tooltip text={invalidMessages.join("\n")} delayDuration={100} open={tooltipOpen}>
+        <span
+          {...spanProps}
+          className={classnames(className)}
+          onBlur={(event) => {
+            setTooltipOpen(false);
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setTooltipOpen(true);
+            onFocus?.(event);
+          }}
+          onMouseEnter={(event) => {
+            setTooltipOpen(true);
+            onMouseEnter?.(event);
+          }}
+          onMouseLeave={(event) => {
+            setTooltipOpen(false);
+            onMouseLeave?.(event);
+          }}
+        >
           <ThemedIcon name={errorIcon} className={classnames(styles.icon, styles.error)} />
-        </Tooltip>
-      </span>
+        </span>
+      </Tooltip>
     );
   }
 

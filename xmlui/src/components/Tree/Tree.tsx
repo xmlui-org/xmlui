@@ -670,6 +670,8 @@ export const treeRenderer = wrapRuntimeComponent({
       ...(hostAttrs.style as Record<string, unknown> | undefined),
       display: "flex",
       flexDirection: "column",
+      flex: (hostAttrs.style as Record<string, unknown> | undefined)?.flex ?? "1 1 0",
+      height: (hostAttrs.style as Record<string, unknown> | undefined)?.height ?? "100%",
       minWidth: 0,
       minHeight: 0,
     };

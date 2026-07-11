@@ -76,7 +76,8 @@ $borderColor-dialog-Inspector: createThemeVar("borderColor-dialog-#{$component}"
     height: 100%;
   }
 
-  :export {
-    themeVars: t.json-stringify($themeVars);
-  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

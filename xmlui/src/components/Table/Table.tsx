@@ -1022,6 +1022,15 @@ export const tableRenderer = wrapRuntimeComponent({
   renderer: ({ adapter }) => {
     const items = adapter.prop("items") ?? adapter.prop("data");
     const refreshOnValue = adapter.prop("refreshOn");
+    const parentLayoutContext = adapter.props.layoutContext as LayoutContext | undefined;
+    const tableLayoutContext = useMemo(
+      () => createChildLayoutContext(parentLayoutContext, { type: "Table" }),
+      [parentLayoutContext],
+    );
+    const tableCellLayoutContext = useMemo(
+      () => createChildLayoutContext(tableLayoutContext, { type: "TableCell", orientation: "horizontal" }),
+      [tableLayoutContext],
+    );
     const columns = collectRuntimeColumns(adapter.node, adapter.scope, (item, rowIndex, column, columnNode, authoredColIndex, cellValue) => {
       const children = nonPropertyChildren(columnNode.children);
       if (children.length === 0) {
@@ -1050,7 +1059,7 @@ export const tableRenderer = wrapRuntimeComponent({
         emitEvent: adapter.scope.emitEvent,
         extensionFunctions: adapter.scope.extensionFunctions,
       });
-      return adapter.context.renderChildren(children, cellScope, adapter.node.range.end);
+      return adapter.context.renderChildren(children, cellScope, adapter.node.range.end, tableCellLayoutContext);
     });
     const rootAttrs = adapter.rootAttrs();
     const noDataTemplate = templateChildren(adapter.node, "noDataTemplate");

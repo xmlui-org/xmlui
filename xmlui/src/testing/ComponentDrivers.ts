@@ -43,6 +43,13 @@ export class ComponentDriver {
   getByPartName(part: string): Locator {
     return this.component.locator(`[data-part-id="${part}"], [data-xmlui-part="${part}"]`).first();
   }
+
+  async hasHtmlElement(selector: string | string[]): Promise<boolean> {
+    const locator = Array.isArray(selector)
+      ? this.component.locator(selector.join(" "))
+      : this.component.locator(selector);
+    return await locator.count() > 0;
+  }
 }
 
 export class InputComponentDriver extends ComponentDriver {

@@ -7,7 +7,7 @@ const basicApiInterceptor: ApiInterceptorDefinition = {
     "get-test": {
       url: "/api/test",
       method: "get",
-      handler: `console.log('GET!!!'); return { message: "GET success", id: 1 };`,
+      handler: `return { message: "GET success", id: 1 };`,
     },
     "post-test": {
       url: "/api/test/1",

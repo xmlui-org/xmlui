@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { createLogger, type CSSOptions, type Logger } from "vite";
+import { createLogger, type CSSOptions, type Logger, type Plugin } from "vite";
 
 export const xmluiCssOptions: CSSOptions = {
   modules: {
@@ -35,6 +35,22 @@ export function createXmluiLogger(): Logger {
   };
 
   return logger;
+}
+
+export function styleToJsInteropPlugin(compatPath = path.resolve("src/compat/styleToJs.ts")): Plugin {
+  return {
+    name: "xmlui-rs:style-to-js-interop",
+    enforce: "pre",
+    resolveId(id) {
+      return id === "xmlui:style-to-js" ? compatPath : null;
+    },
+    transform(source, id) {
+      if (!id.includes("hast-util-to-jsx-runtime/lib/index.js")) {
+        return null;
+      }
+      return source.replace(/from\s+["']style-to-js["']/g, 'from "xmlui:style-to-js"');
+    },
+  };
 }
 
 function shouldExposeLocalCssModuleName(filename: string): boolean {

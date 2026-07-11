@@ -128,7 +128,35 @@ function renderElement(
     );
   }
 
+  if (isNativeElementName(node.type)) {
+    return <NativeElement context={context} node={node} scope={scope} layoutContext={layoutContext} />;
+  }
+
   throw new XmluiRenderError(`Unknown XMLUI component: ${node.type}`, node);
+}
+
+function NativeElement({
+  context,
+  node,
+  scope,
+  layoutContext,
+}: {
+  context: RenderContext;
+  node: Extract<XmluiNode, { kind: "element" }>;
+  scope: RuntimeScope;
+  layoutContext?: RuntimeRenderLayoutContext;
+}) {
+  const props = Object.fromEntries(
+    Object.entries(node.props).map(([name, value]) => [
+      name === "class" ? "className" : name,
+      evaluateExpressionOrText(value, node.parsed?.props?.[name], scope, `native:${node.type}:${name}`),
+    ]),
+  );
+  return React.createElement(node.type, props, context.renderChildren(node.children, scope, node.range.end, layoutContext));
+}
+
+function isNativeElementName(type: string): boolean {
+  return /^[a-z][a-z0-9-]*$/.test(type);
 }
 
 export function renderChildren(

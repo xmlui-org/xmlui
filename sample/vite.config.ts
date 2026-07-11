@@ -4,6 +4,7 @@ import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 
 import { rawScssModulePlugin } from "../xmlui/src/vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "../xmlui/src/vite-plugin/svgReactPlugin";
+import { styleToJsInteropPlugin } from "../xmlui/vite.shared";
 
 const XMLUI_RE = /\.xmlui$/;
 const compilerPath = new URL("../xmlui/src/compiler/compileXmluiModule.ts", import.meta.url).pathname;
@@ -41,19 +42,35 @@ export default defineConfig({
       },
     },
   },
-  plugins: [rawScssModulePlugin(), svgReactPlugin(), sampleXmluiPlugin(), react()],
+  plugins: [
+    styleToJsInteropPlugin(fileURLToPath(new URL("../xmlui/src/compat/styleToJs.ts", import.meta.url))),
+    rawScssModulePlugin(),
+    svgReactPlugin(),
+    sampleXmluiPlugin(),
+    react(),
+  ],
   resolve: {
     alias: {
       "attr-accept": fileURLToPath(new URL("../xmlui/src/compat/attrAccept.ts", import.meta.url)),
       invariant: fileURLToPath(new URL("../xmlui/src/compat/invariant.ts", import.meta.url)),
       papaparse: fileURLToPath(new URL("../xmlui/src/compat/papaParse.ts", import.meta.url)),
       "react-qr-code": fileURLToPath(new URL("../xmlui/src/compat/reactQrCode.tsx", import.meta.url)),
+      "style-to-js": fileURLToPath(new URL("../xmlui/src/compat/styleToJs.ts", import.meta.url)),
     },
     extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui"],
   },
   optimizeDeps: {
     include: [
       "classnames",
+      "debug",
+      "extend",
+      "hast-util-to-jsx-runtime",
+      "micromark",
+      "react-markdown",
+      "rehype-raw",
+      "remark-gfm",
+      "style-to-js",
+      "unified",
       "invariant",
       "prop-types",
       "react",

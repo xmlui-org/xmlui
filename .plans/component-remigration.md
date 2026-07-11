@@ -293,10 +293,10 @@ the required verification pass in this branch, followed by user approval.
 | State | Meaning | Count |
 | --- | --- | ---: |
 | Not started | No strict migration work has been performed under this plan. | 0 |
-| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 2 |
+| Audit required | Component exists in the rewrite but has not passed the new protected-file audit. | 0 |
 | Blocked | Known prerequisite missing before strict migration can finish. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 110 |
+| Complete | User approved after audit and verification. | 112 |
 
 These counts are derived from the built-in component inventory below. Update them
 whenever a component changes state.
@@ -366,7 +366,7 @@ scope, dependencies, and state.
 | List | `ListReact.tsx`, module SCSS | Items, layout, compiler event-expression spread assignment support | Complete |
 | LiveRegion | `LiveRegion.tsx`, `LiveRegionReact.tsx`, `LiveRegion.defaults.ts`, `LiveRegion.md`, `LiveRegion.spec.ts` | accessibility | Complete |
 | Logo | `Logo.tsx`, `LogoReact.tsx`, `Logo.defaults.ts`, `Logo.md`; added `Logo.compat.spec.ts` | AppHeader, Image host shim | Complete |
-| Markdown | `Markdown.tsx`, `CodeText.tsx`, module SCSS | markdown renderer | Audit required |
+| Markdown | `Markdown.tsx`, `MarkdownReact.tsx`, `Markdown.renderer.tsx`, `Markdown.defaults.ts`, `Markdown.md`, `markdown-styles.md`, `parse-binding-expr.ts`, `utils.ts`, `CodeText.tsx`, `CodeText.module.scss`, `Markdown.module.scss`, `Markdown.spec.ts`; added `CodeText.spec.ts` | markdown renderer, raw HTML/GFM support, binding-expression parsing, `xmlui-pg` playground fences, nested code fences, codefence typography and padding parity, raw HTML table border-collapse parity, CJS dependency interop shims for Markdown dependencies | Complete |
 | Menu family | `Menu.module.scss` plus DropdownMenu-owned `MenuItem`, `MenuSeparator`, and `SubMenuItem` metadata/runtime adapters | DropdownMenu, ContextMenu, NavGroup | Complete |
 | MessageListener | `MessageListener.tsx`, `MessageListenerReact.tsx`, `MessageListener.defaults.ts`, `MessageListener.md`, `MessageListener.spec.ts` | browser messaging | Complete |
 | ModalDialog | `ModalDialog.tsx`, `ModalDialogReact.tsx`, `ModalDialog.module.scss`, `ModalDialog.defaults.ts`, `ModalDialog.md`, `ModalDialog.spec.ts`, copied helper files `Dialog.tsx`, `Dialog.module.scss`, `ConfirmationModalContextProvider.tsx`; added `ModalDialog.compat.spec.ts` | portal, focus, layer stack, tooltip behavior, direct child vars | Complete |
@@ -374,7 +374,7 @@ scope, dependencies, and state.
 | NavLink | `NavLinkReact.tsx`, module SCSS | router, Icon | Complete |
 | NavPanel | `NavPanelReact.tsx`, module SCSS | App shell, NavGroup/NavLink | Complete |
 | NavPanelCollapseButton | `NavPanelCollapseButton.tsx`; added `NavPanelCollapseButton.foundation.spec.ts` | App layout context, NavPanel footer | Complete |
-| NestedApp | `NestedAppReact.tsx`, module SCSS | app context nesting | Audit required |
+| NestedApp | `NestedApp.tsx`, `NestedAppReact.tsx`, `NestedApp.renderer.tsx`, `NestedApp.defaults.ts`, `NestedApp.module.scss`, `NestedApp.spec.ts`, `AppWithCodeView.tsx`, `AppWithCodeViewReact.tsx`, `AppWithCodeView.module.scss`, `Tooltip.tsx`, `Tooltip.module.scss`, `logo.svg`, `utils.ts` | app context nesting, `xmlui-pg` frame rendering, nested app compilation, isolated routing/state, reset/remount behavior, inherited themes/config globals, old/new local-server computed-style parity for playground frame, header, code display, and unframed inner app placeholder/root structure | Complete |
 | NoResult | `NoResult.tsx`, `NoResultReact.tsx`, `NoResult.module.scss`, `NoResult.defaults.ts`, `NoResult.md`, `NoResult.spec.ts` | Icon | Complete |
 | NumberBox | `NumberBox.tsx`, `NumberBoxReact.tsx`, `NumberBox.module.scss`, `NumberBox.defaults.ts`, `NumberBox.md`, `NumberBox.spec.ts`, `numberbox-abstractions.ts` | Input helpers, Form context, ConciseValidationFeedback, Button/Icon | Complete |
 | Option | `OptionReact.tsx` | Select, RadioGroup | Complete |

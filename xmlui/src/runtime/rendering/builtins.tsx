@@ -588,7 +588,7 @@ function optionDescriptors(
     const value = evaluateExpressionOrText(child.props.value ?? "", child.parsed?.props?.value, scope, `${child.type}:value`);
     const label = Object.prototype.hasOwnProperty.call(child.props, "label")
       ? evaluateExpressionOrText(child.props.label, child.parsed?.props?.label, scope, `${child.type}:label`)
-      : child.children.map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join(" ");
+      : (child.children ?? []).map((optionChild) => optionChild.kind === "text" ? optionChild.value : "").join(" ");
     const enabled = Object.prototype.hasOwnProperty.call(child.props, "enabled")
       ? Boolean(evaluateExpressionOrText(child.props.enabled, child.parsed?.props?.enabled, scope, `${child.type}:enabled`))
       : true;

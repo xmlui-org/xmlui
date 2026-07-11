@@ -304,10 +304,16 @@ export const textRenderer = wrapRuntimeComponent({
       defaultProps.preserveLinebreaks,
     );
     const overflowMode = adapter.stringProp("overflowMode") as OverflowMode | undefined;
+    const maxLines = adapter.numberProp("maxLines", defaultProps.maxLines);
     const textVariant = adapter.stringProp("variant") as any;
     const textStyle = { ...(style as React.CSSProperties | undefined) };
     if (textVariant === "strong" && textStyle.fontWeight === undefined) {
       textStyle.fontWeight = "var(--xmlui-fontWeight-Text-strong)";
+    }
+    if (isInsideRuntimeLayout(adapter.props.layoutContext, "TableCell") && (overflowMode || maxLines > 0)) {
+      textStyle.minWidth = textStyle.minWidth ?? 0;
+      textStyle.maxWidth = textStyle.maxWidth ?? "100%";
+      textStyle.flex = textStyle.flex ?? "1 1 0";
     }
     if (overflowMode === "flow") {
       textStyle.minWidth = textStyle.minWidth ?? 0;
@@ -328,7 +334,7 @@ export const textRenderer = wrapRuntimeComponent({
         <Text
         {...rootAttrs}
         variant={textVariant}
-        maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
+        maxLines={maxLines}
         classes={className ? { [COMPONENT_PART_KEY]: className as string } : undefined}
         preserveLinebreaks={preserveLinebreaks}
         ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
@@ -367,6 +373,17 @@ export const textRenderer = wrapRuntimeComponent({
     );
   },
 });
+
+function isInsideRuntimeLayout(value: unknown, type: string): boolean {
+  let current = value;
+  while (current && typeof current === "object") {
+    if ((current as { type?: unknown }).type === type) {
+      return true;
+    }
+    current = (current as { parent?: unknown }).parent;
+  }
+  return false;
+}
 
 function displayText(value: unknown): string | undefined {
   return value === undefined || value === null ? undefined : String(value);

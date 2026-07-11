@@ -16,7 +16,8 @@ $borderColor-Image: createThemeVar("borderColor-Image");
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: var(--xmlui-objectFit-Image, contain);
+    aspect-ratio: var(--xmlui-aspectRatio-Image);
     border-radius: $borderRadius-Image;
     border-color: $borderColor-Image;
 
@@ -26,6 +27,10 @@ $borderColor-Image: createThemeVar("borderColor-Image");
 
     &.grayscale {
       filter: grayscale(100%);
+    }
+
+    &.inline {
+      display: inline;
     }
   }
 }

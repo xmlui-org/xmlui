@@ -1,16 +1,103 @@
-.codeText {
-  margin: 0;
-  padding: var(--xmlui-padding-CodeText, var(--xmlui-space-3, 0.75rem));
-  overflow-x: auto;
-  user-select: text;
-  background: var(--xmlui-backgroundColor-CodeText, transparent);
-  border-radius: var(--xmlui-borderRadius-CodeText, 0);
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.codeText > code {
-  display: block;
-  padding-left: var(--xmlui-paddingLeft-CodeText-code, var(--xmlui-space-2, 0.5rem));
-  color: var(--xmlui-textColor-Text-codefence, var(--xmlui-textColor, inherit));
-  font-family: var(--xmlui-fontFamily-Text-codefence, var(--xmlui-fontFamily-Text-code, var(--xmlui-fontFamily-monospace, monospace)));
-  white-space: pre;
+$component: "Text";
+
+@mixin textVariant($variant) {
+  $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
+  $themeVars: t.composePaddingVars($themeVars, $variantName);
+  $themeVars: t.composeBorderVars($themeVars, $variantName);
+  $themeVars: t.composeTextVars($themeVars, $variantName, $component);
+  @include t.paddingVars($themeVars, $variantName);
+  @include t.borderVars($themeVars, $variantName);
+  @include t.textVars($themeVars, $variantName);
+  margin-top: createThemeVar("marginTop-#{$variantName}");
+  margin-bottom: createThemeVar("marginBottom-#{$variantName}");
+  margin-inline-start: createThemeVar("marginLeft-#{$variantName}");
+  margin-inline-end: createThemeVar("marginRight-#{$variantName}");
+  vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
+}
+
+@layer components {
+  .codeText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0.75em;
+    min-height: fit-content;
+    user-select: text;
+    -webkit-user-select: text;
+
+    // --- Styling <pre><code> elements
+
+    // For code blocks: the <pre> always wraps a <code> element produced by
+    // react-markdown (or a syntax highlighter via dangerouslySetInnerHTML).
+    &:has(> code) {
+      @include textVariant("codefence");
+      padding-block: var(--xmlui-paddingVertical-#{$component}-codefence, t.$space-3);
+      padding-inline: var(--xmlui-paddingHorizontal-#{$component}-codefence, t.$space-4);
+      color: var(--xmlui-textColor-#{$component}-codefence, var(--xmlui-color-surface-900));
+      font-family: var(--xmlui-fontFamily-#{$component}-codefence, var(--xmlui-fontFamily-monospace));
+      font-size: var(--xmlui-fontSize-#{$component}-codefence, t.$fontSize-code);
+      line-height: var(--xmlui-lineHeight-#{$component}-codefence, 1.5);
+      // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
+      overflow-x: auto;
+      text-overflow: initial;
+
+      > code {
+        color: var(--xmlui-textColor-#{$component}-codefence, var(--xmlui-color-surface-900)) !important;
+      }
+    }
+
+    // TEMP: experimental - may be removed
+    &:has(> code > span) {
+      padding-inline-start: 0;
+      padding-inline-end: 0;
+    }
+    & > code > span:not([class*="numbered"]) {
+      padding-inline-start: t.$space-5;
+    }
+
+    & > code {
+      font-family: var(--xmlui-fontFamily-#{$component}-codefence, var(--xmlui-fontFamily-monospace));
+      padding-inline-start: 0;
+      display: inline-block;
+      min-width: 100%;
+      box-sizing: border-box;
+      border: createThemeVar("border-#{$component}-codefence");
+      background-color: createThemeVar("backgroundColor-#{$component}-codefence");
+    }
+
+    & > code::before {
+      counter-reset: listing;
+    }
+
+    & > code > span {
+      display: inline-block;
+      width: 100%;
+    }
+    & > code > span[class*="numbered"] {
+      counter-increment: listing;
+    }
+
+    & > code > span[class*="numbered"]::before {
+      content: counter(listing);
+      display: inline-block;
+      width: t.$space-12;
+      padding-inline-start: auto;
+      padding-inline-end: t.$space-5;
+      margin-inline-start: auto;
+      text-align: end;
+      color: t.$textColor-secondary;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

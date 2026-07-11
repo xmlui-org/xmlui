@@ -268,7 +268,7 @@ describe("script function generation", () => {
     expect(generated.body).toContain(`ctx.debug?.emit({ kind: "break", args: []`);
     expect(generated.body).toContain("debugger;");
     expect(generated.body).toContain("__xmluiResult = undefined;");
-    expect(generated.body).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(generated.body).toContain(`ctx.writeLocal("count", __xmluiNext);`);
   });
 
   it("emits structured debug events while running generated handlers", async () => {
@@ -414,7 +414,7 @@ describe("binding and event code generation", () => {
     expect(localSource).toContain('"evaluate": (ctx) => {\n  return 0;\n}');
     expect(globalSource).toContain('"evaluate": (ctx) => {\n  return 0;\n}');
     expect(labelSource).toContain(`return (ctx.props?.["label"] || "Click");`);
-    expect(eventSource).toContain(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`);
+    expect(eventSource).toContain(`ctx.writeLocal("count", __xmluiNext);`);
     expect(textSource).toContain(`return ctx.readLocal("count");`);
     expect(evaluateGeneratedObject(localSource).evaluate(fakeContext())).toBe(0);
   });
@@ -473,7 +473,7 @@ describe("runtime descriptor attachment and module emission", () => {
     expect(String(button.parsed.events.click.execute)).toContain("async function event_");
     expect(button.parsed.events.click.compiledSource).toContain("__xmluiYieldIfNeeded");
     expect(button.parsed.events.click.compiledSource).toContain(
-      `__xmluiResult = ctx.writeGlobal("count", Number(ctx.readGlobal("count")) + 1);`,
+      `ctx.writeGlobal("count", __xmluiNext);`,
     );
     expect(button.parsed.events.click.compiledSource).toContain("return __xmluiResult;");
     expect(text.segments[1].generatedName).toContain("expr_");

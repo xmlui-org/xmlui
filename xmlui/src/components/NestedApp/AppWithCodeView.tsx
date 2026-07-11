@@ -1,0 +1,131 @@
+import styles from "./AppWithCodeView.module.scss";
+
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { AppWithCodeViewReact } from "./AppWithCodeViewReact";
+import { defaultProps } from "./NestedApp.defaults";
+import { createMetadata } from "../metadata-helpers";
+
+const COMP = "AppWithCodeView";
+
+export const AppWithCodeViewMd = createMetadata({
+  status: "stable",
+  description: `The ${COMP} component displays a combination of markdown content and a nested xmlui app. 
+It supports both side-by-side and stacked layouts.`,
+  props: {
+    markdown: {
+      description: "The markdown content to be displayed alongside the app",
+      valueType: "string",
+    },
+    splitView: {
+      description: "Whether to render the markdown and app side by side or stacked vertically",
+      valueType: "boolean",
+    },
+    app: {
+      description: "The source markup of the app to be nested",
+      valueType: "string",
+    },
+    api: {
+      description: "This property defines an optional emulated API to be used with the nested app.",
+      valueType: "hash",
+    },
+    components: {
+      description:
+        "This property defines an optional list of components to be used with the nested app.",
+      defaultValue: defaultProps.components,
+    },
+    config: {
+      description: "You can define the nested app's configuration with this property.",
+      valueType: "hash",
+    },
+    activeTheme: {
+      description:
+        "This property defines the active theme for the nested app. " +
+        "If not set, the default theme is used.",
+      valueType: "string",
+    },
+    activeTone: {
+      description:
+        "This property defines the active tone for the nested app. " +
+        "If not set, the default tone is used.",
+      valueType: "string",
+    },
+    title: {
+      description: "The optional title of the nested app. If not set, no title is displayed.",
+      valueType: "string",
+    },
+    height: {
+      description:
+        "The height of the nested app. If not set, the height is determined automatically.",
+      valueType: "length",
+    },
+    allowPlaygroundPopup: {
+      description:
+        "This property defines whether the nested app can be opened in the xmlui playground.",
+      valueType: "boolean",
+      defaultValue: defaultProps.allowPlaygroundPopup,
+    },
+    withFrame: {
+      description: "This property defines whether the nested app should be displayed with a frame.",
+      valueType: "boolean",
+      defaultValue: defaultProps.withFrame,
+    },
+    allowReset: {
+      description: "This property defines whether the reset button should be displayed in the header.",
+      valueType: "boolean",
+      defaultValue: defaultProps.allowReset,
+    },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {},
+});
+
+export const appWithCodeViewComponentRenderer = wrapComponent(
+  COMP,
+  AppWithCodeViewReact,
+  AppWithCodeViewMd,
+  {
+    exclude: ["markdown", "app", "api", "components", "config", "activeTheme", "activeTone", "title", "height"],
+    customRender(_props, { node, extractValue, renderChild }) {
+      let renderedChildren = "";
+
+      // 1. Static content prop fallback
+      if (!renderedChildren) {
+        renderedChildren = extractValue.asString(node.props.markdown);
+      }
+
+      // 2. "data" property fallback
+      if (!renderedChildren && typeof (node.props as any).data === "string") {
+        renderedChildren = extractValue.asString((node.props as any).data);
+      }
+
+      // 3. Children fallback
+      if (!renderedChildren) {
+        (node.children ?? []).forEach((child) => {
+          const renderedChild = renderChild(child);
+          if (typeof renderedChild === "string") {
+            renderedChildren += renderedChild;
+          }
+        });
+      }
+
+      return (
+        <AppWithCodeViewReact
+          markdown={renderedChildren}
+          splitView={extractValue.asOptionalBoolean(node.props?.splitView)}
+          app={node.props?.app}
+          api={extractValue(node.props?.api)}
+          components={extractValue(node.props?.components)}
+          config={extractValue(node.props?.config)}
+          activeTheme={extractValue(node.props?.activeTheme)}
+          activeTone={extractValue(node.props?.activeTone)}
+          title={extractValue(node.props?.title)}
+          height={extractValue(node.props?.height)}
+          allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
+          withFrame={extractValue.asOptionalBoolean(node.props?.withFrame)}
+          allowReset={extractValue.asOptionalBoolean(node.props?.allowReset)}
+        />
+      );
+    },
+  },
+);

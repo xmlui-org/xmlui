@@ -35,14 +35,19 @@ export function resolveLayoutStyle(
   const style: CSSProperties = { boxSizing: "border-box" };
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
   const parentOrientation = parentLayoutOrientation(props.layoutContext);
+  const insideTableCell = isInsideLayoutType(props.layoutContext, "TableCell");
 
   if (orientation) {
     style.display = "flex";
     style.flexDirection = orientation === "horizontal" ? "row" : "column";
   }
 
+  if (insideTableCell && props.minWidth === undefined) {
+    style.minWidth = 0;
+  }
+
   if (parentOrientation) {
-    style.flexShrink = 0;
+    style.flexShrink = insideTableCell ? 1 : 0;
   }
 
   assignSize(style, "width", props.width, orientation === "horizontal");
@@ -369,6 +374,17 @@ function parentLayoutOrientation(value: unknown): LayoutOrientation | undefined 
     return undefined;
   }
   return orientationFromProp((value as { orientation?: unknown }).orientation);
+}
+
+function isInsideLayoutType(value: unknown, type: string): boolean {
+  let current = value;
+  while (current && typeof current === "object") {
+    if ((current as { type?: unknown }).type === type) {
+      return true;
+    }
+    current = (current as { parent?: unknown }).parent;
+  }
+  return false;
 }
 
 function alignment(value: unknown): CSSProperties["alignItems"] {

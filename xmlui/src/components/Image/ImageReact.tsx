@@ -81,6 +81,15 @@ export const Image = memo(forwardRef(function Img(
 
   // Use blob URL if src is empty and we have a blob URL
   const imageSrc = src || blobUrl;
+  const normalizedFit = fit === "cover" || fit === "contain" ? fit : defaultProps.fit;
+  const imageStyle = {
+    "--xmlui-objectFit-Image": normalizedFit,
+    ...(aspectRatio ? { "--xmlui-aspectRatio-Image": normalizeAspectRatio(aspectRatio) } : {}),
+    boxShadow: "none",
+    ...style,
+    flexShrink: 1,
+  } as CSSProperties;
+
   return (
     <img
       {...rest}
@@ -90,20 +99,17 @@ export const Image = memo(forwardRef(function Img(
       loading={lazyLoad ? "lazy" : "eager"}
       className={classnames(
         styles.img,
+        "xmlui-imageRoot",
         {
           [styles.clickable]: !!onClick,
           [styles.grayscale]: grayscale,
+          [styles.inline]: inline,
+          "xmlui-imageInline": inline,
+          "xmlui-imageInlineWrapper": inline,
         },
         className,
       )}
-      style={{
-        objectFit: fit,
-        boxShadow: "none",
-        ...style,
-        flexShrink: 1,
-        aspectRatio: aspectRatio,
-        ...(inline ? { display: "inline" } : {}),
-      }}
+      style={imageStyle}
       onClick={onClick}
     />
   );
@@ -120,4 +126,8 @@ function safeConvertPropToString(prop: unknown): string | undefined {
     return String(prop);
   }
   return undefined;
+}
+
+function normalizeAspectRatio(aspectRatio: string): string {
+  return aspectRatio.includes("/") ? aspectRatio.replace(/\s*\/\s*/g, " / ") : aspectRatio;
 }

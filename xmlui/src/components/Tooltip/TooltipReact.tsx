@@ -1,6 +1,7 @@
-import { type ForwardedRef, forwardRef, memo } from "react";
+import { type ForwardedRef, forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
-import * as RadixTooltip from "@radix-ui/react-tooltip";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { createPortal } from "react-dom";
 import { isPlainObject } from "lodash-es";
 import classnames from "classnames";
 
@@ -103,36 +104,117 @@ export const Tooltip = memo(forwardRef(function Tooltip({
 }: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, contentRef);
+  const delayRef = useRef<number>();
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const [position, setPosition] = useState<React.CSSProperties>();
+  const isOpen = open ?? uncontrolledOpen;
+
+  const show = useCallback(() => {
+    window.clearTimeout(delayRef.current);
+    delayRef.current = window.setTimeout(() => setUncontrolledOpen(true), delayDuration);
+  }, [delayDuration]);
+
+  const hide = useCallback(() => {
+    window.clearTimeout(delayRef.current);
+    setUncontrolledOpen(false);
+  }, []);
+
+  const updatePosition = useCallback(() => {
+    const trigger = triggerRef.current;
+    const content = contentRef.current;
+    if (!trigger || !content) {
+      return;
+    }
+    const triggerBox = trigger.getBoundingClientRect();
+    const contentBox = content.getBoundingClientRect();
+    const offset = Number(sideOffset) || 0;
+    const crossOffset = Number(alignOffset) || 0;
+    let top = 0;
+    let left = 0;
+
+    if (side === "left" || side === "right") {
+      top = triggerBox.top + triggerBox.height / 2 - contentBox.height / 2;
+      if (align === "start") top = triggerBox.top + crossOffset;
+      if (align === "end") top = triggerBox.bottom - contentBox.height - crossOffset;
+      left = side === "left" ? triggerBox.left - contentBox.width - offset : triggerBox.right + offset;
+    } else {
+      left = triggerBox.left + triggerBox.width / 2 - contentBox.width / 2;
+      if (align === "start") left = triggerBox.left + crossOffset;
+      if (align === "end") left = triggerBox.right - contentBox.width - crossOffset;
+      top = side === "top" ? triggerBox.top - contentBox.height - offset : triggerBox.bottom + offset;
+    }
+
+    if (avoidCollisions) {
+      left = Math.max(0, Math.min(left, window.innerWidth - contentBox.width));
+      top = Math.max(0, Math.min(top, window.innerHeight - contentBox.height));
+    }
+
+    setPosition({ position: "fixed", left, top });
+  }, [align, alignOffset, avoidCollisions, side, sideOffset]);
+
+  useEffect(() => () => window.clearTimeout(delayRef.current), []);
+
+  useEffect(() => {
+    if (!isOpen || !showTooltip) {
+      return;
+    }
+    const animationFrame = requestAnimationFrame(updatePosition);
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen, showTooltip, updatePosition, text, markdown, tooltipTemplate]);
+
+  const content = tooltipTemplate ? (
+    tooltipTemplate
+  ) : markdown ? (
+    <Markdown>{markdown}</Markdown>
+  ) : (
+    text
+  );
 
   return (
-    <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
-      <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
-        <RadixTooltip.Portal container={root}>
-          {showTooltip && (
-            <RadixTooltip.Content
-              ref={ref}
-              className={classnames(styles.content, classes?.[COMPONENT_PART_KEY], className)}
-              side={side}
-              align={align}
-              sideOffset={sideOffset}
-              alignOffset={alignOffset}
-              avoidCollisions={avoidCollisions}
-              data-tooltip-container
-            >
-              {tooltipTemplate ? (
-                tooltipTemplate
-              ) : markdown ? (
-                <Markdown>{markdown}</Markdown>
-              ) : (
-                text
-              )}
-              {showArrow && <RadixTooltip.Arrow className={styles.arrow} />}
-            </RadixTooltip.Content>
-          )}
-        </RadixTooltip.Portal>
-      </RadixTooltip.Root>
-    </RadixTooltip.Provider>
+    <>
+      <span
+        ref={triggerRef}
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onMouseOver={show}
+        onMouseOut={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            hide();
+          }
+        }}
+        onFocus={show}
+        onBlur={hide}
+        style={{ display: "inline-flex" }}
+      >
+        {children}
+      </span>
+      {showTooltip &&
+        isOpen &&
+        createPortal(
+          <div
+            ref={composedRef}
+            role="tooltip"
+            className={classnames(styles.content, classes?.[COMPONENT_PART_KEY], className)}
+            data-side={side}
+            data-align={align}
+            data-tooltip-container
+            style={{ position: "fixed", left: 0, top: 0, width: "max-content", ...position }}
+          >
+            {content}
+            {showArrow && <span aria-hidden="true" className={styles.arrow} />}
+          </div>,
+          root ?? document.body,
+        )}
+    </>
   );
 }));
 

@@ -146,7 +146,7 @@ function findTagEnd(source: string, start: number): number {
 
 function normalizeCdataSections(source: string): string {
   return source.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_match, content: string) =>
-    encodeTextEntities(content),
+    encodeLeadingWhitespaceEntities(encodeTextEntities(content)),
   );
 }
 
@@ -155,6 +155,12 @@ function encodeTextEntities(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function encodeLeadingWhitespaceEntities(value: string): string {
+  return value.replace(/^[ \t\r\n]+/, (leading) =>
+    Array.from(leading, (char) => `&#${char.charCodeAt(0)};`).join(""),
+  );
 }
 
 function normalizeTagBooleanAttributes(tag: string): string {
@@ -404,6 +410,7 @@ function transformElement(
   source: SourceText,
   sourceId: string,
   inheritedNamespaces: Record<string, string> = {},
+  rawTextContent = false,
 ): XmluiElement {
   const attributesForElement = attributes(node, source);
   const namespaces = collectNamespaces(attributesForElement, inheritedNamespaces);
@@ -444,6 +451,10 @@ function transformElement(
       continue;
     }
     props[attr.name] = attr.value;
+    if (isRawTextProp(type, attr.name)) {
+      setParsedLiteralValue(parsed, "props", attr.name, attr);
+      continue;
+    }
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
@@ -466,7 +477,14 @@ function transformElement(
     };
   }
 
-  const transformedChildren = contentChildren(node, source, sourceId, namespaces, type);
+  const transformedChildren = contentChildren(
+    node,
+    source,
+    sourceId,
+    namespaces,
+    type,
+    rawTextContent || isRawTextContentElement(type),
+  );
   const children: XmluiNode[] = [];
   for (const child of transformedChildren) {
     if (child.kind === "element" && child.type === "variable") {
@@ -658,6 +676,7 @@ function contentChildren(
   sourceId: string,
   namespaces: Record<string, string>,
   parentType?: string,
+  rawTextContent = false,
 ): XmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
@@ -668,12 +687,12 @@ function contentChildren(
       if (tagName(child, source) === "script") {
         continue;
       }
-      result.push(transformElement(child, source, sourceId, namespaces));
+      result.push(transformElement(child, source, sourceId, namespaces, rawTextContent));
       continue;
     }
     if (child.kind === MarkupSyntaxKind.Text) {
       const rawText = getNodeText(child, source);
-      if (parentType === "Markdown") {
+      if (parentType === "Markdown" || rawTextContent) {
         const value = decodeEntities(rawText).replace(/\r\n?/g, "\n");
         if (!value.trim()) {
           continue;
@@ -682,6 +701,11 @@ function contentChildren(
           kind: "text",
           value,
           range: rangeOf(child),
+          segments: [{
+            kind: "literal",
+            value,
+            range: rangeOf(child),
+          }],
         });
         continue;
       }
@@ -700,6 +724,14 @@ function contentChildren(
   }
 
   return result;
+}
+
+function isRawTextContentElement(type: string): boolean {
+  return type === "CodeBlock" || type === "pre" || type === "code";
+}
+
+function isRawTextProp(type: string, propName: string): boolean {
+  return type === "IFrame" && propName === "srcdoc";
 }
 
 function eventChildSource(child: XmluiNode): string {
@@ -930,6 +962,20 @@ function setParsedValue(
   target[name] = parseExpressionOrMixedText(attr.value, attr.valueRange, { sourceId });
 }
 
+function setParsedLiteralValue(
+  parsed: XmluiParsedBindings,
+  bucket: "props" | "vars" | "globals",
+  name: string,
+  attr: AttributeInfo,
+): void {
+  const target = (parsed[bucket] ??= {});
+  target[name] = [{
+    kind: "literal",
+    value: attr.value,
+    range: attr.valueRange,
+  }];
+}
+
 function setParsedEvent(
   parsed: XmluiParsedBindings,
   bucket: "events" | "methods",
@@ -1075,6 +1121,7 @@ function normalizeText(text: string): string {
 
 function decodeEntities(value: string): string {
   return value
+    .replace(/&#(\d+);/g, (_match, charCode: string) => String.fromCharCode(Number(charCode)))
     .replace(/&quot;/g, `"`)
     .replace(/&apos;/g, `'`)
     .replace(/&lt;/g, "<")

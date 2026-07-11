@@ -11,6 +11,8 @@ import { resolveThemeReferences, resolveThemeVariable, rootThemeVariables } from
 import { Stack } from "./StackReact";
 import stackStylesSource from "./Stack.module.scss?xmlui-theme-vars";
 import { defaultProps } from "./Stack.defaults";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 
 const COMP = "Stack";
 
@@ -299,6 +301,7 @@ function createStackRenderer(
             resolveCssSize(itemWidth) ?? itemWidth,
             adapter.node.props.itemWidth !== undefined,
             style.overflowX === "scroll",
+            layoutContext,
           )}
         </Stack>
       );
@@ -313,11 +316,12 @@ function renderStackChildren(
   itemWidth: string | undefined,
   hasExplicitItemWidth: boolean,
   preserveHorizontalOverflow: boolean,
+  parentLayoutContext?: LayoutContext,
 ): ReactNode {
   const normalizedChildren = children.map((child) =>
     normalizeStackChild(child, orientation, preserveHorizontalOverflow),
   );
-  const layoutContext = { type: "Stack", orientation, itemWidth };
+  const layoutContext = createChildLayoutContext(parentLayoutContext, { type: "Stack", orientation, itemWidth });
   if (!hasExplicitItemWidth) {
     return adapter.context.renderChildren(normalizedChildren, adapter.scope, undefined, layoutContext);
   }

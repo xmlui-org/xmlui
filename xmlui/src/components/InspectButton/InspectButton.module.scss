@@ -22,8 +22,9 @@ $themeVars: ();
     background: t.$color-primary-500;
   }
 
-  // --- We export the theme variables to add them to the component renderer
-  :export {
-    themeVars: t.json-stringify($themeVars);
-  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

@@ -227,18 +227,15 @@ export function applyResultSelector(value: unknown, selector: string | undefined
 }
 
 export function appendQueryParams(url: string, queryParams: Record<string, unknown> | undefined): string {
-  if (!queryParams || Object.keys(queryParams).length === 0) {
-    return url;
-  }
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
   const base = new URL(url, origin);
-  for (const [key, value] of Object.entries(queryParams)) {
+  for (const [key, value] of Object.entries(queryParams ?? {})) {
     if (value === undefined || value === null) {
       continue;
     }
     base.searchParams.set(key, String(value));
   }
-  return base.pathname + base.search + base.hash;
+  return isAbsoluteUrl(url) ? base.href : base.pathname + base.search + base.hash;
 }
 
 function normalizeUrlForKey(
@@ -258,9 +255,13 @@ function normalizeUrlForKey(
     combined[key] = String(value);
   }
   return {
-    url: base.pathname + base.hash,
+    url: isAbsoluteUrl(url) ? `${base.origin}${base.pathname}${base.hash}` : base.pathname + base.hash,
     queryParams: Object.keys(combined).length > 0 ? combined : undefined,
   };
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url);
 }
 
 async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal): Promise<ManagedResponse> {

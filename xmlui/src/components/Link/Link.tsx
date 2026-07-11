@@ -214,6 +214,7 @@ export const linkRenderer = wrapRuntimeComponent({
     const variant = adapter.stringProp("variant");
     const rootAttrs = adapter.rootAttrs();
     const to = adapter.prop("to");
+    const childLayoutContext = adapter.props.layoutContext as Record<string, unknown> | undefined;
     const hasClickEvent = Object.prototype.hasOwnProperty.call(adapter.node.events, "click");
     const hasContextMenuEvent = Object.prototype.hasOwnProperty.call(adapter.node.events, "contextMenu");
     const needsRuntimeNavigation =
@@ -265,7 +266,7 @@ export const linkRenderer = wrapRuntimeComponent({
         }
         onContextMenu={hasContextMenuEvent ? (event) => void adapter.event("contextMenu")(event) : undefined}
       >
-        {adapter.renderChildren()}
+        {adapter.renderChildren(undefined, childLayoutContext)}
       </ThemedLinkNative>
     );
   },

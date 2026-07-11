@@ -6,6 +6,8 @@ import { TreeDisplay } from "./TreeDisplayReact";
 
 const COMP = "TreeDisplay";
 
+export const ThemedTreeDisplay = TreeDisplay;
+
 const treeDisplayStylesSource = `
 $backgroundColor-TreeDisplay: createThemeVar("backgroundColor-TreeDisplay");
 $border-TreeDisplay: createThemeVar("border-TreeDisplay");
