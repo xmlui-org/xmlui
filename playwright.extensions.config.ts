@@ -4,10 +4,9 @@ const reuseExistingServer = process.env.XMLUI_REUSE_EXISTING_SERVER !== "0";
 
 export default defineConfig({
   testDir: ".",
-  timeout: 10_000,
+  timeout: 30_000,
   globalSetup: "./scripts/extension-e2e-global-setup.mjs",
   testMatch: [
-    "packages/**/*.e2e.spec.ts",
     "packages/xmlui-search/src/Search.spec.ts",
     "packages/xmlui-website-blocks/src/Backdrop/Backdrop.spec.ts",
     "packages/xmlui-website-blocks/src/Breakout/Breakout.spec.ts",

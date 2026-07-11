@@ -203,10 +203,14 @@ export function wrapComponent(
         : {};
       const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
       const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
+      const componentIsExtensionRoot = usesComponentAsExtensionRoot(name);
+      const layoutStyle = componentIsExtensionRoot
+        ? useLayoutStyle(runtimeProps.node, runtimeProps.scope)
+        : undefined;
       const componentStyle = mergeStyles(
         rootAttrs.style,
         compatibilityRootStyle(name, normalizedProps),
-        useLayoutStyle(runtimeProps.node, runtimeProps.scope),
+        layoutStyle,
         normalizedProps.style,
         themeClass.style,
       );
@@ -218,7 +222,7 @@ export function wrapComponent(
         className: themeClass.className,
         style: componentStyle,
       };
-      if (usesComponentAsExtensionRoot(name)) {
+      if (componentIsExtensionRoot) {
         return (
           <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
             <Component {...rootAttrs} {...componentProps}>

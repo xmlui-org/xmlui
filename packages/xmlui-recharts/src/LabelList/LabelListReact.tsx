@@ -5,6 +5,7 @@ import { useEffect, useMemo, memo } from "react";
 import { LabelList as RLabelList } from "recharts";
 import { useChart, useLabelList } from "../utils/ChartProvider";
 import classnames from "classnames";
+import { useTheme } from "xmlui";
 
 type Props = {
   position: LabelPosition;
@@ -18,6 +19,10 @@ import { defaultProps } from "./LabelList.defaults";
 export const LabelList = memo(function LabelList({ position = defaultProps.position, nameKey: key, style, className }: Props) {
   const { nameKey } = useChart();
   const { setLabelList } = useLabelList();
+  const { getThemeVar } = useTheme();
+  const labelFill = String(
+    getThemeVar("textColor-LabelList", getThemeVar("textColor-primary", "#17232b")) ?? "#17232b",
+  );
 
   const content = useMemo(
     () => (
@@ -26,11 +31,12 @@ export const LabelList = memo(function LabelList({ position = defaultProps.posit
         position={position}
         className={classnames(styles.labelList, className)}
         dataKey={key || nameKey}
+        fill={labelFill}
         stroke="none"
-        style={style}
+        style={{ color: labelFill, fill: labelFill, ...style }}
       />
     ),
-    [key, nameKey, position, style, className],
+    [key, labelFill, nameKey, position, style, className],
   );
 
   useEffect(() => {

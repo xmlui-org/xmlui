@@ -66,7 +66,7 @@ test.describe("Basic Functionality", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     // Should render labels for each data point
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
 });
@@ -85,7 +85,7 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
 
@@ -203,7 +203,7 @@ test.describe("Position Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
 
@@ -254,7 +254,7 @@ test.describe("Chart Integration", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
 
@@ -429,7 +429,7 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test.fixme("applies textColor-LabelList theme variable", async ({ initTestBed, page }) => {
+  test("applies textColor-LabelList theme variable", async ({ initTestBed, page }) => {
     await initTestBed(`
         <PieChart
           nameKey="name"
@@ -441,21 +441,17 @@ test.describe("Theme Variables", () => {
           <LabelList />
         </PieChart>
     `, {
+      extensionIds: "xmlui-recharts",
       testThemeVars: { "textColor-LabelList": "rgb(255, 0, 0)" },
     });
     
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     const firstLabel = labels.first();
-    console.log(await firstLabel.textContent());
     await expect(firstLabel).toBeVisible();
-    
-    // Note: The actual CSS property may vary depending on how the theme variable is applied
-    // This test verifies the theme variable system is working
-    // Update expectation to match actual behavior
-    await expect(firstLabel).toHaveCSS("fill", "rgb(23, 35, 43)");
+    await expect(firstLabel).toHaveCSS("fill", "rgb(255, 0, 0)");
   });
 
-  test.fixme("uses default theme variable when not overridden", async ({ initTestBed, page }) => {
+  test("uses default theme variable when not overridden", async ({ initTestBed, page }) => {
     await initTestBed(`
       <PieChart
         nameKey="name"
@@ -468,11 +464,9 @@ test.describe("Theme Variables", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
+    const labels = page.locator(`${labelListSelector} text`).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     const firstLabel = labels.first();
     await expect(firstLabel).toBeVisible();
-    
-    // Should use the default theme color - update to match actual behavior
     await expect(firstLabel).toHaveCSS("fill", "rgb(23, 35, 43)");
   });
 });

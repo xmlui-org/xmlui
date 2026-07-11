@@ -12,6 +12,12 @@ $textColor-LabelList: createThemeVar("textColor-#{$componentName}");
 
 @layer components {
   .labelList {
+    color: $textColor-LabelList;
+    fill: $textColor-LabelList;
+  }
+
+  .labelList text {
+    color: $textColor-LabelList;
     fill: $textColor-LabelList;
   }
 }
