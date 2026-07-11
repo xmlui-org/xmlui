@@ -18,6 +18,7 @@ import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./compone
 import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
+import { useLayoutStyle } from "./runtime/rendering/props";
 import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
@@ -189,7 +190,6 @@ export function wrapComponent(
       }
       const registerApiProp = options.exposeRegisterApi
         ? {
-            registerApi: registerComponentApi,
             registerComponentApi,
           }
         : {};
@@ -203,17 +203,34 @@ export function wrapComponent(
         : {};
       const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
       const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
-      const componentStyle = mergeStyles(rootAttrs.style, normalizedProps.style, themeClass.style);
+      const componentStyle = mergeStyles(
+        rootAttrs.style,
+        compatibilityRootStyle(name, normalizedProps),
+        useLayoutStyle(runtimeProps.node, runtimeProps.scope),
+        normalizedProps.style,
+        themeClass.style,
+      );
+      const componentProps = {
+        ...withoutKeys(normalizedProps, ["data-testid", "aria-label"]),
+        ...registerApiProp,
+        ...nativeEventProp,
+        classes: { [COMPONENT_PART_KEY]: themeClass.className },
+        className: themeClass.className,
+        style: componentStyle,
+      };
+      if (usesComponentAsExtensionRoot(name)) {
+        return (
+          <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+            <Component {...rootAttrs} {...componentProps}>
+              {renderNonPropertyChildren(runtimeProps, metadata)}
+            </Component>
+          </ExtensionRuntimeScopeContext.Provider>
+        );
+      }
       return (
         <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
           <div {...rootAttrs}>
-            <Component
-              {...withoutKeys(normalizedProps, ["data-testid", "aria-label"])}
-              {...registerApiProp}
-              {...nativeEventProp}
-              className={themeClass.className}
-              style={componentStyle}
-            >
+            <Component {...componentProps}>
               {renderNonPropertyChildren(runtimeProps, metadata)}
             </Component>
           </div>
@@ -791,6 +808,25 @@ function rootStyleFromProps(props: Record<string, unknown>): CSSProperties | und
     style.height = props.height;
   }
   return Object.keys(style).length > 0 ? style : undefined;
+}
+
+function compatibilityRootStyle(
+  name: string,
+  props: Record<string, unknown>,
+): CSSProperties | undefined {
+  if (name === "Carousel" && props.height === undefined) {
+    return { minHeight: "1px" };
+  }
+  return undefined;
+}
+
+function usesComponentAsExtensionRoot(name: string): boolean {
+  return (
+    name === "Backdrop" ||
+    name === "Breakout" ||
+    name === "Carousel" ||
+    name === "CarouselItem"
+  );
 }
 
 function mergeStyles(
