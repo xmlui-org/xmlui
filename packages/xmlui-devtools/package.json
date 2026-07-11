@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": "./src/index.tsx",
   "scripts": {
     "start": "xmlui start",
@@ -15,6 +17,15 @@
     "build:meta": "xmlui build-lib --mode=metadata",
     "build:metadata": "xmlui build-lib --mode=metadata",
     "test:e2e": "node ../../scripts/run-extension-e2e.mjs xmlui-devtools"
+  },
+  "dependencies": {
+    "@monaco-editor/loader": "^1.5.0",
+    "@monaco-editor/react": "^4.7.0",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.7",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "framer-motion": "^12.18.1",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@types/react": "18.2.23",
@@ -34,6 +45,9 @@
         ".": {
           "import": "./dist/xmlui-devtools.mjs",
           "require": "./dist/xmlui-devtools.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
         }
       }
     }

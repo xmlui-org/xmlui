@@ -482,9 +482,9 @@ builds, package-level verification, and user approval pass in this rewrite.
 
 | State | Meaning | Public component entries |
 | --- | --- | ---: |
-| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 42 |
+| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 41 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 0 |
+| In review | Audit and tests passed; waiting for user approval. | 1 |
 | Complete | User approved after audit and verification. | 9 |
 
 ### Extension Package Inventory
@@ -495,7 +495,7 @@ builds, package-level verification, and user approval pass in this rewrite.
 | `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Complete; protected source, metadata, changelog, and copied E2E spec copied intact; package build, metadata build, protected-copy diff audit, and all 16 package E2E tests passed; user approved completion. |
 | `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Complete; source audit clean, rewrite-added package E2E passed, and user approved completion. No original package-local E2E spec existed to copy. |
 | `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Complete; protected source copied intact, extension build passed, all 50 package E2E tests passed, and user approved completion. |
-| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | In review; protected package source, metadata, entry, demo, and Monaco syntax helpers copied intact; extension build, metadata build, protected-copy diff audit, and package E2E command passed. No original package-local E2E spec existed to copy. Optional demo build still fails on existing core Vite plugin `/src/compiler/compileXmluiModule.ts` resolution. |
 | `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Audit required. |
 | `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Audit required. |
 | `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Audit required. |

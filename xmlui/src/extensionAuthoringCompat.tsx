@@ -19,6 +19,7 @@ import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
 import { COMPONENT_PART_KEY } from "./styling/layout";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
+import { useInspectMode } from "./components-core/InspectorContext";
 
 export type { ComponentMetadata };
 export type { PropertyValueDescription } from "./component-core/metadata/types";
@@ -405,6 +406,22 @@ export function useTheme() {
     getThemeVar(name: string, fallback?: unknown) {
       return theme.variables[name] ?? theme.variables[`--xmlui-${name}`] ?? fallback;
     },
+  };
+}
+
+export function useDevTools() {
+  const { inspectMode, setInspectMode } = useInspectMode();
+  return {
+    projectCompilation: undefined,
+    inspectedNode: undefined,
+    sources: undefined,
+    isOpen: false,
+    setIsOpen: () => {},
+    devToolsEnabled: inspectMode,
+    mockApi: undefined,
+    clickPosition: { x: 0, y: 0 },
+    inspectMode,
+    setInspectMode,
   };
 }
 
