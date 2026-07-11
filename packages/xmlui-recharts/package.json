@@ -18,6 +18,10 @@
     "build:metadata": "xmlui build-lib --mode=metadata",
     "test:e2e": "node ../../scripts/run-extension-e2e.mjs xmlui-recharts"
   },
+  "dependencies": {
+    "classnames": "2.5.1",
+    "recharts": "^2.15.1"
+  },
   "devDependencies": {
     "@types/react": "18.2.23",
     "typescript": "^5.7.3",

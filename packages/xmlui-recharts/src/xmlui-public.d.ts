@@ -13,6 +13,7 @@ declare module "xmlui" {
   };
 
   export function createMetadata(metadata: ComponentMetadata): ComponentMetadata;
+  export function parseScssVar(scssExports: unknown): Record<string, string>;
   export function startApp(runtime: Record<string, unknown>, extensions?: unknown): void;
   export function wrapComponent(
     name: string,
@@ -27,4 +28,9 @@ declare module "xmlui" {
       [key: string]: unknown;
     },
   ): unknown;
+
+  export function useTheme(): {
+    root?: HTMLElement;
+    getThemeVar(name: string, fallback?: unknown): string;
+  };
 }

@@ -484,10 +484,10 @@ renderer entries those packages expose.
 
 | State | Meaning | Package folders | Public component entries |
 | --- | --- | ---: | ---: |
-| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 4 | 17 |
+| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 3 | 9 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 | 0 |
-| Complete | User approved after audit and verification. | 12 | 34 |
+| Complete | User approved after audit and verification. | 13 | 42 |
 
 ### Extension Package Inventory
 
@@ -505,7 +505,7 @@ renderer entries those packages expose.
 | `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Complete; protected source, metadata, and changelog match the original package except for the copied spec's harness import rewrite; package build and metadata build pass, all 5 copied package E2E tests pass, and user approved completion. |
 | `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Complete; protected source, metadata, docs, resources, package tests, and WASM setup copied from the original package; package build, metadata build, protected-copy diff audit, and all 2 package E2E tests passed; user approved completion. Copied unit tests now run but have 4 original assertion failures around the `✍ Click to sign` placeholder text; leave them unresolved until a package-unit-test compatibility pass documents the protected-test exception or restores the original test dependency behavior. |
 | `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Complete; protected source, metadata, README, and changelog match the original package; rewrite package TypeScript shim preserves the copied source under the stricter rewrite typecheck; package build, metadata build, and all 3 rewrite-added package E2E tests pass serially; user approved completion. No original package-local E2E spec existed to copy. |
-| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Complete; protected package source, docs, metadata, demo, and copied E2E specs were copied from the original package. Copied specs have harness import rewrites only; `BarChartReact.tsx` has a documented tooltip ref source exception. Package build, metadata build, protected-copy audit, and all 322 package E2E tests passed with the default parallel package command after extension testbed warm-up, with 320 passed and 2 skipped; user approved completion for all eight public Recharts components. |
 | `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Audit required. |
 | `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Audit required. |
 | `xmlui-website-blocks` | `HeroSection`, `ScrollToTop`, `FancyButton`, `Carousel`, `CarouselItem`, `Backdrop`, `Breakout` | `@react-spring/web`, Embla carousel, compose refs, website block demos | Audit required. |

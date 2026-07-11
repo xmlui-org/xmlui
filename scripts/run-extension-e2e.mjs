@@ -65,7 +65,10 @@ function runPlaywright(specs, extraArgs) {
     ["playwright", "test", "-c", "playwright.extensions.config.ts", ...specs, ...extraArgs],
     {
       cwd: repoRoot,
-      env: process.env,
+      env: {
+        ...process.env,
+        XMLUI_E2E_EXTENSION_PACKAGE: packageName ?? "",
+      },
       stdio: "inherit",
     },
   );

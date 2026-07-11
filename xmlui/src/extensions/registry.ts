@@ -6,6 +6,7 @@ import type {
   XmluiExtensionComponent,
 } from "./types";
 import type { XmluiComponentContract } from "../compiler/contracts";
+import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../styling";
 
 export type ExtensionRegisteredCallback = (extension: Extension) => void;
 
@@ -113,11 +114,16 @@ function normalizeComponent(
 }
 
 function componentContract(component: ComponentExtension): XmluiComponentContract {
-  const commonProps = ["id", "testId"];
+  const commonProps = [
+    "id",
+    "testId",
+    ...supportedLayoutPropNames,
+    ...supportedResponsiveLayoutPropNames,
+  ];
   return {
     name: component.name,
     kind: "extension",
-    acceptsArbitraryProps: component.acceptsArbitraryProps,
+    acceptsArbitraryProps: component.acceptsArbitraryProps ?? true,
     allowsChildren: component.allowsChildren ?? true,
     declarations: { local: true },
     props: Object.fromEntries([...commonProps, ...(component.props ?? [])].map((name) => [name, { name }])),

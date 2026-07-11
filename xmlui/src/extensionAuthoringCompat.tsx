@@ -74,6 +74,8 @@ type OldWrapOptions = {
   strings?: readonly string[];
   rename?: Record<string, string>;
   exclude?: readonly string[];
+  callbacks?: readonly string[];
+  renderers?: Record<string, OldRendererConfig>;
   exposeRegisterApi?: boolean;
   captureNativeEvents?: boolean;
   deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
@@ -81,6 +83,11 @@ type OldWrapOptions = {
     props: Record<string, unknown>,
     args: OldComponentRenderArgs,
   ) => ReactNode;
+};
+
+type OldRendererConfig = {
+  reactProp?: string;
+  contextVars: readonly (string | null)[] | ((...args: any[]) => Record<string, unknown>);
 };
 
 type OldWrapCompoundOptions = OldWrapOptions & {
@@ -147,6 +154,7 @@ export function wrapComponent(
     component: (runtimeProps) => {
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
       Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
+      Object.assign(normalizedProps, rendererProps(runtimeProps, options));
       const themeClass = useRuntimeComponentThemeClass(name, metadata);
       for (const propName of options.exclude ?? []) {
         delete normalizedProps[propName];
@@ -159,18 +167,23 @@ export function wrapComponent(
         }
       }, [runtimeProps.props.id, runtimeProps.scope]);
       if (options.customRender) {
+        const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
+        const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
+        const componentStyle = mergeStyles(rootAttrs.style, normalizedProps.style);
         return (
           <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
-            {options.customRender(normalizedProps, {
-              className: themeClass.className,
-              classes: { [COMPONENT_PART_KEY]: themeClass.className },
-              node: { ...runtimeProps.node, props: runtimeProps.props },
-              extractValue: createExtractValueCompat(),
-              lookupEventHandler: (eventName) => runtimeProps.events[eventName],
-              registerComponentApi,
-              updateState: () => undefined,
-              renderChild: (child) => renderChildCompat(child, runtimeProps),
-            })}
+            <div {...rootAttrs}>
+              {options.customRender({ ...normalizedProps, style: componentStyle }, {
+                className: themeClass.className,
+                classes: { [COMPONENT_PART_KEY]: themeClass.className },
+                node: { ...runtimeProps.node, props: runtimeProps.props },
+                extractValue: createExtractValueCompat(),
+                lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+                registerComponentApi,
+                updateState: () => undefined,
+                renderChild: (child) => renderChildCompat(child, runtimeProps),
+              })}
+            </div>
           </ExtensionRuntimeScopeContext.Provider>
         );
       }
@@ -190,6 +203,7 @@ export function wrapComponent(
         : {};
       const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
       const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
+      const componentStyle = mergeStyles(rootAttrs.style, normalizedProps.style, themeClass.style);
       return (
         <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
           <div {...rootAttrs}>
@@ -198,7 +212,7 @@ export function wrapComponent(
               {...registerApiProp}
               {...nativeEventProp}
               className={themeClass.className}
-              style={themeClass.style}
+              style={componentStyle}
             >
               {renderNonPropertyChildren(runtimeProps, metadata)}
             </Component>
@@ -551,10 +565,9 @@ function deriveLinkInfoFromNavDom(runtimePath: string | undefined): NavHierarchy
   const group = groups.at(-1);
   const groupLabel = group?.textContent?.trim();
   return {
-    type: "NavLink",
     label,
     to,
-    pathSegments: groupLabel ? [{ type: "NavGroup", label: groupLabel }] : [],
+    pathSegments: groupLabel ? [{ label: groupLabel }] : [],
   };
 }
 
@@ -780,6 +793,18 @@ function rootStyleFromProps(props: Record<string, unknown>): CSSProperties | und
   return Object.keys(style).length > 0 ? style : undefined;
 }
 
+function mergeStyles(
+  ...styles: Array<unknown>
+): CSSProperties | undefined {
+  const merged = Object.assign(
+    {},
+    ...styles.filter((style): style is CSSProperties =>
+      Boolean(style) && typeof style === "object" && !Array.isArray(style),
+    ),
+  );
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
 function templateProps(
   runtimeProps: XmluiExtensionComponentProps,
   metadata?: ComponentMetadata,
@@ -795,6 +820,51 @@ function templateProps(
     }
   }
   return result;
+}
+
+function rendererProps(
+  runtimeProps: XmluiExtensionComponentProps,
+  options: OldWrapOptions,
+): Record<string, (...args: unknown[]) => ReactNode> {
+  const result: Record<string, (...args: unknown[]) => ReactNode> = {};
+  for (const [propName, rendererConfig] of Object.entries(options.renderers ?? {})) {
+    const property = findPropertyChild(runtimeProps.node, propName);
+    if (!property) {
+      continue;
+    }
+    const reactProp = rendererConfig.reactProp ?? templateToRendererName(propName);
+    result[reactProp] = (...args: unknown[]) => {
+      const contextValues =
+        typeof rendererConfig.contextVars === "function"
+          ? rendererConfig.contextVars(...args)
+          : Object.fromEntries(
+              rendererConfig.contextVars
+                .map((name, index) => (name === null ? undefined : [name, args[index]] as const))
+                .filter((entry): entry is readonly [string, unknown] => Boolean(entry)),
+            );
+      const templateScope = createRuntimeScope({
+        store: runtimeProps.scope.store,
+        parent: runtimeProps.scope,
+        props: runtimeProps.scope.props,
+        contextValues,
+        references: runtimeProps.scope.references,
+        slots: runtimeProps.scope.slots,
+        routing: runtimeProps.scope.routing,
+        toast: runtimeProps.scope.toast,
+        i18n: runtimeProps.scope.i18n,
+        emitEvent: runtimeProps.scope.emitEvent,
+        extensionFunctions: runtimeProps.scope.extensionFunctions,
+      });
+      return runtimeProps.context.renderChildren(property.children, templateScope, runtimeProps.node.range.end);
+    };
+  }
+  return result;
+}
+
+function templateToRendererName(propName: string): string {
+  return propName.endsWith("Template")
+    ? `${propName.slice(0, -"Template".length)}Renderer`
+    : `${propName}Renderer`;
 }
 
 function renderNonPropertyChildren(

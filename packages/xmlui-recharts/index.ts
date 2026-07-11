@@ -1,13 +1,13 @@
 import { startApp } from "xmlui";
-import recharts from "./src";
+import animations from "./src";
 
 export const runtime = import.meta.glob(`/demo/**`, { eager: true });
-startApp(runtime, [recharts]);
+startApp(runtime, [animations]);
 
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
-    startApp(newModule?.runtime, [recharts]);
+    startApp(newModule?.runtime, [animations]);
   });
 }
 
-export default recharts;
+export default animations;
