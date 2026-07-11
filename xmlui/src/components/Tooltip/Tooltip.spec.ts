@@ -80,11 +80,11 @@ test.describe("Basic Functionality", () => {
   test("renders with all side property values", async ({ page, initTestBed }) => {
     // right
     await initTestBed(`
-      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned right" side="right">
           <Button label="Hover me!" testId="right-tooltip-button" />
         </Tooltip>
-      </Stack>
+      </CVStack>
     `);
     let button = page.getByTestId("right-tooltip-button");
     await button.hover();
@@ -96,11 +96,11 @@ test.describe("Basic Functionality", () => {
 
     // left
     await initTestBed(`
-      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned left" side="left">
           <Button label="Hover me!" testId="left-tooltip-button" />
         </Tooltip>
-      </Stack>
+      </CVStack>
     `);
     button = page.getByTestId("left-tooltip-button");
     await button.hover();
@@ -112,11 +112,11 @@ test.describe("Basic Functionality", () => {
 
     // top
     await initTestBed(`
-      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned top" side="top">
           <Button label="Hover me!" testId="top-tooltip-button" />
         </Tooltip>
-      </Stack>
+      </CVStack>
     `);
     button = page.getByTestId("top-tooltip-button");
     await button.hover();
@@ -128,11 +128,11 @@ test.describe("Basic Functionality", () => {
 
     // bottom
     await initTestBed(`
-      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned bottom" side="bottom">
           <Button label="Hover me!" testId="bottom-tooltip-button" />
         </Tooltip>
-      </Stack>
+      </CVStack>
     `);
     button = page.getByTestId("bottom-tooltip-button");
     await button.hover();
@@ -145,11 +145,11 @@ test.describe("Basic Functionality", () => {
 
   test(`renders with 'sideOffset' property when side is top`, async ({ page, initTestBed }) => {
     await initTestBed(`
-      <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
+      <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip side="top" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
-          <Icon name="home" testId="tooltip-icon" />
+          <Icon name="email" testId="tooltip-icon" />
         </Tooltip>
-      </Stack>
+      </CVStack>
     `);
     const icon = page.getByTestId("tooltip-icon");
     await icon.hover();
@@ -167,7 +167,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip side="bottom" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
-          <Icon name="home" testId="tooltip-icon" />
+          <Icon name="email" testId="tooltip-icon" />
         </Tooltip>
       </Stack>
     `);
@@ -187,7 +187,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip side="left" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
-          <Icon name="home" testId="tooltip-icon-left" />
+          <Icon name="email" testId="tooltip-icon-left" />
         </Tooltip>
       </Stack>
     `);
@@ -207,7 +207,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Stack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip side="right" text="Tooltip" sideOffset="28" delayDuration="${LOW_DELAY}">
-          <Icon name="home" testId="tooltip-icon-right" />
+          <Icon name="email" testId="tooltip-icon-right" />
         </Tooltip>
       </Stack>
     `);

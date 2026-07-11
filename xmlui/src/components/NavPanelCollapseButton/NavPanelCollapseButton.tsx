@@ -1,26 +1,29 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { memo } from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedIcon } from "../Icon/Icon";
+import { createMetadata } from "../metadata-helpers";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
-export const defaultNavPanelCollapseButtonProps = {
-  icon: "sidebar-collapse",
-  iconCollapsed: "sidebar-collapse",
-  ariaLabel: "Collapse sidebar",
-  ariaLabelCollapsed: "Expand sidebar",
-};
+const COMP = "NavPanelCollapseButton";
 
 export const NavPanelCollapseButtonMd = createMetadata({
-  status: "in progress",
+  status: "experimental",
   description:
-    "`NavPanelCollapseButton` toggles the sidebar (NavPanel) collapse state when used in a vertical app layout.",
+    "`NavPanelCollapseButton` toggles the sidebar (NavPanel) collapse state when used in a vertical app layout. " +
+    "Place it in the NavPanel footer (e.g. next to ToneChangerButton) for a Nextra-like sidebar toggle.",
   props: {
     icon: {
-      description: "Icon name for the button when the panel is expanded.",
+      description: "Icon name for the button when the panel is expanded (collapse action).",
       valueType: "string",
-      defaultValue: defaultNavPanelCollapseButtonProps.icon,
+      defaultValue: "sidebar-collapse",
     },
     iconCollapsed: {
-      description: "Icon name for the button when the panel is collapsed.",
+      description: "Icon name for the button when the panel is collapsed (expand action).",
       valueType: "string",
-      defaultValue: defaultNavPanelCollapseButtonProps.iconCollapsed,
+      defaultValue: "sidebar-collapse",
     },
     "aria-label": {
       description: "Accessible label for the button when expanded.",
@@ -30,9 +33,56 @@ export const NavPanelCollapseButtonMd = createMetadata({
       description: "Accessible label for the button when collapsed.",
       valueType: "string",
     },
-    testId: {
-      description: "Adds a test identifier to the button.",
-      valueType: "string",
-    },
   },
+});
+
+type NavPanelCollapseButtonProps = {
+  icon?: string;
+  iconCollapsed?: string;
+  "aria-label"?: string;
+  "aria-labelCollapsed"?: string;
+};
+
+export const NavPanelCollapseButton = memo(function NavPanelCollapseButton({
+  icon = "sidebar-collapse",
+  iconCollapsed = "sidebar-collapse",
+  "aria-label": ariaLabel = "Collapse sidebar",
+  "aria-labelCollapsed": ariaLabelCollapsed = "Expand sidebar",
+}: NavPanelCollapseButtonProps) {
+  const layoutContext = useAppLayoutContext();
+  const collapsed = layoutContext?.navPanelCollapsed ?? false;
+  const toggle = layoutContext?.toggleNavPanelCollapsed;
+
+  if (!toggle) {
+    return null;
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      icon={<ThemedIcon name={collapsed ? iconCollapsed : icon} />}
+      aria-label={collapsed ? ariaLabelCollapsed : ariaLabel}
+      onClick={toggle}
+    />
+  );
+});
+
+export const navPanelCollapseButtonComponentRenderer = wrapComponent(
+  COMP,
+  NavPanelCollapseButton,
+  NavPanelCollapseButtonMd,
+  {},
+);
+
+export const navPanelCollapseButtonRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: NavPanelCollapseButtonMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <NavPanelCollapseButton
+      icon={adapter.stringProp("icon", "sidebar-collapse")}
+      iconCollapsed={adapter.stringProp("iconCollapsed", "sidebar-collapse")}
+      aria-label={adapter.stringProp("aria-label", "Collapse sidebar")}
+      aria-labelCollapsed={adapter.stringProp("aria-labelCollapsed", "Expand sidebar")}
+    />
+  ),
 });

@@ -27,7 +27,7 @@ test.describe("Basic Functionality", () => {
     await expect(overflow).not.toBeVisible();
   });
 
-  test.skip("moves overflowing items to dropdown when container is too narrow", async ({
+  test("moves overflowing items to dropdown when container is too narrow", async ({
     initTestBed,
     createResponsiveBarDriver,
   }) => {
@@ -86,7 +86,7 @@ test.describe("Basic Functionality", () => {
 // DROPDOWNTEXT PROPERTY TESTS
 // =============================================================================
 
-test.describe.skip("dropdownText property", () => {
+test.describe("dropdownText property", () => {
   test("displays default 'More options' text in dropdown trigger", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -282,7 +282,7 @@ test.describe.skip("dropdownText property", () => {
 // REVERSE PROPERTY TESTS
 // =============================================================================
 
-test.describe.skip("reverse property", () => {
+test.describe("reverse property", () => {
   test("renders children in reverse order horizontally (right to left)", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -396,7 +396,7 @@ test.describe.skip("reverse property", () => {
     await expect(overflow).toBeVisible();
 
     // Get the leftmost visible button
-    const visibleButtons = responsiveBar.component.locator('[data-testid^="btn"]');
+    const visibleButtons = responsiveBar.component.locator('[data-testid^="btn"]').filter({ visible: true });
     const firstVisibleButton = visibleButtons.first();
     
     const { left: overflowLeft } = await getBounds(overflow);
@@ -426,7 +426,7 @@ test.describe.skip("reverse property", () => {
     await expect(overflow).toBeVisible();
 
     // Get the rightmost visible button
-    const visibleButtons = responsiveBar.component.locator('[data-testid^="btn"]');
+    const visibleButtons = responsiveBar.component.locator('[data-testid^="btn"]').filter({ visible: true });
     const lastVisibleButton = visibleButtons.last();
     
     const { right: overflowRight } = await getBounds(overflow);
@@ -463,7 +463,7 @@ test.describe.skip("reverse property", () => {
 // DROPDOWNALIGNMENT PROPERTY TESTS
 // =============================================================================
 
-test.describe.skip("dropdownAlignment property", () => {
+test.describe("dropdownAlignment property", () => {
   test("alignment='start' aligns dropdown menu to the left", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -669,7 +669,7 @@ test.describe.skip("dropdownAlignment property", () => {
 // WILLOPEN EVENT TESTS
 // =============================================================================
 
-test.describe.skip("willOpen event", () => {
+test.describe("willOpen event", () => {
   test("fires willOpen event when overflow dropdown opens", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -787,7 +787,7 @@ test.describe.skip("willOpen event", () => {
 // API METHODS TESTS
 // =============================================================================
 
-test.describe.skip("API methods", () => {
+test.describe("API methods", () => {
   test("open() API method opens the overflow dropdown", async ({
     initTestBed,
     createResponsiveBarDriver,
@@ -1006,7 +1006,7 @@ test.describe.skip("API methods", () => {
 // BEHAVIORS AND PARTS TESTS
 // =============================================================================
 
-test.describe.skip("Behaviors and Parts", () => {
+test.describe("Behaviors and Parts", () => {
   test("can select ResponsiveBarDropdown", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Stack width="300px">

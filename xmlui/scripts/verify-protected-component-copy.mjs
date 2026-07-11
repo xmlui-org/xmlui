@@ -28,7 +28,10 @@ if (!existsSync(originalDir)) {
   process.exit(2);
 }
 
-const files = await protectedFiles(originalDir, componentName, manifest[componentName]);
+const manifestEntry = manifest[componentName];
+const files = await protectedFiles(originalDir, componentName, manifestEntry);
+const entryAdaptedFiles = entryAdaptedManifestFiles(manifestEntry);
+const testAdaptedFiles = testAdaptedManifestFiles(manifestEntry);
 let failed = false;
 
 for (const file of files) {
@@ -45,7 +48,7 @@ for (const file of files) {
     console.log(`${file}: identical`);
     continue;
   }
-  if (file === `${componentName}.tsx`) {
+  if (file === `${componentName}.tsx` || file === `${componentName}.ts` || entryAdaptedFiles.has(file)) {
     const normalizedOriginalEntry = normalizeEntryFile(original);
     const normalizedRewriteEntry = normalizeEntryFile(rewrite);
     if (
@@ -60,6 +63,10 @@ for (const file of files) {
   const normalizedRewrite = normalizeImportExportLines(rewrite);
   if (normalizedOriginal === normalizedRewrite) {
     console.log(`${file}: import-only`);
+    continue;
+  }
+  if (testAdaptedFiles.has(file) && file.endsWith(".spec.ts")) {
+    console.log(`${file}: test-adapted`);
     continue;
   }
   console.log(`${file}: drifted`);
@@ -82,9 +89,24 @@ async function protectedFiles(componentDir, component, manifestEntry) {
   return Array.from(new Set([...fileNames, ...extra])).sort();
 }
 
+function entryAdaptedManifestFiles(manifestEntry) {
+  const files = Array.isArray(manifestEntry?.entryAdapted)
+    ? manifestEntry.entryAdapted
+    : [];
+  return new Set(files);
+}
+
+function testAdaptedManifestFiles(manifestEntry) {
+  const files = Array.isArray(manifestEntry?.testAdapted)
+    ? manifestEntry.testAdapted
+    : [];
+  return new Set(files);
+}
+
 function isProtectedFile(name, component) {
   return name.endsWith("React.tsx") ||
     name === `${component}.tsx` ||
+    name === `${component}.ts` ||
     name.endsWith(".module.scss") ||
     (name.endsWith(".scss") && !name.endsWith(".module.scss")) ||
     name.endsWith(".defaults.ts") ||

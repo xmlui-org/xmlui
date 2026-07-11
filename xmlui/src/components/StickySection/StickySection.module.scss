@@ -1,16 +1,21 @@
-// StickySection.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old StickySection component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $zIndex-StickySection: createThemeVar("zIndex-StickySection");
 
+// --- This part defines the CSS styles
 @layer components {
   .stickySection {
     position: sticky;
-    z-index: var(--xmlui-zIndex-StickySection);
+    // Stack later siblings on top of earlier ones so only the last
+    // (current) sticky section remains visible when multiple overlap.
+    z-index: $zIndex-StickySection;
   }
 
   .stickToTop {
@@ -22,6 +27,7 @@ $zIndex-StickySection: createThemeVar("zIndex-StickySection");
   }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

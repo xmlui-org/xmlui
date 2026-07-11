@@ -1,7 +1,7 @@
 import { builtInComponentContracts } from "../compiler/contracts";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
-import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { avatarRenderer } from "../components/Avatar/Avatar";
@@ -29,27 +29,28 @@ import {
 import { brRenderer, BrRenderer } from "../components/Br/Br";
 import { fragmentRenderer } from "../components/Fragment/Fragment";
 import { iconRenderer } from "../components/Icon/Icon";
-import { imageRenderer } from "../components/Image/Image.renderer";
+import { imageRenderer } from "../components/Image/Image";
 import { iframeRenderer } from "../components/IFrame/IFrame";
 import { itemsRenderer } from "../components/Items/Items";
 import { listRenderer } from "../components/List/List";
-import { linkRenderer } from "../components/Link/Link.renderer";
+import { linkRenderer } from "../components/Link/Link";
 import { logoRenderer } from "../components/Logo/Logo";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { pageMetaTitleRenderer } from "../components/PageMetaTitle/PageMetaTitle";
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
-import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import {
   hSplitterRenderer,
   splitterRenderer,
   vSplitterRenderer,
-} from "../components/Splitter/Splitter.renderer";
-import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
-import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
+} from "../components/Splitter/Splitter";
+import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
+import { stickySectionRenderer } from "../components/StickySection/StickySection";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
-import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
+import { stepRenderer } from "../components/Stepper/Step";
+import { stepperRenderer } from "../components/Stepper/Stepper";
 import {
   chStackRenderer,
   cvStackRenderer,
@@ -57,7 +58,8 @@ import {
   stackRenderer,
   vStackRenderer,
 } from "../components/Stack/Stack";
-import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
+import { tabsRenderer } from "../components/Tabs/Tabs";
+import { tabItemRenderer } from "../components/Tabs/TabItem";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
@@ -70,7 +72,7 @@ import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer";
 import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
-import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
+import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
 import {
   dropdownMenuRenderer,
@@ -89,13 +91,13 @@ import { formValidatorRenderer } from "../components/Form/FormValidator";
 import { formItemRenderer } from "../components/FormItem/FormItem.renderer";
 import { formSegmentRenderer } from "../components/FormSegment/FormSegment.renderer";
 import { formSectionRenderer } from "../components/FormSection/FormSection.renderer";
-import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
+import { stepperFormRenderer } from "../components/StepperForm/StepperForm";
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { optionRenderer } from "../components/Option/Option";
 import { paginationRenderer } from "../components/Pagination/Pagination";
 import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
-import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
+import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
 import { tableRenderer } from "../components/Table/Table";
@@ -104,35 +106,35 @@ import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
-import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
+import { timeInputRenderer } from "../components/TimeInput/TimeInput";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
-import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
+import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
-import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
-import { apiCallRenderer } from "../components/APICall/APICall.renderer";
+import { dataSourceRenderer } from "../components/DataSource/DataSource";
+import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appStateRenderer } from "../components/AppState/AppState";
 import { changeListenerRenderer } from "../components/ChangeListener/ChangeListener";
-import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
-import { timerRenderer } from "../components/Timer/Timer.renderer";
-import { queueRenderer } from "../components/Queue/Queue.renderer";
+import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle";
+import { timerRenderer } from "../components/Timer/Timer";
+import { queueRenderer } from "../components/Queue/Queue";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
-import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
-import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
-import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
+import { eventSourceRenderer } from "../components/EventSource/EventSource";
+import { webSocketRenderer } from "../components/WebSocket/WebSocket";
+import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion";
 import { bookmarkRenderer } from "../components/Bookmark/Bookmark";
-import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
-import { toastRenderer } from "../components/Toast/Toast.renderer";
-import { themeRenderer } from "../components/Theme/Theme.renderer";
-import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { skipLinkRenderer } from "../components/SkipLink/SkipLink";
+import { toastRenderer } from "../components/Toast/Toast";
+import { themeRenderer } from "../components/Theme/Theme";
+import { slotRenderer } from "../components/Slot/Slot";
 import { partRenderer } from "../components/Part/Part";
-import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
-import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
+import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch";
+import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton";
 import { pageRuntimeRenderer, pagesRuntimeRenderer } from "../components/Pages/Pages";
 import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
-import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
@@ -384,7 +386,7 @@ const transferredRenderers: Partial<Record<string, XmluiBuiltInRenderer>> = {
   NavPanelCollapseButton: navPanelCollapseButtonRenderer,
   NavPanel: navPanelRuntimeRenderer,
   DataSource: dataSourceRenderer,
-  APICall: apiCallRenderer,
+  APICall: apiCallRuntimeRenderer,
   AppState: appStateRenderer,
   ChangeListener: changeListenerRenderer,
   Lifecycle: lifecycleRenderer,
@@ -915,7 +917,7 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (navLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavLinkReact.tsx`);
     } else if (navPanelCollapseButtonTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelCollapseButtonReact.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelCollapseButton.tsx`);
     } else if (navPanelTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/NavPanelReact.tsx`);
     } else if (logoTransferred) {
@@ -949,9 +951,9 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (spaceFillerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SpaceFillerReact.tsx`);
     } else if (dataSourceTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DataSource.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/DataSource.tsx`);
     } else if (apiCallTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/APICall.tsx`);
     } else if (appStateTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/AppState.tsx`);
     } else if (changeListenerTransferred) {
@@ -959,15 +961,15 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (lifecycleTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Lifecycle.renderer.tsx`);
     } else if (timerTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Timer.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/TimerReact.tsx`);
     } else if (queueTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Queue.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Queue.tsx`);
     } else if (eventSourceTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/EventSource.renderer.tsx`);
     } else if (messageListenerTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/MessageListenerReact.tsx`);
     } else if (webSocketTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocket.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/WebSocketReact.tsx`);
     } else if (liveRegionTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/LiveRegion.renderer.tsx`);
     } else if (bookmarkTransferred) {
@@ -975,15 +977,15 @@ export const componentTransferModules: XmluiComponentTransferModule[] = builtInC
     } else if (skipLinkTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/SkipLink.renderer.tsx`);
     } else if (toastTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Toast.tsx`);
     } else if (themeTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Theme.tsx`);
     } else if (slotTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Slot.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Slot.ts`);
     } else if (toneSwitchTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneSwitch.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneSwitchReact.tsx`);
     } else if (toneChangerButtonTransferred) {
-      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneChangerButton.renderer.tsx`);
+      implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/ToneChangerButton.tsx`);
     } else if (pagesTransferred) {
       implementationPaths.splice(0, implementationPaths.length, `xmlui/src/components/${folderName}/Pages.renderer.tsx`);
     } else if (redirectTransferred) {

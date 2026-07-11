@@ -308,9 +308,6 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "getDate") {
     return getDate;
   }
-  if (name === "confirm") {
-    return readReference(scope, "confirm");
-  }
   if (name === "Symbol") {
     return Symbol;
   }

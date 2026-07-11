@@ -31,6 +31,12 @@ export function isComponentDefChildren(children?: unknown): boolean {
   return typeof children !== "string";
 }
 
+let lastGeneratedId = 1;
+
+export function generatedId(): string {
+  return `$qid_${lastGeneratedId++}`;
+}
+
 export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
   func: F,
   wait?: number,
@@ -49,4 +55,24 @@ export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
     new Promise((resolve, reject) => {
       throttled(resolve, reject, args);
     }) as ReturnType<F>;
+}
+
+export function normalizePath(url?: string): string | undefined {
+  if (!url) {
+    return undefined;
+  }
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  if (typeof window === "undefined") {
+    return url;
+  }
+  const prefix = (window as any).__PUBLIC_PATH || "";
+  if (!prefix) {
+    return url;
+  }
+  const prefixWithoutTrailingSlash = prefix.endsWith("/") ? prefix.slice(0, -1) : prefix;
+  const urlWithoutLeadingSlash = url.startsWith("/") ? url.slice(1) : url;
+
+  return `${prefixWithoutTrailingSlash}/${urlWithoutLeadingSlash}`;
 }

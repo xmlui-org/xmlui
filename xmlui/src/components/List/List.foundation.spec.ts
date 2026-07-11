@@ -1,4 +1,18 @@
 import { test, expect } from "../../testing/fixtures";
+import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
+
+const absoluteUrlInterceptor: ApiInterceptorDefinition = {
+  operations: {
+    "tube-status": {
+      url: "https://api.example.test/line/mode/tube/status",
+      method: "get",
+      handler: `return [
+        { id: "bakerloo", name: "Bakerloo", lineStatuses: [{ statusSeverityDescription: "Good Service" }] },
+        { id: "central", name: "Central", lineStatuses: [{ statusSeverityDescription: "Minor Delays" }] }
+      ];`,
+    },
+  },
+};
 
 test.describe("List foundation", () => {
   test("renders array of objects with child item template", async ({ initTestBed, page }) => {
@@ -22,6 +36,18 @@ test.describe("List foundation", () => {
     `);
     await expect(page.getByText("Items")).toBeVisible();
     await expect(page.getByText("Data")).toHaveCount(0);
+  });
+
+  test("fetches literal string data URL as list data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <List data="https://api.example.test/line/mode/tube/status">
+        <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
+      </List>
+    `, { apiInterceptor: absoluteUrlInterceptor });
+
+    await expect(page.getByText("Bakerloo: Good Service")).toBeVisible();
+    await expect(page.getByText("Central: Minor Delays")).toBeVisible();
+    await expect(page.getByText("No data available")).toHaveCount(0);
   });
 
   test("keeps default item renderer with group header template only", async ({ initTestBed, page }) => {

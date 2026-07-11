@@ -94,7 +94,7 @@ test.describe("Basic Functionality", () => {
 // EVENT TESTS
 // =============================================================================
 
-test.describe.skip("resize event", () => {
+test.describe("resize event", () => {
   test("emits primary size as pixels when initialPrimarySize uses percent", async ({
     initTestBed,
     page,

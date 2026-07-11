@@ -1,25 +1,75 @@
-import { createContext, useContext } from "react";
-import type { ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import produce from "immer";
 
-export type RegisteredTab = {
-  activated?: () => void;
-  content: ReactNode;
-  header?: ReactNode;
-  id?: string;
-  index: number;
-  innerId: string;
-  label: string;
-};
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import type { Tab } from "../abstractions";
 
-export type TabsContextValue = {
-  activeId: string | undefined;
+type TabItem = Tab & { innerId: string };
+
+interface ITabContext{
+  register: (tabItem: TabItem) => void;
+  unRegister: (innerId: string) => void;
+  activeTabId: string;
+  getTabItems: () => TabItem[];
   keepMounted: boolean;
-  register(tab: RegisteredTab): void;
-  unregister(innerId: string): void;
-};
+}
+export const TabContext = createContext<ITabContext>({
+  register: (tabItem) => {},
+  unRegister: (innerId: string) => {},
+  activeTabId: "",
+  getTabItems: () => [],
+  keepMounted: false,
+});
 
-export const TabsContext = createContext<TabsContextValue | undefined>(undefined);
+export function useTabContextValue(keepMounted: boolean = false) {
+  const [tabItems, setTabItems] = useState<TabItem[]>(EMPTY_ARRAY);
+  const tabItemsRef = useRef<TabItem[]>(EMPTY_ARRAY);
+  tabItemsRef.current = tabItems;
+  
+  const [activeTabId, setActiveTabId] = useState<string>("");
+  
+  const register = useCallback((tabItem: TabItem) => {
+    setTabItems(
+      produce((draft) => {
+        const existing = draft.findIndex((col) => col.innerId === tabItem.innerId);
+        if (existing < 0) {
+          draft.push(tabItem);
+        } else {
+          draft[existing] = tabItem;
+        }
+      }),
+    );
+  }, []);
+  
+  const unRegister = useCallback((innerId: string) => {
+    setTabItems(
+      produce((draft) => {
+        return draft.filter((col) => col.innerId !== innerId);
+      }),
+    );
+  }, []);
+  
+  const getTabItems = useCallback(() => {
+    return tabItemsRef.current;
+  }, []);
+  
+  const tabContextValue = useMemo(() => {
+    return {
+      register,
+      unRegister,
+      activeTabId,
+      setActiveTabId,
+      getTabItems,
+      keepMounted,
+    };
+  }, [register, unRegister, activeTabId, getTabItems, keepMounted]);
 
-export function useTabsContext(): TabsContextValue | undefined {
-  return useContext(TabsContext);
+  return {
+    tabItems,
+    tabContextValue,
+  };
+}
+
+export function useTabContext() {
+  return useContext(TabContext);
 }

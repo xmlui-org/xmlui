@@ -1,309 +1,807 @@
-import { expect, test } from "../../testing/fixtures";
+import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
+import { test, expect } from "../../testing/fixtures";
 
-test.describe("DataSource foundation", () => {
-  test("mockData is visible through component APIs", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <DataSource id="tasks" mockData="{[
-        { id: 1, title: 'Build runtime' },
-        { id: 2, title: 'Write tests' }
-      ]}" />
-      <Text testId="loaded">Loaded: {tasks.loaded ? 'yes' : 'no'}</Text>
-      <Text testId="first">{tasks.value[0].title}</Text>
-    `);
+// Test data constants for API mocking
+const basicApiInterceptor: ApiInterceptorDefinition = {
+  operations: {
+    "get-test": {
+      url: "/api/test",
+      method: "get",
+      handler: `return "GET success";`,
+    },
+    "error-test-400": {
+      url: "/api/error/400",
+      method: "get",
+      handler: `throw Errors.HttpError(400, { message: "Bad request", details: "Invalid data" });`,
+    },
+    "error-test-500": {
+      url: "/api/error/500",
+      method: "get",
+      handler: `throw Errors.HttpError(500, { message: "Internal server error", details: "Something went wrong" });`,
+    },
+    "error-test-unknown": {
+      url: "/api/error/unknown",
+      method: "get",
+      handler: `throw {statusCode: 500, message: $error.message, details: {}};`,
+    },
+  },
+};
 
-    await expect(page.getByTestId("loaded")).toHaveText("Loaded: yes");
-    await expect(page.getByTestId("first")).toHaveText("Build runtime");
-  });
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
-  test("refetch updates rendered API values", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.count="{1}">
-        <DataSource id="stats" mockData="{{ count }}" />
-        <Text testId="count">Count: {stats.value.count}</Text>
-        <Button label="Refresh" onClick="count++; stats.refetch()" />
-      </App>
-    `);
-
-    await expect(page.getByTestId("count")).toHaveText("Count: 1");
-    await page.getByRole("button", { name: "Refresh" }).click();
-    await expect(page.getByTestId("count")).toHaveText("Count: 2");
-  });
-
-  test("fetch event receives request context variables", async ({ initTestBed, page }) => {
-    const { testStateDriver } = await initTestBed(`
-      <DataSource
-        id="ctx"
-        url="/api/items"
-        method="post"
-        queryParams="{{ page: 2 }}"
-        body="{{ active: true }}"
-        headers="{{ 'x-test': 'yes' }}"
-        onFetch="testState = $method + ':' + $url + ':' + $queryParams.page + ':' + $requestBody.active + ':' + $requestHeaders['x-test']; 'ok'" />
-      <Text testId="message">{ctx.value}</Text>
-    `);
-
-    await expect(page.getByTestId("message")).toHaveText("ok");
-    await expect.poll(testStateDriver.testState).toEqual("post:/api/items:2:true:yes");
-  });
-
-  test("resultSelector and transformResult shape the published value", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <DataSource
-        id="selected"
-        mockData="{{ payload: { items: ['alpha', 'beta'] } }}"
-        resultSelector="payload.items"
-        transformResult="{items => items.join(', ')}" />
-      <Text testId="value">{selected.value}</Text>
-    `);
-
-    await expect(page.getByTestId("value")).toHaveText("alpha, beta");
-  });
-
-  test("network load exposes lifecycle status, response headers, and loaded event", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.route("**/api/lifecycle", async (route) => {
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json", "x-source": "route" },
-        body: JSON.stringify({ message: "ready" }),
-      });
+test.describe("Basic Functionality", () => {
+  test("component renders and initializes correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`<DataSource id="test" url="/api/test" />`, {
+      apiInterceptor: basicApiInterceptor,
     });
 
-    const { testStateDriver } = await initTestBed(`
-      <DataSource id="remote" url="/api/lifecycle" onLoaded="(value, isRefetch) => testState = value.message + ':' + isRefetch" />
-      <Text testId="loaded">{remote.loaded ? 'loaded' : 'pending'}</Text>
-      <Text testId="message">{remote.value.message}</Text>
-      <Text testId="header">{remote.responseHeaders['x-source']}</Text>
-      <Text testId="error">{remote.error ? 'error' : 'none'}</Text>
-    `);
-
-    await expect(page.getByTestId("loaded")).toHaveText("loaded");
-    await expect(page.getByTestId("message")).toHaveText("ready");
-    await expect(page.getByTestId("header")).toHaveText("route");
-    await expect(page.getByTestId("error")).toHaveText("none");
-    await expect.poll(testStateDriver.testState).toEqual("ready:false");
+    // DataSource is non-visual, so we check for proper registration by checking if it exists in context
+    const component = page.getByTestId("test");
+    expect(await component.count()).toBe(0); // Non-visual component
   });
 
-  test("network error exposes error state and fires error event", async ({ initTestBed, page }) => {
-    await page.route("**/api/failure", async (route) => {
-      await route.fulfill({
-        status: 500,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: "Nope" }),
-      });
-    });
+  test("component loads correctly", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/test" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+      `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
 
-    const { testStateDriver } = await initTestBed(`
-      <DataSource id="broken" url="/api/failure" onError="error => testState = error.statusCode + ':' + error.response.message" />
-      <Text testId="loaded">{broken.loaded ? 'loaded' : 'not-loaded'}</Text>
-      <Text testId="error">{broken.error ? broken.error.statusCode + ':' + broken.error.response.message : 'none'}</Text>
-    `);
-
-    await expect(page.getByTestId("loaded")).toHaveText("not-loaded");
-    await expect(page.getByTestId("error")).toHaveText("500:Nope");
-    await expect.poll(testStateDriver.testState).toEqual("500:Nope");
+    const component = page.getByTestId("output");
+    await expect(component).toHaveText("GET success");
   });
 
-  test("request builder sends method, query params, headers, credentials, and JSON body", async ({
-    initTestBed,
-    page,
-  }) => {
-    let captured:
-      | {
-          method: string;
-          url: string;
-          header: string | undefined;
-          body: unknown;
+  test("onError working correctly", async ({ initTestBed }) => {
+    const { testStateDriver } = await initTestBed(
+      `<DataSource id="ds" url="/api/error/400" onError="(error) => testState = JSON.stringify(error)" />`,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect
+      .poll(
+        async () => {
+          const dataPacket = await testStateDriver.testState();
+          return JSON.parse(dataPacket);
+        },
+        { timeout: 2000 },
+      )
+      .toEqual({ 
+        statusCode: 400, 
+        details: "Invalid data", 
+        message: "Bad request",
+        response: {
+          message: "Bad request",
+          details: "Invalid data"
         }
-      | undefined;
+      });
+  });
 
-    await page.route("**/api/request?term=xmlui", async (route) => {
-      const request = route.request();
-      captured = {
-        method: request.method(),
-        url: request.url(),
-        header: request.headers()["x-test"],
-        body: request.postDataJSON(),
+  test("shows error notification: code 400", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `<DataSource
+        id="ds"
+        url="/api/error/400"
+        errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+      />`,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect(page.getByText("Error 400: Bad request")).toBeVisible();
+  });
+
+  test("shows error notification: code 500", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <DataSource 
+        id="ds" 
+        url="/api/error/500"
+        errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+      />
+      `,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect(page.getByText("Error 500: Internal server error").first()).toBeVisible();
+  });
+
+  test("shows error notification with error details", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<DataSource 
+        id="ds" 
+        url="/api/error/400"
+        errorNotificationMessage="Error {$error.statusCode}: {$error.message}, Details: {$error.details}"
+      />`,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect(page.getByText("Error 400: Bad request, Details: Invalid data")).toBeVisible();
+  });
+
+  test.skip("shows not found error notification on incorrect endpoint", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<DataSource 
+        id="ds" 
+        url="/api/error" 
+        errorNotificationMessage="Error {$error.statusCode}: {$error.message}"
+      />`,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect(page.getByText("Error 404: <No error description>")).toBeVisible();
+  });
+
+  test("shows unknown error notification", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<DataSource 
+        id="ds" 
+        url="/api/error/unknown" 
+        errorNotificationMessage="Error {$error.statusCode}: {$error.message}, Details: {JSON.stringify($error.details)}"
+      />`,
+      {
+        apiInterceptor: basicApiInterceptor,
+      },
+    );
+    await expect(page.getByText("Error 500: Error without message, Details: {}")).toBeVisible();
+  });
+
+  // =============================================================================
+  // CREDENTIALS PROPERTY TESTS
+  // =============================================================================
+
+  test.describe("credentials property", () => {
+    test("accepts 'omit' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="omit" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("accepts 'same-origin' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="same-origin" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("accepts 'include' value", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" credentials="include" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("works without credentials property (default behavior)", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource id="ds" url="/api/test" />
+          <Text testId="output" value="{ds.value}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: basicApiInterceptor,
+        },
+      );
+
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("GET success");
+    });
+
+    test("credentials property works with POST method", async ({ initTestBed, page }) => {
+      const postApiInterceptor: ApiInterceptorDefinition = {
+        operations: {
+          "post-with-credentials": {
+            url: "/api/submit",
+            method: "post",
+            handler: `return { message: "POST with credentials", body: $requestBody };`,
+          },
+        },
       };
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ok: true }),
-      });
-    });
 
-    await initTestBed(`
-      <DataSource
-        id="remote"
-        url="/api/request"
-        method="post"
-        queryParams="{{ term: 'xmlui' }}"
-        headers="{{ 'x-test': 'yes' }}"
-        credentials="same-origin"
-        body="{{ count: 3 }}" />
-      <Text testId="ok">{remote.value.ok ? 'ok' : 'no'}</Text>
-    `);
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="ds" 
+            url="/api/submit" 
+            method="post" 
+            body='{{"test": "data"}}' 
+            credentials="include" 
+          />
+          <Text testId="output" value="{ds.value.message}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: postApiInterceptor,
+        },
+      );
 
-    await expect(page.getByTestId("ok")).toHaveText("ok");
-    expect(captured).toMatchObject({
-      method: "POST",
-      header: "yes",
-      body: { count: 3 },
+      const component = page.getByTestId("output");
+      await expect(component).toHaveText("POST with credentials");
     });
-    expect(captured?.url).toContain("/api/request?term=xmlui");
   });
 
-  test("polling refetches remote data and marks refetch loads", async ({ initTestBed, page }) => {
-    let requests = 0;
-    await page.route("**/api/polling", async (route) => {
-      requests += 1;
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ count: requests }),
-      });
+  // =============================================================================
+  // REGRESSION TESTS
+  // =============================================================================
+
+  test.describe("Regression: Issue #2672 - URL encoding consistency", () => {
+    // Regression test for: https://github.com/xmlui-org/xmlui/issues/2672
+    // Issue: Inconsistent URL encoding between url and queryParams causes duplicate 
+    // React Query keys and cache misses
+    
+    const pathWithSpecialChars = ":sh:Documents:/";
+    const urlEncodingInterceptor: ApiInterceptorDefinition = {
+      operations: {
+        "list-folder-encoded": {
+          url: "/ListFolder",
+          method: "get",
+          queryParamTypes: {
+            path: "string",
+          },
+          handler: `return { method: "encoded", path: $queryParams.path };`,
+        },
+      },
+    };
+
+    test("queryParams encodes special characters", async ({ initTestBed, page }) => {
+      // Using queryParams should encode special characters like : and /
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="ds1" 
+            url="/ListFolder" 
+            queryParams="{{ path: ':sh:Documents:/' }}"
+          />
+          <Text testId="output1" value="{ds1.value.path}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: urlEncodingInterceptor,
+        },
+      );
+
+      const output = page.getByTestId("output1");
+      await expect(output).toHaveText(pathWithSpecialChars);
     });
 
+    test("direct URL interpolation does not encode special characters", async ({ initTestBed, page }) => {
+      // Using direct URL interpolation should NOT encode special characters
+      // This is the current behavior that causes the issue
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="ds2" 
+            url="/ListFolder?path=:sh:Documents:/"
+          />
+          <Text testId="output2" value="{ds2.value.path}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: urlEncodingInterceptor,
+        },
+      );
+
+      const output = page.getByTestId("output2");
+      // This will likely fail initially because unencoded URL won't match the interceptor
+      await expect(output).toHaveText(pathWithSpecialChars);
+    });
+
+    test("both methods should produce identical cache keys and data", async ({ initTestBed, page }) => {
+      // REGRESSION TEST: Both methods should result in the same React Query cache key
+      // and should not cause duplicate fetches
+      
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="dsWithQueryParams" 
+            url="/ListFolder" 
+            queryParams="{{ path: ':sh:Documents:/' }}"
+          />
+          <DataSource 
+            id="dsWithDirectUrl" 
+            url="/ListFolder?path=:sh:Documents:/"
+          />
+          <Text testId="outputQueryParams" value="{dsWithQueryParams.value.method}" />
+          <Text testId="outputDirectUrl" value="{dsWithDirectUrl.value.method}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: urlEncodingInterceptor,
+        },
+      );
+
+      const outputQueryParams = page.getByTestId("outputQueryParams");
+      const outputDirectUrl = page.getByTestId("outputDirectUrl");
+      
+      // Both should receive the same data from the same cache entry
+      await expect(outputQueryParams).toHaveText("encoded");
+      await expect(outputDirectUrl).toHaveText("encoded");
+      
+      // Both DataSource components should have fetched data successfully
+      // If they have different cache keys, this demonstrates the bug
+    });
+
+    test("encoded URLs should match and share cache", async ({ initTestBed, page }) => {
+      // When the fix is implemented, both approaches should:
+      // 1. Generate the same encoded URL: /ListFolder?path=%3Ash%3ADocuments%3A%2F
+      // 2. Use the same React Query cache key
+      // 3. Result in only ONE network request, not two
+      
+      const interceptorWithCallCounter: ApiInterceptorDefinition = {
+        initialize: "$state.callCount = 0;",
+        operations: {
+          "list-folder-encoded": {
+            url: "/ListFolder",
+            method: "get",
+            queryParamTypes: {
+              path: "string",
+            },
+            handler: `
+              $state.callCount = $state.callCount + 1;
+              return { 
+                method: "encoded", 
+                path: $queryParams.path,
+                callCount: $state.callCount
+              };
+            `,
+          },
+        },
+      };
+
+      await initTestBed(
+        `
+        <Fragment>
+          <DataSource 
+            id="dsWithQueryParams" 
+            url="/ListFolder" 
+            queryParams="{{ path: ':sh:Documents:/' }}"
+          />
+          <DataSource 
+            id="dsWithDirectUrl" 
+            url="/ListFolder?path=:sh:Documents:/"
+          />
+          <Text testId="callCountQueryParams" value="{dsWithQueryParams.value.callCount}" />
+          <Text testId="callCountDirectUrl" value="{dsWithDirectUrl.value.callCount}" />
+        </Fragment>
+        `,
+        {
+          apiInterceptor: interceptorWithCallCounter,
+        },
+      );
+
+      const callCountQueryParams = page.getByTestId("callCountQueryParams");
+      const callCountDirectUrl = page.getByTestId("callCountDirectUrl");
+      
+      // After the fix, both should show "1" indicating only one API call was made
+      // because they share the same cache key
+      await expect(callCountQueryParams).toHaveText("1");
+      await expect(callCountDirectUrl).toHaveText("1");
+      
+      // If this test fails with different values (e.g., "1" and "2"), 
+      // it confirms the bug: different cache keys cause duplicate fetches
+    });
+  });
+});
+
+// =============================================================================
+// MOCK DATA TESTS
+// =============================================================================
+
+test.describe("mockData property", () => {
+  test("returns mock data without making a network request", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="{[1, 2, 3]}" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("[1,2,3]");
+  });
+
+  test("works without a url property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="hello" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("hello");
+  });
+
+  test("returns a mock object", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="{{ name: 'Alice', age: 30 }}" />
+        <Text testId="name" value="{ds.value.name}" />
+        <Text testId="age" value="{ds.value.age}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("name")).toHaveText("Alice");
+    await expect(page.getByTestId("age")).toHaveText("30");
+  });
+
+  test("loaded becomes true after data is resolved", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="ok" />
+        <Text testId="loaded" value="{ds.loaded}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("loaded")).toHaveText("true");
+  });
+
+  test("fires the onLoaded event with mock data", async ({ initTestBed }) => {
     const { testStateDriver } = await initTestBed(`
-      <DataSource
-        id="polling"
-        url="/api/polling"
-        pollIntervalInSeconds="{0.05}"
-        onLoaded="(value, isRefetch) => testState = value.count + ':' + isRefetch" />
-      <Text testId="count">{polling.value.count}</Text>
+      <DataSource id="ds" mockData="{[42]}" onLoaded="(data) => testState = data[0]" />
     `);
 
-    await expect.poll(async () => Number(await page.getByTestId("count").textContent())).toBeGreaterThanOrEqual(2);
-    await expect.poll(async () => {
-      const state = await testStateDriver.testState();
-      return typeof state === "string" && state.endsWith(":true");
-    }).toBe(true);
+    await expect.poll(() => testStateDriver.testState(), { timeout: 2000 }).toBe(42);
   });
 
-  test("older in-flight loads cannot overwrite a newer refetch result", async ({
-    initTestBed,
-    page,
-  }) => {
-    let requests = 0;
-    await page.route("**/api/stale", async (route) => {
-      requests += 1;
-      const current = requests;
-      if (current === 1) {
-        await new Promise((resolve) => setTimeout(resolve, 150));
-      }
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ label: current === 1 ? "slow" : "fresh" }),
-      });
-    });
-
+  test("applies resultSelector to mock data", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <DataSource id="stale" url="/api/stale" />
-      <Button label="Refresh" onClick="stale.refetch()" />
-      <Text testId="label">{stale.value.label || 'pending'}</Text>
+      <Fragment>
+        <DataSource id="ds" mockData="{{ items: ['a', 'b'] }}" resultSelector="items" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
     `);
 
-    await page.getByRole("button", { name: "Refresh" }).click();
-    await expect(page.getByTestId("label")).toHaveText("fresh");
-    await page.waitForTimeout(200);
-    await expect(page.getByTestId("label")).toHaveText("fresh");
+    await expect(page.getByTestId("output")).toHaveText('["a","b"]');
   });
 
-  test("dataType parses text, csv, and sql-compatible text responses", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.route("**/api/plain", async (route) => {
-      await route.fulfill({ status: 200, body: "plain text" });
-    });
-    await page.route("**/api/csv?filter=active", async (route) => {
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "text/csv" },
-        body: 'name,value\n"alpha, one",1\nbeta,2',
-      });
-    });
-    await page.route("**/api/sql", async (route) => {
-      await route.fulfill({ status: 200, body: "select 1" });
-    });
-
+  test("is reactive: updates value when bound expression changes", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <DataSource id="plain" url="/api/plain" dataType="text" />
-      <DataSource id="rows" url="/api/csv" queryParams="{{ filter: 'active' }}" dataType="csv" />
-      <DataSource id="sql" url="/api/sql" dataType="sql" />
-      <Text testId="plain">{plain.value}</Text>
-      <Text testId="csv">{rows.value[0].name}:{rows.value[1].value}</Text>
-      <Text testId="sql">{sql.value}</Text>
-    `);
-
-    await expect(page.getByTestId("plain")).toHaveText("plain text");
-    await expect(page.getByTestId("csv")).toHaveText("alpha, one:2");
-    await expect(page.getByTestId("sql")).toHaveText("select 1");
-  });
-
-  test("page selectors expose previous and next page API values", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.route("**/api/page", async (route) => {
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          items: ["first"],
-          paging: { previous: null, next: { cursor: "next-1" } },
-        }),
-      });
-    });
-
-    await initTestBed(`
-      <DataSource
-        id="paged"
-        url="/api/page"
-        resultSelector="items"
-        prevPageSelector="paging.previous"
-        nextPageSelector="paging.next" />
-      <Text testId="items">{paged.value[0]}</Text>
-      <Text testId="prev">{paged.hasPrevPage ? 'prev' : 'no-prev'}</Text>
-      <Text testId="next">{paged.hasNextPage ? paged.nextPage.cursor : 'no-next'}</Text>
-    `);
-
-    await expect(page.getByTestId("items")).toHaveText("first");
-    await expect(page.getByTestId("prev")).toHaveText("no-prev");
-    await expect(page.getByTestId("next")).toHaveText("next-1");
-  });
-
-  test("structuralSharing keeps unchanged result references across refetch", async ({
-    initTestBed,
-    page,
-  }) => {
-    let requests = 0;
-    await page.route("**/api/shared-structure", async (route) => {
-      requests += 1;
-      await route.fulfill({
-        status: 200,
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ items: [{ id: 1, label: "stable" }] }),
-      });
-    });
-
-    await initTestBed(`
-      <App var.previousValue="{null}" var.shareState="{''}">
-        <DataSource
-          id="shared"
-          url="/api/shared-structure" />
-        <Button label="Check sharing" onClick="previousValue = shared.value; shared.refetch(); delay(100); shareState = previousValue === shared.value ? 'same' : 'different'" />
-        <Text testId="label">{shared.value.items[0].label}</Text>
-        <Text testId="share">{shareState}</Text>
+      <App var.myData="first">
+        <DataSource id="ds" mockData="{myData}" />
+        <Text testId="output" value="{ds.value}" />
+        <Button testId="btn" label="Change" onClick="myData = 'second'" />
       </App>
     `);
 
-    await expect(page.getByTestId("label")).toHaveText("stable");
-    await page.getByRole("button", { name: "Check sharing" }).click();
-    await expect(page.getByTestId("share")).toHaveText("same");
-    expect(requests).toBeGreaterThanOrEqual(2);
+    await expect(page.getByTestId("output")).toHaveText("first");
+    await page.getByTestId("btn").click();
+    await expect(page.getByTestId("output")).toHaveText("second");
+  });
+
+  test("when can react to DataSource loaded status", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="profile" mockData="{{ name: 'Ada' }}" />
+        <Text testId="loading" when="{!profile.loaded}">Loading</Text>
+        <Text testId="ready" when="{profile.loaded}">{profile.value.name}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("ready")).toHaveText("Ada");
+    await expect(page.getByTestId("loading")).not.toBeVisible();
+  });
+
+  test("when can guard a deep DataSource value path after load", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          {profile.value.billing.address.city}
+        </Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("city")).toHaveText("London");
+  });
+
+  test("when treats a missing deep DataSource value path as falsy after load", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="profile"
+          url="/api/profile"
+        />
+        <Text
+          testId="city"
+          when="{profile.loaded && profile.value.billing.address.city}"
+        >
+          City exists
+        </Text>
+        <Text testId="done" when="{profile.loaded}">Loaded</Text>
+      </Fragment>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: {} };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("done")).toHaveText("Loaded");
+    await expect(page.getByTestId("city")).not.toBeVisible();
+  });
+
+  test("onLoaded can store a named visibility decision", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <App var.showBillingPanel="{false}">
+        <DataSource
+          id="profile"
+          url="/api/profile"
+          onLoaded="data => showBillingPanel = !!data.billing.address"
+        />
+        <Text testId="billing" when="{showBillingPanel}">
+          Billing address is available.
+        </Text>
+      </App>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-profile": {
+              url: "/api/profile",
+              method: "get",
+              handler: `return { billing: { address: { city: "London" } } };`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("billing")).toHaveText("Billing address is available.");
+  });
+});
+
+// =============================================================================
+// onFetch EVENT HANDLER
+// =============================================================================
+
+test.describe("onFetch event", () => {
+  test("handler return value becomes the data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" url="/api/custom" onFetch="() => ({ greeting: 'hello' })" />
+        <Text testId="output" value="{ds.value.greeting}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("hello");
+  });
+
+  test("default fetch is bypassed when onFetch is defined", async ({ initTestBed, page }) => {
+    // The interceptor would return "GET success", but onFetch should win.
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/test" onFetch="() => 'from-handler'" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+      `,
+      { apiInterceptor: basicApiInterceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("from-handler");
+  });
+
+  test("handler can use $url, $method and $queryParams context vars", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/custom"
+          method="get"
+          queryParams="{{ q: 'abc' }}"
+          onFetch="() => $url + '|' + $method + '|' + $queryParams.q" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("/api/custom|get|abc");
+  });
+
+  test("fires the onLoaded event with the handler result", async ({ initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DataSource id="ds" url="/api/x"
+        onFetch="() => ({ n: 7 })"
+        onLoaded="(data) => testState = data.n" />
+    `);
+
+    await expect.poll(() => testStateDriver.testState(), { timeout: 2000 }).toBe(7);
+  });
+
+  test("refetch() re-invokes the onFetch handler", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" url="/api/cached"
+          onFetch="() => Math.random()" />
+        <Text testId="output" value="{ds.value}" />
+        <Button testId="refetch-btn" label="Refetch" onClick="ds.refetch()" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).not.toHaveText("");
+    const initialValue = await page.getByTestId("output").textContent();
+
+    await page.getByTestId("refetch-btn").click();
+    await expect.poll(async () => await page.getByTestId("output").textContent()).not.toBe(initialValue);
+  });
+
+  test("two DataSources with the same url share the cached onFetch result", async ({
+    initTestBed,
+    page,
+  }) => {
+    // React Query dedupes by query key (url + queryParams + body). Two
+    // DataSources with identical inputs must call the handler only once and
+    // both surface the same value.
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds1" url="/api/shared"
+          onFetch="() => Math.random()" />
+        <DataSource id="ds2" url="/api/shared"
+          onFetch="() => Math.random()" />
+        <Text testId="out1" value="{ds1.value}" />
+        <Text testId="out2" value="{ds2.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("out1")).not.toHaveText("");
+    await expect
+      .poll(async () => {
+        const out1 = await page.getByTestId("out1").textContent();
+        const out2 = await page.getByTestId("out2").textContent();
+        return out1 && out1 === out2 ? out1 : null;
+      })
+      .not.toBeNull();
+  });
+
+  test("resultSelector is applied to the onFetch result", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/x"
+          resultSelector="items"
+          onFetch="() => ({ items: ['a','b','c'] })" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText('["a","b","c"]');
+  });
+});
+
+// =============================================================================
+// DATA TYPE TESTS
+// =============================================================================
+
+test.describe("dataType property", () => {
+  // Regression test for: https://github.com/xmlui-org/xmlui/issues/3480
+  // Issue: queryParams silently dropped when dataType="text"
+  test("queryParams are appended to URL when dataType is text", async ({ initTestBed, page }) => {
+    const interceptor: ApiInterceptorDefinition = {
+      operations: {
+        "text-with-params": {
+          url: "/api/text",
+          method: "get",
+          queryParamTypes: { lines: "string" },
+          handler: `return $queryParams.lines;`,
+        },
+      },
+    };
+
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/text" queryParams="{{ lines: '200' }}" dataType="text" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+      `,
+      { apiInterceptor: interceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("200");
+  });
+
+  test("queryParams are appended to URL when dataType is csv", async ({ initTestBed, page }) => {
+    const interceptor: ApiInterceptorDefinition = {
+      operations: {
+        "csv-with-params": {
+          url: "/api/csv",
+          method: "get",
+          queryParamTypes: { filter: "string" },
+          handler: `return $queryParams.filter ? "name,value\\nalice,1" : "name,value\\n";`,
+        },
+      },
+    };
+
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/csv" queryParams="{{ filter: 'active' }}" dataType="csv" />
+        <Text testId="output" value="{ds.value && ds.value.length > 0 ? ds.value[0].name : 'no-data'}" />
+      </Fragment>
+      `,
+      { apiInterceptor: interceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("alice");
   });
 });

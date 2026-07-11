@@ -84,7 +84,7 @@ export const Bookmark = memo(forwardRef(function Bookmark(
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span {...rest} ref={elementRef} id={uid} data-anchor={true} className={classnames(styles.anchorRef, className)}>
+    <span {...rest} ref={elementRef} id={uid} data-anchor={true} data-xmlui-omit-from-toc={omitFromToc ? "true" : undefined} className={classnames(styles.anchorRef, className)}>
       {children}
     </span>
   );

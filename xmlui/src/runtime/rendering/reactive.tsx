@@ -29,10 +29,14 @@ export function useBindingRevision(
     () => normalizeDependencies(rawDependencies, scope).some((dependency) => dependency.kind === "route"),
     [rawDependencies, scope],
   );
+  const hasContextDependency = useMemo(
+    () => normalizeDependencies(rawDependencies, scope).some((dependency) => dependency.kind === "context"),
+    [rawDependencies, scope],
+  );
 
   return useSyncExternalStore(
     (listener) => {
-      if (hasReferenceDependency || hasRouteDependency) {
+      if (hasReferenceDependency || hasRouteDependency || hasContextDependency) {
         return scope.store.subscribe(listener);
       }
       if (dependencies.length === 0) {
@@ -47,8 +51,8 @@ export function useBindingRevision(
         }
       };
     },
-    () => (dependencies.length === 0 && hasExplicitMetadata && !hasReferenceDependency && !hasRouteDependency ? 0 : scope.store.getSnapshot()),
-    () => (dependencies.length === 0 && hasExplicitMetadata && !hasReferenceDependency && !hasRouteDependency ? 0 : scope.store.getSnapshot()),
+    () => (dependencies.length === 0 && hasExplicitMetadata && !hasReferenceDependency && !hasRouteDependency && !hasContextDependency ? 0 : scope.store.getSnapshot()),
+    () => (dependencies.length === 0 && hasExplicitMetadata && !hasReferenceDependency && !hasRouteDependency && !hasContextDependency ? 0 : scope.store.getSnapshot()),
   );
 }
 

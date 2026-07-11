@@ -1,5 +1,4 @@
 import { expect, test } from "../../testing/fixtures";
-
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
 // =============================================================================

@@ -1,19 +1,112 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./EventSource.defaults";
+import { EventSourceConnection } from "./EventSourceReact";
+
+const COMP = "EventSource";
 
 export const EventSourceMd = createMetadata({
   status: "experimental",
   nonVisual: true,
   description:
-    "`EventSource` manages a Server-Sent Events connection declaratively.",
+    "`EventSource` is a non-visual component that manages a Server-Sent Events (SSE) " +
+    "connection declaratively. The connection opens when the component mounts (or when " +
+    "`enabled` changes to `true`) and is automatically closed when the component unmounts. " +
+    "Use this component instead of the banned raw `EventSource` constructor to satisfy the " +
+    "DOM-API sandbox.",
   props: {
-    url: { description: "The SSE endpoint URL.", valueType: "string" },
-    enabled: { description: "Whether the connection is enabled.", valueType: "boolean", defaultValue: true },
-    withCredentials: { description: "Whether credentials are sent with the request.", valueType: "boolean", defaultValue: false },
+    url: {
+      description: "The SSE endpoint URL to connect to.",
+      valueType: "string",
+    },
+    enabled: {
+      description: "When `false` the connection is not opened.",
+      valueType: "boolean",
+      defaultValue: defaultProps.enabled,
+    },
+    withCredentials: {
+      description:
+        "When `true`, CORS requests are sent with credentials (cookies, HTTP authentication).",
+      valueType: "boolean",
+      defaultValue: defaultProps.withCredentials,
+    },
   },
   events: {
-    open: { description: "Fires when the connection opens.", signature: "open(): void" },
-    message: { description: "Fires when a message arrives.", signature: "message(data: any): void" },
-    error: { description: "Fires when a non-closing error occurs.", signature: "error(event: Event): void" },
-    close: { description: "Fires when the connection closes permanently.", signature: "close(): void" },
+    open: {
+      description: "Fires when the SSE connection is established.",
+      signature: "(): void",
+      parameters: {},
+    },
+    message: {
+      description:
+        "Fires when a server-sent message arrives. JSON payloads are pre-parsed and passed " +
+        "as objects; plain strings are passed as-is.",
+      signature: "(data: any) => void",
+      parameters: {
+        data: "The parsed message payload.",
+      },
+    },
+    error: {
+      description: "Fires when the connection encounters an error (but remains open for retry).",
+      signature: "(event: Event) => void",
+      parameters: {
+        event: "The native EventSource error event.",
+      },
+    },
+    close: {
+      description: "Fires when the SSE connection is permanently closed (ReadyState CLOSED).",
+      signature: "(): void",
+      parameters: {},
+    },
   },
 });
+
+export const eventSourceComponentRenderer = wrapComponent(COMP, EventSourceConnection, EventSourceMd, {
+  stateful: false,
+  events: {
+    open: "onOpen",
+    message: "onMessage",
+    error: "onError",
+    close: "onClose",
+  },
+  customRender: (_props, { node, extractValue, lookupEventHandler }) => (
+    <EventSourceConnection
+      url={extractValue.asOptionalString(node.props.url) ?? ""}
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      withCredentials={extractValue.asOptionalBoolean(node.props.withCredentials)}
+      onOpen={lookupEventHandler("open")}
+      onMessage={lookupEventHandler("message")}
+      onError={lookupEventHandler("error")}
+      onClose={lookupEventHandler("close")}
+    />
+  ),
+});
+
+export const eventSourceRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: EventSourceMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <EventSourceConnection
+      url={adapter.stringProp("url", "") ?? ""}
+      enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
+      withCredentials={adapter.booleanProp("withCredentials", defaultProps.withCredentials)}
+      onOpen={() => void adapter.event("open")()}
+      onMessage={(data) => void adapter.event("message")(data)}
+      onError={(event) => void adapter.event("error")(event)}
+      onClose={() => void adapter.event("close")()}
+    />
+  ),
+});
+
+export function parseMessageData(data: unknown): unknown {
+  if (typeof data !== "string") {
+    return data;
+  }
+  try {
+    return JSON.parse(data);
+  } catch {
+    return data;
+  }
+}

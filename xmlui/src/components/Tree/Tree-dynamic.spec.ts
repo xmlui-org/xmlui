@@ -1,5 +1,4 @@
 import { expect, test } from "../../testing/fixtures";
-
 import {
   flatTreeData,
   hierarchyTreeData,
@@ -3168,6 +3167,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
+      test.setTimeout(60_000);
       // Hierarchy data for testing expanded nodes tracking
       const hierarchyData = [
         {

@@ -1,7 +1,5 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useState, type ComponentType, type CSSProperties } from "react";
 
-import { compileXmluiSource, throwFirstCompilerDiagnostic } from "../../compiler/compileXmluiSource";
-import { createXmluiModule, XmluiRoot } from "../../runtime";
 import type { ThemeTone } from "../../styling";
 import styles from "./NestedApp.module.scss";
 
@@ -43,42 +41,69 @@ export function NestedAppComponent({
 }: NestedAppProps) {
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const [resetVersion, setResetVersion] = useState(0);
-  const compiled = useMemo(() => {
+  const [compiled, setCompiled] = useState<{
+    module?: unknown;
+    Root?: ComponentType<any>;
+    error?: string;
+  }>();
+
+  useEffect(() => {
+    let cancelled = false;
     const source = String(app ?? "").trim();
     if (!source) {
-      return undefined;
+      setCompiled(undefined);
+      return;
     }
-    try {
-      const appSource = injectConfigGlobals(source, config);
-      const componentSources = components.filter((component): component is string => typeof component === "string");
-      const componentNames = componentSources
-        .map((componentSource) => componentSource.match(/<Component\s+name=["']([^"']+)["']/)?.[1])
-        .filter((name): name is string => Boolean(name));
-      const compiledComponents = componentSources.map((componentSource, index) => {
+
+    async function compileNestedApp() {
+      try {
+        const [{ compileXmluiSource, throwFirstCompilerDiagnostic }, { createXmluiModule, XmluiRoot }] =
+          await Promise.all([
+            import("../../compiler/compileXmluiSource"),
+            import("../../runtime"),
+          ]);
+        const appSource = injectConfigGlobals(source, config);
+        const componentSources = components.filter((component): component is string => typeof component === "string");
+        const componentNames = componentSources
+          .map((componentSource) => componentSource.match(/<Component\s+name=["']([^"']+)["']/)?.[1])
+          .filter((name): name is string => Boolean(name));
+        const compiledComponents = componentSources.map((componentSource, index) => {
+          const result = compileXmluiSource({
+            id: `nested-component-${index + 1}.xmlui`,
+            source: componentSource,
+            knownComponents: componentNames,
+          });
+          throwFirstCompilerDiagnostic(result);
+          return createXmluiModule(result.runtimeDocument);
+        });
         const result = compileXmluiSource({
-          id: `nested-component-${index + 1}.xmlui`,
-          source: componentSource,
+          id: "nested-app.xmlui",
+          source: appSource,
           knownComponents: componentNames,
         });
         throwFirstCompilerDiagnostic(result);
-        return createXmluiModule(result.runtimeDocument);
-      });
-      const result = compileXmluiSource({
-        id: "nested-app.xmlui",
-        source: appSource,
-        knownComponents: componentNames,
-      });
-      throwFirstCompilerDiagnostic(result);
-      return {
-        module: createXmluiModule(result.runtimeDocument, compiledComponents),
-        error: undefined,
-      };
-    } catch (error) {
-      return {
-        module: undefined,
-        error: error instanceof Error ? error.message : String(error),
-      };
+        if (!cancelled) {
+          setCompiled({
+            module: createXmluiModule(result.runtimeDocument, compiledComponents),
+            Root: XmluiRoot,
+            error: undefined,
+          });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setCompiled({
+            module: undefined,
+            Root: undefined,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
     }
+
+    compileNestedApp();
+    return () => {
+      cancelled = true;
+    };
   }, [app, components, config]);
   const mergedStyle = {
     ...style,
@@ -86,12 +111,13 @@ export function NestedAppComponent({
   } as CSSProperties;
   const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
   const defaultTone = normalizeThemeTone(activeTone);
+  const Root = compiled?.Root;
   const appView = compiled?.error ? (
     <pre className={styles.error} data-testid={testId ? `${testId}-error` : undefined}>
       {compiled.error}
     </pre>
-  ) : compiled?.module?.kind === "app" ? (
-    <XmluiRoot
+  ) : Root && (compiled?.module as { kind?: string } | undefined)?.kind === "app" ? (
+    <Root
       key={effectiveRefreshVersion}
       module={compiled.module}
       initialUrl="/"
@@ -108,9 +134,33 @@ export function NestedAppComponent({
   );
   const containerClassName = [
     styles.nestedAppContainer,
-    withFrame ? styles.framed : null,
     className,
   ].filter(Boolean).join(" ");
+
+  if (!withFrame) {
+    const placeholderClassName = [
+      styles.nestedAppPlaceholder,
+      className,
+    ].filter(Boolean).join(" ");
+    const rootClassName = [
+      styles.nestedAppRoot,
+      styles.initialized,
+    ].filter(Boolean).join(" ");
+
+    return (
+      <div
+        className={placeholderClassName}
+        data-testid={testId}
+        data-xmlui-component="NestedApp"
+        data-xmlui-tone={defaultTone}
+        style={mergedStyle}
+      >
+        <div className={rootClassName}>
+          {content}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -165,6 +215,10 @@ export function NestedAppComponent({
     </div>
   );
 }
+
+export const NestedApp = NestedAppComponent;
+export const LazyNestedApp = NestedAppComponent;
+export const IndexAwareNestedApp = NestedAppComponent;
 
 function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
   return value === "dark" || value === "light" ? value : undefined;

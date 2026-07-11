@@ -47,7 +47,8 @@ test.describe("Tabs foundation", () => {
       </Tabs>
     `);
 
-    await expect(page.getByRole("tab", { name: "Counter tab" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Counter" })).toBeVisible();
+    await expect(page.getByText("Counter tab")).toBeVisible();
     await page.getByTestId("increment").click();
     await expect(page.getByTestId("value")).toContainText("Count: 1");
   });

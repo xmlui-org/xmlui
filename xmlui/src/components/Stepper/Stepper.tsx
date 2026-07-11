@@ -1,38 +1,18 @@
-import { createMetadata, dDidChange, dLabel } from "../../component-core/metadata/helpers";
-import { extractScssThemeVars } from "../../styling/theme";
+import styles from "./Stepper.module.scss";
+
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { createMetadata, dDidChange } from "../metadata-helpers";
+import { Stepper } from "./StepperReact";
 import { defaultProps } from "./Stepper.defaults";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import type { CSSProperties } from "react";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { nonPropertyChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import type { StepperOrientation } from "./StepperContext";
 
 const COMP = "Stepper";
-
-const stepperStylesSource = `
-$backgroundColor-Stepper: createThemeVar("backgroundColor-Stepper");
-$padding-Stepper: createThemeVar("padding-Stepper");
-$gap-Stepper: createThemeVar("gap-Stepper");
-$size-icon-Stepper: createThemeVar("size-icon-Stepper");
-$fontSize-icon-Stepper: createThemeVar("fontSize-icon-Stepper");
-$fontWeight-icon-Stepper: createThemeVar("fontWeight-icon-Stepper");
-$backgroundColor-icon-Stepper: createThemeVar("backgroundColor-icon-Stepper");
-$textColor-icon-Stepper: createThemeVar("textColor-icon-Stepper");
-$backgroundColor-icon-Stepper--active: createThemeVar("backgroundColor-icon-Stepper--active");
-$textColor-icon-Stepper--active: createThemeVar("textColor-icon-Stepper--active");
-$backgroundColor-icon-Stepper--completed: createThemeVar("backgroundColor-icon-Stepper--completed");
-$textColor-icon-Stepper--completed: createThemeVar("textColor-icon-Stepper--completed");
-$backgroundColor-icon-Stepper--error: createThemeVar("backgroundColor-icon-Stepper--error");
-$textColor-icon-Stepper--error: createThemeVar("textColor-icon-Stepper--error");
-$fontSize-label-Stepper: createThemeVar("fontSize-label-Stepper");
-$fontWeight-label-Stepper: createThemeVar("fontWeight-label-Stepper");
-$textColor-label-Stepper: createThemeVar("textColor-label-Stepper");
-$textColor-label-Stepper--active: createThemeVar("textColor-label-Stepper--active");
-$textColor-label-Stepper--completed: createThemeVar("textColor-label-Stepper--completed");
-$textColor-label-Stepper--error: createThemeVar("textColor-label-Stepper--error");
-$fontSize-description-Stepper: createThemeVar("fontSize-description-Stepper");
-$textColor-description-Stepper: createThemeVar("textColor-description-Stepper");
-$borderColor-connector-Stepper: createThemeVar("borderColor-connector-Stepper");
-$borderColor-connector-Stepper--completed: createThemeVar("borderColor-connector-Stepper--completed");
-$borderWidth-connector-Stepper: createThemeVar("borderWidth-connector-Stepper");
-$borderStyle-connector-Stepper: createThemeVar("borderStyle-connector-Stepper");
-$padding-content-Stepper: createThemeVar("padding-content-Stepper");
-`;
 
 export const StepperMd = createMetadata({
   status: "experimental",
@@ -78,10 +58,6 @@ export const StepperMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.nonLinear,
     },
-    testId: {
-      description: "Adds a test identifier to the component root.",
-      valueType: "string",
-    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -106,74 +82,85 @@ export const StepperMd = createMetadata({
       signature: "setActiveStep(index: number): void",
     },
   },
-  themeVars: extractScssThemeVars(stepperStylesSource),
+  themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",
     [`padding-${COMP}`]: "0",
     [`gap-${COMP}`]: "0",
+
     [`size-icon-${COMP}`]: "28px",
     [`fontSize-icon-${COMP}`]: "$fontSize-small",
     [`fontWeight-icon-${COMP}`]: "$fontWeight-bold",
+
     [`backgroundColor-icon-${COMP}`]: "$color-surface-300",
     [`textColor-icon-${COMP}`]: "$color-surface-50",
+
     [`backgroundColor-icon-${COMP}--active`]: "$color-primary-500",
     [`textColor-icon-${COMP}--active`]: "$color-surface-50",
+
     [`backgroundColor-icon-${COMP}--completed`]: "$color-primary-500",
     [`textColor-icon-${COMP}--completed`]: "$color-surface-50",
+
     [`backgroundColor-icon-${COMP}--error`]: "$color-danger-500",
     [`textColor-icon-${COMP}--error`]: "$color-surface-50",
+
     [`fontSize-label-${COMP}`]: "$fontSize-base",
     [`fontWeight-label-${COMP}`]: "$fontWeight-normal",
     [`textColor-label-${COMP}`]: "$textColor-secondary",
     [`textColor-label-${COMP}--active`]: "$textColor-primary",
     [`textColor-label-${COMP}--completed`]: "$textColor-primary",
     [`textColor-label-${COMP}--error`]: "$color-danger-600",
+
     [`fontSize-description-${COMP}`]: "$fontSize-small",
     [`textColor-description-${COMP}`]: "$textColor-secondary",
+
     [`borderColor-connector-${COMP}`]: "$borderColor",
     [`borderColor-connector-${COMP}--completed`]: "$color-primary-500",
     [`borderWidth-connector-${COMP}`]: "1px",
     [`borderStyle-connector-${COMP}`]: "solid",
+
     [`padding-content-${COMP}`]: "$space-4 0",
   },
 });
 
-export const StepMd = createMetadata({
-  status: "experimental",
-  description:
-    "`Step` defines an individual step within a [Stepper](/components/Stepper) component. " +
-    "It provides the step header (label, description, icon) and the content shown when the step is active.",
-  docFolder: "Stepper",
-  props: {
-    label: dLabel(),
-    description: {
-      description: "Optional secondary text shown under the step label.",
-      valueType: "string",
-    },
-    icon: {
-      description:
-        "Optional icon name to display in the step indicator instead of the step number.",
-      valueType: "string",
-    },
-    error: {
-      description:
-        "When `true`, the step header is rendered in the error state.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    completed: {
-      description:
-        "When `true`, the step header is rendered in the completed state. Ignored when `error` is also `true`.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
+type ThemedStepperProps = React.ComponentPropsWithoutRef<typeof Stepper>;
+
+export const ThemedStepper = React.forwardRef<React.ElementRef<typeof Stepper>, ThemedStepperProps>(
+  function ThemedStepper({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(StepperMd);
+    return (
+      <Stepper
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
   },
-  events: {
-    activated: {
-      description: "Fires whenever this step becomes the active step.",
-      signature: "activated(): void",
-      parameters: {},
-    },
+);
+
+export const stepperComponentRenderer = wrapComponent(COMP, ThemedStepper, StepperMd, {
+  exposeRegisterApi: true,
+});
+
+export const stepperRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: StepperMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    return (
+      <Stepper
+        {...rootAttrs}
+        style={rootAttrs.style as CSSProperties}
+        activeStep={adapter.numberProp("activeStep", defaultProps.activeStep)}
+        orientation={adapter.stringProp("orientation", defaultProps.orientation) as StepperOrientation}
+        stackedLabel={adapter.booleanProp("stackedLabel", defaultProps.stackedLabel)}
+        nonLinear={adapter.booleanProp("nonLinear", defaultProps.nonLinear)}
+        onDidChange={(index, id) => { void adapter.event("didChange")(index, id); }}
+        registerComponentApi={adapter.registerApi}
+        updateState={(state) => adapter.registerApi(state)}
+      >
+        {adapter.context.renderChildren(nonPropertyChildren(adapter.node.children), adapter.scope)}
+      </Stepper>
+    );
   },
-  themeVars: StepperMd.themeVars,
 });

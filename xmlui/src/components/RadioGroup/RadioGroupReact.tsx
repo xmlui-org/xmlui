@@ -365,6 +365,15 @@ export const RadioGroupOption = ({
       style={style}
       data-radio-item
       data-testid={testId}
+      onClick={(event) => {
+        if (!enabled || radioGroupContext.enabled === false) {
+          return;
+        }
+        if ((event.target as HTMLElement).closest("[role='radio']")) {
+          return;
+        }
+        radioGroupContext.setValue?.(String(value));
+      }}
     >
       {!!optionRenderer ? (
         <label htmlFor={id} className={styles.optionLabel}>

@@ -11,6 +11,8 @@ import { resolveThemeReferences, resolveThemeVariable, rootThemeVariables } from
 import { Stack } from "./StackReact";
 import stackStylesSource from "./Stack.module.scss?xmlui-theme-vars";
 import { defaultProps } from "./Stack.defaults";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 
 const COMP = "Stack";
 
@@ -198,6 +200,7 @@ function createStackRenderer(
       const actualOrientation = orientation ?? adapter.stringProp("orientation", defaultProps.orientation) ?? defaultProps.orientation;
       const horizontalAlignment = fixedHorizontalAlignment ?? adapter.stringProp("horizontalAlignment");
       const verticalAlignment = fixedVerticalAlignment ?? adapter.stringProp("verticalAlignment");
+      const layoutContext = adapter.props.layoutContext as { orientation?: string } | undefined;
       const itemWidth = adapter.stringProp(
         "itemWidth",
         actualOrientation === "vertical" ? "100%" : "fit-content",
@@ -208,6 +211,10 @@ function createStackRenderer(
       delete style.justifyContent;
       if (resolvedGap) {
         (style as Record<string, string>)["--xmlui-gap-Stack"] = resolvedGap;
+      }
+      if (name === "VStack" && layoutContext?.orientation === "horizontal" && adapter.node.props.width == null) {
+        style.width = "100%";
+        style.flexShrink = 1;
       }
       const children = nonPropertyChildren(adapter.node.children);
       const scrollStyle = adapter.stringProp("scrollStyle", defaultProps.scrollStyle);
@@ -224,6 +231,30 @@ function createStackRenderer(
       }
       if (actualOrientation === "horizontal" && adapter.booleanProp("wrapContent", false)) {
         const resolvedItemWidth = resolveCssSize(itemWidth) ?? itemWidth;
+        const flowLayoutContext = {
+          type: "FlowLayout",
+          ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+          wrapChild: (
+            { node }: { node: XmluiElement },
+            renderedChild: ReactNode,
+          ) => {
+            if (node.type === "Items") {
+              return renderedChild;
+            }
+            if (node.type === "SpaceFiller") {
+              return <FlowItemBreak force={true} />;
+            }
+            return (
+              <FlowItemWrapper
+                width={resolveCssSize(node.props.width)}
+                minWidth={resolveCssSize(node.props.minWidth)}
+                maxWidth={resolveCssSize(node.props.maxWidth)}
+              >
+                {renderedChild}
+              </FlowItemWrapper>
+            );
+          },
+        };
         return (
           <FlowLayout
             {...rootAttrs}
@@ -235,19 +266,11 @@ function createStackRenderer(
             onContextMenu={() => void adapter.event("contextMenu")()}
             registerComponentApi={adapter.registerApi}
           >
-            {children.map((child, index) =>
-              child.kind === "element" && child.type === "SpaceFiller" ? (
-                <FlowItemBreak key={index} />
-              ) : (
-                <FlowItemWrapper
-                  key={index}
-                  width={child.kind === "element" ? resolveCssSize(child.props.width) : undefined}
-                  minWidth={child.kind === "element" ? resolveCssSize(child.props.minWidth) : undefined}
-                  maxWidth={child.kind === "element" ? resolveCssSize(child.props.maxWidth) : undefined}
-                >
-                  {adapter.context.renderChildren([stripLayoutProps(child, ["width", "minWidth", "maxWidth"])], adapter.scope)}
-                </FlowItemWrapper>
-              ),
+            {adapter.context.renderChildren(
+              children,
+              adapter.scope,
+              adapter.node.range.end,
+              flowLayoutContext,
             )}
           </FlowLayout>
         );
@@ -275,9 +298,10 @@ function createStackRenderer(
             adapter,
             children,
             actualOrientation,
-            itemWidth,
+            resolveCssSize(itemWidth) ?? itemWidth,
             adapter.node.props.itemWidth !== undefined,
             style.overflowX === "scroll",
+            layoutContext,
           )}
         </Stack>
       );
@@ -292,11 +316,12 @@ function renderStackChildren(
   itemWidth: string | undefined,
   hasExplicitItemWidth: boolean,
   preserveHorizontalOverflow: boolean,
+  parentLayoutContext?: LayoutContext,
 ): ReactNode {
   const normalizedChildren = children.map((child) =>
     normalizeStackChild(child, orientation, preserveHorizontalOverflow),
   );
-  const layoutContext = { type: "Stack", orientation, itemWidth };
+  const layoutContext = createChildLayoutContext(parentLayoutContext, { type: "Stack", orientation, itemWidth });
   if (!hasExplicitItemWidth) {
     return adapter.context.renderChildren(normalizedChildren, adapter.scope, undefined, layoutContext);
   }

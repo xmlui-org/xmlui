@@ -1,108 +1,137 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import styles from "./NestedApp.module.scss";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { IndexAwareNestedApp } from "./NestedAppReact";
+import { defaultProps } from "./NestedApp.defaults";
+import { createMetadata } from "../metadata-helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
-export const defaultProps = {
-  components: [],
-};
+// Wrapper to defer access to IndexAwareNestedApp until render time, avoiding
+// TDZ from the circular init cycle:
+// NestedApp → NestedAppReact → AppRoot → ComponentProvider → NestedApp
+function NestedAppWrapper(props: React.ComponentProps<typeof IndexAwareNestedApp>) {
+  return <IndexAwareNestedApp {...props} />;
+}
+
+const COMP = "NestedApp";
 
 export const NestedAppMd = createMetadata({
   status: "stable",
-  description: "The `NestedApp` component nests an entire XMLUI app inside another one.",
+  description: `The ${COMP} component allows you to nest an entire xmlui app into another one.
+`,
   props: {
     app: {
-      description: "The source markup of the app to be nested.",
+      description: "The source markup of the app to be nested",
       valueType: "string",
     },
     api: {
-      description: "Optional emulated API to be used with the nested app.",
+      description: "This property defines an optional emulated API to be used with the nested app.",
       valueType: "hash",
     },
     components: {
-      description: "Optional list of components to be used with the nested app.",
+      description:
+        "This property defines an optional list of components to be used with the nested app.",
       defaultValue: defaultProps.components,
     },
-    refreshVersion: {
-      description: "Forces the nested app to remount when the value changes.",
-    },
     config: {
-      description: "Optional configuration for the nested app.",
+      description: "You can define the nested app's configuration with this property.",
       valueType: "hash",
     },
     activeTheme: {
-      description: "The active theme for the nested app.",
+      description:
+        "This property defines the active theme for the nested app. " +
+        "If not set, the default theme is used.",
       valueType: "string",
     },
     activeTone: {
-      description: "The active tone for the nested app.",
+      description:
+        "This property defines the active tone for the nested app. " +
+        "If not set, the default tone is used.",
       valueType: "string",
-    },
-    title: {
-      description: "Optional title displayed when the nested app frame is enabled.",
-      valueType: "string",
-    },
-    withFrame: {
-      description: "Displays a lightweight frame around the nested app.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    allowReset: {
-      description: "Displays a reset control when the nested app frame is enabled.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    splitView: {
-      description: "Displays app/code view controls when the nested app frame is enabled.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    initiallyShowCode: {
-      description: "Shows the nested app source first when split view controls are enabled.",
-      valueType: "boolean",
-      defaultValue: false,
-    },
-    noHeader: {
-      description: "Hides the nested app frame header.",
-      valueType: "boolean",
-      defaultValue: false,
     },
     height: {
-      description: "The height of the nested app.",
+      description:
+        "The height of the nested app. If not set, the height is determined automatically.",
       valueType: "length",
     },
-    testId: {
-      description: "Adds a test identifier to the nested app container.",
-      valueType: "string",
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`marginTop-${COMP}`]: "$space-6",
+    [`marginBottom-${COMP}`]: "$space-6",
+    [`padding-${COMP}`]: "0",
+    [`paddingTop-${COMP}`]: "0",
+    [`border-${COMP}`]: "0.5px solid $borderColor",
+    [`borderRadius-${COMP}`]: "$space-2",
+    [`backgroundColor-frame-${COMP}`]: "$color-surface-100",  // NOTE: for some reason, this affects border color, we match it with borderColor-CodeBlock
+    [`gap-frame-${COMP}`]: "0",
+    [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
+    [`boxShadow-${COMP}`]: "0px 0px 32px 0px rgba(0, 0, 0, 0.05)",
+    [`backgroundColor-viewControls-${COMP}`]: "$color-secondary-100",
+    [`borderRadius-viewControls-${COMP}`]: "5px",
+    [`border-viewControls-${COMP}`]: "0.5px solid $borderColor",
+    [`padding-viewControls-${COMP}`]: "$space-0_5",
+    [`borderBottom-header-${COMP}`]: "0.5px solid $borderColor",
+    [`backgroundColor-header-${COMP}`]: "$color-surface-100",
+    [`color-loadingText-${COMP}`]: "$color-surface-600",
+    // --- Split view styles
+    [`padding-button-splitView-${COMP}`]: "1px 6px",
+    [`width-button-splitView-${COMP}`]: "60px",
+    [`height-button-splitView-${COMP}`]: "19px",
+    [`width-logo-splitView-${COMP}`]: "1.5rem",
+    [`height-logo-splitView-${COMP}`]: "2rem",
+    [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-0",
+    [`color-button-splitView-${COMP}`]: "$color-surface-600",
+    [`color-button-splitView-${COMP}--active`]: "$color-primary",
+    [`width-controls-${COMP}`]: "80px",
+    [`backgroundColor-code-splitView-${COMP}`]: "$color-surface-0",
+    [`borderRadius-button-splitView-${COMP}`]: "$space-1",
+    [`borderColor-button-splitView-${COMP}`]: "transparent",
+    dark: {
+      [`backgroundColor-frame-${COMP}`]: "$color-surface-100",  // NOTE: for some reason, this affects border color, we match it with borderColor-CodeBlock
+      [`color-button-splitView-${COMP}`]: "$color-surface-500",
+      [`color-button-splitView-${COMP}--active`]: "$color-primary-800",
+      [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-200",
     },
   },
-  themeVars: {},
-  defaultThemeVars: {
-    "marginTop-NestedApp": "$space-6",
-    "marginBottom-NestedApp": "$space-6",
-    "padding-NestedApp": "0",
-    "paddingTop-NestedApp": "0",
-    "border-NestedApp": "0.5px solid $borderColor",
-    "borderRadius-NestedApp": "$space-2",
-    "backgroundColor-frame-NestedApp": "$color-surface-100",
-    "gap-frame-NestedApp": "0",
-    "fontWeight-header-NestedApp": "$fontWeight-bold",
-    "boxShadow-NestedApp": "0px 0px 32px 0px rgba(0, 0, 0, 0.05)",
-    "backgroundColor-viewControls-NestedApp": "$color-secondary-100",
-    "borderRadius-viewControls-NestedApp": "5px",
-    "border-viewControls-NestedApp": "0.5px solid $borderColor",
-    "padding-viewControls-NestedApp": "$space-0_5",
-    "borderBottom-header-NestedApp": "0.5px solid $borderColor",
-    "backgroundColor-header-NestedApp": "$color-surface-100",
-    "color-loadingText-NestedApp": "$color-surface-600",
-    "padding-button-splitView-NestedApp": "1px 6px",
-    "width-button-splitView-NestedApp": "60px",
-    "height-button-splitView-NestedApp": "19px",
-    "width-logo-splitView-NestedApp": "1.5rem",
-    "height-logo-splitView-NestedApp": "2rem",
-    "backgroundColor-button-splitView-NestedApp--active": "$color-surface-0",
-    "color-button-splitView-NestedApp": "$color-surface-600",
-    "color-button-splitView-NestedApp--active": "$color-primary",
-    "width-controls-NestedApp": "80px",
-    "backgroundColor-code-splitView-NestedApp": "$color-surface-0",
-    "borderRadius-button-splitView-NestedApp": "$space-1",
-    "borderColor-button-splitView-NestedApp": "transparent",
-  },
+});
+
+export const nestedAppComponentRenderer = wrapComponent(COMP, NestedAppWrapper, NestedAppMd, {
+  customRender: (_props, { node, extractValue, className }) => (
+    <NestedAppWrapper
+      app={node.props?.app}
+      className={className}
+      api={extractValue(node.props?.api)}
+      components={extractValue(node.props?.components)}
+      config={extractValue(node.props?.config)}
+      activeTheme={extractValue(node.props?.activeTheme)}
+      activeTone={extractValue(node.props?.activeTone)}
+      height={extractValue(node.props?.height)}
+    />
+  ),
+});
+
+export const nestedAppRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: NestedAppMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <NestedAppWrapper
+      {...adapter.rootAttrs()}
+      activeTheme={adapter.stringProp("activeTheme")}
+      activeTone={adapter.stringProp("activeTone")}
+      allowReset={adapter.booleanProp("allowReset", false)}
+      app={adapter.stringProp("app", "")}
+      components={adapter.prop("components", []) as unknown[]}
+      config={adapter.prop("config")}
+      height={adapter.prop("height")}
+      initiallyShowCode={adapter.booleanProp("initiallyShowCode", false)}
+      noHeader={adapter.booleanProp("noHeader", false)}
+      refreshVersion={adapter.prop("refreshVersion") as number | undefined}
+      splitView={adapter.booleanProp("splitView", false)}
+      testId={adapter.stringProp("testId")}
+      title={adapter.stringProp("title")}
+      withFrame={adapter.booleanProp("withFrame", false)}
+    />
+  ),
 });

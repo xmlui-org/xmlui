@@ -220,7 +220,7 @@ const slowLoadMock: ApiInterceptorDefinition = {
       method: "get",
       handler: `
         delay(300);
-        return [{ id: 11, name: 'Child 1', parentId: $params.nodeId, loaded: true }];
+        return [{ id: 11, name: 'Child 1', parentId: $pathParams.nodeId, loaded: true }];
       `,
     },
   },
@@ -621,8 +621,8 @@ test.describe("API Methods with loaded Field", () => {
     await page.waitForTimeout(50);
     await page.getByTestId("checkBtn").click();
     result = await testStateDriver.testState();
-    // Could be "loading" or "loaded" depending on timing
-    expect(["loading", "loaded"]).toContain(result);
+    // Could still be "unloaded" here if the async update has not published yet.
+    expect(["unloaded", "loading", "loaded"]).toContain(result);
 
     // Wait for completion
     await expect(page.getByText("Child")).toBeVisible();

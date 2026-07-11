@@ -185,11 +185,7 @@ export default function useRowSelection({
   // --- The current selection interval
   const [selectionInterval, setSelectionInterval] = useState<SelectionInterval | null>(null);
   // --- Access the selection context that stores the current state of selection
-  const selectionContext = useSelectionContext();
-  const selectedItems = selectionContext?.selectedItems ?? EMPTY_ARRAY;
-  const setSelectedRowIds = selectionContext?.setSelectedRowIds ?? (() => {});
-  const refreshSelection = selectionContext?.refreshSelection ?? (() => {});
-  const idKey = selectionContext?.idKey ?? "id";
+  const { selectedItems, setSelectedRowIds, refreshSelection, idKey } = useSelectionContext();
   // --- Refresh the list of item IDs whenever the items in the selection change
   const walkableList: string[] = useMemo(() => {
     return visibleItems.map((item) => item[idKey]);

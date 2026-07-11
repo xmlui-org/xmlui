@@ -1,35 +1,16 @@
-.trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: var(--xmlui-color-primary-100);
-  color: var(--xmlui-textColor-primary);
-  font-size: var(--xmlui-fontSize-sm);
-  font-weight: var(--xmlui-fontWeight-medium);
-  overflow: hidden;
-  cursor: pointer;
-}
+@use "../../components-core/theming/themes" as t;
 
-.avatar {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+@layer components {
+  .loggedInUserInfoWrapper {
+    padding: t.$space-2;
+    font-size: t.$fontSize-sm;
+  }
 
-.loggedInUserInfoWrapper {
-  padding: var(--xmlui-space-2);
-  font-size: var(--xmlui-fontSize-sm);
-}
+  .name {
+    color: t.$textColor-primary;
+  }
 
-.name {
-  color: var(--xmlui-textColor-primary);
-  font-weight: var(--xmlui-fontWeight-medium);
-}
-
-.email {
-  color: var(--xmlui-textColor-subtitle);
+  .email {
+    color: t.$textColor-subtitle;
+  }
 }

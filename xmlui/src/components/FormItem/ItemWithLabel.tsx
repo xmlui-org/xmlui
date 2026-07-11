@@ -46,6 +46,7 @@ type ItemWithLabelProps = {
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
   compactInlineLabel?: boolean;
+  activateOnRootClick?: boolean;
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -77,12 +78,14 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     cloneStyle = defaultProps.cloneStyle,
     requireLabelMode = defaultProps.requireLabelMode,
     compactInlineLabel = defaultProps.compactInlineLabel,
+    activateOnRootClick = false,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+  const labelTargetId = componentName === "Switch" ? `${inputId}__input` : inputId;
 
   const formItemLabelPosition = useFormContextPart<LabelPosition | undefined>(
     (value) => value?.itemLabelPosition as LabelPosition | undefined,
@@ -215,6 +218,16 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   const wrapperPartId = shouldExposeWrapperLabeledItemPart(componentName)
     ? PART_LABELED_ITEM
     : undefined;
+  const activateFromWrapperClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    if (!activateOnRootClick) {
+      return;
+    }
+    const target = event.target as HTMLElement;
+    if (target.closest("label, button, input, textarea, select, [role='combobox'], [role='radio'], [role='switch']")) {
+      return;
+    }
+    focusLabeledControl(inputId);
+  }, [activateOnRootClick, inputId]);
 
   if (label === undefined && !validationResult) {
     return (
@@ -365,6 +378,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         [styles.noLabel]: !label && compactInlineLabel,
         [styles.shrinkToLabel]: shrinkToLabel,
       })}
+      onClick={activateFromWrapperClick}
     >
       <div
         className={classnames(styles.container, {
@@ -392,9 +406,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           >
             <Part partId={PART_LABEL}>
               <label
-                htmlFor={inputId}
+                htmlFor={labelTargetId}
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={onLabelClick || (() => focusLabeledControl(inputId))}
+                onClick={onLabelClick || ((event) => {
+                  event.preventDefault();
+                  focusLabeledControl(labelTargetId);
+                })}
                 style={{
                   ...labelStyle,
                   display:
@@ -454,7 +471,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 });
 
 function focusLabeledControl(inputId: string) {
-  const target = document.getElementById(inputId);
+  const target = document.getElementById(inputId) ?? getNormalizedSwitchLabelTarget(inputId);
   if (!target) {
     return;
   }
@@ -468,6 +485,12 @@ function focusLabeledControl(inputId: string) {
   if (nested) {
     clickLabelActivatedControl(nested);
   }
+}
+
+function getNormalizedSwitchLabelTarget(inputId: string) {
+  return inputId.endsWith("__input")
+    ? document.getElementById(inputId.slice(0, -"__input".length))
+    : null;
 }
 
 function isFocusableControl(element: HTMLElement): element is HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement {

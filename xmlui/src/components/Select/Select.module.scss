@@ -282,6 +282,11 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     overflow: hidden;
   }
 
+  .paginationPageSizeTrigger {
+    color: createThemeVar("Input:textColor-#{$componentName}") !important;
+    font-size: inherit !important;
+  }
+
   /**
    * Common trigger value and actions
    */

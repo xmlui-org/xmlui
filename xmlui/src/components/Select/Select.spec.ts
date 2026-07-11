@@ -1504,6 +1504,7 @@ test.describe("Behaviors and Parts", () => {
     // Close dropdown before hovering to show tooltip (modal overlay blocks hover)
     await expect(listWrapper).toBeVisible();
     await page.keyboard.press("Escape");
+    await page.mouse.click(0, 0);
     await expect(listWrapper).not.toBeVisible();
 
     // Hover over the trigger (combobox role) specifically, not the tooltip wrapper

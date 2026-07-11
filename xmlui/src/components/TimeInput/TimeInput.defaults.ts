@@ -1,6 +1,8 @@
+import type { ValidationStatus } from "../abstractions";
+
 export const defaultProps = {
   enabled: true,
-  validationStatus: "none",
+  validationStatus: "none" as ValidationStatus,
   hour24: true,
   seconds: false,
   clearable: false,

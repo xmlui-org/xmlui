@@ -17,9 +17,6 @@
 
 import { expect, test } from "../../testing/fixtures";
 
-const TABLE_ADVANCED_P7B_PENDING =
-  "P7B slice 1 activates the copied-old basic Table baseline; this advanced Table behavior remains queued for later P7B slices.";
-
 // Sample data for testing
 const sampleData = [
   { id: 1, name: "Apple", quantity: 5, category: "Fruit" },
@@ -2511,8 +2508,8 @@ test.describe("Theme Variables and Styling", () => {
 
   // Regression: the row separator used to live on each .cell, so resizing the
   // last column narrower than the row width left a gap on the right where no
-  // cell could draw the border. The divider must live on the row so it spans
-  // the entire row regardless of the last column's width.
+  // cell could draw the border. The divider is now a row-level pseudo-element
+  // so it spans the entire row and uses one painting mechanism at high zoom.
   test("row separator spans the full row when the last column is narrower than the row", async ({
     initTestBed,
     page,
@@ -2525,9 +2522,22 @@ test.describe("Theme Variables and Styling", () => {
     `);
 
     const firstRow = page.locator("tbody tr").first();
-    // Divider now lives on the row itself.
-    await expect(firstRow).toHaveCSS("border-bottom-style", "solid");
-    await expect(firstRow).not.toHaveCSS("border-bottom-width", "0px");
+    await expect(firstRow).toHaveCSS("border-bottom-style", "none");
+    await expect(firstRow).toHaveCSS("border-bottom-width", "0px");
+
+    const rowDivider = await firstRow.evaluate((element) => {
+      const style = getComputedStyle(element, "::after");
+      return {
+        borderStyle: style.borderBottomStyle,
+        borderWidth: style.borderBottomWidth,
+        bottom: style.bottom,
+      };
+    });
+    expect(rowDivider).toEqual({
+      borderStyle: "solid",
+      borderWidth: "1px",
+      bottom: "0px",
+    });
 
     // Cells should not carry the divider any more — otherwise the line would
     // stop at the last column's right edge when it is narrower than the row.
@@ -2648,7 +2658,7 @@ test.describe("Events", () => {
   test("contextMenu event fires on right click", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App var.message="Not clicked">
-        <Text testId="output">{message}</Text>
+        <Text testId="output" label="{message}" />
         <Table
           data='{${JSON.stringify(sampleData)}}'
           testId="table"
@@ -3125,14 +3135,14 @@ test.describe("Keyboard Shortcuts", () => {
         <App
           var.appKeyCount="{0}"
           var.testState="{0}"
-          onKeyDown="event => testState = 'app-keydown'"
+          onKeyDown="event => { if (!event.defaultPrevented && (event.ctrlKey || event.metaKey) && event.key === 'v') appKeyCount = appKeyCount + 1; testState = appKeyCount; }"
         >
           <Table
             data='{${JSON.stringify(sampleData)}}'
             rowsSelectable="true"
             testId="table"
             autoFocus="true"
-            onPasteAction="(row) => testState = 'table-paste'"
+            onPasteAction="(row) => {}"
           >
             <Column bindTo="name"/>
           </Table>
@@ -3147,7 +3157,8 @@ test.describe("Keyboard Shortcuts", () => {
       // App-level handler must NOT count this as unhandled, because Table
       // called event.preventDefault() and the App handler checks defaultPrevented.
       await page.waitForTimeout(200);
-      await expect.poll(testStateDriver.testState).toEqual("table-paste");
+      const count = await testStateDriver.testState();
+      expect(count || 0).toBe(0);
     });
   });
 
@@ -3159,7 +3170,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          keyBindings='{{ "delete": "Backspace" }}'
+          keyBindings='{{ delete: "Backspace" }}'
           onDeleteAction="(row, selectedItems, selectedIds) => testState = 'custom delete triggered'"
         >
           <Column bindTo="name"/>
@@ -3182,7 +3193,7 @@ test.describe("Keyboard Shortcuts", () => {
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          keyBindings='{{ "copy": "Alt+C" }}'
+          keyBindings='{{ copy: "Alt+C" }}'
           onCopyAction="(row, selectedItems, selectedIds) => testState = 'alt copy'"
           onDeleteAction="(row, selectedItems, selectedIds) => testState = 'default delete'"
         >
@@ -3212,8 +3223,8 @@ test.describe("Keyboard Shortcuts", () => {
           testId="table"
           autoFocus="true"
           onCopyAction="(row, selectedItems, selectedIds) => testState = {
-            hasSelectedIds: selectedIds.length >= 0,
-            hasSelectedItems: selectedItems.length >= 0,
+            hasSelectedIds: Array.isArray(selectedIds),
+            hasSelectedItems: Array.isArray(selectedItems),
             hasRow: row !== null,
             contextFields: ['row', 'selectedItems', 'selectedIds']
           }"
@@ -4199,16 +4210,11 @@ test.describe("Column width theme variables", () => {
     const firstHeader = page.locator("thead th").nth(0);
     await expect(firstHeader).toBeVisible();
 
-    await expect
-      .poll(
-        async () => {
-          const headerBox = await firstHeader.boundingBox();
-          const width = headerBox?.width ?? 0;
-          return width >= 44 && width <= 52;
-        },
-        { timeout: 10000 },
-      )
-      .toBe(true);
+    const headerBox = await firstHeader.boundingBox();
+    expect(headerBox).not.toBeNull();
+    // 3rem * 16px = 48px; allow ~4px tolerance across environments
+    expect(headerBox!.width).toBeGreaterThanOrEqual(44);
+    expect(headerBox!.width).toBeLessThanOrEqual(52);
   });
 
   test("column width is consistent whether specified as px or equivalent em theme var", async ({

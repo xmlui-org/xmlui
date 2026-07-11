@@ -285,6 +285,9 @@ export const sliderRenderer = wrapRuntimeComponent({
       void adapterRef.current.event("didChange")(value);
     }, [fieldName, updateState]);
     const currentValue = formValue ?? adapter.prop("value", state.value ?? initialFormValue);
+    const registerSliderApi = React.useCallback((api: Record<string, unknown>) => {
+      adapterRef.current.registerApi({ ...api, value: currentValue });
+    }, [currentValue]);
     const updateThumb = React.useCallback((index: number, rawValue: number) => {
       if (readOnly || !enabled) {
         return;
@@ -436,7 +439,7 @@ export const sliderRenderer = wrapRuntimeComponent({
           }
           void adapter.event("lostFocus")(event);
         }}
-        registerComponentApi={(api) => adapter.registerApi(api as Record<string, unknown>)}
+        registerComponentApi={registerSliderApi}
         classes={{ [COMPONENT_PART_KEY]: adapter.className }}
         min={min}
         max={max}

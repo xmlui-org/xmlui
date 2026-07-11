@@ -6,7 +6,7 @@ import counterBadgeExtension from "../packages/xmlui-counter-badge/src";
 import { rawScssModulePlugin } from "./src/vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "./src/vite-plugin/svgReactPlugin";
 import { xmluiPlugin } from "./src/vite-plugin/xmluiPlugin";
-import { createXmluiLogger, xmluiCssOptions } from "./vite.shared";
+import { createXmluiLogger, styleToJsInteropPlugin, xmluiCssOptions } from "./vite.shared";
 
 export default defineConfig({
   customLogger: createXmluiLogger(),
@@ -15,10 +15,12 @@ export default defineConfig({
       "attr-accept": path.resolve("src/compat/attrAccept.ts"),
       papaparse: path.resolve("src/compat/papaParse.ts"),
       "react-qr-code": path.resolve("src/compat/reactQrCode.tsx"),
+      "style-to-js": path.resolve("src/compat/styleToJs.ts"),
     },
   },
   css: xmluiCssOptions,
   plugins: [
+    styleToJsInteropPlugin(),
     rawScssModulePlugin(),
     svgReactPlugin(),
     xmluiPlugin({ extensions: [counterBadgeExtension] }),

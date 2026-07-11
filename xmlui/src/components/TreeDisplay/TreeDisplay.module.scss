@@ -1,18 +1,99 @@
-.root {
-  padding: var(--xmlui-padding-TreeDisplay);
-  padding-left: var(--xmlui-paddingLeft-TreeDisplay);
-  color: var(--xmlui-color-TreeDisplay);
-  background: var(--xmlui-backgroundColor-TreeDisplay);
-  border: var(--xmlui-border-TreeDisplay);
-  border-radius: var(--xmlui-borderRadius-TreeDisplay);
-  box-shadow: var(--xmlui-boxShadow-TreeDisplay);
-  font-family: var(--xmlui-fontFamily-TreeDisplay);
-  font-size: var(--xmlui-fontSize-TreeDisplay);
-  font-weight: var(--xmlui-fontWeight-TreeDisplay);
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.item {
-  position: relative;
-  min-height: var(--xmlui-itemHeight-TreeDisplay);
-  white-space: pre;
+$component: "TreeDisplay";
+$fontSize-TreeDisplay: createThemeVar("fontSize-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
+
+// Variables for @layer section
+$backgroundColor-TreeDisplay: createThemeVar("backgroundColor-#{$component}");
+$padding-TreeDisplay: createThemeVar("padding-#{$component}");
+$paddingLeft-TreeDisplay: createThemeVar("paddingLeft-#{$component}");
+$fontFamily-TreeDisplay: createThemeVar("fontFamily-#{$component}");
+$fontWeight-TreeDisplay: createThemeVar("fontWeight-#{$component}");
+$boxShadow-TreeDisplay: createThemeVar("boxShadow-#{$component}");
+$color-TreeDisplay: createThemeVar("color-#{$component}");
+$color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
+
+@layer components {
+  .treeDisplay {
+    display: block;
+    @include t.borderVars($themeVars, $component);
+    background-color: $backgroundColor-TreeDisplay;
+    padding: $padding-TreeDisplay;
+    padding-inline-start: $paddingLeft-TreeDisplay;
+    box-shadow: $boxShadow-TreeDisplay;
+  }
+
+  .content {
+    display: block;
+    word-break: break-word;
+    font-family: $fontFamily-TreeDisplay;
+    font-size: $fontSize-TreeDisplay;
+    font-weight: $fontWeight-TreeDisplay;
+    color: $color-TreeDisplay;
+  }
+
+  .treeNode {
+    position: relative;
+    padding: 0;
+    margin: 0;
+  }
+
+  .treeNodeRow {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 0;
+  }
+
+  .connectorArea {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .connector {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+  }
+
+  .connectorLine {
+    stroke: $color-connect-TreeDisplay;
+    fill: none;
+  }
+
+  .ancestorLine {
+    position: absolute;
+    top: 0;
+    width: 1.5px;
+    height: 100%;
+    background-color: $color-connect-TreeDisplay;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .treeNodeContent {
+    padding: 0 4px;
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+  }
+
+  .childrenContainer {
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

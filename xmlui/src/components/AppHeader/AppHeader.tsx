@@ -106,6 +106,8 @@ import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiNode } from "../../compiler/ir";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 import { useEffect, useRef, type ReactNode } from "react";
+import { useAppContext } from "../../components-core/AppContext";
+import { ProfileMenu } from "../ProfileMenu/ProfileMenu";
 
 const runtimeTemplateNames = new Set(["logoTemplate", "titleTemplate", "profileMenuTemplate"]);
 
@@ -113,6 +115,7 @@ export const appHeaderRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: AppHeaderMd as ComponentMetadata,
   renderer: ({ adapter }) => {
+    const { loggedInUser } = useAppContext();
     const children = adapter.node.children.filter((child) => !isRuntimeTemplateProperty(child));
     const titleTemplate = hasRuntimeTemplate(adapter.node.children, "titleTemplate");
     const logoTemplate = hasRuntimeTemplate(adapter.node.children, "logoTemplate");
@@ -124,7 +127,11 @@ export const appHeaderRuntimeRenderer = wrapRuntimeComponent({
         showLogo={adapter.booleanProp("showLogo", defaultProps.showLogo)}
         titleContent={titleTemplate ? adapter.renderTemplate("titleTemplate") : undefined}
         logoContent={logoTemplate ? adapter.renderTemplate("logoTemplate") : undefined}
-        profileMenu={profileTemplate ? adapter.renderTemplate("profileMenuTemplate") : undefined}
+        profileMenu={
+          profileTemplate
+            ? adapter.renderTemplate("profileMenuTemplate")
+            : <ProfileMenu loggedInUser={loggedInUser as any} />
+        }
         classes={{ [COMPONENT_PART_KEY]: adapter.className }}
         renderChild={(child: any) => child ? adapter.context.renderElement(child, adapter.scope) : undefined}
       >

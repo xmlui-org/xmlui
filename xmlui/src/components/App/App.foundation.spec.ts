@@ -47,3 +47,26 @@ test("nested App reuses the existing router", async ({ initTestBed, page }) => {
   await expect(colorInput).toHaveValue("#ff0000");
   expect(pageErrors.some((message) => message.includes("You cannot render a <Router> inside another <Router>"))).toBe(false);
 });
+
+test("ToneSwitch updates the App shell background for dark tone", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App>
+      <AppHeader>
+        <SpaceFiller />
+        <ToneSwitch />
+      </AppHeader>
+      <Card
+        title="Tone Switch"
+        subtitle="Toggle the switch to change the tone."
+      />
+    </App>
+  `);
+
+  await page.locator('input[role="switch"]').click({ force: true });
+
+  await expect(page.locator("html")).toHaveCSS("background-color", "rgb(23, 35, 43)");
+  await expect(page.locator('[class*="pagesContainer"]').first()).toHaveCSS(
+    "background-color",
+    "rgb(23, 35, 43)",
+  );
+});

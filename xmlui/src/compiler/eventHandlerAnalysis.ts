@@ -22,8 +22,14 @@ export function expressionContainsCall(expression: XmluiScriptIr): boolean {
       return expressionContainsCall(expression.test) ||
         expressionContainsCall(expression.consequent) ||
         expressionContainsCall(expression.alternate);
+    case "SequenceExpression":
+      return expression.expressions.some(expressionContainsCall);
     case "ArrayExpression":
-      return expression.elements.some(expressionContainsCall);
+      return expression.elements.some((element) =>
+        expressionContainsCall(element.kind === "ArraySpreadElement" ? element.argument : element)
+      );
+    case "TemplateLiteralExpression":
+      return expression.parts.some((part) => typeof part !== "string" && expressionContainsCall(part));
     case "ObjectExpression":
       return expression.properties.some((property) =>
         expressionContainsCall(property.kind === "spread" ? property.argument : property.value)
@@ -40,11 +46,15 @@ export function expressionContainsCall(expression: XmluiScriptIr): boolean {
     case "ExpressionStatement":
     case "VariableDeclaration":
     case "BlockStatement":
-    case "IfStatement":
     case "WhileStatement":
+    case "IfStatement":
     case "EventHandler":
     case "Unsupported":
       return false;
+    case "ReturnStatement":
+      return expression.argument ? expressionContainsCall(expression.argument) : false;
+    case "ThrowStatement":
+      return expressionContainsCall(expression.argument);
   }
 }
 
@@ -65,6 +75,10 @@ export function statementNeedsCheckpoint(statement: XmluiHandlerStatementIr): bo
     case "IfStatement":
     case "WhileStatement":
       return true;
+    case "ReturnStatement":
+      return statement.argument ? !isCheapExpression(statement.argument) : false;
+    case "ThrowStatement":
+      return !isCheapExpression(statement.argument);
   }
 }
 

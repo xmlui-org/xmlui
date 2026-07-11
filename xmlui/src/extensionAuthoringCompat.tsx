@@ -10,8 +10,8 @@ import { Text } from "./components/Text/TextReact";
 import { TextBox } from "./components/TextBox/TextBoxReact";
 import { Heading } from "./components/Heading/HeadingReact";
 import { Image } from "./components/Image/ImageReact";
-import { TableOfContentsNative } from "./components/TableOfContents/TableOfContentsReact";
-import { TabsComponent } from "./components/Tabs/TabsReact";
+import { TableOfContents } from "./components/TableOfContents/TableOfContentsReact";
+import { Tabs as TabsComponent } from "./components/Tabs/TabsReact";
 import { TabItemComponent } from "./components/Tabs/TabItemReact";
 import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutReact";
 import { useXmluiAppContext } from "./runtime/appContext";
@@ -40,7 +40,7 @@ export {
   Text,
   TextBox,
 };
-export { TableOfContentsNative as TableOfContents, TabsComponent as Tabs, TabItemComponent as TabItem };
+export { TableOfContents, TabsComponent as Tabs, TabItemComponent as TabItem };
 
 export type NavHierarchyNode = {
   label?: string;

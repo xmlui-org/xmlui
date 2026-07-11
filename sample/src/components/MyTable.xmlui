@@ -1,0 +1,15 @@
+<Component name="MyTable">
+  <Table
+    syncWithVar="selState"
+    rowsSelectable="true"
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+      { id: 1, name: "Bananas", quantity: 6 },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</Component>

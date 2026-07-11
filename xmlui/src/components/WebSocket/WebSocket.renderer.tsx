@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { runEvent } from "../../runtime/rendering/bindings";
 import { useBooleanProp, useEvaluatedProp, useStringProp } from "../../runtime/rendering/props";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
-import { parseMessageData } from "../EventSource/EventSource.renderer";
+import { parseMessageData } from "../EventSource/EventSource";
 
 export const webSocketRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const url = useStringProp(node, scope, "url", "");

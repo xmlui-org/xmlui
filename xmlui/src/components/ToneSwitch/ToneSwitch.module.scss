@@ -1,25 +1,93 @@
-.toneSwitch {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--xmlui-gap-ToneSwitch, var(--xmlui-space-2));
-  width: fit-content;
-  padding: 2px;
-  border: 1px solid var(--xmlui-borderColor-ToneSwitch, var(--xmlui-color-surface-300));
-  border-radius: 999px;
-  background: var(--xmlui-backgroundColor-ToneSwitch, var(--xmlui-color-surface-100));
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.button {
-  min-width: 2.25rem;
-  min-height: 1.75rem;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--xmlui-textColor-ToneSwitch, var(--xmlui-textColor));
-  cursor: pointer;
+// Variables for @layer section
+$borderColor-ToneSwitch: createThemeVar("borderColor-ToneSwitch");
+$borderColor-ToneSwitch--hover: createThemeVar("borderColor-ToneSwitch--hover");
+$backgroundColor-ToneSwitch-light: createThemeVar("backgroundColor-ToneSwitch-light");
+$color-ToneSwitch-light: createThemeVar("color-ToneSwitch-light");
+$backgroundColor-ToneSwitch-dark: createThemeVar("backgroundColor-ToneSwitch-dark");
+$color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
+$backgroundColor-indicator-ToneSwitch: createThemeVar("backgroundColor-indicator-ToneSwitch");
+$boxShadow-indicator-ToneSwitch: createThemeVar("boxShadow-indicator-ToneSwitch");
+
+@layer components {
+  .iconSwitch {
+    display: flex;
+    align-items: center;
+    padding: calc(t.$fontSize / 4);
+    border-radius: t.$fontSize;
+    border: 1px solid $borderColor-ToneSwitch;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    min-height: t.$fontSize;
+    width: calc(t.$fontSize * 3);
+    position: relative;
+    pointer-events: auto;
+
+    &:hover {
+      border-color: $borderColor-ToneSwitch--hover;
+    }
+  }
+
+  .iconThumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: t.$fontSize;
+    height: t.$fontSize;
+    border-radius: 50%;
+    background-color: $backgroundColor-indicator-ToneSwitch;
+    transition: transform 0.3s ease;
+    box-shadow: $boxShadow-indicator-ToneSwitch;
+    pointer-events: none;
+  }
+
+  .iconSwitch.light .iconThumb {
+    transform: translateX(0);
+  }
+
+  .iconSwitch.dark .iconThumb {
+    transform: translateX(calc(t.$fontSize + t.$fontSize / 4));
+  }
+
+
+  // Alternative global override for the label class
+  :global(.toneSwitchContainer) {
+    width: fit-content !important;
+
+    :global(.label) {
+      width: fit-content !important;
+    }
+  }
+
+  .iconSwitch.light {
+    background-color: $backgroundColor-ToneSwitch-light;
+    color: $color-ToneSwitch-light;
+  }
+
+  .iconSwitch.dark {
+    background-color: $backgroundColor-ToneSwitch-dark;
+    color: $color-ToneSwitch-dark;
+  }
+
+  .icon {
+    width: t.$fontSize;
+    height: t.$fontSize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
 }
 
-.active {
-  background: var(--xmlui-backgroundColor-indicator-ToneSwitch, var(--xmlui-color-surface-0));
-  box-shadow: var(--xmlui-boxShadow-indicator-ToneSwitch, 0 2px 4px rgba(0, 0, 0, 0.1));
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

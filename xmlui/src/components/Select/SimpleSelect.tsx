@@ -284,6 +284,21 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       return Object.keys(sortedGroups).length > 0 ? sortedGroups : null;
     }, [groupBy, options]);
 
+    const closeDropdown = useCallback(() => {
+      setOpen(false);
+    }, []);
+
+    const SimpleSelectOption = useMemo(
+      () =>
+        forwardRef<React.ElementRef<typeof SelectOption>, Option>(function SimpleSelectOption(
+          option,
+          ref,
+        ) {
+          return <SelectOption {...option} closeDropdown={closeDropdown} ref={ref} />;
+        }),
+      [closeDropdown],
+    );
+
     return (
       <Root
         open={open}
@@ -433,6 +448,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                                 label={option.label}
                                 enabled={option.enabled}
                                 className={styles.selectOption}
+                                closeDropdown={closeDropdown}
                               >
                                 {option.children}
                               </SelectOption>
@@ -453,10 +469,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                           label={option.label}
                           enabled={option.enabled}
                           className={styles.selectOption}
+                          closeDropdown={closeDropdown}
                         />
                       ))
                     ) : (
-                      <OptionTypeProvider Component={SelectOption}>{children}</OptionTypeProvider>
+                      <OptionTypeProvider Component={SimpleSelectOption}>{children}</OptionTypeProvider>
                     )}
                     {options.length === 0 && emptyListNode}
                   </>

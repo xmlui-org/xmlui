@@ -89,6 +89,8 @@ export const iconRenderer = wrapRuntimeComponent({
       rootAttrs={adapter.rootAttrs()}
       name={adapter.stringProp("name")}
       size={adapter.stringProp("size")}
+      width={adapter.stringProp("width")}
+      height={adapter.stringProp("height")}
       fallback={adapter.stringProp("fallback")}
       classes={{ [COMPONENT_PART_KEY]: adapter.className }}
       onClick={
@@ -100,16 +102,26 @@ export const iconRenderer = wrapRuntimeComponent({
   ),
 });
 
-function RuntimeIcon({
-  rootAttrs,
-  name,
-  fallback,
-  ...iconProps
-}: ThemedIconProps & {
+type RuntimeIconProps = ThemedIconProps & React.HTMLAttributes<HTMLSpanElement> & {
   rootAttrs: Record<string, unknown>;
   name?: string;
   fallback?: string;
-}) {
+};
+
+const RuntimeIcon = React.forwardRef<HTMLSpanElement, RuntimeIconProps>(function RuntimeIcon(
+  {
+    rootAttrs,
+    name,
+    fallback,
+    size,
+    width,
+    height,
+    classes,
+    onClick,
+    ...triggerProps
+  },
+  ref,
+) {
   const iconRegistry = useIconRegistry();
   const { getResourceUrl } = useTheme();
   if (!hasRenderableIcon(name, fallback, iconRegistry.lookupIconRenderer, getResourceUrl)) {
@@ -124,24 +136,31 @@ function RuntimeIcon({
   return (
     <span
       {...dataAttrs}
+      {...triggerProps}
+      ref={ref}
       data-testid={testId ?? "test-id-component"}
       className={className as string | undefined}
       style={style as React.CSSProperties | undefined}
       onClick={(event) => {
+        triggerProps.onClick?.(event);
         if (event.target === event.currentTarget) {
-          iconProps.onClick?.(event);
+          onClick?.(event);
         }
       }}
     >
       <ThemedIcon
-        {...iconProps}
         name={name}
         fallback={fallback}
+        size={size}
+        width={width}
+        height={height}
+        classes={classes}
+        onClick={onClick}
         className={className as string | undefined}
       />
     </span>
   );
-}
+});
 
 function hasRenderableIcon(
   name: string | undefined,

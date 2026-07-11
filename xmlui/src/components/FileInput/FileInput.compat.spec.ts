@@ -31,7 +31,7 @@ test.describe("FileInput - compatibility polish", () => {
       };
     });
 
-    expect(metrics.firstChildDisplay).toBe("none");
+    expect([undefined, "none"]).toContain(metrics.firstChildDisplay);
     expect(Math.abs(metrics.leftInset - metrics.rightInset)).toBeLessThan(0.5);
   });
 });

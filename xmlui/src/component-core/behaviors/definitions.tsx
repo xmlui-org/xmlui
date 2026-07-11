@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useState, type CSSProperties, type ReactNode } from "react";
+import { cloneElement, isValidElement, type CSSProperties, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -10,6 +10,7 @@ import {
 import { FormItemMd } from "../../components/FormItem/FormItem";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { useFormContextPart } from "../../components/Form/FormContext";
+import { parseTooltipOptions, ThemedTooltip as Tooltip } from "../../components/Tooltip/Tooltip";
 import { useComponentThemeClass } from "../../runtime/rendering/theme";
 
 const responsiveWhenProps = {
@@ -86,6 +87,7 @@ export const tooltipBehavior: Behavior = {
     <TooltipBehavior
       tooltip={stringValue(context.props.tooltip)}
       tooltipMarkdown={stringValue(context.props.tooltipMarkdown)}
+      tooltipOptions={context.props.tooltipOptions}
     >
       {node}
     </TooltipBehavior>
@@ -148,7 +150,7 @@ export const labelBehavior: Behavior = {
   },
   attach: (context, node) => <LabelBehavior context={context}>{node}</LabelBehavior>,
   canAttach: (context) =>
-    context.componentName !== "Switch" &&
+    context.componentName !== "Text" &&
     context.componentName !== "RadioGroup" &&
     canAttachWhenTriggered("label")(context),
 };
@@ -204,7 +206,7 @@ export const animationBehavior: Behavior = {
     canBehaviorAttachToComponent(animationBehavior.metadata, context.metadata, context.componentName) &&
     hasTriggeredBehaviorProp(animationBehavior.metadata, context.props),
   attach: (context, node) => {
-    const animation = parseAnimation(context.props.animation);
+    const animation = parseAnimation(context.props.animation as string | object);
     const options = parseAnimationOptions(context.props.animationOptions);
     return (
       <Animation animation={animation} {...options}>
@@ -256,6 +258,7 @@ export const liveRegionBehavior: Behavior = {
     condition: { type: "visual" },
   },
   canAttach: (context) =>
+    context.componentName !== "Text" &&
     canBehaviorAttachToComponent(liveRegionBehavior.metadata, context.metadata, context.componentName) &&
     (isTruthyWhenValue(context.props.withLiveRegion) || context.props.liveRegion !== undefined),
   attach: (context, node) => (
@@ -268,7 +271,7 @@ export const liveRegionBehavior: Behavior = {
         aria-atomic="true"
         style={hiddenLiveRegionStyle}
       >
-        {liveRegionMessage(context)}
+        {liveRegionMessage(context, node)}
       </span>
     </>
   ),
@@ -450,38 +453,36 @@ function TooltipBehavior({
   children,
   tooltip,
   tooltipMarkdown,
+  tooltipOptions,
   ...rest
 }: {
   children: ReactNode;
   tooltip?: string;
   tooltipMarkdown?: string;
-} & Record<string, unknown>) {
-  const [visible, setVisible] = useState(false);
-  const content = tooltipMarkdown || tooltip;
+  tooltipOptions?: unknown;
+  [key: string]: unknown;
+}) {
+  const parsedOptions = parseTooltipOptions(tooltipOptions);
+  const title = tooltipMarkdown ? undefined : tooltip;
   return (
-    <span
-      {...rest}
-      data-xmlui-behavior="tooltip"
-      title={tooltip}
-      data-xmlui-tooltip-markdown={tooltipMarkdown}
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
-      onFocus={() => setVisible(true)}
-      onBlur={() => setVisible(false)}
-    >
-      {children}
-      {visible && content ? (
-        <span role="tooltip">
-          {tooltipMarkdown ? renderTinyMarkdown(tooltipMarkdown) : content}
-        </span>
-      ) : null}
-    </span>
+    <Tooltip text={tooltip ?? ""} markdown={tooltipMarkdown} {...parsedOptions}>
+      {annotateTooltipTrigger(children, title, rest)}
+    </Tooltip>
   );
 }
 
-function renderTinyMarkdown(markdown: string) {
-  const strongMatch = /^\*\*(.*)\*\*$/.exec(markdown.trim());
-  return strongMatch ? <strong>{strongMatch[1]}</strong> : markdown;
+function annotateTooltipTrigger(
+  children: ReactNode,
+  title: string | undefined,
+  extraProps: Record<string, unknown>,
+): ReactNode {
+  const { ref: _ref, ...propsWithoutRef } = extraProps as Record<string, unknown> & { ref?: unknown };
+  const behaviorProps = {
+    ...propsWithoutRef,
+    "data-xmlui-behavior": "tooltip",
+    title: typeof window === "undefined" ? title : undefined,
+  };
+  return <span {...behaviorProps}>{children}</span>;
 }
 
 function stringValue(value: unknown): string | undefined {
@@ -508,10 +509,16 @@ function liveRegionPoliteness(props: Record<string, unknown>): "polite" | "asser
   return explicit === "assertive" ? "assertive" : "polite";
 }
 
-function liveRegionMessage(context: BehaviorAttachContext): string {
+function liveRegionMessage(context: BehaviorAttachContext, node: ReactNode): string {
   const explicit = stringValue(context.props.liveRegionMessage);
   if (explicit !== undefined) {
     return explicit;
+  }
+  if (context.componentName === "ProgressBar") {
+    const value = numberValue(context.props.value);
+    if (value !== undefined) {
+      return `${Math.round(value * 100)}%`;
+    }
   }
   for (const name of ["value", "label", "message", "title"]) {
     const value = stringValue(context.props[name]);
@@ -519,5 +526,38 @@ function liveRegionMessage(context: BehaviorAttachContext): string {
       return value;
     }
   }
+  const childText = textFromReactNode(node);
+  if (childText !== undefined) {
+    return childText;
+  }
   return "";
+}
+
+function textFromReactNode(node: ReactNode): string | undefined {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (!isValidElement(node)) {
+    return undefined;
+  }
+  const children = (node.props as { children?: ReactNode }).children;
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+  if (Array.isArray(children)) {
+    const text = children.map(textFromReactNode).filter((value): value is string => value !== undefined).join("");
+    return text === "" ? undefined : text;
+  }
+  return textFromReactNode(children);
+}
+
+function numberValue(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
 }

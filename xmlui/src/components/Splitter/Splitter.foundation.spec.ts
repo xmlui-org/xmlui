@@ -12,7 +12,7 @@ test.describe("Splitter foundation", () => {
     await expect(page.getByTestId("splitter")).toBeVisible();
     await expect(page.getByTestId("primary")).toBeVisible();
     await expect(page.getByTestId("secondary")).toBeVisible();
-    await expect(page.getByTestId("splitter").locator('[data-xmlui-part="resizer"]')).toBeVisible();
+    await expect(page.getByTestId("splitter").locator('[class*="resizer"]')).toBeVisible();
   });
 
   test("HSplitter and VSplitter force their orientations", async ({ initTestBed, page }) => {
@@ -46,5 +46,22 @@ test.describe("Splitter foundation", () => {
     await expect(page.getByTestId("value")).toContainText("Count: 0");
     await page.getByTestId("increment").click();
     await expect(page.getByTestId("value")).toContainText("Count: 1");
+  });
+
+  test("fires a single initial resize event when the handler updates state", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App height="200px" var.counter="{0}">
+        <Splitter onResize="counter++" height="200px">
+          <Stack backgroundColor="lightblue" height="100%">
+            <Text testId="resize-count" value="Resize event called {counter} number of times" />
+          </Stack>
+          <Stack backgroundColor="darksalmon" height="100%" />
+        </Splitter>
+      </App>
+    `);
+
+    await expect(page.getByTestId("resize-count")).toContainText(
+      "Resize event called 1 number of times",
+    );
   });
 });

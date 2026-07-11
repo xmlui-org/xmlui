@@ -146,7 +146,7 @@ function findTagEnd(source: string, start: number): number {
 
 function normalizeCdataSections(source: string): string {
   return source.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_match, content: string) =>
-    encodeTextEntities(content),
+    encodeLeadingWhitespaceEntities(encodeTextEntities(content)),
   );
 }
 
@@ -155,6 +155,12 @@ function encodeTextEntities(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function encodeLeadingWhitespaceEntities(value: string): string {
+  return value.replace(/^[ \t\r\n]+/, (leading) =>
+    Array.from(leading, (char) => `&#${char.charCodeAt(0)};`).join(""),
+  );
 }
 
 function normalizeTagBooleanAttributes(tag: string): string {
@@ -404,6 +410,7 @@ function transformElement(
   source: SourceText,
   sourceId: string,
   inheritedNamespaces: Record<string, string> = {},
+  rawTextContent = false,
 ): XmluiElement {
   const attributesForElement = attributes(node, source);
   const namespaces = collectNamespaces(attributesForElement, inheritedNamespaces);
@@ -444,6 +451,10 @@ function transformElement(
       continue;
     }
     props[attr.name] = attr.value;
+    if (isRawTextProp(type, attr.name)) {
+      setParsedLiteralValue(parsed, "props", attr.name, attr);
+      continue;
+    }
     setParsedValue(parsed, "props", attr.name, attr, sourceId);
   }
 
@@ -458,13 +469,22 @@ function transformElement(
       globals,
       events,
       methods,
-      children: rawScriptChildren(node, source),
+      children: type === "event"
+        ? eventChildren(node, source, sourceId, namespaces)
+        : rawScriptChildren(node, source),
       range: rangeOf(node),
       ...(hasParsedBindings(parsed) ? { parsed } : {}),
     };
   }
 
-  const transformedChildren = contentChildren(node, source, sourceId, namespaces, type);
+  const transformedChildren = contentChildren(
+    node,
+    source,
+    sourceId,
+    namespaces,
+    type,
+    rawTextContent || isRawTextContentElement(type),
+  );
   const children: XmluiNode[] = [];
   for (const child of transformedChildren) {
     if (child.kind === "element" && child.type === "variable") {
@@ -486,7 +506,7 @@ function transformElement(
         throw new Error("<event> requires a name attribute.");
       }
       const eventSource = child.children
-        .map((eventChild) => eventChild.kind === "text" ? eventChild.value : "")
+        .map(eventChildSource)
         .join(" ")
         .trim();
       const range = child.children[0]?.range ?? child.range;
@@ -656,6 +676,7 @@ function contentChildren(
   sourceId: string,
   namespaces: Record<string, string>,
   parentType?: string,
+  rawTextContent = false,
 ): XmluiNode[] {
   const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
   const children = content?.children ?? [];
@@ -666,12 +687,12 @@ function contentChildren(
       if (tagName(child, source) === "script") {
         continue;
       }
-      result.push(transformElement(child, source, sourceId, namespaces));
+      result.push(transformElement(child, source, sourceId, namespaces, rawTextContent));
       continue;
     }
     if (child.kind === MarkupSyntaxKind.Text) {
       const rawText = getNodeText(child, source);
-      if (parentType === "Markdown") {
+      if (parentType === "Markdown" || rawTextContent) {
         const value = decodeEntities(rawText).replace(/\r\n?/g, "\n");
         if (!value.trim()) {
           continue;
@@ -680,6 +701,11 @@ function contentChildren(
           kind: "text",
           value,
           range: rangeOf(child),
+          segments: [{
+            kind: "literal",
+            value,
+            range: rangeOf(child),
+          }],
         });
         continue;
       }
@@ -698,6 +724,133 @@ function contentChildren(
   }
 
   return result;
+}
+
+function isRawTextContentElement(type: string): boolean {
+  return type === "CodeBlock" || type === "pre" || type === "code";
+}
+
+function isRawTextProp(type: string, propName: string): boolean {
+  return type === "IFrame" && propName === "srcdoc";
+}
+
+function eventChildSource(child: XmluiNode): string {
+  if (child.kind === "text") {
+    return child.value;
+  }
+  if (child.type === "APICall") {
+    return apiCallEventSource(child);
+  }
+  return "";
+}
+
+function eventChildren(
+  node: MarkupSyntaxNode,
+  source: SourceText,
+  sourceId: string,
+  namespaces: Record<string, string>,
+): XmluiNode[] {
+  const content = node.children?.find((child) => child.kind === MarkupSyntaxKind.ContentList);
+  const children = content?.children ?? [];
+  const result: XmluiNode[] = [];
+
+  for (const child of children) {
+    if (child.kind === MarkupSyntaxKind.Text) {
+      const rawText = getNodeText(child, source);
+      const value = normalizeText(rawText);
+      if (!value) {
+        continue;
+      }
+      result.push({
+        kind: "text",
+        value,
+        range: rangeOf(child),
+      });
+      continue;
+    }
+    if (child.kind === MarkupSyntaxKind.Element) {
+      result.push(transformElement(child, source, sourceId, namespaces));
+    }
+  }
+
+  return result;
+}
+
+function apiCallEventSource(child: XmluiElement): string {
+  const resultName = "__xmluiApiResult";
+  const mockExecute = child.events.mockExecute;
+  const invocation = mockExecute
+    ? `${resultName} = ${inlineZeroArgHandlerExpression(mockExecute)}`
+    : `${resultName} = Actions.callApi(${objectLiteralFromProps(child.props, [
+      "url",
+      "method",
+      "body",
+      "rawBody",
+      "queryParams",
+      "headers",
+      "credentials",
+      "invalidates",
+      "inProgressNotificationMessage",
+      "completedNotificationMessage",
+      "errorNotificationMessage",
+    ])})`;
+  return [
+    `let ${resultName}`,
+    invocation,
+    inlineArrowHandlerStatement(child.events.success, resultName),
+  ].filter(Boolean).join("; ");
+}
+
+function objectLiteralFromProps(props: Record<string, string>, names: string[]): string {
+  const entries = names
+    .filter((name) => Object.prototype.hasOwnProperty.call(props, name))
+    .map((name) => `${name}: ${propValueSource(props[name])}`);
+  return `{ ${entries.join(", ")} }`;
+}
+
+function propValueSource(value: string): string {
+  const expression = unwrapExpression(value);
+  return expression ?? JSON.stringify(decodeEntities(value));
+}
+
+function inlineZeroArgHandlerExpression(source: string): string {
+  const arrow = parseArrowSource(source);
+  if (!arrow) {
+    return source;
+  }
+  return arrow.body;
+}
+
+function inlineArrowHandlerStatement(source: string | undefined, argumentSource: string): string {
+  if (!source) {
+    return "";
+  }
+  const arrow = parseArrowSource(source);
+  if (!arrow) {
+    return "";
+  }
+  if (!arrow.param) {
+    return arrow.body;
+  }
+  return arrow.body.replace(new RegExp(`\\b${escapeRegExp(arrow.param)}\\b`, "g"), argumentSource);
+}
+
+function parseArrowSource(source: string): { param?: string; body: string } | undefined {
+  const arrowIndex = source.indexOf("=>");
+  if (arrowIndex < 0) {
+    return undefined;
+  }
+  const rawParam = source.slice(0, arrowIndex).trim();
+  const param = rawParam === "()" ? undefined : rawParam.replace(/^\((.*)\)$/, "$1").trim();
+  let body = source.slice(arrowIndex + 2).trim();
+  if (body.startsWith("(") && body.endsWith(")")) {
+    body = body.slice(1, -1).trim();
+  }
+  return { param: param || undefined, body };
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function rawScriptChildren(
@@ -809,6 +962,20 @@ function setParsedValue(
   target[name] = parseExpressionOrMixedText(attr.value, attr.valueRange, { sourceId });
 }
 
+function setParsedLiteralValue(
+  parsed: XmluiParsedBindings,
+  bucket: "props" | "vars" | "globals",
+  name: string,
+  attr: AttributeInfo,
+): void {
+  const target = (parsed[bucket] ??= {});
+  target[name] = [{
+    kind: "literal",
+    value: attr.value,
+    range: attr.valueRange,
+  }];
+}
+
 function setParsedEvent(
   parsed: XmluiParsedBindings,
   bucket: "events" | "methods",
@@ -828,7 +995,8 @@ function setParsedEventSource(
   sourceId: string,
 ): void {
   const events = (parsed[bucket] ??= {});
-  const result = parseScriptEventHandler(eventSource, {
+  const normalizedEventSource = rewriteSimpleForLoops(eventSource);
+  const result = parseScriptEventHandler(normalizedEventSource, {
     originSpan: {
       sourceId,
       start: range.start,
@@ -839,10 +1007,36 @@ function setParsedEventSource(
     throw diagnosticToError(result.diagnostics[0]);
   }
   events[name] = {
-    source: eventSource,
+    source: normalizedEventSource,
     ast: result.node,
     range,
   } satisfies ParsedEvent;
+}
+
+function rewriteSimpleForLoops(source: string): string {
+  let result = "";
+  let cursor = 0;
+  const pattern = /for\s*\(\s*(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([^;]+);\s*([^;]+);\s*\1\+\+\s*\)\s*\{/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(source)) !== null) {
+    const bodyStart = pattern.lastIndex - 1;
+    const bodyEnd = findMatchingBrace(source, bodyStart);
+    if (bodyEnd < 0) {
+      break;
+    }
+    const variableName = match[1];
+    const initialValue = match[2].trim();
+    const condition = match[3].trim();
+    const upperBound = condition.match(new RegExp(`^${variableName}\\s*<\\s*(.+)$`))?.[1]?.trim();
+    const body = upperBound
+      ? source.slice(bodyStart + 1, bodyEnd).replace(/\bbreak\s*;/g, `${variableName} = (${upperBound});`)
+      : source.slice(bodyStart + 1, bodyEnd);
+    result += source.slice(cursor, match.index);
+    result += `{ let ${variableName} = ${initialValue}; while (${condition}) {${body}\n${variableName}++; } };`;
+    cursor = bodyEnd + 1;
+    pattern.lastIndex = cursor;
+  }
+  return cursor === 0 ? source : result + source.slice(cursor);
 }
 
 function rootElement(node: MarkupSyntaxNode): MarkupSyntaxNode | undefined {
@@ -927,6 +1121,7 @@ function normalizeText(text: string): string {
 
 function decodeEntities(value: string): string {
   return value
+    .replace(/&#(\d+);/g, (_match, charCode: string) => String.fromCharCode(Number(charCode)))
     .replace(/&quot;/g, `"`)
     .replace(/&apos;/g, `'`)
     .replace(/&lt;/g, "<")

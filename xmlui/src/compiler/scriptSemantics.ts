@@ -60,6 +60,7 @@ export type BoundScriptResult = {
 
 export type XmluiScriptIr =
   | XmluiLiteralIr
+  | XmluiTemplateLiteralIr
   | XmluiIdentifierReadIr
   | XmluiScopedMemberReadIr
   | XmluiMemberReadIr
@@ -68,6 +69,7 @@ export type XmluiScriptIr =
   | XmluiBinaryExpressionIr
   | XmluiUnaryExpressionIr
   | XmluiConditionalExpressionIr
+  | XmluiSequenceExpressionIr
   | XmluiArrayExpressionIr
   | XmluiObjectExpressionIr
   | XmluiCallExpressionIr
@@ -80,6 +82,8 @@ export type XmluiScriptIr =
   | XmluiBlockStatementIr
   | XmluiIfStatementIr
   | XmluiWhileStatementIr
+  | XmluiReturnStatementIr
+  | XmluiThrowStatementIr
   | XmluiEventHandlerIr
   | XmluiUnsupportedIr;
 
@@ -91,6 +95,11 @@ export type XmluiScriptIrBase = {
 export type XmluiLiteralIr = XmluiScriptIrBase & {
   kind: "LiteralExpression";
   value: string | number | boolean | null | undefined;
+};
+
+export type XmluiTemplateLiteralIr = XmluiScriptIrBase & {
+  kind: "TemplateLiteralExpression";
+  parts: Array<string | XmluiScriptIr>;
 };
 
 export type XmluiIdentifierReadIr = XmluiScriptIrBase & {
@@ -148,9 +157,19 @@ export type XmluiConditionalExpressionIr = XmluiScriptIrBase & {
   alternate: XmluiScriptIr;
 };
 
+export type XmluiSequenceExpressionIr = XmluiScriptIrBase & {
+  kind: "SequenceExpression";
+  expressions: XmluiScriptIr[];
+};
+
 export type XmluiArrayExpressionIr = XmluiScriptIrBase & {
   kind: "ArrayExpression";
-  elements: XmluiScriptIr[];
+  elements: Array<XmluiScriptIr | XmluiArraySpreadElementIr>;
+};
+
+export type XmluiArraySpreadElementIr = XmluiScriptIrBase & {
+  kind: "ArraySpreadElement";
+  argument: XmluiScriptIr;
 };
 
 export type XmluiObjectExpressionIr = XmluiScriptIrBase & {
@@ -234,12 +253,24 @@ export type XmluiWhileStatementIr = XmluiScriptIrBase & {
   body: XmluiHandlerStatementIr;
 };
 
+export type XmluiReturnStatementIr = XmluiScriptIrBase & {
+  kind: "ReturnStatement";
+  argument?: XmluiScriptIr;
+};
+
+export type XmluiThrowStatementIr = XmluiScriptIrBase & {
+  kind: "ThrowStatement";
+  argument: XmluiScriptIr;
+};
+
 export type XmluiHandlerStatementIr =
   | XmluiExpressionStatementIr
   | XmluiVariableDeclarationIr
   | XmluiBlockStatementIr
   | XmluiIfStatementIr
-  | XmluiWhileStatementIr;
+  | XmluiWhileStatementIr
+  | XmluiReturnStatementIr
+  | XmluiThrowStatementIr;
 
 export type XmluiHandlerExecutionMode = "sync" | "async";
 
@@ -516,6 +547,14 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         visit(current.test);
         visit(current.body);
         return;
+      case "ReturnStatement":
+        if (current.argument) {
+          visit(current.argument);
+        }
+        return;
+      case "ThrowStatement":
+        visit(current.argument);
+        return;
       case "VariableDeclaration":
         for (const declaration of current.declarations) {
           if (declaration.init) {
@@ -536,6 +575,13 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
       case "Identifier":
         bindIdentifierRead(current.name, current.span);
         return;
+      case "TemplateLiteral":
+        current.parts.forEach((part) => {
+          if (typeof part !== "string") {
+            visit(part);
+          }
+        });
+        return;
       case "MemberExpression":
         bindMemberRead(current);
         return;
@@ -545,6 +591,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         return;
       case "ArrayExpression":
         current.elements.forEach(visit);
+        return;
+      case "ArraySpreadElement":
+        visit(current.argument);
         return;
       case "ObjectExpression":
         current.properties.forEach(visit);
@@ -563,6 +612,9 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
         visit(current.test);
         visit(current.consequent);
         visit(current.alternate);
+        return;
+      case "SequenceExpression":
+        current.expressions.forEach(visit);
         return;
       case "AssignmentExpression":
         result.writes.push(bindWriteTarget(current.left, current.operator, scope, result, findLexicalBinding));
@@ -854,6 +906,9 @@ export function compileXmluiEventHandler(
       let result: unknown;
       for (const statement of ir.body) {
         result = await executeEventStatement(statement, context, lexical, yieldState);
+        if (isReturnSignal(result)) {
+          return result.value;
+        }
       }
       return result;
     },
@@ -1151,6 +1206,12 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
         span: node.span,
         value: node.value,
       };
+    case "TemplateLiteral":
+      return {
+        kind: "TemplateLiteralExpression",
+        span: node.span,
+        parts: node.parts.map((part) => typeof part === "string" ? part : lowerNode(part, bound)),
+      };
     case "Identifier":
       return identifierReadIr({
         kind: "IdentifierRead",
@@ -1185,7 +1246,15 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
       return {
         kind: "ArrayExpression",
         span: node.span,
-        elements: node.elements.map((element) => lowerNode(element, bound)),
+        elements: node.elements.map((element) =>
+          element.kind === "ArraySpreadElement"
+            ? {
+                kind: "ArraySpreadElement",
+                span: element.span,
+                argument: lowerNode(element.argument, bound),
+              }
+            : lowerNode(element, bound)
+        ),
       };
     case "ObjectExpression":
       return {
@@ -1212,6 +1281,12 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
         test: lowerNode(node.test, bound),
         consequent: lowerNode(node.consequent, bound),
         alternate: lowerNode(node.alternate, bound),
+      };
+    case "SequenceExpression":
+      return {
+        kind: "SequenceExpression",
+        span: node.span,
+        expressions: node.expressions.map((expression) => lowerNode(expression, bound)),
       };
     case "BinaryExpression":
       if (node.operator === "||" || node.operator === "&&" || node.operator === "??") {
@@ -1297,6 +1372,8 @@ function lowerNode(node: ScriptNode, bound: BoundScriptResult): XmluiScriptIr {
     case "BlockStatement":
     case "IfStatement":
     case "WhileStatement":
+    case "ReturnStatement":
+    case "ThrowStatement":
     case "VariableDeclaration":
       return lowerHandlerStatement(node, bound);
     case "Program":
@@ -1374,6 +1451,20 @@ function findSyncUnsafeStatement(
             (statement.alternate ? findSyncUnsafeStatement(statement.alternate) : undefined);
     case "WhileStatement":
       return undefined;
+    case "ReturnStatement":
+      return statement.argument && expressionContainsSyncUnsafeCall(statement.argument)
+        ? {
+            message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
+            span: statement.argument.span,
+          }
+        : undefined;
+    case "ThrowStatement":
+      return expressionContainsSyncUnsafeCall(statement.argument)
+        ? {
+            message: "Sync XMLUI event handlers cannot contain async-capable function calls.",
+            span: statement.argument.span,
+          }
+        : undefined;
   }
 }
 
@@ -1398,8 +1489,18 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
       return expressionContainsSyncUnsafeCall(expression.test) ||
         expressionContainsSyncUnsafeCall(expression.consequent) ||
         expressionContainsSyncUnsafeCall(expression.alternate);
+    case "SequenceExpression":
+      return expression.expressions.some(expressionContainsSyncUnsafeCall);
     case "ArrayExpression":
-      return expression.elements.some(expressionContainsSyncUnsafeCall);
+      return expression.elements.some((element) =>
+        expressionContainsSyncUnsafeCall(
+          element.kind === "ArraySpreadElement" ? element.argument : element,
+        )
+      );
+    case "TemplateLiteralExpression":
+      return expression.parts.some((part) =>
+        typeof part !== "string" && expressionContainsSyncUnsafeCall(part)
+      );
     case "ObjectExpression":
       return expression.properties.some((property) =>
         expressionContainsSyncUnsafeCall(property.kind === "spread" ? property.argument : property.value)
@@ -1423,6 +1524,10 @@ function expressionContainsSyncUnsafeCall(expression: XmluiScriptIr): boolean {
     case "WhileStatement":
       return expressionContainsSyncUnsafeCall(expression.test) ||
         findSyncUnsafeStatement(expression.body) !== undefined;
+    case "ReturnStatement":
+      return expression.argument ? expressionContainsSyncUnsafeCall(expression.argument) : false;
+    case "ThrowStatement":
+      return expressionContainsSyncUnsafeCall(expression.argument);
     case "PrefixUpdate":
     case "PostfixUpdate":
     case "LiteralExpression":
@@ -1466,6 +1571,18 @@ function lowerHandlerStatement(
         span: node.span,
         test: lowerNode(node.test, bound),
         body: lowerHandlerStatement(node.body, bound),
+      };
+    case "ReturnStatement":
+      return {
+        kind: "ReturnStatement",
+        span: node.span,
+        ...(node.argument ? { argument: lowerNode(node.argument, bound) } : {}),
+      };
+    case "ThrowStatement":
+      return {
+        kind: "ThrowStatement",
+        span: node.span,
+        argument: lowerNode(node.argument, bound),
       };
     case "VariableDeclaration":
       return {
@@ -1607,65 +1724,6 @@ function isDebugHelperCallee(callee: ScriptNode): boolean {
       callee.name === "debugWatch");
 }
 
-function isAllowedMethodName(name: string): boolean {
-  return [
-    ...allowedMutatingMethodNames,
-    "map",
-    "filter",
-    "find",
-    "from",
-    "isArray",
-    "concat",
-    "some",
-    "every",
-    "includes",
-    "join",
-    "toLowerCase",
-    "toUpperCase",
-    "startsWith",
-    "endsWith",
-    "stringify",
-    "now",
-    "log",
-    "callApi",
-    "update",
-    "appendToList",
-    "removeFromList",
-    "listIncludes",
-    "getFields",
-    "getData",
-    "getValue",
-    "hasOverflow",
-    "open",
-    "close",
-    "isOpen",
-    "setLocale",
-    "translate",
-    "openAt",
-    "setValue",
-    "scrollToTop",
-    "scrollToBottom",
-    "scrollToStart",
-    "scrollToEnd",
-    "getVisibleItems",
-    "getExpandedNodes",
-    "getSelectedNode",
-    "getNodeById",
-    "scrollIntoView",
-    "appendNode",
-    "removeNode",
-    "removeChildren",
-    "insertNodeBefore",
-    "insertNodeAfter",
-    "refreshData",
-    "getDynamic",
-    "getNodeLoadingState",
-    "getExpandedTimestamp",
-    "getAutoLoadAfter",
-    "getNodeAutoLoadAfter",
-  ].includes(name);
-}
-
 const allowedMutatingMethodNames = ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"];
 
 function isAllowedMutatingMethodName(name: string): boolean {
@@ -1673,16 +1731,19 @@ function isAllowedMutatingMethodName(name: string): boolean {
 }
 
 function isAllowedBuiltInCallName(name: string): boolean {
-  return name === "getDate" || name === "confirm" || name === "Symbol" || name === "BigInt";
+  return name === "Date" || name === "getDate" || name === "Symbol" || name === "BigInt";
 }
 
 function isBuiltInReferenceName(name: string): boolean {
   return name === "App" ||
+    name === "Actions" ||
     name === "Array" ||
     name === "Date" ||
+    name === "JSON" ||
     name === "Math" ||
+    name === "Object" ||
+    name === "window" ||
     name === "getDate" ||
-    name === "confirm" ||
     name === "Symbol" ||
     name === "BigInt";
 }
@@ -1899,6 +1960,10 @@ function emitExpression(ir: XmluiScriptIr): string {
   switch (ir.kind) {
     case "LiteralExpression":
       return JSON.stringify(ir.value);
+    case "TemplateLiteralExpression":
+      return `[${ir.parts.map((part) =>
+        typeof part === "string" ? JSON.stringify(part) : emitExpression(part)
+      ).join(", ")}].join("")`;
     case "IdentifierRead":
       return emitRead(ir.dependency, ir.name);
     case "ScopedMemberRead":
@@ -1921,8 +1986,14 @@ function emitExpression(ir: XmluiScriptIr): string {
       return `(${ir.operator}${emitExpression(ir.argument)})`;
     case "ConditionalExpression":
       return `(${emitExpression(ir.test)} ? ${emitExpression(ir.consequent)} : ${emitExpression(ir.alternate)})`;
+    case "SequenceExpression":
+      return `(${ir.expressions.map(emitExpression).join(", ")})`;
     case "ArrayExpression":
-      return `[${ir.elements.map(emitExpression).join(", ")}]`;
+      return `[${ir.elements.map((element) =>
+        element.kind === "ArraySpreadElement"
+          ? `...${emitExpression(element.argument)}`
+          : emitExpression(element)
+      ).join(", ")}]`;
     case "ObjectExpression":
       return `{${ir.properties.map((property) =>
         property.kind === "spread"
@@ -1970,6 +2041,13 @@ function markArrowParameterReads(ir: XmluiScriptIr, params: Set<string>): XmluiS
     case "LiteralExpression":
     case "Unsupported":
       return ir;
+    case "TemplateLiteralExpression":
+      return {
+        ...ir,
+        parts: ir.parts.map((part) =>
+          typeof part === "string" ? part : markArrowParameterReads(part, params)
+        ),
+      };
     case "MemberRead":
       return { ...ir, object: markArrowParameterReads(ir.object, params) };
     case "IndexRead":
@@ -1994,8 +2072,20 @@ function markArrowParameterReads(ir: XmluiScriptIr, params: Set<string>): XmluiS
         consequent: markArrowParameterReads(ir.consequent, params),
         alternate: markArrowParameterReads(ir.alternate, params),
       };
+    case "SequenceExpression":
+      return {
+        ...ir,
+        expressions: ir.expressions.map((expression) => markArrowParameterReads(expression, params)),
+      };
     case "ArrayExpression":
-      return { ...ir, elements: ir.elements.map((element) => markArrowParameterReads(element, params)) };
+      return {
+        ...ir,
+        elements: ir.elements.map((element) =>
+          element.kind === "ArraySpreadElement"
+            ? { ...element, argument: markArrowParameterReads(element.argument, params) }
+            : markArrowParameterReads(element, params)
+        ),
+      };
     case "ObjectExpression":
       return {
         ...ir,
@@ -2050,6 +2140,13 @@ function markArrowParameterReads(ir: XmluiScriptIr, params: Set<string>): XmluiS
         test: markArrowParameterReads(ir.test, params),
         body: markArrowParameterReads(ir.body, params) as XmluiHandlerStatementIr,
       };
+    case "ReturnStatement":
+      return {
+        ...ir,
+        ...(ir.argument ? { argument: markArrowParameterReads(ir.argument, params) } : {}),
+      };
+    case "ThrowStatement":
+      return { ...ir, argument: markArrowParameterReads(ir.argument, params) };
   }
 }
 
@@ -2075,6 +2172,9 @@ function emitOptionalIndexRead(object: XmluiScriptIr, index: XmluiScriptIr): str
 
 function emitCallExpression(ir: XmluiCallExpressionIr): string {
   const args = ir.args.map(emitExpression).join(", ");
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    return `new Date(${args})`;
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `((__xmluiContextFn) => typeof __xmluiContextFn === "function" ? __xmluiContextFn(${args}) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
   }
@@ -2092,9 +2192,6 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   }
   if (ir.callee.kind === "ScopedMemberRead") {
     throw new Error("Cannot compile unsupported XMLUI expression call target.");
-  }
-  if (!isAllowedMethodName(ir.callee.member)) {
-    throw new Error(`Cannot compile unsupported XMLUI method call '${ir.callee.member}'.`);
   }
   const objectSource = emitExpression(ir.callee.object);
   return `(${objectSource})?.[${JSON.stringify(ir.callee.member)}]?.(${args})`;
@@ -2122,6 +2219,12 @@ function emitEventStatementBody(statement: XmluiHandlerStatementIr, context: Eve
       return emitIfStatement(statement, context);
     case "WhileStatement":
       return emitWhileStatement(statement, context);
+    case "ReturnStatement":
+      return statement.argument
+        ? `return ${emitAsyncExpression(statement.argument)};`
+        : "return;";
+    case "ThrowStatement":
+      return `throw ${emitThrowStatementError(emitAsyncExpression(statement.argument))};`;
   }
 }
 
@@ -2148,6 +2251,14 @@ function emitEventExpression(expression: XmluiScriptIr): string {
 function emitAsyncExpression(expression: XmluiScriptIr): string {
   if (expression.kind === "CallExpression") {
     return emitAsyncCallExpression(expression);
+  }
+  if (expression.kind === "SequenceExpression") {
+    return `(${expression.expressions.map(emitAsyncExpression).join(", ")})`;
+  }
+  if (expression.kind === "TemplateLiteralExpression") {
+    return `[${expression.parts.map((part) =>
+      typeof part === "string" ? JSON.stringify(part) : emitAsyncExpression(part)
+    ).join(", ")}].join("")`;
   }
   return emitExpression(expression);
 }
@@ -2176,6 +2287,9 @@ function emitAsyncCallExpression(ir: XmluiCallExpressionIr): string {
   if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "navigate") {
     const [target, queryParams] = args;
     return `ctx.navigate?.(${target ?? "undefined"}, ${queryParams ?? "undefined"})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    return `new Date(${args.join(", ")})`;
   }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     return `await (async (__xmluiContextFn) => typeof __xmluiContextFn === "function" ? await ((ctx.complete ?? ((value) => Promise.resolve(value)))(await __xmluiContextFn(${args.join(", ")}))) : undefined)(ctx.readContext?.(${JSON.stringify(ir.callee.name)}))`;
@@ -2273,7 +2387,9 @@ function emitUpdateExpression(expression: XmluiPrefixUpdateIr | XmluiPostfixUpda
   if (target.kind === "handlerLocal") {
     return `${expression.kind === "PrefixUpdate" ? expression.operator : ""}${target.name}${expression.kind === "PostfixUpdate" ? expression.operator : ""}`;
   }
-  return emitTargetWrite(target, `Number(${emitTargetRead(target)}) ${delta}`);
+  const current = emitTargetRead(target);
+  const result = expression.kind === "PrefixUpdate" ? "__xmluiNext" : "__xmluiCurrent";
+  return `((__xmluiCurrent) => { const __xmluiNext = Number(__xmluiCurrent) ${delta}; ${emitTargetWrite(target, "__xmluiNext")}; return ${result}; })(${current})`;
 }
 
 function emitTargetRead(target: BoundWriteTarget): string {
@@ -2353,6 +2469,10 @@ function executeExpressionIr(
   switch (ir.kind) {
     case "LiteralExpression":
       return ir.value;
+    case "TemplateLiteralExpression":
+      return ir.parts.map((part) =>
+        typeof part === "string" ? part : String(executeExpressionIr(part, context, lexical))
+      ).join("");
     case "IdentifierRead":
       return executeRead(ir.dependency, ir.name, context, lexical);
     case "ScopedMemberRead":
@@ -2396,8 +2516,19 @@ function executeExpressionIr(
       return executeExpressionIr(ir.test, context, lexical)
         ? executeExpressionIr(ir.consequent, context, lexical)
         : executeExpressionIr(ir.alternate, context, lexical);
+    case "SequenceExpression": {
+      let result: unknown;
+      for (const expression of ir.expressions) {
+        result = executeExpressionIr(expression, context, lexical);
+      }
+      return result;
+    }
     case "ArrayExpression":
-      return ir.elements.map((element) => executeExpressionIr(element, context, lexical));
+      return ir.elements.flatMap((element) =>
+        element.kind === "ArraySpreadElement"
+          ? Array.from(executeExpressionIr(element.argument, context, lexical) as Iterable<unknown>)
+          : [executeExpressionIr(element, context, lexical)]
+      );
     case "ObjectExpression":
       return ir.properties.reduce<Record<string, unknown>>((result, property) => {
         if (property.kind === "spread") {
@@ -2469,6 +2600,9 @@ function executeCallExpression(
   context: CompiledExpressionContext,
   lexical: Record<string, unknown>,
 ): unknown {
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    return createDate(ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     const target = context.readContext?.(ir.callee.name);
     if (typeof target !== "function") {
@@ -2493,7 +2627,7 @@ function executeCallExpression(
     }
     return target(...ir.args.map((arg) => executeExpressionIr(arg, context, lexical)));
   }
-  if (ir.callee.kind !== "MemberRead" || !isAllowedMethodName(ir.callee.member)) {
+  if (ir.callee.kind !== "MemberRead") {
     throw new Error("Cannot execute unsupported XMLUI expression call target.");
   }
   const object = executeExpressionIr(ir.callee.object, context, lexical) as
@@ -2551,8 +2685,23 @@ async function executeExpressionIrAsync(
       return await executeExpressionIrAsync(ir.test, context, lexical)
         ? executeExpressionIrAsync(ir.consequent, context, lexical)
         : executeExpressionIrAsync(ir.alternate, context, lexical);
+    case "SequenceExpression": {
+      let result: unknown;
+      for (const expression of ir.expressions) {
+        result = await executeExpressionIrAsync(expression, context, lexical);
+      }
+      return result;
+    }
+    case "TemplateLiteralExpression":
+      return (await Promise.all(ir.parts.map(async (part) =>
+        typeof part === "string" ? part : String(await executeExpressionIrAsync(part, context, lexical))
+      ))).join("");
     case "ArrayExpression":
-      return Promise.all(ir.elements.map((element) => executeExpressionIrAsync(element, context, lexical)));
+      return (await Promise.all(ir.elements.map(async (element) =>
+        element.kind === "ArraySpreadElement"
+          ? Array.from(await executeExpressionIrAsync(element.argument, context, lexical) as Iterable<unknown>)
+          : [await executeExpressionIrAsync(element, context, lexical)]
+      ))).flat();
     case "ObjectExpression": {
       const result: Record<string, unknown> = {};
       for (const property of ir.properties) {
@@ -2668,6 +2817,10 @@ async function executeCallExpressionAsync(
     context.navigate?.(target, queryParams as Record<string, unknown> | undefined);
     return undefined;
   }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.name === "Date") {
+    const args = await Promise.all(ir.args.map((arg) => executeExpressionIrAsync(arg, context, lexical)));
+    return createDate(args);
+  }
   if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "context") {
     const target = context.readContext?.(ir.callee.name);
     if (typeof target !== "function") {
@@ -2703,6 +2856,10 @@ function defaultCall(target: unknown, methodName: string, args: unknown[]): unkn
     return undefined;
   }
   return method.apply(target, args);
+}
+
+function createDate(args: unknown[]): Date {
+  return new (Date as any)(...args) as Date;
 }
 
 async function completeValue(value: unknown): Promise<unknown> {
@@ -2796,6 +2953,9 @@ async function executeEventStatementBody(
       let blockResult: unknown;
       for (const child of statement.body) {
         blockResult = await executeEventStatement(child, context, blockLexical, yieldState);
+        if (isReturnSignal(blockResult)) {
+          return blockResult;
+        }
       }
       return blockResult;
     }
@@ -2811,13 +2971,56 @@ async function executeEventStatementBody(
       let loopCheckpoint = 0;
       while (await executeExpressionIrAsync(statement.test, context, lexical)) {
         loopResult = await executeEventStatement(statement.body, context, lexical, yieldState);
+        if (isReturnSignal(loopResult)) {
+          return loopResult;
+        }
         if (loopNeedsPacing(statement) && ((++loopCheckpoint) & 255) === 0) {
           await yieldAfterStatementIfNeeded(context, yieldState);
         }
       }
       return loopResult;
     }
+    case "ReturnStatement":
+      return returnSignal(
+        statement.argument
+          ? await executeExpressionIrAsync(statement.argument, context, lexical)
+          : undefined,
+      );
+    case "ThrowStatement":
+      throw createThrowStatementError(await executeExpressionIrAsync(statement.argument, context, lexical));
   }
+}
+
+type ReturnSignal = {
+  readonly __xmluiReturnSignal: true;
+  value: unknown;
+};
+
+function returnSignal(value: unknown): ReturnSignal {
+  return { __xmluiReturnSignal: true, value };
+}
+
+function isReturnSignal(value: unknown): value is ReturnSignal {
+  return !!value &&
+    typeof value === "object" &&
+    (value as { __xmluiReturnSignal?: unknown }).__xmluiReturnSignal === true;
+}
+
+function emitThrowStatementError(argumentSource: string): string {
+  return `((__xmluiThrown) => __xmluiThrown instanceof Error ? __xmluiThrown : Object.assign(new Error(typeof __xmluiThrown === "string" ? __xmluiThrown : (__xmluiThrown?.message || "Error without message")), { name: "ThrowStatementError", errorObject: __xmluiThrown }))(${argumentSource})`;
+}
+
+function createThrowStatementError(errorObject: unknown): Error & { errorObject?: unknown } {
+  if (errorObject instanceof Error) {
+    return errorObject;
+  }
+  const message = typeof errorObject === "string"
+    ? errorObject
+    : (errorObject as { message?: unknown } | null | undefined)?.message || "Error without message";
+  return Object.assign(new Error(String(message)), {
+    name: "ThrowStatementError",
+    errorObject,
+  });
 }
 
 async function executeEventExpression(
@@ -3117,6 +3320,10 @@ function collectHandlerLocalNames(statements: readonly XmluiHandlerStatementIr[]
       case "WhileStatement":
         visit(statement.body);
         break;
+      case "ReturnStatement":
+        break;
+      case "ThrowStatement":
+        break;
       case "ExpressionStatement":
         break;
     }
@@ -3140,12 +3347,18 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
       return isEventMutationExpression(ir.test) ||
         isEventMutationExpression(ir.consequent) ||
         isEventMutationExpression(ir.alternate);
+    case "SequenceExpression":
+      return ir.expressions.some(isEventMutationExpression);
     case "ArrayExpression":
-      return ir.elements.some(isEventMutationExpression);
+      return ir.elements.some((element) =>
+        isEventMutationExpression(element.kind === "ArraySpreadElement" ? element.argument : element)
+      );
     case "ObjectExpression":
       return ir.properties.some((property) =>
         isEventMutationExpression(property.kind === "spread" ? property.argument : property.value)
       );
+    case "TemplateLiteralExpression":
+      return ir.parts.some((part) => typeof part !== "string" && isEventMutationExpression(part));
     case "CallExpression":
       return ir.args.some(isEventMutationExpression);
     case "MemberRead":
@@ -3165,6 +3378,8 @@ function isEventMutationExpression(ir: XmluiScriptIr): boolean {
     case "IfStatement":
     case "WhileStatement":
       return true;
+    case "ReturnStatement":
+      return ir.argument ? isEventMutationExpression(ir.argument) : false;
     default:
       return false;
   }

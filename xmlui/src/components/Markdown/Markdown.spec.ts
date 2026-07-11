@@ -1,169 +1,741 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import type { HeadingLevel } from "../Heading/abstractions";
 
-test.describe("Markdown foundation", () => {
+// --- Testing
+
+test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Markdown renders", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`<App><Markdown># Hello</Markdown></App>`);
-
-    await expect((await createMarkdownDriver()).component.locator("h1")).toHaveText("Hello");
+    await initTestBed(`<Markdown />`);
+    await expect((await createMarkdownDriver()).component).toBeAttached();
   });
 
-  test("handles legacy binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`
-      <App var.value="{2}">
-        <Markdown>One: @{1 + 1}; Two: @{value}; Object: @{{ a: 1, b: () => null }}; Empty: @{}.</Markdown>
-      </App>
-    `);
-
-    await expect((await createMarkdownDriver()).component).toContainText(
-      'One: 2; Two: 2; Object: {"a":1,"b":"[xmlui function]"}; Empty: .',
-    );
-  });
-
-  test("does not detect escaped expressions", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`<App><Markdown>\\@{1} and @\\{2}</Markdown></App>`);
-
-    await expect((await createMarkdownDriver()).component).toHaveText("@{1} and @{2}");
-  });
-
-  test("does not replace binding expressions inside fenced code", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.value="{42}">
-        <Markdown>
-          Before @{value}
-
-          \`\`\`xmlui
-          &lt;Text&gt;@{value}&lt;/Text&gt;
-          \`\`\`
-
-          After @{value}
-        </Markdown>
-      </App>
-    `);
-
-    await expect(page.locator('[data-xmlui-component="Markdown"]')).toContainText("Before 42");
-    await expect(page.locator("pre > code")).toContainText("@{value}");
-    await expect(page.locator('[data-xmlui-component="Markdown"]')).toContainText("After 42");
-  });
-
-  for (const level of ["#", "##", "###", "####", "#####", "######"]) {
-    test(`can render anchor link for '${level}'`, async ({ initTestBed, page }) => {
-      await initTestBed(`<App><Markdown showHeadingAnchors="true">${level} Heading</Markdown></App>`);
-
-      await expect(page.locator(`${"h" + level.length} a`)).toHaveAttribute("href", "#heading");
-    });
-  }
-
-  test("uses explicit heading anchor id when present", async ({ initTestBed, page }) => {
-    await initTestBed(`<App><Markdown showHeadingAnchors="true">## Heading [#explicit-anchor]</Markdown></App>`);
-
-    await expect(page.locator("h2")).toContainText("Heading");
-    await expect(page.locator("h2 a")).toHaveAttribute("href", "#explicit-anchor");
-  });
-
-  test("only renders if children are strings", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`
-      <App>
-        <Markdown>
-          # Heading
-          <Button>Button</Button>
-        </Markdown>
-      </App>
-    `);
-
+  test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
-  test("rendered text-bearing content can be selected by default", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <Markdown>
-          # Heading
+  test("does not detect escaped empty expression #1", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[\\@{}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{}");
+  });
 
-          Paragraph with \`inline\`.
+  test("does not detect escaped empty expression #2", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[\@\\{}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{}");
+  });
 
-          - Item
+  test("does not detect escaped expression #1", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\\@{1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{1}");
+  });
 
-          | Header |
-          | --- |
-          | Cell |
+  test("does not detect escaped expression #2", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@\\{1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{1}");
+  });
 
-          \`\`\`
-          code
-          \`\`\`
-        </Markdown>
-      </App>
+  test("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{   }]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("");
+  });
+
+  test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{1+1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("2");
+  });
+
+  test("handles objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+    const expected = "{ a : 1, b: 'c' }";
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":"c"}`);
+  });
+
+  test("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+    const expected = "[ 1, 2, 3 ]";
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`[1,2,3]`);
+  });
+
+  test("handles functions in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "() => { const x = 1; console.log(x); return null; }";
+    const EXPECTED = "[xmlui function]";
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
+  });
+
+  test("handles nested objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const expected = "{ a : 1, b: { c: 1 } }";
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":{"c":1}}`);
+  });
+
+  test("handles functions nested in objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "{ a: () => { const x = 1; console.log(x); return null; } }";
+    const EXPECTED = '{"a":"[xmlui function]"}';
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
+  });
+
+  test("handles arrays nested in objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const expected = "{ a: [1, 2, 3] }";
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":[1,2,3]}`);
+  });
+
+  test("handles arrays nested in functions in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "() => { return [1, 2, 3]; }";
+    const EXPECTED = "[xmlui function]";
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
+  });
+
+  test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE =
+      "Hello there @{ {a : () => {}, x: null, b: { c: 3, d: 'asdadsda', e: () => {return null;} } } } How are you @{true || undefined || []}";
+    const EXPECTED =
+      'Hello there {"a":"[xmlui function]","x":null,"b":{"c":3,"d":"asdadsda","e":"[xmlui function]"}} How are you true';
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
+  });
+
+  const headingLevelsWithMarkdown: Array<{ level: HeadingLevel; md: string }> = [
+    { level: "h1", md: "# Heading" },
+    { level: "h2", md: "## Heading" },
+    { level: "h3", md: "### Heading" },
+    { level: "h4", md: "#### Heading" },
+    { level: "h5", md: "##### Heading" },
+    { level: "h6", md: "###### Heading" },
+  ];
+  headingLevelsWithMarkdown.forEach(({ level, md }) => {
+    test(`can render anchor link for '${level}'`, async ({ initTestBed, createMarkdownDriver }) => {
+      const SOURCE = md;
+      await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+      const driver = await createMarkdownDriver();
+      expect(await driver.hasHtmlElement("a")).toBe(true);
+    });
+  });
+
+  test("show implicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(true);
+  });
+
+  test("show explicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading [#heading]";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(true);
+  });
+
+  test("don't render implicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading";
+    await initTestBed(`<Markdown showHeadingAnchors="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(false);
+  });
+
+  test("don't render explicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading [#heading]";
+    await initTestBed(`<Markdown showHeadingAnchors="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(false);
+  });
+});
+
+test("only renders if children are strings", async ({ initTestBed, createMarkdownDriver }) => {
+  await initTestBed(`
+      <Markdown>
+        <Button label="Hey!" />
+      </Markdown>
     `);
 
-    for (const selector of ["h1", "p", "li", "code", "td", "pre"]) {
-      await expect(page.locator(selector).first()).toHaveCSS("user-select", "text");
+  // Check if page is empty (no text)
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("");
+});
+
+test("renders if children are provided through CDATA", async ({ initTestBed, createMarkdownDriver }) => {
+  await initTestBed(`
+    <Markdown>
+      <![CDATA[Hello World!]]>
+    </Markdown>
+  `);
+
+  // Check if page is empty (no text)
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("Hello World!");
+});
+
+test("renders raw HTML tables from CDATA", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <App>
+      <Markdown>
+        <![CDATA[
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jill</td>
+      <td>Smith</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td>Eve</td>
+      <td>Jackson</td>
+      <td>57</td>
+    </tr>
+  </tbody>
+</table>
+        ]]>
+      </Markdown>
+    </App>
+  `);
+
+  await expect(page.getByRole("table")).toBeVisible();
+  await expect(page.getByRole("table")).toHaveCSS("border-collapse", "collapse");
+  await expect(page.getByRole("columnheader", { name: "Name" })).toHaveAttribute("colspan", "2");
+  await expect(page.getByRole("cell", { name: "Jill" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Jackson" })).toBeVisible();
+});
+
+test("renders code block", async ({ initTestBed, createMarkdownDriver }) => {
+  const code = "```\n" + "I did not expect this\n" + "```";
+  await initTestBed(`<Markdown><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
+});
+
+test("rendered text-bearing content can be selected by default", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Markdown>
+      <![CDATA[
+## Selectable heading
+
+Try to select this paragraph.
+
+- Selectable list item
+
+\`Selectable inline code\`
+
+| Header |
+| --- |
+| Selectable table cell |
+
+\`\`\`
+Selectable code fence
+\`\`\`
+      ]]>
+    </Markdown>
+  `);
+
+  await expect(page.getByRole("heading", { name: "Selectable heading" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+  await expect(page.getByText("Try to select this paragraph.")).toHaveCSS("user-select", "text");
+  await expect(page.getByText("Selectable list item")).toHaveCSS("user-select", "text");
+  await expect(page.getByText("Selectable inline code")).toHaveCSS("user-select", "text");
+  await expect(page.getByRole("cell", { name: "Selectable table cell" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+  await expect(page.locator("pre").filter({ hasText: "Selectable code fence" })).toHaveCSS(
+    "user-select",
+    "text",
+  );
+});
+
+test("4space/1 tab indent is not code block by default", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the line breaks and indentations are intentional
+  const code = `
+    _I did not expect this_
+  `;
+  await initTestBed(`<Markdown><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement("em")).toBeTruthy();
+});
+
+test("removeIndents=false: 4space/1 tab indent is accounted for", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the lack of indentations is intentional
+  const code = `
+_I did not expect this_
+  `;
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement("em")).toBeTruthy();
+});
+
+test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the indentations are intentional
+  const code = `
+    _I did not expect this_
+  `;
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("_I did not expect this_");
+  expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
+});
+
+// =============================================================================
+// FILE DOWNLOAD ATTRIBUTE TESTS
+// =============================================================================
+
+test.describe("File Download Attribute", () => {
+  test("handles download attribute detection across file types and edge cases", async ({
+    initTestBed,
+    page,
+  }) => {
+    // common downloadable file extensions get download attribute
+    await initTestBed(`<Markdown><![CDATA[
+[PDF File](/resources/files/sample.pdf)
+[CSV File](/resources/files/sample-products.csv)
+[ZIP Archive](/downloads/package.zip)
+[JSON Data](/api/data.json)
+[Excel File](/reports/data.xlsx)
+[Text File](/docs/readme.txt)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "PDF File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "CSV File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ZIP Archive" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "JSON Data" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Excel File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Text File" })).toHaveAttribute("download");
+
+    // web page extensions do not get download attribute
+    await initTestBed(`<Markdown><![CDATA[
+[HTML Page](/docs/index.html)
+[HTM Page](/docs/page.htm)
+[PHP Script](/api/endpoint.php)
+[ASP Page](/legacy/page.asp)
+[ASPX Page](/app/default.aspx)
+[JSP Page](/java/app.jsp)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "HTML Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "HTM Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PHP Script" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ASP Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ASPX Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "JSP Page" })).not.toHaveAttribute("download");
+
+    // file links with query parameters and hash fragments still get download attribute
+    await initTestBed(`<Markdown><![CDATA[
+[CSV with Query](/api/export.csv?format=standard&date=2024)
+[PDF with Hash](/docs/report.pdf#page=5)
+[File with Both](/data/file.json?v=1#section)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "CSV with Query" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PDF with Hash" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "File with Both" })).toHaveAttribute("download");
+
+    // links without file extensions do not get download attribute
+    await initTestBed(`<Markdown><![CDATA[
+[No Extension](/docs/readme)
+[Directory](/resources/)
+[Root](/api)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "No Extension" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Directory" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Root" })).not.toHaveAttribute("download");
+
+    // various document and archive formats get download attribute
+    await initTestBed(`<Markdown><![CDATA[
+[Word Doc](/files/document.doc)
+[Word DocX](/files/document.docx)
+[PowerPoint](/slides/presentation.ppt)
+[PowerPoint X](/slides/presentation.pptx)
+[RAR Archive](/downloads/archive.rar)
+[7z Archive](/downloads/data.7z)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Word Doc", exact: true })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Word DocX" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PowerPoint", exact: true })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PowerPoint X" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "RAR Archive" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "7z Archive" })).toHaveAttribute("download");
+
+    // file extension detection is case-insensitive
+    await initTestBed(`<Markdown><![CDATA[
+[Uppercase PDF](/files/DOCUMENT.PDF)
+[Mixed Case CSV](/data/Products.CsV)
+[Lowercase Zip](/archives/data.zip)
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Uppercase PDF" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Mixed Case CSV" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Lowercase Zip" })).toHaveAttribute("download");
+
+    // explicit download attribute from HTML is preserved
+    await initTestBed(`<Markdown><![CDATA[<a href="/resources/files/sample-products.csv" download>Click to Download</a>]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Click to Download" })).toHaveAttribute("download");
+  });
+});
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Heading ID Generation Regression", () => {
+  test("heading starting with number renders without querySelector error", async ({
+    initTestBed,
+    page,
+  }) => {
+    // This is the user-reported bug: headings starting with numbers cause querySelector errors
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    // Verify the component renders without errors
+    const heading = page.getByRole("heading", { level: 2, name: /1\. Install the management tool/ });
+    await expect(heading).toBeVisible();
+    await expect(heading).toHaveText("1. Install the management tool#");
+    
+    // Check if anchor link renders
+    await heading.hover();
+    const anchorLink = heading.locator("a");
+    await expect(anchorLink).toBeVisible();
+  });
+
+  test("heading ID generation creates valid ID with prefix for numbers", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2 });
+    await heading.hover();
+    
+    // Get the anchor link's href
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: the href should be "#heading-1-install-the-management-tool"
+    // which starts with a letter, making it valid for querySelector
+    expect(href).toBe("#heading-1-install-the-management-tool");
+    
+    // The generated ID should start with a letter or underscore
+    const generatedId = href?.substring(1); // Remove the #
+    expect(generatedId).toMatch(/^[a-zA-Z_]/); // Now starts with valid character
+  });
+
+  test("querySelector works with valid ID", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 1. Install the management tool";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2 });
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    const anchorId = href?.substring(1); // Remove the #
+    
+    // Verify that querySelector works without errors
+    const querySelectorResult = await page.evaluate((id) => {
+      try {
+        const element = document.querySelector(`#${id}`);
+        return element !== null ? "found" : "not-found";
+      } catch (error) {
+        return "error: " + (error as Error).message;
+      }
+    }, anchorId);
+    
+    // After fix: querySelector should work without errors
+    expect(querySelectorResult).not.toContain("error");
+  });
+
+  test("heading with only numbers generates valid ID with prefix", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## 123";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2, name: "123" });
+    await expect(heading).toBeVisible();
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: generates "#heading-123" which is valid for querySelector
+    expect(href).toBe("#heading-123");
+    expect(href).toMatch(/^#[a-zA-Z_]/);
+  });
+
+  test("multiple headings starting with numbers all have valid IDs", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = `
+## 1. First step
+## 2. Second step  
+## 3. Third step
+    `;
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    // All headings should render
+    const headings = page.getByRole("heading", { level: 2 });
+    await expect(headings).toHaveCount(3);
+    
+    // Check each anchor link has valid ID format
+    const expectedHrefs = [
+      "#heading-1-first-step",
+      "#heading-2-second-step",
+      "#heading-3-third-step"
+    ];
+    
+    for (let i = 0; i < 3; i++) {
+      const heading = headings.nth(i);
+      await heading.hover();
+      const anchorLink = heading.locator("a");
+      const href = await anchorLink.getAttribute("href");
+      
+      // After fix: all start with "heading-" prefix
+      expect(href).toBe(expectedHrefs[i]);
+      expect(href).toMatch(/^#heading-[1-3]-/);
     }
   });
 
-  test("4space/1 tab indent is not code block by default", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <Markdown>
-            # Heading
-            _emphasis_
-        </Markdown>
-      </App>
-    `);
-
-    await expect(page.locator("pre")).toHaveCount(0);
-    await expect(page.locator("h1")).toHaveText("Heading");
-    await expect(page.locator("em")).toHaveText("emphasis");
+  test("heading starting with special character that resolves to digit gets valid ID", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "## $100 Budget Planning";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const heading = page.getByRole("heading", { level: 2, name: /\$100 Budget Planning/ });
+    await expect(heading).toBeVisible();
+    await heading.hover();
+    
+    const anchorLink = heading.locator("a");
+    const href = await anchorLink.getAttribute("href");
+    
+    // After fix: the $ gets stripped, leaving "100-budget-planning" which gets prefixed
+    expect(href).toBe("#heading-100-budget-planning");
+    expect(href?.substring(1)).toMatch(/^[a-zA-Z_]/);
   });
 
-  test("removeBr controls br rendering", async ({ initTestBed, page }) => {
-    await initTestBed(`<App><Markdown removeBr="true">one&lt;br/&gt;two</Markdown></App>`);
-    await expect(page.locator("br")).toHaveCount(0);
-
-    await initTestBed(`<App><Markdown removeBr="false">one&lt;br/&gt;two</Markdown></App>`);
-    await expect(page.locator("br")).toHaveCount(1);
+  test("renders <br/> as line break by default", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).toBeAttached();
   });
 
+  test("renders <br/> as line break when removeBr is false", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown removeBr="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).toBeAttached();
+  });
+
+  test("omits <br/> when removeBr is true", async ({ initTestBed, page }) => {
+    const SOURCE = `First line<br/>Second line`;
+    await initTestBed(`<Markdown removeBr="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElement = page.locator("br");
+    await expect(brElement).not.toBeAttached();
+  });
+
+  test("omits multiple <br/> elements when removeBr is true", async ({ initTestBed, page }) => {
+    const SOURCE = `First<br/>Second<br/>Third<br/>Fourth`;
+    await initTestBed(`<Markdown removeBr="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    
+    const brElements = page.locator("br");
+    await expect(brElements).toHaveCount(0);
+  });
+});
+
+// =============================================================================
+// REGRESSION: binding expressions not replaced inside code fences
+// =============================================================================
+
+test.describe("Binding expression code-fence exclusion regression", () => {
+  test("does not replace @{} binding inside a triple-backtick code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // The expression inside the code fence must remain literal
+    await expect(driver.component).toHaveText("@{someValue}");
+  });
+
+  test("replaces @{} binding outside a code fence but not inside", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "Value: @{someValue}\n\n```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // Outside the fence: replaced; inside: literal
+    const text = await driver.component.textContent();
+    expect(text).toContain("Value: 42");
+    expect(text).toContain("@{someValue}");
+  });
+
+  test("replaces @{} binding in text after a closing code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```\n\nOutside: @{someValue}";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    const text = await driver.component.textContent();
+    // Code fence content is literal; text after the fence is replaced
+    expect(text).toContain("@{someValue}");
+    expect(text).toContain("Outside: 42");
+  });
+});
+
+// =============================================================================
+// xmlui-pg: nested code fences with four backticks
+// =============================================================================
+
+test.describe("xmlui-pg nested code fences (four-backtick delimiter)", () => {
   test("renders a basic xmlui-pg playground", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <Markdown>
-          \`\`\`xmlui-pg height="120px"
-          &lt;App var.count="{0}"&gt;
-            &lt;Text testId="pg-count"&gt;Count: {count}&lt;/Text&gt;
-            &lt;Button testId="pg-button" onClick="count++"&gt;Increment&lt;/Button&gt;
-          &lt;/App&gt;
-          \`\`\`
-        </Markdown>
-      </App>
-    `);
-
-    await expect(page.getByTestId("pg-count")).toHaveText("Count: 0");
-    await page.getByTestId("pg-button").click();
-    await expect(page.getByTestId("pg-count")).toHaveText("Count: 1");
+    const SOURCE = "```xmlui-pg\n<Button>Hello</Button>\n```";
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The NestedApp renders the Button component from the playground source
+    await expect(page.getByRole("button", { name: "Hello" })).toBeVisible();
   });
 
-  test("xmlui-pg playground extracts only the app section", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <Markdown>
-          \`\`\`xmlui-pg height="120px"
-          ---config
-          {
-            "defaultTheme": "xmlui-hero-theme"
-          }
-          ---app display
-          &lt;App&gt;
-            &lt;Text testId="pg-section"&gt;Section app&lt;/Text&gt;
-          &lt;/App&gt;
-          ---api
-          {
-            "apiUrl": "/api"
-          }
-          \`\`\`
-        </Markdown>
-      </App>
-    `);
+  test("four-backtick fence inside xmlui-pg does not close the outer fence", async ({
+    initTestBed,
+    page,
+  }) => {
+    // The ````bash...```` block must be treated as nested content, not as the closing ```.
+    // After unescaping, <Markdown> receives a bash code block and renders it.
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "npm start",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The nested app renders Markdown which renders "npm start" inside a code element
+    await expect(page.locator("code").filter({ hasText: "npm start" })).toBeVisible();
+  });
 
-    await expect(page.getByTestId("pg-section")).toHaveText("Section app");
-    await expect(page.getByText("---api")).toHaveCount(0);
+  test("display segment with nested four-backtick fence emits a visible code block", async ({
+    initTestBed,
+    page,
+  }) => {
+    // display mode causes the segment source to appear as a <pre> code block above the playground
+    const SOURCE = [
+      "```xmlui-pg",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // A <pre> display code block must be rendered (the emitted wrapper uses ```` when content has ```)
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The source code shown in the display block must include "echo hello"
+    await expect(page.locator("pre").first()).toContainText("echo hello");
+  });
+
+  test("multiple four-backtick nested fences are all parsed into app content", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "first command",
+      "````",
+      "",
+      "````js",
+      "second command",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // Both unescaped code blocks must appear in the rendered Markdown output
+    await expect(page.locator("code").filter({ hasText: "first command" })).toBeVisible();
+    await expect(page.locator("code").filter({ hasText: "second command" })).toBeVisible();
+  });
+
+  test("four-backtick fence inside explicit ---app segment renders correctly", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg display",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The display code block is rendered as <pre>;
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The nested app renders the Markdown which shows "echo hello" in a code element
+    await expect(page.locator("code").filter({ hasText: "echo hello" }).first()).toBeVisible();
   });
 });

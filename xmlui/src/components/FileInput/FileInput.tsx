@@ -199,7 +199,7 @@ export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
         variant={extractValue(node.props.buttonVariant)}
         buttonThemeColor={extractValue(node.props.buttonThemeColor)}
         buttonSize={extractValue(node.props.buttonSize)}
-        buttonIcon={<ThemedIcon name={iconName} fallback="folder-open" />}
+        buttonIcon={iconName === DEFAULT_ICON ? undefined : <ThemedIcon name={iconName} />}
         buttonIconPosition={extractValue(node.props.buttonIconPosition)}
         buttonLabel={extractValue.asOptionalString(node.props.buttonLabel)}
         updateState={updateState}
@@ -364,7 +364,7 @@ function runtimeFileInputProps(adapter: XmluiComponentAdapter) {
     directory: adapter.booleanProp("directory", defaultProps.directory),
     placeholder: adapter.stringProp("placeholder"),
     buttonLabel: adapter.stringProp("buttonLabel", defaultProps.buttonLabel),
-    buttonIcon: <ThemedIcon name={iconName} fallback="folder-open" />,
+    buttonIcon: iconName === DEFAULT_ICON ? undefined : <ThemedIcon name={iconName} />,
     buttonIconPosition: adapter.stringProp("buttonIconPosition", defaultProps.buttonIconPosition) as React.ComponentProps<typeof FileInput>["buttonIconPosition"],
     buttonPosition: adapter.stringProp("buttonPosition", defaultProps.buttonPosition) as React.ComponentProps<typeof FileInput>["buttonPosition"],
     buttonSize: adapter.stringProp("buttonSize", defaultProps.buttonSize) as React.ComponentProps<typeof FileInput>["buttonSize"],

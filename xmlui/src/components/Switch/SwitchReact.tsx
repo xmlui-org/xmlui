@@ -1,11 +1,12 @@
 import type { CSSProperties, FocusEvent } from "react";
-import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
+import { forwardRef, memo, useCallback, useEffect, useId } from "react";
 
 import { defaultProps } from "./Switch.defaults";
 import styles from "./Switch.module.scss";
 import type { SwitchValidationStatus } from "./switch-abstractions";
 import { useFormContext } from "../Form/FormContext";
 import { transformToLegitValue, useToggleController } from "../Toggle/Toggle";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export type SwitchApi = {
   focus: () => void;
@@ -37,6 +38,7 @@ export type SwitchProps = {
   onDidChange?: (value: boolean) => void | Promise<void>;
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
+  registerComponentApi?: RegisterComponentApiFn;
   "data-testid"?: string;
 };
 
@@ -65,6 +67,7 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
     onDidChange,
     onFocus,
     onBlur,
+    registerComponentApi,
     "data-testid": dataTestId,
     ...rest
   },
@@ -89,7 +92,18 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
     },
   });
 
-  useImperativeHandle(ref, () => api, [api]);
+  useEffect(() => {
+    registerComponentApi?.(api as unknown as Record<string, unknown>);
+  }, [api, registerComponentApi]);
+
+  const setInputRef = useCallback((element: HTMLInputElement | null) => {
+    inputRef.current = element;
+    if (typeof ref === "function") {
+      ref(element as unknown as SwitchApi);
+    } else if (ref) {
+      ref.current = element as unknown as SwitchApi;
+    }
+  }, [inputRef, ref]);
 
   useEffect(() => {
     if (!form || fieldName === undefined || form.getValue(fieldName) != null || initialValue === undefined) {
@@ -112,7 +126,7 @@ export const SwitchNative = memo(forwardRef<SwitchApi, SwitchProps>(function Swi
     <input
       {...rest}
       id={inputId}
-      ref={inputRef}
+      ref={setInputRef}
       data-component-type="Toggle"
       data-part-id="input"
       data-xmlui-part="input"

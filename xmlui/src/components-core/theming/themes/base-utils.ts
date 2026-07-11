@@ -65,3 +65,5 @@ export function textSubject(name: string, valueSpec?: TextValue): Record<string,
     [`textShadow-${name}`]: valueSpec?.shadow ?? "",
   };
 }
+
+export const validationStatusStyleNames = ["default", "success", "error", "warning"] as const;

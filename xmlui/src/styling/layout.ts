@@ -34,10 +34,20 @@ export function resolveLayoutStyle(
 ): CSSProperties {
   const style: CSSProperties = { boxSizing: "border-box" };
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
+  const parentOrientation = parentLayoutOrientation(props.layoutContext);
+  const insideTableCell = isInsideLayoutType(props.layoutContext, "TableCell");
 
   if (orientation) {
     style.display = "flex";
     style.flexDirection = orientation === "horizontal" ? "row" : "column";
+  }
+
+  if (insideTableCell && props.minWidth === undefined) {
+    style.minWidth = 0;
+  }
+
+  if (parentOrientation) {
+    style.flexShrink = insideTableCell ? 1 : 0;
   }
 
   assignSize(style, "width", props.width, orientation === "horizontal");
@@ -357,6 +367,24 @@ function parseStarSize(value: unknown): { grow: number } | undefined {
 
 function orientationFromProp(value: unknown): LayoutOrientation | undefined {
   return value === "horizontal" || value === "vertical" ? value : undefined;
+}
+
+function parentLayoutOrientation(value: unknown): LayoutOrientation | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+  return orientationFromProp((value as { orientation?: unknown }).orientation);
+}
+
+function isInsideLayoutType(value: unknown, type: string): boolean {
+  let current = value;
+  while (current && typeof current === "object") {
+    if ((current as { type?: unknown }).type === type) {
+      return true;
+    }
+    current = (current as { parent?: unknown }).parent;
+  }
+  return false;
 }
 
 function alignment(value: unknown): CSSProperties["alignItems"] {

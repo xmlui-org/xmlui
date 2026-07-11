@@ -24,3 +24,10 @@ export function createLogEntry(
     ...extras,
   };
 }
+
+export function getCurrentTrace(): string | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+  return (window as typeof window & { _xsCurrentTrace?: string })._xsCurrentTrace;
+}

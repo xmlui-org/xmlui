@@ -2,9 +2,11 @@ import { createMetadata, dContextMenu } from "../../component-core/metadata/help
 import { wrapComponent } from "../../runtime/rendering/adapter";
 import { extractScssThemeVars } from "../../styling/theme";
 import { defaultProps } from "./TreeDisplay.defaults";
-import { TreeDisplayNative } from "./TreeDisplayReact";
+import { TreeDisplay } from "./TreeDisplayReact";
 
 const COMP = "TreeDisplay";
+
+export const ThemedTreeDisplay = TreeDisplay;
 
 const treeDisplayStylesSource = `
 $backgroundColor-TreeDisplay: createThemeVar("backgroundColor-TreeDisplay");
@@ -52,7 +54,7 @@ export const treeDisplayRenderer = wrapComponent({
   renderer: ({ adapter }) => {
     const content = adapter.stringProp("content");
     return (
-      <TreeDisplayNative
+      <TreeDisplay
         {...adapter.rootAttrs()}
         content={content ?? directTextContent(adapter.node.children) ?? defaultProps.content}
         itemHeight={adapter.numberProp("itemHeight", defaultProps.itemHeight)}

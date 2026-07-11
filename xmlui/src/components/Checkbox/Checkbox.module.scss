@@ -105,12 +105,12 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
   }
 
   .checkboxRoot {
-    display: inline-grid;
+    display: grid;
     place-content: center;
-    min-width: 1em;
-    min-height: 1em;
-    width: 1em;
-    height: 1em;
+    min-width: min(1em, 1rem);
+    min-height: min(1em, 1rem);
+    width: min(1em, 1rem);
+    height: min(1em, 1rem);
     margin: 0;
     flex: 0 0 auto;
     appearance: none;
@@ -121,6 +121,10 @@ $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-C
     background-color: var(--xmlui-backgroundColor-Checkbox);
     color: var(--xmlui-backgroundColor-indicator-Checkbox);
     font-size: 1rem;
+  }
+
+  .checkboxRoot[class*="_selectionToggle_"] {
+    display: grid;
   }
 
   .checkboxRoot:not([readonly]) {

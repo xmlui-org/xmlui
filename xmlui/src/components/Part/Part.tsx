@@ -1,10 +1,6 @@
 import { memo } from "react";
 import type { ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { createMetadata } from "../../component-core/metadata/helpers";
-import { wrapComponent } from "../../runtime/rendering/adapter";
-import type { ComponentMetadata } from "../../component-core/metadata/types";
-import type { XmluiElement } from "../../compiler/ir";
 
 // --- WIP
 
@@ -16,6 +12,11 @@ type Props = {
 export const Part = memo(function Part({ children, partId }: Props) {
   return <Slot data-part-id={partId}>{children}</Slot>;
 });
+
+import { createMetadata } from "../../component-core/metadata/helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { XmluiElement } from "../../compiler/ir";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 
 const COMP = "Part";
 
@@ -32,7 +33,7 @@ export const PartMd = createMetadata({
   },
 });
 
-export const partRenderer = wrapComponent({
+export const partRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: PartMd as ComponentMetadata,
   renderer: ({ adapter }) => {

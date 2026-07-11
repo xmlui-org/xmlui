@@ -54,6 +54,7 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "const-color-surface-950": "hsl(204, 30.3%, 13%)",
   "const-color-surface-1000": "hsl(204, 30.3%, 9%)",
   "const-color-surface": "$const-color-surface-500",
+  "const-color-gray-300": "$const-color-surface-200",
 
   "const-color-primary-50": "hsl(212,71.9%,94.5%)",
   "const-color-primary-100": "hsl(212,71.9%,89.1%)",
@@ -158,12 +159,13 @@ export const rootThemeVariables: ThemeVariableLayer = {
   "backgroundColor-dropdown-item--hover": "$color-surface-50",
   "backgroundColor-dropdown-item--active": "$color-surface-100",
   "backgroundColor-dropdown-item--active-hover": "$color-surface-50",
-  backgroundColor: "hsl(204, 30.3%, 98%)",
+  backgroundColor: "$color-surface-subtle",
 
   "color-info": "$color-info-500",
   "color-valid": "$color-success-600",
   "color-warning": "$color-warn-700",
   "color-error": "$color-danger-500",
+  "color-gray-300": "$const-color-gray-300",
 
   "fontFamily-sans-serif":
     "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
@@ -403,7 +405,18 @@ export const rootThemeVariables: ThemeVariableLayer = {
 
 export const xmluiThemeVariables: ThemeVariableLayer = {
   "font-size": "15px",
-  "boxShadow-Input": "$boxShadow-sm",
+  "boxShadow-Input": "",
+  "textColor-label-formItem": "$textColor",
+  "textColor-label-formItem--required": "$textColor",
+  "fontSize-label-formItem": "$fontSize-sm",
+  "fontSize-label-formItem--required": "$fontSize-sm",
+  "fontWeight-label-formItem": "$fontWeight-medium",
+  "fontWeight-label-formItem--required": "$fontWeight-medium",
+  "fontStyle-label-formItem": "normal",
+  "textTransform-label-formItem": "none",
+  "textColor-requiredMark-formItem": "$color-danger-400",
+  "textColor-optionalTag-formItem": "$textColor-secondary",
+  "backgroundColor-Button-attention": "rgb(255, 31, 20)",
   "backgroundColor-Button-secondary-solid--hover": "rgb(140, 151, 169)",
   "borderColor-Button-secondary-solid--hover": "rgb(226, 229, 234)",
   light: {
@@ -430,11 +443,13 @@ export const generatedThemeVariables: ThemeVariableLayer = {
   "fontSize-Text-secondary": `calc(${themeVarReference("fontSize-Text")} * 0.875)`,
 };
 
-export const defaultThemeVariables = mergeThemeVariableLayers([
+export const defaultThemeVariableLayers: readonly ThemeVariableLayer[] = [
   rootThemeVariables,
   generatedThemeVariables,
   xmluiThemeVariables,
-]);
+];
+
+export const defaultThemeVariables = mergeThemeVariableLayers(defaultThemeVariableLayers);
 
 export function resolveThemeReferences(value: unknown): unknown {
   if (typeof value !== "string") {
@@ -537,12 +552,14 @@ export function mergeThemeVariableLayers(
 }
 
 function transformThemeVariables(themeVariables: ThemeVariableMap): ThemeVariableMap {
+  const baseToneVariables = generateBaseTones(themeVariables);
   return {
     ...generateBootstrapBaseColumns(),
     ...generateBaseSpacings(themeVariables),
     ...generateBaseFontSizes(themeVariables),
     ...generatePaddingSegments(themeVariables),
     ...generateBorderSegments(themeVariables),
+    ...baseToneVariables,
     ...themeVariables,
   };
 }
@@ -691,6 +708,157 @@ function generateBorderSegments(themeVariables: ThemeVariableMap): ThemeVariable
   return result;
 }
 
+export function generateBaseTones(themeVariables: ThemeVariableMap | undefined): ThemeVariableMap {
+  if (!themeVariables) {
+    return {};
+  }
+  return {
+    ...generateBaseTonesForColor("color-primary", themeVariables),
+    ...generateBaseTonesForColor("color-secondary", themeVariables),
+    ...generateBaseTonesForColor("color-info", themeVariables),
+    ...generateBaseTonesForColor("color-success", themeVariables),
+    ...generateBaseTonesForColor("color-warn", themeVariables),
+    ...generateBaseTonesForColor("color-danger", themeVariables),
+    ...generateBaseTonesForColor("color-surface", themeVariables, true),
+  };
+}
+
+function generateBaseTonesForColor(
+  name: string,
+  themeVariables: ThemeVariableMap,
+  distributeEven = false,
+): ThemeVariableMap {
+  const color = parsedThemeColor(name, themeVariables);
+  if (!color) {
+    return {};
+  }
+  const baseLightness = color.l;
+  const darkStep = baseLightness / 5;
+  const lightStep = (100 - baseLightness) / 5;
+  const lightnesses = distributeEven
+    ? {
+        0: 100,
+        50: 98,
+        100: 95,
+        200: 83,
+        300: 75,
+        400: 63,
+        500: 52,
+        600: 40,
+        700: 32,
+        800: 27,
+        900: 16,
+        950: 13,
+        1000: 9,
+      }
+    : {
+        0: 100,
+        50: baseLightness + lightStep * 4.5,
+        100: baseLightness + lightStep * 4,
+        200: baseLightness + lightStep * 3,
+        300: baseLightness + lightStep * 2,
+        400: baseLightness + lightStep,
+        500: baseLightness,
+        600: baseLightness - darkStep,
+        700: baseLightness - darkStep * 2,
+        800: baseLightness - darkStep * 3,
+        900: baseLightness - darkStep * 4,
+        950: baseLightness - darkStep * 4.5,
+        1000: baseLightness - darkStep * 5,
+      };
+  return Object.fromEntries(
+    Object.entries(lightnesses).map(([tone, lightness]) => [
+      `const-${name}-${tone}`,
+      hslString(color.h, color.s, clamp(lightness, 0, 100)),
+    ]),
+  );
+}
+
+function parsedThemeColor(
+  name: string,
+  themeVariables: ThemeVariableMap,
+): { h: number; s: number; l: number } | undefined {
+  const value = resolvedThemeValue(name, themeVariables);
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  return parseHslColor(value) ?? parseHexColor(value) ?? parseRgbColor(value);
+}
+
+function parseHslColor(value: string): { h: number; s: number; l: number } | undefined {
+  const match = /^hsl\(\s*([-.\d]+)(?:deg)?[\s,]+([-.\d]+)%[\s,]+([-.\d]+)%\s*\)$/i.exec(value.trim());
+  if (!match) {
+    return undefined;
+  }
+  return {
+    h: Number(match[1]),
+    s: Number(match[2]),
+    l: Number(match[3]),
+  };
+}
+
+function parseHexColor(value: string): { h: number; s: number; l: number } | undefined {
+  const match = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value.trim());
+  if (!match) {
+    return undefined;
+  }
+  const hex = match[1].length === 3
+    ? match[1].split("").map((char) => char + char).join("")
+    : match[1];
+  return rgbToHsl(
+    Number.parseInt(hex.slice(0, 2), 16),
+    Number.parseInt(hex.slice(2, 4), 16),
+    Number.parseInt(hex.slice(4, 6), 16),
+  );
+}
+
+function parseRgbColor(value: string): { h: number; s: number; l: number } | undefined {
+  const match = /^rgba?\(\s*([-.\d]+)[\s,]+([-.\d]+)[\s,]+([-.\d]+)(?:\s*[,/]\s*[-.\d]+%?)?\s*\)$/i.exec(value.trim());
+  if (!match) {
+    return undefined;
+  }
+  return rgbToHsl(Number(match[1]), Number(match[2]), Number(match[3]));
+}
+
+function rgbToHsl(red: number, green: number, blue: number): { h: number; s: number; l: number } {
+  const r = clamp(red, 0, 255) / 255;
+  const g = clamp(green, 0, 255) / 255;
+  const b = clamp(blue, 0, 255) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) {
+    return { h: 0, s: 0, l: l * 100 };
+  }
+  const delta = max - min;
+  const s = delta / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (max === r) {
+    h = ((g - b) / delta) % 6;
+  } else if (max === g) {
+    h = (b - r) / delta + 2;
+  } else {
+    h = (r - g) / delta + 4;
+  }
+  h *= 60;
+  if (h < 0) {
+    h += 360;
+  }
+  return { h, s: s * 100, l: l * 100 };
+}
+
+function hslString(hue: number, saturation: number, lightness: number): string {
+  return `hsl(${formatCssNumber(hue)}, ${formatCssNumber(saturation)}%, ${formatCssNumber(lightness)}%)`;
+}
+
+function formatCssNumber(value: number): string {
+  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(4)));
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
 function borderSegmentSides(prefix: string): string[] {
   switch (prefix) {
     case "borderHorizontal":
@@ -772,18 +940,26 @@ export function componentThemeVariablesToCssProperties(
 ): CSSProperties {
   const declarations = new Set<string>();
   const declarationSources = new Map<string, Set<string>>();
+  const defaultDeclarationNames = new Set<string>();
   for (const descriptor of [metadata, ...contributors]) {
     for (const key of Object.keys(descriptor.themeVars ?? {})) {
       addThemeDeclaration(declarations, declarationSources, key);
     }
     for (const key of Object.keys(descriptor.defaultThemeVars ?? {})) {
       addThemeDeclaration(declarations, declarationSources, key);
+      defaultDeclarationNames.add(stripLegacyThemeClassPrefix(key));
     }
   }
 
   const cssVariables: Record<string, string | number> = {};
   for (const name of declarations) {
-    const value = themeVariableValue(name, declarationSources.get(name), themeVariables);
+    const value = themeVariableValue(
+      name,
+      declarationSources.get(name),
+      themeVariables,
+      explicitThemeVariables,
+      defaultDeclarationNames,
+    );
     if (value !== undefined && value !== null && value !== "") {
       cssVariables[themePropNameToCssVarName(name)] = String(resolveThemeReferences(value));
     }
@@ -1072,7 +1248,25 @@ function themeVariableValue(
   name: string,
   sourceNames: Set<string> | undefined,
   themeVariables: ThemeVariableMap,
+  explicitThemeVariables: ThemeVariableMap = themeVariables,
+  defaultDeclarationNames: ReadonlySet<string> = new Set(),
 ): unknown {
+  const exactNames = [...new Set(sourceNames ?? [name])].map(stripLegacyThemeClassPrefix);
+  for (const sourceName of themeVariableLookupNames(sourceNames ?? [name])) {
+    const explicitValue = explicitThemeVariables[sourceName];
+    if (explicitValue !== undefined) {
+      if (!exactNames.includes(stripLegacyThemeClassPrefix(sourceName))) {
+        const defaultValue = exactNames
+          .filter((exactName) => defaultDeclarationNames.has(exactName))
+          .map((exactName) => themeVariables[exactName])
+          .find((value) => value !== undefined);
+        if (defaultValue !== undefined) {
+          return defaultValue;
+        }
+      }
+      return explicitValue;
+    }
+  }
   for (const sourceName of themeVariableLookupNames(sourceNames ?? [name])) {
     const value = themeVariables[sourceName];
     if (value !== undefined) {

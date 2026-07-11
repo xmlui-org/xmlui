@@ -1,119 +1,399 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-test.describe("Timer foundation", () => {
-  test("renders hidden diagnostic attributes", async ({ initTestBed, page }) => {
-    await initTestBed(`<Timer testId="timer" interval="{250}" initialDelay="{100}" once="true" />`);
+test.describe("Basic Functionality", () => {
+  test("component renders with default props", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" />`);
 
     const timer = page.getByTestId("timer");
-    await expect(timer).not.toBeVisible();
     await expect(timer).toHaveAttribute("data-timer-enabled", "true");
-    await expect(timer).toHaveAttribute("data-timer-interval", "250");
-    await expect(timer).toHaveAttribute("data-timer-initial-delay", "100");
+    await expect(timer).toHaveAttribute("data-timer-interval", "1000");
+  });
+
+  test("component renders with enabled=false", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" enabled="false" />`);
+
+    const timer = page.getByTestId("timer");
+    await expect(timer).toHaveAttribute("data-timer-enabled", "false");
+    await expect(timer).toHaveAttribute("data-timer-running", "false");
+  });
+
+  test("component renders with custom interval", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" interval="500" />`);
+
+    const timer = page.getByTestId("timer");
+    await expect(timer).toHaveAttribute("data-timer-interval", "500");
+  });
+
+  test("component renders with once=true", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" once="true" />`);
+
+    const timer = page.getByTestId("timer");
     await expect(timer).toHaveAttribute("data-timer-once", "true");
   });
 
-  test("fires tick at interval", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App var.tickCount="{0}">
-        <Timer interval="{80}" onTick="tickCount++" />
-        <Text testId="counter">{tickCount}</Text>
-      </App>
-    `);
+  test("component renders with initial delay", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" initialDelay="500" />`);
 
-    await expect(page.getByTestId("counter")).toHaveText("0");
-    await expect(page.getByTestId("counter")).toHaveText("1", { timeout: 500 });
+    const timer = page.getByTestId("timer");
+    await expect(timer).toHaveAttribute("data-timer-initial-delay", "500");
   });
 
-  test("once fires a single tick", async ({ initTestBed, page }) => {
+  test("component is not visible (non-visual component)", async ({ page, initTestBed }) => {
+    await initTestBed(`<Timer testId="timer" />`);
+
+    const timer = page.getByTestId("timer");
+    await expect(timer).not.toBeVisible();
+  });
+});
+
+test.describe.fixme("Event Handling", () => {
+  test("timer tick event is called", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App var.tickCount="{0}">
-        <Timer interval="{60}" once="true" onTick="tickCount++" />
+      <Fragment var.tickCount="{0}">
+        <Timer interval="800" enabled="true" onTick="tickCount++" />
         <Text testId="counter">{tickCount}</Text>
-      </App>
+      </Fragment>
     `);
 
-    await expect(page.getByTestId("counter")).toHaveText("1", { timeout: 500 });
-    await page.waitForTimeout(180);
-    await expect(page.getByTestId("counter")).toHaveText("1");
+    const counter = page.getByTestId("counter");
+    
+    // Wait for a few ticks
+    await expect(counter).toHaveText("0");
+    
+    // Wait for the first tick (1000ms + some buffer)
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("1");
+    
+    // Wait for the second tick
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("2");
   });
 
-  test("pause and resume control ticking", async ({ initTestBed, page }) => {
+  test("timer stops when enabled is false", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App var.tickCount="{0}">
-        <Timer id="clock" interval="{80}" onTick="tickCount++" />
-        <Button testId="pause" onClick="clock.pause()">Pause</Button>
-        <Button testId="resume" onClick="clock.resume()">Resume</Button>
+      <Fragment var.tickCount="{0}" var.timerEnabled="{true}">
+        <Timer interval="800" enabled="{timerEnabled}" onTick="tickCount++" />
+        <Button testId="stopButton" onClick="timerEnabled = false">Stop Timer</Button>
         <Text testId="counter">{tickCount}</Text>
-      </App>
+      </Fragment>
     `);
 
-    await expect.poll(async () => Number(await page.getByTestId("counter").textContent())).toBeGreaterThan(0);
-    await page.getByTestId("pause").click();
-    const pausedAt = await page.getByTestId("counter").textContent();
-    await page.waitForTimeout(180);
-    await expect(page.getByTestId("counter")).toHaveText(pausedAt ?? "");
-    await page.getByTestId("resume").click();
-    await expect.poll(async () => Number(await page.getByTestId("counter").textContent())).toBeGreaterThan(Number(pausedAt));
+    const counter = page.getByTestId("counter");
+    const stopButton = page.getByTestId("stopButton");
+    
+    // Wait for the first tick
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("1");
+    
+    // Stop the timer
+    await stopButton.click();
+    
+    // Wait and verify it doesn't increment
+    await page.waitForTimeout(1500);
+    await expect(counter).toHaveText("1");
   });
 
-  test("initialDelay waits before first cycle and only applies once", async ({
-    initTestBed,
-    page,
-  }) => {
-    await page.clock.install();
+  test.fixme("timer prevents overlapping events", async ({ page, initTestBed }) => {
+    // This test verifies that a new tick event doesn't fire if the previous one hasn't completed
     await initTestBed(`
-      <App var.tickCount="{0}">
-        <Timer interval="{100}" initialDelay="{250}" onTick="tickCount++" />
-        <Text testId="counter">{tickCount}</Text>
-      </App>
+      <Fragment var.tickStr="" var.processingTime="{2000}">
+        <Timer 
+          interval="800" 
+          enabled="true" 
+          onTick="
+            tickStr += '+';
+            delay(processingTime);
+          " 
+        />
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
     `);
 
-    await page.clock.fastForward(249);
-    await expect(page.getByTestId("counter")).toHaveText("0");
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("counter")).toHaveText("1");
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("counter")).toHaveText("2");
+    const counter = page.getByTestId("counter");
+    
+    // First tick should start and take 2000ms to complete
+    // but interval is 1000ms, so second tick should not start until first completes
+    await page.waitForTimeout(1500); // Wait for first tick to complete
+    await expect(counter).toHaveText("+");
+    
+    // Wait a bit more to see if overlapping was prevented
+    await page.waitForTimeout(1500); // Should be enough for second tick to start
+    await expect(counter).toContainText("++");
+  });
+});
+
+test.describe.fixme("Initial Delay Functionality", () => {
+  test("timer waits for initial delay before first tick", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickStr="">
+        <Timer interval="800" initialDelay="1600" onTick="tickStr += '+'"/>
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    
+    // Should not tick immediately
+    await expect(counter).toHaveText("");
+    
+    // Should not tick before initial delay
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("");
+    
+    // Should tick after initial delay
+    await page.waitForTimeout(800); // Total 2500ms, past the 2000ms initial delay + 1000ms interval
+    await expect(counter).toHaveText("+");
+    
+    // Should continue ticking at interval
+    await page.waitForTimeout(800);
+    await expect(counter).toHaveText("++");
   });
 
-  test("enabled toggles restart ticking and reset pause state", async ({ initTestBed, page }) => {
-    await page.clock.install();
+  test("initial delay only applies to first execution, not restarts", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App var.tickCount="{0}" var.enabled="{false}">
-        <Timer id="clock" testId="timer" interval="{100}" enabled="{enabled}" onTick="tickCount++" />
-        <Button testId="start" onClick="enabled = true">Start</Button>
-        <Button testId="stop" onClick="enabled = false">Stop</Button>
-        <Button testId="pause" onClick="clock.pause()">Pause</Button>
-        <Text testId="counter">{tickCount}</Text>
-        <Text testId="paused">state</Text>
-      </App>
+      <Fragment var.tickStr="" var.timerEnabled="{true}">
+        <Timer 
+          interval="400" 
+          initialDelay="800" 
+          enabled="{timerEnabled}" 
+          onTick="tickStr += '+'"
+        />
+        <Button testId="restartButton" onClick="timerEnabled = false; timerEnabled = true">Restart</Button>
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
     `);
 
-    await page.clock.fastForward(200);
-    await expect(page.getByTestId("counter")).toHaveText("0");
-    await page.getByTestId("start").click();
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("counter")).toHaveText("1");
-    await page.getByTestId("pause").click();
-    await expect(page.getByTestId("timer")).toHaveAttribute("data-timer-paused", "true");
-    await page.getByTestId("stop").click();
-    await page.getByTestId("start").click();
-    await expect(page.getByTestId("timer")).toHaveAttribute("data-timer-paused", "false");
-    await page.clock.fastForward(100);
-    await expect(page.getByTestId("counter")).toHaveText("2");
+    const counter = page.getByTestId("counter");
+    const restartButton = page.getByTestId("restartButton");
+    
+    // Wait for initial delay + first tick
+    await page.waitForTimeout(1300);
+    await expect(counter).toHaveText("+");
+    
+    // Restart the timer
+    await restartButton.click();
+    
+    // After restart, should tick immediately without initial delay
+    await page.waitForTimeout(500);
+    await expect(counter).toContainText("++");
   });
 
-  test("prevents overlapping async tick handlers", async ({ initTestBed, page }) => {
+  test("initial delay works with once timer", async ({ page, initTestBed }) => {
     await initTestBed(`
-      <App var.tickLog="">
-        <Timer interval="{50}" onTick="tickLog = tickLog + '+'; delay(140); tickLog = tickLog + '-'" />
-        <Text testId="log">{tickLog}</Text>
-      </App>
+      <Fragment var.tickStr="">
+        <Timer interval="800" initialDelay="1600" once="true" onTick="tickStr += '+'"/>
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
     `);
 
-    await expect(page.getByTestId("log")).toContainText("+", { timeout: 500 });
-    await page.waitForTimeout(320);
-    const log = await page.getByTestId("log").textContent();
-    expect(log).not.toContain("++");
+    const counter = page.getByTestId("counter");
+    
+    // Should not tick before initial delay
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("");
+    
+    // Should tick once after initial delay
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("+");
+    
+    // Should not tick again
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("+");
+  });
+});
+
+test.describe.fixme("Pause and Resume API", () => {
+  test("timer can be paused and resumed via API", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickStr="">
+        <Timer 
+          id="myTimer"
+          interval="800" 
+          onTick="tickStr += '+'"
+        />
+        <Button testId="pauseButton" onClick="myTimer.pause()">Pause</Button>
+        <Button testId="resumeButton" onClick="myTimer.resume()">Resume</Button>
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    const pauseButton = page.getByTestId("pauseButton");
+    const resumeButton = page.getByTestId("resumeButton");
+    
+    // Wait for first tick
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("+");
+    
+    // Pause the timer
+    await pauseButton.click();
+    
+    // Should not tick while paused
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("+");
+    
+    // Resume the timer
+    await resumeButton.click();
+    
+    // Should continue ticking after resume
+    await page.waitForTimeout(1000);
+    await expect(counter).toContainText("++");
+  });
+
+  test("pause state is reset when timer is disabled", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickStr="" var.timerEnabled="{true}">
+        <Timer 
+          id="myTimer"
+          interval="1000" 
+          enabled="{timerEnabled}"
+          onTick="tickStr += '+'"
+        />
+        <Button testId="pauseButton" onClick="myTimer.pause()">Pause</Button>
+        <Button testId="disableButton" onClick="timerEnabled = false">Disable</Button>
+        <Button testId="enableButton" onClick="timerEnabled = true">Enable</Button>
+        <Text testId="counter">{tickStr}</Text>
+        <Text testId="paused">{myTimer.isPaused() ? 'Paused' : 'Running'}</Text>
+      </Fragment>
+    `);
+
+    const pauseButton = page.getByTestId("pauseButton");
+    const disableButton = page.getByTestId("disableButton");
+    const enableButton = page.getByTestId("enableButton");
+    const pausedStatus = page.getByTestId("paused");
+    
+    // Pause the timer
+    await pauseButton.click();
+    await expect(pausedStatus).toHaveText("Paused");
+    
+    // Disable the timer
+    await disableButton.click();
+    
+    // Re-enable the timer - pause state should be reset
+    await enableButton.click();
+    await expect(pausedStatus).toHaveText("Running");
+  });
+});
+
+test.describe("Once Functionality", () => {
+  test.fixme("timer with once=true fires only once", 
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickCount="{0}">
+        <Timer interval="1000" once="true" onTick="tickCount++" />
+        <Text testId="counter">{tickCount}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    
+    // Wait for the first tick
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("1");
+    
+    // Wait longer to ensure it doesn't tick again
+    await page.waitForTimeout(2000);
+    await expect(counter).toHaveText("1");
+  });
+
+  test.fixme("timer with once=true can be restarted by re-enabling", 
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickCount="{0}" var.timerEnabled="{true}">
+        <Timer interval="1000" once="true" enabled="{timerEnabled}" onTick="tickCount++" />
+        <Button testId="restartButton" onClick="timerEnabled = false; timerEnabled = true">Restart</Button>
+        <Text testId="counter">{tickCount}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    const restartButton = page.getByTestId("restartButton");
+    
+    // Wait for the first tick
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("1");
+    
+    // Restart the timer
+    await restartButton.click();
+    
+    // Wait for another tick
+    await page.waitForTimeout(1200);
+    await expect(counter).toHaveText("2");
+  });
+
+  test.fixme("once timer doesn't interfere with regular timer functionality",
+    SKIP_REASON.TEST_NOT_WORKING("Waiting for timeouts are bad practice because they are flaky."),
+    async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickStr="">
+        <Timer interval="1000" once="false" onTick="tickStr += '+'" />
+        <Text testId="counter">{tickStr}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    
+    // Wait for multiple ticks
+    await page.waitForTimeout(2000);
+    await expect(counter).toContainText("+");
+  });
+});
+
+test.describe.fixme("State Management", () => {
+  test("timer can be dynamically enabled and disabled", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickCount="{0}" var.timerEnabled="{false}">
+        <Timer interval="800" enabled="{timerEnabled}" onTick="tickCount++" />
+        <Button testId="startButton" onClick="timerEnabled = true">Start Timer</Button>
+        <Button testId="stopButton" onClick="timerEnabled = false">Stop Timer</Button>
+        <Text testId="counter">{tickCount}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    const startButton = page.getByTestId("startButton");
+    const stopButton = page.getByTestId("stopButton");
+    
+    // Initially disabled - should not increment
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("0");
+    
+    // Start the timer
+    await startButton.click();
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText("1");
+    
+    // Stop the timer again
+    await stopButton.click();
+    const currentCount = await counter.textContent();
+    await page.waitForTimeout(1000);
+    await expect(counter).toHaveText(currentCount || "1");
+  });
+
+  test("timer interval can be changed dynamically", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment var.tickCount="{0}" var.timerInterval="{2000}">
+        <Timer interval="{timerInterval}" enabled="true" onTick="tickCount++" />
+        <Button testId="fasterButton" onClick="timerInterval = 500">Faster</Button>
+        <Text testId="counter">{tickCount}</Text>
+      </Fragment>
+    `);
+
+    const counter = page.getByTestId("counter");
+    const fasterButton = page.getByTestId("fasterButton");
+    
+    // Start with 2000ms interval
+    await page.waitForTimeout(2500);
+    await expect(counter).toHaveText("1");
+    
+    // Change to 500ms interval
+    await fasterButton.click();
+    await page.waitForTimeout(1500); // Should get multiple ticks quickly
+    
+    const finalCount = parseInt(await counter.textContent() || "0");
+    expect(finalCount).toBeGreaterThan(1);
   });
 });

@@ -89,7 +89,7 @@ test("pressing enter on header expands content", async ({ initTestBed, page }) =
 // VISUAL STATE TESTS
 // =============================================================================
 
-test.skip("applies border-side and combination theme variables", async ({
+test("applies border-side and combination theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -334,7 +334,7 @@ test.skip("applies border-side and combination theme variables", async ({
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test.skip("applies border-color theme variables", async ({
+test("applies border-color theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -518,7 +518,7 @@ test.skip("applies border-color theme variables", async ({
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
-test.skip("applies border-style and border-width theme variables", async ({
+test("applies border-style and border-width theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {
@@ -748,7 +748,7 @@ test.skip("applies border-style and border-width theme variables", async ({
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test.skip("applies padding theme variables", async ({
+test("applies padding theme variables", async ({
   initTestBed,
   createAccordionDriver,
 }) => {

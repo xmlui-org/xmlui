@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
+import hotToast from "react-hot-toast";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
@@ -13,15 +13,21 @@ import {
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
 import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
-import { createToastService, ToastHost, type ToastService } from "./services/toast";
+import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
-import { LegacyThemeProvider } from "../components-core/theming/ThemeContext";
+import { LegacyThemeProvider, useThemes } from "../components-core/theming/ThemeContext";
+import { ThemedButton as Button } from "../components/Button/Button";
+import { Dialog } from "../components/ModalDialog/Dialog";
+import { ThemedStack as Stack } from "../components/Stack/Stack";
+import { NotificationToast } from "../components/Theme/NotificationToast";
+import { defaultProps as themeDefaultProps } from "../components/Theme/Theme.defaults";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { responsiveBreakpoints } from "../styling/contracts";
 
 ensureXmluiDebugBridge();
@@ -77,6 +83,8 @@ export type MountXmluiAppOptions = {
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
   resources?: Record<string, string>;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -106,6 +114,8 @@ export function mountXmluiApp(
         extensions={options.extensions}
         appGlobals={options.appGlobals}
         resources={options.resources}
+        themes={options.themes}
+        defaultTheme={options.defaultTheme}
         testProbe={options.testProbe}
       />,
     );
@@ -120,6 +130,8 @@ export function mountXmluiApp(
       extensions={options.extensions}
       appGlobals={options.appGlobals}
       resources={options.resources}
+      themes={options.themes}
+      defaultTheme={options.defaultTheme}
       testProbe={options.testProbe}
     />,
   );
@@ -134,6 +146,8 @@ export function XmluiRoot({
   extensions,
   appGlobals = {},
   resources = {},
+  themes = [],
+  defaultTheme,
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -143,20 +157,29 @@ export function XmluiRoot({
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
   resources?: Record<string, string>;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
-  const initializedRef = useRef(false);
   const referencesRef = useRef<Record<string, unknown>>({});
   const [loggedInUser, setLoggedInUser] = useState<unknown>(undefined);
   const updateLoggedInUser = useCallback((user: unknown) => {
-    setLoggedInUser((current) => areContextValuesEqual(current, user) ? current : user);
+    setLoggedInUser((current: unknown) => areContextValuesEqual(current, user) ? current : user);
   }, []);
-  const [confirmDialog, setConfirmDialog] = useState<{ title: string; message?: string; okLabel?: string } | undefined>();
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | undefined>();
   const toastRef = useRef<ToastService>();
   if (!toastRef.current) {
     toastRef.current = createToastService();
   }
+  useEffect(() => {
+    hotToast.dismiss();
+    hotToast.remove();
+    return () => {
+      hotToast.dismiss();
+      hotToast.remove();
+    };
+  }, []);
   const i18nRef = useRef<RuntimeI18n>();
   if (!i18nRef.current) {
     i18nRef.current = createRuntimeI18n();
@@ -180,15 +203,22 @@ export function XmluiRoot({
     [extensions],
   );
   useEffect(() => routingRef.current?.attach(), []);
-  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown) => {
-    setConfirmDialog({
-      title: String(title ?? "Confirm"),
-      message: message == null ? undefined : String(message),
-      okLabel: okLabel == null ? undefined : String(okLabel),
+  const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown, cancelLabel?: unknown) => {
+    return new Promise<boolean>((resolve) => {
+      setConfirmDialog({
+        title: String(title ?? "Confirm"),
+        message: message == null ? undefined : String(message),
+        okLabel: okLabel == null ? undefined : String(okLabel),
+        cancelLabel: cancelLabel == null ? undefined : String(cancelLabel),
+        resolve,
+      });
     });
-    return true;
   }, []);
-  referencesRef.current.confirm = confirm;
+  const signError = useCallback((error: unknown) => {
+    const message = errorMessage(error);
+    hotToast.error(message);
+    console.error("[xmlui]", message);
+  }, []);
   useEffect(() => {
     testProbe?.({
       hasLocal: (name) => store.hasLocal(rootOwnerId, name),
@@ -198,58 +228,6 @@ export function XmluiRoot({
     });
   }, [store, testProbe]);
 
-  if (!initializedRef.current) {
-    store.createLocalOwner(rootOwnerId);
-    store.setInitialGlobalValue("appGlobals", appGlobals);
-    const initialScope = createRuntimeScope({
-      store,
-      localOwnerId: rootOwnerId,
-      props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
-      references: referencesRef.current,
-      routing: routingRef.current,
-      toast: toastRef.current,
-      i18n: i18nRef.current,
-      extensionFunctions: {
-        ...(module.extensionFunctions ?? {}),
-        ...normalizedExtensions.functions,
-      },
-    });
-    initializeStateValuesIntoStore({
-      kind: "global",
-      expressions: module.root.globals,
-      parsed: module.root.parsed?.globals,
-      scope: initialScope,
-      evaluate: evaluateExpressionOrText,
-    });
-    initializeStateValuesIntoStore({
-      kind: "local",
-      ownerId: rootOwnerId,
-      expressions: module.root.vars,
-      parsed: module.root.parsed?.vars,
-      scope: initialScope,
-      evaluate: evaluateExpressionOrText,
-    });
-    initializedRef.current = true;
-  }
-
-  const scope = useMemo<RuntimeScope>(
-    () => createRuntimeScope({
-      store,
-      localOwnerId: rootOwnerId,
-      props: {},
-      contextValues: { appGlobals, $appGlobals: appGlobals, loggedInUser },
-      references: referencesRef.current,
-      routing: routingRef.current,
-      toast: toastRef.current,
-      i18n: i18nRef.current,
-      extensionFunctions: {
-        ...(module.extensionFunctions ?? {}),
-        ...normalizedExtensions.functions,
-      },
-    }),
-    [appGlobals, loggedInUser, module.extensionFunctions, normalizedExtensions.functions, store],
-  );
   const context = useMemo(
     () => createRenderContext(module.components, {
       ...(module.extensionRenderers ?? {}),
@@ -261,20 +239,154 @@ export function XmluiRoot({
 
   return (
     <StyleProvider>
-      <XmluiAppContextProvider value={{ appGlobals, loggedInUser, setLoggedInUser: updateLoggedInUser, mediaSize }}>
+      <XmluiAppContextProvider value={{
+        appGlobals,
+        loggedInUser,
+        setLoggedInUser: updateLoggedInUser,
+        confirm,
+        signError,
+        mediaSize,
+      }}>
         <IconProvider icons={{}}>
           <XmluiThemeRoot tone={defaultTone}>
-            <LegacyThemeProvider resources={resources}>
-              <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
-              {renderConfirmDialog(confirmDialog, () => setConfirmDialog(undefined))}
+            <LegacyThemeProvider resources={resources} themes={themes} defaultTheme={defaultTheme}>
+              <XmluiRuntimeContent
+                appGlobals={appGlobals}
+                confirm={confirm}
+                context={context}
+                extensionFunctions={{
+                  ...(module.extensionFunctions ?? {}),
+                  ...normalizedExtensions.functions,
+                }}
+                i18n={i18nRef.current}
+                loggedInUser={loggedInUser}
+                module={module}
+                references={referencesRef.current}
+                rootOwnerId={rootOwnerId}
+                routing={routingRef.current}
+                signError={signError}
+                store={store}
+                toast={toastRef.current}
+              />
+              {renderConfirmDialog(confirmDialog, (confirmed) => {
+                confirmDialog?.resolve(confirmed);
+                setConfirmDialog(undefined);
+              })}
               <GlobalLiveRegion />
-              <ToastHost service={toastRef.current} />
+              <NotificationToast
+                toastDuration={themeDefaultProps.toastDuration}
+                notificationPosition={themeDefaultProps.notificationPosition}
+              />
             </LegacyThemeProvider>
           </XmluiThemeRoot>
         </IconProvider>
       </XmluiAppContextProvider>
     </StyleProvider>
   );
+}
+
+function XmluiRuntimeContent({
+  appGlobals,
+  confirm,
+  context,
+  extensionFunctions,
+  i18n,
+  loggedInUser,
+  module,
+  references,
+  rootOwnerId,
+  routing,
+  signError,
+  store,
+  toast,
+}: {
+  appGlobals: Record<string, unknown>;
+  confirm: (title: unknown, message?: unknown, okLabel?: unknown, cancelLabel?: unknown) => Promise<boolean>;
+  context: ReturnType<typeof createRenderContext>;
+  extensionFunctions: Record<string, (...args: unknown[]) => unknown>;
+  i18n: RuntimeI18n | undefined;
+  loggedInUser: unknown;
+  module: Extract<XmluiModule, { kind: "app" }>;
+  references: Record<string, unknown>;
+  rootOwnerId: string;
+  routing: RuntimeRoutingStore | undefined;
+  signError: (error: unknown) => void;
+  store: ReturnType<typeof useRuntimeStateStore>;
+  toast: ToastService | undefined;
+}) {
+  const initializedRef = useRef(false);
+  const themes = useThemes();
+  const appContextValues = useMemo(
+    () => ({
+      activeThemeId: themes.activeThemeId,
+      activeThemeTone: themes.activeThemeTone,
+      appGlobals,
+      $appGlobals: appGlobals,
+      availableThemeIds: themes.availableThemeIds,
+      confirm,
+      loggedInUser,
+      setTheme: themes.setActiveThemeId,
+      setThemeTone: themes.setActiveThemeTone,
+      signError,
+      toggleThemeTone: () => {
+        themes.setActiveThemeTone(themes.activeThemeTone === "dark" ? "light" : "dark");
+      },
+    }),
+    [appGlobals, confirm, loggedInUser, signError, themes],
+  );
+  const scope = useMemo<RuntimeScope>(
+    () => createRuntimeScope({
+      store,
+      localOwnerId: rootOwnerId,
+      props: {},
+      contextValues: appContextValues,
+      references,
+      routing,
+      toast,
+      i18n,
+      extensionFunctions,
+    }),
+    [appContextValues, extensionFunctions, i18n, references, rootOwnerId, routing, store, toast],
+  );
+
+  if (!initializedRef.current) {
+    store.createLocalOwner(rootOwnerId);
+    store.setInitialGlobalValue("appGlobals", appGlobals);
+    initializeStateValuesIntoStore({
+      kind: "global",
+      expressions: module.root.globals,
+      parsed: module.root.parsed?.globals,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    initializeStateValuesIntoStore({
+      kind: "local",
+      ownerId: rootOwnerId,
+      expressions: module.root.vars,
+      parsed: module.root.parsed?.vars,
+      scope,
+      evaluate: evaluateExpressionOrText,
+    });
+    initializedRef.current = true;
+  }
+
+  return <XmluiNodeRenderer context={context} node={module.root} scope={scope} />;
+}
+
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message || "Something went wrong";
+  }
+  if (typeof error === "string") {
+    return error || "Something went wrong";
+  }
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null && String(message)) {
+      return String(message);
+    }
+  }
+  return "Something went wrong";
 }
 
 type RuntimeMediaSize = XmluiAppContextValue["mediaSize"];
@@ -353,57 +465,49 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
+type ConfirmDialogState = {
+  title: string;
+  message?: string;
+  okLabel?: string;
+  cancelLabel?: string;
+  resolve: (value: boolean) => void;
+};
+
 function renderConfirmDialog(
-  confirmDialog: { title: string; message?: string; okLabel?: string } | undefined,
-  close: () => void,
+  confirmDialog: ConfirmDialogState | undefined,
+  close: (confirmed: boolean) => void,
 ) {
   if (!confirmDialog) {
     return null;
   }
-  const dialog = (
-    <div
-      data-xmlui-confirm-layer=""
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 2147483647,
-        background: "rgba(0, 0, 0, 0.2)",
-        pointerEvents: "auto",
-      }}
-      onPointerDown={(event) => {
-        event.stopPropagation();
-        close();
-      }}
-      onMouseDown={(event) => {
-        event.stopPropagation();
-        close();
-      }}
-    >
-      <div
-        role="dialog"
-        aria-label={confirmDialog.title}
-        style={{
-          position: "fixed",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          minWidth: "18rem",
-          padding: "1rem",
-          borderRadius: "4px",
-          background: "var(--xmlui-color-surface-0, #fff)",
-          boxShadow: "var(--xmlui-boxShadow-md, 0 8px 24px rgba(0, 0, 0, 0.18))",
-        }}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <div>{confirmDialog.title}</div>
-        {confirmDialog.message ? <div>{confirmDialog.message}</div> : null}
-        <button type="button" onClick={close}>
-          {confirmDialog.okLabel ?? "OK"}
-        </button>
-      </div>
-    </div>
+  return (
+    <Dialog
+      title={confirmDialog.title}
+      description={confirmDialog.message}
+      isOpen={true}
+      onClose={() => close(false)}
+      buttons={
+        <Stack
+          orientation="horizontal"
+          horizontalAlignment="end"
+          style={{ width: "100%", gap: "1em" }}
+        >
+          <Button variant="ghost" themeColor="secondary" size="sm" onClick={() => close(false)}>
+            {confirmDialog.cancelLabel ?? "Cancel"}
+          </Button>
+          <Button
+            variant="solid"
+            themeColor="attention"
+            size="sm"
+            type="submit"
+            onClick={() => close(true)}
+          >
+            {confirmDialog.okLabel ?? "OK"}
+          </Button>
+        </Stack>
+      }
+    />
   );
-  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }
 
 export type { XmluiDocumentInput, XmluiModule } from "./types";

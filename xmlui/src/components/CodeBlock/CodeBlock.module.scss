@@ -1,47 +1,111 @@
-// CodeBlock.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old component metadata pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$themeVars: t.composePaddingVars($themeVars, "CodeBlock");
+$themeVars: t.composeBorderVars($themeVars, "CodeBlock");
 $backgroundColor-CodeBlock: createThemeVar("backgroundColor-CodeBlock");
 $backgroundColor-CodeBlock-header: createThemeVar("backgroundColor-CodeBlock-header");
-$border-CodeBlock: createThemeVar("border-CodeBlock");
-$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
-$height-CodeBlock: createThemeVar("height-CodeBlock");
+$color-CodeBlock-headerSeparator: createThemeVar("color-CodeBlock-headerSeparator");
 $marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
 $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
-$paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-CodeBlock");
+$backgroundColor-CodeBlock-highlightRow: createThemeVar("backgroundColor-CodeBlock-highlightRow");
+$backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-CodeBlock-highlightString");
+$borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-CodeBlock-highlightString-emphasis");
+$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
+$border-CodeBlock: createThemeVar("border-CodeBlock");
+$boxShadow-CodeBlock: createThemeVar("boxShadow-CodeBlock");
+$height-CodeBlock: createThemeVar("height-CodeBlock");
 $paddingHorizontal-content-CodeBlock: createThemeVar("paddingHorizontal-content-CodeBlock");
-
-:export {
-  themeVars: "";
-}
+$paddingVertical-content-CodeBlock: createThemeVar("paddingVertical-content-CodeBlock");
+$fontSize-CodeBlock: createThemeVar("fontSize-CodeBlock");
 
 @layer components {
-  .xmluiCodeBlock {
-    width: 100%;
-    height: var(--xmlui-height-CodeBlock);
-    margin-top: var(--xmlui-marginTop-CodeBlock);
-    margin-bottom: var(--xmlui-marginBottom-CodeBlock);
-    border: var(--xmlui-border-CodeBlock);
-    border-radius: var(--xmlui-borderRadius-CodeBlock);
-    background-color: var(--xmlui-backgroundColor-CodeBlock);
-    overflow: hidden;
-    color: inherit;
+  .codeBlock {
+    @include t.borderVars($themeVars, "CodeBlock");
+    @include t.paddingVars($themeVars, "CodeBlock");
+    margin-top: $marginTop-CodeBlock;
+    margin-bottom: $marginBottom-CodeBlock;
+    background-color: $backgroundColor-CodeBlock;
+    height: $height-CodeBlock;
+    border-radius: $borderRadius-CodeBlock;
+    //overflow: hidden;
+    border: $border-CodeBlock;
+    box-shadow: $boxShadow-CodeBlock;
+    font-size: $fontSize-CodeBlock;
   }
 
-  .xmluiCodeBlockHeader {
-    padding: 0.5rem 0.75rem;
-    background-color: var(--xmlui-backgroundColor-CodeBlock-header);
-    border-bottom: var(--xmlui-border-CodeBlock);
+  .copyButton {
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
-  .xmluiCodeBlockContent {
+  .codeBlockHeader {
+    padding: t.$space-1;
+    padding-inline-start: t.$space-3;
+    background-color: $backgroundColor-CodeBlock-header;
+    border-bottom: $color-CodeBlock-headerSeparator solid 2px;
+    font-size: t.$fontSize-code;
+    border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
+    border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
+  }
+
+  .codeBlockContent {
+    padding: $paddingVertical-content-CodeBlock $paddingHorizontal-content-CodeBlock;
     position: relative;
-    padding: var(--xmlui-paddingVertical-content-CodeBlock) var(--xmlui-paddingHorizontal-content-CodeBlock);
+    display: flex;
+    //align-items: center;
+    min-height: 8px;
+    height: 100%;
     overflow: auto;
-    min-height: 1em;
+    font-size: t.$fontSize-code;
+
+    .codeBlockCopyButton {
+      position: absolute;
+      top: t.$space-1_5;
+      inset-inline-end: t.$space-1_5;
+      z-index: 1;
+      display: none;
+      background-color: $backgroundColor-CodeBlock;
+    }
+
+    &:hover {
+      .codeBlockCopyButton {
+        display: block;
+      }
+    }
+
+    pre {
+      flex-grow: 1;
+    }
   }
+
+  :global {
+    .codeBlockHighlightRow {
+      background-color: $backgroundColor-CodeBlock-highlightRow;
+    }
+
+    .codeBlockHighlightString {
+      background-color: $backgroundColor-CodeBlock-highlightString;
+      padding: 1px;
+    }
+
+    .codeBlockHighlightStringEmphasis {
+      border: 2px solid $borderColor-CodeBlock-highlightString-emphasis;
+      border-radius: 2px;
+      padding: 1px;
+    }
+  }
+}
+
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

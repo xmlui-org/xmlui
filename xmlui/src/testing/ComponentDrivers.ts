@@ -43,6 +43,13 @@ export class ComponentDriver {
   getByPartName(part: string): Locator {
     return this.component.locator(`[data-part-id="${part}"], [data-xmlui-part="${part}"]`).first();
   }
+
+  async hasHtmlElement(selector: string | string[]): Promise<boolean> {
+    const locator = Array.isArray(selector)
+      ? this.component.locator(selector.join(" "))
+      : this.component.locator(selector);
+    return await locator.count() > 0;
+  }
 }
 
 export class InputComponentDriver extends ComponentDriver {
@@ -396,11 +403,11 @@ export class ExpandableItemDriver extends ComponentDriver {
 
 export class SplitterDriver extends ComponentDriver {
   getResizer(): Locator {
-    return this.component.locator('[data-xmlui-part="resizer"], .resizer').first();
+    return this.component.locator('[data-xmlui-part="resizer"], [class*="resizer"]').first();
   }
 
   getFloatingResizer(): Locator {
-    return this.component.locator(".floatingResizer").first();
+    return this.component.locator('[class*="floatingResizer"]').first();
   }
 
   async hoverNearResizer() {
@@ -972,6 +979,26 @@ export class SliderDriver extends ComponentDriver {
     key?: "ArrowLeft" | "ArrowRight" | "Home" | "End";
     repeat?: number;
   }) {
+    const sliderContainer = this.params.page.locator("[data-slider-container]").filter({ visible: true }).first();
+    if (await sliderContainer.count()) {
+      await sliderContainer.waitFor({ state: "attached" });
+      await this.params.page.waitForTimeout(50);
+      await sliderContainer.evaluate((element, eventDetail) => {
+        const driverSet = (element as HTMLElement & {
+          __xmluiSliderDriverSet?: (detail: typeof eventDetail) => void;
+        }).__xmluiSliderDriverSet;
+        if (typeof driverSet === "function") {
+          driverSet(eventDetail);
+          return;
+        }
+        element.dispatchEvent(new CustomEvent("xmlui-slider-driver-set", {
+          bubbles: true,
+          detail: eventDetail,
+        }));
+      }, detail);
+      await this.params.page.waitForTimeout(250);
+      return;
+    }
     const componentId = await this.component.evaluate((element) =>
       element.getAttribute("data-xmlui-id") ?? element.getAttribute("id") ?? "",
     );
@@ -1024,7 +1051,6 @@ export class SliderDriver extends ComponentDriver {
       await this.params.page.waitForTimeout(250);
       return;
     }
-    const sliderContainer = this.params.page.locator("[data-slider-container]").filter({ visible: true }).first();
     await sliderContainer.waitFor({ state: "attached" });
     await this.params.page.waitForTimeout(50);
     await sliderContainer.evaluate((element, eventDetail) => {

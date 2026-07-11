@@ -89,6 +89,7 @@ export const CheckboxMd = createMetadata({
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`borderColor-${COMP}--hover`]: `$borderColor-Input-default--hover`,
     [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
     [`outlineColor-${COMP}`]: `$outlineColor--focus`,
     [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,
@@ -154,7 +155,7 @@ export const checkboxRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
     return (
       <CheckboxNative
         {...adapter.rootAttrs("input")}
-        ref={(api: CheckboxApi | null) => {
+        registerComponentApi={(api: CheckboxApi) => {
           if (api) {
             adapter.registerApi(api as unknown as Record<string, unknown>);
           }

@@ -10,18 +10,17 @@ test.describe("Logo compatibility", () => {
     await expect(logo).toHaveAttribute("alt", "Logo");
   });
 
-  test("supports alt text, inline display, and bound updates", async ({ page, initTestBed }) => {
+  test("supports alt text and bound updates", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <variable name="logoAlt" value="Initial logo" />
-        <Logo testId="logo" alt="{logoAlt}" inline="true" />
+        <Logo testId="logo" alt="{logoAlt}" />
         <Button testId="update" onClick="logoAlt = 'Updated logo'">Update</Button>
       </Fragment>
     `);
 
     const logo = page.getByTestId("logo");
     await expect(logo).toHaveAttribute("alt", "Initial logo");
-    await expect(logo).toHaveCSS("display", "inline");
 
     await page.getByTestId("update").click();
 

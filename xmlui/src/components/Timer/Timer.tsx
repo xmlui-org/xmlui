@@ -1,44 +1,95 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { Timer } from "./TimerReact";
+import { defaultProps } from "./Timer.defaults";
+import { createMetadata } from "../metadata-helpers";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+
+const COMP = "Timer";
 
 export const TimerMd = createMetadata({
   status: "stable",
-  nonVisual: true,
   description:
-    "`Timer` is a non-visual component that fires `tick` events at a configured cadence.",
+    "`Timer` is a non-visual component that fires events at regular intervals. " +
+    "It can be enabled or disabled and ensures that the timer event handler " +
+    "completes before firing the next event.",
   props: {
-    id: { description: "The identifier used to expose the Timer API.", valueType: "string" },
-    testId: { description: "Test identifier for the hidden timer element.", valueType: "string" },
     enabled: {
-      description: "Whether the timer is enabled.",
+      description: "Whether the timer is enabled and should fire events.",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.enabled,
     },
     interval: {
-      description: "The interval in milliseconds between tick events.",
+      description: "The interval in milliseconds between timer events.",
       valueType: "number",
-      defaultValue: 1000,
+      defaultValue: defaultProps.interval,
     },
     initialDelay: {
-      description: "Delay in milliseconds before the first tick cycle starts.",
+      description: "The delay in milliseconds before the first timer event.",
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.initialDelay,
     },
     once: {
-      description: "Whether the timer stops after the first tick.",
+      description: "Whether the timer should stop after firing its first tick event.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.once,
     },
   },
   events: {
     tick: {
-      description: "This event fires for each timer tick.",
-      signature: "tick(): void | Promise<void>",
+      description: `This event is triggered at each interval when the ${COMP} is enabled.`,
+      signature: "tick(): void",
+      parameters: {},
     },
   },
   apis: {
-    pause: { description: "Pauses the timer.", signature: "pause(): void" },
-    resume: { description: "Resumes a paused timer.", signature: "resume(): void" },
-    isPaused: { description: "Returns whether the timer is paused.", signature: "isPaused(): boolean" },
-    isRunning: { description: "Returns whether the timer is running.", signature: "isRunning(): boolean" },
+    pause: {
+      description: "Pauses the timer. The timer can be resumed later from where it left off.",
+      signature: "pause()",
+    },
+    resume: {
+      description: "Resumes a paused timer. If the timer is not paused, this method has no effect.",
+      signature: "resume()",
+    },
+    isPaused: {
+      description: "Returns whether the timer is currently paused.",
+      signature: "isPaused(): boolean",
+    },
+    isRunning: {
+      description: "Returns whether the timer is currently running (enabled and not paused).",
+      signature: "isRunning(): boolean",
+    },
   },
+});
+
+export const timerComponentRenderer = wrapComponent(COMP, Timer, TimerMd, {
+  exposeRegisterApi: true,
+  // interval and initialDelay are valueType: "number" — asOptionalNumber throws for
+  // non-numeric strings. Use customRender to preserve exact original extraction.
+  customRender: (_props, { node, extractValue, lookupEventHandler, registerComponentApi }) => (
+    <Timer
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      interval={extractValue.asOptionalNumber(node.props.interval)}
+      initialDelay={extractValue.asOptionalNumber(node.props.initialDelay)}
+      once={extractValue.asOptionalBoolean(node.props.once)}
+      onTick={lookupEventHandler("tick")}
+      registerComponentApi={registerComponentApi}
+    />
+  ),
+});
+
+export const timerRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: TimerMd as ComponentMetadata,
+  renderer: ({ adapter }) => (
+    <Timer
+      {...adapter.rootAttrs()}
+      enabled={adapter.booleanProp("enabled", defaultProps.enabled)}
+      interval={adapter.numberProp("interval", defaultProps.interval)}
+      initialDelay={adapter.numberProp("initialDelay", defaultProps.initialDelay)}
+      once={adapter.booleanProp("once", defaultProps.once)}
+      onTick={() => void adapter.event("tick")()}
+      registerComponentApi={adapter.registerApi}
+    />
+  ),
 });

@@ -6,11 +6,15 @@ import classnames from "classnames";
 import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
 
-export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
+type SelectOptionProps = Option & {
+  closeDropdown?: () => void;
+};
+
+export const SelectOption = forwardRef<React.ElementRef<typeof Item>, SelectOptionProps>(
   function SelectOption(option, ref) {
     const visibleContentRef = useRef<HTMLDivElement>(null);
-    const { value, label, enabled = true, children, className } = option;
-    const { value: selectedValue, optionRenderer } = useSelect();
+    const { value, label, enabled = true, children, className, closeDropdown } = option;
+    const { value: selectedValue, optionRenderer, multiSelect, setOpen } = useSelect();
 
     return (
       <Item
@@ -23,6 +27,12 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         disabled={!enabled}
         onClick={(event) => {
           event.stopPropagation();
+          if (!multiSelect) {
+            setTimeout(() => {
+              closeDropdown?.();
+              setOpen(false);
+            }, 0);
+          }
         }}
         data-state={selectedValue === value && "checked"}
       >

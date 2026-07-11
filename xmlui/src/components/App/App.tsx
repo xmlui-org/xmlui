@@ -412,10 +412,10 @@ function AppNode({
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
       maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
       applyDefaultContentPadding={applyDefaultContentPadding}
-      header={renderChild(AppHeader)}
-      footer={renderChild(Footer)}
+      header={renderChild(AppHeader, {})}
+      footer={renderChild(Footer, {})}
       footerSticky={footerSticky}
-      navPanel={renderChild(NavPanel)}
+      navPanel={renderChild(NavPanel, {})}
       navPanelDef={NavPanel}
       logoContentDef={logoContentDef}
       renderChild={renderChild}
@@ -542,9 +542,9 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
         scheduler={adapter.stringProp("scheduler") as any}
         maxQueuedPerTrace={adapter.numberProp("maxQueuedPerTrace", 64)}
         applyDefaultContentPadding={!pages && adapter.prop("padding") === undefined}
-        header={renderChild(appHeader)}
-        footer={renderChild(footer)}
-        navPanel={renderChild(navPanel)}
+        header={renderChild(appHeader, {})}
+        footer={renderChild(footer, {})}
+        navPanel={renderChild(navPanel, {})}
         navPanelDef={navPanel as any}
         logoContentDef={logoContentDef as any}
         renderChild={renderChild as any}
@@ -574,6 +574,9 @@ function HorizontalAppBandStyle() {
           width: 100%;
           max-width: var(--xmlui-maxWidth-content, 1280px);
           margin-inline: auto;
+        }
+        [data-xmlui-component="App"][class*="_vertical_"] > [class*="_navPanelWrapper_"] {
+          min-height: 100%;
         }
       `}
     </style>

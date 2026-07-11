@@ -55,8 +55,10 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "../../components/Splitter/
 import { StickyBoxMd } from "../../components/StickyBox/StickyBox";
 import { StickySectionMd } from "../../components/StickySection/StickySection";
 import { SpinnerMd } from "../../components/Spinner/Spinner";
-import { StepMd, StepperMd } from "../../components/Stepper/Stepper";
-import { TabItemMd, TabsMd } from "../../components/Tabs/Tabs";
+import { StepMd } from "../../components/Stepper/Step";
+import { StepperMd } from "../../components/Stepper/Stepper";
+import { TabsMd } from "../../components/Tabs/Tabs";
+import { TabItemMd } from "../../components/Tabs/TabItem";
 import { DataSourceMd } from "../../components/DataSource/DataSource";
 import { APICallMd } from "../../components/APICall/APICall";
 import { AppStateMd } from "../../components/AppState/AppState";
@@ -900,6 +902,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     props: withLayoutProps({
       id: { name: "id" },
       value: { name: "value" },
+      label: { name: "label" },
       variant: { name: "variant" },
       size: { name: "size" },
       weight: { name: "weight" },
@@ -909,6 +912,10 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       overflowMode: { name: "overflowMode" },
       breakMode: { name: "breakMode" },
       lang: { name: "lang" },
+      withLiveRegion: { name: "withLiveRegion" },
+      liveRegion: { name: "liveRegion" },
+      liveRegionMessage: { name: "liveRegionMessage" },
+      liveRegionPoliteness: { name: "liveRegionPoliteness" },
       testId: { name: "testId" },
     }),
     events: {
@@ -1169,6 +1176,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       pageSizeSelectorPosition: { name: "pageSizeSelectorPosition" },
       pageInfoPosition: { name: "pageInfoPosition" },
       buttonRowPosition: { name: "buttonRowPosition" },
+      variant: { name: "variant" },
     }),
     events: {
       pageDidChange: { name: "pageDidChange", attributeName: "onPageDidChange" },
@@ -1268,6 +1276,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       alwaysShowPagination: { name: "alwaysShowPagination" },
       paginationControlsLocation: { name: "paginationControlsLocation" },
       rowHeight: { name: "rowHeight" },
+      headerHeight: { name: "headerHeight" },
       loading: { name: "loading" },
       rowsSelectable: { name: "rowsSelectable" },
       autoFocus: { name: "autoFocus" },
@@ -1303,6 +1312,8 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       rowClick: { name: "rowClick", attributeName: "onRowClick" },
       rowDoubleClick: { name: "rowDoubleClick", attributeName: "onRowDoubleClick" },
       selectionDidChange: { name: "selectionDidChange", attributeName: "onSelectionDidChange" },
+      sortingDidChange: { name: "sortingDidChange", attributeName: "onSortingDidChange" },
+      willSort: { name: "willSort", attributeName: "onWillSort" },
       selectAllAction: { name: "selectAllAction", attributeName: "onSelectAllAction" },
       cutAction: { name: "cutAction", attributeName: "onCutAction" },
       copyAction: { name: "copyAction", attributeName: "onCopyAction" },
@@ -1389,6 +1400,9 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       iconExpanded: { name: "iconExpanded" },
       iconSize: { name: "iconSize" },
       itemHeight: { name: "itemHeight" },
+      fixedItemSize: { name: "fixedItemSize" },
+      animateExpand: { name: "animateExpand" },
+      expandRotation: { name: "expandRotation" },
       scrollStyle: { name: "scrollStyle" },
       showScrollerFade: { name: "showScrollerFade" },
       overflow: { name: "overflow" },
@@ -1805,6 +1819,7 @@ function withLayoutProps(
       supportedResponsiveLayoutPropNames.map((name) => [name, { name }]),
     ),
     when: { name: "when" },
+    if: { name: "if" },
     "when-xs": { name: "when-xs" },
     "when-sm": { name: "when-sm" },
     "when-md": { name: "when-md" },

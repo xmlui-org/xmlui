@@ -1,15 +1,23 @@
-import React, { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
-
-import { defaultProps, type ScrollStyle } from "./ScrollViewer.defaults";
+import React, { forwardRef, memo, useState, useEffect } from "react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import type { OverlayScrollbars } from "overlayscrollbars";
+import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useIsTouchDevice } from "../../components-core/utils/hooks";
+
+export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
+
+export const defaultProps = {
+  scrollStyle: "normal" as ScrollStyle,
+  showScrollerFade: false,
+};
 
 type Props = {
   containerClassName?: string;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
-
-export { type ScrollStyle } from "./ScrollViewer.defaults";
 
 export const Scroller = memo(forwardRef<HTMLDivElement, Props>(function Scroller(
   {
@@ -21,150 +29,237 @@ export const Scroller = memo(forwardRef<HTMLDivElement, Props>(function Scroller
     showScrollerFade = defaultProps.showScrollerFade,
     ...rest
   },
-  forwardedRef,
+  ref
 ) {
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const viewportCompatRef = useRef<HTMLDivElement | null>(null);
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
-  const normalizedScrollStyle = normalizeScrollStyle(scrollStyle);
-  const usesOverlayScroller = normalizedScrollStyle !== "normal";
+  const osInstanceRef = React.useRef<OverlayScrollbars | null>(null);
+  const [osReady, setOsReady] = useState(false);
+  const { getThemeVar } = useTheme();
 
-  const setScrollerNode = useCallback((node: HTMLDivElement | null) => {
-    scrollerRef.current = node;
-    if (typeof forwardedRef === "function") {
-      forwardedRef(node);
-    } else if (forwardedRef) {
-      forwardedRef.current = node;
-    }
-  }, [forwardedRef]);
+  // Get auto-hide delay values from theme
+  const autoHideDelayMouseOver = parseInt(getThemeVar("autoHideDelay-whenMouseOver-Scroller") || "200", 10);
+  const autoHideDelayScrolling = parseInt(getThemeVar("autoHideDelay-whenScrolling-Scroller") || "400", 10);
 
-  const updateFadeIndicators = useCallback(() => {
-    const node = scrollerRef.current;
-    if (!showScrollerFade || !usesOverlayScroller || !node) {
-      setShowTopFade(false);
-      setShowBottomFade(false);
-      return;
-    }
-    setShowTopFade(node.scrollTop > 0);
-    setShowBottomFade(node.scrollTop + node.clientHeight < node.scrollHeight - 1);
-  }, [showScrollerFade, usesOverlayScroller]);
+  // On touch/mobile devices, always use native scrollbars for better UX
+  const isTouchDevice = useIsTouchDevice();
 
+  // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
+  const normalizedScrollStyle = (isTouchDevice
+    ? "normal"
+    : ["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
+      ? scrollStyle
+      : "normal") as ScrollStyle;
+
+  // Update fade indicators based on scroll position
+  const updateFadeIndicators = React.useCallback(() => {
+    if (!showScrollerFade || !osInstanceRef.current) return;
+
+    const { viewport } = osInstanceRef.current.elements();
+    if (!viewport) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = viewport;
+    
+    // Show top fade if scrolled down
+    setShowTopFade(scrollTop > 0);
+    
+    // Show bottom fade if not at the bottom
+    setShowBottomFade(scrollTop + clientHeight < scrollHeight - 1);
+  }, [showScrollerFade]);
+
+  // Set up scroll listener when using styled scrollbars
   useEffect(() => {
-    const node = scrollerRef.current;
-    if (!node || !usesOverlayScroller) return;
+    if (!showScrollerFade || !osReady || !osInstanceRef.current) return;
 
-    const timer = window.setTimeout(updateFadeIndicators, 50);
-    node.addEventListener("scroll", updateFadeIndicators);
+    const instance = osInstanceRef.current;
+    const { viewport } = instance.elements();
+    
+    if (!viewport) return;
+
+    // Initial check with a small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      updateFadeIndicators();
+    }, 50);
+
+    // Listen for scroll events
+    viewport.addEventListener('scroll', updateFadeIndicators);
+    
+    // Also update on resize
     const resizeObserver = new ResizeObserver(updateFadeIndicators);
-    resizeObserver.observe(node);
+    resizeObserver.observe(viewport);
 
     return () => {
-      window.clearTimeout(timer);
-      node.removeEventListener("scroll", updateFadeIndicators);
+      clearTimeout(timer);
+      viewport.removeEventListener('scroll', updateFadeIndicators);
       resizeObserver.disconnect();
     };
-  }, [updateFadeIndicators, usesOverlayScroller]);
+  }, [showScrollerFade, osReady, updateFadeIndicators]);
 
+  // Set up transition detection for all overlay scrollbar modes
   useEffect(() => {
-    const compatNode = viewportCompatRef.current;
-    const scrollerNode = scrollerRef.current;
-    if (!compatNode || !scrollerNode) return;
+    if (normalizedScrollStyle === "normal" || !osReady || !osInstanceRef.current) return;
 
-    compatNode.scrollTo = ((arg1?: ScrollToOptions | number, arg2?: number) => {
-      if (typeof arg1 === "number") {
-        scrollerNode.scrollTo(arg1, arg2 ?? 0);
-      } else {
-        scrollerNode.scrollTo(arg1);
+    const instance = osInstanceRef.current;
+    const { viewport } = instance.elements();
+    
+    if (!viewport) return;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // Listen for transitionend events to update scrollbars after transitions complete
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      // Only respond to grid-template-rows and opacity transitions (NavGroup expand/collapse)
+      // Ignore color, background-color transitions to prevent excessive updates
+      if (e.propertyName !== 'grid-template-rows' && e.propertyName !== 'opacity') {
+        return;
       }
-    }) as HTMLDivElement["scrollTo"];
-  }, [usesOverlayScroller]);
+      
+      // Debounce updates to avoid interfering with scrollbar auto-hide behavior
+      if (debounceTimer) clearTimeout(debounceTimer);
+      
+      debounceTimer = setTimeout(() => {
+        instance.update(true);
+        
+        if (showScrollerFade) {
+          updateFadeIndicators();
+        }
+      }, 50);
+    };
 
-  if (!usesOverlayScroller) {
+    viewport.addEventListener('transitionend', handleTransitionEnd);
+
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      viewport.removeEventListener('transitionend', handleTransitionEnd);
+    };
+  }, [normalizedScrollStyle, osReady, showScrollerFade, updateFadeIndicators]);
+
+  // Normal mode: use standard div with default browser scrollbar
+  if (normalizedScrollStyle === "normal") {
     return (
-      <div
-        {...rest}
-        ref={setScrollerNode}
-        className={joinClasses(containerClassName, className)}
-        style={style}
-      >
+      <div ref={ref} className={`${containerClassName ? `${containerClassName} ` : ""}${className || ""}`} style={style} {...rest}>
         {children}
       </div>
     );
   }
 
+  // Overlay mode: overlay scrollbar using theme variables (always visible)
+  if (normalizedScrollStyle === "overlay") {
+    return (
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
+        <OverlayScrollbarsComponent
+          ref={(instance) => {
+            if (instance) {
+              osInstanceRef.current = instance.osInstance();
+              setOsReady(true);
+            }
+          }}
+          className={`${styles.wrapper} ${className || ""}`}
+          style={style}
+          options={{
+            scrollbars: {
+              autoHide: "never",
+            },
+          }}
+          {...rest}
+        >
+          {children}
+        </OverlayScrollbarsComponent>
+        {showScrollerFade && (
+          <>
+            <div
+              className={`${styles.fadeOverlay} ${styles.fadeTop} ${
+                showTopFade ? styles.fadeVisible : ""
+              }`}
+            />
+            <div
+              className={`${styles.fadeOverlay} ${styles.fadeBottom} ${
+                showBottomFade ? styles.fadeVisible : ""
+              }`}
+            />
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // WhenMouseOver mode: scrollbar appears on hover
+  if (normalizedScrollStyle === "whenMouseOver") {
+    return (
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
+        <OverlayScrollbarsComponent
+          ref={(instance) => {
+            if (instance) {
+              osInstanceRef.current = instance.osInstance();
+              setOsReady(true);
+            }
+          }}
+          className={`${styles.wrapper} ${className || ""}`}
+          style={style}
+          options={{
+            scrollbars: {
+              autoHide: "leave",
+              autoHideDelay: autoHideDelayMouseOver,
+            },
+          }}
+          {...rest}
+        >
+          {children}
+        </OverlayScrollbarsComponent>
+        {showScrollerFade && (
+          <>
+            <div
+              className={`${styles.fadeOverlay} ${styles.fadeTop} ${
+                showTopFade ? styles.fadeVisible : ""
+              }`}
+            />
+            <div
+              className={`${styles.fadeOverlay} ${styles.fadeBottom} ${
+                showBottomFade ? styles.fadeVisible : ""
+              }`}
+            />
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // WhenScrolling mode: scrollbar appears during scroll and fades after 400ms
   return (
-    <div
-      {...rest}
-      ref={setScrollerNode}
-      className={joinClasses(
-        styles.fadeContainer,
-        styles.wrapper,
-        scrollStyleClass(normalizedScrollStyle),
-        containerClassName,
-        className,
-      )}
-      style={style}
-      onScroll={(event) => {
-        rest.onScroll?.(event);
-        updateFadeIndicators();
-      }}
-    >
-      {children}
-      <div
-        aria-hidden="true"
-        data-overlayscrollbars-viewport
-        ref={viewportCompatRef}
-        className={styles.viewportCompat}
-      />
-      {showScrollerFade ? (
+    <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
+      <OverlayScrollbarsComponent
+        ref={(instance) => {
+          if (instance) {
+            osInstanceRef.current = instance.osInstance();
+            setOsReady(true);
+          }
+        }}
+        className={`${styles.wrapper} ${className || ""}`}
+        style={style}
+        options={{
+          scrollbars: {
+            autoHide: "scroll",
+            autoHideDelay: autoHideDelayScrolling,
+          },
+        }}
+        {...rest}
+      >
+        {children}
+      </OverlayScrollbarsComponent>
+      {showScrollerFade && (
         <>
           <div
-            className={joinClasses(
-              styles.fadeOverlay,
-              styles.fadeTop,
-              showTopFade ? styles.fadeVisible : undefined,
-            )}
+            className={`${styles.fadeOverlay} ${styles.fadeTop} ${
+              showTopFade ? styles.fadeVisible : ""
+            }`}
           />
           <div
-            className={joinClasses(
-              styles.fadeOverlay,
-              styles.fadeBottom,
-              showBottomFade ? styles.fadeVisible : undefined,
-            )}
+            className={`${styles.fadeOverlay} ${styles.fadeBottom} ${
+              showBottomFade ? styles.fadeVisible : ""
+            }`}
           />
         </>
-      ) : null}
+      )}
     </div>
   );
 }));
-
-function normalizeScrollStyle(scrollStyle: ScrollStyle | undefined): ScrollStyle {
-  if (
-    scrollStyle === "overlay" ||
-    scrollStyle === "whenMouseOver" ||
-    scrollStyle === "whenScrolling" ||
-    scrollStyle === "normal"
-  ) {
-    return scrollStyle;
-  }
-  return "normal";
-}
-
-function scrollStyleClass(scrollStyle: ScrollStyle): string | undefined {
-  if (scrollStyle === "overlay") {
-    return styles.overlay;
-  }
-  if (scrollStyle === "whenMouseOver") {
-    return styles.whenMouseOver;
-  }
-  if (scrollStyle === "whenScrolling") {
-    return styles.whenScrolling;
-  }
-  return undefined;
-}
-
-function joinClasses(...classes: Array<string | undefined | false>): string | undefined {
-  const result = classes.filter(Boolean).join(" ");
-  return result || undefined;
-}

@@ -1,5 +1,5 @@
 import type { CSSProperties, FocusEvent, ReactNode } from "react";
-import { forwardRef, memo, useEffect, useId, useImperativeHandle } from "react";
+import { forwardRef, memo, useCallback, useEffect, useId, useImperativeHandle } from "react";
 
 import { defaultProps } from "./Checkbox.defaults";
 import type { CheckboxValidationStatus } from "./checkbox-abstractions";
@@ -42,6 +42,7 @@ export type CheckboxProps = {
   onFocus?: () => void | Promise<void>;
   onBlur?: () => void | Promise<void>;
   "data-testid"?: string;
+  "aria-label"?: string;
 };
 
 export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(function CheckboxNative(
@@ -74,6 +75,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     onFocus,
     onBlur,
     "data-testid": dataTestId,
+    "aria-label": ariaLabel,
     ...rest
   },
   ref,
@@ -104,9 +106,15 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     },
   });
 
-  useImperativeHandle(ref, () => api, [api]);
+  useImperativeHandle(ref, () => inputRef.current as unknown as CheckboxApi, [inputRef]);
 
-  void registerComponentApi;
+  useEffect(() => {
+    registerComponentApi?.(api);
+  }, [api, registerComponentApi]);
+
+  const setInputRef = useCallback((element: HTMLInputElement | null) => {
+    inputRef.current = element;
+  }, [inputRef]);
 
   useEffect(() => {
     if (
@@ -147,7 +155,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
     <input
       {...rest}
       id={inputId}
-      ref={inputRef}
+      ref={setInputRef}
       data-part-id="input"
       data-xmlui-part="input"
       data-testid={!hasLabel && !inputRenderer && !needsVariantWrapper ? effectiveTestId : undefined}
@@ -158,7 +166,9 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
         validationStatus === "valid" ? styles.checkboxSuccess : undefined,
         !hasLabel && !inputRenderer && !needsVariantWrapper ? className : undefined,
       )}
-      style={!hasLabel && !inputRenderer && !needsVariantWrapper ? style : undefined}
+      style={!hasLabel && !inputRenderer && !needsVariantWrapper
+        ? { fontSize: "inherit", ...style }
+        : { fontSize: "inherit" }}
       type="checkbox"
       role="checkbox"
       checked={checked}
@@ -170,7 +180,7 @@ export const CheckboxNative = memo(forwardRef<CheckboxApi, CheckboxProps>(functi
       aria-required={required}
       aria-disabled={!enabled}
       aria-readonly={readOnly}
-      aria-label={hasLabel ? labelText : undefined}
+      aria-label={hasLabel ? labelText : ariaLabel}
       onClick={(event) => void onClick?.(event)}
       onChange={(event) => {
         if (readOnly) {

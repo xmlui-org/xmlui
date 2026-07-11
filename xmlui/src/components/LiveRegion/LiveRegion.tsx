@@ -1,13 +1,17 @@
-import { createMetadata } from "../../component-core/metadata/helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { ComponentMetadata } from "../../component-core/metadata/types";
+import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { createMetadata } from "../metadata-helpers";
+import { defaultProps } from "./LiveRegion.defaults";
+import { LiveRegion } from "./LiveRegionReact";
 
-export const defaultProps = {
-  politeness: "polite" as const,
-};
+const COMP = "LiveRegion";
 
 export const LiveRegionMd = createMetadata({
   status: "stable",
   description:
-    "`LiveRegion` announces dynamic status messages to assistive technologies without changing the visible layout.",
+    "`LiveRegion` announces dynamic status messages to assistive technologies " +
+    "without changing the visible layout.",
   props: {
     message: {
       description: "The message announced by the live region.",
@@ -20,13 +24,30 @@ export const LiveRegionMd = createMetadata({
       isStrictEnum: true,
       defaultValue: defaultProps.politeness,
     },
-    testId: {
-      description: "Adds a test identifier to the live region element.",
-      valueType: "string",
-    },
   },
   a11y: {
     role: "decorative",
     requiresAccessibleName: false,
+  },
+});
+
+export const liveRegionComponentRenderer = wrapComponent(COMP, LiveRegion, LiveRegionMd, {
+  strings: ["message", "politeness"],
+});
+
+export const liveRegionRenderer = wrapRuntimeComponent({
+  name: COMP,
+  metadata: LiveRegionMd as ComponentMetadata,
+  renderer: ({ adapter }) => {
+    const politeness = adapter.stringProp("politeness", defaultProps.politeness) === "assertive"
+      ? "assertive"
+      : "polite";
+    return (
+      <LiveRegion
+        {...adapter.rootAttrs()}
+        message={adapter.stringProp("message", "") ?? ""}
+        politeness={politeness}
+      />
+    );
   },
 });

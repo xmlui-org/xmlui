@@ -39,10 +39,18 @@ type WrapComponentOptions = {
       extractResourceUrl: (url?: string) => string | undefined;
       state?: Record<string, any>;
       updateState: (state: Record<string, any>, options?: { initial?: boolean }) => void;
-      lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
+      uid: symbol;
+      lookupEventHandler: (
+        name: string,
+        options?: Record<string, unknown>,
+      ) => ((...args: any[]) => any) | undefined;
       lookupAction: (expression: string, options?: Record<string, unknown>) => ((...args: unknown[]) => unknown) | undefined;
       lookupSyncCallback: (expression: unknown) => ((...args: unknown[]) => unknown) | undefined;
       registerComponentApi: (api: Record<string, unknown>) => void;
+      appContext?: {
+        appGlobals?: Record<string, any>;
+        xmluiConfig?: Record<string, any>;
+      };
       renderChild: (
         child: unknown,
         wrapper?: {
@@ -121,6 +129,7 @@ export function wrapComponent(
           state,
           updateState: (nextState) => setState((prevState) => ({ ...prevState, ...nextState })),
           lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+          uid: Symbol(String(runtimeProps.props.id ?? name)),
           lookupAction: () => undefined,
           lookupSyncCallback: (expression) => typeof expression === "function" ? expression as (...args: unknown[]) => unknown : undefined,
           registerComponentApi: (api) => {
@@ -130,7 +139,21 @@ export function wrapComponent(
               runtimeProps.scope.store.invalidateReference(id);
             }
           },
-          renderChild: () => runtimeProps.children,
+          renderChild: (child, layoutContext) => {
+            if (child === undefined || child === null) {
+              return runtimeProps.children;
+            }
+            if (Array.isArray(child)) {
+              return runtimeProps.context.renderChildren(child, runtimeProps.scope, undefined, layoutContext as any);
+            }
+            if (typeof child === "object" && "kind" in child) {
+              const node = child as any;
+              return node.kind === "element"
+                ? runtimeProps.context.renderElement(node, runtimeProps.scope, layoutContext as any)
+                : runtimeProps.context.renderChildren([node], runtimeProps.scope, undefined, layoutContext as any);
+            }
+            return child as ReactNode;
+          },
           layoutContext: undefined,
         });
       }

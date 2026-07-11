@@ -49,6 +49,9 @@ export class ScriptScanner {
     if (ch === "/" && this.input.peek(1) === "*") {
       return this.scanBlockComment();
     }
+    if (ch === "`") {
+      return this.scanTemplateLiteral();
+    }
     if (ch === `"` || ch === "'") {
       return this.scanString();
     }
@@ -261,6 +264,54 @@ export class ScriptScanner {
     );
   }
 
+  private scanTemplateLiteral(): ScriptToken {
+    const start = this.input.position;
+    this.input.advance();
+    const valueStart = this.input.position;
+    let expressionDepth = 0;
+
+    while (!this.input.eof) {
+      const ch = this.input.peek();
+      if (ch === "\\") {
+        this.input.advance(2);
+        continue;
+      }
+      if (ch === "$" && this.input.peek(1) === "{") {
+        expressionDepth++;
+        this.input.advance(2);
+        continue;
+      }
+      if (ch === "}" && expressionDepth > 0) {
+        expressionDepth--;
+        this.input.advance();
+        continue;
+      }
+      if (ch === "`" && expressionDepth === 0) {
+        break;
+      }
+      this.input.advance();
+    }
+
+    if (this.input.eof) {
+      this.report("XS004", "Unterminated template literal.", start, this.input.position);
+      return this.createToken(
+        ScriptTokenKind.TemplateLiteral,
+        start,
+        this.input.position,
+        this.input.slice(valueStart, this.input.position),
+      );
+    }
+
+    const valueEnd = this.input.position;
+    this.input.advance();
+    return this.createToken(
+      ScriptTokenKind.TemplateLiteral,
+      start,
+      this.input.position,
+      this.input.slice(valueStart, valueEnd),
+    );
+  }
+
   private scanWhitespace(): ScriptToken {
     const start = this.input.position;
     while (this.input.peek() === " " || this.input.peek() === "\t") {
@@ -368,10 +419,12 @@ function classifyScriptToken(kind: ScriptTokenKind): TokenClassification {
     case ScriptTokenKind.WhileKeyword:
     case ScriptTokenKind.ForKeyword:
     case ScriptTokenKind.ReturnKeyword:
+    case ScriptTokenKind.ThrowKeyword:
     case ScriptTokenKind.DeleteKeyword:
       return "keyword";
     case ScriptTokenKind.NumberLiteral:
     case ScriptTokenKind.StringLiteral:
+    case ScriptTokenKind.TemplateLiteral:
       return "string";
     case ScriptTokenKind.WhitespaceTrivia:
     case ScriptTokenKind.NewLineTrivia:
@@ -437,6 +490,8 @@ function keywordKind(text: string): ScriptTokenKind {
       return ScriptTokenKind.ForKeyword;
     case "return":
       return ScriptTokenKind.ReturnKeyword;
+    case "throw":
+      return ScriptTokenKind.ThrowKeyword;
     case "delete":
       return ScriptTokenKind.DeleteKeyword;
     case "typeof":

@@ -1,89 +1,91 @@
-// Splitter.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old Splitter component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$boxShadow-Splitter: createThemeVar("boxShadow-Splitter");
-$backgroundColor-Splitter: createThemeVar("backgroundColor-Splitter");
-$borderRadius-Splitter: createThemeVar("borderRadius-Splitter");
-$borderColor-Splitter: createThemeVar("borderColor-Splitter");
-$borderWidth-Splitter: createThemeVar("borderWidth-Splitter");
-$borderStyle-Splitter: createThemeVar("borderStyle-Splitter");
-$border-Splitter: createThemeVar("border-Splitter");
-$backgroundColor-resizer-Splitter: createThemeVar("backgroundColor-resizer-Splitter");
-$thickness-resizer-Splitter: createThemeVar("thickness-resizer-Splitter");
-$cursor-resizer-horizontal-Splitter: createThemeVar("cursor-resizer-horizontal-Splitter");
-$cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Splitter");
+$component: "Splitter";
+$boxShadow-Splitter: createThemeVar("boxShadow-#{$component}");
+$backgroundColor-Splitter: createThemeVar("backgroundColor-#{$component}");
+$borderRadius-Splitter: createThemeVar("borderRadius-#{$component}");
+$borderColor-Splitter: createThemeVar("borderColor-#{$component}");
+$borderWidth-Splitter: createThemeVar("borderWidth-#{$component}");
+$borderStyle-Splitter: createThemeVar("borderStyle-#{$component}");
+$border-Splitter: createThemeVar("border-#{$component}");
+$backgroundColor-resizer-Splitter: createThemeVar("backgroundColor-resizer-#{$component}");
+$thickness-resizer-Splitter: createThemeVar("thickness-resizer-#{$component}");
+$cursor-resizer-horizontal-Splitter: createThemeVar("cursor-resizer-horizontal-#{$component}");
+$cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$component}");
 
 @layer components {
   .splitter {
-    display: flex;
-    flex-direction: var(--xmlui-splitter-flex-direction, column);
-    flex-wrap: nowrap;
-    position: relative;
     overflow: hidden;
-    min-width: 0;
-    min-height: 0;
-    width: 100%;
+    position: relative;
+    flex-wrap: nowrap;
+    display: flex;
     height: 100%;
+    width: 100%;
     box-shadow: $boxShadow-Splitter;
     background-color: $backgroundColor-Splitter;
     border-radius: $borderRadius-Splitter;
     border: $border-Splitter $borderStyle-Splitter $borderColor-Splitter;
     user-select: none;
-  }
 
-  .dragging {
-    .primaryPanel,
-    .secondaryPanel,
-    .panel {
-      pointer-events: none;
-      user-select: none;
+    &.vertical {
+      flex-direction: column;
+    }
+
+    &.horizontal {
+      flex-direction: row;
+    }
+
+    &.dragging {
+      .primaryPanel,
+      .secondaryPanel,
+      .panel {
+        pointer-events: none;
+        user-select: none;
+      }
     }
   }
 
-  .panel,
-  .primaryPanel,
-  .secondaryPanel {
-    min-width: 0;
-    min-height: 0;
-    overflow: auto;
-  }
-
   .panel {
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    flex: 1;
   }
 
   .primaryPanel {
-    flex-grow: 0;
     flex-shrink: 0;
+    flex-grow: 0;
+    overflow: auto;
     order: 1;
   }
 
   .secondaryPanel {
-    flex: 1 1 auto;
+    flex: 1;
+    overflow: auto;
     order: 3;
   }
 
-  .splitterResizer {
+  .resizer {
     order: 2;
-    flex: 0 0 auto;
     overflow: hidden;
-    background-color: var(--xmlui-backgroundColor-resizer-Splitter, transparent);
-  }
+    background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
 
-  .resizerHorizontal {
-    cursor: var(--xmlui-cursor-resizer-horizontal-Splitter, ew-resize);
-    width: var(--xmlui-thickness-resizer-Splitter, 5px);
-  }
+    &.vertical {
+      cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+      height: t.useVar($thickness-resizer-Splitter, 5px);
+    }
 
-  .resizerVertical {
-    cursor: var(--xmlui-cursor-resizer-vertical-Splitter, ns-resize);
-    height: var(--xmlui-thickness-resizer-Splitter, 5px);
+    &.horizontal {
+      cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+      width: t.useVar($thickness-resizer-Splitter, 5px);
+    }
   }
 
   .floatingResizer {
@@ -92,24 +94,25 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Split
     opacity: 0;
     overflow: hidden;
     transition: opacity 0.2s;
-    background-color: var(--xmlui-backgroundColor-resizer-Splitter, transparent);
-  }
+    background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
 
-  .floatingResizerVertical {
-    cursor: var(--xmlui-cursor-resizer-vertical-Splitter, ns-resize);
-    width: 100%;
-    height: var(--xmlui-thickness-resizer-Splitter, 5px);
-    transform: translateY(-50%);
-  }
+    &.vertical {
+      cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+      width: 100%;
+      height: t.useVar($thickness-resizer-Splitter, 5px);
+      transform: translateY(-50%);
+    }
 
-  .floatingResizerHorizontal {
-    cursor: var(--xmlui-cursor-resizer-horizontal-Splitter, ew-resize);
-    width: var(--xmlui-thickness-resizer-Splitter, 5px);
-    height: 100%;
-    transform: translateX(-50%);
+    &.horizontal {
+      cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+      width: t.useVar($thickness-resizer-Splitter, 5px);
+      height: 100%;
+      transform: translateX(-50%);
+    }
   }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

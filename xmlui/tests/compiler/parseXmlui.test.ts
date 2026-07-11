@@ -44,7 +44,7 @@ describe("parseXmlui", () => {
                 },
               ],
             },
-            compiledSource: expect.stringContaining(`ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`),
+            compiledSource: expect.stringContaining(`ctx.writeLocal("count", __xmluiNext);`),
             invalidates: [{ kind: "local", name: "count" }],
           },
         },
@@ -105,7 +105,7 @@ describe("parseXmlui", () => {
       invalidates: [{ kind: "local", name: "count" }],
     });
     expect(button.parsed?.events?.click.compiledSource).toContain(
-      `ctx.writeLocal("count", Number(ctx.readLocal("count")) + 1);`,
+      `ctx.writeLocal("count", __xmluiNext);`,
     );
   });
 

@@ -1,0 +1,12 @@
+.equalClearableVerticalSizing {
+  :global([data-part-id="clearButton"]) {
+    height: max(
+      1em,
+      var(--xmlui-minHeight-TimeInput, 2.5rem) -
+      var(--xmlui-paddingTop-TimeInput, 8px) -
+      var(--xmlui-paddingBottom-TimeInput, 8px) -
+      var(--xmlui-borderWidth-TimeInput, 1px) -
+      var(--xmlui-borderWidth-TimeInput, 1px)
+    );
+  }
+}

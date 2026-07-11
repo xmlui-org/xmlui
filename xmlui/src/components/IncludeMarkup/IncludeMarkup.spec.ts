@@ -1,7 +1,12 @@
 import { test, expect } from "../../testing/fixtures";
 
+// Fake origins used as mock URLs — chosen to be distinct so Playwright can route them selectively
 const MOCK_URL = "http://xmlui-include-test.local/markup.xmlui";
 const MOCK_URL_2 = "http://xmlui-include-test-2.local/markup.xmlui";
+
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
 
 test.describe("Basic Functionality", () => {
   test("renders a Fragment fetched from a URL", async ({ page, initTestBed }) => {
@@ -52,6 +57,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("shows loadingContent while the request is in-flight", async ({ page, initTestBed }) => {
+    // Gate that we control: the route won't fulfill until we open it
     let openRoute: () => void;
     const routeGate = new Promise<void>((resolve) => {
       openRoute = resolve;
@@ -68,13 +74,15 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <IncludeMarkup url="${MOCK_URL}">
         <property name="loadingContent">
-          <Text testId="loading-text">Loading...</Text>
+          <Text testId="loading-text">Loading…</Text>
         </property>
       </IncludeMarkup>
     `);
 
+    // While the gate is closed the loading placeholder must be visible
     await expect(page.getByTestId("loading-text")).toBeVisible();
 
+    // Open the gate — the real content should replace the placeholder
     openRoute!();
     await expect(page.getByTestId("loaded-text")).toBeVisible();
     await expect(page.getByTestId("loading-text")).not.toBeVisible();
@@ -164,14 +172,21 @@ test.describe("Basic Functionality", () => {
   });
 });
 
+// =============================================================================
+// OTHER EDGE CASE TESTS
+// =============================================================================
+
 test.describe("Other Edge Cases", () => {
   test("renders nothing when url is not provided", async ({ page, initTestBed }) => {
     await initTestBed(`<IncludeMarkup testId="include"/>`);
 
+    // The component should mount and produce no visible output
+    const component = page.getByTestId("include");
+    // nonVisual components don't produce a testId wrapper, so just confirm no crash
     await expect(page.locator("body")).toBeVisible();
   });
 
-  test("is transparent - does not inject a wrapper element", async ({ page, initTestBed }) => {
+  test("is transparent — does not inject a wrapper element", async ({ page, initTestBed }) => {
     await page.route(MOCK_URL, (route) => {
       route.fulfill({
         contentType: "text/plain",
@@ -187,6 +202,7 @@ test.describe("Other Edge Cases", () => {
 
     await expect(page.getByTestId("inner-text")).toBeVisible();
 
+    // The Text element should be a direct child of the VStack, not wrapped in an extra div
     const stack = page.getByTestId("stack");
     await expect(stack.getByTestId("inner-text")).toBeVisible();
   });

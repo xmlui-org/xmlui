@@ -98,6 +98,31 @@ export const TileGridMd = createMetadata({
       signature: "itemDoubleClick(item: any, itemIndex: number): void",
       parameters: {},
     },
+    cutAction: {
+      description: "Fired when the cut keyboard shortcut is invoked.",
+      signature: "cutAction(focusedItem: any, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {},
+    },
+    copyAction: {
+      description: "Fired when the copy keyboard shortcut is invoked.",
+      signature: "copyAction(focusedItem: any, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {},
+    },
+    pasteAction: {
+      description: "Fired when the paste keyboard shortcut is invoked.",
+      signature: "pasteAction(focusedItem: any, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {},
+    },
+    deleteAction: {
+      description: "Fired when the delete keyboard shortcut is invoked.",
+      signature: "deleteAction(focusedItem: any, selectedItems: any[], selectedIds: string[]): void",
+      parameters: {},
+    },
+    selectAllAction: {
+      description: "Fired when the select-all keyboard shortcut is invoked.",
+      signature: "selectAllAction(selectedItems: any[], selectedIds: string[]): void",
+      parameters: {},
+    },
     contextMenu: {
       description: "Fired when a tile is right-clicked.",
       signature: "contextMenu(item: any, itemIndex: number, event: MouseEvent): void",
@@ -118,6 +143,9 @@ export const TileGridMd = createMetadata({
     [`backgroundColor-item-${COMP}--selected`]: "Tile background color when selected.",
     [`backgroundColor-item-${COMP}--selected--hover`]: "Tile background color when selected and hovered.",
     [`borderRadius-item-${COMP}`]: "Tile border radius.",
+    [`offsetVertical-checkbox-${COMP}`]: "Vertical offset of the selection checkbox within a tile.",
+    [`offsetHorizontal-checkbox-${COMP}`]: "Horizontal offset of the selection checkbox within a tile.",
+    [`fontSize-checkbox-${COMP}`]: "Font size of the selection checkbox.",
     [`userSelect-item-${COMP}`]: "Tile text selection behavior.",
     [`outlineColor-item-${COMP}--focus`]: "Focused tile outline color.",
     [`outlineWidth-item-${COMP}--focus`]: "Focused tile outline width.",
@@ -130,11 +158,13 @@ export const TileGridMd = createMetadata({
     [`backgroundColor-item-${COMP}--selected`]: "$color-surface-100",
     [`backgroundColor-item-${COMP}--selected--hover`]: "$color-primary-100",
     [`borderRadius-item-${COMP}`]: "$borderRadius",
+    [`offsetVertical-checkbox-${COMP}`]: "4px",
+    [`offsetHorizontal-checkbox-${COMP}`]: "4px",
     [`userSelect-item-${COMP}`]: "none",
     [`outlineColor-item-${COMP}--focus`]: "$color-primary-500",
     [`outlineWidth-item-${COMP}--focus`]: "2px",
     [`outlineStyle-item-${COMP}--focus`]: "solid",
     [`outlineOffset-item-${COMP}--focus`]: "-2px",
+    [`fontSize-checkbox-${COMP}`]: "$fontSize",
   },
 });
-

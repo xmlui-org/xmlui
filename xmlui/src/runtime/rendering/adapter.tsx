@@ -232,7 +232,7 @@ export function useXmluiComponentAdapter({
       "data-xmlui-part": part,
       "data-part-id": explicitRootPart ? part : undefined,
       "data-xmlui-id": props.id,
-      "data-testid": props.testId,
+      "data-testid": props.testId ?? props.id,
       className: themeClass.className,
       style: {
         ...themeClass.style,
@@ -395,6 +395,10 @@ function arbitraryRootAttrs(
     "tooltip",
     "tooltipMarkdown",
     "tooltipOptions",
+    "withLiveRegion",
+    "liveRegion",
+    "liveRegionMessage",
+    "liveRegionPoliteness",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>
@@ -420,6 +424,13 @@ function externalRootAttrs(
     "className",
     "layoutContext",
     "style",
+    "tooltip",
+    "tooltipMarkdown",
+    "tooltipOptions",
+    "withLiveRegion",
+    "liveRegion",
+    "liveRegionMessage",
+    "liveRegionPoliteness",
   ]);
   return Object.fromEntries(
     Object.entries(props).filter(([name, value]) =>

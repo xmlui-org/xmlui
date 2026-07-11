@@ -85,10 +85,11 @@ export class ManagedFetchService {
   }
 
   requestKey(request: ManagedRequest): string {
+    const normalized = normalizeUrlForKey(request.url, request.queryParams);
     return stableJson({
       method: request.method,
-      url: request.url,
-      queryParams: request.queryParams,
+      url: normalized.url,
+      queryParams: normalized.queryParams,
       body: request.rawBody ?? request.body,
       headers: request.headers,
       credentials: request.credentials,
@@ -175,6 +176,14 @@ export class ManagedFetchService {
     }
   }
 
+  clear(): void {
+    for (const existing of this.inFlight.values()) {
+      existing.controller.abort();
+    }
+    this.inFlight.clear();
+    this.cache.clear();
+  }
+
   private ensureEntry(key: string): ManagedCacheEntry {
     const existing = this.cache.get(key);
     if (existing) {
@@ -218,18 +227,41 @@ export function applyResultSelector(value: unknown, selector: string | undefined
 }
 
 export function appendQueryParams(url: string, queryParams: Record<string, unknown> | undefined): string {
-  if (!queryParams || Object.keys(queryParams).length === 0) {
-    return url;
-  }
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
   const base = new URL(url, origin);
-  for (const [key, value] of Object.entries(queryParams)) {
+  for (const [key, value] of Object.entries(queryParams ?? {})) {
     if (value === undefined || value === null) {
       continue;
     }
     base.searchParams.set(key, String(value));
   }
-  return base.pathname + base.search + base.hash;
+  return isAbsoluteUrl(url) ? base.href : base.pathname + base.search + base.hash;
+}
+
+function normalizeUrlForKey(
+  url: string,
+  queryParams: Record<string, unknown> | undefined,
+): { url: string; queryParams?: Record<string, unknown> } {
+  const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
+  const base = new URL(url || "/", origin);
+  const combined: Record<string, unknown> = {};
+  for (const [key, value] of base.searchParams.entries()) {
+    combined[key] = value;
+  }
+  for (const [key, value] of Object.entries(queryParams ?? {})) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+    combined[key] = String(value);
+  }
+  return {
+    url: isAbsoluteUrl(url) ? `${base.origin}${base.pathname}${base.hash}` : base.pathname + base.hash,
+    queryParams: Object.keys(combined).length > 0 ? combined : undefined,
+  };
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url);
 }
 
 async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal): Promise<ManagedResponse> {
@@ -250,7 +282,14 @@ async function defaultFetchAdapter(request: ManagedRequest, signal: AbortSignal)
 
 async function parseJsonResponse(response: Response): Promise<unknown> {
   const text = await response.text();
-  return text ? JSON.parse(text) : undefined;
+  if (!text) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 async function parseResponseData(
@@ -325,7 +364,7 @@ function normalizeMethod(method: string | undefined): ManagedHttpMethod {
   if (["get", "post", "put", "patch", "delete"].includes(normalized)) {
     return normalized as ManagedHttpMethod;
   }
-  return "get";
+  throw new ManagedFetchError(`Unsupported HTTP method: ${method}`, 0);
 }
 
 function normalizeRecord(value: unknown): Record<string, unknown> | undefined {

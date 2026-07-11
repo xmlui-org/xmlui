@@ -8,7 +8,7 @@ test.describe("ProfileMenu foundation", () => {
       </App>
     `);
 
-    await page.getByLabel("Profile menu for Joe User").click();
+    await page.getByLabel("Avatar of Joe User").click();
     await expect(page.getByRole("menu")).toBeVisible();
     await expect(page.getByRole("menu")).toContainText("Joe User");
     await expect(page.getByRole("menu")).toContainText("joe@example.com");

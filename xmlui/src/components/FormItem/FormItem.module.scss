@@ -43,7 +43,7 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
     &.end {
       flex-direction: row-reverse;
       justify-content: start;
-      align-items: flex-start;
+      align-items: center;
       gap: 0.5em;
     }
 
@@ -55,7 +55,7 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
 
     &.start {
       flex-direction: row;
-      align-items: flex-start;
+      align-items: center;
       justify-content: start;
       gap: 0.5em;
     }

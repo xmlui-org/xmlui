@@ -1,140 +1,133 @@
 import {
+  type CSSProperties,
+  type ForwardedRef,
+  type HTMLAttributes,
   forwardRef,
   memo,
   useEffect,
   useMemo,
   useState,
-  type CSSProperties,
-  type ForwardedRef,
-  type HTMLAttributes,
 } from "react";
+import classnames from "classnames";
 
-import { defaultProps } from "./Image.defaults";
 import styles from "./Image.module.scss";
+import { defaultProps } from "./Image.defaults";
 
-type ImageProps = {
+// =====================================================================================================================
+// React Image component implementation
+
+type Props = {
   src?: string;
-  alt?: unknown;
-  imageData?: unknown;
-  fit?: string;
+  alt?: string;
+  imageData?: Blob | any;
+  fit?: "cover" | "contain";
   style?: CSSProperties;
+  className?: string;
   lazyLoad?: boolean;
   aspectRatio?: string;
+  animation?: object;
   inline?: boolean;
   grayscale?: boolean;
-} & Pick<HTMLAttributes<HTMLImageElement>, "onClick"> &
-  Omit<HTMLAttributes<HTMLImageElement>, "alt" | "src" | "onClick">;
+} & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
 
-export const Image = memo(forwardRef(function Image(
+export const Image = memo(forwardRef(function Img(
   {
     src,
     alt,
     imageData,
     fit = defaultProps.fit,
     style,
+    className,
     onClick,
     aspectRatio,
     lazyLoad = defaultProps.lazyLoad,
     inline = defaultProps.inline,
     grayscale = defaultProps.grayscale,
     ...rest
-  }: ImageProps,
+  }: Props,
   ref: ForwardedRef<HTMLImageElement>,
 ) {
-  const [blobUrl, setBlobUrl] = useState<string | undefined>();
-  const blobToRender = useMemo(
-    () => {
-      if (imageData instanceof Blob) {
-        return imageData;
-      }
-      if (typeof imageData === "string" && imageData !== "") {
-        return new Blob([imageData]);
-      }
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  const blobToRender = useMemo(() => {
+    if (!imageData || !(imageData instanceof Blob)) {
       return undefined;
-    },
-    [imageData],
-  );
-
-  useEffect(() => {
-    if (src || !blobToRender) {
-      setBlobUrl(undefined);
-      return;
     }
-    const url = URL.createObjectURL(blobToRender);
-    setBlobUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [blobToRender, src]);
+    return imageData;
+  }, [imageData]);
 
-  const imageSrc = safeString(src) || blobUrl;
-  const altText = safeString(alt);
-  const imageFit = validFit(fit);
-  const imageElement = (
+  // Handle Blob data when src is empty
+  useEffect(() => {
+    if (!src && blobToRender) {
+      const url = URL.createObjectURL(blobToRender);
+      setBlobUrl(url);
+
+      // Cleanup function to revoke the blob URL
+      return () => {
+        URL.revokeObjectURL(url);
+        setBlobUrl(null);
+      };
+    } else {
+      // Clean up any existing blob URL if src is provided or imageData is not a Blob
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+        setBlobUrl(null);
+      }
+    }
+  }, [src, blobToRender, blobUrl]);
+
+  src = safeConvertPropToString(src);
+  alt = safeConvertPropToString(alt);
+
+  // Use blob URL if src is empty and we have a blob URL
+  const imageSrc = src || blobUrl;
+  const normalizedFit = fit === "cover" || fit === "contain" ? fit : defaultProps.fit;
+  const imageStyle = {
+    "--xmlui-objectFit-Image": normalizedFit,
+    ...(aspectRatio ? { "--xmlui-aspectRatio-Image": normalizeAspectRatio(aspectRatio) } : {}),
+    boxShadow: "none",
+    ...style,
+    flexShrink: 1,
+  } as CSSProperties;
+
+  return (
     <img
       {...rest}
-      ref={ref}
       src={imageSrc}
-      alt={altText}
+      ref={ref}
+      alt={alt}
       loading={lazyLoad ? "lazy" : "eager"}
-      className={cx(
-        styles["xmlui-imageRoot"],
-        inline ? styles["xmlui-imageInline"] : undefined,
-        grayscale ? styles["xmlui-imageGrayscale"] : undefined,
-        onClick ? styles["xmlui-imageClickable"] : undefined,
-        rest.className,
+      className={classnames(
+        styles.img,
+        "xmlui-imageRoot",
+        {
+          [styles.clickable]: !!onClick,
+          [styles.grayscale]: grayscale,
+          [styles.inline]: inline,
+          "xmlui-imageInline": inline,
+          "xmlui-imageInlineWrapper": inline,
+        },
+        className,
       )}
-      style={{
-        ...style,
-        ...imageCssVariables(imageFit, aspectRatio),
-      }}
+      style={imageStyle}
       onClick={onClick}
     />
   );
-
-  return inline ? (
-    <span className={styles["xmlui-imageInlineWrapper"]}>
-      {imageElement}
-    </span>
-  ) : imageElement;
 }));
 
-function safeString(value: unknown): string | undefined {
-  if (typeof value === "string") {
-    return value;
-  }
+function safeConvertPropToString(prop: unknown): string | undefined {
+  if (typeof prop === "string") return prop;
   if (
-    value !== null &&
-    value !== undefined &&
-    typeof value !== "object" &&
-    typeof value !== "function" &&
-    !Number.isNaN(value)
+    prop != null &&
+    typeof prop !== "object" &&
+    typeof prop !== "function" &&
+    !Number.isNaN(prop)
   ) {
-    return String(value);
+    return String(prop);
   }
   return undefined;
 }
 
-function validFit(value: unknown): string {
-  return value === "cover" || value === "contain" ? value : defaultProps.fit;
-}
-
-function aspectRatioValue(value: string | undefined): string | undefined {
-  if (!value) {
-    return undefined;
-  }
-  return value.includes("/") ? value.replace(/\s*\/\s*/, " / ") : value;
-}
-
-function imageCssVariables(fit: string, aspectRatio: string | undefined): CSSProperties {
-  const style: Record<string, string> = {
-    "--xmlui-objectFit-Image": fit,
-  };
-  const normalizedAspectRatio = aspectRatioValue(aspectRatio);
-  if (normalizedAspectRatio) {
-    style["--xmlui-aspectRatio-Image"] = normalizedAspectRatio;
-  }
-  return style as CSSProperties;
-}
-
-function cx(...classes: Array<string | undefined | false>): string {
-  return classes.filter(Boolean).join(" ");
+function normalizeAspectRatio(aspectRatio: string): string {
+  return aspectRatio.includes("/") ? aspectRatio.replace(/\s*\/\s*/g, " / ") : aspectRatio;
 }

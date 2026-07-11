@@ -10,6 +10,7 @@ export {
   type XmluiDocumentInput,
   type XmluiModule,
 } from "./runtime";
+export type { ApiInterceptorDefinition } from "./components-core/interception/abstractions";
 export {
   createComponentRenderer,
   createMetadata,

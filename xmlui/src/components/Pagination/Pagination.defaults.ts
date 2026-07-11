@@ -1,3 +1,5 @@
+import type { OrientationOptions } from "../abstractions";
+
 export type Position = "start" | "center" | "end";
 export const PositionValues = ["start", "center", "end"] as const;
 
@@ -10,7 +12,7 @@ export const defaultProps = {
   maxVisiblePages: 1 as PageNumber,
   showPageInfo: true,
   showPageSizeSelector: true,
-  orientation: "horizontal",
+  orientation: "horizontal" as OrientationOptions,
   showCurrentPage: true,
   pageSizeSelectorPosition: "start" as Position,
   buttonRowPosition: "center" as Position,

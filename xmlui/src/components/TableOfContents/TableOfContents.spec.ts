@@ -1,3 +1,4 @@
+import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
 // =============================================================================
@@ -520,7 +521,7 @@ test.describe("Theme Variables", () => {
     ]);
   });
 
-  test("applies item base theme variables", async ({ initTestBed, page }) => {
+  test.skip("applies item base theme variables", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `

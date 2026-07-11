@@ -1,9 +1,14 @@
-// Tabs.tsx extracts available theme variables from createThemeVar
-// declarations in this file, mirroring the old Tabs component pattern.
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "Tabs";
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
+
+$themeVars: t.composePaddingVars($themeVars, "trigger-Tabs");
 
 $backgroundColor-Tabs: createThemeVar("backgroundColor-Tabs");
 $borderColor-Tabs: createThemeVar("borderColor-Tabs");
@@ -21,128 +26,170 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 $borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
 $border-list-Tabs: createThemeVar("border-list-Tabs");
 $gap-list-Tabs: createThemeVar("gap-list-Tabs");
-$padding-trigger-Tabs: createThemeVar("padding-trigger-Tabs");
 $paddingTop-TabItem: createThemeVar("paddingTop-TabItem");
 
 @layer components {
   .tabs {
     display: flex;
     width: 100%;
-    min-width: 0;
+    background-color: $backgroundColor-Tabs;
     overflow: hidden;
-    background-color: var(--xmlui-backgroundColor-Tabs);
+    &[data-orientation="vertical"] {
+      flex-direction: row;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: column;
+    }
   }
 
-  .horizontal {
-    flex-direction: column;
+  .filler {
+    flex: 1 1 auto;
+
+    &[data-orientation="vertical"] {
+      border-right-width: $borderWidth-Tabs;
+      border-right-style: solid;
+      border-right-color: $borderColor-Tabs;
+    }
+
+    &[data-orientation="horizontal"] {
+      border-bottom-width: $borderWidth-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $borderColor-Tabs;
+    }
   }
 
-  .vertical {
-    flex-direction: row;
-  }
+  .tabTrigger {
+    @include t.paddingVars($themeVars, "trigger-Tabs");
+    &.distributeEvenly {
+      flex: 1 1 auto;
+    }
+    color: $textColor-trigger-Tabs;
 
-  .accordionView {
-    flex-direction: column;
+    &[data-state="active"] {
+      color: $textColor-trigger-Tabs--active;
+    }
+
+    &:hover {
+      color: $textColor-trigger-Tabs--hover;
+    }
+
+    background-color: $backgroundColor-trigger-Tabs;
+    border-radius: $borderRadius-trigger-Tabs;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: t.$fontSize-base;
+    line-height: 1;
+    user-select: none;
+    //border-color: transparent;
+    border: $border-trigger-Tabs;
+
+    &:hover {
+      background-color: $backgroundColor-trigger-Tabs--hover;
+    }
+
+    &[data-orientation="vertical"] {
+      border-right-width: $borderWidth-Tabs;
+      border-right-style: solid;
+      border-right-color: $borderColor-Tabs;
+
+      &[data-state="active"] {
+        border-right-width: $borderWidth-Tabs;
+        border-right-style: solid;
+        border-right-color: $borderColor-active-Tabs;
+        background-color: $backgroundColor-trigger-Tabs--active;
+      }
+    }
+
+    &[data-orientation="horizontal"] {
+      border-bottom-width: $borderWidth-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $borderColor-Tabs;
+
+      &[data-state="active"] {
+        border-bottom-width: $borderWidth-Tabs;
+        border-bottom-style: solid;
+        border-bottom-color: $borderColor-active-Tabs;
+        background-color: $backgroundColor-trigger-Tabs--active;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .tabsList {
+    background-color: $backgroundColor-list-Tabs;
+    border-radius: $borderRadius-list-Tabs;
+    border: $border-list-Tabs;
+    position: relative;
+    z-index: 99;
+    overflow: hidden;
     display: flex;
     flex-shrink: 0;
-    overflow: hidden;
-    gap: var(--xmlui-gap-list-Tabs);
-    background-color: var(--xmlui-backgroundColor-list-Tabs);
-    border-radius: var(--xmlui-borderRadius-list-Tabs);
-    border: var(--xmlui-border-list-Tabs);
+    scrollbar-width: thin;
+    gap: $gap-list-Tabs;
+
+    &[data-orientation="vertical"] {
+      flex-direction: column;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: row;
+    }
+
+    &.alignStart {
+      justify-content: flex-start;
+    }
+
+    &.alignEnd {
+      justify-content: flex-end;
+    }
+
+    &.alignCenter {
+      justify-content: center;
+    }
+
+    &.alignStretch {
+      justify-content: stretch;
+    }
   }
 
   .tabsList:hover {
     overflow: auto;
   }
 
-  .horizontal .tabsList {
-    flex-direction: row;
-  }
-
-  .vertical .tabsList {
-    flex-direction: column;
-  }
-
-  .alignStart {
-    justify-content: flex-start;
-  }
-
-  .alignEnd {
-    justify-content: flex-end;
-  }
-
-  .alignCenter {
-    justify-content: center;
-  }
-
-  .alignStretch {
-    justify-content: stretch;
-  }
-
-  .tabTrigger {
-    appearance: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    border: var(--xmlui-border-trigger-Tabs);
-    border-radius: var(--xmlui-borderRadius-trigger-Tabs);
-    padding: var(--xmlui-padding-trigger-Tabs);
-    color: var(--xmlui-textColor-trigger-Tabs);
-    background-color: var(--xmlui-backgroundColor-trigger-Tabs);
-    font: inherit;
-    line-height: 1;
-    user-select: none;
-    cursor: pointer;
-  }
-
-  .tabTrigger:hover {
-    color: var(--xmlui-textColor-trigger-Tabs--hover);
-    background-color: var(--xmlui-backgroundColor-trigger-Tabs--hover);
-  }
-
-  .tabTrigger[aria-selected="true"] {
-    color: var(--xmlui-textColor-trigger-Tabs--active);
-    background-color: var(--xmlui-backgroundColor-trigger-Tabs--active);
-  }
-
-  .horizontal .tabTrigger {
-    border-bottom-width: var(--xmlui-borderWidth-Tabs);
-    border-bottom-style: solid;
-    border-bottom-color: var(--xmlui-borderColor-Tabs);
-  }
-
-  .horizontal .tabTrigger[aria-selected="true"] {
-    border-bottom-color: var(--xmlui-borderColor-active-Tabs);
-  }
-
-  .vertical .tabTrigger {
-    border-right-width: var(--xmlui-borderWidth-Tabs);
-    border-right-style: solid;
-    border-right-color: var(--xmlui-borderColor-Tabs);
-  }
-
-  .vertical .tabTrigger[aria-selected="true"] {
-    border-right-color: var(--xmlui-borderColor-active-Tabs);
-  }
-
-  .distributeEvenly {
-    flex: 1 1 auto;
-  }
-
   .tabsContent {
     flex-grow: 1;
-    min-width: 0;
     outline: none;
-    padding-top: var(--xmlui-paddingTop-TabItem);
+    padding-top: var(--paddingTop-TabItem, #{$paddingTop-TabItem});
   }
 
-  .hiddenContent {
-    display: none;
+  // Accordion view styles
+  .accordionView {
+    width: 100%;
+  }
+
+  .accordionRoot {
+    display: flex;
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .accordionInterleaved {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .accordionList {
+    display: contents; // Makes children act as direct children of parent
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
   }
 
   .accordionItem {
@@ -154,12 +201,28 @@ $paddingTop-TabItem: createThemeVar("paddingTop-TabItem");
   .accordionTrigger {
     width: 100%;
     justify-content: flex-start;
-    border-bottom-width: var(--xmlui-borderWidth-Tabs);
+    border-bottom-width: $borderWidth-Tabs;
     border-bottom-style: solid;
-    border-bottom-color: var(--xmlui-borderColor-Tabs);
+    border-bottom-color: $borderColor-Tabs;
+    border-right: none !important;
+
+    &[data-state="active"] {
+      border-bottom-width: $borderWidth-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $borderColor-active-Tabs;
+      background-color: $backgroundColor-trigger-Tabs--active;
+      border-right: none !important;
+    }
+  }
+
+  // Style for accordion content to appear inline with headers
+  .accordionInterleaved .tabsContent {
+    width: 100%;
+    order: inherit;
   }
 }
 
+// --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: "";
+  themeVars: t.json-stringify($themeVars);
 }

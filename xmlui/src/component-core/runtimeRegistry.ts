@@ -1,5 +1,5 @@
-import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion.renderer";
-import { apiCallRenderer } from "../components/APICall/APICall.renderer";
+import { accordionItemRenderer, accordionRenderer } from "../components/Accordion/Accordion";
+import { apiCallRuntimeRenderer } from "../components/APICall/APICall";
 import { appRuntimeRenderer } from "../components/App/App";
 import { appHeaderRuntimeRenderer } from "../components/AppHeader/AppHeader";
 import { appStateRenderer } from "../components/AppState/AppState";
@@ -18,7 +18,7 @@ import { columnRenderer } from "../components/Column/Column";
 import { conciseValidationFeedbackRenderer } from "../components/ConciseValidationFeedback/ConciseValidationFeedback.renderer";
 import { contentSeparatorRenderer } from "../components/ContentSeparator/ContentSeparator";
 import { contextMenuRenderer } from "../components/ContextMenu/ContextMenu";
-import { dataSourceRenderer } from "../components/DataSource/DataSource.renderer";
+import { dataSourceRenderer } from "../components/DataSource/DataSource";
 import { dateInputRenderer } from "../components/DateInput/DateInput";
 import { datePickerRenderer } from "../components/DatePicker/DatePicker";
 import { drawerRenderer } from "../components/Drawer/Drawer";
@@ -28,7 +28,7 @@ import {
   menuSeparatorRuntimeRenderer as menuSeparatorRenderer,
   subMenuItemRuntimeRenderer as subMenuItemRenderer,
 } from "../components/DropdownMenu/DropdownMenu";
-import { eventSourceRenderer } from "../components/EventSource/EventSource.renderer";
+import { eventSourceRenderer } from "../components/EventSource/EventSource";
 import { expandableItemRenderer } from "../components/ExpandableItem/ExpandableItem";
 import { fallbackRenderer } from "../components/Fallback/Fallback";
 import { fileInputRuntimeRenderer } from "../components/FileInput/FileInput";
@@ -54,16 +54,16 @@ import {
 import { htmlTagRenderers } from "../components/HtmlTags/HtmlTags";
 import { iconRenderer } from "../components/Icon/Icon";
 import { iframeRenderer } from "../components/IFrame/IFrame";
-import { imageRenderer } from "../components/Image/Image.renderer";
-import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup.renderer";
+import { imageRenderer } from "../components/Image/Image";
+import { includeMarkupRenderer } from "../components/IncludeMarkup/IncludeMarkup";
 import { inspectorRenderer } from "../components/Inspector/Inspector";
 import { inspectButtonRenderer } from "../components/InspectButton/InspectButton";
 import { i18nRenderer } from "../components/I18n/I18n";
 import { itemsRenderer } from "../components/Items/Items";
-import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle.renderer";
-import { linkRenderer } from "../components/Link/Link.renderer";
+import { lifecycleRenderer } from "../components/Lifecycle/Lifecycle";
+import { linkRenderer } from "../components/Link/Link";
 import { listRenderer } from "../components/List/List";
-import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion.renderer";
+import { liveRegionRenderer } from "../components/LiveRegion/LiveRegion";
 import { logoRenderer } from "../components/Logo/Logo";
 import { markdownRenderer } from "../components/Markdown/Markdown.renderer";
 import { messageListenerRenderer } from "../components/MessageListener/MessageListener";
@@ -71,7 +71,7 @@ import { modalDialogRenderer } from "../components/ModalDialog/ModalDialog";
 import { navGroupRuntimeRenderer } from "../components/NavGroup/NavGroup";
 import { navLinkRuntimeRenderer } from "../components/NavLink/NavLink";
 import { navPanelRuntimeRenderer } from "../components/NavPanel/NavPanel";
-import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton.renderer";
+import { navPanelCollapseButtonRenderer } from "../components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { nestedAppRenderer } from "../components/NestedApp/NestedApp.renderer";
 import { noResultRenderer } from "../components/NoResult/NoResult";
 import { numberBoxRenderer } from "../components/NumberBox/NumberBox";
@@ -83,26 +83,26 @@ import { partRenderer } from "../components/Part/Part";
 import { passwordInputRenderer, textBoxRenderer } from "../components/TextBox/TextBox";
 import { progressBarRenderer } from "../components/ProgressBar/ProgressBar";
 import { qrCodeRenderer } from "../components/QRCode/QRCode";
-import { queueRenderer } from "../components/Queue/Queue.renderer";
+import { queueRenderer } from "../components/Queue/Queue";
 import { radioGroupRuntimeRenderer } from "../components/RadioGroup/RadioGroup";
 import { radioItemRenderer } from "../components/RadioGroup/RadioItem";
 import { ratingInputRenderer } from "../components/RatingInput/RatingInput";
 import { redirectRuntimeRenderer } from "../components/Redirect/Redirect";
-import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar.renderer";
+import { responsiveBarRenderer } from "../components/ResponsiveBar/ResponsiveBar";
 import { retryPolicyRenderer } from "../components/RetryPolicy/RetryPolicy";
-import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer.renderer";
+import { scrollViewerRenderer } from "../components/ScrollViewer/ScrollViewer";
 import { selectRenderer } from "../components/Select/Select";
 import { selectionStoreRenderer } from "../components/SelectionStore/SelectionStore";
-import { skipLinkRenderer } from "../components/SkipLink/SkipLink.renderer";
+import { skipLinkRenderer } from "../components/SkipLink/SkipLink";
 import { sliderRenderer } from "../components/Slider/Slider";
-import { slotRenderer } from "../components/Slot/Slot.renderer";
+import { slotRenderer } from "../components/Slot/Slot";
 import { spaceFillerRenderer } from "../components/SpaceFiller/SpaceFiller";
 import { spinnerRenderer } from "../components/Spinner/Spinner";
 import {
   hSplitterRenderer,
   splitterRenderer,
   vSplitterRenderer,
-} from "../components/Splitter/Splitter.renderer";
+} from "../components/Splitter/Splitter";
 import {
   chStackRenderer,
   cvStackRenderer,
@@ -110,29 +110,31 @@ import {
   stackRenderer,
   vStackRenderer,
 } from "../components/Stack/Stack";
-import { stepRenderer, stepperRenderer } from "../components/Stepper/Stepper.renderer";
-import { stepperFormRenderer } from "../components/StepperForm/StepperForm.renderer";
-import { stickyBoxRenderer } from "../components/StickyBox/StickyBox.renderer";
-import { stickySectionRenderer } from "../components/StickySection/StickySection.renderer";
+import { stepRenderer } from "../components/Stepper/Step";
+import { stepperRenderer } from "../components/Stepper/Stepper";
+import { stepperFormRenderer } from "../components/StepperForm/StepperForm";
+import { stickyBoxRenderer } from "../components/StickyBox/StickyBox";
+import { stickySectionRenderer } from "../components/StickySection/StickySection";
 import { switchRenderer } from "../components/Switch/Switch";
-import { tabItemRenderer, tabsRenderer } from "../components/Tabs/Tabs.renderer";
+import { tabsRenderer } from "../components/Tabs/Tabs";
+import { tabItemRenderer } from "../components/Tabs/TabItem";
 import { tabsFormRenderer } from "../components/TabsForm/TabsForm.renderer";
 import { tableRenderer } from "../components/Table/Table";
 import { tableOfContentsRenderer } from "../components/TableOfContents/TableOfContents";
 import { textRenderer } from "../components/Text/Text";
 import { textAreaRenderer } from "../components/TextArea/TextArea";
-import { themeRenderer } from "../components/Theme/Theme.renderer";
+import { themeRenderer } from "../components/Theme/Theme";
 import { tileGridRenderer } from "../components/TileGrid/TileGrid.renderer";
-import { timeInputRenderer } from "../components/TimeInput/TimeInput.renderer";
-import { timerRenderer } from "../components/Timer/Timer.renderer";
-import { toastRenderer } from "../components/Toast/Toast.renderer";
-import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton.renderer";
-import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch.renderer";
-import { tooltipRenderer } from "../components/Tooltip/Tooltip.renderer";
+import { timeInputRenderer } from "../components/TimeInput/TimeInput";
+import { timerRenderer } from "../components/Timer/Timer";
+import { toastRenderer } from "../components/Toast/Toast";
+import { toneChangerButtonRenderer } from "../components/ToneChangerButton/ToneChangerButton";
+import { toneSwitchRenderer } from "../components/ToneSwitch/ToneSwitch";
+import { tooltipRenderer } from "../components/Tooltip/Tooltip";
 import { treeRenderer } from "../components/Tree/Tree";
 import { treeDisplayRenderer } from "../components/TreeDisplay/TreeDisplay";
 import { validationSummaryRenderer } from "../components/ValidationSummary/ValidationSummary.renderer";
-import { webSocketRenderer } from "../components/WebSocket/WebSocket.renderer";
+import { webSocketRenderer } from "../components/WebSocket/WebSocket";
 import { builtInRenderers as legacyBuiltInRenderers } from "../runtime/rendering/builtins";
 import type { XmluiBuiltInRenderer } from "../runtime/rendering/types";
 
@@ -246,7 +248,7 @@ export const coreRuntimeRendererEntries = [
   { name: "NavPanelCollapseButton", renderer: navPanelCollapseButtonRenderer },
   { name: "NavPanel", renderer: navPanelRuntimeRenderer },
   { name: "DataSource", renderer: dataSourceRenderer },
-  { name: "APICall", renderer: apiCallRenderer },
+  { name: "APICall", renderer: apiCallRuntimeRenderer },
   { name: "AppState", renderer: appStateRenderer },
   { name: "ChangeListener", renderer: changeListenerRenderer },
   { name: "Lifecycle", renderer: lifecycleRenderer },

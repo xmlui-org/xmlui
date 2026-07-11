@@ -2,6 +2,9 @@
   "AutoComplete": [
     "AutoCompleteContext.tsx"
   ],
+  "Column": [
+    "TableContext.tsx"
+  ],
   "ModalDialog": [
     "ConfirmationModalContextProvider.tsx",
     "Dialog.tsx"
@@ -9,6 +12,17 @@
   "Option": [
     "OptionTypeProvider.tsx"
   ],
+  "Queue": [
+    "queueActions.ts"
+  ],
+  "ResponsiveBar": {
+    "files": [
+      "ResponsiveBarItem.tsx"
+    ],
+    "testAdapted": [
+      "ResponsiveBar.spec.ts"
+    ]
+  },
   "Select": [
     "HiddenOption.tsx",
     "MultiSelectOption.tsx",
@@ -16,5 +30,41 @@
     "SelectContext.tsx",
     "SelectOption.tsx",
     "SimpleSelect.tsx"
+  ],
+  "Slot": [
+    "Slot.ts"
+  ],
+  "Stepper": {
+    "files": [
+      "Step.tsx"
+    ],
+    "entryAdapted": [
+      "Step.tsx"
+    ]
+  },
+  "Splitter": [
+    "utils.ts"
+  ],
+  "Tabs": {
+    "files": [
+      "TabContext.tsx",
+      "TabItem.tsx"
+    ],
+    "entryAdapted": [
+      "TabItem.tsx"
+    ]
+  },
+  "Theme": [
+    "NotificationToast.tsx"
+  ],
+  "TimeInput": [
+    "utils.ts"
+  ],
+  "Table": [
+    "react-table-config.d.ts",
+    "useRowSelection.tsx"
+  ],
+  "Tree": [
+    "testData.ts"
   ]
 }

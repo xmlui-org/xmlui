@@ -15,7 +15,10 @@ import { Text } from "./TextReact";
 import { defaultProps } from "./Text.defaults";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
+import type { XmluiNode } from "../../compiler/ir";
+import { renderMixedText } from "../../runtime/rendering/bindings";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import type { RuntimeScope } from "../../runtime/state";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Text";
@@ -294,24 +297,44 @@ export const textRenderer = wrapRuntimeComponent({
       Object.entries(adapter.props)
         .filter(([key]) => VariantPropsKeys.includes(key as any)),
     );
-    const value = adapter.prop("value");
+    const value = adapter.prop("value") ?? adapter.prop("label");
     const valueText = normalizeMultilineValueText(displayText(value));
     const preserveLinebreaks = adapter.booleanProp(
       "preserveLinebreaks",
       defaultProps.preserveLinebreaks,
     );
     const overflowMode = adapter.stringProp("overflowMode") as OverflowMode | undefined;
+    const maxLines = adapter.numberProp("maxLines", defaultProps.maxLines);
     const textVariant = adapter.stringProp("variant") as any;
     const textStyle = { ...(style as React.CSSProperties | undefined) };
     if (textVariant === "strong" && textStyle.fontWeight === undefined) {
       textStyle.fontWeight = "var(--xmlui-fontWeight-Text-strong)";
     }
+    if (isInsideRuntimeLayout(adapter.props.layoutContext, "TableCell") && (overflowMode || maxLines > 0)) {
+      textStyle.minWidth = textStyle.minWidth ?? 0;
+      textStyle.maxWidth = textStyle.maxWidth ?? "100%";
+      textStyle.flex = textStyle.flex ?? "1 1 0";
+    }
+    if (overflowMode === "flow") {
+      textStyle.minWidth = textStyle.minWidth ?? 0;
+      textStyle.maxWidth = textStyle.maxWidth ?? "100%";
+      textStyle.flexShrink = textStyle.flexShrink ?? 1;
+    }
+
+    const children = valueText || adapter.renderChildren();
+    const childText = valueText === undefined
+      ? textFromXmluiChildren(adapter.node.children, adapter.scope)
+      : undefined;
+    const liveRegionMessage = shouldRenderTextLiveRegion(adapter.props)
+      ? textLiveRegionMessage(adapter.props, children, childText)
+      : undefined;
 
     return (
-      <Text
+      <>
+        <Text
         {...rootAttrs}
         variant={textVariant}
-        maxLines={adapter.numberProp("maxLines", defaultProps.maxLines)}
+        maxLines={maxLines}
         classes={className ? { [COMPONENT_PART_KEY]: className as string } : undefined}
         preserveLinebreaks={preserveLinebreaks}
         ellipses={adapter.booleanProp("ellipses", defaultProps.ellipses)}
@@ -323,14 +346,44 @@ export const textRenderer = wrapRuntimeComponent({
             ? adapter.event("contextMenu")
             : undefined
         }
+        onClick={
+          Object.prototype.hasOwnProperty.call(adapter.node.events, "click")
+            ? adapter.event("click")
+            : undefined
+        }
         style={textStyle}
         {...variantSpecificProps}
       >
-        {valueText || adapter.renderChildren()}
-      </Text>
+          {children}
+        </Text>
+        {liveRegionMessage !== undefined
+          ? (
+            <span
+              data-xmlui-behavior="liveRegion"
+              role={textLiveRegionPoliteness(adapter.props) === "assertive" ? "alert" : "status"}
+              aria-live={textLiveRegionPoliteness(adapter.props)}
+              aria-atomic="true"
+              style={hiddenLiveRegionStyle}
+            >
+              {liveRegionMessage}
+            </span>
+          )
+          : null}
+      </>
     );
   },
 });
+
+function isInsideRuntimeLayout(value: unknown, type: string): boolean {
+  let current = value;
+  while (current && typeof current === "object") {
+    if ((current as { type?: unknown }).type === type) {
+      return true;
+    }
+    current = (current as { parent?: unknown }).parent;
+  }
+  return false;
+}
 
 function displayText(value: unknown): string | undefined {
   return value === undefined || value === null ? undefined : String(value);
@@ -344,4 +397,74 @@ function normalizeMultilineValueText(value: string | undefined): string | undefi
     const normalized = indentation.replace(/\t/g, " ");
     return `\n ${"\u00a0".repeat(Math.max(0, normalized.length - 1))}`;
   });
+}
+
+const hiddenLiveRegionStyle: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
+
+function shouldRenderTextLiveRegion(props: Record<string, unknown>): boolean {
+  return truthyBehaviorValue(props.withLiveRegion) || props.liveRegion !== undefined;
+}
+
+function textLiveRegionPoliteness(props: Record<string, unknown>): "polite" | "assertive" {
+  const value = displayText(props.liveRegionPoliteness) ?? displayText(props.liveRegion);
+  return value === "assertive" ? "assertive" : "polite";
+}
+
+function textLiveRegionMessage(
+  props: Record<string, unknown>,
+  children: React.ReactNode,
+  childText?: string,
+): string {
+  const explicit = displayText(props.liveRegionMessage);
+  if (explicit !== undefined) {
+    return explicit;
+  }
+  const value = displayText(props.value ?? props.label);
+  if (value !== undefined) {
+    return value;
+  }
+  if (childText !== undefined) {
+    return childText;
+  }
+  return textFromReactNode(children) ?? "";
+}
+
+function textFromXmluiChildren(children: XmluiNode[], scope: RuntimeScope): string | undefined {
+  const text = children
+    .filter((child): child is Extract<XmluiNode, { kind: "text" }> => child.kind === "text")
+    .map((child) => renderMixedText(child.segments, child.value, scope))
+    .join("");
+  return text === "" ? undefined : text;
+}
+
+function textFromReactNode(node: React.ReactNode): string | undefined {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (!React.isValidElement(node)) {
+    return undefined;
+  }
+  const children = (node.props as { children?: React.ReactNode }).children;
+  if (Array.isArray(children)) {
+    const text = children.map(textFromReactNode).filter((value): value is string => value !== undefined).join("");
+    return text === "" ? undefined : text;
+  }
+  return textFromReactNode(children);
+}
+
+function truthyBehaviorValue(value: unknown): boolean {
+  if (typeof value === "string") {
+    return value !== "" && value !== "false";
+  }
+  return Boolean(value);
 }

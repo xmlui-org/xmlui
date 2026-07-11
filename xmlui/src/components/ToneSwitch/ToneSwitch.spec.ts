@@ -1,34 +1,93 @@
 import { expect, test } from "../../testing/fixtures";
 
-test.describe("ToneSwitch foundation", () => {
-  test("switches tone and fires didChange", async ({ initTestBed, page }) => {
+// =============================================================================
+// BASIC FUNCTIONALITY TESTS
+// =============================================================================
+
+test.describe("Basic Functionality", () => {
+  test("renders in light mode by default", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App var.tone="light">
-        <ToneSwitch testId="tone" onDidChange="next => tone = next" />
-        <Text testId="result">{tone}</Text>
+      <App>
+        <ToneSwitch />
+        <Text>{activeThemeTone}</Text>
       </App>
     `);
-
-    await page.getByLabel("Dark tone").click();
-    await expect(page.getByTestId("tone")).toHaveAttribute("data-tone", "dark");
-    await expect(page.getByTestId("result")).toHaveText("dark");
+    const toggle = page.getByRole("switch");
+    await expect(toggle).toBeVisible();
+    await expect(page.getByText("light")).toBeVisible();
   });
 
-  test("renders custom icons and switches back to light tone", async ({ initTestBed, page }) => {
+  test("toggles to dark mode when clicked", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <App var.tone="light">
-        <ToneSwitch testId="tone" iconLight="Light custom" iconDark="Dark custom" onDidChange="next => tone = next" />
-        <Text testId="result">{tone}</Text>
+      <App>
+        <ToneSwitch />
+        <Text>{activeThemeTone}</Text>
       </App>
     `);
+    const toggle = page.getByRole("switch");
+    await expect(toggle).toBeVisible();
+    await toggle.click({ force: true });
+    await expect(page.getByText("dark")).toBeVisible();
+    await expect(toggle).toBeChecked();
+  });
 
-    await expect(page.getByRole("button", { name: "Light tone" })).toHaveText("Light custom");
-    await expect(page.getByRole("button", { name: "Dark tone" })).toHaveText("Dark custom");
-    await page.getByRole("button", { name: "Dark tone" }).click();
-    await expect(page.getByTestId("tone")).toHaveAttribute("data-tone", "dark");
+  test("toggles back to light mode when clicked again", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <ToneSwitch />
+        <Text>{activeThemeTone}</Text>
+      </App>
+    `);
+    const toggle = page.getByRole("switch");
+    await expect(toggle).toBeVisible();
+    await toggle.click({ force: true });
+    await expect(page.getByText("dark")).toBeVisible();
+    await expect(toggle).toBeChecked();
+    await toggle.click({ force: true });
+    await expect(page.getByText("light")).toBeVisible();
+    await expect(toggle).not.toBeChecked();
+  });
+});
 
-    await page.getByRole("button", { name: "Light tone" }).click();
-    await expect(page.getByTestId("tone")).toHaveAttribute("data-tone", "light");
-    await expect(page.getByTestId("result")).toHaveText("light");
+// =============================================================================
+// ACCESSIBILITY TESTS
+// =============================================================================
+
+test.describe("Accessibility", () => {
+  test("has switch role", async ({ initTestBed, page }) => {
+    await initTestBed(`<ToneSwitch />`);
+    const toggle = page.getByRole("switch");
+    await expect(toggle).toBeVisible();
+  });
+
+  test("is keyboard accessible with Space key", async ({ initTestBed, page }) => {
+    await initTestBed(`<ToneSwitch />`);
+    const toggle = page.getByRole("switch");
+    
+    await toggle.focus();
+    await expect(toggle).toBeFocused();
+    
+    await expect(toggle).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(toggle).toBeChecked();
+  });
+
+  test("maintains focus during interactions", async ({ initTestBed, page }) => {
+    await initTestBed(`<ToneSwitch />`);
+    const toggle = page.getByRole("switch");
+    
+    await toggle.focus();
+    await toggle.click({ force: true });
+    await expect(toggle).toBeFocused();
+  });
+
+  test("has appropriate aria-checked state", async ({ initTestBed, page }) => {
+    await initTestBed(`<ToneSwitch />`);
+    const toggle = page.getByRole("switch");
+    
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+    
+    await toggle.click({ force: true });
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
   });
 });

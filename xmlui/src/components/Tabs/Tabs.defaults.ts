@@ -5,4 +5,4 @@ export const defaultProps = {
   accordionView: false,
   distributeEvenly: false,
   keepMounted: undefined as boolean | undefined,
-} as const;
+};

@@ -1,6 +1,7 @@
 import styles from "./Select.module.scss";
 
 import React from "react";
+import classnames from "classnames";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -299,7 +300,11 @@ type ThemedSelectProps = React.ComponentProps<typeof Select> & { className?: str
 export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
   function ThemedSelect({ className, ...props }: ThemedSelectProps, ref) {
     const themeClass = useComponentThemeClass(SelectMd);
-    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    const combinedClassName = classnames(
+      themeClass,
+      className,
+      className?.includes("pageSizeSelect") && styles.paginationPageSizeTrigger,
+    );
     return (
       <Select
         {...props}
@@ -481,6 +486,16 @@ type RuntimeSelectProps = React.ComponentProps<typeof Select> & {
   bindTo?: string;
 };
 
+const RuntimeSelectWithOptionClass = React.forwardRef<HTMLDivElement, RuntimeSelectProps>(
+function RuntimeSelectWithOptionClass(props, ref) {
+  return (
+    <RuntimeOptionClassContext.Provider value={props.adapter.className}>
+      <RuntimeSelectShell {...props} ref={ref} />
+    </RuntimeOptionClassContext.Provider>
+  );
+});
+
+const RuntimeSelectShell = React.forwardRef<HTMLDivElement, RuntimeSelectProps>(
 function RuntimeSelectShell({
   adapter,
   bindTo,
@@ -494,7 +509,7 @@ function RuntimeSelectShell({
   verboseValidationFeedback,
   onDidChange,
   ...props
-}: RuntimeSelectProps) {
+}: RuntimeSelectProps, ref) {
   const form = useFormContext();
   const defaultId = React.useId();
   const { parentFormItemId } = React.useContext(FormItemContext);
@@ -602,6 +617,7 @@ function RuntimeSelectShell({
       validationStatus={effectiveValidationStatus}
       invalidMessages={effectiveInvalidMessages}
       verboseValidationFeedback={effectiveVerboseValidationFeedback}
+      ref={ref}
       onDidChange={(newValue) => {
         setLocalValue(newValue);
         onDidChange?.(newValue);
@@ -630,7 +646,7 @@ function RuntimeSelectShell({
       {renderedWithValidation}
     </div>
   ) : renderedWithValidation;
-}
+});
 
 function runtimeSelectProps(adapter: XmluiComponentAdapter): RuntimeSelectProps {
   const rootAttrs = adapter.rootAttrs(COMPONENT_PART_KEY) as React.HTMLAttributes<HTMLDivElement>;
@@ -801,6 +817,71 @@ Object.assign(SelectMd.defaultThemeVars ??= {}, {
   "backgroundColor-dropdown-item": "transparent",
   "backgroundColor-dropdown-item--hover": "hsl(204, 30.3%, 98%)",
   "backgroundColor-dropdown-item--active": "hsl(204, 30.3%, 95%)",
+  [`borderWidth-${COMP}`]: "$borderWidth-Input",
+  [`borderStyle-${COMP}`]: "$borderStyle-Input",
+  [`borderColor-${COMP}`]: "$borderColor-Input",
+  [`borderRadius-${COMP}`]: "$borderRadius-Input",
+  [`backgroundColor-${COMP}`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}`]: "$boxShadow-Input",
+  [`textColor-${COMP}`]: "$textColor-Input",
+  [`borderColor-${COMP}--hover`]: "$borderColor-Input--hover",
+  [`backgroundColor-${COMP}--hover`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--hover`]: "$boxShadow-Input",
+  [`textColor-${COMP}--hover`]: "$textColor-Input",
+  [`outlineWidth-${COMP}--focus`]: "$outlineWidth-Input--focus",
+  [`outlineColor-${COMP}--focus`]: "$outlineColor-Input--focus",
+  [`outlineStyle-${COMP}--focus`]: "$outlineStyle-Input--focus",
+  [`outlineOffset-${COMP}--focus`]: "$outlineOffset-Input--focus",
+  [`textColor-placeholder-${COMP}`]: "$textColor-placeholder-Input",
+  [`borderRadius-${COMP}--error`]: "$borderRadius-Input",
+  [`borderColor-${COMP}--error`]: "$borderColor-Input--error",
+  [`borderWidth-${COMP}--error`]: "$borderWidth-Input",
+  [`borderStyle-${COMP}--error`]: "$borderStyle-Input",
+  [`backgroundColor-${COMP}--error`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--error`]: "$boxShadow-Input",
+  [`textColor-${COMP}--error`]: "$textColor-Input",
+  [`borderColor-${COMP}--error--hover`]: "$borderColor-Input--hover",
+  [`backgroundColor-${COMP}--error--hover`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--error--hover`]: "$boxShadow-Input",
+  [`textColor-${COMP}--error--hover`]: "$textColor-Input",
+  [`outlineWidth-${COMP}--error--focus`]: "$outlineWidth-Input--focus",
+  [`outlineColor-${COMP}--error--focus`]: "$outlineColor-Input--focus",
+  [`outlineStyle-${COMP}--error--focus`]: "$outlineStyle-Input--focus",
+  [`outlineOffset-${COMP}--error--focus`]: "$outlineOffset-Input--focus",
+  [`textColor-placeholder-${COMP}--error`]: "$textColor-placeholder-Input",
+  [`borderRadius-${COMP}--warning`]: "$borderRadius-Input",
+  [`borderColor-${COMP}--warning`]: "$borderColor-Input--warning",
+  [`borderWidth-${COMP}--warning`]: "$borderWidth-Input",
+  [`borderStyle-${COMP}--warning`]: "$borderStyle-Input",
+  [`backgroundColor-${COMP}--warning`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--warning`]: "$boxShadow-Input",
+  [`textColor-${COMP}--warning`]: "$textColor-Input",
+  [`borderColor-${COMP}--warning--hover`]: "$borderColor-Input--hover",
+  [`backgroundColor-${COMP}--warning--hover`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--warning--hover`]: "$boxShadow-Input",
+  [`textColor-${COMP}--warning--hover`]: "$textColor-Input",
+  [`outlineWidth-${COMP}--warning--focus`]: "$outlineWidth-Input--focus",
+  [`outlineColor-${COMP}--warning--focus`]: "$outlineColor-Input--focus",
+  [`outlineStyle-${COMP}--warning--focus`]: "$outlineStyle-Input--focus",
+  [`outlineOffset-${COMP}--warning--focus`]: "$outlineOffset-Input--focus",
+  [`textColor-placeholder-${COMP}--warning`]: "$textColor-placeholder-Input",
+  [`borderRadius-${COMP}--success`]: "$borderRadius-Input",
+  [`borderColor-${COMP}--success`]: "$borderColor-Input--success",
+  [`borderWidth-${COMP}--success`]: "$borderWidth-Input",
+  [`borderStyle-${COMP}--success`]: "$borderStyle-Input",
+  [`backgroundColor-${COMP}--success`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--success`]: "$boxShadow-Input",
+  [`textColor-${COMP}--success`]: "$textColor-Input",
+  [`borderColor-${COMP}--success--hover`]: "$borderColor-Input--hover",
+  [`backgroundColor-${COMP}--success--hover`]: "$backgroundColor-Input",
+  [`boxShadow-${COMP}--success--hover`]: "$boxShadow-Input",
+  [`textColor-${COMP}--success--hover`]: "$textColor-Input",
+  [`outlineWidth-${COMP}--success--focus`]: "$outlineWidth-Input--focus",
+  [`outlineColor-${COMP}--success--focus`]: "$outlineColor-Input--focus",
+  [`outlineStyle-${COMP}--success--focus`]: "$outlineStyle-Input--focus",
+  [`outlineOffset-${COMP}--success--focus`]: "$outlineOffset-Input--focus",
+  [`textColor-placeholder-${COMP}--success`]: "$textColor-placeholder-Input",
+  [`backgroundColor-${COMP}--disabled`]: "$backgroundColor-Input--disabled",
   [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
   [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
 });
@@ -828,11 +909,7 @@ export const selectRenderer = wrapRuntimeComponent({
       required: adapter.booleanProp("required", defaultProps.required),
       requiredInvalidMessage: adapter.stringProp("requiredInvalidMessage"),
     };
-    const shell = (
-      <RuntimeOptionClassContext.Provider value={adapter.className}>
-        <RuntimeSelectShell adapter={adapter} {...props} />
-      </RuntimeOptionClassContext.Provider>
-    );
+    const shell = <RuntimeSelectWithOptionClass adapter={adapter} {...props} />;
     return validations.required ? (
       <ValidationWrapper
         bindTo={props.bindTo}

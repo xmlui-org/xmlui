@@ -121,6 +121,12 @@ export function dSetValueApi() {
   };
 }
 
+export function dFocus(comp: string) {
+  return {
+    description: `This method sets the focus on the ${comp}.`,
+  };
+}
+
 export function dTriggerTemplate(component: string) {
   return {
     description: `This property defines a custom trigger template for the ${component}.`,

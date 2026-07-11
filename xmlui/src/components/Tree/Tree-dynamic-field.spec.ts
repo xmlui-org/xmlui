@@ -91,7 +91,7 @@ test.describe("Dynamic Field - Basic Functionality", () => {
           data="{[
             { id: 1, name: 'Node Without Dynamic Field' }
           ]}"
-          dynamic="{true}"
+          dynamic
         >
           <property name="itemTemplate">
             <HStack testId="{$item.id}">
@@ -147,7 +147,7 @@ test.describe("Dynamic Field - Basic Functionality", () => {
             { id: 1, name: 'Static Override', dynamic: false },
             { id: 2, name: 'Uses Default' }
           ]}"
-          dynamic="{true}"
+          dynamic
         >
           <property name="itemTemplate">
             <HStack testId="{$item.id}">

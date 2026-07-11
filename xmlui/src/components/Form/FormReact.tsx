@@ -1180,6 +1180,8 @@ export const FormWithContextVar = forwardRef(function (
     setClearedAtResetVersion((formState.resetVersion ?? 0) + 1);
   }, [formState.resetVersion]);
 
+  const rawInitialValue = extractValue(node.props.data);
+
   const $data = useMemo(() => {
     const updateData = (change: any) => {
       if (typeof change !== "object" || change === null || change === undefined) {
@@ -1196,8 +1198,16 @@ export const FormWithContextVar = forwardRef(function (
       });
     };
 
-    return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
-  }, [formState.subject, formState.noSubmitFields]);
+    const initialData =
+      rawInitialValue && typeof rawInitialValue === "object" && !Array.isArray(rawInitialValue)
+        ? rawInitialValue
+        : EMPTY_OBJECT;
+    return {
+      ...cleanUpSubject(initialData, formState.noSubmitFields),
+      ...cleanUpSubject(formState.subject, formState.noSubmitFields),
+      update: updateData,
+    };
+  }, [formState.subject, formState.noSubmitFields, rawInitialValue]);
 
   // $validationIssues: { [fieldName]: SingleValidationResult[] } — only invalid entries.
   const $validationIssues = useMemo(() => {
@@ -1235,7 +1245,6 @@ export const FormWithContextVar = forwardRef(function (
     };
   }, [$data, $validationIssues, $hasValidationIssue, node.children]);
 
-  const rawInitialValue = extractValue(node.props.data);
   const apiBoundDataUrl =
     extractValue.asOptionalString(node.props._data_url) || getApiBoundDataUrl(rawInitialValue);
   const [apiBoundData, setApiBoundData] = useState<{

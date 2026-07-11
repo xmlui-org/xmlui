@@ -1,11 +1,12 @@
+import type { OrientationOptions } from "../abstractions";
+
 export type SplitterResizeMode = "preserveRatio" | "preservePrimary" | "preserveSecondary";
-export type SplitterOrientation = "horizontal" | "vertical";
 
 export const defaultProps: {
   initialPrimarySize: string;
   minPrimarySize: string;
   maxPrimarySize: string;
-  orientation: SplitterOrientation;
+  orientation: OrientationOptions;
   swapped: boolean;
   floating: boolean;
   resizeMode: SplitterResizeMode;
