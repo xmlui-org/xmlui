@@ -94,14 +94,14 @@ Code, diagnostics, and package tooling.
 npm run build:website-extensions
 npm run build:website-extensions:metadata
 npm run verify:website-extensions
-npm run test:extensions:e2e
+npm run test:e2e:extension-packages
 npm --workspace xmlui-counter-badge run test
 npm --workspace xmlui-counter-badge run build
 npm --workspace xmlui-counter-badge run build:metadata
 npm --workspace xmlui run compatibility:sweep
 ```
 
-For migrated website extension packages, `npm run test:extensions:e2e` runs
+For migrated website extension packages, `npm run test:e2e:extension-packages` runs
 package-level Playwright smoke coverage for `xmlui-docs-blocks`,
 `xmlui-website-blocks`, `xmlui-search`, `xmlui-masonry`, `xmlui-gauge`,
 `xmlui-echart`, `xmlui-calendar`, `xmlui-grid-layout`, and

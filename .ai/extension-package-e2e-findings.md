@@ -36,7 +36,7 @@ The suite covers one smoke per migrated package:
 
 Command:
 
-- `npm run test:extensions:e2e`
+- `npm run test:e2e:extension-packages`
 
 Result:
 

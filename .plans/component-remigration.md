@@ -482,16 +482,16 @@ builds, and package-level verification pass in this rewrite.
 
 | State | Meaning | Public component entries |
 | --- | --- | ---: |
-| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 51 |
+| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 50 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 |
-| Complete | User approved after audit and verification. | 0 |
+| Complete | User approved after audit and verification. | 1 |
 
 ### Extension Package Inventory
 
 | Package | Public components from original package index | Package dependencies / infrastructure | Rewrite state |
 | --- | --- | --- | --- |
-| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Complete; protected source copied intact, metadata/build passed, package E2E smoke passed, and user approved completion. No original package-local E2E spec existed to copy. |
 | `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Audit required. |
 | `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Audit required; empty target package scaffold exists for future protected-source migration. |

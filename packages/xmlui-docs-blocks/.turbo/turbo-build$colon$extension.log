@@ -3,7 +3,7 @@
 > xmlui build-lib
 
 [36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (89) [2m../../node_modules/mdast-util-to-markdown/lib/util/track.js[0m[2Ktransforming (90) [2m../../node_modules/mdast-util-to-markdown/lib/configure.js[0m[2Ktransforming (243) [2m../../node_modules/unist-util-is/lib/index.js[0m[2Ktransforming (244) [2m../../node_modules/stringify-entities/lib/index.js[0m[2K[32m✓[0m 268 modules transformed.
+[2Ktransforming (83) [2m../../node_modules/trough/lib/index.js[0m[2Ktransforming (84) [2m../../node_modules/mdast-util-to-markdown/lib/configure.js[0m[2Ktransforming (251) [2m../../node_modules/hast-util-whitespace/index.js[0m[2K[32m✓[0m 268 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
 [2K[2mdist/[0m[35mxmlui-docs-blocks.css  [0m[1;2m  7.40 kB[0m[2m │ gzip:   1.77 kB[0m
 [2mdist/[0m[36mxmlui-docs-blocks.mjs  [0m[33;1m979.20 kB[0m[2m │ gzip: 180.64 kB[0m
@@ -13,5 +13,5 @@
 [2K[2mdist/[0m[35mxmlui-docs-blocks.css  [0m[1;2m  7.40 kB[0m[2m │ gzip:   1.77 kB[0m
 [2mdist/[0m[36mxmlui-docs-blocks.js   [0m[33;1m849.30 kB[0m[2m │ gzip: 167.33 kB[0m
 
-[32m✓ built in 461ms[39m
+[32m✓ built in 430ms[39m
 ⠙[1G[0K

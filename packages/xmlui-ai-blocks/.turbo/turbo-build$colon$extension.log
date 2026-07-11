@@ -1,15 +1,17 @@
 
-> xmlui-ai-blocks@0.0.0 build:extension
+> xmlui-ai-blocks@0.0.2 build:extension
 > xmlui build-lib
 
 [36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2K[32m✓[0m 2 modules transformed.
+[2Ktransforming (6) [2msrc/AiConversation/AiConversation.module.scss[0m[2K[32m✓[0m 6 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-ai-blocks.mjs  [0m[1;2m0.15 kB[0m[2m │ gzip: 0.15 kB[0m
+[2K[2mdist/[0m[35mxmlui-ai-blocks.css  [0m[1;2m2.27 kB[0m[2m │ gzip: 0.64 kB[0m
+[2mdist/[0m[36mxmlui-ai-blocks.mjs  [0m[1;2m5.54 kB[0m[2m │ gzip: 1.60 kB[0m
 
-[2K[32m✓[0m 2 modules transformed.
+[2K[32m✓[0m 6 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-ai-blocks.js  [0m[1;2m0.19 kB[0m[2m │ gzip: 0.17 kB[0m
+[2K[2mdist/[0m[35mxmlui-ai-blocks.css  [0m[1;2m2.27 kB[0m[2m │ gzip: 0.64 kB[0m
+[2mdist/[0m[36mxmlui-ai-blocks.js   [0m[1;2m4.65 kB[0m[2m │ gzip: 1.43 kB[0m
 
-[32m✓ built in 44ms[39m
+[32m✓ built in 352ms[39m
 ⠙[1G[0K

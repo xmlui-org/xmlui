@@ -10,53 +10,53 @@
 [1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/dotneteer/source/xmlui-rs/xmlui[39m
 
 [?2026h
-[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
 
 [2m Test Files [22m[1m[32m0 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m0 passed[39m[22m[90m (0)[39m
-[2m   Start at [22m08:25:16
+[2m   Start at [22m08:43:48
 [2m   Duration [22m0ms
 [?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/codegen.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22msrc/components/Text/Text.spec.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/codegen.test.ts[2m 0/17[22m
 [1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/componentBehaviors.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/contracts.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/ir.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/parseXmlui.test.ts[2m 0/11[22m
 [1m[33m ❯ [39m[22mtests/compiler/production.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/scriptSemantics.test.ts[2m [queued][22m
 
 [2m Test Files [22m[1m[32m0 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m0 passed[39m[22m[90m (11)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m356ms
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parseXmlui.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 14[2mms[22m[39m
- [32m✓[39m tests/compiler/scriptSemantics.test.ts [2m([22m[2m53 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+[2m      Tests [22m[1m[32m0 passed[39m[22m[90m (17)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m349ms
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/ir.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/compiler/scriptSemantics.test.ts [2m([22m[2m53 tests[22m[2m)[22m[32m 87[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22msrc/components/Text/Text.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/codegen.test.ts[2m 1/17[22m
 [1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/componentBehaviors.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/contracts.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/ir.test.ts[2m 18/18[22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/parseXmlui.test.ts[2m 11/11[22m
 [1m[33m ❯ [39m[22mtests/compiler/production.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/scriptSemantics.test.ts[2m 53/53[22m
 
 [2m Test Files [22m[1m[32m2 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m65 passed[39m[22m[90m (81)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m457ms
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/codegen.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+[2m      Tests [22m[1m[32m72 passed[39m[22m[90m (88)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m448ms
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/codegen.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 137[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -66,17 +66,17 @@
 [1m[33m ❯ [39m[22mtests/compiler/componentMetadata.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/contracts.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/ir.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/parseXmlui.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/production.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
 
 [2m Test Files [22m[1m[32m3 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m81 passed[39m[22m[90m (81)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m557ms
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/ir.test.ts [2m([22m[2m18 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+[2m      Tests [22m[1m[32m88 passed[39m[22m[90m (88)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m651ms
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parseXmlui.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 12[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -94,8 +94,8 @@
 
 [2m Test Files [22m[1m[32m4 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m99 passed[39m[22m[90m (99)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m757ms
+[2m   Start at [22m08:43:48
+[2m   Duration [22m750ms
 [?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -113,8 +113,8 @@
 
 [2m Test Files [22m[1m[32m4 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m99 passed[39m[22m[90m (99)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m962ms
+[2m   Start at [22m08:43:48
+[2m   Duration [22m950ms
 [?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -132,9 +132,9 @@
 
 [2m Test Files [22m[1m[32m4 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m99 passed[39m[22m[90m (103)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m1.66s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m src/components/Input/Input.spec.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m1.65s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m src/components/Input/Input.spec.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -152,7 +152,7 @@
 
 [2m Test Files [22m[1m[32m5 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m103 passed[39m[22m[90m (103)[39m
-[2m   Start at [22m08:25:16
+[2m   Start at [22m08:43:48
 [2m   Duration [22m1.96s
 [?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
@@ -171,52 +171,32 @@
 
 [2m Test Files [22m[1m[32m5 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m103 passed[39m[22m[90m (107)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m2.57s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/production.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 33[2mms[22m[39m
- [32m✓[39m tests/compiler/contracts.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m2.56s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/production.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m tests/compiler/contracts.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 33[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Text/Text.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 0/21[22m
 [1m[33m ❯ [39m[22mtests/compiler/componentBehaviors.test.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/componentMetadata.test.ts[2m 1/5[22m
+[1m[33m ❯ [39m[22mtests/compiler/componentMetadata.test.ts[2m 0/5[22m
 [1m[33m ❯ [39m[22mtests/compiler/contracts.test.ts[2m 12/12[22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/managedFetch.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/production.test.ts[2m 4/4[22m
-[1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
-
-[2m Test Files [22m[1m[32m7 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m120 passed[39m[22m[90m (145)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m2.67s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentMetadata.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
- [32m✓[39m tests/compiler/managedFetch.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
- [32m✓[39m tests/compiler/parser/scriptParser.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 8[2mms[22m[39m
-
-[1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22msrc/components/Text/Text.spec.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 9/21[22m
-[1m[33m ❯ [39m[22mtests/compiler/componentBehaviors.test.tsx[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/componentDocs.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/scriptParser.test.ts[2m 23/23[22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m10 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m159 passed[39m[22m[90m (171)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m2.77s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parser/compatibility.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+[2m Test Files [22m[1m[32m7 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m119 passed[39m[22m[90m (145)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m2.66s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentMetadata.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/compiler/managedFetch.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/scriptParser.test.ts [2m([22m[2m23 tests[22m[2m)[22m[32m 8[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
@@ -232,14 +212,34 @@
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m11 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m163 passed[39m[22m[90m (175)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m2.87s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentBehaviors.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 17[2mms[22m[39m
- [32m✓[39m src/components/Text/Text.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 18[2mms[22m[39m
- [32m✓[39m tests/compiler/renderingPipeline.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 28[2mms[22m[39m
- [32m✓[39m tests/compiler/renderingAdapter.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+[2m Test Files [22m[1m[32m10 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m159 passed[39m[22m[90m (171)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m2.86s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+[1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22msrc/components/Text/Text.spec.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 9/21[22m
+[1m[33m ❯ [39m[22mtests/compiler/componentBehaviors.test.tsx[2m 0/7[22m
+[1m[33m ❯ [39m[22mtests/compiler/componentDocs.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
+[1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
+
+[2m Test Files [22m[1m[32m10 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m159 passed[39m[22m[90m (178)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m2.96s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentBehaviors.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/components/Text/Text.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/components/Heading/Heading.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/compiler/renderingAdapter.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m tests/compiler/renderingPipeline.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 33[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m 3/3[22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m 3/3[22m
@@ -249,16 +249,16 @@
 [1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m 4/4[22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 0/4[22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/lsp.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m 2/2[22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m 16/16[22m
+[1m[33m ❯ [39m[22mtests/compiler/runtimeState.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m18 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m201 passed[39m[22m[90m (217)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.07s
+[2m Test Files [22m[1m[32m17 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m197 passed[39m[22m[90m (213)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.06s
 [?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[90mstderr[2m | src/components/App/App.spec.tsx[2m > [22m[2mApp main content layout migration[2m > [22m[2mrenders direct content inside the migrated App content and page-content parts
 [22m[39mWarning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client. See https://reactjs.org/link/uselayouteffect-ssr for common fixes.
     at MemoryRouter (/Users/dotneteer/source/xmlui-rs/node_modules/react-router/dist/umd/react-router.development.js:1101:7)
@@ -301,19 +301,18 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 [1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m 4/4[22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 0/4[22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/lsp.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m 2/2[22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m 16/16[22m
+[1m[33m ❯ [39m[22mtests/compiler/runtimeState.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m18 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m201 passed[39m[22m[90m (217)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.07s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m src/components/Heading/Heading.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 31[2mms[22m[39m
- [32m✓[39m src/components/App/App.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 33[2mms[22m[39m
- [32m✓[39m tests/compiler/extensions.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 51[2mms[22m[39m
+[2m Test Files [22m[1m[32m17 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m197 passed[39m[22m[90m (213)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.06s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m src/components/App/App.spec.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m tests/compiler/extensions.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 52[2mms[22m[39m
 
 [1m[33m ❯ [39m[22msrc/components/App/App.spec.tsx[2m 3/3[22m
 [1m[33m ❯ [39m[22msrc/components/Heading/Heading.spec.tsx[2m 3/3[22m
@@ -323,62 +322,67 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 [1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/extensions.test.ts[2m 4/4[22m
 [1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 0/4[22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/lsp.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingAdapter.test.tsx[2m 2/2[22m
 [1m[33m ❯ [39m[22mtests/compiler/renderingPipeline.test.ts[2m 16/16[22m
+[1m[33m ❯ [39m[22mtests/compiler/runtimeState.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m18 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m201 passed[39m[22m[90m (217)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.07s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parser/lsp.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/compiler/runtimeState.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/compiler/parser/markupParser.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/compiler/parser/syntaxNode.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
- [32m✓[39m tests/compiler/rawXmlui.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
- [32m✓[39m tests/compiler/parser/scriptScanner.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/compiler/mixedText.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+[2m Test Files [22m[1m[32m17 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m197 passed[39m[22m[90m (213)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.06s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/runtimeState.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/compatibility.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/markupScanner.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/scriptScanner.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/markupParser.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/lsp.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 5[2mms[22m[39m
 
-[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 9/21[22m
+[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 10/21[22m
 [1m[33m ❯ [39m[22mtests/compiler/componentDocs.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 0/4[22m
+[1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 1/4[22m
+[1m[33m ❯ [39m[22mtests/compiler/parser/compatibility.test.ts[2m 4/4[22m
+[1m[33m ❯ [39m[22mtests/compiler/parser/lsp.test.ts[2m 6/6[22m
 [1m[33m ❯ [39m[22mtests/compiler/parser/markupParser.test.ts[2m 9/9[22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/markupScanner.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/parser/syntaxNode.test.ts[2m 4/4[22m
-[1m[33m ❯ [39m[22mtests/compiler/rawXmlui.test.ts[2m 3/3[22m
+[1m[33m ❯ [39m[22mtests/compiler/parser/markupScanner.test.ts[2m 5/5[22m
+[1m[33m ❯ [39m[22mtests/compiler/parser/scriptScanner.test.ts[2m 8/8[22m
+[1m[33m ❯ [39m[22mtests/compiler/rawXmlui.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/runtimeState.test.ts[2m 12/12[22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
-[2m Test Files [22m[1m[32m25 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m248 passed[39m[22m[90m (264)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.17s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parser/markupScanner.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/compiler/routing.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+[2m Test Files [22m[1m[32m23 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m243 passed[39m[22m[90m (257)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.16s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/rawXmlui.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/compiler/mixedText.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
  [32m✓[39m tests/compiler/exampleApiMocks.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/compiler/parser/syntaxNode.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/compiler/routing.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 3[2mms[22m[39m
  [32m✓[39m src/components/Image/Image.spec.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
  [32m✓[39m tests/compiler/runtimeServices.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 3[2mms[22m[39m
- [32m✓[39m tests/compiler/parser/source.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/compiler/metadata.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 266[2mms[22m[39m
+
 
 
 
 [1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 10/21[22m
 [1m[33m ❯ [39m[22mtests/compiler/componentDocs.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/componentRegistry.test.ts[2m [queued][22m
-[1m[33m ❯ [39m[22mtests/compiler/metadata.test.ts[2m 2/4[22m
+[1m[33m ❯ [39m[22mtests/compiler/parser/source.test.ts[2m 0/3[22m
 [1m[33m ❯ [39m[22mtests/compiler/standalone.test.ts[2m [queued][22m
 [1m[33m ❯ [39m[22mtests/compiler/styling.test.ts[2m [queued][22m
 
 [2m Test Files [22m[1m[32m31 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m270 passed[39m[22m[90m (283)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.27s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/metadata.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 307[2mms[22m[39m
+[2m      Tests [22m[1m[32m269 passed[39m[22m[90m (283)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.26s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/parser/source.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
  [32m✓[39m tests/compiler/styling.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+
 
 
 
@@ -390,9 +394,10 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 
 [2m Test Files [22m[1m[32m33 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m290 passed[39m[22m[90m (297)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.47s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/standalone.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.56s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/standalone.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+
 
 
 
@@ -403,33 +408,24 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 
 [2m Test Files [22m[1m[32m34 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m292 passed[39m[22m[90m (300)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.67s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentDocs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.66s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/componentDocs.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
  [32m✓[39m tests/compiler/componentRegistry.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
 
 
 
 
 
-[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 16/21[22m
-
-[2m Test Files [22m[1m[32m36 passed[39m[22m[90m (37)[39m
-[2m      Tests [22m[1m[32m298 passed[39m[22m[90m (303)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m3.97s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
-
-
-
 
 [1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 16/21[22m
 
 [2m Test Files [22m[1m[32m36 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m298 passed[39m[22m[90m (303)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m4.98s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+[2m   Start at [22m08:43:48
+[2m   Duration [22m3.96s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+
 
 
 
@@ -438,9 +434,22 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 
 [2m Test Files [22m[1m[32m36 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m298 passed[39m[22m[90m (303)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m5.99s
-[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+[2m   Start at [22m08:43:48
+[2m   Duration [22m4.97s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+
+
+
+
+
+[1m[33m ❯ [39m[22mtests/compiler/compileXmluiModule.test.ts[2m 16/21[22m
+
+[2m Test Files [22m[1m[32m36 passed[39m[22m[90m (37)[39m
+[2m      Tests [22m[1m[32m298 passed[39m[22m[90m (303)[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m5.98s
+[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K
+
 
 
 
@@ -449,15 +458,15 @@ Warning: useLayoutEffect does nothing on the server, because its effect cannot b
 
 [2m Test Files [22m[1m[32m36 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m[1m[32m299 passed[39m[22m[90m (303)[39m
-[2m   Start at [22m08:25:16
-[2m   Duration [22m6.49s
-[?2026l[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/compileXmluiModule.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 3959[2mms[22m[39m
-     [33m[2m✓[22m[39m accepts Date calls in Tree autoLoadAfter loadChildren handlers [33m 497[2mms[22m[39m
-     [33m[2m✓[22m[39m compiles Queue processError confirmation retry handlers [33m 3142[2mms[22m[39m
+[2m   Start at [22m08:43:48
+[2m   Duration [22m6.39s
+[?2026l[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K [32m✓[39m tests/compiler/compileXmluiModule.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 3852[2mms[22m[39m
+     [33m[2m✓[22m[39m accepts Date calls in Tree autoLoadAfter loadChildren handlers [33m 451[2mms[22m[39m
+     [33m[2m✓[22m[39m compiles Queue processError confirmation retry handlers [33m 3085[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m37 passed[39m[22m[90m (37)[39m
 [2m      Tests [22m [1m[32m303 passed[39m[22m[90m (303)[39m
-[2m   Start at [22m 08:25:16
-[2m   Duration [22m 6.58s[2m (transform 19.05s, setup 0ms, import 38.81s, tests 4.88s, environment 2ms)[22m
+[2m   Start at [22m 08:43:48
+[2m   Duration [22m 6.49s[2m (transform 18.24s, setup 0ms, import 38.99s, tests 4.79s, environment 2ms)[22m
 
 [?25h⠙[1G[0K⠙[1G[0K

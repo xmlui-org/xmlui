@@ -3,15 +3,15 @@
 > xmlui build-lib
 
 [36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (24) [2m../../node_modules/embla-carousel-reactive-utils/esm/embla-carousel-reactive-utils.esm.js[0m[2Ktransforming (27) [2msrc/Breakout/Breakout.module.scss[0m[2K[32m✓[0m 31 modules transformed.
+[2Ktransforming (24) [2m../../node_modules/immer/dist/immer.esm.mjs[0m[2Ktransforming (27) [2msrc/Breakout/Breakout.module.scss[0m[2K[32m✓[0m 31 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
 [2K[2mdist/[0m[35mxmlui-website-blocks.css  [0m[1;2m15.72 kB[0m[2m │ gzip:  2.09 kB[0m
 [2mdist/[0m[36mxmlui-website-blocks.mjs  [0m[1;2m93.23 kB[0m[2m │ gzip: 25.31 kB[0m
 
-[2K[32m✓[0m 31 modules transformed.
+[2Ktransforming (28) [2msrc/ScrollToTop/ScrollToTop.module.scss[0m[2K[32m✓[0m 31 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
 [2K[2mdist/[0m[35mxmlui-website-blocks.css  [0m[1;2m15.72 kB[0m[2m │ gzip:  2.09 kB[0m
 [2mdist/[0m[36mxmlui-website-blocks.js   [0m[1;2m76.63 kB[0m[2m │ gzip: 22.73 kB[0m
 
-[32m✓ built in 451ms[39m
+[32m✓ built in 1.03s[39m
 ⠙[1G[0K

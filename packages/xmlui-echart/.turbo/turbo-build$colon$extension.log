@@ -3,15 +3,15 @@
 > xmlui build-lib
 
 [36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (82) [2m../../node_modules/zrender/lib/svg/Painter.js[0m[2Ktransforming (578) [2msrc/EChart.module.scss[0m[2K[32m✓[0m 578 modules transformed.
+[2Ktransforming (319) [2m../../node_modules/zrender/lib/graphic/Image.js[0m[2Ktransforming (578) [2msrc/EChart.module.scss[0m[2K[32m✓[0m 578 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
 [2K[2mdist/[0m[35mxmlui-echart.css  [0m[1;2m    0.09 kB[0m[2m │ gzip:   0.09 kB[0m
 [2mdist/[0m[36mxmlui-echart.mjs  [0m[33;1m1,424.67 kB[0m[2m │ gzip: 401.75 kB[0m
 
-[2K[32m✓[0m 578 modules transformed.
+[2Ktransforming (577) [2msrc/EChart.module.scss[0m[2K[32m✓[0m 578 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
 [2K[2mdist/[0m[35mxmlui-echart.css  [0m[1;2m    0.09 kB[0m[2m │ gzip:   0.09 kB[0m
 [2mdist/[0m[36mxmlui-echart.js   [0m[33;1m1,082.76 kB[0m[2m │ gzip: 354.53 kB[0m
 
-[32m✓ built in 767ms[39m
+[32m✓ built in 832ms[39m
 ⠙[1G[0K

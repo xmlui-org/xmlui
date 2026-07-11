@@ -13,7 +13,8 @@
     "build-watch": "xmlui build-lib --watch",
     "build:demo": "xmlui build",
     "build:meta": "xmlui build-lib --mode=metadata",
-    "build:metadata": "xmlui build-lib --mode=metadata"
+    "build:metadata": "xmlui build-lib --mode=metadata",
+    "test:e2e": "node ../../scripts/run-extension-e2e.mjs xmlui-animations"
   },
   "devDependencies": {
     "@types/react": "18.2.23",

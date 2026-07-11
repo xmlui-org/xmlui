@@ -2,11 +2,11 @@ import { startApp } from "xmlui";
 import aiBlocks from "./src";
 
 export const runtime = import.meta.glob(`/demo/**`, { eager: true });
-startApp(runtime, [aiBlocks]);
+startApp(runtime, aiBlocks);
 
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
-    startApp(newModule?.runtime, [aiBlocks]);
+    startApp(newModule?.runtime, aiBlocks);
   });
 }
 

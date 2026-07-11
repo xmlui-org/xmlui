@@ -4,6 +4,7 @@ const reuseExistingServer = process.env.XMLUI_REUSE_EXISTING_SERVER !== "0";
 
 export default defineConfig({
   testDir: ".",
+  timeout: 10_000,
   testMatch: [
     "packages/**/*.e2e.spec.ts",
     "packages/xmlui-search/src/Search.spec.ts",
@@ -19,9 +20,10 @@ export default defineConfig({
     "packages/xmlui-tiptap-editor/src/TiptapEditor.spec.ts",
     "packages/xmlui-calendar/src/Calendar.spec.ts",
     "packages/xmlui-grid-layout/src/GridLayout.spec.ts",
+    "packages/xmlui-ai-blocks/src/AiConversation.spec.ts",
   ],
-  fullyParallel: false,
-  workers: 1,
+  fullyParallel: true,
+  workers: process.env.CI ? "80%" : "75%",
   reporter: process.env.CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
   expect: { timeout: 10_000 },
   webServer: {
