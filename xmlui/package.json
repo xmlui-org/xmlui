@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.build.json --noEmit && vite build",
+    "build:core": "npm run build:metadata && npm run build:standalone",
     "build:xmlui": "npm run build",
     "build:xmlui-standalone": "npm run build:standalone",
     "build:xmlui-metadata": "npm run build:metadata",

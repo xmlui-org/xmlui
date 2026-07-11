@@ -10,6 +10,7 @@ import { build as viteBuild, createServer, type Plugin } from "vite";
 
 import { rawScssModulePlugin } from "../vite-plugin/rawScssModulePlugin";
 import { svgReactPlugin } from "../vite-plugin/svgReactPlugin";
+import { xmluiCssOptions } from "../../vite.shared";
 
 const execFileAsync = promisify(execFile);
 
@@ -98,6 +99,7 @@ async function buildExtensionLibrary(options: {
   await viteBuild({
     root: options.root,
     configFile: false,
+    css: xmluiCssOptions,
     plugins: [rawXmluiPlugin(), rawScssModulePlugin(), svgReactPlugin(), react()],
     build: {
       emptyOutDir: true,
@@ -132,9 +134,10 @@ async function buildExtensionMetadata(options: {
   const xmluiSrcDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const server = await createServer({
     root: options.root,
-    server: { middlewareMode: true },
+    server: { middlewareMode: true, hmr: false },
     appType: "custom",
     logLevel: "silent",
+    css: xmluiCssOptions,
     plugins: [rawXmluiPlugin(), rawScssModulePlugin(), svgReactPlugin(), react()],
     resolve: {
       alias: [

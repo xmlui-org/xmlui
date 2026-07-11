@@ -1,18 +1,15 @@
 
-
 > xmlui-tiptap-editor@0.1.1 build:extension
 > xmlui build-lib
 
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (188) [2m../../node_modules/@popperjs/core/lib/utils/g[2K[32m✓[39m 201 modules transformed.
+[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
+[2K[32m✓[0m 195 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-tiptap-editor.js  [39m[33m[1m511.05 kB[0m[39m[2m │ gzip: 172.05 kB[0m
+[2K[2mdist/[0m[36mxmlui-tiptap-editor.mjs  [0m[33;1m646.40 kB[0m[2m │ gzip: 190.70 kB[0m
 
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2Ktransforming (73) [2m../../node_modules/prosemirror-transform/dist/[2K[32m✓[39m 201 modules transformed.
+[2K[32m✓[0m 195 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-tiptap-editor.mjs  [39m[33m[1m641.34 kB[0m[39m[2m │ gzip: 189.67 kB[0m
+[2K[2mdist/[0m[36mxmlui-tiptap-editor.js  [0m[33;1m514.55 kB[0m[2m │ gzip: 172.77 kB[0m
 
-[32m✓ built in 809ms[39m
-[1G[0K⠙[1G[0K
+[32m✓ built in 239ms[39m
+⠙[1G[0K

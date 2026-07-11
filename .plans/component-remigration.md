@@ -457,6 +457,19 @@ Extension migration rules:
   `build:extension`, `build:meta` or `build:metadata`, package tests, demo
   smoke checks, and a consumer check that loads the built extension into an
   XMLUI app.
+- The original root extension build command is
+  `build-extensions: turbo run build:extension`, with package-level
+  `build:extension` scripts running `xmlui build-lib`. This rewrite preserves
+  that Turbo command shape with `build-extensions: turbo run build:extension
+  --filter='./packages/*'`, scoped to extension packages and package-style
+  workspaces.
+- The root regression command for migration work is `npm run check:regression`;
+  it first builds the XMLUI core artifacts currently supported by this rewrite
+  (`build:core`, metadata plus standalone) and extension packages through
+  Turbo, then runs XMLUI unit tests, XMLUI e2e tests, and extension package e2e
+  tests. The stricter `build:xmlui`/`npm run build` target remains a separate
+  migration target because it currently gates on full TypeScript/app-build
+  parity.
 - Do not flatten extension package components into `xmlui/src/components`. They
   must remain extension package components under `packages/<package>/src`.
 

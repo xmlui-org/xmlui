@@ -1,19 +1,17 @@
 
-
 > xmlui-grid-layout@0.1.1 build:extension
 > xmlui build-lib
 
-[1G[0K[36mvite v8.0.9 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (7) [2m../../node_modules/react-re[2K[32m✓[39m 7 modules transformed.
+[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
+[2K[32m✓[0m 7 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-grid-layout.js  [39m[2m[1m119.20 kB[0m[0m[2m │ gzip: 40.66 kB[0m
+[2K[2mdist/[0m[35mxmlui-grid-layout.css  [0m[1;2m  3.62 kB[0m[2m │ gzip:  0.96 kB[0m
+[2mdist/[0m[36mxmlui-grid-layout.mjs  [0m[1;2m116.22 kB[0m[2m │ gzip: 39.41 kB[0m
 
-[2K[1G[33m[33m[MISSING_GLOBAL_NAME] Warning:[0m No name was provided for external module "xmlui" in "output.globals" – guessing "xmlui".
-[39m
-[2K[32m✓[39m 7 modules transformed.
+[2K[32m✓[0m 7 modules transformed.
 [2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mindex.css              [39m[2m[1m  3.61 kB[0m[0m[2m │ gzip:  0.95 kB[0m
-[2mdist/[0m[36mxmlui-grid-layout.mjs  [39m[2m[1m115.73 kB[0m[0m[2m │ gzip: 39.40 kB[0m
+[2K[2mdist/[0m[35mxmlui-grid-layout.css  [0m[1;2m  3.62 kB[0m[2m │ gzip:  0.96 kB[0m
+[2mdist/[0m[36mxmlui-grid-layout.js   [0m[1;2m115.40 kB[0m[2m │ gzip: 39.51 kB[0m
 
-[32m✓ built in 387ms[39m
-[1G[0K⠙[1G[0K
+[32m✓ built in 88ms[39m
+⠙[1G[0K
