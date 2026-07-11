@@ -482,10 +482,10 @@ builds, package-level verification, and user approval pass in this rewrite.
 
 | State | Meaning | Public component entries |
 | --- | --- | ---: |
-| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 41 |
+| Audit required | Original extension component exists and must be audited or copied into the matching package structure. | 40 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 |
-| In review | Audit and tests passed; waiting for user approval. | 1 |
-| Complete | User approved after audit and verification. | 9 |
+| In review | Audit and tests passed; waiting for user approval. | 0 |
+| Complete | User approved after audit and verification. | 11 |
 
 ### Extension Package Inventory
 
@@ -495,8 +495,8 @@ builds, package-level verification, and user approval pass in this rewrite.
 | `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Complete; protected source, metadata, changelog, and copied E2E spec copied intact; package build, metadata build, protected-copy diff audit, and all 16 package E2E tests passed; user approved completion. |
 | `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Complete; source audit clean, rewrite-added package E2E passed, and user approved completion. No original package-local E2E spec existed to copy. |
 | `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Complete; protected source copied intact, extension build passed, all 50 package E2E tests passed, and user approved completion. |
-| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | In review; protected package source, metadata, entry, demo, and Monaco syntax helpers copied intact; extension build, metadata build, protected-copy diff audit, and package E2E command passed. No original package-local E2E spec existed to copy. Optional demo build still fails on existing core Vite plugin `/src/compiler/compileXmluiModule.ts` resolution. |
-| `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Audit required. |
+| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Complete; protected package source, metadata, entry, demo, and Monaco syntax helpers copied intact; extension build, metadata build, protected-copy diff audit, and package E2E command passed; user approved completion. No original package-local E2E spec existed to copy. Optional demo build still fails on existing core Vite plugin `/src/compiler/compileXmluiModule.ts` resolution. |
+| `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Complete; package XMLUI template components render through the extension user-defined component bridge, copied E2E skips were removed, package E2E command passes all 64 tests serially, and `BlogReact.tsx` was restored to the original protected source. Breadcrumbs route-hierarchy fallback and ReadingTime test literal rewrites remain documented compatibility exceptions until the host link-info and expression-string contracts are fully restored; user approved completion. |
 | `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Audit required. |
 | `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Audit required. |
 | `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Audit required. |

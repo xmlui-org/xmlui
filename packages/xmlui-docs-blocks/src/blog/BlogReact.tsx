@@ -69,8 +69,7 @@ type Props = {
 
 export function Blog({ classes, className, style }: Props) {
   const mergedClassName = classnames(classes?.[COMPONENT_PART_KEY], className);
-  const { slug: routeSlug } = useParams<{ slug?: string }>();
-  const slug = routeSlug ?? getSlugFromLocation();
+  const { slug } = useParams<{ slug?: string }>();
   const { appGlobals, mediaSize } = useAppContext();
   const { getThemeVar } = useTheme();
 
@@ -146,14 +145,6 @@ export function Blog({ classes, className, style }: Props) {
   );
 }
 
-function getSlugFromLocation(): string | undefined {
-  if (typeof window === "undefined") {
-    return undefined;
-  }
-  const match = window.location.pathname.match(/^\/blog\/([^/?#]+)/);
-  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
-}
-
 function BlogPostView({
   post,
   prefetchedContent,
@@ -212,6 +203,8 @@ function BlogPostView({
         {showToc && (
           <div className={styles.postTocSidebar}>
             <TableOfContents
+              scrollStyle="whenScrolling"
+              showScrollerFade
               omitH1
               maxHeadingLevel={3}
             />
@@ -271,7 +264,7 @@ function PostCard({
           </Text>
         )}
         <div className={styles.postCardReadMore}>
-          <span>Read more →</span>
+          <LinkNative to={`${blogBasePath}/${post.slug}`}>Read more →</LinkNative>
         </div>
       </div>
     </LinkNative>
@@ -320,7 +313,7 @@ function FeaturedStylePostItem({
           </Text>
         )}
         <div className={styles.featuredPostReadMore}>
-          <span>Read more →</span>
+          <LinkNative to={`${blogBasePath}/${post.slug}`}>Read more →</LinkNative>
         </div>
       </div>
     </LinkNative>

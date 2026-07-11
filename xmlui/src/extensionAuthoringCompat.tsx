@@ -14,12 +14,17 @@ import { TableOfContents } from "./components/TableOfContents/TableOfContentsRea
 import { Tabs as TabsComponent } from "./components/Tabs/TabsReact";
 import { TabItemComponent } from "./components/Tabs/TabItemReact";
 import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutReact";
+import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./components/App/LinkInfoContext";
 import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
 import { COMPONENT_PART_KEY } from "./styling/layout";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
 import { useInspectMode } from "./components-core/InspectorContext";
+import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
+import { createXmluiModule } from "./runtime";
+import { ComponentInstance } from "./runtime/rendering/components";
+import type { XmluiComponentModule } from "./runtime/types";
 
 export type { ComponentMetadata };
 export type { PropertyValueDescription } from "./component-core/metadata/types";
@@ -27,6 +32,7 @@ export type CompoundComponentRendererInfo = ComponentExtension;
 export type RegisterComponentApiFn = (api: Record<string, unknown>) => void;
 
 const UNINITIALIZED_API_VALUE = Symbol("uninitialized-api-value");
+const ExtensionRuntimeScopeContext = React.createContext<XmluiExtensionComponentProps["scope"] | undefined>(undefined);
 
 export {
   createMetadata,
@@ -150,15 +156,19 @@ export function wrapComponent(
         }
       }, [runtimeProps.props.id, runtimeProps.scope]);
       if (options.customRender) {
-        return options.customRender(normalizedProps, {
-          className: themeClass.className,
-          classes: { [COMPONENT_PART_KEY]: themeClass.className },
-          node: { ...runtimeProps.node, props: runtimeProps.props },
-          extractValue: createExtractValueCompat(),
-          lookupEventHandler: (eventName) => runtimeProps.events[eventName],
-          registerComponentApi,
-          renderChild: (child) => renderChildCompat(child, runtimeProps),
-        });
+        return (
+          <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+            {options.customRender(normalizedProps, {
+              className: themeClass.className,
+              classes: { [COMPONENT_PART_KEY]: themeClass.className },
+              node: { ...runtimeProps.node, props: runtimeProps.props },
+              extractValue: createExtractValueCompat(),
+              lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+              registerComponentApi,
+              renderChild: (child) => renderChildCompat(child, runtimeProps),
+            })}
+          </ExtensionRuntimeScopeContext.Provider>
+        );
       }
       const registerApiProp = options.exposeRegisterApi
         ? {
@@ -167,14 +177,16 @@ export function wrapComponent(
           }
         : {};
       return (
-        <Component
-          {...normalizedProps}
-          {...registerApiProp}
-          className={themeClass.className}
-          style={themeClass.style}
-        >
-          {renderNonPropertyChildren(runtimeProps)}
-        </Component>
+        <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
+          <Component
+            {...normalizedProps}
+            {...registerApiProp}
+            className={themeClass.className}
+            style={themeClass.style}
+          >
+            {renderNonPropertyChildren(runtimeProps)}
+          </Component>
+        </ExtensionRuntimeScopeContext.Provider>
       );
     },
   };
@@ -351,20 +363,51 @@ export function createUserDefinedComponentRenderer(
   metadata: ComponentMetadata,
   componentSource: string,
 ): ComponentExtension {
+  const compiledComponent = compileUserDefinedComponent(componentSource);
   return {
-    name: extractUserComponentName(componentSource) ?? "UserDefinedComponent",
+    name: compiledComponent?.name ?? extractUserComponentName(componentSource) ?? "UserDefinedComponent",
     description: metadata.description,
     props: Object.keys(metadata.props ?? {}),
     events: Object.keys(metadata.events ?? {}),
     allowsChildren: true,
     component: (runtimeProps) => (
-      <UserDefinedComponentFallback
-        metadata={metadata}
-        source={componentSource}
-        runtimeProps={runtimeProps}
-      />
+      compiledComponent ? (
+        <ComponentInstance
+          component={compiledComponent}
+          context={runtimeProps.context}
+          node={runtimeProps.node}
+          scope={runtimeProps.scope}
+        />
+      ) : (
+        <UserDefinedComponentFallback
+          metadata={metadata}
+          source={componentSource}
+          runtimeProps={runtimeProps}
+        />
+      )
     ),
   };
+}
+
+function compileUserDefinedComponent(componentSource: string): XmluiComponentModule | undefined {
+  try {
+    const normalizedSource = normalizeUserDefinedComponentSource(componentSource);
+    const compiled = compileXmluiSource({
+      id: `extension-component:${extractUserComponentName(componentSource) ?? "UserDefinedComponent"}.xmlui`,
+      source: normalizedSource,
+      validateComponentReferences: false,
+    });
+    throwFirstCompilerDiagnostic(compiled);
+    const module = createXmluiModule(compiled.runtimeDocument);
+    return module.kind === "component" ? module : undefined;
+  } catch (error) {
+    console.error("[xmlui] Failed to compile extension user-defined component.", error);
+    return undefined;
+  }
+}
+
+function normalizeUserDefinedComponentSource(source: string): string {
+  return source.replace(/<\/([A-Za-z][\w.-]*)\s+>/g, "</$1>");
 }
 
 export function Markdown({
@@ -430,7 +473,76 @@ export function useComponentThemeClass(metadata: ComponentMetadata): string {
 }
 
 export function useLinkInfo(): NavHierarchyNode | undefined {
-  return undefined;
+  const scope = React.useContext(ExtensionRuntimeScopeContext);
+  const runtimeSnapshot = React.useSyncExternalStore(
+    (listener) => scope?.routing?.subscribe(listener) ?? (() => undefined),
+    () => scope?.routing?.getSnapshot(),
+    () => scope?.routing?.getSnapshot(),
+  );
+  const routerLinkInfo = useRuntimeLinkInfo();
+  const linkInfoContext = useLinkInfoContext();
+  const runtimePath = runtimeSnapshot?.pathname;
+  const mappedLinkInfo = React.useMemo(() => {
+    const linkMap = linkInfoContext?.linkMap;
+    if (!linkMap || !runtimePath) {
+      return routerLinkInfo;
+    }
+    return (
+      linkMap.get(runtimePath) ??
+      linkMap.get(`#${runtimePath}`) ??
+      [...linkMap.values()].find((node) => normalizeLinkInfoPath(node.to) === runtimePath) ??
+      routerLinkInfo
+    );
+  }, [linkInfoContext?.linkMap, routerLinkInfo, runtimePath]);
+  const [domLinkInfo, setDomLinkInfo] = React.useState<NavHierarchyNode | undefined>();
+  React.useEffect(() => {
+    if ((mappedLinkInfo?.pathSegments?.length ?? 0) > 0 || typeof document === "undefined") {
+      setDomLinkInfo(undefined);
+      return;
+    }
+    const update = () => setDomLinkInfo(deriveLinkInfoFromNavDom(runtimePath));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    return () => observer.disconnect();
+  }, [mappedLinkInfo, runtimePath]);
+  return (mappedLinkInfo?.pathSegments?.length ?? 0) > 0 ? mappedLinkInfo : domLinkInfo ?? mappedLinkInfo;
+}
+
+function normalizeLinkInfoPath(path: string | undefined): string | undefined {
+  if (!path) {
+    return undefined;
+  }
+  return path.startsWith("#/") ? path.slice(1) : path;
+}
+
+function deriveLinkInfoFromNavDom(runtimePath: string | undefined): NavHierarchyNode | undefined {
+  const links = [...document.querySelectorAll("nav a")];
+  const link = links.find((candidate) => {
+    const href = candidate.getAttribute("href") ?? "";
+    return runtimePath
+      ? href === runtimePath || href === `#${runtimePath}` || href.endsWith(`#${runtimePath}`)
+      : href.startsWith("#/");
+  }) ?? links.find((candidate) => (candidate.getAttribute("href") ?? "").startsWith("#/"));
+  const label = link?.textContent?.trim();
+  if (!link || !label) {
+    return undefined;
+  }
+  const to = runtimePath ?? normalizeLinkInfoPath(link.getAttribute("href") ?? "") ?? "/";
+  const nav = link.closest("nav");
+  const groups = nav ? [...nav.querySelectorAll("button")].filter((button) => precedes(button, link)) : [];
+  const group = groups.at(-1);
+  const groupLabel = group?.textContent?.trim();
+  return {
+    type: "NavLink",
+    label,
+    to,
+    pathSegments: groupLabel ? [{ type: "NavGroup", label: groupLabel }] : [],
+  };
+}
+
+function precedes(left: Element, right: Element): boolean {
+  return !!(left.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING);
 }
 
 export const SEARCH_DEFAULT_CATEGORY = "General";
