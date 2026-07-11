@@ -2,6 +2,8 @@
 
 Date: 2026-06-27
 
+Updated: 2026-07-11
+
 ## Source Baseline
 
 Old package: `/Users/dotneteer/source/xmlui/packages/xmlui-tiptap-editor`
@@ -35,6 +37,8 @@ events, and exposes the props `initialValue`, `placeholder`, `editable`,
 - `packages/xmlui-tiptap-editor/src/xmlui-public.d.ts`
 - `packages/xmlui-tiptap-editor/src/vite-env.d.ts`
 - `packages/xmlui-tiptap-editor/meta/componentsMetadata.ts`
+- `packages/xmlui-tiptap-editor/CHANGELOG.md`
+- `packages/xmlui-tiptap-editor/src/TiptapEditor.spec.ts`
 - `packages/xmlui-tiptap-editor/tests/TiptapEditor.test.ts`
 
 Website wiring:
@@ -49,10 +53,10 @@ Website wiring:
 - The focused website smoke uses `toolbar="false"` to keep the route compact
   while proving the editor display path and old `id`/`setValue`/`value` API
   path.
-- The copied old package spec covers placeholder rendering, initial value,
-  toolbar toggling, toolbar item configuration, `setValue`, `getMarkdown`,
-  `didChange`, and `editable={false}`. Activating that spec in the rewrite test
-  runner remains follow-up work.
+- The copied old package spec is active in the rewrite extension E2E runner.
+  It covers placeholder rendering, initial value, toolbar toggling, toolbar
+  item configuration, `setValue`, `getMarkdown`, `didChange`, and
+  `editable={false}`.
 - The current `wrapCompound` compatibility layer supplies enough value,
   `onChange`, and `registerApi` behavior for the display smoke and `setValue`
   API path. Full native-event capture remains a broader extension-authoring
@@ -66,7 +70,10 @@ Website wiring:
 Passing commands:
 
 - `npm --workspace xmlui-tiptap-editor run build`
+- `npm --workspace xmlui-tiptap-editor run build:extension`
 - `npm --workspace xmlui-tiptap-editor run build:metadata`
+- `node xmlui/scripts/verify-protected-component-copy.mjs --package xmlui-tiptap-editor`
+- `npm --workspace xmlui-tiptap-editor run test:e2e` (9 passed)
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui-website run build`
 
@@ -88,8 +95,8 @@ Known verification noise:
 
 ## Follow-Up
 
-- Activate the copied old `TiptapEditor` E2E spec in the package test runner.
-- Add focused coverage for `getHTML`, toolbar interactions, editable mode, and
-  `didChange` once the extension E2E harness is consolidated.
+- Add focused coverage for `getHTML` if future package work needs it; the copied
+  original E2E suite is now active and covers toolbar interactions, editable
+  mode, and `didChange`.
 - Implement native-event capture in the extension authoring compatibility layer
   and verify editor event propagation against the old package behavior.

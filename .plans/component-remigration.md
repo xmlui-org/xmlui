@@ -484,10 +484,10 @@ renderer entries those packages expose.
 
 | State | Meaning | Package folders | Public component entries |
 | --- | --- | ---: | ---: |
-| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 2 | 8 |
+| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 1 | 7 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 | 0 |
-| Complete | User approved after audit and verification. | 14 | 43 |
+| Complete | User approved after audit and verification. | 15 | 44 |
 
 ### Extension Package Inventory
 
@@ -507,7 +507,7 @@ renderer entries those packages expose.
 | `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Complete; protected source, metadata, README, and changelog match the original package; rewrite package TypeScript shim preserves the copied source under the stricter rewrite typecheck; package build, metadata build, and all 3 rewrite-added package E2E tests pass serially; user approved completion. No original package-local E2E spec existed to copy. |
 | `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Complete; protected package source, docs, metadata, demo, and copied E2E specs were copied from the original package. Copied specs have harness import rewrites only; `BarChartReact.tsx` has a documented tooltip ref source exception. Package build, metadata build, protected-copy audit, and all 322 package E2E tests passed with the default parallel package command after extension testbed warm-up, with 320 passed and 2 skipped; user approved completion for all eight public Recharts components. |
 | `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Complete; protected source and changelog restored to the original package, copied spec has harness import rewrites only, package shim now types `TextBox.onDidChange` so original callbacks compile, protected-copy audit passed, package build and metadata build passed, all 28 copied package E2E tests passed, and user approved completion. |
-| `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Audit required. |
+| `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Complete; protected source, metadata, changelog, and copied E2E spec match the original package except for the copied spec's harness import rewrite; package build, metadata build, protected-copy audit, and all 9 copied package E2E tests passed; user approved completion. |
 | `xmlui-website-blocks` | `HeroSection`, `ScrollToTop`, `FancyButton`, `Carousel`, `CarouselItem`, `Backdrop`, `Breakout` | `@react-spring/web`, Embla carousel, compose refs, website block demos | Audit required. |
 
 Source package note: `xmlui-hello-world` exists in the original checkout only as

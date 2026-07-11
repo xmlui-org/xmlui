@@ -3,6 +3,10 @@ import { test } from "../../../xmlui/src/testing";
 
 const EXT = { extensionIds: "xmlui-tiptap-editor" };
 
+// =============================================================================
+// TiptapEditor
+// =============================================================================
+
 test.describe("TiptapEditor", () => {
   test("renders the editor", async ({ initTestBed, page }) => {
     await initTestBed(`<TiptapEditor testId="ed" />`, EXT);
@@ -11,6 +15,7 @@ test.describe("TiptapEditor", () => {
 
   test("renders toolbar by default", async ({ initTestBed, page }) => {
     await initTestBed(`<TiptapEditor testId="ed" />`, EXT);
+    // The toolbar contains at least one button (Bold)
     await expect(page.getByTestId("ed").getByTitle("Bold (Ctrl+B)")).toBeVisible();
   });
 
@@ -24,6 +29,7 @@ test.describe("TiptapEditor", () => {
       `<TiptapEditor testId="ed" toolbar="false" placeholder="Type here..." />`,
       EXT,
     );
+    // Tiptap renders placeholder via CSS data-placeholder attribute on .is-editor-empty
     const editorEl = page.getByTestId("ed").locator(".ProseMirror");
     await expect(editorEl).toBeAttached();
   });
