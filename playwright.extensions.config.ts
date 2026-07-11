@@ -22,6 +22,7 @@ export default defineConfig({
     "packages/xmlui-grid-layout/src/GridLayout.spec.ts",
     "packages/xmlui-ai-blocks/src/AiConversation.spec.ts",
     "packages/xmlui-animations/src/Animation.spec.ts",
+    "packages/xmlui-crm-blocks/src/components/TableSelect.spec.ts",
   ],
   fullyParallel: true,
   workers: process.env.CI ? "80%" : "75%",

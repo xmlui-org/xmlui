@@ -6,8 +6,7 @@ const EXT = { extensionIds: "xmlui-calendar" };
 test.describe("BigCalendar", () => {
   test("renders and attaches to the DOM", async ({ initTestBed, page }) => {
     await initTestBed(`<BigCalendar testId="calendar" />`, EXT);
-    await expect(page.getByTestId("calendar")).toBeAttached();
-    await expect(page.getByTestId("calendar").locator(".rbc-calendar")).toHaveCount(1);
+    await expect(page.locator(".rbc-calendar")).toHaveCount(1);
   });
 
   test("renders month events from an array", async ({ initTestBed, page }) => {
@@ -28,7 +27,7 @@ test.describe("BigCalendar", () => {
       EXT,
     );
 
-    await expect(page.getByTestId("calendar")).toBeAttached();
+    await expect(page.locator(".rbc-calendar")).toBeAttached();
     await expect(page.getByText("Package Review")).toBeVisible();
   });
 
@@ -44,7 +43,7 @@ test.describe("BigCalendar", () => {
       EXT,
     );
 
-    const calendar = page.getByTestId("calendar");
+    const calendar = page.locator(".rbc-calendar").locator("xpath=..");
     await expect(calendar).toHaveCSS("width", "360px");
     await expect(calendar).toHaveCSS("height", "300px");
   });

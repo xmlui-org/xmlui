@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
 import classnames from "classnames";
@@ -234,6 +234,14 @@ export function Theme({
   const className = useStyles(transformedStyles, { layer: "themes" });
 
   const [currentThemeRoot, setCurrentThemeRoot] = useState(root);
+  const currentThemeRootRef = useRef(currentThemeRoot);
+  currentThemeRootRef.current = currentThemeRoot;
+  const updatePortalThemeRoot = useCallback((el: HTMLDivElement | null) => {
+    if (el && currentThemeRootRef.current !== el) {
+      currentThemeRootRef.current = el;
+      setCurrentThemeRoot(el);
+    }
+  }, []);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
@@ -323,11 +331,7 @@ export function Theme({
             createPortal(
               <div
                 className={classnames(styles.themeWrapper, className)}
-                ref={(el) => {
-                  if (el) {
-                    setCurrentThemeRoot(el);
-                  }
-                }}
+                ref={updatePortalThemeRoot}
               ></div>,
               root,
             )}

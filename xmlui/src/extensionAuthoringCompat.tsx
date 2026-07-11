@@ -14,6 +14,7 @@ import { TableOfContents } from "./components/TableOfContents/TableOfContentsRea
 import { Tabs as TabsComponent } from "./components/Tabs/TabsReact";
 import { TabItemComponent } from "./components/Tabs/TabItemReact";
 import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutReact";
+import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
 import { COMPONENT_PART_KEY } from "./styling/layout";
@@ -23,6 +24,9 @@ export type { ComponentMetadata };
 export type { PropertyValueDescription } from "./component-core/metadata/types";
 export type CompoundComponentRendererInfo = ComponentExtension;
 export type RegisterComponentApiFn = (api: Record<string, unknown>) => void;
+
+const UNINITIALIZED_API_VALUE = Symbol("uninitialized-api-value");
+
 export {
   createMetadata,
   Button,
@@ -78,9 +82,11 @@ type OldComponentRenderArgs = {
   className?: string;
   classes: Record<string, string>;
   node: unknown;
+  state?: Record<string, unknown>;
   extractValue: ExtractValueCompat;
   lookupEventHandler: (name: string) => ((...args: unknown[]) => unknown) | undefined;
   registerComponentApi: (api: Record<string, unknown>) => void;
+  updateState: (state: Record<string, unknown>, options?: { initial?: boolean }) => void;
   renderChild: (child: unknown) => ReactNode;
 };
 
@@ -206,28 +212,138 @@ export function createComponentRenderer(
   return {
     name,
     description: metadata.description,
-    props: Object.keys(metadata.props ?? {}),
+    props: [...new Set([...Object.keys(metadata.props ?? {}), "bindTo", "value"])],
     events: Object.keys(metadata.events ?? {}),
+    apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
-    component: (runtimeProps) => {
-      const themeClass = useRuntimeComponentThemeClass(name, metadata);
-      return render({
-        className: themeClass.className,
-        classes: { [COMPONENT_PART_KEY]: themeClass.className },
-        node: { ...runtimeProps.node, props: runtimeProps.props },
-        extractValue: createExtractValueCompat(),
-        lookupEventHandler: (eventName) => runtimeProps.events[eventName],
-        registerComponentApi: (api) => {
-          const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
-          if (id) {
-            runtimeProps.scope.references[id] = api;
-            runtimeProps.scope.store.invalidateReference(id);
-          }
-        },
-        renderChild: () => runtimeProps.children,
-      });
-    },
+    component: (runtimeProps) => (
+      <OldComponentRendererCompat
+        name={name}
+        metadata={metadata}
+        render={render}
+        runtimeProps={runtimeProps}
+      />
+    ),
   };
+}
+
+function OldComponentRendererCompat({
+  name,
+  metadata,
+  render,
+  runtimeProps,
+}: {
+  name: string;
+  metadata: ComponentMetadata;
+  render: (args: OldComponentRenderArgs) => ReactNode;
+  runtimeProps: XmluiExtensionComponentProps;
+}) {
+  const form = useFormContext();
+  const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+  const bindTo = typeof runtimeProps.props.bindTo === "string" ? runtimeProps.props.bindTo : undefined;
+  const formValue = bindTo ? form?.getValue(bindTo) : undefined;
+  const [state, setState] = React.useState<Record<string, unknown>>(() => {
+    if (formValue !== undefined) {
+      return { value: formValue };
+    }
+    if (runtimeProps.props.value !== undefined) {
+      return { value: runtimeProps.props.value };
+    }
+    if (runtimeProps.props.initialValue !== undefined) {
+      return { value: runtimeProps.props.initialValue };
+    }
+    return {};
+  });
+  const apiRef = React.useRef<Record<string, unknown>>({});
+  const registeredApiRef = React.useRef<Record<string, unknown> | undefined>(undefined);
+  const lastInvalidatedApiValueRef = React.useRef<unknown>(UNINITIALIZED_API_VALUE);
+  const formRef = React.useRef(form);
+  formRef.current = form;
+
+  React.useEffect(() => {
+    if (!bindTo) {
+      return;
+    }
+    return formRef.current?.registerItem({ name: bindTo });
+  }, [bindTo]);
+
+  React.useEffect(() => {
+    if (formValue !== undefined) {
+      setState((current) => current.value === formValue ? current : { ...current, value: formValue });
+    }
+  }, [formValue]);
+
+  const registerComponentApi = React.useCallback((api: Record<string, unknown>) => {
+    apiRef.current = api;
+    if (id) {
+      if (registeredApiRef.current && shallowEqualRecords(registeredApiRef.current, api)) {
+        return;
+      }
+      registeredApiRef.current = api;
+      runtimeProps.scope.references[id] = api;
+      if (
+        Object.prototype.hasOwnProperty.call(api, "value") &&
+        !Object.is(lastInvalidatedApiValueRef.current, api.value)
+      ) {
+        lastInvalidatedApiValueRef.current = api.value;
+        runtimeProps.scope.store.invalidateReference(id);
+      }
+    }
+  }, [id, runtimeProps.scope]);
+
+  const updateState = React.useCallback((nextState: Record<string, unknown>, options?: { initial?: boolean }) => {
+    setState((current) => ({ ...current, ...nextState }));
+    if (
+      bindTo &&
+      Object.prototype.hasOwnProperty.call(nextState, "value") &&
+      !options?.initial
+    ) {
+      formRef.current?.setValue(bindTo, nextState.value);
+      void formRef.current?.validateField(bindTo, nextState.value);
+    }
+    if (id && Object.prototype.hasOwnProperty.call(nextState, "value")) {
+      const nextApi = {
+        ...apiRef.current,
+        value: nextState.value,
+      };
+      if (!registeredApiRef.current || !shallowEqualRecords(registeredApiRef.current, nextApi)) {
+        registeredApiRef.current = nextApi;
+        runtimeProps.scope.references[id] = nextApi;
+        runtimeProps.scope.store.invalidateReference(id);
+      }
+    }
+  }, [bindTo, id, runtimeProps.scope]);
+
+  return render({
+    className: themeClass.className,
+    classes: { [COMPONENT_PART_KEY]: themeClass.className },
+    node: { ...runtimeProps.node, props: runtimeProps.props },
+    state,
+    extractValue: createExtractValueCompat(),
+    lookupEventHandler: (eventName) => runtimeProps.events[eventName],
+    registerComponentApi,
+    updateState,
+    renderChild: () => runtimeProps.children,
+  });
+}
+
+function shallowEqualRecords(
+  left: Record<string, unknown> | undefined,
+  right: Record<string, unknown> | undefined,
+): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+  return leftKeys.every((key) => left[key] === right[key]);
 }
 
 export function createUserDefinedComponentRenderer(
