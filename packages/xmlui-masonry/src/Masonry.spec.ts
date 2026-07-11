@@ -3,6 +3,10 @@ import { test } from "../../../xmlui/src/testing";
 
 const EXT = { extensionIds: "xmlui-masonry" };
 
+// =============================================================================
+// Masonry — rendering
+// =============================================================================
+
 test.describe("Masonry", () => {
   test("renders and attaches to the DOM", async ({ initTestBed, page }) => {
     await initTestBed(`<Masonry testId="masonry" />`, EXT);
@@ -24,8 +28,6 @@ test.describe("Masonry", () => {
   });
 
   test("renders items from data array via itemTemplate", async ({ initTestBed, page }) => {
-    test.skip(true, "COMP-0036: Masonry data item-template context is not restored yet");
-
     await initTestBed(
       `<Masonry testId="masonry" data="{items}">
         <Text testId="item-{$itemIndex}">{$item}</Text>
@@ -38,8 +40,6 @@ test.describe("Masonry", () => {
   });
 
   test("exposes $itemIndex context variable", async ({ initTestBed, page }) => {
-    test.skip(true, "COMP-0036: Masonry data item-template context is not restored yet");
-
     await initTestBed(
       `<Masonry data="{items}">
         <Text testId="idx-{$itemIndex}">{$itemIndex}</Text>
@@ -51,8 +51,6 @@ test.describe("Masonry", () => {
   });
 
   test("exposes $isFirst and $isLast context variables", async ({ initTestBed, page }) => {
-    test.skip(true, "COMP-0036: Masonry data item-template context is not restored yet");
-
     await initTestBed(
       `<Masonry data="{items}">
         <Text testId="flag-{$itemIndex}">{$isFirst ? 'first' : $isLast ? 'last' : 'middle'}</Text>

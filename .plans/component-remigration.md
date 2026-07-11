@@ -484,10 +484,10 @@ renderer entries those packages expose.
 
 | State | Meaning | Package folders | Public component entries |
 | --- | --- | ---: | ---: |
-| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 7 | 20 |
+| Audit required | Original extension package exists and must be audited or copied into the matching package structure. | 6 | 19 |
 | Blocked | Missing extension-package infrastructure or dependency prevents audit/verification. | 0 | 0 |
 | In review | Audit and tests passed; waiting for user approval. | 0 | 0 |
-| Complete | User approved after audit and verification. | 9 | 31 |
+| Complete | User approved after audit and verification. | 10 | 32 |
 
 ### Extension Package Inventory
 
@@ -502,7 +502,7 @@ renderer entries those packages expose.
 | `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Complete; protected source, metadata, README, changelog, and copied E2E spec are restored to original contents except for the copied spec's harness import rewrite; package build and all 5 package E2E tests passed; user approved completion. |
 | `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Complete; protected source, metadata, changelog, and copied E2E spec match the original package except for the copied spec's harness import rewrite; package E2E command passes all 6 tests; user approved completion. |
 | `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Complete; protected package source and changelog match the original package, rewrite-added package E2E covers DOM attachment, static children, row height/gap, state-driven rerendering, and data item-template context, package build and metadata build pass, the package E2E command passes all 5 tests, and user approved completion. No original package-local E2E spec existed to copy. |
-| `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Audit required. |
+| `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Complete; protected source, metadata, and changelog match the original package except for the copied spec's harness import rewrite; package build and metadata build pass, all 5 copied package E2E tests pass, and user approved completion. |
 | `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; empty target package scaffold exists for future protected-source migration. |

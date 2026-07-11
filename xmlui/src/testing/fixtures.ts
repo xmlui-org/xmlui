@@ -1093,7 +1093,7 @@ function normalizeLegacyMainXsDeclarations(mainXs: string | undefined): string[]
   const declarations: string[] = [];
   const variablePattern = /\bvar\s+([A-Za-z_$][\w$]*)\s*=\s*([\s\S]*?);(?=\s*(?:var\b|$))/g;
   for (const match of mainXs.matchAll(variablePattern)) {
-    declarations.push(`var.${match[1]}="{${match[2].trim()}}"`);
+    declarations.push(`var.${match[1]}=${quoteAttribute(`{${match[2].trim()}}`)}`);
   }
   return declarations;
 }
