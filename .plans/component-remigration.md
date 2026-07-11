@@ -478,19 +478,19 @@ builds, and package-level verification pass in this rewrite.
 
 | Package | Public components from original package index | Package dependencies / infrastructure | Rewrite state |
 | --- | --- | --- | --- |
-| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Audit required; target package scaffold is missing in rewrite. |
-| `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Audit required; target package scaffold is missing in rewrite. |
+| `xmlui-ai-blocks` | `AiConversation` | XMLUI extension runtime, AI conversation host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-animations` | `Animation`, `FadeAnimation`, `FadeInAnimation`, `FadeOutAnimation`, `SlideInAnimation`, `ScaleAnimation` | `@react-spring/web`, animation timing and lifecycle host contracts | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-calendar` | `Calendar` / `BigCalendar` renderer | `react-big-calendar`, `dayjs`, package CSS build | Audit required. |
-| `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Audit required; target package scaffold is missing in rewrite. |
-| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Audit required; target package scaffold is missing in rewrite. |
+| `xmlui-crm-blocks` | `TableSelect` | Table/select host contracts and package demo support | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-devtools` | `DevTools` | Devtools namespace, Monaco, Radix dialog/menu/tooltip, editor export | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-docs-blocks` | `BasicLayout`, `FeaturedWithTabsLayout`, `OverviewCard`, `Breadcrumbs`, `Separator`, `LinkButton`, `DocumentLinks`, `DocumentPage`, `DocumentPageNoTOC`, `TBD`, `SectionHeader`, `Overview`, `TwoColumnCode`, `PageNotFound`, `ReleaseList`, `Blog`, `ReadingTime`, `Share` | Docs theme, docs helper functions, Shiki/highlighter utilities, XMLUI template components | Audit required. |
 | `xmlui-echart` | `EChart` | `echarts`, `echarts-for-react`, CSS/module build | Audit required. |
 | `xmlui-gauge` | `Gauge` | `smart-webcomponents-react`, CSS/module build | Audit required. |
 | `xmlui-grid-layout` | `GridLayout` | `react-grid-layout`, extension build without original metadata script parity | Audit required. |
 | `xmlui-masonry` | `Masonry` | Masonry layout behavior and package tests | Audit required. |
-| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Audit required; target package scaffold is missing in rewrite. |
-| `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Audit required; target package scaffold is missing in rewrite. |
-| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; target package scaffold is missing in rewrite. |
+| `xmlui-pdf` | `Pdf` | PDF.js/react-pdf, pdf-lib, WASM setup, package unit tests and E2E | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-react-flow` | `ReactFlowCanvas` | `@xyflow/react`, canvas sizing and package CSS | Audit required; empty target package scaffold exists for future protected-source migration. |
+| `xmlui-recharts` | `AreaChart`, `BarChart`, `DonutChart`, `LabelList`, `Legend`, `LineChart`, `PieChart`, `RadarChart` | `recharts`, chart provider utilities, chart CSS/modules | Audit required; empty target package scaffold exists for future protected-source migration. |
 | `xmlui-search` | `Search` | `fuse.js`, popover/search host contracts, metadata build | Audit required. |
 | `xmlui-tiptap-editor` | `TiptapEditor` | Tiptap extensions, markdown serialization, editor CSS | Audit required. |
 | `xmlui-website-blocks` | `HeroSection`, `ScrollToTop`, `FancyButton`, `Carousel`, `CarouselItem`, `Backdrop`, `Breakout` | `@react-spring/web`, Embla carousel, compose refs, website block demos | Audit required. |
