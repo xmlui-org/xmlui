@@ -20,6 +20,7 @@ export default defineConfig({
     "packages/xmlui-tiptap-editor/src/TiptapEditor.spec.ts",
     "packages/xmlui-calendar/src/Calendar.spec.ts",
     "packages/xmlui-grid-layout/src/GridLayout.spec.ts",
+    "packages/xmlui-react-flow/src/ReactFlowCanvas.spec.ts",
     "packages/xmlui-ai-blocks/src/AiConversation.spec.ts",
     "packages/xmlui-animations/src/Animation.spec.ts",
     "packages/xmlui-crm-blocks/src/components/TableSelect.spec.ts",
