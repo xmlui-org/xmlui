@@ -3,6 +3,10 @@ import { test } from "../../../xmlui/src/testing";
 
 const EXT = { extensionIds: "xmlui-gauge" };
 
+// =============================================================================
+// Gauge — rendering
+// =============================================================================
+
 test.describe("Gauge", () => {
   test("renders and attaches to the DOM", async ({ initTestBed, page }) => {
     await initTestBed(`<Gauge testId="gauge" />`, EXT);
@@ -59,6 +63,7 @@ test.describe("Gauge", () => {
       </VStack>`,
       EXT,
     );
+    // value should be clamped to maxValue=50
     await expect(page.getByTestId("result")).toHaveText("50");
   });
 });

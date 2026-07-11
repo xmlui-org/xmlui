@@ -622,8 +622,16 @@ function CompoundComponentCompat({
   options: OldWrapCompoundOptions;
   runtimeProps: XmluiExtensionComponentProps;
 }) {
-  const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
+  const normalizedProps = React.useMemo(
+    () => normalizeProps(runtimeProps.props, options, metadata),
+    [metadata, options, runtimeProps.props],
+  );
+  const normalizedPropsRef = React.useRef(normalizedProps);
+  normalizedPropsRef.current = normalizedProps;
   const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+  const scope = runtimeProps.scope;
+  const didChange = runtimeProps.events.didChange;
   const [value, setValue] = React.useState(() => {
     const rawInitialValue = normalizedProps.initialValue;
     return options.parseInitialValue
@@ -632,36 +640,40 @@ function CompoundComponentCompat({
   });
   const valueRef = React.useRef(value);
   valueRef.current = value;
+  const registeredApiRef = React.useRef<Record<string, unknown> | undefined>(undefined);
 
   const onChange = React.useCallback(
     (newValue: unknown) => {
       const formattedValue = options.formatExternalValue
-        ? options.formatExternalValue(newValue, normalizedProps)
+        ? options.formatExternalValue(newValue, normalizedPropsRef.current)
         : newValue;
       setValue(formattedValue);
-      runtimeProps.events.didChange?.(formattedValue);
-      const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
+      didChange?.(formattedValue);
       if (id) {
-        runtimeProps.scope.store.invalidateReference(id);
+        scope.store.invalidateReference(id);
       }
     },
-    [normalizedProps, options, runtimeProps],
+    [didChange, id, options, scope.store],
   );
 
   const registerApi = React.useCallback(
     (api: Record<string, unknown>) => {
-      const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
       if (id) {
-        runtimeProps.scope.references[id] = {
+        const nextApi = {
           ...api,
           get value() {
             return valueRef.current;
           },
         };
-        runtimeProps.scope.store.invalidateReference(id);
+        if (registeredApiRef.current && shallowEqualRecords(registeredApiRef.current, nextApi)) {
+          return;
+        }
+        registeredApiRef.current = nextApi;
+        scope.references[id] = nextApi;
+        scope.store.invalidateReference(id);
       }
     },
-    [runtimeProps],
+    [id, scope.references, scope.store],
   );
 
   return (
