@@ -18,6 +18,7 @@ import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./compone
 import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
 import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
+import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
 import { useInspectMode } from "./components-core/InspectorContext";
@@ -199,7 +200,7 @@ export function wrapComponent(
               className={themeClass.className}
               style={themeClass.style}
             >
-              {renderNonPropertyChildren(runtimeProps)}
+              {renderNonPropertyChildren(runtimeProps, metadata)}
             </Component>
           </div>
         </ExtensionRuntimeScopeContext.Provider>
@@ -796,7 +797,45 @@ function templateProps(
   return result;
 }
 
-function renderNonPropertyChildren(runtimeProps: XmluiExtensionComponentProps): ReactNode {
+function renderNonPropertyChildren(
+  runtimeProps: XmluiExtensionComponentProps,
+  metadata?: ComponentMetadata,
+): ReactNode {
+  const childrenTemplateName = metadata?.childrenAsTemplate;
+  const data = runtimeProps.props.data;
+  if (childrenTemplateName && Array.isArray(data)) {
+    const propertyTemplate = findPropertyChild(runtimeProps.node, childrenTemplateName);
+    const templateChildren = propertyTemplate
+      ? propertyTemplate.children
+      : runtimeProps.node.children.filter(
+        (child) => !(child.kind === "element" && child.type === "property"),
+      );
+    return data.map((item, index) => {
+      const itemScope = createRuntimeScope({
+        store: runtimeProps.scope.store,
+        parent: runtimeProps.scope,
+        props: runtimeProps.scope.props,
+        contextValues: {
+          $item: item,
+          $itemIndex: index,
+          $isFirst: index === 0,
+          $isLast: index === data.length - 1,
+        },
+        references: runtimeProps.scope.references,
+        slots: runtimeProps.scope.slots,
+        routing: runtimeProps.scope.routing,
+        toast: runtimeProps.scope.toast,
+        i18n: runtimeProps.scope.i18n,
+        emitEvent: runtimeProps.scope.emitEvent,
+        extensionFunctions: runtimeProps.scope.extensionFunctions,
+      });
+      return (
+        <React.Fragment key={index}>
+          {runtimeProps.context.renderChildren(templateChildren, itemScope, runtimeProps.node.range.end)}
+        </React.Fragment>
+      );
+    });
+  }
   const children = runtimeProps.node.children.filter(
     (child) => !(child.kind === "element" && child.type === "property"),
   );

@@ -31,6 +31,7 @@ real `ResponsiveGridLayout` rendering.
 - `packages/xmlui-grid-layout/src/index.tsx`
 - `packages/xmlui-grid-layout/src/GridLayoutWrapped.tsx`
 - `packages/xmlui-grid-layout/src/GridLayoutRender.tsx`
+- `packages/xmlui-grid-layout/CHANGELOG.md`
 - `packages/xmlui-grid-layout/src/xmlui-public.d.ts`
 - `packages/xmlui-grid-layout/src/vite-env.d.ts`
 
@@ -43,9 +44,8 @@ Website wiring:
 
 ## Compatibility Notes
 
-- The display smoke uses fixed children rather than `data` plus
-  `childrenAsTemplate`. Template/data rendering remains a follow-up
-  compatibility target.
+- The package E2E suite now covers `data` plus child item-template rendering
+  through the shared extension authoring compatibility adapter.
 - `captureNativeEvents: true` is accepted by the package authoring surface, but
   native-event trace plumbing for layout changes, drag stops, and resize stops
   is not fully implemented in the rewrite compatibility layer yet.
@@ -59,6 +59,7 @@ Passing commands:
 
 - `npm --workspace xmlui-grid-layout run build`
 - `npm --workspace xmlui-grid-layout run build:metadata`
+- `npm --workspace xmlui-grid-layout run test:e2e`
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
 - `npm --workspace xmlui-website run build`
 
@@ -82,8 +83,4 @@ Known verification noise:
 
 ## Follow-Up
 
-- Add a new package E2E smoke test because no old `xmlui-grid-layout` spec
-  exists.
-- Add coverage for `data` plus `childrenAsTemplate` once extension template
-  rendering is implemented.
 - Add interaction coverage for drag/resize and native event capture.
