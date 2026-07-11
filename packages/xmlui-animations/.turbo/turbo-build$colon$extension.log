@@ -1,15 +1,0 @@
-
-> xmlui-animations@0.0.0 build:extension
-> xmlui build-lib
-
-[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2K[32m✓[0m 2 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-animations.mjs  [0m[1;2m0.12 kB[0m[2m │ gzip: 0.13 kB[0m
-
-[2K[32m✓[0m 2 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-animations.js  [0m[1;2m0.16 kB[0m[2m │ gzip: 0.15 kB[0m
-
-[32m✓ built in 112ms[39m
-⠙[1G[0K

@@ -1,17 +1,0 @@
-
-> xmlui-search@0.1.13 build:extension
-> xmlui build-lib
-
-[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (8) [2msrc/Search.module.scss[0m[2K[32m✓[0m 8 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mxmlui-search.css  [0m[1;2m16.66 kB[0m[2m │ gzip:  2.89 kB[0m
-[2mdist/[0m[36mxmlui-search.mjs  [0m[1;2m73.84 kB[0m[2m │ gzip: 19.92 kB[0m
-
-[2Ktransforming (8) [2msrc/Search.module.scss[0m[2K[32m✓[0m 8 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mxmlui-search.css  [0m[1;2m16.66 kB[0m[2m │ gzip:  2.89 kB[0m
-[2mdist/[0m[36mxmlui-search.js   [0m[1;2m59.85 kB[0m[2m │ gzip: 17.63 kB[0m
-
-[32m✓ built in 830ms[39m
-⠙[1G[0K

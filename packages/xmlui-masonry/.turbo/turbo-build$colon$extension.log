@@ -1,15 +1,0 @@
-
-> xmlui-masonry@0.1.1 build:extension
-> xmlui build-lib
-
-[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2K[32m✓[0m 4 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-masonry.mjs  [0m[1;2m3.24 kB[0m[2m │ gzip: 1.47 kB[0m
-
-[2K[32m✓[0m 4 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[36mxmlui-masonry.js  [0m[1;2m3.21 kB[0m[2m │ gzip: 1.57 kB[0m
-
-[32m✓ built in 24ms[39m
-⠙[1G[0K

@@ -1,7 +1,0 @@
-
-> xmlui@0.12.29 check:metadata-purity
-> node scripts/check-metadata-purity.mjs
-
-[ok] src/components/metadata-helpers.ts: 43 files, no React/SCSS leaks.
-
-All metadata entry points are pure.

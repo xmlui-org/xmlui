@@ -1,17 +1,0 @@
-
-> xmlui-calendar@0.1.1 build:extension
-> xmlui build-lib
-
-[36mvite v8.1.0 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming (9) [2m../../node_modules/dom-helpers/esm/height.js[0m[2Ktransforming (265) [2m../../node_modules/lodash/constant.js[0m[2K[32m✓[0m 357 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mxmlui-calendar.css  [0m[1;2m 10.70 kB[0m[2m │ gzip:  2.45 kB[0m
-[2mdist/[0m[36mxmlui-calendar.mjs  [0m[1;2m299.18 kB[0m[2m │ gzip: 72.61 kB[0m
-
-[2K[32m✓[0m 357 modules transformed.
-[2Krendering chunks (1)...[2Kcomputing gzip size...
-[2K[2mdist/[0m[35mxmlui-calendar.css  [0m[1;2m 10.70 kB[0m[2m │ gzip:  2.45 kB[0m
-[2mdist/[0m[36mxmlui-calendar.js   [0m[1;2m223.29 kB[0m[2m │ gzip: 63.32 kB[0m
-
-[32m✓ built in 687ms[39m
-⠙[1G[0K
