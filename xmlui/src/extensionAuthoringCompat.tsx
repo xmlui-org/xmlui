@@ -74,6 +74,8 @@ type OldWrapOptions = {
   rename?: Record<string, string>;
   exclude?: readonly string[];
   exposeRegisterApi?: boolean;
+  captureNativeEvents?: boolean;
+  deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
   customRender?: (
     props: Record<string, unknown>,
     args: OldComponentRenderArgs,
@@ -165,6 +167,7 @@ export function wrapComponent(
               extractValue: createExtractValueCompat(),
               lookupEventHandler: (eventName) => runtimeProps.events[eventName],
               registerComponentApi,
+              updateState: () => undefined,
               renderChild: (child) => renderChildCompat(child, runtimeProps),
             })}
           </ExtensionRuntimeScopeContext.Provider>
@@ -176,16 +179,29 @@ export function wrapComponent(
             registerComponentApi,
           }
         : {};
+      const nativeEventProp = options.captureNativeEvents
+        ? {
+            onNativeEvent: (event: Record<string, unknown>) => {
+              const eventType = typeof event?.type === "string" ? event.type : "unknown";
+              void runtimeProps.events[eventType]?.(event);
+            },
+          }
+        : {};
+      const ariaLabel = deriveAriaLabel(normalizedProps, options, metadata);
+      const rootAttrs = extensionRootAttrs(name, normalizedProps, ariaLabel);
       return (
         <ExtensionRuntimeScopeContext.Provider value={runtimeProps.scope}>
-          <Component
-            {...normalizedProps}
-            {...registerApiProp}
-            className={themeClass.className}
-            style={themeClass.style}
-          >
-            {renderNonPropertyChildren(runtimeProps)}
-          </Component>
+          <div {...rootAttrs}>
+            <Component
+              {...withoutKeys(normalizedProps, ["data-testid", "aria-label"])}
+              {...registerApiProp}
+              {...nativeEventProp}
+              className={themeClass.className}
+              style={themeClass.style}
+            >
+              {renderNonPropertyChildren(runtimeProps)}
+            </Component>
+          </div>
         </ExtensionRuntimeScopeContext.Provider>
       );
     },
@@ -680,6 +696,7 @@ function normalizeProps(
   }
   const booleanProps = new Set(options.booleans ?? []);
   const numberProps = new Set(options.numbers ?? []);
+  const stringProps = new Set(options.strings ?? []);
   for (const [name, propMetadata] of Object.entries(metadata?.props ?? {})) {
     const targetName = options.rename?.[name] ?? name;
     const valueType = (propMetadata as { valueType?: unknown }).valueType;
@@ -688,6 +705,9 @@ function normalizeProps(
     }
     if (valueType === "number") {
       numberProps.add(targetName);
+    }
+    if (valueType === "string") {
+      stringProps.add(targetName);
     }
   }
   for (const name of booleanProps) {
@@ -700,7 +720,51 @@ function normalizeProps(
       normalized[name] = numberValue(normalized[name]);
     }
   }
+  for (const name of stringProps) {
+    if (name in normalized) {
+      normalized[name] = stringValue(normalized[name]);
+    }
+  }
   return normalized;
+}
+
+function deriveAriaLabel(
+  props: Record<string, unknown>,
+  options: OldWrapOptions,
+  metadata?: ComponentMetadata,
+): string | undefined {
+  const explicit = props["aria-label"];
+  if (explicit !== undefined && explicit !== null) {
+    return String(explicit);
+  }
+  return options.deriveAriaLabel?.(props as Record<string, any>) ??
+    metadata?.defaultAriaLabel ??
+    (props.label === undefined || props.label === null ? undefined : String(props.label));
+}
+
+function extensionRootAttrs(
+  name: string,
+  props: Record<string, unknown>,
+  ariaLabel: string | undefined,
+): Record<string, unknown> {
+  return {
+    "data-xmlui-component": name,
+    "data-xmlui-id": props.id,
+    "data-testid": props["data-testid"] ?? props.id,
+    "aria-label": ariaLabel,
+    style: rootStyleFromProps(props),
+  };
+}
+
+function rootStyleFromProps(props: Record<string, unknown>): CSSProperties | undefined {
+  const style: CSSProperties = {};
+  if (typeof props.width === "string" && props.width.length > 0) {
+    style.width = props.width;
+  }
+  if (typeof props.height === "string" && props.height.length > 0) {
+    style.height = props.height;
+  }
+  return Object.keys(style).length > 0 ? style : undefined;
 }
 
 function templateProps(
@@ -779,6 +843,13 @@ function numberValue(value: unknown): number | undefined {
     return Number.isFinite(parsed) ? parsed : undefined;
   }
   return undefined;
+}
+
+function stringValue(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  return String(value);
 }
 
 export function dInitialValue(defaultValue?: unknown, valueType = "any") {

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, type HTMLAttributes } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
 import { useTheme } from "xmlui";
@@ -85,13 +85,12 @@ function formatDisplayLabel(event: unknown, eventName: string): string | undefin
   return undefined;
 }
 
-type Props = HTMLAttributes<HTMLDivElement> & {
+type Props = {
   option?: unknown;
   className?: string;
   width?: string;
   height?: string;
   renderer?: "canvas" | "svg";
-  registerApi?: RegisterComponentApiFn;
   registerComponentApi?: RegisterComponentApiFn;
   onNativeEvent?: (event: Record<string, unknown>) => void;
 };
@@ -102,10 +101,8 @@ export const EChartRender = memo(function EChartRender({
   width,
   height,
   renderer = "canvas",
-  registerApi: _registerApi,
   registerComponentApi,
   onNativeEvent,
-  ...rest
 }: Props) {
   const chartRef = useRef<InstanceType<typeof ReactECharts> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -247,7 +244,6 @@ export const EChartRender = memo(function EChartRender({
 
   return (
     <div
-      {...rest}
       ref={containerRef}
       className={classnames(styles.echartContainer, className)}
       style={{ width: width || "100%", height: height || "400px" }}
