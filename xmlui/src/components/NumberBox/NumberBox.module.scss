@@ -121,7 +121,10 @@ $borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--d
 
 // --- CSS properties of a particular NumberBox variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
   border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
   border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");

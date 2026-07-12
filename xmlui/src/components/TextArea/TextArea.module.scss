@@ -115,7 +115,10 @@ $borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentN
 
 // --- CSS properties of a particular Textarea variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
   border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
   border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");

@@ -167,7 +167,10 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
 
 // --- CSS properties of a particular TimeInput variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
   border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
   border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");

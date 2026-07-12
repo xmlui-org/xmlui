@@ -242,6 +242,43 @@ describe("parseXmlui", () => {
     ).toThrow("Cannot write to read-only XMLUI script target '$props.label'.");
   });
 
+  it("parses semicolonless script variables for descendant bindings", () => {
+    const document = parseXmlui(`
+      <App>
+        <Page>
+          <script>
+            var post = appGlobals.allPosts.find(p => p.slug === $routeParams.slug)
+          </script>
+          <Text when="{post}">{post.title}</Text>
+        </Page>
+      </App>
+    `);
+
+    const page = document.root.children[0];
+    if (page.kind !== "element") {
+      throw new Error("Expected Page element.");
+    }
+
+    expect(page.vars).toEqual({
+      post: "{appGlobals.allPosts.find(p => p.slug === $routeParams.slug)}",
+    });
+    expect(page.children[0]).toMatchObject({
+      parsed: {
+        props: {
+          when: expect.objectContaining({
+            source: "post",
+            dependencies: [
+              expect.objectContaining({
+                kind: "local",
+                name: "post",
+              }),
+            ],
+          }),
+        },
+      },
+    });
+  });
+
   it("surfaces malformed mixed text expression diagnostics", () => {
     expect(() => parseXmlui(`<App><Button>{count ||}</Button></App>`)).toThrow(
       "Expected expression.",

@@ -498,6 +498,7 @@ const builtInElementNames = new Set([
   "NavLink",
   "NavPanelCollapseButton",
   "NavPanel",
+  "IncludeNavSection",
   "NoResult",
   "ValidationSummary",
   "ConciseValidationFeedback",

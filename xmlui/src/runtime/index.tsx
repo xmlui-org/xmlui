@@ -82,6 +82,7 @@ export type MountXmluiAppOptions = {
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  icons?: Record<string, string>;
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
@@ -113,6 +114,7 @@ export function mountXmluiApp(
         defaultTone={options.defaultTone}
         extensions={options.extensions}
         appGlobals={options.appGlobals}
+        icons={options.icons}
         resources={options.resources}
         themes={options.themes}
         defaultTheme={options.defaultTheme}
@@ -127,11 +129,12 @@ export function mountXmluiApp(
       initialUrl={options.initialUrl}
       isolateRouting={options.isolateRouting}
       defaultTone={options.defaultTone}
-      extensions={options.extensions}
-      appGlobals={options.appGlobals}
-      resources={options.resources}
-      themes={options.themes}
-      defaultTheme={options.defaultTheme}
+        extensions={options.extensions}
+        appGlobals={options.appGlobals}
+        icons={options.icons}
+        resources={options.resources}
+        themes={options.themes}
+        defaultTheme={options.defaultTheme}
       testProbe={options.testProbe}
     />,
   );
@@ -145,6 +148,7 @@ export function XmluiRoot({
   defaultTone,
   extensions,
   appGlobals = {},
+  icons = {},
   resources = {},
   themes = [],
   defaultTheme,
@@ -156,6 +160,7 @@ export function XmluiRoot({
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  icons?: Record<string, string>;
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
@@ -247,7 +252,7 @@ export function XmluiRoot({
         signError,
         mediaSize,
       }}>
-        <IconProvider icons={{}}>
+        <IconProvider icons={icons}>
           <XmluiThemeRoot tone={defaultTone}>
             <LegacyThemeProvider resources={resources} themes={themes} defaultTheme={defaultTheme}>
               <XmluiRuntimeContent

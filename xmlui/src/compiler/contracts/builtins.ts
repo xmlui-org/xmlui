@@ -1546,6 +1546,16 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
     events: {},
   },
   {
+    name: "IncludeNavSection",
+    kind: "builtin",
+    allowsChildren: false,
+    declarations: {},
+    props: {
+      sectionId: { name: "sectionId" },
+    },
+    events: {},
+  },
+  {
     name: "NavLink",
     kind: "builtin",
     allowsChildren: true,

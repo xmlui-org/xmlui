@@ -470,6 +470,8 @@ describe("runtime descriptor attachment and module emission", () => {
       },
     });
     expect(button.parsed.events.click.generatedName).toContain("event_");
+    expect(button.parsed.events.click.ast).toBeUndefined();
+    expect(button.parsed.events.click.ir).toBeUndefined();
     expect(String(button.parsed.events.click.execute)).toContain("async function event_");
     expect(button.parsed.events.click.compiledSource).toContain("__xmluiYieldIfNeeded");
     expect(button.parsed.events.click.compiledSource).toContain(
@@ -477,6 +479,8 @@ describe("runtime descriptor attachment and module emission", () => {
     );
     expect(button.parsed.events.click.compiledSource).toContain("return __xmluiResult;");
     expect(text.segments[1].generatedName).toContain("expr_");
+    expect(text.segments[1].ast).toBeUndefined();
+    expect(text.segments[1].ir).toBeUndefined();
     expect(String(text.segments[1].evaluate)).toContain("function expr_");
     expect(text.segments[1].evaluate(fakeContext({ globals: { count: 3 } }))).toBe(3);
   });

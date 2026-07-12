@@ -4,6 +4,8 @@ import { createRoot, type Root } from "react-dom/client";
 import { XmluiRoot } from "./index";
 import type { XmluiModule } from "./types";
 import type { Extension } from "../extensions";
+import type { ThemeTone } from "../styling";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 
 let contentRoot: Root | null = null;
 let hmrKey = 0;
@@ -24,13 +26,13 @@ export function startApp(
 ): Root {
   const appModule = findAppModule(runtime);
   const appConfig = findAppConfig(runtime);
-  return renderApp(appModule, extensions, appConfig?.appGlobals);
+  return renderApp(appModule, extensions, appConfig);
 }
 
 function renderApp(
   appModule: XmluiModule & { kind: "app" },
   extensions: Extension[],
-  appGlobals: Record<string, unknown> = {},
+  appConfig: StandaloneAppConfig = {},
 ): Root {
   const rootElement = ensureRootElement();
 
@@ -43,21 +45,50 @@ function renderApp(
       key: hmrKey++,
       module: appModule,
       extensions,
-      appGlobals,
+      appGlobals: appConfig.appGlobals,
+      icons: appConfig.icons,
+      resources: appConfig.resources,
+      themes: appConfig.themes,
+      defaultTheme: appConfig.defaultTheme,
+      defaultTone: appConfig.defaultTone,
     }),
   );
 
   return contentRoot;
 }
 
-function findAppConfig(runtime: Record<string, unknown>): { appGlobals?: Record<string, unknown> } | undefined {
+type StandaloneAppConfig = {
+  appGlobals?: Record<string, unknown>;
+  icons?: Record<string, string>;
+  resources?: Record<string, string>;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
+  defaultTone?: ThemeTone;
+};
+
+function findAppConfig(runtime: Record<string, unknown>): StandaloneAppConfig | undefined {
   for (const value of Object.values(runtime)) {
     const config = (value as any)?.default;
-    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
-      return config as { appGlobals?: Record<string, unknown> };
+    if (isStandaloneAppConfig(config)) {
+      return config;
     }
   }
   return undefined;
+}
+
+function isStandaloneAppConfig(value: unknown): value is StandaloneAppConfig {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const config = value as StandaloneAppConfig;
+  return Boolean(
+    config.appGlobals ||
+      config.icons ||
+      config.resources ||
+      config.themes ||
+      config.defaultTheme ||
+      config.defaultTone,
+  );
 }
 
 function findAppModule(

@@ -45,12 +45,9 @@ type Props = {
   ellipses?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
-} & Partial<
-  Pick<
-    HTMLAnchorElement,
-    "hreflang" | "rel" | "download" | "target" | "referrerPolicy" | "ping" | "type"
-  >
->;
+  hreflang?: string;
+  hrefLang?: string;
+} & Partial<Pick<HTMLAnchorElement, "rel" | "download" | "target" | "referrerPolicy" | "ping" | "type">>;
 
 import { defaultProps } from "./Link.defaults";
 
@@ -79,8 +76,14 @@ export const LinkNative = memo(forwardRef(function LinkNative(
     ellipses = defaultProps.ellipses,
     overflowMode,
     breakMode,
+    hreflang,
+    hrefLang,
     ...anchorProps
   } = specifyTypes(props);
+  const normalizedAnchorProps = {
+    ...anchorProps,
+    hrefLang: hrefLang ?? hreflang,
+  };
 
   const content = label ?? children;
   const iconLink = !!icon && !content;
@@ -179,7 +182,7 @@ export const LinkNative = memo(forwardRef(function LinkNative(
   const Node = to ? Link : "span";
   return (
     <Node
-      {...anchorProps}
+      {...normalizedAnchorProps}
       ref={forwardedRef as any}
       // reloadDocument is a react-router-dom <Link>-only prop; omit it for plain divs.
       // Ref: https://v2.remix.run/docs/components/link#reloaddocument

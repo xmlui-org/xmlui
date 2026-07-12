@@ -94,7 +94,10 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
 
 // --- CSS properties of a particular Checkbox variant
 @mixin checkboxVariant($variantName: "") {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-Checkbox#{$suffix}");
   border-color: createThemeVar("Input:borderColor-Checkbox#{$suffix}");
   background-color: createThemeVar("Input:backgroundColor-Checkbox#{$suffix}");

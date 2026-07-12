@@ -247,6 +247,7 @@ export const coreRuntimeRendererEntries = [
   { name: "NavLink", renderer: navLinkRuntimeRenderer },
   { name: "NavPanelCollapseButton", renderer: navPanelCollapseButtonRenderer },
   { name: "NavPanel", renderer: navPanelRuntimeRenderer },
+  { name: "IncludeNavSection", renderer: () => null },
   { name: "DataSource", renderer: dataSourceRenderer },
   { name: "APICall", renderer: apiCallRuntimeRenderer },
   { name: "AppState", renderer: appStateRenderer },

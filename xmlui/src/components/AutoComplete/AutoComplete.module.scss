@@ -111,7 +111,10 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
 // --- CSS properties of a particular AutoComplete variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-#{$component}#{$suffix}");
   border-color: createThemeVar("Input:borderColor-#{$component}#{$suffix}");
   border-width: createThemeVar("Input:borderWidth-#{$component}#{$suffix}");

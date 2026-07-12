@@ -9,7 +9,10 @@ $themeVars: ();
 $component: "Text";
 
 @mixin textVariant($variant) {
-  $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
+  $variantName: "#{$component}-#{$variant}";
+  @if $variant == "" {
+    $variantName: "#{$component}";
+  }
   $themeVars: t.composePaddingVars($themeVars, $variantName);
   $themeVars: t.composeBorderVars($themeVars, $variantName);
   $themeVars: t.composeTextVars($themeVars, $variantName, $component);

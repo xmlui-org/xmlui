@@ -47,9 +47,9 @@ export const Icon = memo(forwardRef(function Icon(
     onKeyDown?.(event);
   };
 
-  const computedSize = typeof size === "string" ? mapSizeToIconPack(size) : size;
-  const width = computedSize || restProps.width;
-  const height = computedSize || restProps.height;
+  const computedSize = normalizeIconDimension(size, true);
+  const width = computedSize || normalizeIconDimension(restProps.width);
+  const height = computedSize || normalizeIconDimension(restProps.height);
   const computedProps = {
     // className is needed to apply a default color to the icon, thus other component classes can override this one
     className: classnames(styles.base, className, { [styles.clickable]: !!onClick }),
@@ -173,9 +173,15 @@ function useCustomIconUrl(iconName?: string) {
   return getResourceUrl(`resource:icon.${iconName}`);
 }
 
-function mapSizeToIconPack(size: string) {
-  if (/^\$[a-zA-Z0-9_$-]+$/g.test(size)) {
-    return toCssVar(size);
+function normalizeIconDimension(value: unknown, mapNamedSize = false) {
+  if (typeof value !== "string") {
+    return value;
+  }
+  if (/^\$[a-zA-Z0-9_$-]+$/g.test(value)) {
+    return toCssVar(value);
+  }
+  if (!mapNamedSize) {
+    return value;
   }
   return (
     {
@@ -183,7 +189,7 @@ function mapSizeToIconPack(size: string) {
       sm: "16px",
       md: "24px",
       lg: "32px",
-    }[size] || size
+    }[value] || value
   );
 }
 

@@ -1,7 +1,9 @@
 import type { Plugin, ViteDevServer } from "vite";
 import type { XmluiComponentContract } from "../compiler/contracts/types";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const XMLUI_RE = /\.xmlui$/;
+const compilerModulePath = fileURLToPath(new URL("../compiler/compileXmluiModule.ts", import.meta.url));
 
 export type XmluiPluginOptions = {
   extensions?: Iterable<any>;
@@ -20,17 +22,19 @@ export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
       if (!XMLUI_RE.test(id)) {
         return null;
       }
-      if (isExternalPackageXmlui(id)) {
+      if (isPackageXmlui(id)) {
+        if (/^\s*export\s+default\s+/.test(source)) {
+          return null;
+        }
         return {
           code: `export default ${JSON.stringify(source)};`,
           map: null,
         };
       }
 
-      const compilerModulePath = "/src/compiler/compileXmluiModule.ts";
       const { compileXmluiModuleWithSourceMap } = devServer
         ? await devServer.ssrLoadModule(compilerModulePath)
-        : await import(compilerModulePath);
+        : await import(pathToFileURL(compilerModulePath).href);
       const compiled = compileXmluiModuleWithSourceMap({
         id,
         source,
@@ -45,11 +49,7 @@ export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
   };
 }
 
-function isExternalPackageXmlui(id: string): boolean {
+function isPackageXmlui(id: string): boolean {
   const normalized = id.replaceAll("\\", "/");
-  const cwd = process.cwd().replaceAll("\\", "/");
-  return !normalized.startsWith(`${cwd}/`) && (
-    normalized.includes("/packages/") ||
-    normalized.includes("/node_modules/")
-  );
+  return normalized.includes("/packages/") || normalized.includes("/node_modules/");
 }

@@ -137,8 +137,6 @@ function emitRuntimeTextSegment(segment: XmluiIrTextSegment): EmitJsValue {
     source: segment.sourceText,
     range: rangeFromSource(segment.source),
     expressionRange: rangeFromSource(segment.expression.source),
-    ast: segment.expression.ast,
-    ir: segment.expression.ir,
     bindingMode: segment.expression.bindingMode,
     ...emitGeneratedExpressionFields(segment.expression, generatedName("expr", segment.expression.source)),
     dependencies: segment.expression.dependencies,
@@ -152,9 +150,7 @@ function emitRuntimeExpression(
 ): EmitJsValue {
   return {
     source: expression.sourceText,
-    ast: expression.ast,
     range: rangeFromSource(expression.source),
-    ir: expression.ir,
     rawValue,
     irId,
     bindingMode: expression.bindingMode,
@@ -174,9 +170,8 @@ function emitRuntimeEvent(event: XmluiEventIr): EmitJsValue {
   });
   return {
     source: event.rawSource,
-    ast: event.ast,
     range: rangeFromSource(event.source),
-    ir: event.ir,
+    ir: eventNeedsInterpreterFallback(event) ? event.ir : undefined,
     irId: event.id,
     generatedName: generatedName("event", event.id),
     compiledSource: generated.body,
@@ -186,6 +181,10 @@ function emitRuntimeEvent(event: XmluiEventIr): EmitJsValue {
     writes: event.writes,
     invalidates: generated.invalidates,
   };
+}
+
+function eventNeedsInterpreterFallback(event: XmluiEventIr): boolean {
+  return event.writes.some((write) => write.kind === "member" || write.kind === "index");
 }
 
 function emitGeneratedExpressionFields(
