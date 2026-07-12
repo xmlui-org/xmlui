@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 4 implemented; Step 4.5 and Step 5 resequenced after rollback  
+Status: Step 4.5 implemented and verified; Step 5 resequenced after rollback  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -369,6 +369,34 @@ Verification:
 - `npm --workspace xmlui run check:metadata`
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Implementation checkpoint:
+
+- Added a build-safe `.xmlui` compiler loader that uses an internal Vite SSR
+  server instead of native Node importing `compileXmluiModule.ts`.
+- Added shared Vite environment CSS handling so SSG/compiler SSR loads keep the
+  same SCSS preprocessor options in Vite environments.
+- Added `build:ssg:focused` for the focused SSG gate while leaving
+  `build:ssg` and `build:production` strict typing behavior unchanged.
+- Updated the focused Playwright SSG server to use `build:ssg:focused`.
+- Wrapped SSG rendering in `MemoryRouter` so SSG render does not instantiate a
+  browser router while rendering server-side.
+- Replaced production-manifest config-time compiler imports with a static
+  compatibility manifest for the focused fixture build. The broad
+  compiler-backed production manifest analysis remains explicit deferred debt.
+- Verification passed:
+  `vite build --config vite.ssg-render.config.ts`,
+  `npm --workspace xmlui run build:ssg:focused`,
+  focused SSG/standalone Playwright specs (`8 passed`),
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run test:unit` (`308 passed`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5534 passed`, `83 skipped`).
+- Remaining notes: `check:metadata` still logs Vite's sandbox-only WebSocket
+  `EPERM` warning but exits successfully; SSG rendering still logs React
+  `useLayoutEffect` SSR warnings; generated standalone sample bundles are
+  tracked in the repository, so they may appear modified even though the
+  `.gitignore` rule now ignores newly generated copies.
 
 ### Step 5: Port the Old Theme Compilation Pipeline Safely
 

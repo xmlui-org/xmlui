@@ -1,5 +1,6 @@
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { MemoryRouter } from "react-router-dom";
 
 import { XmluiRoot } from "../runtime";
 import { StyleProvider } from "../components-core/theming/StyleContext";
@@ -32,7 +33,9 @@ export function renderSsgExample(example: SsgExampleName, path = "/"): SsgRender
   const registry = new StyleRegistry();
   const markup = renderToString(
     <StyleProvider styleRegistry={registry}>
-      <XmluiRoot module={module} initialUrl={path} extensions={[counterBadgeExtension]} />
+      <MemoryRouter initialEntries={[path]}>
+        <XmluiRoot module={module} initialUrl={path} extensions={[counterBadgeExtension]} />
+      </MemoryRouter>
     </StyleProvider>,
   );
   return {

@@ -53,6 +53,43 @@ export function styleToJsInteropPlugin(compatPath = path.resolve("src/compat/sty
   };
 }
 
+export function xmluiEnvironmentCssPlugin(): Plugin {
+  const applyCssOptions = (config: any) => {
+    config.css = {
+      ...xmluiCssOptions,
+      ...config.css,
+      modules: {
+        ...xmluiCssOptions.modules,
+        ...config.css?.modules,
+      },
+      preprocessorOptions: {
+        ...xmluiCssOptions.preprocessorOptions,
+        ...config.css?.preprocessorOptions,
+      },
+    };
+  };
+  return {
+    name: "xmlui-rs:environment-css",
+    configEnvironment(_name, config) {
+      const nextConfig = { ...config };
+      applyCssOptions(nextConfig);
+      return nextConfig;
+    },
+    configResolved(config) {
+      for (const environment of Object.values(config.environments)) {
+        applyCssOptions(environment as any);
+      }
+    },
+    transform() {
+      const environment = (this as any).environment;
+      if (environment?.config) {
+        applyCssOptions(environment.config);
+      }
+      return null;
+    },
+  };
+}
+
 function shouldExposeLocalCssModuleName(filename: string): boolean {
   const basename = path.basename(filename);
   return basename === "ExpandableItem.module.scss" ||

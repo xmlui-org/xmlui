@@ -62,7 +62,7 @@ const webServers = [
     : undefined,
   requestsSsg
     ? {
-        command: "npm run build:ssg && XMLUI_SSG_PORT=5176 node scripts/preview-ssg.mjs",
+        command: "npm run build:ssg:focused && XMLUI_SSG_PORT=5176 node scripts/preview-ssg.mjs",
         url: "http://127.0.0.1:5176/xmlui-ssg-manifest.json",
         reuseExistingServer,
       }
