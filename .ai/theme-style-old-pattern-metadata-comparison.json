@@ -1,0 +1,239 @@
+{
+  "generatedAt": "2026-07-12",
+  "method": "Source-pattern inventory over core components, website extension packages, and website-local themes. Counts are a migration guide, not a replacement for runtime metadata tests.",
+  "scope": {
+    "core": "xmlui/src/components",
+    "websitePackages": [
+      "xmlui-search",
+      "xmlui-website-blocks",
+      "xmlui-docs-blocks",
+      "xmlui-echart",
+      "xmlui-calendar",
+      "xmlui-gauge",
+      "xmlui-grid-layout",
+      "xmlui-masonry",
+      "xmlui-tiptap-editor"
+    ],
+    "websiteThemes": "website/src/themes"
+  },
+  "old": {
+    "source": "/Users/dotneteer/source/xmlui",
+    "metadata": {
+      "files": 724,
+      "themeVarFiles": 94,
+      "defaultThemeVarFiles": 78,
+      "toneSpecificThemeVarFiles": 0,
+      "contributorFiles": 3,
+      "valueTypeFiles": 118,
+      "themeVarsOccurrences": 121,
+      "defaultThemeVarsOccurrences": 101,
+      "toneSpecificOccurrences": 0,
+      "contributorOccurrences": 3,
+      "valueTypeOccurrences": 948,
+      "websiteThemeFiles": 7,
+      "packageFiles": {
+        "xmlui-search": {
+          "files": 5,
+          "themeVarFiles": 1,
+          "defaultThemeVarFiles": 1,
+          "valueTypeOccurrences": 10
+        },
+        "xmlui-website-blocks": {
+          "files": 22,
+          "themeVarFiles": 4,
+          "defaultThemeVarFiles": 5,
+          "valueTypeOccurrences": 47
+        },
+        "xmlui-docs-blocks": {
+          "files": 33,
+          "themeVarFiles": 4,
+          "defaultThemeVarFiles": 3,
+          "valueTypeOccurrences": 31
+        },
+        "xmlui-echart": {
+          "files": 4,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 3
+        },
+        "xmlui-calendar": {
+          "files": 3,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 0
+        },
+        "xmlui-gauge": {
+          "files": 5,
+          "themeVarFiles": 1,
+          "defaultThemeVarFiles": 1,
+          "valueTypeOccurrences": 10
+        },
+        "xmlui-grid-layout": {
+          "files": 3,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 6
+        },
+        "xmlui-masonry": {
+          "files": 4,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 5
+        },
+        "xmlui-tiptap-editor": {
+          "files": 4,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 5
+        }
+      }
+    },
+    "registry": {
+      "xmlui/src/components/ComponentProvider.tsx": {
+        "componentThemeVars": true,
+        "componentDefaultThemeVars": true,
+        "componentThemeVarDeclarations": true,
+        "themeVarsSet": true,
+        "defaultThemeVarsStore": true,
+        "useCompiledTheme": false,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": false
+      },
+      "xmlui/src/components-core/theming/ThemeProvider.tsx": {
+        "componentThemeVars": true,
+        "componentDefaultThemeVars": true,
+        "componentThemeVarDeclarations": true,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": true,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": false
+      }
+    }
+  },
+  "rewrite": {
+    "source": "/Users/dotneteer/source/xmlui-rs",
+    "metadata": {
+      "files": 869,
+      "themeVarFiles": 97,
+      "defaultThemeVarFiles": 80,
+      "toneSpecificThemeVarFiles": 0,
+      "contributorFiles": 3,
+      "valueTypeFiles": 121,
+      "themeVarsOccurrences": 124,
+      "defaultThemeVarsOccurrences": 104,
+      "toneSpecificOccurrences": 0,
+      "contributorOccurrences": 3,
+      "valueTypeOccurrences": 937,
+      "websiteThemeFiles": 7,
+      "packageFiles": {
+        "xmlui-search": {
+          "files": 7,
+          "themeVarFiles": 1,
+          "defaultThemeVarFiles": 1,
+          "valueTypeOccurrences": 10
+        },
+        "xmlui-website-blocks": {
+          "files": 24,
+          "themeVarFiles": 4,
+          "defaultThemeVarFiles": 5,
+          "valueTypeOccurrences": 47
+        },
+        "xmlui-docs-blocks": {
+          "files": 36,
+          "themeVarFiles": 4,
+          "defaultThemeVarFiles": 3,
+          "valueTypeOccurrences": 31
+        },
+        "xmlui-echart": {
+          "files": 6,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 3
+        },
+        "xmlui-calendar": {
+          "files": 6,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 0
+        },
+        "xmlui-gauge": {
+          "files": 7,
+          "themeVarFiles": 1,
+          "defaultThemeVarFiles": 1,
+          "valueTypeOccurrences": 10
+        },
+        "xmlui-grid-layout": {
+          "files": 6,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 6
+        },
+        "xmlui-masonry": {
+          "files": 5,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 5
+        },
+        "xmlui-tiptap-editor": {
+          "files": 6,
+          "themeVarFiles": 0,
+          "defaultThemeVarFiles": 0,
+          "valueTypeOccurrences": 5
+        }
+      }
+    },
+    "registry": {
+      "xmlui/src/component-core/registry.ts": {
+        "componentThemeVars": false,
+        "componentDefaultThemeVars": false,
+        "componentThemeVarDeclarations": false,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": false,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": false
+      },
+      "xmlui/src/component-core/runtimeRegistry.ts": {
+        "componentThemeVars": false,
+        "componentDefaultThemeVars": false,
+        "componentThemeVarDeclarations": false,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": false,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": false
+      },
+      "xmlui/src/runtime/rendering/theme.tsx": {
+        "componentThemeVars": false,
+        "componentDefaultThemeVars": false,
+        "componentThemeVarDeclarations": false,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": false,
+        "xmluiThemeRoot": true,
+        "legacyThemeProvider": false
+      },
+      "xmlui/src/components-core/theming/ThemeContext.tsx": {
+        "componentThemeVars": false,
+        "componentDefaultThemeVars": false,
+        "componentThemeVarDeclarations": false,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": false,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": true
+      },
+      "xmlui/src/components-core/theming/ThemeProvider.tsx": {
+        "componentThemeVars": false,
+        "componentDefaultThemeVars": false,
+        "componentThemeVarDeclarations": false,
+        "themeVarsSet": false,
+        "defaultThemeVarsStore": false,
+        "useCompiledTheme": true,
+        "xmluiThemeRoot": false,
+        "legacyThemeProvider": false
+      }
+    }
+  }
+}

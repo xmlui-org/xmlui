@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { IconRegistryContext } from "../IconRegistryContext";
+import { StyleProvider } from "../../components-core/theming/StyleContext";
 import { Adornment } from "./InputAdornment";
 import { InputDivider } from "./InputDivider";
 import { InputLabel } from "./InputLabel";
@@ -26,9 +27,11 @@ describe("Input shared internals", () => {
     expect(renderToStaticMarkup(<Adornment />)).toBe("");
 
     const html = renderToStaticMarkup(
-      <IconRegistryContext.Provider value={fakeIconRegistry}>
-        <Adornment text="USD" iconName="search" />
-      </IconRegistryContext.Provider>,
+      <StyleProvider>
+        <IconRegistryContext.Provider value={fakeIconRegistry}>
+          <Adornment text="USD" iconName="search" />
+        </IconRegistryContext.Provider>
+      </StyleProvider>,
     );
     expect(html).toContain("wrapper");
     expect(html).toContain('role="presentation"');

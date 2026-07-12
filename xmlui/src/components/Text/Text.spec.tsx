@@ -6,6 +6,7 @@ import { builtInComponentContracts } from "../../compiler/contracts";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { XmluiThemeRoot } from "../../runtime/rendering/theme";
+import { StyleProvider } from "../../components-core/theming/StyleContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -41,7 +42,9 @@ describe("Text migration", () => {
 
     const html = renderToStaticMarkup(
       <XmluiThemeRoot>
-        <TextRenderer context={context} node={text} scope={scope} />
+        <StyleProvider>
+          <TextRenderer context={context} node={text} scope={scope} />
+        </StyleProvider>
       </XmluiThemeRoot>,
     );
 
@@ -60,8 +63,8 @@ describe("Text migration", () => {
 
 function renderTextVariant(variant: string) {
   return renderToStaticMarkup(
-    <TextReact variant={variant}>
-      content
-    </TextReact>,
+    <StyleProvider>
+      <TextReact variant={variant}>content</TextReact>
+    </StyleProvider>,
   );
 }

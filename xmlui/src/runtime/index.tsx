@@ -12,11 +12,12 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
-import { StyleProvider, XmluiThemeRoot } from "./rendering/theme";
+import { StyleProvider as RuntimeStyleProvider, XmluiThemeRoot } from "./rendering/theme";
 import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
 import { LegacyThemeProvider, useThemes } from "../components-core/theming/ThemeContext";
+import { StyleProvider as LegacyStyleProvider } from "../components-core/theming/StyleContext";
 import { ThemedButton as Button } from "../components/Button/Button";
 import { Dialog } from "../components/ModalDialog/Dialog";
 import { ThemedStack as Stack } from "../components/Stack/Stack";
@@ -243,7 +244,7 @@ export function XmluiRoot({
   const mediaSize = useRuntimeMediaSize();
 
   return (
-    <StyleProvider>
+    <RuntimeStyleProvider>
       <XmluiAppContextProvider value={{
         appGlobals,
         loggedInUser,
@@ -254,39 +255,41 @@ export function XmluiRoot({
       }}>
         <IconProvider icons={icons}>
           <XmluiThemeRoot tone={defaultTone}>
-            <LegacyThemeProvider resources={resources} themes={themes} defaultTheme={defaultTheme}>
-              <XmluiRuntimeContent
-                appGlobals={appGlobals}
-                confirm={confirm}
-                context={context}
-                extensionFunctions={{
-                  ...(module.extensionFunctions ?? {}),
-                  ...normalizedExtensions.functions,
-                }}
-                i18n={i18nRef.current}
-                loggedInUser={loggedInUser}
-                module={module}
-                references={referencesRef.current}
-                rootOwnerId={rootOwnerId}
-                routing={routingRef.current}
-                signError={signError}
-                store={store}
-                toast={toastRef.current}
-              />
-              {renderConfirmDialog(confirmDialog, (confirmed) => {
-                confirmDialog?.resolve(confirmed);
-                setConfirmDialog(undefined);
-              })}
-              <GlobalLiveRegion />
-              <NotificationToast
-                toastDuration={themeDefaultProps.toastDuration}
-                notificationPosition={themeDefaultProps.notificationPosition}
-              />
-            </LegacyThemeProvider>
+            <LegacyStyleProvider>
+              <LegacyThemeProvider resources={resources} themes={themes} defaultTheme={defaultTheme}>
+                <XmluiRuntimeContent
+                  appGlobals={appGlobals}
+                  confirm={confirm}
+                  context={context}
+                  extensionFunctions={{
+                    ...(module.extensionFunctions ?? {}),
+                    ...normalizedExtensions.functions,
+                  }}
+                  i18n={i18nRef.current}
+                  loggedInUser={loggedInUser}
+                  module={module}
+                  references={referencesRef.current}
+                  rootOwnerId={rootOwnerId}
+                  routing={routingRef.current}
+                  signError={signError}
+                  store={store}
+                  toast={toastRef.current}
+                />
+                {renderConfirmDialog(confirmDialog, (confirmed) => {
+                  confirmDialog?.resolve(confirmed);
+                  setConfirmDialog(undefined);
+                })}
+                <GlobalLiveRegion />
+                <NotificationToast
+                  toastDuration={themeDefaultProps.toastDuration}
+                  notificationPosition={themeDefaultProps.notificationPosition}
+                />
+              </LegacyThemeProvider>
+            </LegacyStyleProvider>
           </XmluiThemeRoot>
         </IconProvider>
       </XmluiAppContextProvider>
-    </StyleProvider>
+    </RuntimeStyleProvider>
   );
 }
 

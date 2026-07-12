@@ -8,6 +8,7 @@ import { appRuntimeRenderer } from "./App";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { ThemeScope, XmluiThemeRoot } from "../../runtime/rendering/theme";
+import { StyleProvider } from "../../components-core/theming/StyleContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -41,17 +42,19 @@ describe("App main content layout migration", () => {
     const AppRenderer = appRuntimeRenderer;
     const html = renderToStaticMarkup(
       <XmluiThemeRoot>
-        <ThemeScope
-          variables={{
-            "paddingHorizontal-content-App": "28px",
-            "paddingVertical-content-App": "32px",
-            "gap-content-App": "24px",
-          }}
-        >
-          <MemoryRouter>
-            <AppRenderer context={context} node={document.root} scope={scope} />
-          </MemoryRouter>
-        </ThemeScope>
+        <StyleProvider>
+          <ThemeScope
+            variables={{
+              "paddingHorizontal-content-App": "28px",
+              "paddingVertical-content-App": "32px",
+              "gap-content-App": "24px",
+            }}
+          >
+            <MemoryRouter>
+              <AppRenderer context={context} node={document.root} scope={scope} />
+            </MemoryRouter>
+          </ThemeScope>
+        </StyleProvider>
       </XmluiThemeRoot>,
     );
 
