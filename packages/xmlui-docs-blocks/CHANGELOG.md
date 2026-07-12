@@ -1,5 +1,11 @@
 # xmlui-docs-blocks
 
+## 0.0.11
+
+### Patch Changes
+
+- e666771: Disable custom font feature settings in the docs themes so punctuation such as colons keeps its normal baseline alignment.
+
 ## 0.0.10
 
 ### Patch Changes
