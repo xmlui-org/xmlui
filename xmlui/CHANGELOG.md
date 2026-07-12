@@ -1,5 +1,49 @@
 # xmlui
 
+## 0.12.31
+
+### Patch Changes
+
+- 2005039: Expose SkipLink, FocusScope, and LiveRegion in component metadata and generated documentation.
+  Preserve user-authored Fragment scopes inside App content so variables declared on those Fragments remain readable and writable from child event handlers.
+  Add a withLiveRegion behavior for supported text-like components so dynamic status text can be announced without adding a separate LiveRegion component.
+  Add accessibility how-to articles for SkipLink, LiveRegion, withLiveRegion, and FocusScope, with website example tests.
+  Allow SkipLink targets to resolve XMLUI component/test ids as well as DOM ids.
+  Keep FocusScope trapping scoped to the active focus container, including xmlui-pg Shadow DOM previews, so sibling examples embedded on the same page do not disable each other.
+- 69b3eda: Expose `autoComplete`, `autoCorrect`, `spellCheck`, and `autoCapitalize` on `TextArea` and `TextBox`.
+- eeb554e: Reuse a single API interceptor worker instance and serialize its start/stop
+  lifecycle. Previously each (re)initialization created a new MSW worker and
+  stopped the old one, so an overlapping stop/start could race over the shared
+  Service Worker registration and silently disable request mocking. This caused
+  intermittent failures (e.g. requests falling through unhandled) when the app
+  re-initialized with an interceptor.
+- 03fcaba: Fix analyzer false positives around reusable Component definitions and parsed event-handler arrows.
+
+  Vars declared on reusable Component definitions are no longer reported as unused from the transformed component body, and single-parameter event-handler arrows such as `primarySize => ...` are covered by regression tests.
+  The VS Code extension also now discovers the current `xmlui/dist/nodejs/server.cjs`/`.mjs` language-server build instead of only probing for the old `server.js` path.
+
+- 9ff4236: Prevent TextArea layout props from leaking to the native textarea element.
+- 91416bb: Fix stored arrow callbacks so they retain the evaluation context where they were defined.
+- 658f704: Reduce analyzer false positives for local script declarations, function parameters, and arrow parameters in expression-scope and component-reference rules.
+- e4e85c6: Improve parser diagnostics for quoted text that appears where an attribute name is expected, helping users identify attributes closed early by an unescaped quote.
+- 144d6e3: Add app-bound layout spacing theme variables and wire non-breaking default spacing hooks for App content, Stack, FlowLayout, and Pages.
+- 89737e4: Add `listenToSources` to `ChangeListener` for watching named independent values with source-level change details.
+- c71bd1e: Prevent textarea-backed FormItem layout props from leaking to the native textarea DOM element.
+- 14bb9c4: Update Remix runtime dependencies to avoid vulnerable transitive versions of `@remix-run/server-runtime` and `turbo-stream`.
+- e4e85c6: Improve runtime event handler and managed localStorage failure diagnostics with component/event context, handler source snippets, stable diagnostic codes, targeted hints, and Inspector trace metadata.
+- e4e85c6: Improve unbound-identifier analysis for nested arrow handlers so callback parameters stay scoped to their callback body and unresolved names inside callbacks are reported more precisely.
+- 795d4a8: Add a Splitter resizeMode prop for controlling how panels adjust when the splitter container resizes.
+- eeb554e: Use XMLUI's date helper functions in how-to examples so `onInit` and API mock handlers run reliably in the expression sandbox.
+- fa60d52: Preserve `TextArea` caret and selection while editing bound form values.
+- c825246: Add `xmluiConfig` as a dedicated setting group for framework / runtime configuration.
+
+  Apps can now place framework settings (e.g. `useHashBasedRouting`, `disableInlineStyle`, `xsVerbose`, the `strict*` family) under a separate `xmluiConfig` key in their app description instead of mixing them with application-specific values in `appGlobals`. The engine merges both objects — `xmluiConfig` wins on conflict — so existing apps that keep framework settings under `appGlobals` continue to work without any changes.
+
+  New exports:
+  - `mergeXmluiConfig(appGlobals, xmluiConfig)` — pure helper that returns a frozen merged object.
+  - `useXmluiConfig()` — React hook returning the merged framework config view.
+  - `useAppGlobals()` — React hook returning the raw `appGlobals` object (for app-specific values).
+
 ## 0.12.30
 
 ### Patch Changes
