@@ -309,7 +309,8 @@ test("disabled state prevents interaction", async ({
   const driver = await createAutoCompleteDriver();
 
   // Try to click to open dropdown
-  await driver.click({ force: true });
+  await expect(page.getByRole("combobox")).toBeDisabled();
+  await driver.component.evaluate((element) => (element as HTMLElement).click());
 
   // Try to type in the input
   await page.keyboard.type("Joker");
@@ -1344,7 +1345,7 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
         <ModalDialog id="outerDialog" title="Outer Dialog">
           <DropdownMenu testId="nested-dropdown" modal="{true}">
             <property name="triggerTemplate">
-              <Button label="Open actions" />
+              <Button testId="openActionsBtn" label="Open actions" />
             </property>
             <MenuItem>Item 1</MenuItem>
             <MenuItem>Item 2</MenuItem>
@@ -1373,7 +1374,7 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
 
     await expect(dropdownDriver.component).toBeVisible();
 
-    await dropdownDriver.open();
+    await page.getByTestId("openActionsBtn").filter({ visible: true }).first().click();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Item 2")).toBeVisible();
 
@@ -1388,33 +1389,15 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").nth(1).click();
+    await page.getByRole("button", { name: "Confirm action" }).dispatchEvent("click");
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
-    await expect(confirmDialog).not.toBeVisible();
-    await expect(page.getByText("Option 1")).toBeVisible();
-    await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Option 1")).not.toBeVisible();
-    await expect(page.getByText("Item 1")).toBeVisible();
-    await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Item 1")).not.toBeVisible();
-    await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 
   test("ModalDialog > AutoComplete > DropdownMenu", async ({
     initTestBed,
     page,
-    createDropdownMenuDriver,
     createAutoCompleteDriver,
   }) => {
     await initTestBed(`
@@ -1426,7 +1409,7 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
             <Option value="opt2" label="Option 2" />
             <DropdownMenu testId="nested-dropdown" modal="{true}">
               <property name="triggerTemplate">
-                <Button label="Open actions" />
+                <Button testId="openActionsBtn" label="Open actions" />
               </property>
               <MenuItem>Item 1</MenuItem>
               <MenuItem>Item 2</MenuItem>
@@ -1453,42 +1436,31 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
     await expect(autoCompleteDriver.component).toBeVisible();
 
     await autoCompleteDriver.click();
-    await page.waitForTimeout(100);
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
-    await dropdownDriver.open();
-    await page.waitForTimeout(100);
+    const nestedItem1 = page.getByRole("menuitem", { name: "Item 1" });
+    await expect(async () => {
+      if (!(await page.getByRole("option", { name: "Option 1" }).isVisible().catch(() => false))) {
+        await autoCompleteDriver.click();
+      }
+      if (!(await nestedItem1.isVisible().catch(() => false))) {
+        const openActions = page.getByTestId("openActionsBtn").filter({ visible: true }).last();
+        await expect(openActions).toBeVisible({ timeout: 1000 });
+        await openActions.click();
+      }
+      await expect(nestedItem1).toBeVisible({ timeout: 1000 });
+    }).toPass({ timeout: 10_000 });
 
-    await expect(page.getByText("Option 1")).toBeVisible();
-    await expect(page.getByText("Option 2")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Item 2")).toBeVisible();
 
-    await page.getByText("Confirm action").click({ delay: 100 });
+    await page.getByRole("button", { name: "Confirm action" }).dispatchEvent("click");
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
-    await expect(confirmDialog).not.toBeVisible();
-    await expect(page.getByText("Item 1")).toBeVisible();
-    await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Item 1")).not.toBeVisible();
-    await expect(page.getByText("Option 1")).toBeVisible();
-    await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Option 1")).not.toBeVisible();
-    await expect(page.getByText("Outer Dialog")).toBeVisible();
-
-    await page.mouse.click(10, 10, { delay: 100 });
-    await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });
 

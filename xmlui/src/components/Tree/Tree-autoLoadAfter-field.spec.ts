@@ -30,6 +30,27 @@ const countingLoadMock: ApiInterceptorDefinition = {
   },
 };
 
+async function expectLoadCount(testStateDriver: any, nodeId: string, count: number) {
+  await expect
+    .poll(async () => (await testStateDriver.testState())?.[nodeId] ?? 0)
+    .toBe(count);
+}
+
+async function expectNamedLoadCount(testStateDriver: any, count: number) {
+  await expect
+    .poll(async () => (await testStateDriver.testState())?.loadCount ?? 0)
+    .toBe(count);
+}
+
+async function waitPastRecordedTimestamp(testStateDriver: any, elapsedMs: number) {
+  await expect
+    .poll(async () => {
+      const timestamp = (await testStateDriver.testState())?.loadTimestamp;
+      return timestamp ? Date.now() - timestamp : 0;
+    })
+    .toBeGreaterThanOrEqual(elapsedMs);
+}
+
 // =============================================================================
 // AUTOLOADAFTER FIELD TESTS
 // =============================================================================
@@ -40,6 +61,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>
@@ -88,36 +111,34 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Expand fast node
     await tree.getByTestId("fast").click();
-    await page.waitForTimeout(100);
     await expect(page.getByText("Child 1")).toBeVisible();
+    await expectLoadCount(testStateDriver, "fast", 1);
 
     // Collapse and immediately re-expand
     await tree.getByTestId("fast").click();
-    await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
 
     await tree.getByTestId("fast").click();
-    await page.waitForTimeout(100);
 
     // Should reload because autoLoadAfter=0 - Child 2 appears (new load)
     await expect(page.getByText("Child 2")).toBeVisible();
+    await expectLoadCount(testStateDriver, "fast", 2);
 
     // Expand slow node
     await tree.getByTestId("slow").click();
-    await page.waitForTimeout(100);
     // Wait for slow node's child to load
     await expect(tree.getByTestId("slow-child1")).toBeVisible();
+    await expectLoadCount(testStateDriver, "slow", 1);
     // Should see Child 1 (from slow) and Child 2 (from fast)
     await expect(page.getByText("Child 1")).toBeVisible();
     await expect(page.getByText("Child 2")).toBeVisible();
 
     // Collapse and immediately re-expand
     await tree.getByTestId("slow").click();
-    await page.waitForTimeout(50);
     await tree.getByTestId("slow").click();
-    await page.waitForTimeout(100);
 
     // Should NOT reload because autoLoadAfter=99999 - still showing first Child 1
+    await expectLoadCount(testStateDriver, "slow", 1);
     await expect(page.getByText("Child 1")).toBeVisible(); // From slow
     await expect(page.getByText("Child 2")).toBeVisible(); // From fast - only 1 because slow didn't reload
   });
@@ -127,6 +148,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>
@@ -176,28 +199,27 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Test parent1 (short threshold)
     await tree.getByTestId("parent1").click();
-    await page.waitForTimeout(100);
+    await expect(tree.getByTestId("parent1-child1")).toBeVisible();
     let state = await testStateDriver.testState();
     expect(state?.lastLoadedId).toBe("parent1");
 
     await tree.getByTestId("parent1").click();
-    await page.waitForTimeout(150);
+    await waitPastRecordedTimestamp(testStateDriver, 100);
 
     await tree.getByTestId("parent1").click();
-    await page.waitForTimeout(100);
+    await expect(tree.getByTestId("parent1-child2")).toBeVisible();
     state = await testStateDriver.testState();
     expect(state?.lastLoadedId).toBe("parent1"); // Reloaded
 
     // Test parent2 (long threshold)
     await tree.getByTestId("parent2").click();
-    await page.waitForTimeout(100);
+    await expect(tree.getByTestId("parent2-child1")).toBeVisible();
     const loadTime = (await testStateDriver.testState())?.loadTimestamp;
 
     await tree.getByTestId("parent2").click();
-    await page.waitForTimeout(150);
 
     await tree.getByTestId("parent2").click();
-    await page.waitForTimeout(100);
+    await expect(tree.getByTestId("parent2-child1")).toBeVisible();
     state = await testStateDriver.testState();
     expect(state?.loadTimestamp).toBe(loadTime); // Not reloaded
   });
@@ -249,19 +271,18 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Initial load
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
     await expect(page.getByText("Child 1")).toBeVisible();
+    await expectNamedLoadCount(testStateDriver, 1);
 
     // Collapse and immediately re-expand
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
 
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
 
     // Should reload using custom field - Child 2 appears
     await expect(page.getByText("Child 2")).toBeVisible();
+    await expectNamedLoadCount(testStateDriver, 2);
   });
 
   test("should prioritize node data field over component-level autoLoadAfter", async ({
@@ -269,6 +290,8 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
+    test.setTimeout(60_000);
+
     const { testStateDriver } = await initTestBed(
       `
       <Fragment>
@@ -317,32 +340,30 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Test node with override (0ms)
     await tree.getByTestId("override").click();
-    await page.waitForTimeout(100);
     await expect(page.getByText("Child 1")).toBeVisible();
+    await expectLoadCount(testStateDriver, "override", 1);
 
     await tree.getByTestId("override").click();
-    await page.waitForTimeout(50);
     await expect(page.getByText("Child 1")).not.toBeVisible();
 
     await tree.getByTestId("override").click();
-    await page.waitForTimeout(100);
     // Reloaded with node-level 0ms - Child 2 appears
     await expect(page.getByText("Child 2")).toBeVisible();
+    await expectLoadCount(testStateDriver, "override", 2);
 
     // Test node without override (component-level 99999ms)
     await tree.getByTestId("default").click();
-    await page.waitForTimeout(100);
     // Wait for default node's child to load
     await expect(tree.getByTestId("default-child1")).toBeVisible();
+    await expectLoadCount(testStateDriver, "default", 1);
     // Should see Child 1 (from default) and Child 2 (from override)
     await expect(page.getByText("Child 1")).toBeVisible();
     await expect(page.getByText("Child 2")).toBeVisible();
 
     await tree.getByTestId("default").click();
-    await page.waitForTimeout(50);
     await tree.getByTestId("default").click();
-    await page.waitForTimeout(100);
     // Not reloaded (long threshold) - still showing first Child 1
+    await expectLoadCount(testStateDriver, "default", 1);
     await expect(page.getByText("Child 1")).toBeVisible(); // From default
     await expect(page.getByText("Child 2")).toBeVisible(); // From override - only 1 because default didn't reload
   });
@@ -394,17 +415,17 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Initial load
     await tree.getByTestId("disabled").click();
-    await page.waitForTimeout(100);
+    await expect(page.getByText("Child 1")).toBeVisible();
     let state = await testStateDriver.testState();
     expect(state?.loadCount).toBe(1);
 
     // Collapse and wait
     await tree.getByTestId("disabled").click();
-    await page.waitForTimeout(150);
+    await expect(page.getByText("Child 1")).not.toBeVisible();
 
     // Re-expand - should NOT reload (autoLoadAfter=null)
     await tree.getByTestId("disabled").click();
-    await page.waitForTimeout(100);
+    await expect(page.getByText("Child 1")).toBeVisible();
     state = await testStateDriver.testState();
     expect(state?.loadCount).toBe(1); // Still 1, not reloaded
   });
@@ -459,18 +480,18 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     // Initial load
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
     await expect(page.getByText("Child 1")).toBeVisible();
+    await expectNamedLoadCount(testStateDriver, 1);
 
     // Collapse and wait
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(150);
     await expect(page.getByText("Child 1")).not.toBeVisible();
+    await expectNamedLoadCount(testStateDriver, 1);
 
     // Re-expand - should reload using API value (100ms), not data field (5000ms)
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
     // Child 2 appears because of reload
     await expect(page.getByText("Child 2")).toBeVisible();
+    await expectNamedLoadCount(testStateDriver, 2);
   });
 });

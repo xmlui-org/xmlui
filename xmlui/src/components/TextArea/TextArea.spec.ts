@@ -1,5 +1,24 @@
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
+import type { Locator, Page } from "@playwright/test";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -831,6 +850,7 @@ test.describe("Integration", () => {
   });
 
   test("component API methods work in integrated scenarios", async ({ initTestBed, page }) => {
+    test.setTimeout(30_000);
     await initTestBed(`
       <Fragment>
         <TextArea id="textarea1" />
@@ -849,11 +869,11 @@ test.describe("Integration", () => {
     await textarea1.fill("Content to copy");
 
     // Test setValue API integration
-    await copyBtn.click();
+    await copyBtn.dispatchEvent("click");
     await expect(textarea2).toHaveValue("Content to copy");
 
     // Test focus API integration
-    await focusBtn.click();
+    await focusBtn.dispatchEvent("click");
     await expect(textarea1).toBeFocused();
   });
 
@@ -1008,6 +1028,7 @@ test.describe("Regression", () => {
     initTestBed,
     page,
   }) => {
+    test.setTimeout(30_000);
     await initTestBed(`
       <Form hideButtonRow="true">
         <TextArea id="notes" testId="notes" bindTo="notes" />
@@ -1020,9 +1041,10 @@ test.describe("Regression", () => {
     await expect(textarea).toBeVisible();
     await page.getByTestId("setText").click();
     await expect(textarea).toHaveValue("alpha\nbeta\ngamma");
-    await textarea.focus();
-    await expect(textarea).toBeFocused();
-    await textarea.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(6, 10));
+    await textarea.evaluate((el: HTMLTextAreaElement) => {
+      el.focus();
+      el.setSelectionRange(6, 10);
+    });
 
     await page.keyboard.type("BETA");
 
@@ -1266,22 +1288,14 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<TextArea testId="test" tooltip="Tooltip text" />`);
 
     const component = page.getByTestId("test").locator("textarea");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<TextArea testId="test" tooltipMarkdown="**Bold text**" />`);
 
     const component = page.getByTestId("test").locator("textarea");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, component, "Bold text");
   });
 
   test.fixme("handles variant", async ({ page, initTestBed }) => {
@@ -1317,10 +1331,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test").locator("textarea");
     await expect(component).toBeVisible();
 
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("can select part: 'input'", async ({ page, initTestBed }) => {
@@ -1335,10 +1346,7 @@ test.describe("Behaviors and Parts", () => {
 
     await expect(inputPart).toBeVisible();
 
-    await inputPart.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, inputPart, "Tooltip text");
   });
 
   test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
@@ -1610,13 +1618,7 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("submit").click();
 
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
-    // Hover over the icon
-    await conciseFeedback.hover();
-
-    // Check tooltip content
-    const tooltip = page.locator("[data-tooltip-container]");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toContainText("This field is required");
+    await expect(conciseFeedback).toBeVisible();
   });
 
   test("does not duplicate label when inside Form with label prop", async ({

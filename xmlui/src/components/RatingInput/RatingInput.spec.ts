@@ -81,7 +81,9 @@ test.describe("Basic Functionality", () => {
     `);
     await expect(page.getByTestId("value")).toHaveText("2");
     const inputPart = page.locator(`[data-part-id="${PART_INPUT}"]`);
-    await inputPart.getByRole("button", { name: "Set rating to 5", exact: true }).click({ force: true });
+    const ratingButton = inputPart.getByRole("button", { name: "Set rating to 5", exact: true });
+    await expect(ratingButton).toBeDisabled();
+    await ratingButton.evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByTestId("value")).toHaveText("2");
   });
 });

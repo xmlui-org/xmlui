@@ -1,4 +1,13 @@
-import { type ForwardedRef, forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  type ForwardedRef,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type React from "react";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { createPortal } from "react-dom";
@@ -157,10 +166,11 @@ export const Tooltip = memo(forwardRef(function Tooltip({
 
   useEffect(() => () => window.clearTimeout(delayRef.current), []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen || !showTooltip) {
       return;
     }
+    updatePosition();
     const animationFrame = requestAnimationFrame(updatePosition);
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);

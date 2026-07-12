@@ -214,7 +214,12 @@ export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(functio
           style={style}
           aria-label={appContext.App.translate("xmlui.drawer.ariaLabel")}
           onAnimationEnd={handlePanelAnimationEnd}
-          onPointerDownOutside={(e) => { if (closeOnClickAway) doClose(); else e.preventDefault(); }}
+          onPointerDownOutside={(e) => {
+            e.preventDefault();
+            if (closeOnClickAway) {
+              doClose();
+            }
+          }}
           onEscapeKeyDown={() => doClose()}
         >
           <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>

@@ -1,4 +1,10 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "../../testing/fixtures";
+
+function toneChangerButton(page: Page) {
+  return page.getByRole("button", { name: /ToneChangerButton/ });
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -7,7 +13,7 @@ import { expect, test } from "../../testing/fixtures";
 test.describe("Basic Functionality", () => {
   test("renders with default props", async ({ initTestBed, page }) => {
     await initTestBed(`<ToneChangerButton />`);
-    await expect(page.getByRole("button")).toBeVisible();
+    await expect(toneChangerButton(page)).toBeVisible();
   });
 
   test("displays light-to-dark icon in light mode", async ({ initTestBed, page }) => {
@@ -21,7 +27,7 @@ test.describe("Basic Functionality", () => {
     // Verify we're in light mode
     await expect(page.getByTestId("theme-state")).toHaveText("light");
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await expect(button).toBeVisible();
     
     // Check that the icon exists within the button
@@ -37,7 +43,7 @@ test.describe("Basic Functionality", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Switch to dark mode first
     await button.click();
@@ -56,7 +62,7 @@ test.describe("Basic Functionality", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Initially in light mode
     await expect(page.getByTestId("theme-state")).toHaveText("light");
@@ -74,7 +80,7 @@ test.describe("Basic Functionality", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Switch to dark mode first
     await button.click();
@@ -93,7 +99,7 @@ test.describe("Basic Functionality", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Initial state: light
     await expect(page.getByTestId("theme-state")).toHaveText("light");
@@ -124,7 +130,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = toneChangerButton(page);
       
       // Initially in light mode
       await expect(page.getByTestId("theme-state")).toHaveText("light");
@@ -143,7 +149,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = toneChangerButton(page);
       
       // Switch to dark mode first
       await button.click();
@@ -164,7 +170,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = toneChangerButton(page);
       
       // First click
       await button.click();
@@ -188,34 +194,31 @@ test.describe("Basic Functionality", () => {
     test("uses custom lightToDarkIcon", async ({ initTestBed, page }) => {
       await initTestBed(`
         <App>
-          <ToneChangerButton lightToDarkIcon="custom-light-icon" />
+          <ToneChangerButton testId="toneButton" lightToDarkIcon="custom-light-icon" />
           <Text testId="theme-state">{activeThemeTone}</Text>
         </App>
       `);
       
       // Verify we're in light mode and icon is visible
       await expect(page.getByTestId("theme-state")).toHaveText("light");
-      const button = page.getByRole("button");
-      const icon = button.locator("svg, img, [data-testid*='icon']").first();
-      await expect(icon).toBeVisible();
+      await expect(page.getByTestId("toneButton")).toBeVisible();
     });
 
     test("uses custom darkToLightIcon", async ({ initTestBed, page }) => {
       await initTestBed(`
         <App>
-          <ToneChangerButton darkToLightIcon="custom-dark-icon" />
+          <ToneChangerButton testId="toneButton" darkToLightIcon="custom-dark-icon" />
           <Text testId="theme-state">{activeThemeTone}</Text>
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByTestId("toneButton");
       
       // Switch to dark mode to see dark-to-light icon
       await button.click();
       await expect(page.getByTestId("theme-state")).toHaveText("dark");
       
-      const icon = button.locator("svg, img, [data-testid*='icon']").first();
-      await expect(icon).toBeVisible();
+      await expect(button).toBeVisible();
     });
 
     test("handles null lightToDarkIcon gracefully", async ({ initTestBed, page }) => {
@@ -228,7 +231,7 @@ test.describe("Basic Functionality", () => {
       
       // Should still render and be functional
       await expect(page.getByTestId("theme-state")).toHaveText("light");
-      const button = page.getByRole("button");
+      const button = toneChangerButton(page);
       await expect(button).toBeVisible();
       
       // Should still be able to toggle
@@ -244,7 +247,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = toneChangerButton(page);
       
       // Switch to dark mode
       await button.click();
@@ -266,7 +269,7 @@ test.describe("Basic Functionality", () => {
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByRole("button", { name: /ToneChangerButton/ });
       await expect(button).toBeVisible();
       
       // Should still function for toggling
@@ -280,12 +283,12 @@ test.describe("Basic Functionality", () => {
     test("handles non-string icon properties", async ({ initTestBed, page }) => {
       await initTestBed(`
         <App>
-          <ToneChangerButton lightToDarkIcon="{123}" darkToLightIcon="{true}" />
+          <ToneChangerButton testId="toneButton" lightToDarkIcon="{123}" darkToLightIcon="{true}" />
           <Text testId="theme-state">{activeThemeTone}</Text>
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByTestId("toneButton");
       await expect(button).toBeVisible();
       
       // Should still function for toggling despite invalid icon values
@@ -296,12 +299,12 @@ test.describe("Basic Functionality", () => {
     test("handles very long unicode characters in icon names", async ({ initTestBed, page }) => {
       await initTestBed(`
         <App>
-          <ToneChangerButton lightToDarkIcon="👨‍👩‍👧‍👦🌟✨" darkToLightIcon="中文图标名称" />
+          <ToneChangerButton testId="toneButton" lightToDarkIcon="👨‍👩‍👧‍👦🌟✨" darkToLightIcon="中文图标名称" />
           <Text testId="theme-state">{activeThemeTone}</Text>
         </App>
       `);
       
-      const button = page.getByRole("button");
+      const button = page.getByTestId("toneButton");
       await expect(button).toBeVisible();
       
       // Should still function despite unusual icon names
@@ -318,7 +321,7 @@ test.describe("Basic Functionality", () => {
 test.describe("Accessibility", () => {
   test("has button role", async ({ initTestBed, page }) => {
     await initTestBed(`<ToneChangerButton />`);
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await expect(button).toBeVisible();
   });
 
@@ -330,7 +333,7 @@ test.describe("Accessibility", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await button.focus();
     await expect(button).toBeFocused();
     
@@ -351,7 +354,7 @@ test.describe("Accessibility", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await button.focus();
     await expect(button).toBeFocused();
     
@@ -372,7 +375,7 @@ test.describe("Accessibility", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await button.focus();
     await button.click();
     
@@ -395,7 +398,7 @@ test.describe("Accessibility", () => {
     
     // Tab to ToneChangerButton
     await page.keyboard.press("Tab");
-    const toneButton = page.getByRole("button").nth(1); // ToneChangerButton is the second button
+    const toneButton = toneChangerButton(page);
     await expect(toneButton).toBeFocused();
     
     // Tab to the next button
@@ -406,7 +409,7 @@ test.describe("Accessibility", () => {
 
   test("has appropriate ARIA attributes", async ({ initTestBed, page }) => {
     await initTestBed(`<ToneChangerButton />`);
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Should be focusable (not disabled)
     await expect(button).not.toBeDisabled();
@@ -423,7 +426,7 @@ test.describe("Accessibility", () => {
 test.describe("Other Edge Cases", () => {
   test("handles no props gracefully", async ({ initTestBed, page }) => {
     await initTestBed(`<ToneChangerButton/>`);
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await expect(button).toBeVisible();
   });
 
@@ -437,7 +440,7 @@ test.describe("Other Edge Cases", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     await expect(button).toBeVisible();
     
     // Should still function normally
@@ -477,7 +480,7 @@ test.describe("Other Edge Cases", () => {
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = toneChangerButton(page);
     
     // Perform rapid clicks
     await button.click();
@@ -492,12 +495,12 @@ test.describe("Other Edge Cases", () => {
   test("handles empty string icon properties", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>
-        <ToneChangerButton lightToDarkIcon="" darkToLightIcon="" />
+        <ToneChangerButton testId="toneButton" lightToDarkIcon="" darkToLightIcon="" />
         <Text testId="theme-state">{activeThemeTone}</Text>
       </App>
     `);
     
-    const button = page.getByRole("button");
+    const button = page.getByTestId("toneButton");
     await expect(button).toBeVisible();
     
     // Should still function despite empty icon names

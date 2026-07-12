@@ -37,6 +37,19 @@ const countingLoadMock: ApiInterceptorDefinition = {
   },
 };
 
+async function expectStateValueStable(
+  testStateDriver: any,
+  readValue: (state: any) => unknown,
+  expectedValue: unknown,
+  durationMs = 250,
+) {
+  const deadline = Date.now() + durationMs;
+  do {
+    expect(readValue(await testStateDriver.testState())).toEqual(expectedValue);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  } while (Date.now() < deadline);
+}
+
 // =============================================================================
 // DYNAMIC FIELD INTEGRATION WITH ASYNC LOADING TESTS
 // =============================================================================
@@ -84,17 +97,14 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Expand the static node (dynamic=false) - should NOT call onLoadChildren
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
-
-    let state = await testStateDriver.testState();
-    expect(state?.loadedNodeId).toBeUndefined();
+    await expectStateValueStable(testStateDriver, (state) => state?.loadedNodeId, undefined);
 
     // Expand the dynamic node (dynamic=true) - should call onLoadChildren
     await tree.getByTestId("node2").click();
-    await page.waitForTimeout(100);
 
-    state = await testStateDriver.testState();
-    expect(state?.loadedNodeId).toBe("node2");
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.loadedNodeId)
+      .toBe("node2");
 
     // Verify children were loaded
     await expect(page.getByText("Child 1")).toBeVisible();
@@ -222,11 +232,9 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Expand the node
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
 
     // Verify loadChildren was NOT called
-    const state = await testStateDriver.testState();
-    expect(state?.loadCalled).toBeUndefined();
+    await expectStateValueStable(testStateDriver, (state) => state?.loadCalled, undefined);
   });
 
   test("should use setDynamic() to override node dynamic state", async ({
@@ -271,14 +279,12 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Initially, the node is static (dynamic=false), so expanding should NOT load
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
 
-    let state = await testStateDriver.testState();
-    expect(state?.loadCalled).toBeUndefined();
+    await expectStateValueStable(testStateDriver, (state) => state?.loadCalled, undefined);
 
     // Collapse the node
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
+    await expect(page.getByText("Child 1")).not.toBeVisible();
 
     // Use setDynamic to override to true
     await page.getByTestId("setDynamic").click();
@@ -288,8 +294,9 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Verify children were loaded
     await expect(page.getByText("Child 1")).toBeVisible();
-    state = await testStateDriver.testState();
-    expect(state?.loadCalled).toBe(true);
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.loadCalled)
+      .toBe(true);
   });
 
   test("should NOT apply autoLoadAfter to static nodes", async ({
@@ -337,22 +344,20 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Expand static node (has children in data, dynamic=false)
     await tree.getByTestId("static").click();
-    await page.waitForTimeout(50);
 
     // Verify child is visible (from data, not loaded)
     await expect(page.getByText("Child 1")).toBeVisible();
 
     // Collapse static node
     await tree.getByTestId("static").click();
-    await page.waitForTimeout(50);
+    await expect(page.getByText("Child 1")).not.toBeVisible();
 
     // Re-expand static node - should NOT trigger autoLoadAfter
     await tree.getByTestId("static").click();
-    await page.waitForTimeout(100);
+    await expect(page.getByText("Child 1")).toBeVisible();
 
     // Check that autoLoad was NOT triggered for static node
-    const state = await testStateDriver.testState();
-    expect(state?.autoLoadCount || 0).toBe(0);
+    await expectStateValueStable(testStateDriver, (state) => state?.autoLoadCount || 0, 0);
   });
 
   test("should apply autoLoadAfter to dynamic nodes", async ({
@@ -395,7 +400,7 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Collapse
     await tree.getByTestId("dynamic").click();
-    await page.waitForTimeout(50);
+    await expect(page.getByText("Child 1")).not.toBeVisible();
 
     // Re-expand - should trigger autoLoadAfter (threshold is 0)
     await tree.getByTestId("dynamic").click();
@@ -445,17 +450,15 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Expand node1 (isAsync=false) - should NOT load
     await tree.getByTestId("node1").click();
-    await page.waitForTimeout(100);
 
-    let state = await testStateDriver.testState();
-    expect(state?.loadedNodes || []).toEqual([]);
+    await expectStateValueStable(testStateDriver, (state) => state?.loadedNodes || [], []);
 
     // Expand node2 (isAsync=true) - should load
     await tree.getByTestId("node2").click();
-    await page.waitForTimeout(100);
 
-    state = await testStateDriver.testState();
-    expect(state?.loadedNodes).toEqual(["node2"]);
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.loadedNodes)
+      .toEqual(["node2"]);
   });
 
   test("should handle hierarchy data format with dynamic nodes", async ({
@@ -501,16 +504,14 @@ test.describe("Dynamic Field Integration with Async Loading", () => {
 
     // Expand static node - should NOT call onLoadChildren
     await tree.getByTestId("static").click();
-    await page.waitForTimeout(100);
 
-    let state = await testStateDriver.testState();
-    expect(state?.loadedNodeKey).toBeUndefined();
+    await expectStateValueStable(testStateDriver, (state) => state?.loadedNodeKey, undefined);
 
     // Expand dynamic node - should call onLoadChildren
     await tree.getByTestId("dynamic").click();
-    await page.waitForTimeout(100);
 
-    state = await testStateDriver.testState();
-    expect(state?.loadedNodeKey).toBe("dynamic");
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.loadedNodeKey)
+      .toBe("dynamic");
   });
 });

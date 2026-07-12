@@ -5,6 +5,40 @@ const PAGE_WIDTH = 1280;
 const PAGE_HEIGHT = 720;
 test.use({ viewport: { width: PAGE_WIDTH, height: PAGE_HEIGHT } });
 
+async function expectScrollTop(locator: import("@playwright/test").Locator, expected: number) {
+  await expect
+    .poll(() => locator.evaluate((elem) => elem.scrollTop))
+    .toBe(expected);
+}
+
+async function expectScrollLeft(locator: import("@playwright/test").Locator, expected: number) {
+  await expect
+    .poll(() => locator.evaluate((elem) => elem.scrollLeft))
+    .toBe(expected);
+}
+
+async function expectScrolledToBottom(locator: import("@playwright/test").Locator) {
+  await expect(async () => {
+    const { scrollTop, scrollHeight, clientHeight } = await locator.evaluate((elem) => ({
+      scrollTop: elem.scrollTop,
+      scrollHeight: elem.scrollHeight,
+      clientHeight: elem.clientHeight,
+    }));
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+  }).toPass();
+}
+
+async function expectScrolledToEnd(locator: import("@playwright/test").Locator) {
+  await expect(async () => {
+    const { scrollLeft, scrollWidth, clientWidth } = await locator.evaluate((elem) => ({
+      scrollLeft: elem.scrollLeft,
+      scrollWidth: elem.scrollWidth,
+      clientWidth: elem.clientWidth,
+    }));
+    expect(scrollLeft).toBeCloseTo(scrollWidth - clientWidth, 0);
+  }).toPass();
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -104,9 +138,6 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -120,9 +151,6 @@ test.describe("Basic Functionality", () => {
         </Stack>
       </Stack>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
@@ -972,13 +1000,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the top
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(stack, 0);
   });
 
   test("scrollToBottom scrolls to the bottom of a scrollable Stack", async ({ page, initTestBed }) => {
@@ -1001,16 +1025,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(stack);
   });
 
   test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
@@ -1034,13 +1051,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top with smooth behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for smooth scroll to complete
-    await page.waitForTimeout(500);
 
     // Verify we're at the top
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(stack, 0);
   });
 
   test("scrollToBottom with 'instant' behavior parameter", async ({ page, initTestBed }) => {
@@ -1059,16 +1072,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom with instant behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait minimal time for instant scroll
-    await page.waitForTimeout(50);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(stack);
   });
 
   test("scrollToTop works on HStack with horizontal scroll", async ({ page, initTestBed }) => {
@@ -1088,7 +1094,6 @@ test.describe("Api", () => {
     // Note: scrollToTop affects vertical scroll even in HStack
     // This test verifies the API doesn't error on HStack
     await page.getByTestId("scrollBtn").click();
-    await page.waitForTimeout(50);
     
     // Should complete without error
     await expect(stack).toBeVisible();
@@ -1115,13 +1120,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top (default behavior)
     await page.getByTestId("scrollBtn").click();
-    
-    // With instant behavior, should be immediate
-    await page.waitForTimeout(50);
 
     // Verify we're at the top
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(stack, 0);
   });
 
   test("multiple scrollToTop calls work correctly", async ({ page, initTestBed }) => {
@@ -1145,15 +1146,11 @@ test.describe("Api", () => {
 
     // Call scrollToTop multiple times
     await page.getByTestId("scrollBtn").click();
-    await page.waitForTimeout(50);
     await page.getByTestId("scrollBtn").click();
-    await page.waitForTimeout(50);
     await page.getByTestId("scrollBtn").click();
-    await page.waitForTimeout(50);
 
     // Verify we're at the top
-    const scrollTopAfter = await stack.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(stack, 0);
   });
 
   test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
@@ -1173,20 +1170,13 @@ test.describe("Api", () => {
     
     // Scroll to bottom
     await page.getByTestId("scrollBottomBtn").click();
-    await page.waitForTimeout(100);
 
-    const scrollHeight = await stack.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await stack.evaluate((elem) => elem.clientHeight);
-    let scrollTop = await stack.evaluate((elem) => elem.scrollTop);
-    
-    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(stack);
 
     // Now scroll back to top
     await page.getByTestId("scrollTopBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await stack.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBe(0);
+    await expectScrollTop(stack, 0);
   });
 
   test("scrollToStart scrolls to the start of a horizontally scrollable Stack", async ({ page, initTestBed }) => {
@@ -1214,13 +1204,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to start
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the start
-    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
-    expect(scrollLeftAfter).toBe(0);
+    await expectScrollLeft(stack, 0);
   });
 
   test("scrollToEnd scrolls to the end of a horizontally scrollable Stack", async ({ page, initTestBed }) => {
@@ -1243,16 +1229,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to end
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the end
-    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
-    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
-    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
-    
-    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+    await expectScrolledToEnd(stack);
   });
 
   test("scrollToStart with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
@@ -1276,13 +1255,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to start with smooth behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for smooth scroll to complete
-    await page.waitForTimeout(500);
 
     // Verify we're at the start
-    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
-    expect(scrollLeftAfter).toBe(0);
+    await expectScrollLeft(stack, 0);
   });
 
   test("scrollToEnd with 'instant' behavior parameter", async ({ page, initTestBed }) => {
@@ -1301,16 +1276,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to end with instant behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait minimal time for instant scroll
-    await page.waitForTimeout(50);
 
     // Verify we're at the end
-    const scrollLeftAfter = await stack.evaluate((elem) => elem.scrollLeft);
-    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
-    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
-    
-    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+    await expectScrolledToEnd(stack);
   });
 
   test("scrollToEnd followed by scrollToStart", async ({ page, initTestBed }) => {
@@ -1330,20 +1298,13 @@ test.describe("Api", () => {
     
     // Scroll to end
     await page.getByTestId("scrollEndBtn").click();
-    await page.waitForTimeout(100);
 
-    const scrollWidth = await stack.evaluate((elem) => elem.scrollWidth);
-    const clientWidth = await stack.evaluate((elem) => elem.clientWidth);
-    let scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
-    
-    expect(scrollLeft).toBeCloseTo(scrollWidth - clientWidth, 0);
+    await expectScrolledToEnd(stack);
 
     // Now scroll back to start
     await page.getByTestId("scrollStartBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
-    expect(scrollLeft).toBe(0);
+    await expectScrollLeft(stack, 0);
   });
 
   test("all scroll APIs work together", async ({ page, initTestBed }) => {
@@ -1368,22 +1329,20 @@ test.describe("Api", () => {
     // Scroll to bottom-end
     await page.getByTestId("scrollBottomBtn").click();
     await page.getByTestId("scrollEndBtn").click();
-    await page.waitForTimeout(100);
 
-    let scrollTop = await stack.evaluate((elem) => elem.scrollTop);
-    let scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
-    expect(scrollTop).toBeGreaterThan(0);
-    expect(scrollLeft).toBeGreaterThan(0);
+    await expect
+      .poll(() => stack.evaluate((elem) => elem.scrollTop))
+      .toBeGreaterThan(0);
+    await expect
+      .poll(() => stack.evaluate((elem) => elem.scrollLeft))
+      .toBeGreaterThan(0);
 
     // Scroll to top-start
     await page.getByTestId("scrollTopBtn").click();
     await page.getByTestId("scrollStartBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await stack.evaluate((elem) => elem.scrollTop);
-    scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
-    expect(scrollTop).toBe(0);
-    expect(scrollLeft).toBe(0);
+    await expectScrollTop(stack, 0);
+    await expectScrollLeft(stack, 0);
   });
 });
 
@@ -1893,7 +1852,6 @@ test.describe("Dock Layout", () => {
 
     // Resize the viewport (simulates a parent size change)
     await page.setViewportSize({ width: 800, height: 400 });
-    await page.waitForTimeout(50);
 
     // Stack without fixed height relies on viewport; here parent has fixed 500px so
     // the stretch child's height stays 450px regardless of viewport height.

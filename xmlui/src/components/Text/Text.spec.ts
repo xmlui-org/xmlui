@@ -165,12 +165,12 @@ test.describe("API", () => {
           <Text id="overflowText" maxLines="{1}"
             value="This is a very long text that should definitely overflow when constrained to a small width"
           />
-          <Button onClick="testState = overflowText.hasOverflow()" />
+          <Button testId="check-horizontal-overflow" onClick="testState = overflowText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
+    await page.getByTestId("check-horizontal-overflow").click();
     await expect.poll(testStateDriver.testState).toBe(true);
   });
 
@@ -182,12 +182,12 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="200px">
           <Text id="overflowText" maxLines="{2}" value="This is a very long text that will wrap to multiple lines and should overflow beyond the maxLines constraint when the container is wide enough to allow wrapping" />
-          <Button onClick="testState = overflowText.hasOverflow()" />
+          <Button testId="check-maxlines-overflow" onClick="testState = overflowText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
+    await page.getByTestId("check-maxlines-overflow").click();
     await expect.poll(testStateDriver.testState).toBe(true);
   });
 
@@ -199,12 +199,12 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="300px" height="100px">
           <Text id="normalText" value="Short text" />
-          <Button onClick="testState = normalText.hasOverflow()" />
+          <Button testId="check-normal-overflow" onClick="testState = normalText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
+    await page.getByTestId("check-normal-overflow").click();
     await expect.poll(testStateDriver.testState).toBe(false);
   });
 
@@ -213,13 +213,15 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="100px" height="50px">
           <Text id="emptyText" value="" />
-          <Button onClick="testState = emptyText.hasOverflow()" />
+          <Button testId="check-empty-overflow" onClick="testState = emptyText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    await expect.poll(testStateDriver.testState).toBe(false);
+    await expect(async () => {
+      await page.getByTestId("check-empty-overflow").click();
+      await expect.poll(testStateDriver.testState).toBe(false);
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow returns false for text with no size constraints", async ({
@@ -229,12 +231,14 @@ test.describe("API", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Text id="unconstrainedText" value="This text has no width or height constraints so it should not overflow" />
-        <Button onClick="testState = unconstrainedText.hasOverflow()" />
+        <Button testId="check-unconstrained-overflow" onClick="testState = unconstrainedText.hasOverflow()" />
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    await expect.poll(testStateDriver.testState).toBe(false);
+    await expect(async () => {
+      await page.getByTestId("check-unconstrained-overflow").click();
+      await expect.poll(testStateDriver.testState).toBe(false);
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow works with different overflow modes", async ({ initTestBed, page }) => {
@@ -242,27 +246,28 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="100px">
           <Text id="ellipsisText" overflowMode="ellipsis" maxLines="{1}" value="This is a very long text that should overflow" />
-          <Button onClick="testState = { ellipsis: ellipsisText.hasOverflow() }" />
+          <Button testId="check-overflow-modes" onClick="testState = { ellipsis: ellipsisText.hasOverflow() }" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    const result = await testStateDriver.testState();
-    expect(result.ellipsis).toBe(true);
+    await expect(async () => {
+      await page.getByTestId("check-overflow-modes").click();
+      await expect.poll(testStateDriver.testState).toEqual({ ellipsis: true });
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow works with scroll overflow mode", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Stack width="100px">
-          <Text id="scrollText" overflowMode="scroll" value="This is a very long text that should create horizontal scroll" />
-          <Button onClick="testState = scrollText.hasOverflow()" />
+          <Stack width="100px">
+            <Text id="scrollText" overflowMode="scroll" value="This is a very long text that should create horizontal scroll" />
+          <Button testId="check-scroll-overflow" onClick="testState = scrollText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
+    await page.getByTestId("check-scroll-overflow").click();
     await expect.poll(testStateDriver.testState).toBe(true);
   });
 
@@ -295,13 +300,15 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="100px">
           <Text id="nullText" value="{null}" />
-          <Button onClick="testState = nullText.hasOverflow()" />
+          <Button testId="check-null-overflow" onClick="testState = nullText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    await expect.poll(testStateDriver.testState).toBe(false);
+    await expect(async () => {
+      await page.getByTestId("check-null-overflow").click();
+      await expect.poll(testStateDriver.testState).toBe(false);
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow works with unicode characters", async ({ initTestBed, page }) => {
@@ -309,13 +316,15 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="100px">
           <Text id="unicodeText" maxLines="{1}" value="👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦👨‍👩‍👧‍👦" />
-          <Button onClick="testState = unicodeText.hasOverflow()" />
+          <Button testId="check-unicode-overflow" onClick="testState = unicodeText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    await expect.poll(testStateDriver.testState).toBe(true);
+    await expect(async () => {
+      await page.getByTestId("check-unicode-overflow").click();
+      await expect.poll(testStateDriver.testState).toBe(true);
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow works with Chinese characters", async ({ initTestBed, page }) => {
@@ -323,13 +332,15 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="100px">
           <Text id="chineseText" maxLines="{1}" value="这是一个非常长的中文文本，应该会在小容器中溢出显示区域超出边界限制" />
-          <Button onClick="testState = chineseText.hasOverflow()" />
+          <Button testId="check-chinese-overflow" onClick="testState = chineseText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
-    await page.getByRole("button").click();
-    await expect.poll(testStateDriver.testState).toBe(true);
+    await expect(async () => {
+      await page.getByTestId("check-chinese-overflow").click();
+      await expect.poll(testStateDriver.testState).toBe(true);
+    }).toPass({ timeout: 10_000 });
   });
 
   test("hasOverflow API can be called multiple times", async ({ initTestBed, page }) => {
@@ -337,15 +348,15 @@ test.describe("API", () => {
       <Fragment>
         <Stack width="200px">
           <Text id="multiCallText" value="Test content" />
-          <Button onClick="testState = testState == null ? 1 : testState + 1; multiCallText.hasOverflow()" />
+          <Button testId="check-multi-overflow" onClick="testState = testState == null ? 1 : testState + 1; multiCallText.hasOverflow()" />
         </Stack>
       </Fragment>
     `);
 
     // Call API multiple times
-    await page.getByRole("button").click();
-    await page.getByRole("button").click();
-    await page.getByRole("button").click();
+    await page.getByTestId("check-multi-overflow").click();
+    await page.getByTestId("check-multi-overflow").click();
+    await page.getByTestId("check-multi-overflow").click();
 
     // Should have been called 3 times without errors
     await expect.poll(testStateDriver.testState).toBe(3);

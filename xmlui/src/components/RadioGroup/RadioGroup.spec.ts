@@ -324,7 +324,7 @@ test.describe("Basic Functionality", () => {
     // Verify the radio buttons are disabled
     await expect(options.nth(1)).toBeDisabled();
 
-    await options.nth(1).click({ force: true });
+    await options.nth(1).evaluate((element) => (element as HTMLElement).click());
 
     // Verify the state hasn't changed (should still be null since no change handler was called)
     await expect.poll(testStateDriver.testState).toBe(null);

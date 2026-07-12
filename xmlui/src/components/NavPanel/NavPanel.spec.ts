@@ -1187,9 +1187,6 @@ test.describe("showScrollerFade", () => {
       </App>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -1229,17 +1226,11 @@ test.describe("showScrollerFade", () => {
       </App>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Scroll down in NavPanel
     const panel = page.getByTestId("panel");
     await panel.evaluate((el) => {
       el.querySelector("[data-overlayscrollbars-viewport]")?.scrollTo(0, 50);
     });
-
-    // Wait for fade to update
-    await page.waitForTimeout(100);
 
     // Top fade overlay should exist
     const topFade = page.locator("[class*='fadeTop']");
@@ -1276,9 +1267,6 @@ test.describe("showScrollerFade", () => {
       </App>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -1313,9 +1301,6 @@ test.describe("showScrollerFade", () => {
         </Pages>
       </App>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");

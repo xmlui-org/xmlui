@@ -1,4 +1,10 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "../../testing/fixtures";
+
+function toneSwitchSurface(page: Page) {
+  return page.getByRole("switch").locator("xpath=ancestor::label[1]");
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -26,7 +32,7 @@ test.describe("Basic Functionality", () => {
     `);
     const toggle = page.getByRole("switch");
     await expect(toggle).toBeVisible();
-    await toggle.click({ force: true });
+    await toneSwitchSurface(page).click();
     await expect(page.getByText("dark")).toBeVisible();
     await expect(toggle).toBeChecked();
   });
@@ -40,10 +46,10 @@ test.describe("Basic Functionality", () => {
     `);
     const toggle = page.getByRole("switch");
     await expect(toggle).toBeVisible();
-    await toggle.click({ force: true });
+    await toneSwitchSurface(page).click();
     await expect(page.getByText("dark")).toBeVisible();
     await expect(toggle).toBeChecked();
-    await toggle.click({ force: true });
+    await toneSwitchSurface(page).click();
     await expect(page.getByText("light")).toBeVisible();
     await expect(toggle).not.toBeChecked();
   });
@@ -77,7 +83,7 @@ test.describe("Accessibility", () => {
     const toggle = page.getByRole("switch");
     
     await toggle.focus();
-    await toggle.click({ force: true });
+    await toneSwitchSurface(page).click();
     await expect(toggle).toBeFocused();
   });
 
@@ -87,7 +93,7 @@ test.describe("Accessibility", () => {
     
     await expect(toggle).toHaveAttribute("aria-checked", "false");
     
-    await toggle.click({ force: true });
+    await toneSwitchSurface(page).click();
     await expect(toggle).toHaveAttribute("aria-checked", "true");
   });
 });

@@ -54,7 +54,7 @@ test.describe("Tooltip foundation", () => {
 
     const tip = page.getByRole("tooltip").getByTestId("tip");
     await expect(tip).toContainText("Count: 0");
-    await page.getByRole("tooltip").getByTestId("increment").click({ force: true });
+    await page.getByRole("tooltip").getByTestId("increment").click();
     await expect(tip).toContainText("Count: 1");
   });
 });

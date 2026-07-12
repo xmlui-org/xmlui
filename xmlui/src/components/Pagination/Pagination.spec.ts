@@ -90,10 +90,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test("handles maxVisiblePages property correctly", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="100" pageSize="10" maxVisiblePages="3"/>`);
+    await initTestBed(`<Pagination testId="pagination" itemCount="100" pageSize="10" maxVisiblePages="3"/>`);
 
     // With maxVisiblePages=3, should only show 3 page buttons
-    const pageButtons = page.getByRole("button").filter({ hasText: /^\d+$/ });
+    const pageButtons = page.getByTestId("pagination").getByRole("button").filter({ hasText: /^\d+$/ });
     await expect(pageButtons).toHaveCount(3);
 
     // Should show pages 1, 2, 3
@@ -103,12 +103,12 @@ test.describe("Basic Functionality", () => {
   });
 
   test("handles maxVisiblePages when there's only one page", async ({ initTestBed, page }) => {
-    await initTestBed(`<Pagination itemCount="5" pageSize="10" maxVisiblePages="1"/>`);
+    await initTestBed(`<Pagination testId="pagination" itemCount="5" pageSize="10" maxVisiblePages="1"/>`);
 
     // Should show just the page number as text, not a button
     await expect(page.getByText("1", { exact: true })).toBeVisible();
     // Should not have clickable page buttons
-    const pageButtons = page.getByRole("button").filter({ hasText: /^\d+$/ });
+    const pageButtons = page.getByTestId("pagination").getByRole("button").filter({ hasText: /^\d+$/ });
     await expect(pageButtons).toHaveCount(0);
   });
 

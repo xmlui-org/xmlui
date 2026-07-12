@@ -1,6 +1,40 @@
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
+async function expectScrollTop(locator: import("@playwright/test").Locator, expected: number) {
+  await expect
+    .poll(() => locator.evaluate((elem) => elem.scrollTop))
+    .toBe(expected);
+}
+
+async function expectScrollLeft(locator: import("@playwright/test").Locator, expected: number) {
+  await expect
+    .poll(() => locator.evaluate((elem) => elem.scrollLeft))
+    .toBe(expected);
+}
+
+async function expectScrolledToBottom(locator: import("@playwright/test").Locator) {
+  await expect(async () => {
+    const { scrollTop, scrollHeight, clientHeight } = await locator.evaluate((elem) => ({
+      scrollTop: elem.scrollTop,
+      scrollHeight: elem.scrollHeight,
+      clientHeight: elem.clientHeight,
+    }));
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+  }).toPass();
+}
+
+async function expectScrolledToEnd(locator: import("@playwright/test").Locator) {
+  await expect(async () => {
+    const { scrollLeft, scrollWidth, clientWidth } = await locator.evaluate((elem) => ({
+      scrollLeft: elem.scrollLeft,
+      scrollWidth: elem.scrollWidth,
+      clientWidth: elem.clientWidth,
+    }));
+    expect(scrollLeft).toBeCloseTo(scrollWidth - clientWidth, 0);
+  }).toPass();
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -230,7 +264,6 @@ test.describe("Event Handling", () => {
 
     await expect(textDriver.component).not.toBeVisible();
     await title.click();
-    await page.waitForTimeout(200);
     await expect(page).toHaveURL(/\/test-link$/);
     await expect(textDriver.component).toBeVisible();
   });
@@ -266,13 +299,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the top
-    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(card, 0);
   });
 
   test("scrollToBottom scrolls to the bottom of a scrollable Card", async ({ page, initTestBed }) => {
@@ -295,16 +324,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(card);
   });
 
   test("scrollToStart scrolls to the start of a horizontally scrollable Card", async ({ page, initTestBed }) => {
@@ -332,13 +354,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to start
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the start
-    const scrollLeftAfter = await card.evaluate((elem) => elem.scrollLeft);
-    expect(scrollLeftAfter).toBe(0);
+    await expectScrollLeft(card, 0);
   });
 
   test("scrollToEnd scrolls to the end of a horizontally scrollable Card", async ({ page, initTestBed }) => {
@@ -361,16 +379,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to end
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the end
-    const scrollLeftAfter = await card.evaluate((elem) => elem.scrollLeft);
-    const scrollWidth = await card.evaluate((elem) => elem.scrollWidth);
-    const clientWidth = await card.evaluate((elem) => elem.clientWidth);
-    
-    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
+    await expectScrolledToEnd(card);
   });
 
   test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
@@ -394,13 +405,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top with smooth behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for smooth scroll to complete
-    await page.waitForTimeout(500);
 
     // Verify we're at the top
-    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(card, 0);
   });
 
   test("scrollToBottom with default behavior uses instant", async ({ page, initTestBed }) => {
@@ -419,16 +426,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom (default behavior)
     await page.getByTestId("scrollBtn").click();
-    
-    // With instant behavior, should be immediate
-    await page.waitForTimeout(50);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await card.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(card);
   });
 
   test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
@@ -448,20 +448,13 @@ test.describe("Api", () => {
     
     // Scroll to bottom
     await page.getByTestId("scrollBottomBtn").click();
-    await page.waitForTimeout(100);
 
-    const scrollHeight = await card.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await card.evaluate((elem) => elem.clientHeight);
-    let scrollTop = await card.evaluate((elem) => elem.scrollTop);
-    
-    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(card);
 
     // Now scroll back to top
     await page.getByTestId("scrollTopBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await card.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBe(0);
+    await expectScrollTop(card, 0);
   });
 
   test("Card with title and subtitle scrolls correctly", async ({ page, initTestBed }) => {
@@ -485,16 +478,14 @@ test.describe("Api", () => {
     
     // Scroll to bottom
     await page.getByTestId("scrollBottomBtn").click();
-    await page.waitForTimeout(100);
 
-    let scrollTop = await card.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBeGreaterThan(0);
+    await expect
+      .poll(() => card.evaluate((elem) => elem.scrollTop))
+      .toBeGreaterThan(0);
 
     // Scroll back to top
     await page.getByTestId("scrollTopBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await card.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBe(0);
+    await expectScrollTop(card, 0);
   });
 });

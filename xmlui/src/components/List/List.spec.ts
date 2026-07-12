@@ -609,7 +609,7 @@ test.describe("Basic Functionality", () => {
     // Appending follows the bottom to each newest item.
     for (let i = 0; i < 3; i++) {
       await page.getByTestId("add").click();
-      await page.waitForTimeout(100);
+      await expect(page.getByText(`Item ${101 + i}`, { exact: true })).toBeVisible();
     }
     await expect(page.getByText("Item 103", { exact: true })).toBeVisible();
     await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
@@ -643,7 +643,6 @@ test.describe("Basic Functionality", () => {
     // newest row through the fits -> overflows transition.
     for (let i = 0; i < 60; i++) {
       await page.getByTestId("add").click();
-      await page.waitForTimeout(30);
     }
     // Followed to the bottom: newest rendered, oldest virtualized away.
     await expect(page.getByText("Item 61", { exact: true })).toBeVisible();
@@ -1197,7 +1196,9 @@ test.describe("Virtualization", () => {
 
     // Scroll to bottom
     await driver.scrollTo("bottom");
-    await page.waitForTimeout(150);
+    await expect
+      .poll(() => list.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
 
     // After scrolling to bottom, item count might change (virtualization update)
     const itemsAfter = page.locator("[data-list-item-type]");
@@ -1241,7 +1242,9 @@ test.describe("Virtualization", () => {
 
     // Verify we can scroll programmatically
     await driver.scrollTo("bottom");
-    await page.waitForTimeout(100);
+    await expect
+      .poll(() => list.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
 
     // After scrolling, list should still be visible
     await expect(list).toBeVisible();
@@ -1277,7 +1280,9 @@ test.describe("Virtualization", () => {
     
     // Scroll around
     await driver.scrollTo("bottom");
-    await page.waitForTimeout(100);
+    await expect
+      .poll(() => list.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
     
     const bottomScrollHeight = await list.evaluate((el) => el.scrollHeight);
     
@@ -1763,7 +1768,8 @@ test.describe("Row Selection", () => {
       const items = page.locator("[data-list-item-type='ITEM']");
       // The 3rd item (index 2) is Carrot (Vegetable) — its checkbox should not select it
       const vegetableCheckbox = items.filter({ hasText: "Carrot" }).locator("input[type='checkbox']");
-      await vegetableCheckbox.click({ force: true });
+      await expect(vegetableCheckbox).toBeDisabled();
+      await vegetableCheckbox.evaluate((element) => (element as HTMLElement).click());
       await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute("data-selected", "true");
       await expect.poll(testStateDriver.testState).toBe(0);
     });
@@ -1826,7 +1832,8 @@ test.describe("Row Selection", () => {
         </List>
       `);
       const firstCheckbox = page.locator("input[type='checkbox']").first();
-      await firstCheckbox.check({ force: true });
+      await expect(firstCheckbox).toBeAttached();
+      await firstCheckbox.evaluate((element) => (element as HTMLElement).click());
       await expect.poll(testStateDriver.testState).toBe(1);
 
       const items = page.locator("[data-list-item-type='ITEM']");
@@ -1961,7 +1968,8 @@ test.describe("Row Selection", () => {
         </List>
       `);
       const firstCheckbox = page.locator("input[type='checkbox']").first();
-      await firstCheckbox.check({ force: true });
+      await expect(firstCheckbox).toBeAttached();
+      await firstCheckbox.evaluate((element) => (element as HTMLElement).click());
       await expect.poll(testStateDriver.testState).toBe(1);
 
       const items = page.locator("[data-list-item-type='ITEM']");

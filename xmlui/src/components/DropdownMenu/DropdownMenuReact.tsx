@@ -6,6 +6,9 @@ import {
   createContext,
   useContext,
   useCallback,
+  type MouseEvent,
+  type KeyboardEvent,
+  type PointerEvent,
 } from "react";
 import { useEffect, useState, useRef } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
@@ -122,6 +125,13 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
     setOpen(false);
   }, []);
 
+  const stopTriggerPropagation = useCallback(
+    (event: MouseEvent | KeyboardEvent | PointerEvent) => {
+      event.stopPropagation();
+    },
+    [],
+  );
+
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -166,7 +176,15 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
         }}
         modal={modal}
       >
-        <DropdownMenuPrimitive.Trigger {...rest} asChild disabled={disabled} ref={ref}>
+        <DropdownMenuPrimitive.Trigger
+          {...rest}
+          asChild
+          disabled={disabled}
+          ref={ref}
+          onClick={stopTriggerPropagation}
+          onKeyDown={stopTriggerPropagation}
+          onPointerDown={stopTriggerPropagation}
+        >
           {triggerTemplate ? (
             triggerTemplate
           ) : (

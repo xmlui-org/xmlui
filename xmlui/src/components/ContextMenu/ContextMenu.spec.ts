@@ -1,5 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
+async function clickOutsideMenu(page: import("@playwright/test").Page) {
+  await page.getByTestId("outsideTarget").click();
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -181,6 +185,7 @@ test("compound component re-reads $context on subsequent openAt calls", async ({
 
 test("closes when clicking outside", async ({ initTestBed, page }) => {
   await initTestBed(`
+    <Button testId="outsideTarget">Outside</Button>
     <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
       <Text value="Right click me" />
     </Card>
@@ -193,8 +198,7 @@ test("closes when clicking outside", async ({ initTestBed, page }) => {
   await page.getByTestId("target").click({ button: "right" });
   await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
 
-  // Click outside
-  await page.mouse.click(10, 10);
+  await clickOutsideMenu(page);
 
   // Menu should close
   await expect(page.getByRole("menuitem", { name: "Item 1" })).not.toBeVisible();
@@ -675,7 +679,13 @@ test.describe("Positioning", () => {
   const menu = page.locator('[class*="ContextMenuContent"]');
   await expect(menu).toBeVisible();
 
-  // Menu should be positioned near click coordinates
+  await expect
+    .poll(async () => {
+      const menuBox = await menu.boundingBox();
+      return !!menuBox && menuBox.x >= clickX - 20 && menuBox.y >= clickY - 20;
+    })
+    .toBe(true);
+
   const menuBox = await menu.boundingBox();
   expect(menuBox!.x).toBeGreaterThanOrEqual(clickX - 20); // Allow small offset
   expect(menuBox!.y).toBeGreaterThanOrEqual(clickY - 20);
@@ -780,9 +790,22 @@ test("alignment='end' works correctly", async ({ initTestBed, page }) => {
     const menu = page.locator('[class*="ContextMenuContent"]');
     await expect(menu).toBeVisible();
 
+    await expect
+      .poll(async () => {
+        const menuBox = await menu.boundingBox();
+        return (
+          !!menuBox &&
+          menuBox.x > 50 &&
+          menuBox.y > 50 &&
+          menuBox.x >= clickX - 20 &&
+          menuBox.y >= clickY - 20
+        );
+      })
+      .toBe(true);
+
     // Menu should be positioned near click coordinates, NOT at top-left corner (0, 0)
     const menuBox = await menu.boundingBox();
-    
+
     // Verify menu is NOT stuck at top-left corner
     expect(menuBox!.x).toBeGreaterThan(50); // Should be near center, not at 0
     expect(menuBox!.y).toBeGreaterThan(50); // Should be near center, not at 0

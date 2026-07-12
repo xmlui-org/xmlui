@@ -1,5 +1,25 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "../../testing/fixtures";
 import { getBounds } from "../../testing/component-test-helpers";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createLinkDriver }) => {
@@ -996,11 +1016,7 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<Link to="/" testId="test" tooltip="Tooltip text">text</Link>`);
 
     const link = page.getByTestId("test");
-    await link.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, link, "Tooltip text");
   });
 
   test("handles variant", async ({ page, initTestBed }) => {
@@ -1032,12 +1048,8 @@ test.describe("Behaviors and Parts", () => {
     
     const link = page.getByTestId("test");
     const icon = link.locator("[data-part-id='icon']");
-    const tooltip = page.getByRole("tooltip");
     
-    await link.hover();
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, link, "Tooltip text");
     await expect(icon).toBeVisible();
   });
 
@@ -1047,11 +1059,7 @@ test.describe("Behaviors and Parts", () => {
     `);
     
     const link = page.getByTestId("test");
-    await link.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, link, "Bold text");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
@@ -1071,10 +1079,7 @@ test.describe("Behaviors and Parts", () => {
     const link = page.getByTestId("test");
     await expect(link).toBeVisible();
     
-    await link.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, link, "Tooltip text");
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {

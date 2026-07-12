@@ -1,5 +1,5 @@
 import type { ForwardedRef, HTMLAttributes, Ref } from "react";
-import { forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
+import { forwardRef, memo, useMemo, useRef, useCallback, useEffect, useLayoutEffect } from "react";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -148,7 +148,7 @@ export const Text = memo(forwardRef(function Text(
   }, []);
 
   // Register API with XMLUI if provided
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({ hasOverflow });
     }

@@ -176,14 +176,14 @@ test.describe("Edge Cases", { tag: "@smoke" }, () => {
   test("button behind fullScreen spinner can't be clicked", async ({ page, initTestBed }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Button label="Click Me" onClick="testState = clicked" />
+        <Button testId="coveredBtn" label="Click Me" onClick="testState = clicked" />
         <Spinner fullScreen="true" />
       </Fragment>`);
 
     const spinner = page.getByRole("status");
     await expect(spinner).toBeVisible();
 
-    await page.getByRole("button").click({ force: true });
+    await page.getByTestId("coveredBtn").click({ force: true });
 
     await expect.poll(testStateDriver.testState).not.toEqual("clicked");
   });

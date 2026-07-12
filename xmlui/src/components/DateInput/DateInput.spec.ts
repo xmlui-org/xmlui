@@ -1,4 +1,33 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { test, expect } from "../../testing/fixtures";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
+
+async function expectValidationTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText(text);
+  }).toPass();
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -785,12 +814,12 @@ test.describe("API Methods", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <DateInput id="dateInput" testId="dateInput" />
-        <Button onClick="dateInput.focus(); testState = 'focused'" />
+        <Button testId="apiBtn" onClick="dateInput.focus(); testState = 'focused'" />
       </Fragment>
     `);
     const driver = await createDateInputDriver("dateInput");
 
-    await driver.component.page().getByRole("button").click();
+    await driver.component.page().getByTestId("apiBtn").click();
 
     await expect.poll(testStateDriver.testState).toEqual("focused");
     await expect(driver.monthInput).toBeFocused();
@@ -800,12 +829,12 @@ test.describe("API Methods", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <DateInput id="dateInput" testId="dateInput" />
-        <Button onClick="dateInput.setValue('05/25/2024'); testState = 'set'" />
+        <Button testId="apiBtn" onClick="dateInput.setValue('05/25/2024'); testState = 'set'" />
       </Fragment>
     `);
     const driver = await createDateInputDriver("dateInput");
 
-    await driver.component.page().getByRole("button").click();
+    await driver.component.page().getByTestId("apiBtn").click();
 
     await expect.poll(testStateDriver.testState).toEqual("set");
     await expect(driver.monthInput).toHaveValue("05");
@@ -835,12 +864,12 @@ test.describe("API Methods", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <DateInput id="dateInput" testId="dateInput" initialValue="05/25/2024" />
-        <Button onClick="testState = dateInput.value" />
+        <Button testId="apiBtn" onClick="testState = dateInput.value" />
       </Fragment>
     `);
     const driver = await createDateInputDriver("dateInput");
 
-    await driver.component.page().getByRole("button").click();
+    await driver.component.page().getByTestId("apiBtn").click();
 
     await expect.poll(testStateDriver.testState).toEqual("05/25/2024");
   });
@@ -852,12 +881,12 @@ test.describe("API Methods", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <DateInput id="dateInput" testId="dateInput" initialValue="05/25/2024" />
-        <Button onClick="dateInput.setValue(''); testState = 'cleared'" />
+        <Button testId="apiBtn" onClick="dateInput.setValue(''); testState = 'cleared'" />
       </Fragment>
     `);
     const driver = await createDateInputDriver("dateInput");
 
-    await driver.component.page().getByRole("button").click();
+    await driver.component.page().getByTestId("apiBtn").click();
 
     await expect.poll(testStateDriver.testState).toEqual("cleared");
     await expect(driver.monthInput).toHaveValue("");
@@ -1305,11 +1334,7 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<DateInput testId="test" tooltip="Tooltip text" />`);
 
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("handles variant", async ({ page, initTestBed }) => {
@@ -1362,12 +1387,8 @@ test.describe("Behaviors and Parts", () => {
     const monthPart = component.locator("[data-part-id='month']");
     const yearPart = component.locator("[data-part-id='year']");
     const clearButton = component.locator("[data-part-id='clearButton']");
-    const tooltip = page.getByRole("tooltip");
     
-    await component.hover();
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
     await expect(dayPart).toBeVisible();
     await expect(monthPart).toBeVisible();
     await expect(yearPart).toBeVisible();
@@ -1409,11 +1430,7 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<DateInput testId="test" tooltipMarkdown="**Bold text**" />`);
     
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, component, "Bold text");
   });
 
   test("animation behavior", async ({ page, initTestBed }) => {
@@ -1429,10 +1446,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
     
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
@@ -1465,10 +1479,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(yearPart).toBeVisible();
     await expect(clearButton).toBeVisible();
 
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 });
 
@@ -1572,13 +1583,7 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("submit").click();
     
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
-    // Hover over the icon
-    await conciseFeedback.hover();
-    
-    // Check tooltip content
-    const tooltip = page.locator("[data-tooltip-container]");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toContainText("This field is required");
+    await expectValidationTooltipText(page, conciseFeedback, "This field is required");
   });
 
   test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {

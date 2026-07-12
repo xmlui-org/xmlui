@@ -1,5 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
+async function clickOutsideMenu(page: import("@playwright/test").Page) {
+  await page.getByTestId("outsideTarget").click();
+}
+
 test.describe("ContextMenu foundation", () => {
   test("opens at mouse position and menu item mutates state", async ({ initTestBed, page }) => {
     await initTestBed(`
@@ -43,6 +47,7 @@ test.describe("ContextMenu foundation", () => {
   test("closes when clicking outside or pressing Escape", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App>
+        <Button testId="outsideTarget">Outside</Button>
         <Card testId="target" title="Right click" onContextMenu="ev => menu.openAt(ev)">
           <Text>Right click me</Text>
         </Card>
@@ -54,7 +59,7 @@ test.describe("ContextMenu foundation", () => {
 
     await page.getByTestId("target").click({ button: "right" });
     await expect(page.getByRole("menuitem", { name: "Item 1" })).toBeVisible();
-    await page.mouse.click(10, 10);
+    await clickOutsideMenu(page);
     await expect(page.getByRole("menuitem", { name: "Item 1" })).not.toBeVisible();
 
     await page.getByTestId("target").click({ button: "right" });

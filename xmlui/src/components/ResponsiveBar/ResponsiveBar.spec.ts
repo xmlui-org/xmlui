@@ -485,9 +485,11 @@ test.describe("dropdownAlignment property", () => {
     await expect(overflow).toBeVisible();
 
     await overflow.click();
-    const { x: triggerX } = await overflow.boundingBox();
-    const { x: menuX } = await page.getByRole("menu").boundingBox();
-    expect(menuX).toBeCloseTo(triggerX, 0);
+    await expect(async () => {
+      const triggerBox = await overflow.boundingBox();
+      const menuBox = await page.getByRole("menu").boundingBox();
+      expect(menuBox?.x).toBeCloseTo(triggerBox!.x, 0);
+    }).toPass();
   });
 
   test("alignment='end' aligns dropdown menu to the right", async ({
@@ -968,8 +970,8 @@ test.describe("API methods", () => {
     await page.getByTestId("openBtn").click();
     await expect(menu).toBeVisible();
 
-    // Close via API - use force since menu might overlap the button
-    await page.getByTestId("closeBtn").click({ force: true });
+    // Close via API even when the open menu overlaps the trigger surface.
+    await page.getByTestId("closeBtn").evaluate((element) => (element as HTMLElement).click());
     await expect(menu).not.toBeVisible();
   });
 

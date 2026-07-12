@@ -24,7 +24,7 @@ test.describe("NavLink foundation", () => {
 
     await expect(page.getByTestId("disabled")).toHaveJSProperty("tagName", "BUTTON");
     await expect(page.getByTestId("disabled")).toBeDisabled();
-    await page.getByTestId("disabled").click({ force: true });
+    await page.getByTestId("disabled").evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByTestId("path")).toContainText("/");
   });
 

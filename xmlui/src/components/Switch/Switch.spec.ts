@@ -223,7 +223,8 @@ test.describe("Basic Functionality", () => {
   test("enabled=false disables interaction", async ({ initTestBed, page }) => {
     await initTestBed(`<Switch enabled="false" initialValue="false" />`);
     const switchElement = page.getByRole("switch");
-    await switchElement.click({ force: true });
+    await expect(switchElement).toBeDisabled();
+    await switchElement.evaluate((element) => (element as HTMLElement).click());
     await expect(switchElement).not.toBeChecked();
   });
 
@@ -308,10 +309,10 @@ test.describe("Accessibility", () => {
     await switchElement.focus();
     await expect(switchElement).not.toBeChecked();
 
-    await switchElement.press("Space", { delay: 100 });
+    await switchElement.press("Space");
     await expect(switchElement).toBeChecked();
 
-    await switchElement.press("Space", { delay: 100 });
+    await switchElement.press("Space");
     await expect(switchElement).not.toBeChecked();
   });
 
