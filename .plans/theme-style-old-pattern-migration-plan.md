@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: proposed for review  
+Status: Step 3 implemented; focused SSG build gate blocked by pre-existing build/type issues  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -210,6 +210,20 @@ Verification:
 
 ### Step 3: Make the Test Bed and SSG Use the Restored Registry
 
+Implementation note, 2026-07-12:
+
+- The active rewrite SSG entry and sample SSG builder now return and inject
+  old-style `ssrStyles`, `ssrHashes`, and root classes from `StyleRegistry`.
+- `StyleProvider` and `StyleRegistry` are exported from the public `xmlui`
+  entry so generated SSG modules can use the same import pattern as the old
+  project.
+- The focused SSG/standalone Playwright gate is currently blocked before tests
+  run by the existing `build:ssg`/`build:production` pipeline: `tsc -p
+  tsconfig.build.json --noEmit` reports broad unrelated strictness/module
+  errors, and the direct SSG Vite build still hits the existing `.xmlui` plugin
+  `Unknown file extension ".ts"` issue. The standard `test:unit` and
+  `test:e2e -- --max-failures=10` gates passed after the Step 3 edits.
+
 Re-align test and server rendering paths with the old registry behavior:
 
 - keep a stable outer `StyleProvider` in the E2E test bed reinit path;
@@ -229,6 +243,32 @@ Verification:
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
 ### Step 4: Reconnect Component Metadata to the Theme Chain
+
+Implementation note, 2026-07-12:
+
+- Runtime-wrapped components now carry their `ComponentMetadata` and theme
+  contributor metadata on the renderer function so the active runtime registry
+  can expose the same component metadata surface the old registry used.
+- Extension component definitions and old authoring compatibility wrappers now
+  preserve `metadata`, `themeVars`, `defaultThemeVars`,
+  `toneSpecificThemeVars`, and `themeVarContributorComponents` instead of
+  dropping theme metadata at normalization time.
+- `component-core/themeMetadata.ts` now collects old-registry-shaped
+  `componentThemeVars`, deeply merged `componentDefaultThemeVars`,
+  `componentThemeVarDeclarations`, contributor relationships, and
+  `componentMetadataByName` from core runtime renderers and optional
+  extensions. Extension theme variables are namespaced with
+  `themeNamespacePrefix`.
+- `tests/compiler/themeMetadata.test.ts` covers the representative component
+  set, deep default-theme-var merging, and a namespaced extension with theme
+  declarations and contributor metadata.
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/compiler/themeMetadata.test.ts`,
+  `npm --workspace xmlui run check:metadata`,
+  `npm --workspace xmlui run test:unit`, and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`. The metadata
+  check still logs Vite's sandbox-only WebSocket `EPERM` warning but exits
+  successfully and regenerates metadata.
 
 Restore the old component registry theme metadata contract in the rewrite's
 active component registry:

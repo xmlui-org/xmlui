@@ -152,6 +152,11 @@ export function wrapComponent(
     events: Object.keys(metadata.events ?? {}),
     apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
+    metadata,
+    themeVars: metadata.themeVars,
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
+    themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps) => {
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
       Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
@@ -257,6 +262,11 @@ export function wrapCompound(
     events: Object.keys(metadata.events ?? {}),
     apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
+    metadata,
+    themeVars: metadata.themeVars,
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
+    themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps) => (
       <CompoundComponentCompat
         name={name}
@@ -281,6 +291,11 @@ export function createComponentRenderer(
     events: Object.keys(metadata.events ?? {}),
     apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
+    metadata,
+    themeVars: metadata.themeVars,
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
+    themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps) => (
       <OldComponentRendererCompat
         name={name}

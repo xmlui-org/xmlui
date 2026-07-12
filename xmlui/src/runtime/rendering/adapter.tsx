@@ -47,6 +47,11 @@ export type XmluiWrappedRenderer = (props: {
   [key: string]: unknown;
 }) => ReactNode;
 
+export type XmluiWrappedRendererMetadata = {
+  metadata: ComponentMetadata;
+  themeContributors?: readonly ComponentMetadata[];
+};
+
 export type XmluiComponentAdapter = {
   name: string;
   metadata: ComponentMetadata;
@@ -92,6 +97,10 @@ export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrapp
       layoutContext: extraProps.layoutContext as Record<string, unknown> | undefined,
     }, rendered)}</>;
   }
+  Object.assign(WrappedXmluiComponent, {
+    metadata: options.metadata,
+    themeContributors: options.themeContributors,
+  } satisfies XmluiWrappedRendererMetadata);
   return WrappedXmluiComponent;
 }
 

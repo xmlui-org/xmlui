@@ -30,6 +30,7 @@ export type {
   ComponentMetadataOptimization,
   ComponentPartMetadata,
   ComponentPropertyMetadata,
+  DefaultThemeVarValue,
   DefaultThemeVars,
   IsValidFunction,
   PropertyValueDescription,

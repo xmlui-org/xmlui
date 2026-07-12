@@ -80,6 +80,11 @@ export function wrapComponent(
     events: Object.keys(metadata.events ?? {}),
     apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
+    metadata,
+    themeVars: metadata.themeVars,
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
+    themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps: XmluiExtensionComponentProps) => {
       const themeClass = useComponentThemeClass(name, metadata);
       const props = { ...runtimeProps.props };

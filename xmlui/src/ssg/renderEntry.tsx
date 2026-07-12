@@ -2,6 +2,8 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 
 import { XmluiRoot } from "../runtime";
+import { StyleProvider } from "../components-core/theming/StyleContext";
+import { StyleRegistry } from "../components-core/theming/StyleRegistry";
 import counterBadgeExtension from "../../../packages/xmlui-counter-badge/src";
 
 import counterComponentsApp from "../../standalone-samples/counter-components/Main.xmlui";
@@ -18,7 +20,25 @@ const examples = {
 
 export type SsgExampleName = keyof typeof examples;
 
-export function renderSsgExample(example: SsgExampleName, path = "/"): string {
+export type SsgRenderResult = {
+  markup: string;
+  ssrStyles: string;
+  ssrHashes: string;
+  htmlClasses: string;
+};
+
+export function renderSsgExample(example: SsgExampleName, path = "/"): SsgRenderResult {
   const module = examples[example];
-  return renderToString(<XmluiRoot module={module} initialUrl={path} extensions={[counterBadgeExtension]} />);
+  const registry = new StyleRegistry();
+  const markup = renderToString(
+    <StyleProvider styleRegistry={registry}>
+      <XmluiRoot module={module} initialUrl={path} extensions={[counterBadgeExtension]} />
+    </StyleProvider>,
+  );
+  return {
+    markup,
+    ssrStyles: registry.getSsrStyles(),
+    ssrHashes: Array.from(registry.cache.keys()).join(","),
+    htmlClasses: registry.getRootClasses(),
+  };
 }

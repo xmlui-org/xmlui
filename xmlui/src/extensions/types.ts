@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { XmluiElement } from "../compiler/ir";
 import type { XmluiComponentContract } from "../compiler/contracts";
+import type { ComponentMetadata, DefaultThemeVars } from "../component-core/metadata";
 import type { RuntimeScope } from "../runtime/state";
 import type { RenderContext } from "../runtime/rendering/types";
 
@@ -27,6 +28,11 @@ export type ComponentExtension = {
   acceptsArbitraryProps?: boolean;
   allowsChildren?: boolean;
   description?: string;
+  metadata?: ComponentMetadata;
+  themeVars?: ComponentMetadata["themeVars"];
+  defaultThemeVars?: DefaultThemeVars;
+  toneSpecificThemeVars?: ComponentMetadata["toneSpecificThemeVars"];
+  themeVarContributorComponents?: string[];
 };
 
 export type ThemeDefinition = {
@@ -51,6 +57,7 @@ export type NormalizedExtensionComponent = {
   component: XmluiExtensionComponent;
   contract: XmluiComponentContract;
   description?: string;
+  metadata?: ComponentMetadata;
 };
 
 export type NormalizedExtensions = {
@@ -62,4 +69,3 @@ export type NormalizedExtensions = {
   themes: ThemeDefinition[];
   functionNames: string[];
 };
-

@@ -4,6 +4,13 @@ export {
   runtimeComponentModules,
 } from "./registry";
 export { builtInComponentRenderers } from "./runtimeRegistry";
+export {
+  collectComponentThemeMetadata,
+  createComponentThemeMetadataRegistry,
+  createCoreComponentThemeMetadataRegistry,
+  type ComponentThemeMetadataEntry,
+  type ComponentThemeMetadataRegistry,
+} from "./themeMetadata";
 export * from "./behaviors";
 export * from "./metadata";
 export type {

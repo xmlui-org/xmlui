@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import type { XmluiComponentContract } from "../compiler/contracts";
 import { supportedLayoutPropNames, supportedResponsiveLayoutPropNames } from "../styling";
+import type { ComponentMetadata, DefaultThemeVarValue, DefaultThemeVars } from "../component-core/metadata";
 
 export type ExtensionRegisteredCallback = (extension: Extension) => void;
 
@@ -109,17 +110,20 @@ function normalizeComponent(
     qualifiedName,
     component: component.component,
     description: component.description,
-    contract: componentContract(component),
+    metadata: component.metadata,
+    contract: componentContract(extension, component),
   };
 }
 
-function componentContract(component: ComponentExtension): XmluiComponentContract {
+function componentContract(extension: Extension, component: ComponentExtension): XmluiComponentContract {
   const commonProps = [
     "id",
     "testId",
     ...supportedLayoutPropNames,
     ...supportedResponsiveLayoutPropNames,
   ];
+  const themeVars = component.themeVars ?? component.metadata?.themeVars;
+  const defaultThemeVars = component.defaultThemeVars ?? component.metadata?.defaultThemeVars;
   return {
     name: component.name,
     kind: "extension",
@@ -134,5 +138,80 @@ function componentContract(component: ComponentExtension): XmluiComponentContrac
     templates: Object.fromEntries((component.templates ?? []).map((name) => [name, { name }])),
     contextVariables: Object.fromEntries((component.contextVariables ?? []).map((name) => [name, { name }])),
     apis: Object.fromEntries((component.apis ?? []).map((name) => [name, { name }])),
+    themeVars: themeVarContracts(extension, themeVars, defaultThemeVars),
+    defaultThemeVars: flatDefaultThemeVars(extension, defaultThemeVars),
+    toneSpecificThemeVars: namespaceToneSpecificThemeVars(
+      extension,
+      component.toneSpecificThemeVars ?? component.metadata?.toneSpecificThemeVars,
+    ),
   };
+}
+
+function themeVarContracts(
+  extension: Extension,
+  themeVars: ComponentMetadata["themeVars"],
+  defaultThemeVars: DefaultThemeVars | undefined,
+): XmluiComponentContract["themeVars"] {
+  const names = new Set([
+    ...Object.keys(themeVars ?? {}),
+    ...Object.entries(defaultThemeVars ?? {})
+      .filter(([, value]) => isPrimitiveDefaultThemeVarValue(value))
+      .map(([name]) => name),
+  ]);
+  return names.size > 0
+    ? Object.fromEntries([...names].sort().map((name) => {
+      const namespacedName = namespaceThemeVariableName(extension, name);
+      return [namespacedName, { name: namespacedName }];
+    }))
+    : undefined;
+}
+
+function flatDefaultThemeVars(
+  extension: Extension,
+  defaultThemeVars: DefaultThemeVars | undefined,
+): XmluiComponentContract["defaultThemeVars"] {
+  if (!defaultThemeVars) {
+    return undefined;
+  }
+  const flatVars: Record<string, string | number | boolean> = {};
+  for (const [name, value] of Object.entries(defaultThemeVars)) {
+    if (isPrimitiveDefaultThemeVarValue(value)) {
+      flatVars[namespaceThemeVariableName(extension, name)] = value;
+    }
+  }
+  return Object.keys(flatVars).length > 0 ? flatVars : undefined;
+}
+
+function namespaceToneSpecificThemeVars(
+  extension: Extension,
+  toneSpecificThemeVars: ComponentMetadata["toneSpecificThemeVars"],
+): XmluiComponentContract["toneSpecificThemeVars"] {
+  if (!toneSpecificThemeVars) {
+    return undefined;
+  }
+  return Object.fromEntries(
+    Object.entries(toneSpecificThemeVars).map(([tone, vars]) => [
+      tone,
+      Object.fromEntries(
+        Object.entries(vars).map(([name, value]) => [
+          namespaceThemeVariableName(extension, name),
+          value,
+        ]),
+      ),
+    ]),
+  );
+}
+
+export function namespaceThemeVariableName(extension: Extension | undefined, name: string): string {
+  const prefix = extension?.themeNamespacePrefix;
+  if (!prefix || name.startsWith(`${prefix}:`)) {
+    return name;
+  }
+  return `${prefix}:${name}`;
+}
+
+function isPrimitiveDefaultThemeVarValue(
+  value: DefaultThemeVarValue,
+): value is string | number | boolean {
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean";
 }
