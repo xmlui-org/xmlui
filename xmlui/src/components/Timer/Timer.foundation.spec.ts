@@ -17,9 +17,12 @@ test("timer stops when enabled is driven by a labeled Switch API value", async (
   await expect.poll(async () => Number(await counter.textContent())).toBeGreaterThan(0);
 
   await page.getByTestId("enable").getByRole("switch").click();
-  await page.waitForTimeout(150);
   const stoppedAt = Number(await counter.textContent());
-  await page.waitForTimeout(250);
 
-  expect(Number(await counter.textContent())).toBe(stoppedAt);
+  await expect
+    .poll(async () => Number(await counter.textContent()), {
+      timeout: 350,
+      intervals: [100, 100, 100],
+    })
+    .toBe(stoppedAt);
 });

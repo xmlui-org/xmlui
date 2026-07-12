@@ -4,6 +4,28 @@ import { getBounds } from "../../testing/component-test-helpers";
 type ApiInterceptorDefinition = Record<string, unknown>;
 const labelPositionValues = ["top", "start", "end", "bottom", "before", "after"] as const;
 
+async function expectStateStable(
+  testStateDriver: { testState: () => Promise<unknown> },
+  expectedValue: unknown,
+  durationMs = 300,
+) {
+  const deadline = Date.now() + durationMs;
+  do {
+    expect(await testStateDriver.testState()).toEqual(expectedValue);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  } while (Date.now() < deadline);
+}
+
+async function expectStoredFormValue(
+  page: import("@playwright/test").Page,
+  storageKey: string,
+  predicate: (stored: string | null) => void,
+) {
+  await expect(async () => {
+    predicate(await page.evaluate((key) => localStorage.getItem(key), storageKey));
+  }).toPass();
+}
+
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
   initialize: `
@@ -91,10 +113,10 @@ test.describe("Basic Functionality", () => {
 
   test("component swaps cancel and save button positions", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <Form swapCancelAndSave="true"/>
+      <Form testId="form" swapCancelAndSave="true"/>
     `);
 
-    const buttons = page.getByRole("button");
+    const buttons = page.getByTestId("form").getByRole("button");
     await expect(buttons.first()).toHaveText("Save");
     await expect(buttons.last()).toHaveText("Cancel");
   });
@@ -490,7 +512,7 @@ test.describe("Basic Functionality", () => {
       await expect(saveButton).toBeDisabled();
 
       // Verify form does not submit (button is disabled, so click won't work)
-      await saveButton.click({ force: true }); // Force click on disabled button
+      await saveButton.evaluate((element) => (element as HTMLElement).click());
 
       // testState should remain null since submit was prevented
       await expect.poll(testStateDriver.testState).toBeNull();
@@ -1183,9 +1205,7 @@ test.describe("Basic Functionality", () => {
 
       await page.getByRole("button", { name: "Save" }).click();
 
-      // Wait a bit to ensure submission doesn't happen
-      await page.waitForTimeout(200);
-      await expect.poll(testStateDriver.testState).toEqual(null);
+      await expectStateStable(testStateDriver, null);
     });
 
     test("onWillSubmit submits modified data when returning a plain object", async ({
@@ -1549,14 +1569,12 @@ test.describe("Basic Functionality", () => {
       // Click validate button without filling required field
       await page.getByTestId("validateBtn").click();
 
-      // Wait for validation to complete
-      await page.waitForTimeout(100);
-
+      await expect
+        .poll(testStateDriver.testState)
+        .toMatchObject({ isValid: false });
       const result = await testStateDriver.testState();
-      expect(result).toBeTruthy();
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toBeDefined();
-      expect(result.errors.length).toBeGreaterThan(0);
+      expect((result as any).errors).toBeDefined();
+      expect((result as any).errors.length).toBeGreaterThan(0);
     });
 
     test("validate method returns isValid true when all validations pass", async ({
@@ -1580,13 +1598,9 @@ test.describe("Basic Functionality", () => {
       // Click validate button
       await page.getByTestId("validateBtn").click();
 
-      // Wait for validation to complete
-      await page.waitForTimeout(100);
-
-      const result = await testStateDriver.testState();
-      expect(result).toBeTruthy();
-      expect(result.isValid).toBe(true);
-      expect(result.errors.length).toBe(0);
+      await expect
+        .poll(testStateDriver.testState)
+        .toMatchObject({ isValid: true, errors: [] });
     });
 
     test("validate method returns cleaned form data", async ({
@@ -1615,12 +1629,9 @@ test.describe("Basic Functionality", () => {
       // Click validate button
       await page.getByTestId("validateBtn").click();
 
-      // Wait for validation to complete
-      await page.waitForTimeout(100);
-
-      const result = await testStateDriver.testState();
-      expect(result).toBeTruthy();
-      expect(result.data).toEqual({ name: "John Doe", age: 30 });
+      await expect
+        .poll(testStateDriver.testState)
+        .toMatchObject({ data: { name: "John Doe", age: 30 } });
     });
 
     test("validate method displays validation errors on form", async ({
@@ -1692,11 +1703,8 @@ test.describe("Basic Functionality", () => {
       // Click validate button
       await page.getByTestId("validateBtn").click();
 
-      // Wait a bit
-      await page.waitForTimeout(200);
-
       // testState should remain null (not 'submitted')
-      await expect.poll(testStateDriver.testState).toBeNull();
+      await expectStateStable(testStateDriver, null);
     });
 
     test("validate method returns complete validation results object", async ({
@@ -1721,15 +1729,15 @@ test.describe("Basic Functionality", () => {
       // Click validate button
       await page.getByTestId("validateBtn").click();
 
-      // Wait for validation to complete
-      await page.waitForTimeout(100);
-
+      await expect
+        .poll(testStateDriver.testState)
+        .toMatchObject({ isValid: false });
       const result = await testStateDriver.testState();
       expect(result).toBeTruthy();
-      expect(result.isValid).toBeDefined();
-      expect(result.data).toBeDefined();
-      expect(result.errors).toBeDefined();
-      expect(result.warnings).toBeDefined();
+      expect((result as any).isValid).toBeDefined();
+      expect((result as any).data).toBeDefined();
+      expect((result as any).errors).toBeDefined();
+      expect((result as any).warnings).toBeDefined();
       expect(result.validationResults).toBeDefined();
     });
   });
@@ -1777,7 +1785,7 @@ test.describe("Basic Functionality", () => {
       const counterInput = counterDriver.textBox;
       await expect(counterInput).toHaveValue("0");
 
-      await page.getByRole("button", { name: "Increment" }).click({ force: true });
+      await page.getByRole("button", { name: "Increment" }).click();
 
       await expect(counterInput).toHaveValue("1");
     });
@@ -1989,8 +1997,6 @@ test.describe("Basic Functionality", () => {
 
         // Fill the field to trigger async validation (delay 3000ms)
         await page.getByRole("textbox").fill("alice");
-        // Brief pause to ensure the partial validation state is reflected in React state
-        await page.waitForTimeout(100);
 
         // While async validation is in-flight, the Save button should be disabled
         // and show the pending label "Validating..."
@@ -2026,7 +2032,6 @@ test.describe("Basic Functionality", () => {
 
         // Fill the field to trigger async validation (delay 500ms, returns error)
         await page.getByRole("textbox").fill("alice");
-        await page.waitForTimeout(100);
 
         // While async validation is in-flight, Save button shows "Validating..." and is disabled
         await expect(page.getByRole("button", { name: "Validating..." })).toBeDisabled();
@@ -2037,9 +2042,7 @@ test.describe("Basic Functionality", () => {
 
         // Clicking Save with a validation error must not submit the form
         await page.getByRole("button", { name: "Save" }).click();
-        await page.waitForTimeout(500);
-        const state = await testStateDriver.testState();
-        expect(state).not.toEqual("submitted");
+        await expectStateStable(testStateDriver, null);
       });
     });
 
@@ -3725,9 +3728,8 @@ test.describe("Api", () => {
     expect(data.name).toEqual("Modified");
 
     // Get data again to verify form still has original value
-    await page.getByTestId("getDataAgainBtn").click({ delay: 100 });
-    data = await testStateDriver.testState();
-    expect(data.name).toEqual("John");
+    await page.getByTestId("getDataAgainBtn").click();
+    await expect.poll(async () => (await testStateDriver.testState()).name).toEqual("John");
   });
 
   test("getData excludes unbound fields (fields ending with __UNBOUND_FIELD__)", async ({
@@ -4140,9 +4142,7 @@ test.describe("Form persistence — localStorage temporary save", () => {
     const nameInput = await createTextBoxDriver(nameItem.input);
     await nameInput.field.fill("Alice");
 
-    // Wait for the autosave to fire
-    await page.waitForTimeout(100);
-
+    await expectStoredFormValue(page, "test-form", (stored) => expect(stored).not.toBeNull());
     const stored = await page.evaluate(() => localStorage.getItem("test-form"));
     expect(stored).not.toBeNull();
     const parsed = JSON.parse(stored!);
@@ -4267,8 +4267,7 @@ test.describe("Form persistence — localStorage temporary save", () => {
     await nameInput.field.fill("Frank");
     await secretInput.field.fill("password123");
 
-    await page.waitForTimeout(100);
-
+    await expectStoredFormValue(page, "test-form-exclude", (stored) => expect(stored).not.toBeNull());
     const stored = await page.evaluate(() => localStorage.getItem("test-form-exclude"));
     expect(stored).not.toBeNull();
     const parsed = JSON.parse(stored!);
@@ -4292,10 +4291,10 @@ test.describe("Form persistence — localStorage temporary save", () => {
     const nameInput = await createTextBoxDriver(nameItem.input);
     await nameInput.field.fill("Grace");
 
-    await page.waitForTimeout(100);
-
-    const stored = await page.evaluate(() => localStorage.getItem("test-form-no-persist"));
-    expect(stored).toBeNull();
+    await expectStateStable(
+      { testState: () => page.evaluate(() => localStorage.getItem("test-form-no-persist")) },
+      null,
+    );
   });
 });
 

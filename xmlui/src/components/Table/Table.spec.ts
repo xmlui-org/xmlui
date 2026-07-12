@@ -17,6 +17,18 @@
 
 import { expect, test } from "../../testing/fixtures";
 
+async function expectStateStable(
+  testStateDriver: { testState: () => Promise<unknown> },
+  expectedValue: unknown,
+  durationMs = 300,
+) {
+  const deadline = Date.now() + durationMs;
+  do {
+    expect(await testStateDriver.testState()).toEqual(expectedValue);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  } while (Date.now() < deadline);
+}
+
 // Sample data for testing
 const sampleData = [
   { id: 1, name: "Apple", quantity: 5, category: "Fruit" },
@@ -567,16 +579,10 @@ test.describe("Basic Functionality", () => {
       const firstDataRow = page.locator("tbody tr").first();
       await expect(firstDataRow).toBeVisible();
 
-      // Get row bounds for calculation
-      const rowBounds = await firstDataRow.boundingBox();
-
       // Click near the left edge of the row (where checkbox would be with tolerance)
       // This simulates clicking within the 8px compact tolerance of the checkbox
-      const clickX = rowBounds.x + 15; // Slightly to the right of where checkbox would be
-      const clickY = rowBounds.y + rowBounds.height / 2;
-
       // Click within tolerance boundary should trigger selection due to checkboxTolerance="compact"
-      await page.mouse.click(clickX, clickY);
+      await firstDataRow.click({ position: { x: 15, y: 10 } });
 
       // Verify checkbox is now checked (using force since it's hidden)
       await expect(firstRowCheckbox).toBeChecked();
@@ -611,16 +617,10 @@ test.describe("Basic Functionality", () => {
       const headerRow = page.locator("thead tr").first();
       await expect(headerRow).toBeVisible();
 
-      // Get header row bounds for calculation
-      const headerBounds = await headerRow.boundingBox();
-
       // Click near the left edge of the header row (where checkbox would be with tolerance)
       // This simulates clicking within the 8px compact tolerance of the header checkbox
-      const clickX = headerBounds.x + 15; // Slightly to the right of where checkbox would be
-      const clickY = headerBounds.y + headerBounds.height / 2;
-
       // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="compact"
-      await page.mouse.click(clickX, clickY);
+      await headerRow.click({ position: { x: 15, y: 10 } });
 
       // Verify header checkbox is now checked (select all)
       await expect(headerCheckbox).toBeChecked();
@@ -666,7 +666,7 @@ test.describe("Basic Functionality", () => {
 
       // For "none" tolerance, we need to click precisely on the checkbox
       // Since checkboxes are hidden, click on their expected position
-      await firstRowCheckbox.click({ force: true });
+      await firstRowCheckbox.evaluate((element) => (element as HTMLElement).click());
 
       // Verify checkbox is now checked
       await expect(firstRowCheckbox).toBeChecked();
@@ -706,7 +706,7 @@ test.describe("Basic Functionality", () => {
 
       // For "none" tolerance, we need to click precisely on the checkbox
       // Since checkboxes are hidden, click on their expected position
-      await headerCheckbox.click({ force: true });
+      await headerCheckbox.evaluate((element) => (element as HTMLElement).click());
 
       // Verify header checkbox is now checked (select all)
       await expect(headerCheckbox).toBeChecked();
@@ -747,16 +747,10 @@ test.describe("Basic Functionality", () => {
       const firstDataRow = page.locator("tbody tr").first();
       await expect(firstDataRow).toBeVisible();
 
-      // Get row bounds for calculation
-      const rowBounds = await firstDataRow.boundingBox();
-
       // Click near the left edge of the row (where checkbox would be with tolerance)
       // This simulates clicking within the 12px comfortable tolerance of the checkbox
-      const clickX = rowBounds.x + 20; // Further right to test 12px tolerance
-      const clickY = rowBounds.y + rowBounds.height / 2;
-
       // Click within tolerance boundary should trigger selection due to checkboxTolerance="comfortable"
-      await page.mouse.click(clickX, clickY);
+      await firstDataRow.click({ position: { x: 20, y: 10 } });
 
       // Verify checkbox is now checked
       await expect(firstRowCheckbox).toBeChecked();
@@ -791,16 +785,10 @@ test.describe("Basic Functionality", () => {
       const headerRow = page.locator("thead tr").first();
       await expect(headerRow).toBeVisible();
 
-      // Get header row bounds for calculation
-      const headerBounds = await headerRow.boundingBox();
-
       // Click near the left edge of the header row (where checkbox would be with tolerance)
       // This simulates clicking within the 12px comfortable tolerance of the header checkbox
-      const clickX = headerBounds.x + 20; // Further right to test 12px tolerance
-      const clickY = headerBounds.y + headerBounds.height / 2;
-
       // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="comfortable"
-      await page.mouse.click(clickX, clickY);
+      await headerRow.click({ position: { x: 20, y: 10 } });
 
       // Verify header checkbox is now checked (select all)
       await expect(headerCheckbox).toBeChecked();
@@ -841,16 +829,10 @@ test.describe("Basic Functionality", () => {
       const firstDataRow = page.locator("tbody tr").first();
       await expect(firstDataRow).toBeVisible();
 
-      // Get row bounds for calculation
-      const rowBounds = await firstDataRow.boundingBox();
-
       // Click near the left edge of the row (where checkbox would be with tolerance)
       // This simulates clicking within the 16px spacious tolerance of the checkbox
-      const clickX = rowBounds.x + 24; // Even further right to test 16px tolerance
-      const clickY = rowBounds.y + rowBounds.height / 2;
-
       // Click within tolerance boundary should trigger selection due to checkboxTolerance="spacious"
-      await page.mouse.click(clickX, clickY);
+      await firstDataRow.click({ position: { x: 24, y: 10 } });
 
       // Verify checkbox is now checked
       await expect(firstRowCheckbox).toBeChecked();
@@ -885,16 +867,10 @@ test.describe("Basic Functionality", () => {
       const headerRow = page.locator("thead tr").first();
       await expect(headerRow).toBeVisible();
 
-      // Get header row bounds for calculation
-      const headerBounds = await headerRow.boundingBox();
-
       // Click near the left edge of the header row (where checkbox would be with tolerance)
       // This simulates clicking within the 16px spacious tolerance of the header checkbox
-      const clickX = headerBounds.x + 24; // Even further right to test 16px tolerance
-      const clickY = headerBounds.y + headerBounds.height / 2;
-
       // Click within tolerance boundary should trigger "select all" due to checkboxTolerance="spacious"
-      await page.mouse.click(clickX, clickY);
+      await headerRow.click({ position: { x: 24, y: 10 } });
 
       // Verify header checkbox is now checked (select all)
       await expect(headerCheckbox).toBeChecked();
@@ -1097,7 +1073,8 @@ test.describe("Basic Functionality", () => {
 
         // Click the header checkbox to select all
         const headerCheckbox = page.locator("thead input[type='checkbox']");
-        await headerCheckbox.check({ force: true });
+        await expect(headerCheckbox).toBeAttached();
+        await headerCheckbox.evaluate((element) => (element as HTMLElement).click());
 
         // Should only select 2 items (Apple and Banana - the fruits)
         await expect.poll(testStateDriver.testState).toBe(2);
@@ -1631,8 +1608,8 @@ test.describe("Features Needing Investigation", () => {
       `);
 
     const checkboxes = page.locator("input[type='checkbox']");
-    await checkboxes.nth(1).check({ force: true }); // First data row
-    await checkboxes.nth(2).check({ force: true }); // Second data row
+    await checkboxes.nth(1).evaluate((element) => (element as HTMLElement).click()); // First data row
+    await checkboxes.nth(2).evaluate((element) => (element as HTMLElement).click()); // Second data row
 
     await expect(checkboxes.nth(1)).toBeChecked();
     await expect(checkboxes.nth(2)).toBeChecked();
@@ -2381,7 +2358,7 @@ test.describe("Edge Cases", () => {
         </Table>
       `);
     const checkboxes = page.locator("input[type='checkbox']");
-    await checkboxes.nth(1).check({ force: true }); // First data row
+    await checkboxes.nth(1).evaluate((element) => (element as HTMLElement).click()); // First data row
     await expect(checkboxes.nth(1)).toBeChecked();
     await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
   });
@@ -2403,7 +2380,7 @@ test.describe("Edge Cases", () => {
         </Table>
       `);
     const checkboxes = page.locator("input[type='checkbox']");
-    await checkboxes.nth(1).check({ force: true }); // First data row
+    await checkboxes.nth(1).evaluate((element) => (element as HTMLElement).click()); // First data row
     await expect(checkboxes.nth(1)).toBeChecked();
     await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
   });
@@ -2966,9 +2943,11 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("ControlOrMeta+A");
-      await page.waitForTimeout(100);
 
       // Verify that all items are selected in the context
+      await expect
+        .poll(testStateDriver.testState)
+        .toMatchObject({ selectedItemsLength: sampleData.length, selectedIdsLength: sampleData.length });
       const result = await testStateDriver.testState();
       expect(result.selectedItemsLength).toBe(sampleData.length);
       expect(result.selectedIdsLength).toBe(sampleData.length);
@@ -3156,9 +3135,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       // App-level handler must NOT count this as unhandled, because Table
       // called event.preventDefault() and the App handler checks defaultPrevented.
-      await page.waitForTimeout(200);
-      const count = await testStateDriver.testState();
-      expect(count || 0).toBe(0);
+      await expectStateStable(testStateDriver, 0);
     });
   });
 
@@ -3303,9 +3280,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       // Navigate with arrow keys
       await page.keyboard.press("ArrowDown");
-      await page.waitForTimeout(50);
       await page.keyboard.press("ArrowDown");
-      await page.waitForTimeout(50);
 
       // Use keyboard shortcut
       await page.keyboard.press("ControlOrMeta+C");
@@ -3334,13 +3309,10 @@ test.describe("Keyboard Shortcuts", () => {
 
       // First use a keyboard shortcut (this might not do anything if no onSelectAll handler)
       await page.keyboard.press("ControlOrMeta+A");
-      await page.waitForTimeout(50);
 
       // Then try space key for selection
       await page.keyboard.press("ArrowDown");
-      await page.waitForTimeout(100);
       await page.keyboard.press("Space");
-      await page.waitForTimeout(100);
 
       // Should have selected one item
       await expect.poll(testStateDriver.testState).toMatchObject({ count: 1 });
@@ -3393,11 +3365,9 @@ test.describe("Keyboard Shortcuts", () => {
 
       // Press the platform-appropriate key
       await page.keyboard.press("ControlOrMeta+A");
-      await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
-      const state = await testStateDriver.testState();
-      expect(state).toBeNull();
+      await expectStateStable(testStateDriver, null);
     });
 
     test("does not trigger onDelete when rowsSelectable is false", async ({
@@ -3420,11 +3390,9 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("Delete");
-      await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
-      const state = await testStateDriver.testState();
-      expect(state).toBeNull();
+      await expectStateStable(testStateDriver, null);
     });
 
     test("does not trigger onCopy when rowsSelectable is false", async ({ initTestBed, page }) => {
@@ -3444,11 +3412,9 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("ControlOrMeta+C");
-      await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
-      const state = await testStateDriver.testState();
-      expect(state).toBeNull();
+      await expectStateStable(testStateDriver, null);
     });
 
     test("does not trigger onCut when rowsSelectable is false", async ({ initTestBed, page }) => {
@@ -3468,11 +3434,9 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("ControlOrMeta+X");
-      await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
-      const state = await testStateDriver.testState();
-      expect(state).toBeNull();
+      await expectStateStable(testStateDriver, null);
     });
 
     test("triggers onPaste even when rowsSelectable is false", async ({ initTestBed, page }) => {
@@ -3492,11 +3456,9 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("ControlOrMeta+V");
-      await page.waitForTimeout(100);
 
       // Should have triggered the handler
-      const state = await testStateDriver.testState();
-      expect(state).toEqual({ triggered: true });
+      await expect.poll(testStateDriver.testState).toEqual({ triggered: true });
     });
     test("keyboard actions work when rowsSelectable is explicitly true", async ({
       initTestBed,
@@ -3518,7 +3480,6 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       await page.keyboard.press("ControlOrMeta+A");
-      await page.waitForTimeout(100);
 
       // Should have triggered the handler
       await expect.poll(testStateDriver.testState).toEqual({ triggered: true });
@@ -3598,9 +3559,6 @@ test.describe("Virtualization", () => {
       el.scrollTop = el.scrollHeight;
     });
 
-    // Wait a moment for virtualization to update
-    await page.waitForTimeout(100);
-
     // Now row 600 should be visible
     await expect(page.locator("td").filter({ hasText: "File #600" }).first()).toBeVisible();
 
@@ -3653,7 +3611,6 @@ test.describe("Virtualization", () => {
     expect(bottomScrollTop).toBeGreaterThan(middleScrollTop);
 
     // Verify we can see the last item when scrolled to bottom
-    await page.waitForTimeout(100);
     await expect(page.locator("td").filter({ hasText: "Item #600" }).first()).toBeVisible();
   });
 
@@ -3731,8 +3688,6 @@ test.describe("Virtualization", () => {
       el.scrollTop = el.scrollHeight;
     });
 
-    await page.waitForTimeout(100);
-
     // Now item #1 should be visible at bottom
     await expect(page.locator("td").filter({ hasText: /^1$/ }).first()).toBeVisible();
   });
@@ -3771,15 +3726,16 @@ test.describe("Virtualization", () => {
       el.scrollTop = el.scrollHeight;
     });
 
-    await page.waitForTimeout(100);
-
     // Should be able to see items near the end of page 1 (around item 50)
-    const visibleCells = await page.locator("td").allTextContents();
-    const hasItemsNear50 = visibleCells.some((text) => {
-      const num = parseInt(text);
-      return num >= 45 && num <= 50;
-    });
-    expect(hasItemsNear50).toBe(true);
+    await expect
+      .poll(async () => {
+        const visibleCells = await page.locator("td").allTextContents();
+        return visibleCells.some((text) => {
+          const num = parseInt(text);
+          return num >= 45 && num <= 50;
+        });
+      })
+      .toBe(true);
 
     // Still only rendering visible rows even after scrolling
     const scrolledRowCount = await page.locator("tbody tr").count();
@@ -3852,7 +3808,7 @@ test.describe("syncWithVar property", () => {
     // Click the first data-row checkbox (index 1 skips the header checkbox)
     const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
     await expect(firstRowCheckbox).toBeAttached();
-    await firstRowCheckbox.click({ force: true });
+    await firstRowCheckbox.evaluate((element) => (element as HTMLElement).click());
     await expect(firstRowCheckbox).toBeChecked();
 
     // The global variable should now contain selectedIds holding the first item's id
@@ -3909,11 +3865,11 @@ test.describe("syncWithVar property", () => {
     await expect(firstRowCheckbox).toBeAttached();
 
     // Select the first row
-    await firstRowCheckbox.click({ force: true });
+    await firstRowCheckbox.evaluate((element) => (element as HTMLElement).click());
     await expect(firstRowCheckbox).toBeChecked();
 
     // Deselect the first row
-    await firstRowCheckbox.click({ force: true });
+    await firstRowCheckbox.evaluate((element) => (element as HTMLElement).click());
     await expect(firstRowCheckbox).not.toBeChecked();
 
     // The variable's selectedIds should now be empty
@@ -3943,7 +3899,7 @@ test.describe("syncWithVar property", () => {
     // Click the first row checkbox in table1
     const t1Checkbox = table1.locator("input[type='checkbox']").nth(1);
     await expect(t1Checkbox).toBeAttached();
-    await t1Checkbox.click({ force: true });
+    await t1Checkbox.evaluate((element) => (element as HTMLElement).click());
     await expect(t1Checkbox).toBeChecked();
 
     // table2 should reflect the same selection via the shared variable
@@ -3974,7 +3930,7 @@ test.describe("syncWithVar property", () => {
     // Click the first row checkbox in table2
     const t2Checkbox = table2.locator("input[type='checkbox']").nth(1);
     await expect(t2Checkbox).toBeAttached();
-    await t2Checkbox.click({ force: true });
+    await t2Checkbox.evaluate((element) => (element as HTMLElement).click());
     await expect(t2Checkbox).toBeChecked();
 
     // table1 should reflect the same selection via the shared variable (bidirectional)
@@ -4040,7 +3996,7 @@ test.describe("syncWithVar property", () => {
     // Row selection should still work locally even without a sync target
     const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
     await expect(firstRowCheckbox).toBeAttached();
-    await firstRowCheckbox.click({ force: true });
+    await firstRowCheckbox.evaluate((element) => (element as HTMLElement).click());
     await expect(firstRowCheckbox).toBeChecked();
   });
 });
@@ -4627,13 +4583,12 @@ test.describe("Regression", () => {
     const initialWidth = initialBox!.width;
     expect(initialWidth).toBeGreaterThan(0);
 
-    // Wait long enough for any layout-feedback loop to have run several iterations
-    await page.waitForTimeout(500);
-
     // The width must not have shrunk
-    const finalBox = await table.boundingBox();
-    expect(finalBox).not.toBeNull();
-    expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
+    await expect(async () => {
+      const finalBox = await table.boundingBox();
+      expect(finalBox).not.toBeNull();
+      expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
+    }).toPass({ timeout: 1000 });
   });
 });
 

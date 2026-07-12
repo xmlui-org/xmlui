@@ -32,7 +32,7 @@ const basicApiInterceptor: ApiInterceptorDefinition = {
     "headers-test": {
       url: "/api/headers",
       method: "get",
-      handler: `console.log('hd', $requestHeaders); return { headers: $requestHeaders };`,
+      handler: `return { headers: $requestHeaders };`,
     },
     "error-test-400": {
       url: "/api/error/400",

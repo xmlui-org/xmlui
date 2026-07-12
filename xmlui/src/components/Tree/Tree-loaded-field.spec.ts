@@ -1,6 +1,17 @@
 import { test, expect } from "../../testing/fixtures";
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
+async function expectCheckedState(
+  page: import("@playwright/test").Page,
+  testStateDriver: any,
+  predicate: (state: any) => void,
+) {
+  await expect(async () => {
+    await page.getByTestId("checkBtn").click();
+    predicate(await testStateDriver.testState());
+  }).toPass();
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -326,7 +337,7 @@ test.describe("Async Loading with loaded Field", () => {
     await tree.getByTestId("1").click();
 
     // Check for spinner (it should appear briefly)
-    await page.waitForTimeout(50);
+    await expect(page.locator("[data-tree-node-spinner]").first()).toBeVisible();
 
     // Eventually children appear
     await expect(page.getByText("Child 1")).toBeVisible({ timeout: 2000 });
@@ -410,7 +421,9 @@ test.describe("Async Loading with loaded Field", () => {
     await tree.getByTestId("1").click();
 
     // Wait for the async load to complete
-    await page.waitForTimeout(500);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(true);
+    });
     
     // Check that node is now marked as loaded
     await page.getByTestId("checkBtn").click();
@@ -457,7 +470,9 @@ test.describe("Async Loading with loaded Field", () => {
     await tree.getByTestId("1").click();
 
     // Wait a bit for error handling
-    await page.waitForTimeout(200);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(false);
+    });
 
     // Node should remain unloaded
     await page.getByTestId("checkBtn").click();
@@ -536,12 +551,11 @@ test.describe("API Methods with loaded Field", () => {
 
     // Mark node as unloaded
     await page.getByTestId("unloadBtn").click();
-    await page.waitForTimeout(50);
 
     // Check that loaded field is false
-    await page.getByTestId("checkBtn").click();
-    const result = await testStateDriver.testState();
-    expect(result.loaded).toBe(false);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(false);
+    });
   });
 
   test("markNodeLoaded sets loaded to true", async ({ initTestBed, page }) => {
@@ -568,12 +582,11 @@ test.describe("API Methods with loaded Field", () => {
 
     // Mark node as loaded
     await page.getByTestId("loadBtn").click();
-    await page.waitForTimeout(50);
 
     // Check that loaded field is true
-    await page.getByTestId("checkBtn").click();
-    const result = await testStateDriver.testState();
-    expect(result.loaded).toBe(true);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(true);
+    });
   });
 
   test("getNodeLoadingState returns correct state", async ({
@@ -618,7 +631,6 @@ test.describe("API Methods with loaded Field", () => {
     await tree.getByTestId("1").click();
 
     // Check loading state (might be flaky due to timing)
-    await page.waitForTimeout(50);
     await page.getByTestId("checkBtn").click();
     result = await testStateDriver.testState();
     // Could still be "unloaded" here if the async update has not published yet.
@@ -659,12 +671,11 @@ test.describe("API Methods with loaded Field", () => {
 
     // Mark node as unloaded
     await page.getByTestId("unloadBtn").click();
-    await page.waitForTimeout(50);
 
     // Check that loaded field is false
-    await page.getByTestId("checkBtn").click();
-    const result = await testStateDriver.testState();
-    expect(result.loaded).toBe(false);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(false);
+    });
   });
 
   test("markNodeLoaded works in hierarchy format", async ({ initTestBed, page }) => {
@@ -691,11 +702,10 @@ test.describe("API Methods with loaded Field", () => {
 
     // Mark node as loaded
     await page.getByTestId("loadBtn").click();
-    await page.waitForTimeout(50);
 
     // Check that loaded field is true
-    await page.getByTestId("checkBtn").click();
-    const result = await testStateDriver.testState();
-    expect(result.loaded).toBe(true);
+    await expectCheckedState(page, testStateDriver, (result) => {
+      expect(result.loaded).toBe(true);
+    });
   });
 });

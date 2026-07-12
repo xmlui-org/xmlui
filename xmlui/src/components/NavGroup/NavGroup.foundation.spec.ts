@@ -45,7 +45,7 @@ test.describe("NavGroup foundation", () => {
 
     const group = await createNavGroupDriver("group");
     await expect(group.getTrigger()).toBeDisabled();
-    await group.getTrigger().click({ force: true });
+    await group.getTrigger().evaluate((element) => (element as HTMLElement).click());
     await expect(group.getTrigger()).toHaveAttribute("aria-expanded", "false");
     await expect(page.getByTestId("child")).toBeHidden();
   });

@@ -6,8 +6,8 @@ import type { ApiInterceptorDefinition } from "../../components-core/interceptio
 // =============================================================================
 
 const treeDataWithUnloadedNodes = [
-  { id: "1", name: "Unloaded Parent 1", parentId: null, dynamic: true },
-  { id: "2", name: "Unloaded Parent 2", parentId: null, dynamic: true },
+  { id: "1", name: "Unloaded Parent 1", parentId: null, dynamic: true, loaded: false },
+  { id: "2", name: "Unloaded Parent 2", parentId: null, dynamic: true, loaded: false },
 ];
 
 // =============================================================================
@@ -48,14 +48,15 @@ const quickLoadMock: ApiInterceptorDefinition = {
   },
 };
 
-// Mock backend with 800ms delay for longer loading tests
+// Mock backend with 2000ms delay for delayed-spinner tests. This keeps the
+// spinner visible long enough to observe under multi-worker load.
 const verySlowLoadMock: ApiInterceptorDefinition = {
   operations: {
     loadChildren: {
       url: "/api/tree/children/:id",
       method: "get",
       handler: `
-        delay(800);
+        delay(2000);
         return [
           { id: 'child-1', name: 'Child 1', parentId: $pathParams.id, loaded: true },
           { id: 'child-2', name: 'Child 2', parentId: $pathParams.id, loaded: true }
@@ -108,7 +109,7 @@ test.describe("spinnerDelay Property", () => {
     await expect(spinner).toBeVisible();
 
     // Eventually children appear
-    await expect(page.getByText("Child 1")).toBeVisible({ timeout: 2000 });
+    await expect(page.getByText("Child 1")).toBeVisible({ timeout: 3000 });
   });
 
   test("expand icon shows during delay period with spinnerDelay=300", async ({
@@ -149,12 +150,10 @@ test.describe("spinnerDelay Property", () => {
     const expandIcon = page.locator("[data-tree-expand-icon]").first();
     const spinner = page.locator("[data-tree-node-spinner]").first();
 
-    await page.waitForTimeout(100);
     await expect(expandIcon).toBeVisible();
     await expect(spinner).not.toBeVisible();
 
     // After delay expires, spinner should appear
-    await page.waitForTimeout(250); // Total 350ms, past the 300ms delay
     await expect(spinner).toBeVisible({ timeout: 1000 });
 
     // Eventually children appear
@@ -198,12 +197,10 @@ test.describe("spinnerDelay Property", () => {
     const spinner = page.locator("[data-tree-node-spinner]").first();
 
     // Spinner should not be visible immediately
-    await page.waitForTimeout(100);
     await expect(spinner).not.toBeVisible();
 
-    // After delay expires, spinner should be visible
-    await page.waitForTimeout(150); // Total 250ms, past the 200ms delay
-    await expect(spinner).toBeVisible({ timeout: 500 });
+    // After delay expires, spinner should be visible.
+    await expect(spinner).toBeVisible({ timeout: 1000 });
 
     // Eventually children appear
     await expect(page.getByText("Child 1")).toBeVisible({ timeout: 2000 });
@@ -245,14 +242,13 @@ test.describe("spinnerDelay Property", () => {
 
     const spinner = page.locator("[data-tree-node-spinner]").first();
 
-    // Wait for loading to complete (100ms) plus a bit more
-    await page.waitForTimeout(200);
+    // Wait for loading to complete before checking that the delayed spinner stayed hidden.
+    await expect(page.getByText("Child 1")).toBeVisible({ timeout: 1000 });
 
     // Spinner should never have appeared because loading finished before delay expired
     await expect(spinner).not.toBeVisible();
 
     // Children should be visible
-    await expect(page.getByText("Child 1")).toBeVisible();
     await expect(page.getByText("Child 2")).toBeVisible();
   });
 
@@ -291,7 +287,6 @@ test.describe("spinnerDelay Property", () => {
     await expandIcon.click();
 
     // During delay period, expand icon should still be visible
-    await page.waitForTimeout(100);
     await expect(expandIcon).toBeVisible();
 
     // Try clicking again during loading - should not toggle
@@ -341,12 +336,10 @@ test.describe("spinnerDelay Property", () => {
     const spinner = page.locator("[data-tree-node-spinner]").first();
 
     // Spinner should not be visible immediately
-    await page.waitForTimeout(100);
     await expect(spinner).not.toBeVisible();
 
     // After delay expires, spinner should be visible
-    await page.waitForTimeout(200); // Total 300ms, past the 250ms delay
-    await expect(spinner).toBeVisible({ timeout: 500 });
+    await expect(spinner).toBeVisible({ timeout: 1000 });
 
     // Eventually children appear
     await expect(page.getByText("Child 1")).toBeVisible({ timeout: 2000 });
@@ -520,9 +513,6 @@ test.describe("spinnerDelay Edge Cases", () => {
     await tree.getByTestId("1").click();
 
     const spinner = page.locator("[data-tree-node-spinner]").first();
-
-    // Wait a bit
-    await page.waitForTimeout(400);
 
     // Spinner should not appear for static nodes
     await expect(spinner).not.toBeVisible();

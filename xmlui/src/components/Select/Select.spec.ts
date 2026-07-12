@@ -1,5 +1,33 @@
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import type { Locator, Page } from "@playwright/test";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
+
+async function expectValidationTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText(text);
+  }).toPass();
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -142,7 +170,8 @@ test.describe("Basic Functionality", () => {
     </Select>
     `);
     const driver = await createSelectDriver();
-    await driver.click({ force: true });
+    await expect(page.getByRole("combobox")).toBeDisabled();
+    await driver.component.evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByText("One")).not.toBeVisible();
   });
 
@@ -1393,11 +1422,7 @@ test.describe("Behaviors and Parts", () => {
     );
 
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
@@ -1406,11 +1431,7 @@ test.describe("Behaviors and Parts", () => {
     );
 
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, component, "Bold text");
   });
 
   test("handles variant", async ({ page, initTestBed }) => {
@@ -1456,10 +1477,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
 
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("can select part: 'listWrapper'", async ({ page, initTestBed, createSelectDriver }) => {
@@ -1509,10 +1527,7 @@ test.describe("Behaviors and Parts", () => {
 
     // Hover over the trigger (combobox role) specifically, not the tooltip wrapper
     const trigger = page.getByRole("combobox");
-    await trigger.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, trigger, "Tooltip text");
   });
 
   test("parts are present when variant is added", async ({ page, initTestBed }) => {
@@ -1815,7 +1830,7 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     const selectDriver = await createSelectDriver("testSelect");
 
-    await page.getByTestId("openBtn").click({ delay: 100 });
+    await page.getByTestId("openBtn").click();
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
@@ -1837,7 +1852,7 @@ test.describe("Nested DropdownMenu and Select", () => {
       await openActions.focus();
       await page.keyboard.press("ArrowDown");
       if (!(await nestedItem1.isVisible().catch(() => false))) {
-        await openActions.click({ force: true });
+        await openActions.click();
       }
       await expect(nestedItem1).toBeVisible({ timeout: 1000 });
     }).toPass({ timeout: 10_000 });
@@ -2154,7 +2169,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Get all options
     const options = page.locator('[role="option"]');
@@ -2195,7 +2210,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Get all options
     const options = page.locator('[role="option"]');
@@ -2236,7 +2251,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Get all options
     const options = page.locator('[role="option"]');
@@ -2277,7 +2292,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Check custom ungrouped header is visible
     await expect(page.getByText("Miscellaneous")).toBeVisible();
@@ -2314,7 +2329,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Get all options
     const options = page.locator('[role="option"]');
@@ -2364,7 +2379,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Get all options
     const options = page.locator('[role="option"]');
@@ -2411,7 +2426,7 @@ test.describe("Grouping Functionality", () => {
     `);
 
     const driver = await createSelectDriver();
-    await driver.click({ delay: 100 });
+    await driver.toggleOptionsVisibility();
 
     // Check custom ungrouped header is visible
     await expect(page.getByText("Uncategorized")).toBeVisible();
@@ -2944,13 +2959,7 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("submit").click();
 
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
-    // Hover over the icon
-    await conciseFeedback.hover();
-
-    // Check tooltip content
-    const tooltip = page.locator("[data-tooltip-container]");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toContainText("This field is required");
+    await expectValidationTooltipText(page, conciseFeedback, "This field is required");
   });
 
   test("does not duplicate label when inside Form with label prop", async ({

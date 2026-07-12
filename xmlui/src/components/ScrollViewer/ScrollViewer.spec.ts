@@ -165,9 +165,6 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Bottom fade should be visible (has fadeVisible class)
     const bottomFade = page.locator("[class*='fadeBottom'][class*='fadeVisible']");
     await expect(bottomFade).toBeVisible();
@@ -184,17 +181,11 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Scroll down
     const viewer = page.getByTestId("viewer");
     await viewer.evaluate((el) => {
       el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
     });
-
-    // Wait for fade to update
-    await page.waitForTimeout(100);
 
     // Top fade should now be visible
     const topFade = page.locator("[class*='fadeTop'][class*='fadeVisible']");
@@ -212,9 +203,6 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -230,9 +218,6 @@ test.describe("Basic Functionality", () => {
         </ScrollViewer>
       </Stack>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
@@ -486,13 +471,13 @@ test.describe("Other Edge Cases", () => {
         <ScrollViewer testId="viewer">
           <Text>{testState || 'Initial'}</Text>
         </ScrollViewer>
-        <Button onClick="testState = 'Updated'">Update</Button>
+        <Button testId="updateBtn" onClick="testState = 'Updated'">Update</Button>
       </Fragment>
     `);
 
     await expect(page.getByText("Initial")).toBeVisible();
 
-    await page.getByRole("button").click();
+    await page.getByTestId("updateBtn").click();
     await expect.poll(testStateDriver.testState).toEqual("Updated");
     await expect(page.getByTestId("viewer").getByText("Updated")).toBeVisible();
   });
@@ -501,14 +486,14 @@ test.describe("Other Edge Cases", () => {
     await initTestBed(`
       <ScrollViewer testId="viewer">
         <Text>Text content</Text>
-        <Button>Button</Button>
+        <Button testId="contentBtn">Button</Button>
         <Image src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Test" />
         <TextBox placeholder="Input" />
       </ScrollViewer>
     `);
 
     await expect(page.getByText("Text content")).toBeVisible();
-    await expect(page.getByRole("button")).toBeVisible();
+    await expect(page.getByTestId("contentBtn")).toBeVisible();
     await expect(page.getByRole("img")).toBeVisible();
     await expect(page.getByPlaceholder("Input")).toBeVisible();
   });

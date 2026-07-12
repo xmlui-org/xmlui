@@ -65,6 +65,9 @@ text/ordinal-only cases. Treat the groups below as the actionable set.
 
 ## Priority 0: Observed Or Recently Reported
 
+Status: implemented for Drawer click-away; previously reported tooltip/queue
+cases were rechecked with multi-worker repeats and did not recur.
+
 - `Drawer/Drawer.spec.ts:146` `closeOnClickAway=true closes drawer when clicking outside`
   - Surfaced as flaky in the latest full-suite run. Replace coordinate outside
     click with a stable backdrop/page-target helper and assert close via dialog
@@ -76,6 +79,9 @@ text/ordinal-only cases. Treat the groups below as the actionable set.
   - Goal: remove hover timing assumptions and generic toast/dialog races.
 
 ## Priority 1: Nested Overlay Stacks
+
+Status: implemented for the listed Drawer, ContextMenu, AutoComplete, Select,
+and DropdownMenu cases.
 
 Suspicious cases:
 
@@ -96,6 +102,10 @@ Fix recipe:
 4. Verify each group with `--workers=4 --repeat-each=30`.
 
 ## Priority 2: Fixed Sleeps Around Async State
+
+Status: implemented for active Tree, Timer foundation, Form, and
+scroll/virtualization files listed below; fixed sleeps were replaced with
+state, visibility, storage, or scroll-position polling.
 
 Suspicious families:
 
@@ -130,6 +140,12 @@ Fix recipe:
 
 ## Priority 3: Forced Or Delayed Clicks
 
+Status: implemented for the listed disabled/read-only checks, delayed click
+cases, hidden checkbox wiring tests, and tooltip/API overlap cases. The only
+remaining signal in this group is `Spinner.spec.ts`'s fullscreen overlay
+negative test, where `force: true` is intentionally retained because the test
+proves a covered button is not activated by pointer interaction.
+
 Suspicious cases:
 
 - Disabled/read-only interaction checks:
@@ -163,6 +179,11 @@ Fix recipe:
 
 ## Priority 4: Ambiguous Harness Buttons
 
+Status: implemented for ToneChangerButton, Heading API, DateInput API,
+Checkbox API/custom-template, Pagination, DropdownMenu, Form, ScrollViewer, and
+Spinner cases. Remaining matches in Stepper/Form/Pagination are scoped to the
+component root/group and are not page-wide harness-sensitive selectors.
+
 Components with notable generic `getByRole("button")` exposure:
 
 - `ToneChangerButton.spec.ts` many tests
@@ -179,6 +200,13 @@ Fix recipe:
 3. Sweep with a simple locator audit after each component is fixed.
 
 ## Priority 5: Hover, Tooltip, And Geometry Tests
+
+Status: implemented for active tooltip/hover-heavy cases in Checkbox, Link,
+DateInput, TextBox, TextArea, NumberBox, and Select; concise validation
+tooltips in DateInput/TextBox/NumberBox/Select; Table checkbox-tolerance
+coordinate clicks; and ResponsiveBar start-alignment geometry polling.
+ContextMenu coordinate positioning and the rest of ResponsiveBar dropdown
+alignment were rechecked with multi-worker repeats and did not recur.
 
 Suspicious families:
 

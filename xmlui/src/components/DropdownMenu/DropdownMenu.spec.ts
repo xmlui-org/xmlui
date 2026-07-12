@@ -235,7 +235,7 @@ test("is keyboard accessible", async ({ initTestBed, createDropdownMenuDriver, p
     </DropdownMenu>
   `);
 
-  const btn = page.getByRole("button");
+  const btn = page.getByRole("button", { name: "Keyboard Menu" });
   await expect(btn).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(btn).toBeFocused();
@@ -317,7 +317,7 @@ test("navigates between multiple menu items with arrow keys", async ({
 
 test("disabled DropdownMenu can't be focused", async ({ initTestBed, page }) => {
   await initTestBed(`<DropdownMenu label="Disabled Menu" enabled="false" />`);
-  const btn = page.getByRole("button");
+  const btn = page.getByRole("button", { name: "Disabled Menu" });
 
   await expect(btn).toBeDisabled();
 
@@ -359,8 +359,8 @@ test("applies theme variables correctly", async ({ initTestBed, createDropdownMe
 // =============================================================================
 
 test("handles null label gracefully", async ({ initTestBed, page }) => {
-  await initTestBed(`<DropdownMenu label="{null}" />`);
-  await expect(page.getByRole("button")).toBeVisible();
+  await initTestBed(`<DropdownMenu testId="menu" label="{null}" />`);
+  await expect(page.getByTestId("menu")).toBeVisible();
 });
 
 test("handles special characters in labels", async ({
@@ -704,9 +704,9 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(async () => {
       const listbox = page.getByRole("listbox");
       if (!(await listbox.isVisible().catch(() => false))) {
-        await selectDriver.click({ force: true });
+        await selectDriver.toggleOptionsVisibility();
       }
-      await page.getByTestId("openActionsBtn").last().click({ force: true });
+      await listbox.getByTestId("openActionsBtn").click();
       await expect(page.getByText("Item 1")).toBeVisible({ timeout: 1000 });
     }).toPass({ timeout: 10_000 });
     await expect(page.getByText("Outer Dialog")).toBeVisible();

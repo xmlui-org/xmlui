@@ -1,6 +1,23 @@
 import { getBounds, overflows } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
+async function expectScrollTop(locator: import("@playwright/test").Locator, expected: number) {
+  await expect
+    .poll(() => locator.evaluate((elem) => elem.scrollTop))
+    .toBe(expected);
+}
+
+async function expectScrolledToBottom(locator: import("@playwright/test").Locator) {
+  await expect(async () => {
+    const { scrollTop, scrollHeight, clientHeight } = await locator.evaluate((elem) => ({
+      scrollTop: elem.scrollTop,
+      scrollHeight: elem.scrollHeight,
+      clientHeight: elem.clientHeight,
+    }));
+    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+  }).toPass();
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -526,9 +543,6 @@ test.describe("Basic functionality", () => {
       el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
     });
 
-    // Wait for fade to update
-    await page.waitForTimeout(100);
-
     // Top fade overlay should exist
     const topFade = page.locator("[class*='fadeTop']");
     await expect(topFade).toBeVisible();
@@ -543,9 +557,6 @@ test.describe("Basic functionality", () => {
       </FlowLayout>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -559,9 +570,6 @@ test.describe("Basic functionality", () => {
         </Stack>
       </FlowLayout>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
@@ -1408,13 +1416,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the top
-    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(layout, 0);
   });
 
   test("scrollToBottom scrolls to the bottom of a scrollable FlowLayout", async ({ page, initTestBed }) => {
@@ -1437,16 +1441,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for scroll to complete
-    await page.waitForTimeout(100);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(layout);
   });
 
   test("scrollToTop with 'smooth' behavior parameter", async ({ page, initTestBed }) => {
@@ -1470,13 +1467,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to top with smooth behavior
     await page.getByTestId("scrollBtn").click();
-    
-    // Wait for smooth scroll to complete
-    await page.waitForTimeout(500);
 
     // Verify we're at the top
-    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
-    expect(scrollTopAfter).toBe(0);
+    await expectScrollTop(layout, 0);
   });
 
   test("scrollToBottom with default behavior uses instant", async ({ page, initTestBed }) => {
@@ -1495,16 +1488,9 @@ test.describe("Api", () => {
 
     // Click button to scroll to bottom (default behavior)
     await page.getByTestId("scrollBtn").click();
-    
-    // With instant behavior, should be immediate
-    await page.waitForTimeout(50);
 
     // Verify we're at the bottom
-    const scrollTopAfter = await layout.evaluate((elem) => elem.scrollTop);
-    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
-    
-    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(layout);
   });
 
   test("scrollToBottom followed by scrollToTop", async ({ page, initTestBed }) => {
@@ -1524,20 +1510,13 @@ test.describe("Api", () => {
     
     // Scroll to bottom
     await page.getByTestId("scrollBottomBtn").click();
-    await page.waitForTimeout(100);
 
-    const scrollHeight = await layout.evaluate((elem) => elem.scrollHeight);
-    const clientHeight = await layout.evaluate((elem) => elem.clientHeight);
-    let scrollTop = await layout.evaluate((elem) => elem.scrollTop);
-    
-    expect(scrollTop).toBeCloseTo(scrollHeight - clientHeight, 0);
+    await expectScrolledToBottom(layout);
 
     // Now scroll back to top
     await page.getByTestId("scrollTopBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await layout.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBe(0);
+    await expectScrollTop(layout, 0);
   });
 
   test("scrolling in FlowLayout with wrapped items", async ({ page, initTestBed }) => {
@@ -1560,17 +1539,15 @@ test.describe("Api", () => {
     
     // Scroll to bottom
     await page.getByTestId("scrollBottomBtn").click();
-    await page.waitForTimeout(100);
 
-    let scrollTop = await layout.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBeGreaterThan(0);
+    await expect
+      .poll(() => layout.evaluate((elem) => elem.scrollTop))
+      .toBeGreaterThan(0);
 
     // Scroll back to top
     await page.getByTestId("scrollTopBtn").click();
-    await page.waitForTimeout(100);
 
-    scrollTop = await layout.evaluate((elem) => elem.scrollTop);
-    expect(scrollTop).toBe(0);
+    await expectScrollTop(layout, 0);
   });
 
   test("Bookmark inside FlowLayout (known limitation: empty bookmark cannot scroll into view)", async ({ page, initTestBed }) => {
@@ -1593,7 +1570,6 @@ test.describe("Api", () => {
 
     // Verify that clicking the button doesn't cause an error
     await page.getByTestId("scrollToBookmarkBtn").click();
-    await page.waitForTimeout(500);
 
     // Just verify the page is still responsive
     const button = page.getByTestId("scrollToBookmarkBtn");

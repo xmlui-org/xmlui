@@ -43,7 +43,8 @@ test("component renders custom header with headerTemplate prop", async ({ initTe
   await expect(content).not.toBeVisible();
 
   const templatedButton = page.getByText("Click me");
-  await templatedButton.click({ delay: 100 });
+  await expect(templatedButton).toBeEnabled();
+  await templatedButton.click();
 
   await expect(content).toBeVisible();
 });
@@ -63,7 +64,7 @@ test("AccordionItem has correct accessibility attributes", async ({ initTestBed,
   await expect(header).toContainText("header-here");
   await expect(header).toHaveAttribute("aria-expanded", "false");
 
-  await header.click({ delay: 100 });
+  await header.click();
   await expect(header).toHaveAttribute("aria-expanded", "true");
 });
 

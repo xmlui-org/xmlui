@@ -1591,8 +1591,6 @@ test.describe("Basic Functionality", () => {
 
       // Test focus styling - ensure we can detect focus
       await tree.component.focus();
-      // Give some time for focus to be applied
-      await page.waitForTimeout(100);
 
       // Check if any item has focus, or skip focus-specific checks for this comprehensive test
       // The focus behavior is already tested in the dedicated focus tests
@@ -3842,9 +3840,6 @@ test.describe("Scroll Styling", () => {
       </VStack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist (top and bottom)
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -3871,9 +3866,6 @@ test.describe("Scroll Styling", () => {
         </Tree>
       </VStack>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Bottom fade should be visible (has fadeVisible class)
     const bottomFade = page.locator("[class*='fadeBottom'][class*='fadeVisible']");
@@ -3902,17 +3894,11 @@ test.describe("Scroll Styling", () => {
       </VStack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Scroll down
     const tree = page.getByTestId("tree");
     await tree.evaluate((el) => {
       el.querySelector("[data-overlayscrollbars-viewport]")?.scrollTo(0, 50);
     });
-
-    // Wait for fade to update
-    await page.waitForTimeout(100);
 
     // Top fade should now be visible
     const topFade = page.locator("[class*='fadeTop'][class*='fadeVisible']");
@@ -3940,9 +3926,6 @@ test.describe("Scroll Styling", () => {
       </VStack>
     `);
 
-    // Wait for initialization
-    await page.waitForTimeout(100);
-
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
     await expect(fadeOverlays).toHaveCount(2);
@@ -3968,9 +3951,6 @@ test.describe("Scroll Styling", () => {
         </Tree>
       </VStack>
     `);
-
-    // Wait for initialization
-    await page.waitForTimeout(100);
 
     // Fade overlays should exist
     const fadeOverlays = page.locator("[class*='fadeOverlay']");
@@ -4077,8 +4057,7 @@ test.describe("API - getVisibleItems", () => {
       </Fragment>
     `);
 
-    // Wait for tree to render
-    await page.waitForTimeout(100);
+    await expect(page.getByTestId("1")).toBeVisible();
 
     const getVisibleButton = await createButtonDriver("get-visible-btn");
     await getVisibleButton.click();
@@ -4130,8 +4109,7 @@ test.describe("API - getVisibleItems", () => {
       </Fragment>
     `);
 
-    // Wait for initial render
-    await page.waitForTimeout(100);
+    await expect(page.getByTestId("item-1")).toBeVisible();
 
     // Get initial visible items
     const getVisibleButton = await createButtonDriver("get-visible-btn");
@@ -4142,10 +4120,14 @@ test.describe("API - getVisibleItems", () => {
     // Scroll to middle of the tree
     const scrollButton = await createButtonDriver("scroll-btn");
     await scrollButton.click();
-    await page.waitForTimeout(200);
 
     // Get visible items after scrolling
-    await getVisibleButton.click();
+    await expect(async () => {
+      await getVisibleButton.click();
+      const visibleItems = await testStateDriver.testState();
+      expect(visibleItems[0].id).toBeGreaterThan(firstItemId);
+      expect(visibleItems.some((item: any) => item.id >= 45)).toBe(true);
+    }).toPass();
     const scrolledVisibleItems = await testStateDriver.testState();
     const firstItemIdAfterScroll = scrolledVisibleItems[0].id;
 
@@ -4567,9 +4549,6 @@ test.describe("API - replaceNode", () => {
 
     const replaceButton = await createButtonDriver("replace-btn");
     await replaceButton.click();
-
-    // Wait for update
-    await page.waitForTimeout(100);
 
     // Verify root name changed
     const root = page.getByTestId("1");

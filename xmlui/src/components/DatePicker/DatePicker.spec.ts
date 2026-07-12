@@ -872,7 +872,9 @@ test.describe("Disabled Days", () => {
     `);
     await openCalendar(page);
     // Day 5 is before the start date — clicking it must not change the value.
-    await dayCell(page, 5).first().click({ force: true });
+    const blockedDay = dayCell(page, 5).first();
+    await expect(blockedDay).toHaveAttribute("data-unavailable");
+    await blockedDay.evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByTestId("out")).toHaveText("05/15/2024");
   });
 
@@ -885,7 +887,9 @@ test.describe("Disabled Days", () => {
       </Fragment>
     `);
     await openCalendar(page);
-    await dayCell(page, 25).first().click({ force: true });
+    const blockedDay = dayCell(page, 25).first();
+    await expect(blockedDay).toHaveAttribute("data-unavailable");
+    await blockedDay.evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByTestId("out")).toHaveText("05/15/2024");
   });
 
@@ -926,7 +930,7 @@ test.describe("Disabled Days", () => {
     `);
     await page.getByTestId("dp").locator('[data-view="day"][data-unavailable]').filter({
       hasText: /^20$/,
-    }).first().click({ force: true });
+    }).first().evaluate((element) => (element as HTMLElement).click());
     await expect(page.getByTestId("out")).toHaveText("05/15/2024");
   });
 

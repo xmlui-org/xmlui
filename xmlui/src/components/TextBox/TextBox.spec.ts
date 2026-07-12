@@ -1,5 +1,33 @@
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
+import type { Locator, Page } from "@playwright/test";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
+
+async function expectValidationTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.locator("[data-tooltip-container]");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toContainText(text);
+  }).toPass();
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -1126,22 +1154,14 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<TextBox testId="test" tooltip="Tooltip text" />`);
 
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<TextBox testId="test" tooltipMarkdown="**Bold text**" />`);
 
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, component, "Bold text");
   });
 
   test.fixme("handles variant", async ({ page, initTestBed }) => {
@@ -1177,10 +1197,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
 
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("can select part: 'input'", async ({ page, initTestBed }) => {
@@ -1231,10 +1248,7 @@ test.describe("Behaviors and Parts", () => {
     await expect(inputPart).toBeVisible();
     await expect(startAdornment).toBeVisible();
 
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {
@@ -1521,13 +1535,7 @@ test.describe("Validation Feedback", () => {
     await page.getByTestId("submit").click();
 
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
-    // Hover over the icon
-    await conciseFeedback.hover();
-
-    // Check tooltip content
-    const tooltip = page.locator("[data-tooltip-container]");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toContainText("This field is required");
+    await expectValidationTooltipText(page, conciseFeedback, "This field is required");
   });
 
   test("does not duplicate label when inside Form with label prop", async ({

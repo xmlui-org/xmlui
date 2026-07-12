@@ -1,5 +1,25 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { getBounds, isIndeterminate } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+
+async function expectTooltipText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip).toHaveText(text);
+  }).toPass();
+}
+
+async function expectTooltipStrongText(page: Page, trigger: Locator, text: string) {
+  await expect(async () => {
+    await trigger.hover();
+    const tooltip = page.getByRole("tooltip");
+    await expect(tooltip).toBeVisible();
+    await expect(tooltip.locator("strong")).toHaveText(text);
+  }).toPass();
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -278,7 +298,8 @@ test.describe("Basic Functionality", () => {
   test("enabled=false disables interaction", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox enabled="false" initialValue="false" />`);
     const checkbox = page.getByRole("checkbox");
-    await checkbox.click({ force: true });
+    await expect(checkbox).toBeDisabled();
+    await checkbox.evaluate((element) => (element as HTMLElement).click());
     await expect(checkbox).not.toBeChecked();
   });
 
@@ -290,7 +311,8 @@ test.describe("Basic Functionality", () => {
   test("readOnly prevents state changes", async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox readOnly="true" initialValue="false" />`);
     const checkbox = page.getByRole("checkbox");
-    await checkbox.click({ force: true });
+    await expect(checkbox).toHaveAttribute("readonly");
+    await checkbox.click();
     await expect(checkbox).not.toBeChecked();
   });
 
@@ -670,7 +692,7 @@ test.describe("Api", () => {
         <Button onClick="checkbox.setValue(true)" testId="button">Check</Button>
       </Fragment>
     `);
-    await page.getByRole("button").click();
+    await page.getByTestId("button").click();
     await expect(page.getByTestId("checkbox")).toBeChecked();
   });
 
@@ -681,7 +703,7 @@ test.describe("Api", () => {
         <Button onClick="checkbox.setValue(true)" testId="button">Check</Button>
       </Fragment>
     `);
-    await page.getByRole("button").click();
+    await page.getByTestId("button").click();
     await expect.poll(testStateDriver.testState).toEqual("changed");
   });
 
@@ -817,18 +839,18 @@ test.describe("Custom inputTemplate", () => {
     await initTestBed(`
       <Checkbox>
         <property name="inputTemplate">
-          <Button/>
+          <Button testId="customInput" />
         </property>
       </Checkbox>`);
-    await expect(page.getByRole("button")).toBeVisible();
+    await expect(page.getByTestId("customInput")).toBeVisible();
   });
 
   test("inputTemplate without <property>", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Checkbox>
-        <Button/>
+        <Button testId="customInput" />
       </Checkbox>`);
-    await expect(page.getByRole("button")).toBeVisible();
+    await expect(page.getByTestId("customInput")).toBeVisible();
   });
 
   test("inputTemplate fires didChange event", async ({ initTestBed, page }) => {
@@ -1081,22 +1103,14 @@ test.describe("Behaviors and Parts", () => {
     await initTestBed(`<Checkbox testId="test" tooltip="Tooltip text" />`);
     
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<Checkbox testId="test" tooltipMarkdown="**Bold text**" />`);
     
     const component = page.getByTestId("test");
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip.locator("strong")).toHaveText("Bold text");
+    await expectTooltipStrongText(page, component, "Bold text");
   });
 
   test.fixme("handles variant", async ({ page, initTestBed }) => {
@@ -1132,10 +1146,7 @@ test.describe("Behaviors and Parts", () => {
     const component = page.getByTestId("test");
     await expect(component).toBeVisible();
     
-    await component.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, component, "Tooltip text");
   });
 
   test("can select part: 'input'", async ({ page, initTestBed }) => {
@@ -1151,10 +1162,7 @@ test.describe("Behaviors and Parts", () => {
     
     await expect(inputPart).toBeVisible();
     
-    await inputPart.hover();
-    const tooltip = page.getByRole("tooltip");
-    await expect(tooltip).toBeVisible();
-    await expect(tooltip).toHaveText("Tooltip text");
+    await expectTooltipText(page, inputPart, "Tooltip text");
   });
 
   test.fixme("parts are present when variant is added", async ({ page, initTestBed }) => {

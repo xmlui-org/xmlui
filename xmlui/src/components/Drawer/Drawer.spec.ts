@@ -1,5 +1,13 @@
 import { expect, test } from "../../testing/fixtures";
 
+async function clickOutsideDrawer(page: import("@playwright/test").Page) {
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toHaveAttribute("data-state", "open");
+  const box = await page.getByTestId("outsideTarget").boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
+}
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -151,6 +159,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Button testId="outsideTarget">Outside</Button>
         <Drawer id="drawer" position="right" closeOnClickAway="true" hasBackdrop="false">
           <Text testId="drawerContent">Content</Text>
         </Drawer>
@@ -159,8 +168,7 @@ test.describe("Basic Functionality", () => {
 
     await page.getByTestId("openBtn").click();
     await expect(page.getByTestId("drawerContent")).toBeVisible();
-    // Click the far-left area, well outside the right-side drawer (320px wide)
-    await page.mouse.click(100, 300);
+    await clickOutsideDrawer(page);
     await expect(page.getByTestId("drawerContent")).not.toBeVisible();
   });
 
@@ -172,6 +180,7 @@ test.describe("Basic Functionality", () => {
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Button testId="outsideTarget">Outside</Button>
         <Drawer id="drawer" position="right" closeOnClickAway="false" closeButtonVisible="true" hasBackdrop="false">
           <Text testId="drawerContent">Content</Text>
         </Drawer>
@@ -180,8 +189,7 @@ test.describe("Basic Functionality", () => {
 
     await page.getByTestId("openBtn").click();
     await expect(page.getByTestId("drawerContent")).toBeVisible();
-    // Click the far-left area, well outside the right-side drawer (320px wide)
-    await page.mouse.click(100, 300);
+    await clickOutsideDrawer(page);
     await expect(page.getByTestId("drawerContent")).toBeVisible();
   });
 
@@ -498,6 +506,7 @@ test.describe("Events", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Button testId="outsideTarget">Outside</Button>
         <Drawer id="drawer" position="right" onClose="testState = 'closed'" closeOnClickAway="true" hasBackdrop="false">
           <Text>Content</Text>
         </Drawer>
@@ -513,8 +522,7 @@ test.describe("Events", () => {
     await expect
       .poll(() => dialog.evaluate((el) => getComputedStyle(el).transform))
       .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-    // Click the far-left area, well outside the right-side drawer (320px wide)
-    await page.mouse.click(8, 300);
+    await clickOutsideDrawer(page);
     await expect.poll(testStateDriver.testState).toEqual("closed");
   });
 });

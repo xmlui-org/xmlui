@@ -37,7 +37,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const pagesBtn = page.getByRole("button", { name: "Pages", exact: true });
 
     await expect(pagesBtn).toBeDisabled();
-    await pagesBtn.click({ force: true });
+    await pagesBtn.evaluate((element) => (element as HTMLElement).click());
 
     await expect(page.getByRole("menuitem", { name: "Page 1" })).not.toBeVisible();
     await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
@@ -90,7 +90,7 @@ test("nested disabled navgroup can't open", async ({ initTestBed, page }) => {
 
   await expect(subpagesBtn).toBeDisabled();
 
-  await subpagesBtn.click({ force: true });
+  await subpagesBtn.evaluate((element) => (element as HTMLElement).click());
 
   await expect(page.getByRole("menuitem", { name: "inner page 2" })).not.toBeVisible();
 });
