@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 3 implemented; focused SSG build gate blocked by pre-existing build/type issues  
+Status: Step 4 implemented; Step 4.5 and Step 5 resequenced after rollback  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -157,6 +157,37 @@ or limited to syntax-preserving rewrites.
 - If there are more than three failures, or any deterministic failure, fix
   before moving to the next step.
 
+## Regression Lessons From the Aborted Step 5 Attempt
+
+After Step 4, an attempted Step 4.5 plus Step 5 run produced dozens of E2E
+failures. The main mistake was not the old theme compiler itself, but the size
+of the runtime change: provider compilation, theme context topology,
+component-theme class generation, metadata registry activation, fallback
+contexts, and component-specific shims were changed together. That made broad
+interaction failures, such as `ContextMenu` and `Checkbox` regressions,
+difficult to attribute to a single compatibility difference.
+
+Use these guardrails for the renewed sequence:
+
+- Step 4.5 is build/SSG plumbing only. It must not change runtime theme
+  compilation, provider topology, `useComponentThemeClass`, component
+  interaction behavior, or component styles.
+- Step 5 must introduce the old compiler first as pure, inert code; then as a
+  shadow calculation; then behind opt-in canaries; and only then as the global
+  provider path.
+- Do not edit `components-core/theming/utils.ts` or restore
+  `useComponentThemeClass` during Step 5. That remains Step 7.
+- Do not edit root provider topology, no-prop nested provider behavior, or
+  `XmluiThemeRoot` ownership during Step 5. That remains Step 8.
+- Do not patch component interaction drivers or Playwright helper behavior to
+  hide theme regressions. If a menu, checkbox, portal, or keyboard test fails
+  after a theme step, first prove whether the emitted CSS or class topology
+  changed.
+- If any Step 5 substep causes more than three deterministic E2E failures,
+  revert or bisect that substep before adding more code.
+- Run focused canaries before full E2E. Do not run multiple Playwright E2E
+  commands in parallel against the same dev server.
+
 ## Implementation Steps
 
 ### Step 1: Freeze the Theme Contract Inventory
@@ -221,8 +252,10 @@ Implementation note, 2026-07-12:
   run by the existing `build:ssg`/`build:production` pipeline: `tsc -p
   tsconfig.build.json --noEmit` reports broad unrelated strictness/module
   errors, and the direct SSG Vite build still hits the existing `.xmlui` plugin
-  `Unknown file extension ".ts"` issue. The standard `test:unit` and
-  `test:e2e -- --max-failures=10` gates passed after the Step 3 edits.
+  `Unknown file extension ".ts"` issue. This caveat is superseded by Step 4.5,
+  which unblocks a focused SSG gate without weakening the full production type
+  gate. The standard `test:unit` and `test:e2e -- --max-failures=10` gates
+  passed after the Step 3 edits.
 
 Re-align test and server rendering paths with the old registry behavior:
 
@@ -291,11 +324,60 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
-### Step 5: Port the Old Theme Compilation Pipeline
+### Step 4.5: Unblock the Focused SSG Theme Gate
 
-Replace the simplified `components-core/theming/ThemeProvider.tsx`
-implementation with the old pipeline, adapted to rewrite types and registry
-names. Restore:
+Before replacing the provider, make the SSG/render build path usable enough to
+verify theme CSS collection and hydration without taking on the entire
+production strict-type cleanup.
+
+Scope guard:
+
+- This step is allowed to touch build, Vite plugin, SSG render, sample build
+  script, Playwright web-server wiring, and generated-bundle ignore rules only.
+- This step must not touch runtime provider semantics, theme compilation,
+  `ThemeContext`, `ThemeProvider`, `useComponentThemeClass`, component
+  stylesheets, component renderers, or interaction/test helpers.
+- Complete and verify this step alone before starting Step 5. If generated
+  standalone sample bundles change during verification, either ignore them via
+  the appropriate `.gitignore` rule or leave them unstaged as generated output;
+  do not mix generated-bundle churn into the Step 5 diff.
+
+Scope:
+
+- Fix the `.xmlui` Vite plugin's build-time compiler loading path. In dev the
+  plugin can use `server.ssrLoadModule`, but in build it currently falls back
+  to native Node `import()` of `compileXmluiModule.ts`, which fails with
+  `Unknown file extension ".ts"`. Replace that fallback with a Vite-compatible
+  load/transform path or a build-safe compiler entry that does not require Node
+  to import raw TypeScript.
+- Add a focused SSG build/check script or test helper that builds the SSG render
+  entry and runs SSG hydration/standalone specs without requiring
+  `build:production`'s broad `tsc -p tsconfig.build.json --noEmit` gate.
+- Keep `build:ssg` behavior documented: it still depends on
+  `build:production`, so it remains blocked until the broader strict
+  TypeScript errors are fixed. Do not hide or weaken that production gate as
+  part of theme migration.
+- Record the broad strict-type errors as separate build-pipeline debt if they
+  still reproduce after the focused SSG path is fixed.
+
+Verification:
+
+- Direct SSG render build succeeds:
+  `npm --workspace xmlui exec -- vite build --config vite.ssg-render.config.ts`
+- Focused SSG/standalone specs run without `test:e2e:all`:
+  `npm --workspace xmlui exec -- playwright test --max-failures=10 tests/e2e/ssg-hydration.spec.ts tests/e2e/standalone-runtime.spec.ts`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+### Step 5: Port the Old Theme Compilation Pipeline Safely
+
+Do not replace the active provider in one step. Step 5 ports the old compiler
+through small substeps that are either unit-only, inert at runtime, shadowed at
+runtime, or opt-in for focused canaries. The global provider switch is the last
+substep, after component-specific incompatibilities are isolated and tested.
+
+The old behavior to restore across the substeps is:
 
 - built-in theme list and active theme/tone state;
 - `collectThemeChainByExtends` with `RootThemeDefinition` plus component
@@ -311,18 +393,130 @@ names. Restore:
 - `themeCssVars`, `themeVars`, `rawAllThemeVars`, `getThemeVar`,
   `getResourceUrl`, and `fontLinks`.
 
-Do not remove `XmluiThemeRoot` yet; first make the legacy provider capable of
-serving the old contract.
+#### Step 5.1: Port Pure Compiler Helpers
+
+Port pure functions from the old theme provider and helper modules into the
+rewrite without wiring them to React context or emitted CSS. This includes the
+generated-variable helpers, `matchThemeVar`, variable reference resolution,
+embedded `$var` conversion, theme-chain collection, and resource URL helpers.
 
 Verification:
 
-- Port old `tests/components-core/theming/ThemeProvider.test.tsx` coverage.
-- Add tests proving a custom default theme changes root CSS variables without a
-  manual nested `<Theme>`.
-- Add tests for generated padding/border/font/button/base-tone variables.
+- Port old focused unit tests for generated spacing, padding, border, tone,
+  font-size, button-tone, and variable-resolution helpers.
+- Add rewrite tests that compare representative old and new compiler helper
+  outputs for `RootThemeDefinition`, `xmlui`, and one custom theme.
 - `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+The E2E suite should be unchanged by this substep. Any deterministic E2E
+failure means the substep accidentally changed runtime behavior and must be
+bisected before continuing.
+
+#### Step 5.2: Add an Inert Old Compiler Entry
+
+Add a buildable old-pattern compiler entry, such as `compileOldThemeModel`,
+that accepts explicit inputs: built-in themes, custom themes, component theme
+metadata from Step 4, resources, resource map, default theme, and default tone.
+It must return the old provider-shaped output, but no runtime provider may use
+it yet.
+
+Verification:
+
+- Port old `tests/components-core/theming/ThemeProvider.test.tsx` cases that
+  can be expressed as pure compiler tests.
+- Add output-shape tests for representative components and contributors:
+  `App`, `Button`, `Avatar`, `AutoComplete`, `DateInput`, `ContextMenu`,
+  `Select`, `DatePicker`, `Markdown`, and one namespaced extension.
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+- `npm --workspace xmlui run check:metadata`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 5.3: Shadow the Compiler Without Applying It
+
+Compute the old compiler output beside the current active theme provider in
+development/test mode, but do not emit its CSS variables, classes, root
+classes, font links, or resource lookups. The only runtime side effect allowed
+is a test-readable diagnostic or debug snapshot used by focused assertions.
+
+Verification:
+
+- Add a focused unit or component test proving the shadow compiler runs with
+  the active metadata registry and produces stable output.
+- Add tests that diff shadow output against the currently emitted root vars for
+  known mismatches without failing the application render.
+- `npm --workspace xmlui run test:unit`
+- Focused canary run:
+  `npm --workspace xmlui exec -- playwright test --max-failures=10 src/components/Theme/Theme.spec.ts src/components/DateInput/DateInput.spec.ts src/components/AutoComplete/AutoComplete.spec.ts src/components/Avatar/Avatar.spec.ts src/components/ContextMenu/ContextMenu.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts src/components/Checkbox/Checkbox.spec.ts`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Full E2E should remain behaviorally unchanged. Any broad E2E failure here
+means the shadow path is not side-effect free.
+
+#### Step 5.4: Add an Opt-In Old Compiler Canary Path
+
+Add an internal opt-in that lets a focused test bed or fixture use the old
+compiler output for root CSS variables. Keep the default runtime path on the
+current provider. The opt-in must be explicit per test/app; do not enable it
+globally through ambient process state that affects unrelated E2E specs.
+
+Verification:
+
+- Add canary tests for root custom theme variables, generated padding/border
+  variables, generated font variables, base tones, button tones, resource URLs,
+  and font links.
+- Add a custom default-theme test proving root CSS variables can change without
+  requiring a manual nested `<Theme>`.
+- Run the focused canary specs with the opt-in enabled.
+- Run the full default E2E suite with the opt-in disabled:
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 5.5: Isolate Component Compatibility Carve-Outs
+
+Only after the opt-in root compiler canaries pass, fix component-specific
+theme-variable mismatches one component at a time. Known risk areas from the
+aborted attempt include `DateInput` custom variants, `AutoComplete` themed
+inputs, `Avatar` border/background variables, and menu/portal interaction
+surfaces that are sensitive to class topology.
+
+Rules:
+
+- Each component carve-out needs a focused failing test first.
+- Prefer matching old Sass/theme-variable semantics over React-computed inline
+  styles.
+- If a temporary inline bridge is unavoidable, document why in the test or
+  adjacent code comment and keep it scoped to emitted theme CSS variables.
+- Do not change shared interaction helpers while fixing theme output.
+
+Verification per component:
+
+- Focused component E2E file, for example:
+  `npm --workspace xmlui exec -- playwright test --max-failures=10 src/components/DateInput/DateInput.spec.ts`
+- Focused theming unit tests affected by the carve-out.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 5.6: Switch the Active Provider to the Old Compiler
+
+Switch the default provider to the old compiler only after Steps 5.1 through
+5.5 pass. Keep `XmluiThemeRoot` in place until Step 8; this substep only
+changes which compiled variables the legacy provider serves.
+
+Verification:
+
+- Port any remaining old `ThemeProvider.test.tsx` coverage that required the
+  live provider rather than pure compiler tests.
+- Run the Step 5 canary list first:
+  `npm --workspace xmlui exec -- playwright test --max-failures=10 src/components/Theme/Theme.spec.ts src/components/DateInput/DateInput.spec.ts src/components/AutoComplete/AutoComplete.spec.ts src/components/Avatar/Avatar.spec.ts src/components/ContextMenu/ContextMenu.spec.ts src/components/DropdownMenu/DropdownMenu.spec.ts src/components/Checkbox/Checkbox.spec.ts`
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 5 is complete only when the full unit and E2E gates pass after the global
+switch. Up to three E2E flakes are acceptable only if they pass on focused
+rerun without code changes.
 
 ### Step 6: Restore Strict Theme Validation and Accessibility Diagnostics
 
@@ -520,6 +714,10 @@ Create `.ai/theme-style-old-pattern-closure.md` with:
 
 ## Risk Areas
 
+- The highest regression risk is a broad provider switch that also changes
+  `ThemeContext`, `useComponentThemeClass`, component-specific generated
+  variables, and root topology. Keep those concerns separated by the Step 5
+  substeps and do not advance after broad E2E failures.
 - Replacing provider topology can cause large visual changes even when tests
   still pass; add targeted theme assertions before deleting the simplified
   runtime model.
