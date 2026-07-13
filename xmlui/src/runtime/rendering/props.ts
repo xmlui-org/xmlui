@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { emitThemeDiagnostics } from "../../components-core/theming/validator/emit";
 import type { XmluiElement } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
@@ -13,9 +14,11 @@ import {
   supportedLayoutPropNames,
   type LayoutOrientation,
 } from "../../styling";
+import { useXmluiAppContext } from "../appContext";
 import type { RuntimeScope } from "../state";
 import { evaluateExpressionOrText, dependenciesForBinding } from "./bindings";
 import { useBindingRevision } from "./reactive";
+import { inlineStyleValidationOptions, validateRuntimeStyleProps } from "./styleValidation";
 import type { RenderContext } from "./types";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 
@@ -80,9 +83,22 @@ export function useLayoutStyle(
       props[name] = useEvaluatedProp(node, scope, name, undefined);
     }
   }
+  const appContext = useXmluiAppContext();
+  const validationOptions = useMemo(() => inlineStyleValidationOptions(appContext.xmluiConfig), [
+    appContext.xmluiConfig?.allowInlineRawCss,
+    appContext.xmluiConfig?.maxZIndex,
+    appContext.xmluiConfig?.strictTheming,
+  ]);
+  const validatedStyleProps = useMemo(
+    () => validateRuntimeStyleProps(props, node.type, validationOptions),
+    [node.type, props, validationOptions],
+  );
+  useEffect(() => {
+    emitThemeDiagnostics(validatedStyleProps.diagnostics);
+  }, [validatedStyleProps.diagnostics]);
   const theme = useTheme();
   const viewportWidth = useViewportWidth();
-  return theme.disableInlineStyle ? {} : resolveActiveLayoutStyle(props, viewportWidth, options);
+  return theme.disableInlineStyle ? {} : resolveActiveLayoutStyle(validatedStyleProps.props, viewportWidth, options);
 }
 
 export function flexStyle(

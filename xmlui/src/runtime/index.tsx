@@ -86,6 +86,7 @@ export type MountXmluiAppOptions = {
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  xmluiConfig?: Record<string, unknown>;
   icons?: Record<string, string>;
   resources?: Record<string, string>;
   resourceMap?: Record<string, string>;
@@ -122,6 +123,7 @@ export function mountXmluiApp(
         defaultTone={options.defaultTone}
         extensions={options.extensions}
         appGlobals={options.appGlobals}
+        xmluiConfig={options.xmluiConfig}
         icons={options.icons}
         resources={options.resources}
         resourceMap={options.resourceMap}
@@ -143,6 +145,7 @@ export function mountXmluiApp(
       defaultTone={options.defaultTone}
       extensions={options.extensions}
       appGlobals={options.appGlobals}
+      xmluiConfig={options.xmluiConfig}
       icons={options.icons}
       resources={options.resources}
       resourceMap={options.resourceMap}
@@ -164,6 +167,7 @@ export function XmluiRoot({
   defaultTone,
   extensions,
   appGlobals = {},
+  xmluiConfig = {},
   icons = {},
   resources = {},
   resourceMap = {},
@@ -180,6 +184,7 @@ export function XmluiRoot({
   defaultTone?: ThemeTone;
   extensions?: Iterable<Extension>;
   appGlobals?: Record<string, unknown>;
+  xmluiConfig?: Record<string, unknown>;
   icons?: Record<string, string>;
   resources?: Record<string, string>;
   resourceMap?: Record<string, string>;
@@ -294,11 +299,19 @@ export function XmluiRoot({
     () => resolveStoredTheme(module.root, defaultTheme, defaultTone),
     [defaultTheme, defaultTone, module.root],
   );
+  const contextXmluiConfig = useMemo(
+    () => ({
+      ...xmluiConfig,
+      strictTheming: xmluiConfig.strictTheming ?? strictTheming,
+    }),
+    [strictTheming, xmluiConfig],
+  );
 
   return (
     <HelmetProvider>
       <XmluiAppContextProvider value={{
         appGlobals,
+        xmluiConfig: contextXmluiConfig,
         loggedInUser,
         setLoggedInUser: updateLoggedInUser,
         confirm,

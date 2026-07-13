@@ -52,7 +52,7 @@ export function useAppContext(): {
     ...appContext,
     appGlobals: appContext.appGlobals as Record<string, any>,
     loggedInUser: appContext.loggedInUser,
-    xmluiConfig: {},
+    xmluiConfig: appContext.xmluiConfig as Record<string, any>,
     navigate: noop,
     setLoggedInUser: appContext.setLoggedInUser,
     setNavigationHandlers: noop,

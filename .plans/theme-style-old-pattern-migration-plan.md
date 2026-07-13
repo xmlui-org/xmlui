@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 11.3 duplicate runtime theme module removal complete; Step 12 is next; app-compat remains blocked by existing production build errors  
+Status: Step 12.3 config and diagnostic parity sweep complete; Step 13 is next; app-compat remains blocked by existing production build errors  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -1740,6 +1740,138 @@ Verification:
 - `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 12.1: Adapter-Level Inline Style Validation
+
+Wire validation into `runtime/rendering/adapter.tsx` for the component adapter
+path. This substep owns root layout props, responsive layout props,
+part-targeted layout props, and raw `style` string props that flow through
+`rootAttrs()` / adapter layout style generation.
+
+Completed implementation:
+
+- Threaded `xmluiConfig` through `mountXmluiApp`, `XmluiRoot`, standalone
+  startup, runtime app context, the legacy `useAppContext` bridge, and the E2E
+  testbed.
+- Added adapter-level validation for root layout props, responsive layout
+  props, part-targeted layout props, and raw `style` string props before layout
+  style resolution.
+- Preserved old config defaults from `valueExtractor`: `strictTheming !==
+  false`, `allowInlineRawCss !== false`, and `maxZIndex ?? 9999`.
+- Preserved original component props on `adapter.props`; only the layout/style
+  prop view passed into layout resolvers is sanitized.
+- Emitted collected diagnostics through `emitThemeDiagnostics`.
+- Preserved XMLUI star sizes such as `height="*"` and `height="3*"` for layout
+  sizing, and expanded named color validation to the full CSS named-color set
+  promised by the validator contract.
+- Added `Theme/InlineStyleValidation.spec.ts` coverage for strict dropping,
+  non-strict warning passthrough, `allowInlineRawCss`, `maxZIndex` clamping,
+  and responsive part-targeted layout props.
+
+Implementation plan:
+
+- Read validation flags from `appContext.xmluiConfig` using the old
+  `valueExtractor` defaults: `strictTheming !== false`,
+  `allowInlineRawCss !== false`, and `maxZIndex ?? 9999`.
+- Validate only layout/style props before handing them to
+  `resolveLayoutStyle` and `resolveResponsiveLayoutStyles`, leaving unrelated
+  component props untouched.
+- Emit collected diagnostics through `emitThemeDiagnostics`.
+- Preserve non-strict passthrough with warnings, strict dropping for invalid
+  layout/style values, and `maxZIndex` clamping.
+- Add focused adapter/runtime coverage for strict dropping, non-strict
+  passthrough, raw CSS blocking/allowing, z-index clamping, and a
+  part-breakpoint layout prop.
+
+Verification:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+  passed with `98` tests.
+- `npm --workspace xmlui run test:unit` passed with `312` tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Theme/InlineStyleValidation.spec.ts --max-failures=5`
+  passed with `5` tests.
+- `npm --workspace xmlui run test:e2e -- src/components/App/App-star-sizing.spec.ts src/components/Theme/InlineStyleValidation.spec.ts --max-failures=5`
+  passed with `6` tests after preserving XMLUI star-size layout values.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  `5554` passed, `83` skipped, and one already tracked flaky test:
+  `src/components/DropdownMenu/DropdownMenu.spec.ts:698:3`.
+- `npm --workspace xmlui run test:e2e -- src/components/DropdownMenu/DropdownMenu.spec.ts -g "ModalDialog > Select > DropdownMenu" --max-failures=5`
+  passed on focused rerun.
+
+#### Step 12.2: Helper and Built-In Layout Validation
+
+Audit and wire the same validation behavior into runtime/helper paths that can
+bypass the adapter, especially `useLayoutStyle`, layout helpers in
+`runtime/rendering/props.ts`, and built-in renderers that resolve layout props
+directly.
+
+Completed implementation:
+
+- Moved the shared runtime style-prop validation logic from
+  `runtime/rendering/adapter.tsx` into
+  `runtime/rendering/styleValidation.ts`.
+- Reused that shared helper from both the adapter and `useLayoutStyle`.
+- Wired `useLayoutStyle` to read `xmluiConfig`, apply the old validation
+  defaults, emit diagnostics through `emitThemeDiagnostics`, and resolve layout
+  styles from the sanitized prop view.
+- Audited legacy `runtime/rendering/builtins.tsx`; currently migrated runtime
+  renderers shadow the legacy layout-capable built-ins in the runtime registry,
+  but the helper path is now protected if any built-in or internal renderer
+  calls it directly.
+
+Verification:
+
+- No additional E2E fixture was added because the audited legacy built-ins that
+  call `useLayoutStyle` are shadowed by migrated runtime renderers in
+  `builtInComponentRenderers`; the helper itself now reuses the Step 12.1
+  validation implementation.
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+  passed with `98` tests.
+- `npm --workspace xmlui run test:unit` passed with `312` tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  `5553` passed, `83` skipped, and two already tracked flaky tests:
+  `src/components/DropdownMenu/DropdownMenu.spec.ts:698:3` and
+  `src/components/Timer/Timer.foundation.spec.ts:3:1`.
+- `npm --workspace xmlui run test:e2e -- src/components/DropdownMenu/DropdownMenu.spec.ts src/components/Timer/Timer.foundation.spec.ts -g "ModalDialog > Select > DropdownMenu|timer stops when enabled is driven by a labeled Switch API value" --max-failures=5`
+  passed on focused rerun with `2` tests.
+
+#### Step 12.3: Config and Diagnostic Parity Sweep
+
+Compare the rewrite wiring against the old `valueExtractor.asLayoutProp` and
+`valueExtractor.asStyleProp` behavior, then close any remaining gaps in
+config defaults, diagnostic severity, diagnostic message metadata, and
+strict/non-strict runtime behavior.
+
+Completed implementation:
+
+- Compared the rewrite runtime validation wiring with the old
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/rendering/valueExtractor.ts`
+  `asLayoutProp` and `asStyleProp` implementations.
+- Confirmed strict/non-strict defaults match the old extractor:
+  `strictTheming !== false` and `allowInlineRawCss !== false`.
+- Fixed the remaining `maxZIndex` default gap by preserving the old
+  `xmluiConfig.maxZIndex ?? 9999` behavior instead of normalizing non-number
+  config values to `9999` before passing them to the validator.
+- Confirmed diagnostic severity and message generation are shared with the old
+  validator module.
+- Confirmed the old diagnostic emitter carries `componentName` on the
+  diagnostic object but does not push it into `_xsLogs`; the rewrite keeps that
+  old log shape for compatibility.
+- Added E2E coverage proving `maxZIndex` keeps the old nullish-default behavior
+  even when the config value is not a number.
+
+Verification:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+  passed with `98` tests.
+- `npm --workspace xmlui run test:unit` passed with `312` tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Theme/InlineStyleValidation.spec.ts --max-failures=5`
+  passed with `6` tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  `5555` passed, `83` skipped, and one already tracked flaky test:
+  `src/components/DropdownMenu/DropdownMenu.spec.ts:698:3`.
+- `npm --workspace xmlui run test:e2e -- src/components/DropdownMenu/DropdownMenu.spec.ts -g "ModalDialog > Select > DropdownMenu" --max-failures=5`
+  passed on focused rerun with `1` test.
 
 ### Step 13: Port Old Theme Documentation E2E Coverage
 

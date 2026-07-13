@@ -46,6 +46,7 @@ function renderApp(
       module: appModule,
       extensions,
       appGlobals: appConfig.appGlobals,
+      xmluiConfig: appConfig.xmluiConfig,
       icons: appConfig.icons,
       resources: appConfig.resources,
       themes: appConfig.themes,
@@ -59,6 +60,7 @@ function renderApp(
 
 type StandaloneAppConfig = {
   appGlobals?: Record<string, unknown>;
+  xmluiConfig?: Record<string, unknown>;
   icons?: Record<string, string>;
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
@@ -83,6 +85,7 @@ function isStandaloneAppConfig(value: unknown): value is StandaloneAppConfig {
   const config = value as StandaloneAppConfig;
   return Boolean(
     config.appGlobals ||
+      config.xmluiConfig ||
       config.icons ||
       config.resources ||
       config.themes ||

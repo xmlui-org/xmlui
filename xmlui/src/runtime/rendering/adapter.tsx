@@ -11,6 +11,7 @@ import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { emitThemeDiagnostics } from "../../components-core/theming/validator/emit";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
@@ -21,9 +22,11 @@ import {
   supportedResponsiveLayoutPropNames,
   type LayoutOrientation,
 } from "../../styling";
+import { useXmluiAppContext } from "../appContext";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
+import { inlineStyleValidationOptions, validateRuntimeStyleProps } from "./styleValidation";
 import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export type XmluiAdapterRendererProps = {
@@ -150,18 +153,31 @@ export function useXmluiComponentAdapter({
   const registeredIdRef = useRef<string>();
   const themeClassName = useComponentThemeClass(metadata, themeContributors);
   const theme = useTheme();
+  const appContext = useXmluiAppContext();
+  const validationOptions = useMemo(() => inlineStyleValidationOptions(appContext.xmluiConfig), [
+    appContext.xmluiConfig?.allowInlineRawCss,
+    appContext.xmluiConfig?.maxZIndex,
+    appContext.xmluiConfig?.strictTheming,
+  ]);
+  const validatedStyleProps = useMemo(
+    () => validateRuntimeStyleProps(props, name, validationOptions),
+    [name, props, validationOptions],
+  );
+  useEffect(() => {
+    emitThemeDiagnostics(validatedStyleProps.diagnostics);
+  }, [validatedStyleProps.diagnostics]);
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
     () => theme.disableInlineStyle
       ? {}
-      : resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
-    [layoutOrientation, props, theme.disableInlineStyle, viewportWidth],
+      : resolveActiveLayoutStyle(validatedStyleProps.props, viewportWidth, layoutOrientation),
+    [layoutOrientation, theme.disableInlineStyle, validatedStyleProps.props, viewportWidth],
   );
   const layoutStyles = useMemo(
     () => theme.disableInlineStyle
       ? {}
-      : resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
-    [layoutOrientation, props, theme.disableInlineStyle],
+      : resolveResponsiveLayoutStyles(validatedStyleProps.props, { orientation: layoutOrientation }),
+    [layoutOrientation, theme.disableInlineStyle, validatedStyleProps.props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
