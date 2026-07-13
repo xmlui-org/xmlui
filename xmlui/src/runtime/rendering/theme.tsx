@@ -31,6 +31,7 @@ export type ThemeRuntimeContext = {
   variables: Record<string, unknown>;
   tone: ThemeTone;
   setTone: (tone: ThemeTone) => void;
+  disableInlineStyle?: boolean;
 };
 
 const noopSetTone = () => undefined;
@@ -39,6 +40,7 @@ const ThemeContext = createContext<ThemeRuntimeContext>({
   variables: defaultThemeVariables,
   tone: "light",
   setTone: noopSetTone,
+  disableInlineStyle: undefined,
 });
 const themeRootBaseStyles: CSSProperties = {
   direction: "var(--xmlui-direction)" as CSSProperties["direction"],
@@ -67,15 +69,23 @@ export function RuntimeThemeProvider({
   variables,
   tone,
   setTone,
+  disableInlineStyle,
 }: {
   children: ReactNode;
   variables: Record<string, unknown>;
   tone: ThemeTone;
   setTone: (tone: ThemeTone) => void;
+  disableInlineStyle?: boolean;
 }) {
+  const parent = useThemeRuntime();
   const value = useMemo<ThemeRuntimeContext>(
-    () => ({ variables, tone, setTone }),
-    [setTone, tone, variables],
+    () => ({
+      variables,
+      tone,
+      setTone,
+      disableInlineStyle: disableInlineStyle ?? parent.disableInlineStyle,
+    }),
+    [disableInlineStyle, parent.disableInlineStyle, setTone, tone, variables],
   );
   return (
     <ThemeContext.Provider value={value}>
@@ -100,7 +110,7 @@ export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { chil
     [tone],
   );
   const value = useMemo<ThemeRuntimeContext>(
-    () => ({ variables, tone, setTone }),
+    () => ({ variables, tone, setTone, disableInlineStyle: undefined }),
     [tone, variables],
   );
   const rootClassName = useDynamicStyle(
@@ -184,8 +194,9 @@ export function ThemeScope({
       variables: nextVariables,
       tone: tone ?? parent.tone,
       setTone: parent.setTone,
+      disableInlineStyle: parent.disableInlineStyle,
     }),
-    [nextVariables, parent.setTone, parent.tone, tone],
+    [nextVariables, parent.disableInlineStyle, parent.setTone, parent.tone, tone],
   );
   if (!hasHostLayoutStyle(style)) {
     return (

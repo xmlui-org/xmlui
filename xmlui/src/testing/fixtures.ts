@@ -61,6 +61,7 @@ export type InitTestBedOptions = {
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
   defaultTone?: "light" | "dark";
+  appGlobals?: Record<string, unknown>;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
   oldThemeCanary?: boolean;
@@ -770,6 +771,7 @@ async function initTestBed(
     themes: options.themes ?? [],
     defaultTheme: options.defaultTheme,
     defaultTone: options.defaultTone,
+    appGlobals: options.appGlobals ?? {},
     strictTheming: options.strictTheming,
     strictAccessibility: options.strictAccessibility,
     oldThemeCanary: options.oldThemeCanary === true,
@@ -799,6 +801,7 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
     window.sessionStorage.setItem("__xmluiTestBedResourceMap", JSON.stringify(payload.resourceMap));
     window.sessionStorage.setItem("__xmluiTestBedThemes", JSON.stringify(payload.themes));
+    window.sessionStorage.setItem("__xmluiTestBedAppGlobals", JSON.stringify(payload.appGlobals));
     if (payload.defaultTheme) {
       window.sessionStorage.setItem("__xmluiTestBedDefaultTheme", payload.defaultTheme);
     } else {
@@ -875,6 +878,7 @@ type TestBedPayload = {
   themes: Array<ThemeDefinition>;
   defaultTheme?: string;
   defaultTone?: "light" | "dark";
+  appGlobals: Record<string, unknown>;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
   oldThemeCanary: boolean;

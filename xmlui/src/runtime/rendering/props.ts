@@ -17,6 +17,7 @@ import type { RuntimeScope } from "../state";
 import { evaluateExpressionOrText, dependenciesForBinding } from "./bindings";
 import { useBindingRevision } from "./reactive";
 import type { RenderContext } from "./types";
+import { useThemeRuntime } from "./theme";
 
 export function useEvaluatedProp(
   node: XmluiElement,
@@ -79,8 +80,9 @@ export function useLayoutStyle(
       props[name] = useEvaluatedProp(node, scope, name, undefined);
     }
   }
+  const themeRuntime = useThemeRuntime();
   const viewportWidth = useViewportWidth();
-  return resolveActiveLayoutStyle(props, viewportWidth, options);
+  return themeRuntime.disableInlineStyle ? {} : resolveActiveLayoutStyle(props, viewportWidth, options);
 }
 
 export function flexStyle(

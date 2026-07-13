@@ -2,8 +2,14 @@ import { type ComponentType, type ReactNode, useState } from "react";
 
 import type { ComponentMetadata } from "../component-core/metadata";
 import { useComponentThemeClass } from "./theming/utils";
+import { useTheme } from "./theming/ThemeContext";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "../extensions";
 import { COMPONENT_PART_KEY } from "../styling/layout";
+import {
+  isLayoutPropName,
+  parseStyleSelectorKey,
+  supportedResponsiveLayoutPropNames,
+} from "../styling";
 
 type ExtractValueCompat = ((value: unknown) => any) & {
   asString(value: unknown, fallback?: string): string;
@@ -86,6 +92,7 @@ export function wrapComponent(
     toneSpecificThemeVars: metadata.toneSpecificThemeVars,
     themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps: XmluiExtensionComponentProps) => {
+      const { disableInlineStyle } = useTheme();
       const themeClassName = useComponentThemeClass(metadata);
       const themeClass = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
       const props = { ...runtimeProps.props };
@@ -100,6 +107,7 @@ export function wrapComponent(
         }
       }
       if (options.customRender) {
+        const renderedProps = disableInlineStyle ? removeInlineStyleProps(props) : props;
         const extractValue = ((value: unknown) => value) as ExtractValueCompat;
         extractValue.asString = (value, fallback = "") =>
           value === undefined || value === null ? fallback : String(value);
@@ -125,10 +133,10 @@ export function wrapComponent(
           value === undefined || value === null ? fallback : String(value);
         extractValue.asSize = (value, fallback) =>
           value === undefined || value === null || value === "" ? fallback : String(value);
-        return options.customRender(props, {
+        return options.customRender(renderedProps, {
           className: themeClass,
           classes: { [COMPONENT_PART_KEY]: themeClass },
-          node: { ...runtimeProps.node, props: runtimeProps.props },
+          node: { ...runtimeProps.node, props: renderedProps },
           extractValue,
           extractResourceUrl: (url) =>
             url === undefined || url === null || /^https?:\/\//.test(url) ? url : `/${url}`,
@@ -174,4 +182,18 @@ export function wrapComponent(
       );
     },
   };
+}
+
+function removeInlineStyleProps(props: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(props).filter(([name]) => !isInlineStylePropName(name)),
+  );
+}
+
+function isInlineStylePropName(name: string): boolean {
+  if (isLayoutPropName(name) || supportedResponsiveLayoutPropNames.includes(name as never)) {
+    return true;
+  }
+  const selector = parseStyleSelectorKey(name);
+  return selector.breakpoint !== undefined && isLayoutPropName(selector.property);
 }

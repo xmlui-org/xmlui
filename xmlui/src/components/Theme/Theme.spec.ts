@@ -245,6 +245,89 @@ test.describe("root provider topology", () => {
     await expect(option).toBeVisible();
     await expect(option).toHaveCSS("background-color", "rgb(12, 34, 56)");
   });
+
+  test("root notification config controls toast position and duration", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Button testId="show-toast" onClick="toast('Saved')">Show toast</Button>
+      </App>
+    `,
+      {
+        appGlobals: {
+          notifications: {
+            position: "bottom-start",
+            duration: 300,
+          },
+        },
+      },
+    );
+
+    await page.getByTestId("show-toast").click();
+    const status = page.getByRole("status").filter({ hasText: "Saved" }).last();
+    await expect(status).toBeVisible();
+
+    const box = await status.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeLessThan(PAGE_WIDTH / 2);
+    expect(box!.y).toBeGreaterThan(PAGE_HEIGHT / 2);
+
+    await expect(status).toBeHidden({ timeout: 2500 });
+  });
+
+  test("scoped Theme portal mirror is stable across unrelated rerenders", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App var.count="{0}">
+        <Button testId="rerender" onClick="count = count + 1">Rerender {count}</Button>
+        <Theme
+          backgroundColor-item-Select="rgb(12, 34, 56)"
+          backgroundColor-item-Select--hover="rgb(12, 34, 56)"
+          backgroundColor-item-Select--active="rgb(12, 34, 56)"
+        >
+          <Select testId="scoped-select">
+            <Option value="one" label="One" />
+          </Select>
+        </Theme>
+      </App>
+    `);
+
+    const initialMirrorCount = await page.evaluate(() => {
+      const mirrors = [...document.querySelectorAll('div[class*="themeWrapper"]')].filter((element) =>
+        element instanceof HTMLElement &&
+        element.childElementCount === 0
+      );
+      if (mirrors[0] instanceof HTMLElement) {
+        mirrors[0].dataset.step93Mirror = "stable";
+      }
+      return mirrors.length;
+    });
+
+    expect(initialMirrorCount).toBe(1);
+
+    await page.getByTestId("rerender").click();
+    await page.getByTestId("rerender").click();
+
+    const stableMirrorCount = await page.evaluate(() => {
+      const mirrors = [...document.querySelectorAll('div[class*="themeWrapper"]')].filter((element) =>
+        element instanceof HTMLElement &&
+        element.childElementCount === 0
+      );
+      return {
+        total: mirrors.length,
+        tagged: mirrors.filter(
+          (element) => element instanceof HTMLElement && element.dataset.step93Mirror === "stable",
+        ).length,
+      };
+    });
+
+    expect(stableMirrorCount).toEqual({ total: 1, tagged: 1 });
+  });
 });
 
 // =============================================================================

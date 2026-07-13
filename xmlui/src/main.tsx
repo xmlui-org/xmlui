@@ -400,6 +400,21 @@ if (params.has("__xmluiTestBed")) {
     }
   };
 
+  const readTestBedAppGlobals = (): Record<string, unknown> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedAppGlobals");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed as Record<string, unknown>
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
   const readTestBedDefaultTheme = (): string | undefined => {
     const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTheme");
     return value || undefined;
@@ -474,6 +489,7 @@ if (params.has("__xmluiTestBed")) {
     const resources = readTestBedResources();
     const resourceMap = readTestBedResourceMap();
     const themes = readTestBedThemes();
+    const appGlobals = readTestBedAppGlobals();
     const defaultTheme = readTestBedDefaultTheme();
     const defaultTone = readTestBedDefaultTone();
     const strictTheming = readOptionalBoolean("__xmluiTestBedStrictTheming");
@@ -488,6 +504,7 @@ if (params.has("__xmluiTestBed")) {
         resources,
         resourceMap,
         themes,
+        appGlobals,
         defaultTheme,
         defaultTone,
         strictTheming,
@@ -504,6 +521,7 @@ if (params.has("__xmluiTestBed")) {
       resources,
       resourceMap,
       themes,
+      appGlobals,
       defaultTheme,
       defaultTone,
       strictTheming,

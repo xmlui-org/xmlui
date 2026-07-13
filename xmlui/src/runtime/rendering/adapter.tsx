@@ -10,6 +10,7 @@ import React, {
 import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { useThemeRuntime } from "./theme";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
@@ -148,14 +149,19 @@ export function useXmluiComponentAdapter({
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
   const themeClassName = useComponentThemeClass(metadata, themeContributors);
+  const themeRuntime = useThemeRuntime();
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
-    () => resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
-    [layoutOrientation, props, viewportWidth],
+    () => themeRuntime.disableInlineStyle
+      ? {}
+      : resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
+    [layoutOrientation, props, themeRuntime.disableInlineStyle, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
-    [layoutOrientation, props],
+    () => themeRuntime.disableInlineStyle
+      ? {}
+      : resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
+    [layoutOrientation, props, themeRuntime.disableInlineStyle],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {

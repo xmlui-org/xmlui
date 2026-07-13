@@ -116,7 +116,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
   const themeTone = tone ?? appThemes.activeThemeTone;
   const themeId = useEvaluatedProp(node, scope, "themeId", undefined);
   const root = useBooleanProp(node, scope, "root", false);
-  const disableInlineStyle = useEvaluatedProp(node, scope, "disableInlineStyle", undefined);
+  const disableInlineStyle = useBooleanProp(node, scope, "disableInlineStyle", undefined);
   const themeVariables = themeVariablesOnly(useThemeOverrideProps(node, scope));
   const authoredProps = node.props;
   const hasExplicitApplyIf = Object.prototype.hasOwnProperty.call(authoredProps, "applyIf");
@@ -167,7 +167,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
       id={typeof themeId === "string" ? themeId : undefined}
       isRoot={root}
       applyIf={applyIf}
-      disableInlineStyle={typeof disableInlineStyle === "boolean" ? disableInlineStyle : undefined}
+      disableInlineStyle={disableInlineStyle}
       layoutContext={layoutContext as LayoutContext | undefined}
       renderChild={(children, childLayoutContext) =>
         renderThemeChildren(context, scope, children, childLayoutContext)

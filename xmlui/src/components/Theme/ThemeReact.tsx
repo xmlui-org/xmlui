@@ -68,14 +68,20 @@ export function Theme({
   renderChild,
   node,
   tone,
-  toastDuration = defaultProps.toastDuration,
-  notificationPosition = defaultProps.notificationPosition,
+  toastDuration,
+  notificationPosition,
   themeVars = defaultProps.themeVars,
   layoutContext,
   children,
 }: Props) {
   const generatedId = useId();
   const appContext = useAppContext();
+  const notifications =
+    appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
+  const resolvedToastDuration =
+    toastDuration ?? (typeof notifications?.duration === "number" ? notifications.duration : undefined) ?? defaultProps.toastDuration;
+  const resolvedNotificationPosition =
+    notificationPosition ?? notifications?.position ?? defaultProps.notificationPosition;
 
   const { themes, resources, resourceMap, activeThemeId, setActiveThemeTone } = useThemes();
   const { activeTheme, activeThemeTone, root } = useTheme();
@@ -335,7 +341,10 @@ export function Theme({
           {renderChild && renderChild(node.children)}
           {children}
         </ErrorBoundary>
-        <NotificationToast toastDuration={toastDuration} notificationPosition={notificationPosition} />
+        <NotificationToast
+          toastDuration={resolvedToastDuration}
+          notificationPosition={resolvedNotificationPosition}
+        />
       </>
     );
   }
@@ -351,6 +360,7 @@ export function Theme({
         variables={scopedRuntimeThemeVars}
         tone={themeTone}
         setTone={setActiveThemeTone}
+        disableInlineStyle={disableInlineStyle}
       >
         {needsWrapper ? (
           <>

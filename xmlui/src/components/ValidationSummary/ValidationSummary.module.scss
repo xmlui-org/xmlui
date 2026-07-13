@@ -1,16 +1,25 @@
-$themeVars: "";
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
 @function createThemeVar($componentVariable) {
-  @return var(--xmlui-#{$componentVariable});
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
 $gap-ValidationSummary: createThemeVar("gap-ValidationSummary");
 $padding-ValidationDisplay: createThemeVar("padding-ValidationDisplay");
 $backgroundColor-ValidationDisplay-error: createThemeVar("backgroundColor-ValidationDisplay-error");
 $backgroundColor-ValidationDisplay-warning: createThemeVar("backgroundColor-ValidationDisplay-warning");
+$backgroundColor-ValidationDisplay-info: createThemeVar("backgroundColor-ValidationDisplay-info");
+$backgroundColor-ValidationDisplay-valid: createThemeVar("backgroundColor-ValidationDisplay-valid");
 $color-accent-ValidationDisplay-error: createThemeVar("color-accent-ValidationDisplay-error");
 $color-accent-ValidationDisplay-warning: createThemeVar("color-accent-ValidationDisplay-warning");
+$color-accent-ValidationDisplay-info: createThemeVar("color-accent-ValidationDisplay-info");
+$color-accent-ValidationDisplay-valid: createThemeVar("color-accent-ValidationDisplay-valid");
 $textColor-ValidationDisplay-error: createThemeVar("textColor-ValidationDisplay-error");
 $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDisplay-warning");
+$textColor-ValidationDisplay-info: createThemeVar("textColor-ValidationDisplay-info");
+$textColor-ValidationDisplay-valid: createThemeVar("textColor-ValidationDisplay-valid");
 
 .summary {
   display: flex;
@@ -52,6 +61,24 @@ $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDispla
   background-color: $color-accent-ValidationDisplay-warning;
 }
 
+.info {
+  color: $textColor-ValidationDisplay-info;
+  background-color: $backgroundColor-ValidationDisplay-info;
+}
+
+.info::before {
+  background-color: $color-accent-ValidationDisplay-info;
+}
+
+.valid {
+  color: $textColor-ValidationDisplay-valid;
+  background-color: $backgroundColor-ValidationDisplay-valid;
+}
+
+.valid::before {
+  background-color: $color-accent-ValidationDisplay-valid;
+}
+
 .heading {
   margin: 0 0 0.25rem;
   font-weight: 700;
@@ -68,4 +95,8 @@ $textColor-ValidationDisplay-warning: createThemeVar("textColor-ValidationDispla
 
 .field {
   font-weight: 700;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
