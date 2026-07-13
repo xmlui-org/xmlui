@@ -3,6 +3,8 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
 import { useThemeRuntime } from "../../runtime/rendering/theme";
+import { checkThemeContrast } from "../accessibility/contrast";
+import { pushXsLog } from "../inspector/inspectorUtils";
 import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
 import { emitThemeDiagnostics } from "./validator/emit";
 import {
@@ -101,6 +103,7 @@ export function LegacyThemeProvider({
   defaultTheme,
   componentThemeMetadata = EMPTY_COMPONENT_THEME_METADATA,
   strictTheming = true,
+  strictAccessibility = false,
   enableOldThemeShadowDiagnostics = false,
   enableOldThemeCanary = false,
   children,
@@ -114,6 +117,7 @@ export function LegacyThemeProvider({
     "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
   >;
   strictTheming?: boolean;
+  strictAccessibility?: boolean;
   enableOldThemeShadowDiagnostics?: boolean;
   enableOldThemeCanary?: boolean;
   children: ReactNode;
@@ -208,6 +212,33 @@ export function LegacyThemeProvider({
       emitThemeDiagnostics(oldCompiledTheme.themeDiagnostics);
     }
   }, [oldCompiledTheme.themeDiagnostics, strictTheming]);
+
+  useMemo(() => {
+    if (!strictAccessibility && !import.meta.env.DEV) {
+      return;
+    }
+    const resolvedForContrast = new Map<string, string>();
+    for (const key of Object.keys(oldCompiledTheme.rawAllThemeVars)) {
+      const value = oldCompiledTheme.getThemeVar(key);
+      if (value !== undefined) {
+        resolvedForContrast.set(key, value);
+      }
+    }
+    for (const diagnostic of checkThemeContrast(resolvedForContrast)) {
+      pushXsLog({
+        kind: "a11y",
+        ts: Date.now(),
+        severity: strictAccessibility ? "error" : diagnostic.severity,
+        code: diagnostic.code,
+        componentName: diagnostic.componentName,
+        message: diagnostic.message,
+        fix: diagnostic.fix,
+      });
+      if (strictAccessibility) {
+        console.error(`[XMLUI Accessibility] ${diagnostic.message}`);
+      }
+    }
+  }, [oldCompiledTheme, strictAccessibility]);
 
   useEffect(() => {
     if (typeof document === "undefined") {

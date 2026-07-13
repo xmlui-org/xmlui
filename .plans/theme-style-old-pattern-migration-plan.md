@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 6.3 implemented and verified; next step is Step 6.4 restore accessibility and contrast diagnostics  
+Status: Step 6.5 completed; Step 7 restore `useComponentThemeClass` is in progress  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -899,6 +899,31 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
+Implemented:
+
+- Ported the old accessibility diagnostic type surface and theme contrast
+  helpers under `xmlui/src/components-core/accessibility/`.
+- Ported the old focused contrast unit test to
+  `xmlui/tests/components-core/accessibility/contrast.test.ts`.
+- Added `strictAccessibility` to `LegacyThemeProvider`.
+- Wired old theme contrast diagnostics in development and strict accessibility
+  mode through `_xsLogs` with `kind: "a11y"`, escalating severity and console
+  output only when `strictAccessibility` is enabled.
+- Added a provider canary proving strict contrast diagnostics are emitted from
+  the old theme path without changing rendered theme CSS variables.
+
+Verification passed:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/accessibility/contrast.test.ts tests/components-core/theming/oldThemeCompiler.test.ts tests/components-core/theming/oldThemeCanary.test.tsx tests/components-core/theming/validator.test.ts`
+  (`116 passed`).
+- `npm --workspace xmlui run test:unit`
+  (`308 passed`).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5538 passed`, `83 skipped`, `1 flaky`, no failures). The flaky test was
+  the already tracked
+  `xmlui/src/components/DropdownMenu/DropdownMenu.spec.ts:698:3` case, so no
+  new flaky entry was added.
+
 #### Step 6.5: Evaluate Inline Style Validation Scope
 
 The old `validator/style-prop-validator.ts` validates layout props and raw
@@ -919,6 +944,41 @@ Verification if implemented in Step 6:
 - Add one runtime test for strict dropping and non-strict warning behavior.
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Decision, 2026-07-13:
+
+- Do not wire inline style validation into the active runtime in Step 6.
+- The old `style-prop-validator.ts` module and its exports are already ported
+  byte-for-byte in the rewrite.
+- The old focused unit coverage for `validateInlineStyle` and
+  `validateStyleString` is already present in
+  `xmlui/tests/components-core/theming/validator.test.ts`.
+- The old runtime call sites live in
+  `/Users/dotneteer/source/xmlui/xmlui/src/components-core/rendering/valueExtractor.ts`,
+  where `extractor.asLayoutProp` and `extractor.asStyleProp` validate,
+  sanitize, and emit diagnostics while extracting values.
+- The rewrite does not use that same value-extraction path for active layout
+  rendering. Layout and style props currently flow through
+  `runtime/rendering/props.ts`, `runtime/rendering/adapter.tsx`,
+  `components-core/theming/parse-layout-props.ts`, and the styling resolver
+  utilities.
+- Enabling strict dropping and style-string sanitization in the rewrite now
+  would affect every component adapter, `rootAttrs()`, arbitrary prop
+  forwarding, responsive part styles, and raw `style` string behavior. That is
+  broad style/layout runtime work, not theme compilation work.
+- Add the dedicated runtime wiring as a later step after the old
+  `useComponentThemeClass` path and provider topology are restored.
+
+Verification passed:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+  (`98 passed`).
+- `npm --workspace xmlui run test:unit`
+  (`308 passed`).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5538 passed`, `83 skipped`, `1 flaky`, no failures). The flaky test was
+  the already tracked `xmlui/src/components/List/List.spec.ts:2416:3` case, so
+  no new flaky entry was added.
 
 ### Step 7: Restore `useComponentThemeClass`
 
@@ -1033,7 +1093,38 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
-### Step 12: Port Old Theme Documentation E2E Coverage
+### Step 12: Restore Inline Style Validation Runtime Wiring
+
+After old-pattern theme class generation, provider topology, and duplicate
+runtime theme ownership are reconciled, wire the already ported
+`validateInlineStyle` and `validateStyleString` helpers into the rewrite's
+active runtime adapter/layout path.
+
+Scope:
+
+- preserve the old diagnostics and sanitization semantics from
+  `valueExtractor.asLayoutProp` and `valueExtractor.asStyleProp`;
+- feed `strictTheming`, `allowInlineRawCss`, and `maxZIndex` from the active
+  app XMLUI config;
+- emit diagnostics through the existing theme diagnostic channel;
+- validate root layout props, responsive layout props, part-targeted layout
+  props, and raw `style` string props without changing unrelated component
+  props;
+- preserve old non-strict behavior: diagnostics warn but values are kept;
+- preserve old strict behavior: invalid layout values and blocked raw CSS are
+  dropped or clamped according to `style-prop-validator.ts`.
+
+Verification:
+
+- Add focused runtime tests for strict dropping, non-strict warning passthrough,
+  `allowInlineRawCss`, and `maxZIndex` clamping through the active adapter.
+- Add one responsive part-style test proving validation does not break
+  `part-breakpoint` layout props.
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+### Step 13: Port Old Theme Documentation E2E Coverage
 
 Bring the old website theme/style docs and how-to E2E specs into the rewrite's
 current `xmlui/tests/e2e` structure. Start by copying the old `tests-e2e`
@@ -1058,7 +1149,7 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
-### Step 13: Website Theme Parity Checkpoint
+### Step 14: Website Theme Parity Checkpoint
 
 Use the migrated old website as the broad visual compatibility surface:
 
@@ -1075,7 +1166,7 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
-### Step 14: Final Compatibility Sweep
+### Step 15: Final Compatibility Sweep
 
 Run the broader compatibility commands and record closure notes:
 

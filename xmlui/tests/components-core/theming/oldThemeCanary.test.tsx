@@ -230,6 +230,72 @@ describe("old theme compiler canary", () => {
     expect(result.theme.themeStyles["--xmlui-backgroundColor-Panel"]).toBe("not-a-color");
     expect(result.theme.themeVars["backgroundColor-Panel"]).toBe("not-a-color");
   });
+
+  test("emits strict accessibility contrast diagnostics through the old theme path", () => {
+    const previousWindow = globalThis.window;
+    const previousDocument = globalThis.document;
+    const fakeWindow = { _xsLogs: [] as Array<Record<string, unknown>> } as unknown as Window &
+      typeof globalThis & { _xsLogs: Array<Record<string, unknown>> };
+    const fakeDocument = {
+      querySelector: () => null,
+      documentElement: undefined,
+    } as unknown as Document;
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      writable: true,
+      value: fakeWindow,
+    });
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      writable: true,
+      value: fakeDocument,
+    });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      renderCanaryProvider({
+        themes: [
+          {
+            id: "brand",
+            extends: "xmlui",
+            themeVars: {
+              textColor: "#ffffff",
+              backgroundColor: "#ffffff",
+            },
+          },
+        ],
+        defaultTheme: "brand",
+        strictAccessibility: true,
+        enableOldThemeCanary: false,
+      });
+
+      expect(fakeWindow._xsLogs).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "a11y",
+            code: "color-contrast-low",
+            severity: "error",
+            componentName: "Theme",
+          }),
+        ]),
+      );
+      expect(error).toHaveBeenCalledWith(expect.stringContaining("[XMLUI Accessibility]"));
+    } finally {
+      warn.mockRestore();
+      error.mockRestore();
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        writable: true,
+        value: previousWindow,
+      });
+      Object.defineProperty(globalThis, "document", {
+        configurable: true,
+        writable: true,
+        value: previousDocument,
+      });
+    }
+  });
 });
 
 function createCanaryTheme(): ThemeDefinition {
@@ -261,6 +327,7 @@ function renderCanaryProvider({
   resourceMap,
   componentThemeMetadata = createCoreComponentThemeMetadataRegistry(),
   strictTheming,
+  strictAccessibility,
   enableOldThemeCanary,
 }: {
   themes: ThemeDefinition[];
@@ -269,6 +336,7 @@ function renderCanaryProvider({
   resourceMap?: Record<string, string>;
   componentThemeMetadata?: ReturnType<typeof createCoreComponentThemeMetadataRegistry>;
   strictTheming?: boolean;
+  strictAccessibility?: boolean;
   enableOldThemeCanary: boolean;
 }) {
   let capturedTheme: ThemeScope | undefined;
@@ -282,6 +350,7 @@ function renderCanaryProvider({
           resourceMap={resourceMap}
           componentThemeMetadata={componentThemeMetadata}
           strictTheming={strictTheming}
+          strictAccessibility={strictAccessibility}
           enableOldThemeCanary={enableOldThemeCanary}
         >
           <ThemeProbe onTheme={(theme) => {
