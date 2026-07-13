@@ -849,6 +849,51 @@ test.describe("Theme Variables", () => {
   await expect(menuContent).toHaveCSS("background-color", "rgb(255, 0, 0)");
   await expect(menuContent).toHaveCSS("min-width", "200px");
   });
+
+  test("old compiler canary applies root ContextMenu content variables", async ({
+    initTestBed,
+    createContextMenuDriver,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
+        <Text value="Right click me" />
+      </Card>
+      <ContextMenu id="menu">
+        <MenuItem>Item 1</MenuItem>
+      </ContextMenu>
+      `,
+      {
+        oldThemeCanary: true,
+        defaultTheme: "context-root-canary",
+        themes: [
+          {
+            id: "context-root-canary",
+            extends: "xmlui",
+            themeVars: {
+              "backgroundColor-ContextMenu": "rgb(255, 0, 0)",
+              "minWidth-ContextMenu": "200px",
+              "borderColor-ContextMenu-content": "rgb(0, 128, 0)",
+              "borderWidth-ContextMenu-content": "3px",
+              "borderStyle-ContextMenu-content": "dotted",
+            },
+          },
+        ],
+      },
+    );
+    const driver = await createContextMenuDriver("menu");
+
+    await page.getByTestId("target").click({ button: "right" });
+
+    const menuContent = driver.getMenuContent();
+    await expect(menuContent).toBeVisible();
+    await expect(menuContent).toHaveCSS("background-color", "rgb(255, 0, 0)");
+    await expect(menuContent).toHaveCSS("min-width", "200px");
+    await expect(menuContent).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+    await expect(menuContent).toHaveCSS("border-top-width", "3px");
+    await expect(menuContent).toHaveCSS("border-top-style", "dotted");
+  });
 });
 
 // =============================================================================

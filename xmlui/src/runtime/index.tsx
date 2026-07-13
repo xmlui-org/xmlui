@@ -30,6 +30,7 @@ import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { responsiveBreakpoints } from "../styling/contracts";
+import { createCoreComponentThemeMetadataRegistry } from "../component-core";
 
 ensureXmluiDebugBridge();
 
@@ -87,6 +88,7 @@ export type MountXmluiAppOptions = {
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  enableOldThemeCanary?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -119,6 +121,7 @@ export function mountXmluiApp(
         resources={options.resources}
         themes={options.themes}
         defaultTheme={options.defaultTheme}
+        enableOldThemeCanary={options.enableOldThemeCanary}
         testProbe={options.testProbe}
       />,
     );
@@ -130,12 +133,13 @@ export function mountXmluiApp(
       initialUrl={options.initialUrl}
       isolateRouting={options.isolateRouting}
       defaultTone={options.defaultTone}
-        extensions={options.extensions}
-        appGlobals={options.appGlobals}
-        icons={options.icons}
-        resources={options.resources}
-        themes={options.themes}
-        defaultTheme={options.defaultTheme}
+      extensions={options.extensions}
+      appGlobals={options.appGlobals}
+      icons={options.icons}
+      resources={options.resources}
+      themes={options.themes}
+      defaultTheme={options.defaultTheme}
+      enableOldThemeCanary={options.enableOldThemeCanary}
       testProbe={options.testProbe}
     />,
   );
@@ -153,6 +157,7 @@ export function XmluiRoot({
   resources = {},
   themes = [],
   defaultTheme,
+  enableOldThemeCanary = false,
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -165,6 +170,7 @@ export function XmluiRoot({
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  enableOldThemeCanary?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
@@ -208,6 +214,7 @@ export function XmluiRoot({
     ]),
     [extensions],
   );
+  const componentThemeMetadata = useMemo(() => createCoreComponentThemeMetadataRegistry(), []);
   useEffect(() => routingRef.current?.attach(), []);
   const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown, cancelLabel?: unknown) => {
     return new Promise<boolean>((resolve) => {
@@ -256,7 +263,13 @@ export function XmluiRoot({
         <IconProvider icons={icons}>
           <XmluiThemeRoot tone={defaultTone}>
             <LegacyStyleProvider>
-              <LegacyThemeProvider resources={resources} themes={themes} defaultTheme={defaultTheme}>
+              <LegacyThemeProvider
+                resources={resources}
+                themes={themes}
+                defaultTheme={defaultTheme}
+                componentThemeMetadata={componentThemeMetadata}
+                enableOldThemeCanary={enableOldThemeCanary}
+              >
                 <XmluiRuntimeContent
                   appGlobals={appGlobals}
                   confirm={confirm}

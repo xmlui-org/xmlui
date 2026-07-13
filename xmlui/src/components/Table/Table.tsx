@@ -1014,7 +1014,6 @@ import type { ComponentMetadata } from "../../component-core/metadata";
 import { createRuntimeScope, hasLocalName, readLocal, writeLocal, type RuntimeScope } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
 import { evaluateProps, runEvent } from "../../runtime/rendering/bindings";
-import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
 
 export const tableRenderer = wrapRuntimeComponent({
   name: COMP,
@@ -1134,7 +1133,6 @@ export const tableRenderer = wrapRuntimeComponent({
     } as CSSProperties;
 
     const tableContent = (
-      <LegacyThemeProvider>
         <Table
         {...rootAttrs}
         key={refreshOnValue === undefined ? undefined : stableRuntimeKey(refreshOnValue)}
@@ -1222,7 +1220,6 @@ export const tableRenderer = wrapRuntimeComponent({
         onPasteAction={(row, selectedItems, selectedIds) => adapter.event("pasteAction")(row, selectedItems, selectedIds)}
         onDeleteAction={(row, selectedItems, selectedIds) => adapter.event("deleteAction")(row, selectedItems, selectedIds)}
         />
-      </LegacyThemeProvider>
     );
     if (selectionContext === null) {
       return <StandaloneSelectionStore idKey={idKey}>{tableContent}</StandaloneSelectionStore>;

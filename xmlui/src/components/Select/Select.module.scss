@@ -288,6 +288,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   .paginationPageSizeTrigger {
     color: createThemeVar("Input:textColor-#{$componentName}") !important;
     font-size: inherit !important;
+    box-shadow: none;
   }
 
   /**

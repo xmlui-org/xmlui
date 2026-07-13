@@ -1426,7 +1426,41 @@ test.describe("Behaviors and Parts", () => {
 
     const component = page.getByTestId("test");
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
-  });  test("tooltip with markdown content", async ({ page, initTestBed }) => {
+  });
+
+  test("old compiler canary applies root DateInput custom variant variables", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`<DateInput testId="test" variant="CustomVariant" />`, {
+      oldThemeCanary: true,
+      defaultTheme: "dateinput-root-canary",
+      themes: [
+        {
+          id: "dateinput-root-canary",
+          extends: "xmlui",
+          themeVars: {
+            "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",
+            "borderWidth-DateInput-CustomVariant": "2px",
+            "borderStyle-DateInput-CustomVariant": "dashed",
+            "backgroundColor-DateInput-CustomVariant": "rgb(240, 240, 240)",
+            "fontSize-DateInput-CustomVariant": "14px",
+            "textColor-DateInput-CustomVariant": "rgb(0, 0, 0)",
+          },
+        },
+      ],
+    });
+
+    const component = page.getByTestId("test");
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(component).toHaveCSS("border-width", "2px");
+    await expect(component).toHaveCSS("border-style", "dashed");
+    await expect(component).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(component).toHaveCSS("font-size", "14px");
+    await expect(component).toHaveCSS("color", "rgb(0, 0, 0)");
+  });
+
+  test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`<DateInput testId="test" tooltipMarkdown="**Bold text**" />`);
     
     const component = page.getByTestId("test");

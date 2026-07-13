@@ -924,6 +924,38 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Theme Variables", () => {
+  test("old compiler canary applies root AutoComplete input variables", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<AutoComplete testId="test" />`, {
+      oldThemeCanary: true,
+      defaultTheme: "autocomplete-root-canary",
+      themes: [
+        {
+          id: "autocomplete-root-canary",
+          extends: "xmlui",
+          themeVars: {
+            "borderColor-AutoComplete": "rgb(255, 0, 0)",
+            "borderWidth-AutoComplete": "2px",
+            "borderStyle-AutoComplete": "dashed",
+            "backgroundColor-AutoComplete": "rgb(240, 240, 240)",
+            "fontSize-AutoComplete": "14px",
+            "textColor-AutoComplete": "rgb(0, 0, 0)",
+          },
+        },
+      ],
+    });
+    const component = page.getByTestId("test");
+
+    await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
+    await expect(component).toHaveCSS("border-width", "2px");
+    await expect(component).toHaveCSS("border-style", "dashed");
+    await expect(component).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(component).toHaveCSS("font-size", "14px");
+    await expect(component).toHaveCSS("color", "rgb(0, 0, 0)");
+  });
+
   [
     { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },

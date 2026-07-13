@@ -396,6 +396,9 @@ if (params.has("__xmluiTestBed")) {
     return value || undefined;
   };
 
+  const readTestBedOldThemeCanary = (): boolean =>
+    window.sessionStorage.getItem("__xmluiTestBedOldThemeCanary") === "true";
+
   const readTestBedExtensions = async (): Promise<Extension[]> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
     if (!raw) {
@@ -446,6 +449,7 @@ if (params.has("__xmluiTestBed")) {
     const resources = readTestBedResources();
     const themes = readTestBedThemes();
     const defaultTheme = readTestBedDefaultTheme();
+    const enableOldThemeCanary = readTestBedOldThemeCanary();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
@@ -455,6 +459,7 @@ if (params.has("__xmluiTestBed")) {
         resources,
         themes,
         defaultTheme,
+        enableOldThemeCanary,
         testProbe,
       });
       return;
@@ -466,6 +471,7 @@ if (params.has("__xmluiTestBed")) {
       resources,
       themes,
       defaultTheme,
+      enableOldThemeCanary,
       testProbe,
     }));
   };

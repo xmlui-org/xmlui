@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 5.3 implemented and verified; next step is Step 5.4 opt-in old compiler canary path  
+Status: Step 5.6 implemented and verified; next step is Step 6 restore strict theme validation and accessibility diagnostics  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -586,6 +586,38 @@ Verification:
 - Run the full default E2E suite with the opt-in disabled:
   `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
+Implementation checkpoint:
+
+- Added explicit `enableOldThemeCanary` support to
+  `LegacyThemeProvider`. The default runtime path remains unchanged; the old
+  compiler output is used only when the prop is set for a specific test/app.
+- Reused the Step 5.3 old compiler computation for canary mode instead of
+  adding another provider path. Canary mode exposes old root `themeCssVars`,
+  old resolved `themeVars`, old `getThemeVar`, and old resource lookup through
+  the legacy theme context.
+- Added a browser-side canary installer that applies old root CSS variables to
+  `document.documentElement` and restores the previous values on cleanup. This
+  gives focused canaries real root CSS variables without enabling the old
+  compiler globally.
+- Added a test-readable `globalThis.__XMLUI_OLD_THEME_CANARY__` snapshot only
+  while `enableOldThemeCanary` is active, so canary tests can assert old
+  compiler font-link output without changing public theme context types.
+- Added `xmlui/tests/components-core/theming/oldThemeCanary.test.tsx` covering
+  root custom theme variables, generated padding and border segments,
+  generated text font variables, base tones, button tones, resource URLs, font
+  links, custom default themes without nested `<Theme>`, and root CSS variable
+  cleanup.
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+  (`26 passed`),
+  `npm --workspace xmlui run test:unit` (`308 passed`),
+  `npm --workspace xmlui run check:metadata` (passed; known sandbox-only Vite
+  WebSocket `EPERM` warning),
+  focused Playwright canary
+  (`568 passed`, `7 skipped`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5534 passed`, `83 skipped`).
+
 #### Step 5.5: Isolate Component Compatibility Carve-Outs
 
 Only after the opt-in root compiler canaries pass, fix component-specific
@@ -611,6 +643,29 @@ Verification per component:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
+Step 5.5 implementation notes:
+
+- Added an `oldThemeCanary` test-bed option and passed it through
+  `sessionStorage`, `main.tsx`, `mountXmluiApp`, and `XmluiRoot` to the
+  opt-in old compiler path added in Step 5.4. The canary remains off by
+  default and does not alter normal runtime theme behavior.
+- Added root-theme canaries for the known risk areas:
+  `Avatar` background/border variables, `AutoComplete` input variables,
+  `DateInput` custom variant variables, `DropdownMenu` portal content
+  variables, and `ContextMenu` portal content variables.
+- All focused canaries passed, so no production component compatibility
+  carve-out was needed in this step. This is important before Step 5.6: the
+  active old compiler can serve these existing component surfaces through the
+  current class topology when explicitly enabled.
+- Verification passed:
+  focused Avatar canary (`1 passed`),
+  focused AutoComplete canary (`1 passed`),
+  focused DateInput canary (`1 passed`),
+  focused DropdownMenu/ContextMenu canaries (`2 passed`),
+  `npm --workspace xmlui run test:unit` (`308 passed`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5539 passed`, `83 skipped`).
+
 #### Step 5.6: Switch the Active Provider to the Old Compiler
 
 Switch the default provider to the old compiler only after Steps 5.1 through
@@ -630,6 +685,40 @@ Verification:
 Step 5 is complete only when the full unit and E2E gates pass after the global
 switch. Up to three E2E flakes are acceptable only if they pass on focused
 rerun without code changes.
+
+Step 5.6 implementation notes:
+
+- Switched `LegacyThemeProvider` so the served `themeStyles`, `themeVars`,
+  `getThemeVar`, and `getResourceUrl` always come from `compileOldThemeModel`.
+  The old theme canary global remains opt-in diagnostics only; it no longer
+  controls whether the old compiler is active.
+- Root CSS variables are now applied to `document.documentElement` from the old
+  compiler output on every active theme/tone change.
+- Passed the core component theme metadata registry into `LegacyThemeProvider`
+  from `XmluiRoot`, so active old compilation includes component default theme
+  variables.
+- Updated the old compiler's synthetic root theme to seed from
+  `mergeThemeVariableLayers(defaultThemeVariableLayers, activeTone)` instead
+  of the light-only `defaultThemeVariables` map. This fixed dark-tone root
+  output used by `ToneSwitch` and `App`.
+- Kept the existing `XmluiThemeRoot` topology in place for Step 8, but removed
+  the nested no-prop `LegacyThemeProvider` inside `Table`, which reset the
+  active scoped theme during Table render.
+- Extended scoped `<Theme>` to emit generated old shorthand variables from
+  explicit theme variables, including padding and border segments. This fixed
+  scoped values such as `paddingHorizontal-Text-code` that old CSS consumes as
+  generated side variables.
+- Added a focused Select/Pagination style compatibility fix so the Pagination
+  page-size trigger clears the default Select box shadow.
+- Focused regressions fixed and verified:
+  `App.foundation.spec.ts` `ToneSwitch updates the App shell background for dark tone`
+  (`1 passed`), `Text.spec.ts` `variant='code' applies inline code theme variables`
+  (`1 passed`), and `Pagination.compat.spec.ts` (`1 passed`).
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+  (`26 passed`), `npm --workspace xmlui run test:unit` (`308 passed`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5539 passed`, `83 skipped`, no failures or flakes reported).
 
 ### Step 6: Restore Strict Theme Validation and Accessibility Diagnostics
 

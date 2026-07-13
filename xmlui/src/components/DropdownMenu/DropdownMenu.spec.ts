@@ -354,6 +354,45 @@ test("applies theme variables correctly", async ({ initTestBed, createDropdownMe
   await expect(menuContent).toHaveCSS("min-width", "200px");
 });
 
+test("old compiler canary applies root DropdownMenu content variables", async ({
+  initTestBed,
+  createDropdownMenuDriver,
+}) => {
+  await initTestBed(
+    `<DropdownMenu label="Themed Menu">
+      <MenuItem>Item 1</MenuItem>
+    </DropdownMenu>`,
+    {
+      oldThemeCanary: true,
+      defaultTheme: "dropdown-root-canary",
+      themes: [
+        {
+          id: "dropdown-root-canary",
+          extends: "xmlui",
+          themeVars: {
+            "backgroundColor-DropdownMenu": "rgb(255, 0, 0)",
+            "minWidth-DropdownMenu": "200px",
+            "borderColor-DropdownMenu-content": "rgb(0, 128, 0)",
+            "borderWidth-DropdownMenu-content": "3px",
+            "borderStyle-DropdownMenu-content": "dotted",
+          },
+        },
+      ],
+    },
+  );
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+
+  const menuContent = driver.getMenuContent();
+  await expect(menuContent).toBeVisible();
+  await expect(menuContent).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  await expect(menuContent).toHaveCSS("min-width", "200px");
+  await expect(menuContent).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(menuContent).toHaveCSS("border-top-width", "3px");
+  await expect(menuContent).toHaveCSS("border-top-style", "dotted");
+});
+
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================

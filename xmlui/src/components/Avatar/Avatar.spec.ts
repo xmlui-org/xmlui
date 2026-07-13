@@ -1125,6 +1125,37 @@ test("avatar memory usage stays stable", async ({ initTestBed, createAvatarDrive
 });
 
 test.describe("Theme Vars", () => {
+  test("old compiler canary applies root Avatar background and border variables", async ({
+    initTestBed,
+    createAvatarDriver,
+  }) => {
+    const BACKGROUND = "rgb(255, 192, 203)";
+    const BORDER_COLOR = "rgb(0, 128, 0)";
+    const BORDER_WIDTH = "5px";
+    const BORDER_STYLE = "dotted";
+
+    await initTestBed(`<Avatar name="Root Canary"/>`, {
+      oldThemeCanary: true,
+      defaultTheme: "avatar-root-canary",
+      themes: [
+        {
+          id: "avatar-root-canary",
+          extends: "xmlui",
+          themeVars: {
+            "backgroundColor-Avatar": BACKGROUND,
+            "border-Avatar": `${BORDER_WIDTH} ${BORDER_STYLE} ${BORDER_COLOR}`,
+          },
+        },
+      ],
+    });
+    const component = (await createAvatarDriver()).component;
+
+    await expect(component).toHaveCSS("background-color", BACKGROUND);
+    await expect(component).toHaveCSS("border-top-color", BORDER_COLOR);
+    await expect(component).toHaveCSS("border-top-width", BORDER_WIDTH);
+    await expect(component).toHaveCSS("border-top-style", BORDER_STYLE);
+  });
+
   test("custom backgroundColor theme var applies correctly", async ({
     initTestBed,
     createAvatarDriver,

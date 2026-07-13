@@ -5,7 +5,7 @@ import type {
   ThemeTone,
 } from "../../abstractions/ThemingDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
-import { defaultThemeVariables } from "../../styling";
+import { defaultThemeVariableLayers, mergeThemeVariableLayers } from "../../styling";
 import { normalizePath } from "../utils/misc";
 import { matchThemeVar } from "./hvar";
 import {
@@ -72,15 +72,22 @@ export function compileOldThemeModel(input: CompileOldThemeModelInput): Compiled
   }
 
   const activeThemeId = activeTheme.id;
+  const rootThemeVars = stringRecord(mergeThemeVariableLayers(defaultThemeVariableLayers, activeThemeTone));
   const themeDefChain = collectThemeChainByExtends(
     toOldThemeDefinition(activeTheme),
     themes.map(toOldThemeDefinition),
     toOldDefaultThemeVars(input.componentThemeMetadata.componentDefaultThemeVars),
+    {
+      id: "root",
+      themeVars: rootThemeVars,
+      resources: {},
+      tones: {},
+    },
   );
   const allResources = mergeResources(themeDefChain, activeThemeTone, input.resources ?? {});
   const themeDefChainVars = compileThemeDefChainVars(themeDefChain, activeThemeTone);
   const rawAllThemeVars = cleanThemeVars(
-    compileRawAllThemeVars(themeDefChainVars, input.componentThemeMetadata),
+    compileRawAllThemeVars(themeDefChainVars, input.componentThemeMetadata, rootThemeVars),
   );
   const themeVars = resolveThemeVarsWithCssVars(rawAllThemeVars);
   const themeCssVars = Object.fromEntries(
@@ -144,6 +151,7 @@ function compileThemeDefChainVars(
 function compileRawAllThemeVars(
   themeDefChainVars: OldThemeVars[],
   componentThemeMetadata: Pick<ComponentThemeMetadataRegistry, "componentThemeVars">,
+  rootThemeVars: OldThemeVars,
 ): OldThemeVars {
   let mergedThemeVars: OldThemeVars = {};
   themeDefChainVars.forEach((themeVars) => {
@@ -156,7 +164,7 @@ function compileRawAllThemeVars(
 
   const resolvedThemeVarsFromChains: OldThemeVars = {};
   const knownThemeVars = new Set([
-    ...Object.keys(defaultThemeVariables),
+    ...Object.keys(rootThemeVars),
     ...componentThemeMetadata.componentThemeVars,
   ]);
   knownThemeVars.forEach((themeVar) => {

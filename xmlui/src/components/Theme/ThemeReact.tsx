@@ -25,6 +25,10 @@ import {
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
+import {
+  generateBorderSegments,
+  generatePaddingSegments,
+} from "../../components-core/theming/transformThemeVars";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
 import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
@@ -68,6 +72,10 @@ export function Theme({
   const { themes, resources, resourceMap, activeThemeId } = useThemes();
   const { activeTheme, activeThemeTone, root } = useTheme();
   const themeTone = tone || activeThemeTone;
+  const generatedThemeVars = useMemo(
+    () => generateBorderSegments(generatePaddingSegments(themeVars)),
+    [themeVars],
+  );
   const currentTheme: ThemeDefinition = useMemo(() => {
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
     if (!themeToExtend) {
@@ -84,13 +92,13 @@ export function Theme({
           ...themeToExtend.tones?.[themeTone],
           themeVars: {
             ...themeToExtend.tones?.[themeTone]?.themeVars,
-            ...themeVars,
+            ...generatedThemeVars,
           },
         },
       },
     };
     return foundTheme;
-  }, [activeTheme, generatedId, id, themeTone, themeVars, themes]);
+  }, [activeTheme, generatedId, generatedThemeVars, id, themeTone, themes]);
 
   const {
     themeCssVars,
@@ -126,10 +134,10 @@ export function Theme({
     const needsCompiledVars =
       tone !== undefined ||
       id !== undefined ||
-      Object.keys(themeVars).some((key) => !parseHVar(key)?.component);
+      Object.keys(generatedThemeVars).some((key) => !parseHVar(key)?.component);
 
     if (needsCompiledVars) {
-      Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
+      Object.entries({ ...themeCssVars, ...generatedThemeVars }).forEach(([key, value]) => {
         // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
         // parseHVar correctly identifies the component part of a theme var name.
         // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
@@ -166,11 +174,12 @@ export function Theme({
 
     // Always add the explicitly specified themeVars with the correct prefix,
     // even if they don't match the componentName pattern
-    Object.entries(themeVars).forEach(([key, value]) => {
+    Object.entries(generatedThemeVars).forEach(([key, value]) => {
       if (invalidThemeVarNames.has(key)) {
         return;
       }
-      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
+      const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[key] ?? value;
+      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = resolvedValue;
     });
 
     const ret = {
@@ -222,7 +231,7 @@ export function Theme({
     return ret;
   }, [
     themeCssVars,
-    themeVars,
+    generatedThemeVars,
     themeTone,
     isRoot,
     componentRegistry,

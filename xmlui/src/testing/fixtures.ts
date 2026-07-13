@@ -59,6 +59,7 @@ export type InitTestBedOptions = {
   resources?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  oldThemeCanary?: boolean;
   apiInterceptor?: {
     initialize?: string;
     operations?: Record<string, {
@@ -763,6 +764,7 @@ async function initTestBed(
     },
     themes: options.themes ?? [],
     defaultTheme: options.defaultTheme,
+    oldThemeCanary: options.oldThemeCanary === true,
   };
   await installApiInterceptor(page, options.apiInterceptor);
   const installTestBedSource = (payload: TestBedPayload) => {
@@ -785,6 +787,11 @@ async function initTestBed(
       window.sessionStorage.setItem("__xmluiTestBedDefaultTheme", payload.defaultTheme);
     } else {
       window.sessionStorage.removeItem("__xmluiTestBedDefaultTheme");
+    }
+    if (payload.oldThemeCanary) {
+      window.sessionStorage.setItem("__xmluiTestBedOldThemeCanary", "true");
+    } else {
+      window.sessionStorage.removeItem("__xmluiTestBedOldThemeCanary");
     }
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
@@ -843,6 +850,7 @@ type TestBedPayload = {
   resources: Record<string, string>;
   themes: Array<ThemeDefinition>;
   defaultTheme?: string;
+  oldThemeCanary: boolean;
 };
 
 async function clearManagedFetchCache(page: Page): Promise<void> {
