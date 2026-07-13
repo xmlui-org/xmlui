@@ -45,6 +45,9 @@ export type ThemeScope = {
   // Controls whether inline styles are disabled within this theme scope.
   // When undefined, the appGlobals.disableInlineStyle setting is used.
   disableInlineStyle?: boolean;
+
+  // True when disableInlineStyle comes from an explicitly authored Theme prop.
+  disableInlineStyleIsExplicit?: boolean;
 };
 
 // This type represents the object managing app themes. When an app runs, styles are

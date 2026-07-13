@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 12.3 config and diagnostic parity sweep complete; Step 13 is next; app-compat remains blocked by existing production build errors  
+Status: Step 13.3.1 core theme how-to examples complete; Step 13.3.2 is next; app-compat remains blocked by existing production build errors  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -50,6 +50,8 @@ duplicates; keep the original Playwright file path and test title.
   `Basic Functionality > setValue API with transformToLegitValue > setValue with number values`
 - `xmlui/src/components/Switch/Switch.spec.ts:150:5` -
   `Basic Functionality > setValue API with transformToLegitValue > setValue with string values`
+- `xmlui/src/components/Switch/Switch.spec.ts:740:5` -
+  `Api > value property with transformToLegitValue > switch handles string case sensitivity correctly`
 
 ## Compatibility Sources
 
@@ -1895,6 +1897,163 @@ Verification:
 
 - Focused run of the newly ported specs with retries and the default worker
   model.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 13.1: Inventory and Port Styles-and-Themes Docs Fixtures
+
+Inventory the old `xmlui/tests-e2e/pages/styles-and-themes` specs and port a
+focused rewrite-compatible batch covering theme variables, common units, and
+theme scoping/layout style assertions. Keep the assertions based on rendered
+CSS/computed styles where possible, and record any old docs fixtures that
+cannot be ported yet.
+
+Completed notes:
+
+- Inventoried the old styles-and-themes docs E2E files:
+  - `xmlui/tests-e2e/pages/styles-and-themes/theme-variables.spec.ts`
+  - `xmlui/tests-e2e/pages/styles-and-themes/common-units.spec.ts`
+  - `xmlui/tests-e2e/pages/styles-and-themes/themes.spec.ts`
+- The old files depend on website markdown extraction helpers
+  (`website-example-utils`) that are not present in the rewrite harness, so
+  this step ports the assertion intent into a direct rewrite E2E fixture
+  instead of copying the markdown extraction layer.
+- Added `xmlui/tests/e2e/theme-docs-styles.spec.ts` with computed-style
+  coverage for theme variables, common CSS/unit style props, and a state
+  mutation path that changes rendered styles.
+- Remaining old docs coverage still to port: the broad built-in theme gallery,
+  inline-styles-disabled behavior, and theme how-to examples. These stay in
+  Steps 13.2, 13.3, and the website checkpoint.
+
+Verification:
+
+- Focused run of the newly ported styles-and-themes specs.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 13.1 verification results:
+
+- `npx playwright test tests/e2e/theme-docs-styles.spec.ts` passed 3 tests.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e` passed with 5,558 passed, 83 skipped,
+  and one already tracked flaky retry:
+  `xmlui/src/components/DropdownMenu/DropdownMenu.spec.ts:698:3` -
+  `Nested DropdownMenu and Select > ModalDialog > Select > DropdownMenu`.
+
+#### Step 13.2: Port Inline-Styles-Disabled Coverage
+
+Port the old `xmlui/tests-e2e/inline-styles-disabled.spec.ts` scenarios to the
+rewrite fixtures, preserving the old disable-inline-style semantics and adding
+computed-style assertions for layout/style props that should be suppressed or
+kept.
+
+Completed notes:
+
+- Added `xmlui/tests/e2e/inline-styles-disabled.spec.ts` with coverage for
+  `appGlobals.disableInlineStyle`, scoped `<Theme disableInlineStyle>`, explicit
+  `false` overrides, and fallback from non-explicit scoped themes to
+  app-level settings.
+- Added `xmlui/src/styling/inlineStyle.ts` as the shared compatibility helper
+  for deciding whether inline styles are disabled and filtering style props.
+  The filter preserves dimensions and responsive dimension props while dropping
+  visual inline style props.
+- Wired inline-style disabling through runtime layout style generation, the
+  adapter, extension component wrapping, the root legacy theme provider, and
+  scoped `<Theme>` explicitness tracking.
+- Stabilized the existing nested `DropdownMenu`/`Select` portal test by using
+  the keyboard-first trigger sequence from the matching `Select` coverage. This
+  preserves the same assertion target but avoids the intermittent menu timing
+  miss seen during the Step 13.2 full E2E gate.
+- The final full E2E gate still emits existing console warning noise for some
+  DOM-forwarded props such as `layoutContext` and `groupBy`; those warnings did
+  not fail the gate and were not expanded into this step.
+
+Verification:
+
+- Focused run of the inline-styles-disabled port.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 13.2 verification results:
+
+- `npx playwright test tests/e2e/inline-styles-disabled.spec.ts` passed 4 tests.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npx playwright test src/components/DropdownMenu/DropdownMenu.spec.ts -g "ModalDialog > Select > DropdownMenu"`
+  passed 1 test after the stabilization edit.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with 5,562
+  passed, 83 skipped, and one already tracked flaky retry:
+  `xmlui/src/components/Timer/Timer.foundation.spec.ts:3:1` -
+  `timer stops when enabled is driven by a labeled Switch API value`.
+- An earlier successful full E2E gate during this step reported the newly
+  tracked flaky retry `xmlui/src/components/Switch/Switch.spec.ts:740:5` -
+  `Api > value property with transformToLegitValue > switch handles string case sensitivity correctly`.
+
+#### Step 13.3: Port Theme How-To Examples
+
+Port the theme-related how-to specs in batches: custom color themes,
+overriding component vars, dark mode toggle, scoped themes, button variants,
+form input states, nested NavGroup theming, DatePicker theming, Badge theming,
+and related style examples.
+
+Verification:
+
+- Focused run of each newly ported how-to batch.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+##### Step 13.3.1: Port Core Theme How-To Examples
+
+Port the low-interaction core theme how-to examples first:
+
+- `create-a-custom-color-theme.spec.ts`
+- `override-a-components-theme-vars.spec.ts`
+- `scope-a-theme-to-a-card-or-section.spec.ts`
+- `implement-a-dark-mode-toggle.spec.ts`
+
+Use direct rewrite fixtures instead of the old website markdown extraction
+helper, and strengthen the old visibility checks with computed-style
+assertions for scoped variables, generated color tokens, and tone changes.
+
+Completed notes:
+
+- Added `xmlui/tests/e2e/theme-howto-core.spec.ts` with direct rewrite
+  fixtures for custom palette colors, component-scoped theme variables,
+  scoped pricing cards controlled by `applyIf`, and the dark-mode
+  `ToneSwitch` how-to shell.
+- Kept the dark-mode toggle port at the old how-to smoke/assertion level:
+  the snippet renders the dashboard controls and header `ToneSwitch`; the
+  richer AppHeader shell color update remains covered by existing App/Theme
+  foundation coverage.
+- Added the missing `autoDetectTone` compiler contract for `App`, matching
+  the existing metadata/runtime support and allowing the old how-to snippet's
+  `<App autoDetectTone="{false}">` markup to compile.
+
+Verification:
+
+- Focused run of the Step 13.3.1 spec.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 13.3.1 verification results:
+
+- `npx playwright test tests/e2e/theme-howto-core.spec.ts` passed 4 tests.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,566 passed, 83 skipped, and one already tracked flaky retry:
+  `xmlui/src/components/Switch/Switch.spec.ts:740:5` -
+  `Api > value property with transformToLegitValue > switch handles string case sensitivity correctly`.
+
+##### Step 13.3.2: Port Component-Specific Theme How-To Examples
+
+Port the remaining component-specific theme how-to examples in a separate
+batch, including Button variants, form input states, Badge theming,
+DatePicker calendar item theming, NavGroup nesting, ExpandableItem
+transitions, Tooltip appearance, Markdown admonition variants, Slider
+track/thumb/range, and NoResult placeholder styling.
+
+Verification:
+
+- Focused run of the Step 13.3.2 spec batch.
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 

@@ -301,6 +301,7 @@ export const builtInComponentContracts: XmluiComponentContract[] = [
       useHashBasedRouting: { name: "useHashBasedRouting" },
       defaultTheme: { name: "defaultTheme" },
       defaultTone: { name: "defaultTone" },
+      autoDetectTone: { name: "autoDetectTone" },
       persistTheme: { name: "persistTheme" },
       themeStorageKey: { name: "themeStorageKey" },
       toneStorageKey: { name: "toneStorageKey" },

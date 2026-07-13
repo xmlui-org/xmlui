@@ -6,6 +6,8 @@ import type { XmluiElement } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
   isLayoutPropName,
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
   looksLikeComponentThemeVariableName,
   parseStyleSelectorKey,
   responsiveBreakpoints,
@@ -98,7 +100,14 @@ export function useLayoutStyle(
   }, [validatedStyleProps.diagnostics]);
   const theme = useTheme();
   const viewportWidth = useViewportWidth();
-  return theme.disableInlineStyle ? {} : resolveActiveLayoutStyle(validatedStyleProps.props, viewportWidth, options);
+  const activeProps = isInlineStyleDisabled(
+    theme.disableInlineStyle,
+    appGlobalsForScope(scope) ?? appContext.appGlobals,
+    theme.disableInlineStyleIsExplicit,
+  )
+    ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+    : validatedStyleProps.props;
+  return resolveActiveLayoutStyle(activeProps, viewportWidth, options);
 }
 
 export function flexStyle(
@@ -154,6 +163,14 @@ function coerceBoolean(value: unknown, fallback: boolean): boolean {
     }
   }
   return value == null ? fallback : Boolean(value);
+}
+
+function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
+  const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return scope?.parent ? appGlobalsForScope(scope.parent) : undefined;
 }
 
 function resolveActiveLayoutStyle(

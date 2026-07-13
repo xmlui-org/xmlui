@@ -450,7 +450,7 @@ function XmluiRuntimeContent({
   }
 
   return (
-    <RootTheme isRoot applyIf={true}>
+    <RootTheme isRoot applyIf={true} disableInlineStyleExplicit={false}>
       <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
     </RootTheme>
   );

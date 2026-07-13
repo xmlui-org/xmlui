@@ -94,6 +94,7 @@ export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
         isRoot={isRoot}
         applyIf={applyIf}
         disableInlineStyle={disableInlineStyle}
+        disableInlineStyleExplicit={hasDisableInlineStyle}
         layoutContext={layoutContext}
         renderChild={renderChild}
         tone={themeTone as ThemeTone}
@@ -141,6 +142,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
       isRoot={root}
       applyIf={applyIf}
       disableInlineStyle={disableInlineStyle}
+      disableInlineStyleExplicit={hasDisableInlineStyle}
       layoutContext={layoutContext as LayoutContext | undefined}
       renderChild={(children, childLayoutContext) =>
         renderThemeChildren(context, scope, children, childLayoutContext)

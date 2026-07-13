@@ -48,6 +48,7 @@ type Props = {
   isRoot?: boolean;
   applyIf?: boolean;
   disableInlineStyle?: boolean;
+  disableInlineStyleExplicit?: boolean;
   layoutContext?: LayoutContext;
   renderChild?: RenderChildFn;
   node?: ComponentDef;
@@ -58,20 +59,24 @@ type Props = {
   children?: ReactNode;
 };
 
-export function Theme({
-  id,
-  isRoot = defaultProps.isRoot,
-  applyIf,
-  disableInlineStyle,
-  renderChild,
-  node,
-  tone,
-  toastDuration,
-  notificationPosition,
-  themeVars = defaultProps.themeVars,
-  layoutContext,
-  children,
-}: Props) {
+export function Theme(props: Props) {
+  const hasExplicitDisableInlineStyle = props.disableInlineStyleExplicit ??
+    Object.prototype.hasOwnProperty.call(props, "disableInlineStyle");
+  const {
+    id,
+    isRoot = defaultProps.isRoot,
+    applyIf,
+    disableInlineStyle,
+    disableInlineStyleExplicit: _disableInlineStyleExplicit,
+    renderChild,
+    node,
+    tone,
+    toastDuration,
+    notificationPosition,
+    themeVars = defaultProps.themeVars,
+    layoutContext,
+    children,
+  } = props;
   const generatedId = useId();
   const appContext = useAppContext();
   const notifications =
@@ -82,7 +87,13 @@ export function Theme({
     notificationPosition ?? notifications?.position ?? defaultProps.notificationPosition;
 
   const { themes, resources, resourceMap, activeThemeId, setActiveThemeTone } = useThemes();
-  const { activeTheme, activeThemeTone, root } = useTheme();
+  const {
+    activeTheme,
+    activeThemeTone,
+    root,
+    disableInlineStyle: parentDisableInlineStyle,
+    disableInlineStyleIsExplicit: parentDisableInlineStyleIsExplicit,
+  } = useTheme();
   const themeTone = tone || activeThemeTone;
   const generatedThemeVars = useMemo(
     () => generateBorderSegments(generatePaddingSegments(themeVars)),
@@ -281,7 +292,9 @@ export function Theme({
       themeVars: scopedThemeVars,
       getResourceUrl,
       getThemeVar,
-      disableInlineStyle,
+      disableInlineStyle: disableInlineStyle ?? parentDisableInlineStyle,
+      disableInlineStyleIsExplicit:
+        hasExplicitDisableInlineStyle ? true : parentDisableInlineStyleIsExplicit,
     };
     return themeVal;
   }, [
@@ -294,6 +307,9 @@ export function Theme({
     themeCssVars,
     themeTone,
     disableInlineStyle,
+    hasExplicitDisableInlineStyle,
+    parentDisableInlineStyle,
+    parentDisableInlineStyleIsExplicit,
   ]);
 
   const { indexing } = useIndexerContext();

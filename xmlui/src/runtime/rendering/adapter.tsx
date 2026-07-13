@@ -15,6 +15,8 @@ import { emitThemeDiagnostics } from "../../components-core/theming/validator/em
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
   resolveLayoutStyle,
   resolveResponsiveLayoutStyles,
   responsiveBreakpoints,
@@ -167,17 +169,29 @@ export function useXmluiComponentAdapter({
     emitThemeDiagnostics(validatedStyleProps.diagnostics);
   }, [validatedStyleProps.diagnostics]);
   const viewportWidth = useViewportWidth();
+  const inlineStylesDisabled = isInlineStyleDisabled(
+    theme.disableInlineStyle,
+    appGlobalsForScope(scope) ?? appContext.appGlobals,
+    theme.disableInlineStyleIsExplicit,
+  );
   const layoutStyle = useMemo(
-    () => theme.disableInlineStyle
-      ? {}
-      : resolveActiveLayoutStyle(validatedStyleProps.props, viewportWidth, layoutOrientation),
-    [layoutOrientation, theme.disableInlineStyle, validatedStyleProps.props, viewportWidth],
+    () => resolveActiveLayoutStyle(
+      inlineStylesDisabled
+        ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+        : validatedStyleProps.props,
+      viewportWidth,
+      layoutOrientation,
+    ),
+    [inlineStylesDisabled, layoutOrientation, validatedStyleProps.props, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => theme.disableInlineStyle
-      ? {}
-      : resolveResponsiveLayoutStyles(validatedStyleProps.props, { orientation: layoutOrientation }),
-    [layoutOrientation, theme.disableInlineStyle, validatedStyleProps.props],
+    () => resolveResponsiveLayoutStyles(
+      inlineStylesDisabled
+        ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+        : validatedStyleProps.props,
+      { orientation: layoutOrientation },
+    ),
+    [inlineStylesDisabled, layoutOrientation, validatedStyleProps.props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
@@ -337,6 +351,14 @@ export function useXmluiComponentAdapter({
   ]);
 
   return adapter;
+}
+
+function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
+  const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return scope?.parent ? appGlobalsForScope(scope.parent) : undefined;
 }
 
 function resolveActiveLayoutStyle(

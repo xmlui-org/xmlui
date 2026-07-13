@@ -19,6 +19,7 @@ import {
 } from "./themes/xmlui";
 import { useDomRoot } from "./StyleContext";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
+import { useXmluiAppContext } from "../../runtime/appContext";
 
 type ResourceMap = Record<string, string | FontDef>;
 type ShadowThemeVarMismatch = {
@@ -125,6 +126,7 @@ export function LegacyThemeProvider({
   enableOldThemeCanary?: boolean;
   children: ReactNode;
 }) {
+  const appContext = useXmluiAppContext();
   const allThemes = useMemo(() => mergeThemes(themes), [themes]);
   const [activeThemeId, setActiveThemeIdState] = useState(() =>
     defaultTheme && allThemes.some((theme) => theme.id === defaultTheme) ? defaultTheme : "xmlui",
@@ -283,6 +285,7 @@ export function LegacyThemeProvider({
     themeVars: activeThemeVars,
     getThemeVar: activeGetThemeVar,
     getResourceUrl: activeGetResourceUrl,
+    disableInlineStyle: isTruthyBoolean(appContext.appGlobals.disableInlineStyle) ? true : undefined,
   }), [
     activeGetResourceUrl,
     activeGetThemeVar,
@@ -290,6 +293,7 @@ export function LegacyThemeProvider({
     activeThemeStyles,
     activeThemeTone,
     activeThemeVars,
+    appContext.appGlobals.disableInlineStyle,
     root,
   ]);
 
@@ -302,6 +306,10 @@ export function LegacyThemeProvider({
       </ThemeContext.Provider>
     </ThemesContext.Provider>
   );
+}
+
+function isTruthyBoolean(value: unknown): boolean {
+  return value === true || value === "true";
 }
 
 export function useTheme(): ThemeScope {

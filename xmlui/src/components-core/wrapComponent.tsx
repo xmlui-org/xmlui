@@ -3,12 +3,13 @@ import { type ComponentType, type ReactNode, useState } from "react";
 import type { ComponentMetadata } from "../component-core/metadata";
 import { useComponentThemeClass } from "./theming/utils";
 import { useTheme } from "./theming/ThemeContext";
+import { useAppContext } from "./AppContext";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "../extensions";
 import { COMPONENT_PART_KEY } from "../styling/layout";
 import {
-  isLayoutPropName,
-  parseStyleSelectorKey,
-  supportedResponsiveLayoutPropNames,
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
+  isInlineStylePropName,
 } from "../styling";
 
 type ExtractValueCompat = ((value: unknown) => any) & {
@@ -92,7 +93,13 @@ export function wrapComponent(
     toneSpecificThemeVars: metadata.toneSpecificThemeVars,
     themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps: XmluiExtensionComponentProps) => {
-      const { disableInlineStyle } = useTheme();
+      const { disableInlineStyle, disableInlineStyleIsExplicit } = useTheme();
+      const appContext = useAppContext();
+      const inlineStylesDisabled = isInlineStyleDisabled(
+        disableInlineStyle,
+        appContext.appGlobals,
+        disableInlineStyleIsExplicit,
+      );
       const themeClassName = useComponentThemeClass(metadata);
       const themeClass = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
       const props = { ...runtimeProps.props };
@@ -107,7 +114,7 @@ export function wrapComponent(
         }
       }
       if (options.customRender) {
-        const renderedProps = disableInlineStyle ? removeInlineStyleProps(props) : props;
+        const renderedProps = inlineStylesDisabled ? removeInlineStyleProps(props) : props;
         const extractValue = ((value: unknown) => value) as ExtractValueCompat;
         extractValue.asString = (value, fallback = "") =>
           value === undefined || value === null ? fallback : String(value);
@@ -185,15 +192,10 @@ export function wrapComponent(
 }
 
 function removeInlineStyleProps(props: Record<string, unknown>): Record<string, unknown> {
+  const allowedProps = filterPropsForDisabledInlineStyle(props);
   return Object.fromEntries(
-    Object.entries(props).filter(([name]) => !isInlineStylePropName(name)),
+    Object.entries(props).filter(([name]) =>
+      !isInlineStylePropName(name) || Object.prototype.hasOwnProperty.call(allowedProps, name)
+    ),
   );
-}
-
-function isInlineStylePropName(name: string): boolean {
-  if (isLayoutPropName(name) || supportedResponsiveLayoutPropNames.includes(name as never)) {
-    return true;
-  }
-  const selector = parseStyleSelectorKey(name);
-  return selector.breakpoint !== undefined && isLayoutPropName(selector.property);
 }
