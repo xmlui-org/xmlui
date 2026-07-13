@@ -246,7 +246,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       await initTestBed(page, markup, options);
       const viewport = page.viewportSize();
       return {
-        width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
+        width: viewport?.width ?? 0,
         height: viewport?.height ?? 0,
         clipboard: createClipboardHelper(page),
         testStateDriver: {

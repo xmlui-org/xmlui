@@ -9,6 +9,7 @@ import React, {
 
 import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
@@ -22,7 +23,6 @@ import {
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
-import { useComponentThemeClass } from "./theme";
 import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export type XmluiAdapterRendererProps = {
@@ -147,8 +147,7 @@ export function useXmluiComponentAdapter({
   const explicitRootPart = typeof props.__xmluiPartId === "string" && props.__xmluiPartId.length > 0;
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
-  const variant = typeof props.variant === "string" ? props.variant : undefined;
-  const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
+  const themeClassName = useComponentThemeClass(metadata, themeContributors);
   const viewportWidth = useViewportWidth();
   const layoutStyle = useMemo(
     () => resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
@@ -168,10 +167,23 @@ export function useXmluiComponentAdapter({
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
-    const changed = Object.entries(api).some(([key, value]) =>
-      apiRef.current[key] !== value
-    );
-    Object.assign(apiRef.current, api);
+    const descriptors = Object.getOwnPropertyDescriptors(api);
+    const changed = Object.entries(descriptors).some(([key, descriptor]) => {
+      const currentDescriptor = Object.getOwnPropertyDescriptor(apiRef.current, key);
+      if ("value" in descriptor) {
+        if (!currentDescriptor || !("value" in currentDescriptor)) {
+          return true;
+        }
+        if (typeof currentDescriptor.value === "function" && typeof descriptor.value === "function") {
+          return false;
+        }
+        return currentDescriptor.value !== descriptor.value;
+      }
+      return !currentDescriptor ||
+        currentDescriptor.get !== descriptor.get ||
+        currentDescriptor.set !== descriptor.set;
+    });
+    Object.defineProperties(apiRef.current, descriptors);
     const id = typeof props.id === "string" ? props.id : undefined;
     if (id) {
       const alreadyRegistered = scope.references[id] === apiRef.current;
@@ -220,6 +232,7 @@ export function useXmluiComponentAdapter({
     };
   }, [props.id, scope.references, scope.store]);
 
+  const componentClassName = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
   const adapter = useMemo<XmluiComponentAdapter>(() => ({
     name,
     metadata,
@@ -229,9 +242,8 @@ export function useXmluiComponentAdapter({
     props,
     events,
     api: apiRef.current,
-    className: themeClass.className,
+    className: componentClassName,
     style: {
-      ...themeClass.style,
       ...layoutStyle,
     },
     rootAttrs: (part = rootPart) => ({
@@ -242,9 +254,8 @@ export function useXmluiComponentAdapter({
       "data-part-id": explicitRootPart ? part : undefined,
       "data-xmlui-id": props.id,
       "data-testid": props.testId ?? props.id,
-      className: themeClass.className,
+      className: componentClassName,
       style: {
-        ...themeClass.style,
         ...layoutStyleForPart(part),
       },
     }),
@@ -289,19 +300,18 @@ export function useXmluiComponentAdapter({
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
   }), [
     context,
+    componentClassName,
     events,
     explicitRootPart,
+    layoutStyle,
     layoutStyleForPart,
     metadata,
-    themeContributors,
     name,
     node,
     props,
     registerApi,
     rootPart,
     scope,
-    themeClass.className,
-    themeClass.style,
   ]);
 
   return adapter;

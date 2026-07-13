@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { memo, forwardRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { memo, forwardRef, useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { defaultProps } from "./Timer.defaults";
 
@@ -49,14 +49,15 @@ export const Timer = memo(forwardRef(function Timer(
   const hasExecutedOnceRef = useRef(hasExecutedOnce);
   const hasEverStartedRef = useRef(hasEverStarted);
 
-  // Update refs when values change
-  enabledRef.current = enabled;
-  isPausedRef.current = isPaused;
-  intervalValueRef.current = interval;
-  onTickRef.current = onTick;
-  onceRef.current = once;
-  hasExecutedOnceRef.current = hasExecutedOnce;
-  hasEverStartedRef.current = hasEverStarted;
+  useLayoutEffect(() => {
+    enabledRef.current = enabled;
+    isPausedRef.current = isPaused;
+    intervalValueRef.current = interval;
+    onTickRef.current = onTick;
+    onceRef.current = once;
+    hasExecutedOnceRef.current = hasExecutedOnce;
+    hasEverStartedRef.current = hasEverStarted;
+  }, [enabled, hasEverStarted, hasExecutedOnce, interval, isPaused, onTick, once]);
 
   // Derived state
   const isRunning =

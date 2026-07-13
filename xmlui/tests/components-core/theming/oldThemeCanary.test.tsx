@@ -9,12 +9,29 @@ import {
   useTheme,
 } from "../../../src/components-core/theming/ThemeContext";
 import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
+import { StyleRegistry } from "../../../src/components-core/theming/StyleRegistry";
+import { useComponentThemeClass } from "../../../src/components-core/theming/utils";
+import { ComponentRegistryProvider } from "../../../src/components/ComponentRegistryContext";
 import {
   collectComponentThemeMetadata,
   createCoreComponentThemeMetadataRegistry,
 } from "../../../src/component-core";
 import { XmluiThemeRoot } from "../../../src/runtime/rendering/theme";
 import { resetThemeDiagnosticDeduplication } from "../../../src/components-core/theming/validator/emit";
+import { AppMd } from "../../../src/components/App/App";
+import { FooterMd } from "../../../src/components/Footer/Footer";
+import { PagesMd } from "../../../src/components/Pages/Pages";
+import { MarkdownMd } from "../../../src/components/Markdown/Markdown";
+import { CodeBlockMd } from "../../../src/components/CodeBlock/CodeBlock";
+import { TextMd } from "../../../src/components/Text/Text";
+import { NestedAppMd } from "../../../src/components/NestedApp/NestedApp";
+import { ContextMenuMd } from "../../../src/components/ContextMenu/ContextMenu";
+import {
+  MenuItemMd,
+  MenuSeparatorMd,
+  SubMenuItemMd,
+} from "../../../src/components/DropdownMenu/DropdownMenu";
+import type { ComponentMetadata } from "../../../src/component-core/metadata";
 
 afterEach(() => {
   globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ = undefined;
@@ -296,6 +313,106 @@ describe("old theme compiler canary", () => {
       });
     }
   });
+
+  test("component theme class includes Markdown contributor variables", () => {
+    const result = renderThemeClassProvider({
+      descriptor: MarkdownMd as ComponentMetadata,
+      entries: [
+        ["Markdown", MarkdownMd as ComponentMetadata],
+        ["CodeBlock", CodeBlockMd as ComponentMetadata],
+        ["Text", TextMd as ComponentMetadata],
+        ["NestedApp", NestedAppMd as ComponentMetadata],
+      ],
+      themes: [
+        {
+          id: "brand",
+          extends: "xmlui",
+          themeVars: {
+            "fontSize-Text": "21px",
+            "backgroundColor-CodeBlock": "#123456",
+          },
+        },
+      ],
+    });
+
+    expect(result.css).toContain("--xmlui-fontSize-Text:21px");
+    expect(result.css).toContain("--xmlui-backgroundColor-CodeBlock:#123456");
+  });
+
+  test("component theme class includes ContextMenu contributor variables", () => {
+    const result = renderThemeClassProvider({
+      descriptor: ContextMenuMd as ComponentMetadata,
+      entries: [
+        ["ContextMenu", ContextMenuMd as ComponentMetadata],
+        ["MenuItem", MenuItemMd as ComponentMetadata],
+        ["MenuSeparator", MenuSeparatorMd as ComponentMetadata],
+        ["SubMenuItem", SubMenuItemMd as ComponentMetadata],
+      ],
+      themes: [
+        {
+          id: "brand",
+          extends: "xmlui",
+          themeVars: {
+            "backgroundColor-MenuItem": "#010203",
+            "paddingHorizontal-MenuItem": "17px",
+          },
+        },
+      ],
+    });
+
+    expect(result.css).toContain("--xmlui-backgroundColor-MenuItem:#010203");
+    expect(result.css).toContain("--xmlui-paddingHorizontal-MenuItem:17px");
+  });
+
+  test("component theme class includes App contributor variables", () => {
+    const result = renderThemeClassProvider({
+      descriptor: AppMd as ComponentMetadata,
+      entries: [
+        ["App", AppMd as ComponentMetadata],
+        ["Footer", FooterMd as ComponentMetadata],
+        ["Pages", PagesMd as ComponentMetadata],
+      ],
+      themes: [
+        {
+          id: "brand",
+          extends: "xmlui",
+          themeVars: {
+            "backgroundColor-Footer": "#0f172a",
+            "gap-Pages": "23px",
+          },
+        },
+      ],
+    });
+
+    expect(result.css).toContain("--xmlui-backgroundColor-Footer:#0f172a");
+    expect(result.css).toContain("--xmlui-gap-Pages:23px");
+  });
+
+  test("component theme class preserves compound values resolved to CSS variables", () => {
+    const PanelMd: ComponentMetadata = {
+      themeVars: {
+        "border-Panel": {
+          name: "border-Panel",
+          valueType: "border",
+        },
+      },
+    };
+    const result = renderThemeClassProvider({
+      descriptor: PanelMd,
+      entries: [["Panel", PanelMd]],
+      themes: [
+        {
+          id: "brand",
+          extends: "xmlui",
+          themeVars: {
+            "border-Panel": "1px solid $borderColor",
+          },
+        },
+      ],
+    });
+
+    expect(result.css).toContain("--xmlui-border-Panel:1px solid var(--xmlui-borderColor)");
+  });
 });
 
 function createCanaryTheme(): ThemeDefinition {
@@ -366,10 +483,77 @@ function renderCanaryProvider({
   return { html, theme: capturedTheme };
 }
 
+function renderThemeClassProvider({
+  descriptor,
+  explicitContributors = [],
+  entries,
+  themes,
+}: {
+  descriptor: ComponentMetadata;
+  explicitContributors?: ComponentMetadata[];
+  entries: Array<[string, ComponentMetadata]>;
+  themes: ThemeDefinition[];
+}) {
+  let capturedClassName: string | undefined;
+  const styleRegistry = new StyleRegistry();
+  const componentThemeMetadata = collectComponentThemeMetadata(
+    entries.map(([name, metadata]) => ({ name, metadata })),
+  );
+  const descriptors = new Map(entries);
+  renderToStaticMarkup(
+    <XmluiThemeRoot>
+      <StyleProvider styleRegistry={styleRegistry}>
+        <LegacyThemeProvider
+          themes={themes}
+          defaultTheme="brand"
+          componentThemeMetadata={componentThemeMetadata}
+          enableOldThemeCanary={false}
+        >
+          <ComponentRegistryProvider
+            value={{
+              lookupComponentRenderer: (name) => ({ descriptor: descriptors.get(name) }),
+              componentThemeVars: componentThemeMetadata.componentThemeVars,
+            }}
+          >
+            <ThemeClassProbe
+              descriptor={descriptor}
+              explicitContributors={explicitContributors}
+              onClassName={(className) => {
+                capturedClassName = className;
+              }}
+            />
+          </ComponentRegistryProvider>
+        </LegacyThemeProvider>
+      </StyleProvider>
+    </XmluiThemeRoot>,
+  );
+  if (!capturedClassName) {
+    throw new Error("ThemeClassProbe did not render.");
+  }
+  return {
+    className: capturedClassName,
+    css: Array.from(styleRegistry.cache.values()).map((entry) => entry.css).join(""),
+  };
+}
+
 function ThemeProbe({ onTheme }: { onTheme: (theme: ThemeScope) => void }) {
   const theme = useTheme();
   onTheme(theme);
   return <span>{`theme:${theme.activeThemeId}`}</span>;
+}
+
+function ThemeClassProbe({
+  descriptor,
+  explicitContributors,
+  onClassName,
+}: {
+  descriptor: ComponentMetadata;
+  explicitContributors: ComponentMetadata[];
+  onClassName: (className: string | undefined) => void;
+}) {
+  const className = useComponentThemeClass(descriptor, explicitContributors);
+  onClassName(className);
+  return <span className={className}>class:{className}</span>;
 }
 
 class FakeStyleDeclaration {

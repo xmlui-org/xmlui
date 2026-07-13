@@ -171,12 +171,12 @@ export function generateButtonTones(theme?: OldThemeVars) {
 
   variants.forEach((variant) => {
     const solidTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-solid`), (tones) => ({
-      [`backgroundColor-Button-${variant}-solid`]: tones.base,
+      [`backgroundColor-Button-${variant}-solid`]: toCssVar(`$backgroundColor-Button-${variant}`),
       [`backgroundColor-Button-${variant}-solid--hover`]: tones.tone1,
       [`backgroundColor-Button-${variant}-solid--active`]: tones.tone2,
-      [`borderColor-Button-${variant}-solid`]: tones.base,
-      [`borderColor-Button-${variant}-solid--hover`]: tones.base,
-      [`borderColor-Button-${variant}-solid--active`]: tones.base,
+      [`borderColor-Button-${variant}-solid`]: toCssVar(`$borderColor-Button-${variant}`),
+      [`borderColor-Button-${variant}-solid--hover`]: toCssVar(`$borderColor-Button-${variant}`),
+      [`borderColor-Button-${variant}-solid--active`]: toCssVar(`$borderColor-Button-${variant}`),
       [`textColor-Button-${variant}-solid`]: tones.tone3,
       [`textColor-Button-${variant}-solid--hover`]: tones.tone3,
       [`textColor-Button-${variant}-solid--active`]: tones.tone3,
@@ -463,7 +463,77 @@ export function generateBorderSegments(theme?: OldThemeVars) {
     }
   });
 
+  normalizeBorderSideSegments(theme, result);
   return result;
+}
+
+type BorderSegment = "thickness" | "style" | "color";
+type BorderSide = "Left" | "Right" | "Top" | "Bottom";
+
+const BORDER_SIDES: BorderSide[] = ["Left", "Right", "Top", "Bottom"];
+
+function normalizeBorderSideSegments(theme: OldThemeVars, result: OldThemeVars) {
+  const remainders = new Set<string>();
+  Object.keys(theme).forEach((key) => {
+    const match =
+      borderRegEx.exec(key) ??
+      thicknessBorderRegEx.exec(key) ??
+      thicknessBorderHorizontalRegEx.exec(key) ??
+      thicknessBorderVerticalRegEx.exec(key) ??
+      styleBorderRegEx.exec(key) ??
+      styleBorderHorizontalRegEx.exec(key) ??
+      styleBorderVerticalRegEx.exec(key) ??
+      borderLeftRegEx.exec(key) ??
+      borderRightRegEx.exec(key) ??
+      borderTopRegEx.exec(key) ??
+      borderBottomRegEx.exec(key) ??
+      borderHorizontalRegEx.exec(key) ??
+      borderVerticalRegEx.exec(key) ??
+      colorBorderRegEx.exec(key) ??
+      colorBorderHorizontalRegEx.exec(key) ??
+      colorBorderVerticalRegEx.exec(key);
+    if (match) {
+      remainders.add(match[1]);
+    }
+  });
+
+  remainders.forEach((remainder) => {
+    BORDER_SIDES.forEach((side) => {
+      const axis = side === "Left" || side === "Right" ? "Horizontal" : "Vertical";
+      applyBorderSideSegment(theme, result, remainder, side, axis, "thickness");
+      applyBorderSideSegment(theme, result, remainder, side, axis, "style");
+      applyBorderSideSegment(theme, result, remainder, side, axis, "color");
+    });
+  });
+}
+
+function applyBorderSideSegment(
+  theme: OldThemeVars,
+  result: OldThemeVars,
+  remainder: string,
+  side: BorderSide,
+  axis: "Horizontal" | "Vertical",
+  segment: BorderSegment,
+) {
+  const suffix = segment === "thickness" ? "Width" : segment === "style" ? "Style" : "Color";
+  const value =
+    theme[`border${side}${suffix}-${remainder}`] ??
+    getBorderSegment(theme[`border${side}-${remainder}`], segment) ??
+    theme[`border${axis}${suffix}-${remainder}`] ??
+    getBorderSegment(theme[`border${axis}-${remainder}`], segment) ??
+    theme[`border${suffix}-${remainder}`] ??
+    getBorderSegment(theme[`border-${remainder}`], segment);
+
+  if (value) {
+    result[`border${side}${suffix}-${remainder}`] = value;
+  }
+}
+
+function getBorderSegment(value: string | undefined, segment: BorderSegment) {
+  if (!value) {
+    return undefined;
+  }
+  return getBorderSegments(value)[segment];
 }
 
 export type OldThemeDefinitionDetails = {
@@ -533,7 +603,7 @@ function parseSimpleBorder(value: string) {
     "outset",
   ]);
   const ret: { thickness?: string; style?: string; color?: string } = {};
-  value.trim().split(/\s+/).forEach((segment) => {
+  tokenizeBorderValue(value).forEach((segment) => {
     if (!ret.thickness && /^[-.\d]+(?:px|rem|em|%)?$/.test(segment)) {
       ret.thickness = segment;
     } else if (!ret.style && borderStyles.has(segment)) {
@@ -543,6 +613,31 @@ function parseSimpleBorder(value: string) {
     }
   });
   return ret;
+}
+
+function tokenizeBorderValue(value: string): string[] {
+  const tokens: string[] = [];
+  let current = "";
+  let depth = 0;
+  for (const char of value.trim()) {
+    if (/\s/.test(char) && depth === 0) {
+      if (current) {
+        tokens.push(current);
+        current = "";
+      }
+      continue;
+    }
+    current += char;
+    if (char === "(") {
+      depth += 1;
+    } else if (char === ")" && depth > 0) {
+      depth -= 1;
+    }
+  }
+  if (current) {
+    tokens.push(current);
+  }
+  return tokens;
 }
 
 function findClosest(theme: OldThemeVars, themeVarName: string) {

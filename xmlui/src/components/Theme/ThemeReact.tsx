@@ -8,8 +8,13 @@ import styles from "./Theme.module.scss";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
-import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import {
+  builtInThemes,
+  ThemeContext,
+  useTheme,
+  useThemes,
+} from "../../components-core/theming/ThemeContext";
+import { compileOldThemeModel } from "../../components-core/theming/oldThemeCompiler";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { defaultProps } from "./Theme.defaults";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
@@ -33,6 +38,7 @@ import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
 import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
 import { useAppContext } from "../../components-core/AppContext";
+import type { ThemeVarMetadata } from "../../component-core/metadata";
 
 const STYLE_ID = "xmlui-base-styles";
 const THEME_CSS_VAR_PREFIX = `--${THEME_VAR_PREFIX}-`;
@@ -107,14 +113,13 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     invalidThemeVarNames,
     getThemeVar,
-  } = useCompiledTheme(
+  } = useScopedOldTheme(
     currentTheme,
     themeTone,
     themes,
     resources,
     resourceMap,
     appContext?.xmluiConfig?.strictTheming !== false,
-    appContext?.xmluiConfig?.strictAccessibility === true,
   );
   const componentRegistry = useComponentRegistry();
 
@@ -357,6 +362,42 @@ export function Theme({
 
 function stripThemeCssVarPrefix(key: string): string {
   return key.startsWith(THEME_CSS_VAR_PREFIX) ? key.slice(THEME_CSS_VAR_PREFIX.length) : key;
+}
+
+function useScopedOldTheme(
+  currentTheme: ThemeDefinition,
+  themeTone: ThemeTone,
+  themes: Array<ThemeDefinition>,
+  resources: Record<string, string | import("../../abstractions/ThemingDefs").FontDef>,
+  resourceMap: Record<string, string>,
+  strictTheming: boolean,
+) {
+  const componentRegistry = useComponentRegistry();
+  return useMemo(() => {
+    const compiled = compileOldThemeModel({
+      builtInThemes,
+      customThemes: [currentTheme, ...themes],
+      activeThemeId: currentTheme.id,
+      defaultTone: themeTone,
+      componentThemeMetadata: {
+        componentThemeVars: componentRegistry.componentThemeVars,
+        componentDefaultThemeVars: (componentRegistry.componentDefaultThemeVars ?? {}) as Record<string, any>,
+        componentThemeVarDeclarations:
+          (componentRegistry.componentThemeVarDeclarations ?? new Map()) as Map<string, ThemeVarMetadata>,
+      },
+      strictTheming,
+      resources,
+      resourceMap,
+    });
+    return {
+      themeCssVars: compiled.themeCssVars,
+      getResourceUrl: compiled.getResourceUrl,
+      fontLinks: compiled.fontLinks,
+      allThemeVarsWithResolvedHierarchicalVars: compiled.themeVars,
+      invalidThemeVarNames: compiled.invalidThemeVarNames,
+      getThemeVar: compiled.getThemeVar,
+    };
+  }, [componentRegistry, currentTheme, resourceMap, resources, strictTheming, themeTone, themes]);
 }
 
 type HtmlClassProps = {

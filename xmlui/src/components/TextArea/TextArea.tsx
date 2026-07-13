@@ -289,8 +289,10 @@ const RuntimeTextAreaShell = React.forwardRef<HTMLDivElement, RuntimeTextAreaPro
   const [submitAttempted, setSubmitAttempted] = React.useState(false);
   const apiRef = React.useRef<Record<string, unknown>>({});
   const lastRegisteredValueRef = React.useRef<unknown>(undefined);
+  const localValueRef = React.useRef(localValue);
   formRef.current = form;
   adapterRef.current = adapter;
+  localValueRef.current = localValue;
 
   React.useEffect(() => {
     const nextValue = stringValue(formValue) ?? controlledValue;
@@ -345,12 +347,12 @@ const RuntimeTextAreaShell = React.forwardRef<HTMLDivElement, RuntimeTextAreaPro
           : api.insert,
     };
     apiRef.current = normalizedApi;
-    lastRegisteredValueRef.current = localValue;
+    lastRegisteredValueRef.current = localValueRef.current;
     adapterRef.current.registerApi({
       ...normalizedApi,
-      value: localValue,
+      value: localValueRef.current,
     });
-  }, [localValue]);
+  }, []);
 
   React.useEffect(() => {
     if (lastRegisteredValueRef.current === localValue) {
@@ -390,6 +392,19 @@ const RuntimeTextAreaShell = React.forwardRef<HTMLDivElement, RuntimeTextAreaPro
   const effectiveVerboseValidationFeedback =
     verboseValidationFeedback ?? form?.verboseValidationFeedback ?? true;
 
+  const handleDidChange = React.useCallback((newValue: string) => {
+    onDidChange?.(newValue);
+    void adapterRef.current.event("didChange")(newValue);
+  }, [onDidChange]);
+
+  const handleFocus = React.useCallback(() => {
+    void adapterRef.current.event("gotFocus")();
+  }, []);
+
+  const handleBlur = React.useCallback(() => {
+    void adapterRef.current.event("lostFocus")();
+  }, []);
+
   const renderedTextArea = (
     <TextArea
       {...props}
@@ -402,16 +417,9 @@ const RuntimeTextAreaShell = React.forwardRef<HTMLDivElement, RuntimeTextAreaPro
       validationStatus={effectiveValidationStatus}
       invalidMessages={effectiveInvalidMessages}
       verboseValidationFeedback={effectiveVerboseValidationFeedback}
-      onDidChange={(newValue) => {
-        onDidChange?.(newValue);
-        void adapter.event("didChange")(newValue);
-      }}
-      onFocus={() => {
-        void adapter.event("gotFocus")();
-      }}
-      onBlur={() => {
-        void adapter.event("lostFocus")();
-      }}
+      onDidChange={handleDidChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     />
   );
 

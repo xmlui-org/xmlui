@@ -61,7 +61,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(30_000);
 
     const { testStateDriver } = await initTestBed(
       `
@@ -148,7 +148,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(30_000);
 
     const { testStateDriver } = await initTestBed(
       `
@@ -205,6 +205,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
 
     await tree.getByTestId("parent1").click();
     await waitPastRecordedTimestamp(testStateDriver, 100);
+    await page.waitForTimeout(125);
 
     await tree.getByTestId("parent1").click();
     await expect(tree.getByTestId("parent1-child2")).toBeVisible();
@@ -290,7 +291,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     page,
     createTreeDriver,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(30_000);
 
     const { testStateDriver } = await initTestBed(
       `
@@ -487,6 +488,7 @@ test.describe("AutoLoadAfter Field Integration", () => {
     await tree.getByTestId("node1").click();
     await expect(page.getByText("Child 1")).not.toBeVisible();
     await expectNamedLoadCount(testStateDriver, 1);
+    await page.waitForTimeout(125);
 
     // Re-expand - should reload using API value (100ms), not data field (5000ms)
     await tree.getByTestId("node1").click();

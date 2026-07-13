@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useRef,
 } from "react";
 import { useState } from "react";
 import classNames from "classnames";
@@ -76,47 +77,53 @@ export const ExpandableItem = memo(forwardRef(function ExpandableItem(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyExpanded);
+  const isOpenRef = useRef(isOpen);
   const generatedId = useId();
   const summaryId = `${generatedId}-${PART_SUMMARY}`;
   const contentId = `${generatedId}-${PART_CONTENT}`;
 
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const setOpenState = useCallback((value: boolean) => {
+    isOpenRef.current = value;
+    setIsOpen(value);
+    onExpandedChange?.(value);
+  }, [onExpandedChange]);
+
   const toggleOpen = useCallback(() => {
     if (!enabled) return;
 
-    const newValue = !isOpen;
-    setIsOpen(newValue);
-    onExpandedChange?.(newValue);
-  }, [enabled, isOpen, onExpandedChange]);
+    setOpenState(!isOpenRef.current);
+  }, [enabled, setOpenState]);
 
   // Register component API
   const expand = useCallback(() => {
-    if (!isOpen && enabled) {
-      setIsOpen(true);
-      onExpandedChange?.(true);
+    if (!isOpenRef.current && enabled) {
+      setOpenState(true);
     }
-  }, [enabled, isOpen, onExpandedChange]);
+  }, [enabled, setOpenState]);
 
   const collapse = useCallback(() => {
-    if (isOpen && enabled) {
-      setIsOpen(false);
-      onExpandedChange?.(false);
+    if (isOpenRef.current && enabled) {
+      setOpenState(false);
     }
-  }, [enabled, isOpen, onExpandedChange]);
+  }, [enabled, setOpenState]);
 
   const toggle = useCallback(() => {
     toggleOpen();
   }, [toggleOpen]);
 
-  const getIsExpanded = useCallback(() => isOpen, [isOpen]);
+  const getIsExpanded = useCallback(() => isOpenRef.current, []);
 
   // Handle switch value change
   const handleSwitchChange = useCallback(
     (value: boolean) => {
       if (!enabled) return;
-      setIsOpen(value);
-      onExpandedChange?.(value);
+      setOpenState(value);
     },
-    [enabled, onExpandedChange],
+    [enabled, setOpenState],
   );
 
   // Register these functions with the component API using useEffect
@@ -133,10 +140,8 @@ export const ExpandableItem = memo(forwardRef(function ExpandableItem(
   const handleSummaryClick = useCallback(() => {
     if (!enabled || !withSwitch) return;
 
-    const newValue = !isOpen;
-    setIsOpen(newValue);
-    onExpandedChange?.(newValue);
-  }, [enabled, withSwitch, isOpen, onExpandedChange]);
+    setOpenState(!isOpenRef.current);
+  }, [enabled, withSwitch, setOpenState]);
 
   // Handle keyboard events for accessibility
   const handleKeyDown = useCallback(

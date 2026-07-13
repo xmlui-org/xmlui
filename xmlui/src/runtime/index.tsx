@@ -22,6 +22,7 @@ import { ThemedButton as Button } from "../components/Button/Button";
 import { Dialog } from "../components/ModalDialog/Dialog";
 import { ThemedStack as Stack } from "../components/Stack/Stack";
 import { NotificationToast } from "../components/Theme/NotificationToast";
+import { ComponentRegistryProvider } from "../components/ComponentRegistryContext";
 import { defaultProps as themeDefaultProps } from "../components/Theme/Theme.defaults";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
@@ -30,7 +31,7 @@ import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { responsiveBreakpoints } from "../styling/contracts";
-import { createCoreComponentThemeMetadataRegistry } from "../component-core";
+import { createCoreComponentThemeMetadataRegistry, runtimeRendererEntries } from "../component-core";
 
 ensureXmluiDebugBridge();
 
@@ -215,6 +216,30 @@ export function XmluiRoot({
     [extensions],
   );
   const componentThemeMetadata = useMemo(() => createCoreComponentThemeMetadataRegistry(), []);
+  const componentRegistry = useMemo(() => {
+    const entries = new Map<string, { descriptor?: any; isCompoundComponent?: boolean }>();
+    for (const { name, renderer } of runtimeRendererEntries) {
+      const metadata = (renderer as { metadata?: unknown }).metadata;
+      entries.set(name, {
+        descriptor: metadata,
+      });
+    }
+    for (const [name, renderer] of Object.entries({
+      ...(module.extensionRenderers ?? {}),
+      ...normalizedExtensions.renderers,
+    })) {
+      const metadata = (renderer as { metadata?: unknown }).metadata;
+      entries.set(name, {
+        descriptor: metadata,
+      });
+    }
+    return {
+      lookupComponentRenderer: (name: string) => entries.get(name),
+      componentThemeVars: componentThemeMetadata.componentThemeVars,
+      componentDefaultThemeVars: componentThemeMetadata.componentDefaultThemeVars,
+      componentThemeVarDeclarations: componentThemeMetadata.componentThemeVarDeclarations,
+    };
+  }, [componentThemeMetadata, module.extensionRenderers, normalizedExtensions.renderers]);
   useEffect(() => routingRef.current?.attach(), []);
   const confirm = useCallback((title: unknown, message?: unknown, okLabel?: unknown, cancelLabel?: unknown) => {
     return new Promise<boolean>((resolve) => {
@@ -270,24 +295,26 @@ export function XmluiRoot({
                 componentThemeMetadata={componentThemeMetadata}
                 enableOldThemeCanary={enableOldThemeCanary}
               >
-                <XmluiRuntimeContent
-                  appGlobals={appGlobals}
-                  confirm={confirm}
-                  context={context}
-                  extensionFunctions={{
-                    ...(module.extensionFunctions ?? {}),
-                    ...normalizedExtensions.functions,
-                  }}
-                  i18n={i18nRef.current}
-                  loggedInUser={loggedInUser}
-                  module={module}
-                  references={referencesRef.current}
-                  rootOwnerId={rootOwnerId}
-                  routing={routingRef.current}
-                  signError={signError}
-                  store={store}
-                  toast={toastRef.current}
-                />
+                <ComponentRegistryProvider value={componentRegistry}>
+                  <XmluiRuntimeContent
+                    appGlobals={appGlobals}
+                    confirm={confirm}
+                    context={context}
+                    extensionFunctions={{
+                      ...(module.extensionFunctions ?? {}),
+                      ...normalizedExtensions.functions,
+                    }}
+                    i18n={i18nRef.current}
+                    loggedInUser={loggedInUser}
+                    module={module}
+                    references={referencesRef.current}
+                    rootOwnerId={rootOwnerId}
+                    routing={routingRef.current}
+                    signError={signError}
+                    store={store}
+                    toast={toastRef.current}
+                  />
+                </ComponentRegistryProvider>
                 {renderConfirmDialog(confirmDialog, (confirmed) => {
                   confirmDialog?.resolve(confirmed);
                   setConfirmDialog(undefined);

@@ -157,7 +157,7 @@ export const stepperRenderer = wrapRuntimeComponent({
         nonLinear={adapter.booleanProp("nonLinear", defaultProps.nonLinear)}
         onDidChange={(index, id) => { void adapter.event("didChange")(index, id); }}
         registerComponentApi={adapter.registerApi}
-        updateState={(state) => adapter.registerApi(state)}
+        updateState={adapter.registerApi}
       >
         {adapter.context.renderChildren(nonPropertyChildren(adapter.node.children), adapter.scope)}
       </Stepper>

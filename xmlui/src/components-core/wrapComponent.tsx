@@ -1,9 +1,9 @@
 import { type ComponentType, type ReactNode, useState } from "react";
 
 import type { ComponentMetadata } from "../component-core/metadata";
+import { useComponentThemeClass } from "./theming/utils";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "../extensions";
 import { COMPONENT_PART_KEY } from "../styling/layout";
-import { useComponentThemeClass } from "../runtime/rendering/theme";
 
 type ExtractValueCompat = ((value: unknown) => any) & {
   asString(value: unknown, fallback?: string): string;
@@ -86,7 +86,8 @@ export function wrapComponent(
     toneSpecificThemeVars: metadata.toneSpecificThemeVars,
     themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps: XmluiExtensionComponentProps) => {
-      const themeClass = useComponentThemeClass(name, metadata);
+      const themeClassName = useComponentThemeClass(metadata);
+      const themeClass = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
       const props = { ...runtimeProps.props };
       const [state, setState] = useState<Record<string, any>>({});
       for (const name of options.exclude ?? []) {
@@ -125,8 +126,8 @@ export function wrapComponent(
         extractValue.asSize = (value, fallback) =>
           value === undefined || value === null || value === "" ? fallback : String(value);
         return options.customRender(props, {
-          className: themeClass.className,
-          classes: { [COMPONENT_PART_KEY]: themeClass.className },
+          className: themeClass,
+          classes: { [COMPONENT_PART_KEY]: themeClass },
           node: { ...runtimeProps.node, props: runtimeProps.props },
           extractValue,
           extractResourceUrl: (url) =>
@@ -166,8 +167,7 @@ export function wrapComponent(
         <Component
           {...props}
           uid={options.passUid ? runtimeProps.props.id : undefined}
-          className={themeClass.className}
-          style={themeClass.style}
+          className={themeClass}
         >
           {runtimeProps.children}
         </Component>

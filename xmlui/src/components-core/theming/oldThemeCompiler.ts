@@ -34,6 +34,7 @@ export type CompileOldThemeModelInput = {
   activeThemeId?: string;
   defaultTheme?: string;
   defaultTone?: ThemeTone;
+  runtimeThemeVars?: Record<string, unknown>;
   componentThemeMetadata: Pick<
     ComponentThemeMetadataRegistry,
     "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
@@ -79,7 +80,10 @@ export function compileOldThemeModel(input: CompileOldThemeModelInput): Compiled
   }
 
   const activeThemeId = activeTheme.id;
-  const rootThemeVars = stringRecord(mergeThemeVariableLayers(defaultThemeVariableLayers, activeThemeTone));
+  const rootThemeVars = {
+    ...stringRecord(mergeThemeVariableLayers(defaultThemeVariableLayers, activeThemeTone)),
+    ...stringRecord(input.runtimeThemeVars),
+  };
   const themeDefChain = collectThemeChainByExtends(
     toOldThemeDefinition(activeTheme),
     themes.map(toOldThemeDefinition),

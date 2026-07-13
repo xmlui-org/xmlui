@@ -165,6 +165,7 @@ export const switchRenderer: XmluiBuiltInRenderer = wrapRuntimeComponent({
         void adapter.event("click")(event);
       }}
       onDidChange={(value) => {
+        adapter.registerApi({ value });
         void adapter.event("didChange")(value);
       }}
       onFocus={() => {

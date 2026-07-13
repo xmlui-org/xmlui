@@ -3,7 +3,7 @@ export {
   getComponentTransferModule,
   runtimeComponentModules,
 } from "./registry";
-export { builtInComponentRenderers } from "./runtimeRegistry";
+export { builtInComponentRenderers, runtimeRendererEntries } from "./runtimeRegistry";
 export {
   collectComponentThemeMetadata,
   createComponentThemeMetadataRegistry,

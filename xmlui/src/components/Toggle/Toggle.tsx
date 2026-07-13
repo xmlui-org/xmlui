@@ -87,9 +87,11 @@ export function useToggleController({
   const controlled = value !== undefined;
   const initialChecked = transformToLegitValue(value ?? initialValue);
   const [checked, setChecked] = useState(() => initialChecked);
+  const checkedRef = useRef(checked);
   const [suppressTransition, setSuppressTransition] = useState(
     () => suppressInitialTransition && initialChecked,
   );
+  checkedRef.current = checked;
 
   useEffect(() => {
     if (controlled) {
@@ -130,11 +132,12 @@ export function useToggleController({
 
   const updateValue = useCallback((nextValue: unknown) => {
     const normalized = transformToLegitValue(nextValue);
-    if (checked !== normalized) {
+    if (checkedRef.current !== normalized) {
+      checkedRef.current = normalized;
       void onDidChange?.(normalized);
     }
     setChecked(normalized);
-  }, [checked, onDidChange]);
+  }, [onDidChange]);
 
   const focus = useCallback(() => {
     if (enabled) {
@@ -152,7 +155,7 @@ export function useToggleController({
       focus,
       setValue: updateValue,
       get value() {
-        return checked;
+        return checkedRef.current;
       },
     },
   };

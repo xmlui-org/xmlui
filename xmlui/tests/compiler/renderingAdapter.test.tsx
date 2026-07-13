@@ -126,7 +126,11 @@ describe("XMLUI rendering adapter", () => {
       },
     });
     const context = createRenderContext({}, {});
-    const html = renderToStaticMarkup(<Dummy context={context} node={dummyNode} scope={scope} />);
+    const html = renderToStaticMarkup(
+      <StyleProvider>
+        <Dummy context={context} node={dummyNode} scope={scope} />
+      </StyleProvider>,
+    );
 
     expect(html).toContain('data-resource="/assets/logo.svg"');
     expect(html).toContain('data-has-api="true"');

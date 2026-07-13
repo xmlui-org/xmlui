@@ -268,8 +268,21 @@ export const sliderRenderer = wrapRuntimeComponent({
       };
     }, [dispatch, fieldName, initialFormValue, noSubmit]);
     const updateState = React.useCallback((nextState: Record<string, any>) => {
-      setState((previous) => ({ ...previous, ...nextState }));
+      let valueChanged = false;
+      setState((previous) => {
+        valueChanged = Object.prototype.hasOwnProperty.call(nextState, "value") &&
+          !runtimeSliderValuesEqual(previous.value, nextState.value);
+        const changed = Object.entries(nextState).some(([key, value]) =>
+          key === "value"
+            ? !runtimeSliderValuesEqual(previous[key], value)
+            : previous[key] !== value,
+        );
+        return changed ? { ...previous, ...nextState } : previous;
+      });
       if (Object.prototype.hasOwnProperty.call(nextState, "value")) {
+        if (!valueChanged) {
+          return;
+        }
         adapterRef.current.registerApi({ value: nextState.value });
         if (fieldName) {
           formRef.current?.setValue(fieldName, nextState.value);
@@ -486,6 +499,16 @@ function normalizeRuntimeSliderValues(value: unknown, min: number, max: number):
     return values.length > 0 ? values : [min];
   }
   return [min];
+}
+
+function runtimeSliderValuesEqual(left: unknown, right: unknown): boolean {
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+      return false;
+    }
+    return left.every((value, index) => value === right[index]);
+  }
+  return left === right;
 }
 
 function snapRuntimeSliderValue(value: number, min: number, max: number, step: number): number {

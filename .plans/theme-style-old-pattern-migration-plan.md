@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 6.5 completed; Step 7 restore `useComponentThemeClass` is in progress  
+Status: Step 7 restore `useComponentThemeClass` complete; full unit and E2E gates are green with three tracked flakes  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -38,6 +38,10 @@ duplicates; keep the original Playwright file path and test title.
   `Imperative API > API Method Tests > getExpandedNodes() - returns array of expanded node keys`
 - `xmlui/src/components/List/List.spec.ts:2416:3` -
   `scroll event > scroll event does not fire for the list's own programmatic scroll`
+- `xmlui/src/components/Switch/Switch.spec.ts:710:5` -
+  `Api > value property with transformToLegitValue > switch handles special string values correctly`
+- `xmlui/src/components/Timer/Timer.foundation.spec.ts:3:1` -
+  `timer stops when enabled is driven by a labeled Switch API value`
 
 ## Compatibility Sources
 
@@ -981,6 +985,71 @@ Verification passed:
   no new flaky entry was added.
 
 ### Step 7: Restore `useComponentThemeClass`
+
+Implementation note, 2026-07-13:
+
+- Restored old-pattern `useComponentThemeClass` in
+  `components-core/theming/utils.ts`, including old descriptor/default/contributor
+  collection, `Input:`/`Heading:` namespace stripping, and `useStyles(...,
+  { layer: "themes" })`.
+- Wired runtime/component wrappers to emit `xmlui-${name}` plus the old theme
+  class, and exposed component metadata through the runtime
+  `ComponentRegistryProvider` so scoped components can resolve old theme vars.
+- Reworked scoped `<Theme>` compilation to use the old theme model so scoped
+  theme variables are visible to the restored hook.
+- Restored old custom-variant wrapper behavior and added focused canaries for
+  Markdown, ContextMenu, App contributor variables, and compound border values.
+- Fixed border theme shorthand parsing/precedence for function colors such as
+  `rgb(255, 0, 0)` and explicit side/axis/all-side longhand overrides.
+
+Verification status:
+
+- Focused canary unit gate passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming/oldThemeCanary.test.tsx`
+  (`11 passed`).
+- Focused Accordion regression slice passed:
+  `npx playwright test src/components/Accordion/Accordion.spec.ts:93 src/components/Accordion/Accordion.spec.ts:338 src/components/Accordion/Accordion.spec.ts:522 --retries=1 --max-failures=10`
+  (`3 passed`).
+- Unit gate passed:
+  `npm --workspace xmlui run test:unit` (`308 passed`).
+- Initial full E2E gate after restoring the hook exposed API/reference
+  regressions in Pagination, Slider, TextArea, Timer/Switch, Tree
+  auto-load/dynamic APIs, and one brittle ExpandableItem selector. These were
+  fixed before completing Step 7.
+- Runtime API registration now preserves property descriptors, refreshes
+  function-only APIs without invalidating component references, and still
+  invalidates value/getter API changes. Pagination and Stepper pass stable
+  `registerApi` callbacks; Slider avoids redundant array state writes;
+  TextArea and ExpandableItem expose ref-backed APIs; Switch publishes current
+  API value immediately; Toggle and Timer use ref/layout-effect updates for
+  current enabled/value reads.
+- Test/runtime stability fixes kept the global Playwright timeout at 30s per
+  the latest user direction. The Timer foundation assertion now waits for the
+  enabled state to settle and checks counter stability. Tree auto-load tests
+  now wait past their documented `autoLoadAfter` threshold before re-expanding.
+  `initTestBed` avoids an eager root layout read on every setup. The
+  ExpandableItem API test now asserts the visible accessible content region
+  instead of a generated CSS-module class substring and no longer initializes
+  the test bed twice.
+- Focused verification passed:
+  `npm --workspace xmlui run test:e2e -- src/components/ExpandableItem/ExpandableItem.spec.ts --max-failures=1`
+  (`59 passed`).
+- Focused non-Tree regression slice passed:
+  Pagination boundary APIs, Slider multi-thumb APIs, TextArea API/bindTo/caret
+  regressions, and Timer foundation (`9 passed`).
+- Focused Tree/Dropdown regression slice passed:
+  `DropdownMenu.spec.ts:698`, Tree auto-load field cases, Tree dynamic
+  integration, Tree dynamic API cases, and Tree auto-load regressions
+  (`11 passed`), plus the shifted `Tree-autoLoadAfter-field.spec.ts:289`
+  case (`1 passed`).
+- Final unit gate passed:
+  `npm --workspace xmlui run test:unit` (`308 passed`).
+- Final full E2E gate passed:
+  `XMLUI_E2E_DEV_PORT=5177 npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5536 passed`, `83 skipped`, `3 flaky`, no failures). The newly confirmed
+  successful-run flakes, `Switch.spec.ts:710:5` and
+  `Timer.foundation.spec.ts:3:1`, were added to the tracked flaky-test list;
+  `DropdownMenu.spec.ts:698:3` was already tracked.
 
 Replace the rewrite adapter in `components-core/theming/utils.ts` with the old
 component theme class behavior:
