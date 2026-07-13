@@ -1,6 +1,6 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import type { ThemeDefinition, ThemeScope } from "../../../src/abstractions/ThemingDefs";
 import {
@@ -9,13 +9,18 @@ import {
   useTheme,
 } from "../../../src/components-core/theming/ThemeContext";
 import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
-import { createCoreComponentThemeMetadataRegistry } from "../../../src/component-core";
+import {
+  collectComponentThemeMetadata,
+  createCoreComponentThemeMetadataRegistry,
+} from "../../../src/component-core";
 import { XmluiThemeRoot } from "../../../src/runtime/rendering/theme";
+import { resetThemeDiagnosticDeduplication } from "../../../src/components-core/theming/validator/emit";
 
 afterEach(() => {
   globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ = undefined;
   globalThis.__XMLUI_OLD_THEME_SHADOW__ = undefined;
   globalThis.__XMLUI_OLD_THEME_CANARY__ = undefined;
+  resetThemeDiagnosticDeduplication();
 });
 
 describe("old theme compiler canary", () => {
@@ -114,6 +119,117 @@ describe("old theme compiler canary", () => {
     expect(style.getPropertyValue("--xmlui-existing")).toBe("previous");
     expect(style.getPropertyValue("--xmlui-added")).toBe("");
   });
+
+  test("emits diagnostics while filtering invalid strict theme variables", () => {
+    const previousWindow = globalThis.window;
+    const previousDocument = globalThis.document;
+    const fakeWindow = { _xsLogs: [] as Array<Record<string, unknown>> } as unknown as Window &
+      typeof globalThis & { _xsLogs: Array<Record<string, unknown>> };
+    const fakeDocument = {
+      querySelector: () => null,
+      documentElement: undefined,
+    } as unknown as Document;
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      writable: true,
+      value: fakeWindow,
+    });
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      writable: true,
+      value: fakeDocument,
+    });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const registry = collectComponentThemeMetadata([
+        {
+          name: "Panel",
+          metadata: {
+            themeVars: {
+              "backgroundColor-Panel": {
+                name: "backgroundColor-Panel",
+                valueType: "color",
+              },
+            },
+          },
+        },
+      ]);
+      const result = renderCanaryProvider({
+        themes: [
+          {
+            id: "brand",
+            themeVars: {
+              "backgroundColor-Panel": "not-a-color",
+            },
+          },
+        ],
+        defaultTheme: "brand",
+        componentThemeMetadata: registry,
+        enableOldThemeCanary: false,
+      });
+
+      expect(result.theme.themeStyles["--xmlui-backgroundColor-Panel"]).toBeUndefined();
+      expect(result.theme.themeVars["backgroundColor-Panel"]).toBeUndefined();
+      expect(fakeWindow._xsLogs).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "theming",
+            code: "invalid-theme-value",
+            severity: "error",
+            variableName: "backgroundColor-Panel",
+          }),
+        ]),
+      );
+    } finally {
+      warn.mockRestore();
+      error.mockRestore();
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        writable: true,
+        value: previousWindow,
+      });
+      Object.defineProperty(globalThis, "document", {
+        configurable: true,
+        writable: true,
+        value: previousDocument,
+      });
+    }
+  });
+
+  test("keeps invalid theme variables when provider strict theming is disabled", () => {
+    const registry = collectComponentThemeMetadata([
+      {
+        name: "Panel",
+        metadata: {
+          themeVars: {
+            "backgroundColor-Panel": {
+              name: "backgroundColor-Panel",
+              valueType: "color",
+            },
+          },
+        },
+      },
+    ]);
+    const result = renderCanaryProvider({
+      themes: [
+        {
+          id: "brand",
+          themeVars: {
+            "backgroundColor-Panel": "not-a-color",
+          },
+        },
+      ],
+      defaultTheme: "brand",
+      componentThemeMetadata: registry,
+      strictTheming: false,
+      enableOldThemeCanary: false,
+    });
+
+    expect(result.theme.themeStyles["--xmlui-backgroundColor-Panel"]).toBe("not-a-color");
+    expect(result.theme.themeVars["backgroundColor-Panel"]).toBe("not-a-color");
+  });
 });
 
 function createCanaryTheme(): ThemeDefinition {
@@ -143,12 +259,16 @@ function renderCanaryProvider({
   defaultTheme,
   resources,
   resourceMap,
+  componentThemeMetadata = createCoreComponentThemeMetadataRegistry(),
+  strictTheming,
   enableOldThemeCanary,
 }: {
   themes: ThemeDefinition[];
   defaultTheme: string;
   resources?: Record<string, string>;
   resourceMap?: Record<string, string>;
+  componentThemeMetadata?: ReturnType<typeof createCoreComponentThemeMetadataRegistry>;
+  strictTheming?: boolean;
   enableOldThemeCanary: boolean;
 }) {
   let capturedTheme: ThemeScope | undefined;
@@ -160,7 +280,8 @@ function renderCanaryProvider({
           defaultTheme={defaultTheme}
           resources={resources}
           resourceMap={resourceMap}
-          componentThemeMetadata={createCoreComponentThemeMetadataRegistry()}
+          componentThemeMetadata={componentThemeMetadata}
+          strictTheming={strictTheming}
           enableOldThemeCanary={enableOldThemeCanary}
         >
           <ThemeProbe onTheme={(theme) => {

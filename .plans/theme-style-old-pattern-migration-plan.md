@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 5.6 implemented and verified; next step is Step 6 restore strict theme validation and accessibility diagnostics  
+Status: Step 6.3 implemented and verified; next step is Step 6.4 restore accessibility and contrast diagnostics  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -21,6 +21,23 @@ The current unit and E2E suites pass. Each implementation step below must keep
 that true. A step is not complete while unit tests fail. A step is also not
 complete while there are E2E failures, except for up to three confirmed flaky
 tests that pass on rerun without code changes.
+
+When a full E2E gate succeeds but reports flaky tests, add each flaky test to
+the tracked flaky-test list below if it is not already present. Do not add
+duplicates; keep the original Playwright file path and test title.
+
+## Tracked Flaky E2E Tests
+
+- `xmlui/src/components/DropdownMenu/DropdownMenu.spec.ts:698:3` -
+  `Nested DropdownMenu and Select > ModalDialog > Select > DropdownMenu`
+- `xmlui/src/components/Accordion/Accordion.foundation.spec.ts:36:3` -
+  `Accordion foundation > headerTemplate renders and expanded content can mutate state`
+- `xmlui/src/components/Select/Select.foundation.spec.ts:18:3` -
+  `Select foundation > didChange fires when selection changes`
+- `xmlui/src/components/Tree/Tree-dynamic.spec.ts:3175:5` -
+  `Imperative API > API Method Tests > getExpandedNodes() - returns array of expanded node keys`
+- `xmlui/src/components/List/List.spec.ts:2416:3` -
+  `scroll event > scroll event does not fire for the list's own programmatic scroll`
 
 ## Compatibility Sources
 
@@ -722,20 +739,184 @@ Step 5.6 implementation notes:
 
 ### Step 6: Restore Strict Theme Validation and Accessibility Diagnostics
 
-Port the old `validator/*` modules and wire them into the active provider:
+Step 6 is intentionally split into smaller substeps. The validator modules,
+diagnostic emission, strict CSS-variable filtering, accessibility contrast
+checks, and inline-style validation touch different runtime surfaces. Keeping
+them separate avoids repeating the broad-regression risk from the aborted Step
+5 attempt.
 
-- strict known-name validation from global and component vars;
-- invalid value sanitization before CSS vars are emitted;
-- derived-variable validation;
-- diagnostic emission through the same old channel;
-- contrast checks in dev mode and strict accessibility mode.
+#### Step 6.1: Port Validator Modules Inertly
+
+Port the old theme validator modules without wiring them into the active
+runtime provider yet:
+
+- `validator/diagnostics.ts`
+- `validator/emit.ts`
+- `validator/index.ts`
+- `validator/rule-table.ts`
+- `validator/rules/*`
+- `validator/theme-validator.ts`
+
+Port the old focused unit coverage for the pure validator behavior.
+
+Implemented:
+
+- Ported the old validator module tree under
+  `xmlui/src/components-core/theming/validator/`.
+- Ported the old focused validator unit test to
+  `xmlui/tests/components-core/theming/validator.test.ts`.
+- Ported the old shared type-contract rule helpers required by the validator
+  to `xmlui/src/components-core/type-contracts/rules/`.
+- Re-exported the metadata-facing `PropertyValueType`,
+  `PropertyValueDescription`, `ThemeValueType`, and `ThemeVarMetadata` types
+  from `xmlui/src/abstractions/ComponentDefs.ts`.
+- Kept the port inert: no runtime provider or compiler wiring was added in
+  this step.
 
 Verification:
 
-- Port old validator unit tests.
-- Add one runtime test proving an invalid strict theme var is filtered and
-  logged, while a valid var applies.
 - `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+  (`97 passed`).
+- `npm --workspace xmlui run test:unit`
+  (`308 passed`).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5538 passed`, `83 skipped`, `1 flaky`, no failures).
+
+#### Step 6.2: Wire Theme Validation in Diagnostics-Only Mode
+
+Run the validator against the active old compiler output and emit diagnostics
+through the old diagnostic channel, but do not filter or drop CSS variables
+yet. This substep should prove known-name collection and derived-variable
+diagnostic suppression without changing rendered styles.
+
+Implementation notes:
+
+- Build known theme variable names from root/default vars, component metadata,
+  generated vars, and registered component theme vars.
+- Validate active resolved theme vars from `compileOldThemeModel`.
+- Emit diagnostics with the old deduplication behavior.
+- Keep strict mode as severity selection only in this substep; do not sanitize
+  output yet.
+
+Verification:
+
+- Add a focused unit test for diagnostics-only unknown and invalid variables.
+- Add a runtime test proving diagnostics are emitted while rendered CSS output
+  is unchanged.
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Implemented:
+
+- Extended the old theme compiler output with `knownThemeVarNames` and
+  `themeDiagnostics`.
+- Collected known names from root/default variables, component theme metadata,
+  component defaults, registered component vars, and old generated-variable
+  passes.
+- Wired `LegacyThemeProvider` to emit diagnostics through the old diagnostic
+  channel while leaving CSS variable output unchanged.
+- Kept this substep diagnostics-only: no strict filtering, no
+  `invalidThemeVarNames` behavior change, and no rendered-style sanitization.
+- Expanded the color value rule to accept CSS Color 4 functions such as
+  `color(srgb ...)`, preventing false positives from generated theme output.
+- Observed one old-compatible border shorthand diagnostic (`rgb(0,`) from the
+  generated border segment path; keep it visible for Step 6.3/6.5 rather than
+  changing generation behavior in this diagnostics-only step.
+
+Verification passed:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/oldThemeCompiler.test.ts tests/components-core/theming/oldThemeCanary.test.tsx tests/components-core/theming/validator.test.ts`
+  (`109 passed`).
+- `npm --workspace xmlui run test:unit`
+  (`308 passed`).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5536 passed`, `83 skipped`, `3 flaky`, no failures).
+
+#### Step 6.3: Enable Strict Filtering for Theme Vars
+
+Enable strict invalid-value sanitization before CSS variables are emitted from
+the active provider. Unknown variables should preserve old behavior: report as
+warnings because third-party extensions can register variables late.
+
+Implementation notes:
+
+- Apply filtering only to invalid values that old strict mode drops.
+- Preserve non-strict behavior when `strictTheming === false`.
+- Keep valid scoped and generated variables intact.
+- Record invalid variable names in `invalidThemeVarNames` so scoped `<Theme>`
+  filtering remains compatible.
+
+Verification:
+
+- Add one runtime test proving an invalid strict theme var is filtered and
+  logged while a valid var applies.
+- Add one runtime test proving `strictTheming={false}` keeps the invalid value
+  path compatible with old non-strict behavior.
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/validator.test.ts`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Implemented:
+
+- Added `strictTheming` to the old compiler input and passed the provider's
+  strict flag into `compileOldThemeModel`.
+- Mirrored the old provider's strict sanitization in the compiler: theme
+  layers are sanitized before generated-variable passes, then the final raw
+  theme map is sanitized again using derived diagnostics for removal.
+- Kept unknown theme variables as warnings only; they are not included in
+  `invalidThemeVarNames` and are not filtered.
+- Returned filtered `rawAllThemeVars`, filtered `themeVars`, emitted
+  `themeCssVars`, and populated `invalidThemeVarNames` from layer and final
+  invalid-value diagnostics.
+- Preserved non-strict behavior with `strictTheming: false`: invalid values
+  remain emitted and theme diagnostics remain empty.
+
+Verification passed:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/theming/oldThemeCompiler.test.ts tests/components-core/theming/oldThemeCanary.test.tsx tests/components-core/theming/validator.test.ts`
+  (`111 passed`).
+- `npm --workspace xmlui run test:unit`
+  (`308 passed`).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5538 passed`, `83 skipped`, `1 flaky`, no failures).
+
+#### Step 6.4: Restore Accessibility and Contrast Diagnostics
+
+Port old accessibility contrast helpers and wire strict accessibility behavior
+separately from theme-value validation.
+
+Implementation notes:
+
+- Port `/Users/dotneteer/source/xmlui/xmlui/src/components-core/accessibility/contrast.ts`.
+- Port `/Users/dotneteer/source/xmlui/xmlui/tests/components-core/accessibility/contrast.test.ts`.
+- Wire contrast checks in dev mode and strict accessibility mode through the
+  same old diagnostic channel.
+
+Verification:
+
+- `npm --workspace xmlui exec -- vitest run tests/components-core/accessibility/contrast.test.ts`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 6.5: Evaluate Inline Style Validation Scope
+
+The old `validator/style-prop-validator.ts` validates layout props and raw
+style strings rather than theme compilation itself. Before porting it into the
+active runtime path, decide whether it belongs in the theme migration or should
+be a separate style/layout validation step.
+
+Implementation notes:
+
+- Inspect old call sites for `validateInlineStyle` and `validateStyleString`.
+- Compare against current rewrite layout prop and `style` parsing paths.
+- If wiring it now would affect broad layout behavior, create a later dedicated
+  plan step instead of folding it into Step 6.
+
+Verification if implemented in Step 6:
+
+- Port focused old style-prop validator unit tests.
+- Add one runtime test for strict dropping and non-strict warning behavior.
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 

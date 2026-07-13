@@ -4,6 +4,7 @@ import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from 
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
 import { useThemeRuntime } from "../../runtime/rendering/theme";
 import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
+import { emitThemeDiagnostics } from "./validator/emit";
 import {
   XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
@@ -46,10 +47,11 @@ const DEFAULT_RESOURCE_URLS: Record<string, string> = {
 
 const EMPTY_COMPONENT_THEME_METADATA: Pick<
   ComponentThemeMetadataRegistry,
-  "componentThemeVars" | "componentDefaultThemeVars"
+  "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
 > = {
   componentThemeVars: new Set<string>(),
   componentDefaultThemeVars: {},
+  componentThemeVarDeclarations: new Map(),
 };
 
 export const builtInThemes: Array<ThemeDefinition> = [
@@ -98,6 +100,7 @@ export function LegacyThemeProvider({
   themes = [],
   defaultTheme,
   componentThemeMetadata = EMPTY_COMPONENT_THEME_METADATA,
+  strictTheming = true,
   enableOldThemeShadowDiagnostics = false,
   enableOldThemeCanary = false,
   children,
@@ -108,8 +111,9 @@ export function LegacyThemeProvider({
   defaultTheme?: string;
   componentThemeMetadata?: Pick<
     ComponentThemeMetadataRegistry,
-    "componentThemeVars" | "componentDefaultThemeVars"
+    "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
   >;
+  strictTheming?: boolean;
   enableOldThemeShadowDiagnostics?: boolean;
   enableOldThemeCanary?: boolean;
   children: ReactNode;
@@ -158,6 +162,7 @@ export function LegacyThemeProvider({
       defaultTheme,
       defaultTone: activeThemeTone,
       componentThemeMetadata,
+      strictTheming,
       resources: resourceDefinitions,
       resourceMap,
     });
@@ -168,6 +173,7 @@ export function LegacyThemeProvider({
     defaultTheme,
     resourceDefinitions,
     resourceMap,
+    strictTheming,
     themes,
   ]);
   const oldThemeShadowDiagnostics = useMemo<OldThemeShadowDiagnostics | undefined>(() => {
@@ -196,6 +202,12 @@ export function LegacyThemeProvider({
   } else {
     globalThis.__XMLUI_OLD_THEME_CANARY__ = undefined;
   }
+
+  useMemo(() => {
+    if (strictTheming) {
+      emitThemeDiagnostics(oldCompiledTheme.themeDiagnostics);
+    }
+  }, [oldCompiledTheme.themeDiagnostics, strictTheming]);
 
   useEffect(() => {
     if (typeof document === "undefined") {

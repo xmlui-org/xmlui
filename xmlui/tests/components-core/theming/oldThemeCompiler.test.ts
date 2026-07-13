@@ -214,6 +214,81 @@ describe("compileOldThemeModel", () => {
     expect(compiled.themeCssVars["--xmlui-demo:backgroundColor-Meter"]).toBe("green");
   });
 
+  test("filters invalid strict theme variables and records invalid names", () => {
+    const registry = collectComponentThemeMetadata([
+      {
+        name: "Panel",
+        metadata: {
+          themeVars: {
+            "backgroundColor-Panel": {
+              name: "backgroundColor-Panel",
+              valueType: "color",
+            },
+          },
+        },
+      },
+    ]);
+    const compiled = compileOldThemeModel({
+      builtInThemes: [
+        {
+          id: "xmlui",
+          themeVars: {
+            "backgroundColor-Panel": "definitely-not-a-color",
+          },
+        },
+      ],
+      defaultTheme: "xmlui",
+      componentThemeMetadata: registry,
+    });
+
+    expect(compiled.themeCssVars["--xmlui-backgroundColor-Panel"]).toBeUndefined();
+    expect(compiled.themeVars["backgroundColor-Panel"]).toBeUndefined();
+    expect(compiled.rawAllThemeVars["backgroundColor-Panel"]).toBeUndefined();
+    expect(compiled.invalidThemeVarNames.has("backgroundColor-Panel")).toBe(true);
+    expect(compiled.themeDiagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "invalid-theme-value",
+          severity: "error",
+          variableName: "backgroundColor-Panel",
+        }),
+      ]),
+    );
+  });
+
+  test("keeps invalid theme variables when strict theming is disabled", () => {
+    const registry = collectComponentThemeMetadata([
+      {
+        name: "Panel",
+        metadata: {
+          themeVars: {
+            "backgroundColor-Panel": {
+              name: "backgroundColor-Panel",
+              valueType: "color",
+            },
+          },
+        },
+      },
+    ]);
+    const compiled = compileOldThemeModel({
+      builtInThemes: [
+        {
+          id: "xmlui",
+          themeVars: {
+            "backgroundColor-Panel": "definitely-not-a-color",
+          },
+        },
+      ],
+      defaultTheme: "xmlui",
+      componentThemeMetadata: registry,
+      strictTheming: false,
+    });
+
+    expect(compiled.themeCssVars["--xmlui-backgroundColor-Panel"]).toBe("definitely-not-a-color");
+    expect(compiled.invalidThemeVarNames.size).toBe(0);
+    expect(compiled.themeDiagnostics).toEqual([]);
+  });
+
   test("falls back to the first available theme when the requested theme is missing", () => {
     const compiled = compileOldThemeModel({
       customThemes: [{ id: "custom", themeVars: { color: "custom" } }],

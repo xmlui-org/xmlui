@@ -1,10 +1,16 @@
 import type {
   ComponentMetadata as RuntimeComponentMetadata,
+  PropertyValueType as RuntimePropertyValueType,
   PropertyValueDescription as RuntimePropertyValueDescription,
+  ThemeValueType as RuntimeThemeValueType,
+  ThemeVarMetadata as RuntimeThemeVarMetadata,
 } from "../component-core/metadata/types";
 
 export type ComponentMetadata = RuntimeComponentMetadata;
+export type PropertyValueType = RuntimePropertyValueType;
 export type PropertyValueDescription<T = string | number> = RuntimePropertyValueDescription<T>;
+export type ThemeValueType = RuntimeThemeValueType;
+export type ThemeVarMetadata = RuntimeThemeVarMetadata;
 
 export type ComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = {
   type: string;
@@ -18,4 +24,3 @@ export type ComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = {
 export type CompoundComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = ComponentDef<TMd>;
 export type DynamicChildComponentDef<TMd extends ComponentMetadata = ComponentMetadata> = ComponentDef<TMd>;
 export type ParentRenderContext = Record<string, any>;
-export type ThemeValueType = string;

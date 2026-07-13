@@ -4,6 +4,7 @@ import type {
   ThemeDefinitionDetails,
   ThemeTone,
 } from "../../abstractions/ThemingDefs";
+import type { ThemeVarMetadata } from "../../abstractions/ComponentDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
 import { defaultThemeVariableLayers, mergeThemeVariableLayers } from "../../styling";
 import { normalizePath } from "../utils/misc";
@@ -24,6 +25,8 @@ import {
   type OldThemeDefinition,
   type OldThemeVars,
 } from "./transformThemeVars";
+import type { ThemeDiagnostic } from "./validator/diagnostics";
+import { validateTheme } from "./validator";
 
 export type CompileOldThemeModelInput = {
   builtInThemes?: ThemeDefinition[];
@@ -33,8 +36,9 @@ export type CompileOldThemeModelInput = {
   defaultTone?: ThemeTone;
   componentThemeMetadata: Pick<
     ComponentThemeMetadataRegistry,
-    "componentThemeVars" | "componentDefaultThemeVars"
+    "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
   >;
+  strictTheming?: boolean;
   resources?: Record<string, string | FontDef>;
   resourceMap?: Record<string, string>;
 };
@@ -49,6 +53,8 @@ export type CompiledOldThemeModel = {
   themeCssVars: Record<string, string>;
   themeVars: OldThemeVars;
   rawAllThemeVars: OldThemeVars;
+  knownThemeVarNames: Set<string>;
+  themeDiagnostics: ThemeDiagnostic[];
   invalidThemeVarNames: Set<string>;
   getThemeVar: (themeVar: string) => string | undefined;
   getResourceUrl: (resourceString?: string) => string | undefined;
@@ -59,6 +65,7 @@ export type CompiledOldThemeModel = {
 const CSS_VAR_PREFIX = "xmlui";
 
 export function compileOldThemeModel(input: CompileOldThemeModelInput): CompiledOldThemeModel {
+  const strictTheming = input.strictTheming !== false;
   const activeThemeTone = input.defaultTone ?? "light";
   const themes = [...(input.customThemes ?? []), ...(input.builtInThemes ?? [])];
   const availableThemeIds = [...new Set(themes.map((theme) => theme.id))];
@@ -85,11 +92,53 @@ export function compileOldThemeModel(input: CompileOldThemeModelInput): Compiled
     },
   );
   const allResources = mergeResources(themeDefChain, activeThemeTone, input.resources ?? {});
-  const themeDefChainVars = compileThemeDefChainVars(themeDefChain, activeThemeTone);
+  const declaredThemeVarNames = collectDeclaredThemeVarNames(
+    rootThemeVars,
+    input.componentThemeMetadata,
+  );
+  const {
+    themeDefChainVars,
+    invalidThemeVarNames: layerInvalidThemeVarNames,
+    themeDiagnostics: layerThemeDiagnostics,
+  } = compileThemeDefChainVars(
+    themeDefChain,
+    activeThemeTone,
+    strictTheming,
+    input.componentThemeMetadata.componentThemeVarDeclarations,
+    declaredThemeVarNames,
+  );
+  const knownThemeVarNames = collectKnownThemeVarNames(
+    rootThemeVars,
+    input.componentThemeMetadata,
+    themeDefChainVars,
+  );
   const rawAllThemeVars = cleanThemeVars(
     compileRawAllThemeVars(themeDefChainVars, input.componentThemeMetadata, rootThemeVars),
   );
-  const themeVars = resolveThemeVarsWithCssVars(rawAllThemeVars);
+  const allThemeDiagnostics = validateOldThemeDiagnostics(
+    rawAllThemeVars,
+    input.componentThemeMetadata.componentThemeVarDeclarations,
+    knownThemeVarNames,
+    strictTheming,
+    true,
+  );
+  const displayThemeDiagnostics = validateOldThemeDiagnostics(
+    rawAllThemeVars,
+    input.componentThemeMetadata.componentThemeVarDeclarations,
+    knownThemeVarNames,
+    strictTheming,
+  );
+  const finalInvalidThemeVarNames = collectInvalidThemeVarNames(allThemeDiagnostics);
+  const invalidThemeVarNames = new Set([
+    ...layerInvalidThemeVarNames,
+    ...finalInvalidThemeVarNames,
+  ]);
+  const filteredRawAllThemeVars = invalidThemeVarNames.size
+    ? Object.fromEntries(
+        Object.entries(rawAllThemeVars).filter(([key]) => !invalidThemeVarNames.has(key)),
+      )
+    : rawAllThemeVars;
+  const themeVars = resolveThemeVarsWithCssVars(filteredRawAllThemeVars);
   const themeCssVars = Object.fromEntries(
     Object.entries(themeVars)
       .filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -105,47 +154,111 @@ export function compileOldThemeModel(input: CompileOldThemeModelInput): Compiled
     themeDefChainVars,
     themeCssVars,
     themeVars,
-    rawAllThemeVars,
-    invalidThemeVarNames: new Set<string>(),
-    getThemeVar: (themeVar) => resolveThemeVar(themeVar, rawAllThemeVars),
+    rawAllThemeVars: filteredRawAllThemeVars,
+    knownThemeVarNames,
+    themeDiagnostics: [...layerThemeDiagnostics, ...displayThemeDiagnostics],
+    invalidThemeVarNames,
+    getThemeVar: (themeVar) => resolveThemeVar(themeVar, filteredRawAllThemeVars),
     getResourceUrl: (resourceString) => getResourceUrl(resourceString, allResources, input.resourceMap ?? {}),
     fontLinks: collectFontLinks(allResources),
     resources: allResources,
   };
 }
 
+export function validateOldThemeDiagnostics(
+  rawThemeVars: OldThemeVars,
+  declarations: ReadonlyMap<string, ThemeVarMetadata>,
+  knownThemeVarNames: ReadonlySet<string>,
+  strictTheming: boolean,
+  includeDerived = false,
+): ThemeDiagnostic[] {
+  if (!strictTheming) {
+    return [];
+  }
+  const resolvedForValidation = new Map<string, string>();
+  Object.keys(rawThemeVars).forEach((key) => {
+    resolvedForValidation.set(key, resolveThemeVar(key, rawThemeVars));
+  });
+  return validateTheme(resolvedForValidation, declarations, {
+    strict: true,
+    knownNames: knownThemeVarNames,
+    includeDerived,
+  });
+}
+
 function compileThemeDefChainVars(
   themeDefChain: OldThemeDefinition[],
   activeTone: ThemeTone,
-): OldThemeVars[] {
+  strictTheming: boolean,
+  declarations: ReadonlyMap<string, ThemeVarMetadata>,
+  knownNames: ReadonlySet<string>,
+): {
+  themeDefChainVars: OldThemeVars[];
+  invalidThemeVarNames: Set<string>;
+  themeDiagnostics: ThemeDiagnostic[];
+} {
   if (!themeDefChain.length) {
-    return [];
+    return {
+      themeDefChainVars: [],
+      invalidThemeVarNames: new Set<string>(),
+      themeDiagnostics: [],
+    };
   }
 
   let mergedThemeVars: OldThemeVars = {};
+  const invalidThemeVarNames = new Set<string>();
+  const themeDiagnostics: ThemeDiagnostic[] = [];
   themeDefChain.forEach((theme) => {
+    const varsForTone = sanitizeThemeVarsForStrictTheming(
+      themeVarsForTone(theme, activeTone),
+      strictTheming,
+      declarations,
+      knownNames,
+      invalidThemeVarNames,
+      themeDiagnostics,
+    );
     mergedThemeVars = {
       ...mergedThemeVars,
-      ...themeVarsForTone(theme, activeTone),
+      ...varsForTone,
     };
   });
 
-  return [
-    ...themeDefChain
-      .map((theme) => themeVarsForTone(theme, activeTone))
-      .slice(0, themeDefChain.length - 1),
-    {
-      ...generateBootstrapBaseColumns(mergedThemeVars),
-      ...generateBaseSpacings(mergedThemeVars),
-      ...generatePaddingSegments(mergedThemeVars),
-      ...generateBorderSegments(mergedThemeVars),
-      ...generateBaseTones(mergedThemeVars),
-      ...generateButtonTones(mergedThemeVars),
-      ...generateBaseFontSizes(mergedThemeVars),
-      ...generateTextFontSizes(mergedThemeVars),
-    },
-    themeVarsForTone(themeDefChain[themeDefChain.length - 1], activeTone),
-  ];
+  return {
+    themeDefChainVars: [
+      ...themeDefChain
+        .map((theme) =>
+          sanitizeThemeVarsForStrictTheming(
+            themeVarsForTone(theme, activeTone),
+            strictTheming,
+            declarations,
+            knownNames,
+            invalidThemeVarNames,
+            themeDiagnostics,
+          ),
+        )
+        .slice(0, themeDefChain.length - 1),
+      {
+        ...generateBootstrapBaseColumns(mergedThemeVars),
+        ...generateBaseSpacings(mergedThemeVars),
+        ...generatePaddingSegments(mergedThemeVars),
+        ...generateBorderSegments(mergedThemeVars),
+        ...generateBaseTones(mergedThemeVars),
+        ...generateButtonTones(mergedThemeVars),
+        ...generateBaseFontSizes(mergedThemeVars),
+        ...generateTextFontSizes(mergedThemeVars),
+      },
+      sanitizeThemeVarsForStrictTheming(
+        themeVarsForTone(themeDefChain[themeDefChain.length - 1], activeTone),
+        strictTheming,
+        declarations,
+        knownNames,
+        invalidThemeVarNames,
+        themeDiagnostics,
+      ),
+    ],
+    invalidThemeVarNames,
+    themeDiagnostics,
+  };
 }
 
 function compileRawAllThemeVars(
@@ -183,6 +296,121 @@ function compileRawAllThemeVars(
     ...mergedThemeVars,
     ...resolvedThemeVarsFromChains,
   };
+}
+
+function collectDeclaredThemeVarNames(
+  rootThemeVars: OldThemeVars,
+  componentThemeMetadata: Pick<
+    ComponentThemeMetadataRegistry,
+    "componentThemeVars" | "componentDefaultThemeVars"
+  >,
+): Set<string> {
+  const known = new Set<string>();
+  Object.keys(rootThemeVars).forEach((name) => addKnownThemeVarName(known, name));
+  componentThemeMetadata.componentThemeVars.forEach((name) => addKnownThemeVarName(known, name));
+  collectThemeVarKeys(componentThemeMetadata.componentDefaultThemeVars).forEach((name) =>
+    addKnownThemeVarName(known, name),
+  );
+  return known;
+}
+
+function collectKnownThemeVarNames(
+  rootThemeVars: OldThemeVars,
+  componentThemeMetadata: Pick<
+    ComponentThemeMetadataRegistry,
+    "componentThemeVars" | "componentDefaultThemeVars"
+  >,
+  themeDefChainVars: OldThemeVars[],
+): Set<string> {
+  const known = new Set<string>();
+  Object.keys(rootThemeVars).forEach((name) => addKnownThemeVarName(known, name));
+  componentThemeMetadata.componentThemeVars.forEach((name) => addKnownThemeVarName(known, name));
+  collectThemeVarKeys(componentThemeMetadata.componentDefaultThemeVars).forEach((name) =>
+    addKnownThemeVarName(known, name),
+  );
+  themeDefChainVars.forEach((theme) => {
+    const generated = {
+      ...generateBootstrapBaseColumns(theme),
+      ...generateBaseSpacings(theme),
+      ...generatePaddingSegments(theme),
+      ...generateBorderSegments(theme),
+      ...generateBaseTones(theme),
+      ...generateButtonTones(theme),
+      ...generateBaseFontSizes(theme),
+      ...generateTextFontSizes(theme),
+    };
+    Object.keys(generated).forEach((name) => addKnownThemeVarName(known, name));
+  });
+  return known;
+}
+
+function sanitizeThemeVarsForStrictTheming(
+  vars: OldThemeVars | undefined,
+  strictTheming: boolean,
+  declarations: ReadonlyMap<string, ThemeVarMetadata>,
+  knownNames: ReadonlySet<string>,
+  invalidNames: Set<string>,
+  diagnostics: ThemeDiagnostic[],
+): OldThemeVars {
+  if (!vars || !strictTheming) {
+    return vars ?? {};
+  }
+  const normalizedVars = cleanThemeVars(vars);
+  const resolved = new Map<string, string>();
+  Object.keys(normalizedVars).forEach((key) => {
+    resolved.set(key, resolveThemeVar(key, normalizedVars));
+  });
+  const allDiagnostics = validateTheme(resolved, declarations, {
+    strict: true,
+    knownNames,
+    includeDerived: true,
+  });
+  diagnostics.push(
+    ...validateTheme(resolved, declarations, { strict: true, knownNames }).filter(
+      (diagnostic) => diagnostic.code === "invalid-theme-value",
+    ),
+  );
+  collectInvalidThemeVarNames(allDiagnostics).forEach((name) => invalidNames.add(name));
+  if (!invalidNames.size) {
+    return normalizedVars;
+  }
+  return Object.fromEntries(
+    Object.entries(normalizedVars).filter(([key]) => !invalidNames.has(key)),
+  );
+}
+
+function collectInvalidThemeVarNames(diagnostics: ThemeDiagnostic[]): Set<string> {
+  return new Set(
+    diagnostics
+      .filter(
+        (diagnostic) =>
+          diagnostic.severity === "error" &&
+          diagnostic.code !== "unknown-theme-variable" &&
+          diagnostic.variableName,
+      )
+      .map((diagnostic) => diagnostic.variableName!),
+  );
+}
+
+function collectThemeVarKeys(value: unknown, keys: Set<string> = new Set()): Set<string> {
+  if (!value || typeof value !== "object") return keys;
+  for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+    if (key === "light" || key === "dark" || key === "tones") {
+      collectThemeVarKeys(nested, keys);
+      continue;
+    }
+    keys.add(key);
+    if (nested && typeof nested === "object") {
+      collectThemeVarKeys(nested, keys);
+    }
+  }
+  return keys;
+}
+
+function addKnownThemeVarName(known: Set<string>, name: string): void {
+  known.add(name);
+  const denamespaced = name.substring(name.lastIndexOf(":") + 1);
+  known.add(denamespaced);
 }
 
 function cleanThemeVars(themeVars: OldThemeVars): OldThemeVars {
