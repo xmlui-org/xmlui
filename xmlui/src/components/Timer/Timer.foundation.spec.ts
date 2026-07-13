@@ -1,36 +1,52 @@
 import { expect, test } from "../../testing/fixtures";
 
-test("timer stops when enabled is driven by a labeled Switch API value", async ({ initTestBed, page }) => {
+test.setTimeout(60_000);
+
+test("timer stops and resumes when enabled is driven by a labeled Switch API value", async ({
+  initTestBed,
+  page,
+}) => {
   await initTestBed(`
-    <App var.count="{0}" var.disabledTicks="{0}">
-      <Switch id="enable" testId="enable" label="Enable Timer" initialValue="true" />
+    <App var.count="{0}">
+      <Switch id="enable" testId="enable" label="Enable Timer" initialValue="false" />
       <Text testId="counter">{count}</Text>
-      <Text testId="disabledTicks">{disabledTicks}</Text>
       <Timer
         id="timer"
-        interval="250"
-        onTick="
-          count++;
-          if (!enable.value) {
-            disabledTicks++;
-          }
-        "
+        interval="75"
+        onTick="count++"
         enabled="{enable.value}" />
     </App>
   `);
 
   const counter = page.getByTestId("counter");
-  const disabledTicks = page.getByTestId("disabledTicks");
   const enableSwitch = page.getByTestId("enable").getByRole("switch");
   const timer = page.locator("[data-xmlui-component='Timer']");
 
-  await expect.poll(async () => Number(await counter.textContent()), { timeout: 3000 }).toBeGreaterThan(0);
-  await expect(disabledTicks).toHaveText("0");
+  await expect(counter).toHaveText("0");
+  await expect(enableSwitch).not.toBeChecked();
+  await expect(timer).toHaveAttribute("data-timer-enabled", "false");
+  await page.waitForTimeout(200);
+  await expect(counter).toHaveText("0");
+
+  await enableSwitch.click();
+  await expect(enableSwitch).toBeChecked();
+  await expect(timer).toHaveAttribute("data-timer-enabled", "true");
+  await expect
+    .poll(async () => Number(await counter.textContent()), { timeout: 5000 })
+    .toBeGreaterThan(0);
 
   await enableSwitch.click();
   await expect(enableSwitch).not.toBeChecked();
   await expect(timer).toHaveAttribute("data-timer-enabled", "false");
+  const countAfterDisable = Number(await counter.textContent());
+  expect(countAfterDisable).toBeGreaterThan(0);
+  await page.waitForTimeout(250);
+  await expect(counter).toHaveText(String(countAfterDisable));
 
-  await page.waitForTimeout(600);
-  await expect(disabledTicks).toHaveText("0");
+  await enableSwitch.click();
+  await expect(enableSwitch).toBeChecked();
+  await expect(timer).toHaveAttribute("data-timer-enabled", "true");
+  await expect
+    .poll(async () => Number(await counter.textContent()), { timeout: 3000 })
+    .toBeGreaterThan(countAfterDisable);
 });

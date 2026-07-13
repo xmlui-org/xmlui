@@ -15,9 +15,9 @@ describe("Phase 1 package and command compatibility", () => {
 
     expect(packageJson.scripts).toMatchObject({
       setup: "npm install",
-      "build-xmlui": "npm --workspace xmlui run build",
+      "build-xmlui": "turbo run build:core --filter=xmlui",
       "build-vscode-extension": "npm --workspace xmlui-vscode run build:vsix",
-      "build-extensions": "npm --workspace xmlui-counter-badge run build && npm --workspace xmlui-counter-badge run build:metadata",
+      "build-extensions": "turbo run build:extension --filter='./packages/*'",
       "build-docs": "npm --workspace xmlui run build:docs-reference",
       "generate-docs": "npm --workspace xmlui run build:docs-reference",
       "test-integration": "node scripts/phase1-integration-smoke.mjs",

@@ -93,7 +93,7 @@ for (let i = 0; i < routes.length; i++) {
     const html = mod.renderPath(route);
     results.push({ route, html });
   } catch (err) {
-    results.push({ route, error: err?.message || String(err) });
+    results.push({ route, error: err?.stack || err?.message || String(err) });
   }
 }
 

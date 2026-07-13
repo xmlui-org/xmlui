@@ -19,6 +19,7 @@ export function getSsgEntrySource(extensionNames: string[] = []): string {
   return `
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { MemoryRouter } from "react-router-dom";
 import { StyleProvider, StyleRegistry, XmluiRoot } from "xmlui";
 import type { XmluiModule, Extension } from "xmlui";
 ${extensionImports}
@@ -57,12 +58,21 @@ export function renderPath(pathname: string) {
     React.createElement(
       StyleProvider,
       { styleRegistry: registry },
-      React.createElement(XmluiRoot, {
-        module: appModule,
+      React.createElement(
+        MemoryRouter,
+        { initialEntries: [pathname] },
+        React.createElement(XmluiRoot, {
+          module: appModule,
         initialUrl: pathname,
         extensions: loadedExtensions,
         appGlobals: { ...(appConfig?.appGlobals ?? {}), isSsg: true },
+        icons: appConfig?.icons,
+        resources: appConfig?.resources,
+        resourceMap: appConfig?.resourceMap,
+        themes: appConfig?.themes,
+        defaultTheme: appConfig?.defaultTheme,
       })
+      )
     )
   );
   return {
@@ -73,11 +83,27 @@ export function renderPath(pathname: string) {
   };
 }
 
-function findAppConfig(): { appGlobals?: Record<string, unknown> } | undefined {
+type AppConfig = {
+  appGlobals?: Record<string, unknown>;
+  icons?: Record<string, string>;
+  resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+  themes?: Array<any>;
+  defaultTheme?: string;
+};
+
+function findAppConfig(): AppConfig | undefined {
   for (const value of Object.values(runtime)) {
     const config = (value as any)?.default;
-    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
-      return config as { appGlobals?: Record<string, unknown> };
+    if (config && typeof config === "object" && (
+      config.appGlobals ||
+      config.themes ||
+      config.defaultTheme ||
+      config.icons ||
+      config.resources ||
+      config.resourceMap
+    )) {
+      return config as AppConfig;
     }
   }
   return undefined;

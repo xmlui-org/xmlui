@@ -15,16 +15,20 @@ test.describe("Select foundation", () => {
     expect(await driver.value()).toBe("2");
   });
 
-  test("didChange fires when selection changes", async ({ initTestBed, createSelectDriver }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Select onDidChange="value => testState = value">
-        <Option value="a" label="Alpha" />
-        <Option value="b" label="Beta" />
-      </Select>
+  test("didChange fires when selection changes", async ({ initTestBed, createSelectDriver, page }) => {
+    await initTestBed(`
+      <App var.selected="">
+        <Select onDidChange="value => selected = value">
+          <Option value="a" label="Alpha" />
+          <Option value="b" label="Beta" />
+        </Select>
+        <Text testId="selected">{selected}</Text>
+      </App>
     `);
     const driver = await createSelectDriver();
-    await driver.selectOption("b");
-    await expect.poll(testStateDriver.testState).toBe("b");
+    await driver.toggleOptionsVisibility();
+    await page.getByRole("option", { name: "Beta" }).click({ force: true });
+    await expect(page.getByTestId("selected")).toHaveText("b");
   });
 
   test("renders options from data", async ({ initTestBed, createSelectDriver, page }) => {

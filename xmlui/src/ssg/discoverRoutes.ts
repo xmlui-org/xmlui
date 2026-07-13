@@ -34,6 +34,7 @@ export async function discoverRoutes(
     (r) => r.includes(":") || r.includes("*"),
   );
   const discovered = new Set<string>(extractedRoutes);
+  const navGroupSummaryUrls = await extractNavGroupUrls(srcDir);
 
   if (options.contentDir && dynamicRoutes.length > 0) {
     const contentDir = path.resolve(cwd, options.contentDir);
@@ -53,7 +54,7 @@ export async function discoverRoutes(
   }
 
   discovered.add("/");
-  return new RouteStore([...discovered]);
+  return new RouteStore([...discovered], navGroupSummaryUrls);
 }
 
 async function extractPageRoutes(srcDir: string): Promise<string[]> {
@@ -113,6 +114,42 @@ function findElementByType(
   return null;
 }
 
+async function extractNavGroupUrls(srcDir: string): Promise<Set<string>> {
+  const mainXmluiPath = path.join(srcDir, "Main.xmlui");
+  try {
+    const mainContent = await readFile(mainXmluiPath, "utf-8");
+    const doc = parseXmlui(mainContent, { sourceId: mainXmluiPath });
+    if (doc.kind === "component") {
+      return new Set();
+    }
+    return extractNavGroupUrlsFromTree(findElementByType(doc.root, "NavPanel"));
+  } catch {
+    return new Set();
+  }
+}
+
+function extractNavGroupUrlsFromTree(el: XmluiElement | null): Set<string> {
+  const urls = new Set<string>();
+  if (el) {
+    collectNavGroupUrls(el, urls);
+  }
+  return urls;
+}
+
+function collectNavGroupUrls(el: XmluiElement, urls: Set<string>): void {
+  if (el.type === "NavGroup") {
+    const to = el.props?.to;
+    if (typeof to === "string" && to.length > 0) {
+      urls.add(to);
+    }
+  }
+  for (const child of el.children) {
+    if (child.kind !== "text") {
+      collectNavGroupUrls(child, urls);
+    }
+  }
+}
+
 function extractUrls(pagesEl: XmluiElement): string[] {
   const urls: string[] = [];
   for (const child of pagesEl.children) {
@@ -151,7 +188,10 @@ function dynRouteToGlobPattern(route: string, contentDir: string): string {
 }
 
 export class RouteStore {
-  constructor(private readonly routes: string[]) {}
+  constructor(
+    private readonly routes: string[],
+    private readonly _navGroupUrls: Set<string> = new Set(),
+  ) {}
 
   /** Routes without ":param" or "*" wildcards — safe for SSG. */
   staticRoutes(): string[] {
@@ -160,5 +200,10 @@ export class RouteStore {
 
   allRoutes(): string[] {
     return this.routes;
+  }
+
+  /** URLs that are NavGroup summary pages, matching the old website sitemap contract. */
+  navGroupUrls(): Set<string> {
+    return this._navGroupUrls;
   }
 }

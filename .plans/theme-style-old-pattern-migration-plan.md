@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 13.3.1 core theme how-to examples complete; Step 13.3.2 is next; app-compat remains blocked by existing production build errors  
+Status: Step 15 final compatibility sweep recorded; unit, metadata, and E2E gates pass; production, SSG, and compatibility sweep remain blocked by pre-existing production build and optional VS Code esbuild issues  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -32,26 +32,16 @@ duplicates; keep the original Playwright file path and test title.
   `Nested DropdownMenu and Select > ModalDialog > Select > DropdownMenu`
 - `xmlui/src/components/Accordion/Accordion.foundation.spec.ts:36:3` -
   `Accordion foundation > headerTemplate renders and expanded content can mutate state`
-- `xmlui/src/components/Select/Select.foundation.spec.ts:18:3` -
-  `Select foundation > didChange fires when selection changes`
 - `xmlui/src/components/Tree/Tree-dynamic.spec.ts:3175:5` -
   `Imperative API > API Method Tests > getExpandedNodes() - returns array of expanded node keys`
 - `xmlui/src/components/List/List.spec.ts:2416:3` -
   `scroll event > scroll event does not fire for the list's own programmatic scroll`
-- `xmlui/src/components/Switch/Switch.spec.ts:710:5` -
-  `Api > value property with transformToLegitValue > switch handles special string values correctly`
-- `xmlui/src/components/Timer/Timer.foundation.spec.ts:3:1` -
-  `timer stops when enabled is driven by a labeled Switch API value`
 - `xmlui/src/components/Spinner/Spinner.spec.ts:453:3` -
   `Responsive Layout Properties > responsive props do not affect non-visual spinner state (delay still works)`
 - `xmlui/src/components/Switch/Switch.spec.ts:664:5` -
   `Api > value property with transformToLegitValue > switch reflects state changes with different value types`
 - `xmlui/src/components/Switch/Switch.spec.ts:128:5` -
   `Basic Functionality > setValue API with transformToLegitValue > setValue with number values`
-- `xmlui/src/components/Switch/Switch.spec.ts:150:5` -
-  `Basic Functionality > setValue API with transformToLegitValue > setValue with string values`
-- `xmlui/src/components/Switch/Switch.spec.ts:740:5` -
-  `Api > value property with transformToLegitValue > switch handles string case sensitivity correctly`
 
 ## Compatibility Sources
 
@@ -2057,6 +2047,38 @@ Verification:
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
 
+Completed notes:
+
+- Added `xmlui/tests/e2e/theme-howto-components.spec.ts` with direct rewrite
+  fixtures for Button variants, TextBox validation/disabled states, Badge
+  shapes/colors, DatePicker calendar item colors, nested NavGroup padding,
+  ExpandableItem summary/transition styling, Tooltip appearance, Markdown and
+  NoResult placeholder styling, and Slider track/range/thumb/disabled states.
+- Used direct fixtures instead of the old website markdown extraction helper,
+  matching the Step 13.3.1 approach while preserving the old examples'
+  user-visible behavior.
+- Added computed-style assertions for Button, TextBox, Badge, DatePicker,
+  ExpandableItem, Tooltip, NoResult, and Slider, plus state-update paths for
+  Button click count, TextBox editing, NavGroup expansion, ExpandableItem
+  toggle, DatePicker popup selection surface, and Slider disabled state.
+- Kept the Markdown port at the visible documentation-text level: the rewrite
+  renders the documented text and blockquote content, but the old `:::`
+  admonition syntax is not parsed as a special block in this direct fixture.
+  Deeper Markdown parser parity remains a later docs/Markdown checkpoint if
+  needed.
+
+Step 13.3.2 verification results:
+
+- `npx playwright test tests/e2e/theme-howto-components.spec.ts` passed 9
+  tests.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,574 passed, 83 skipped, and two already tracked flaky retries:
+  `xmlui/src/components/Switch/Switch.spec.ts:710:5` -
+  `Api > value property with transformToLegitValue > switch handles special string values correctly`;
+  `xmlui/src/components/Timer/Timer.foundation.spec.ts:3:1` -
+  `timer stops when enabled is driven by a labeled Switch API value`.
+
 ### Step 14: Website Theme Parity Checkpoint
 
 Use the migrated old website as the broad visual compatibility surface:
@@ -2069,10 +2091,152 @@ Use the migrated old website as the broad visual compatibility surface:
 
 Verification:
 
-- `npm --workspace xmlui-website run test:e2e`
+- Website-local E2E parity note: neither the old checkout nor the rewrite
+  currently defines a `test:e2e` script in the `xmlui-website` workspace.
+  Use focused XMLUI E2E canaries for website theme regressions until a
+  website-local E2E runner exists.
 - `npm --workspace xmlui-website run build`
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+#### Step 14.1: Website Theme Registration Canary
+
+Add focused XMLUI E2E coverage that imports the website theme definitions and
+proves that `xmlui-website-theme`, `xmlui-hero-theme`, and
+`xmlui-landing-theme` are consumable by the runtime as app themes and scoped
+themes.
+
+Completed notes:
+
+- Added `xmlui/tests/e2e/website-theme-parity.spec.ts` as the focused Step
+  14.1 website theme canary. The spec uses a test-safe copy of the website
+  theme definitions because direct Playwright imports from
+  `website/src/themes/*.ts` currently hit Node's CommonJS loader before
+  Playwright transforms the spec.
+- Covered `xmlui-website-theme` as a root/default app theme by asserting
+  website-driven `AppHeader`, `NavPanel`, and `Text` styles, including the
+  old website header height, nav width, text size, and text color.
+- Covered scoped `xmlui-hero-theme`, scoped `xmlui-landing-theme`, and an
+  `xmlui-green-on-default` built-in-plus-website extends chain over website
+  content.
+- Rewrote `xmlui/src/components/Timer/Timer.foundation.spec.ts` after the
+  full E2E gate exposed a Timer flake. The new test asserts durable
+  stop/resume behavior after `enabled="{enable.value}"` settles, avoids the
+  old in-flight tick race, and gives the test enough timeout headroom for the
+  full shared-page E2E run.
+- Removed the Timer foundation test from the active flaky-test list after it
+  passed five focused repeats and the full E2E gate without retry.
+
+Verification:
+
+- Focused run of the website theme parity spec.
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 14.1 verification results:
+
+- `npx playwright test tests/e2e/website-theme-parity.spec.ts` passed 2
+  tests.
+- `npm --workspace xmlui run test:e2e -- src/components/Timer/Timer.foundation.spec.ts --repeat-each=5 --max-failures=1`
+  passed 5 focused Timer repeats.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,578 passed, 83 skipped, and no flaky retries.
+
+#### Step 14.2: Website Route Visual Parity
+
+Inspect or test the first viewport of the home, docs, blog, get-started, and
+news routes against the old website behavior. Convert regressions into focused
+XMLUI E2E tests before changing implementation.
+
+Implementation notes:
+
+- Old and rewrite website route shells both use `website/src/Main.xmlui` with
+  `layout="vertical-full-header"`, the `xmlui-website-theme` default theme,
+  a 44px `AppHeader`, docs-only nav visibility, and a 280px docs nav width.
+- `website/content/home/get-started.md` is the old and rewrite source of truth
+  for the `/get-started` route heading and intro copy.
+- Added `xmlui/tests/e2e/website-route-parity.spec.ts` as the focused route
+  canary. It covers the first-viewport shell/content contract for `/`,
+  `/docs`, `/blog`, `/get-started`, and `/news`, including non-doc routes
+  hiding the docs nav and the docs route exposing the 280px nav.
+- Extracted the Step 14.1 website theme copy into
+  `xmlui/tests/e2e/website-theme-fixtures.ts` so website E2E canaries share
+  one test-safe theme fixture.
+- The route canary uses the same bare route-context names as the old website
+  shell, including `pathname.startsWith('/docs')`. This exposed a compatibility
+  gap in the rewrite: bare `pathname`, `queryParams`, `queryString`, and
+  `routeParams` now resolve and subscribe like their `$...` aliases.
+- The website build exposed two build-surface gaps. The lockfile did not yet
+  include the website manifest's declared `@octokit/rest` and
+  `@emotion/is-prop-valid` dev dependencies, so `npm install --workspace
+  xmlui-website` refreshed the lockfile. The sitemap generator also imported
+  the old `xmlui/src/nodejs/discoverRoutes` path; it now imports the rewrite
+  `xmlui/src/ssg/discoverRoutes.ts`, whose `RouteStore` preserves the old
+  `navGroupUrls()` method for website tooling compatibility.
+
+Verification:
+
+- Route-level screenshots or focused E2E assertions recorded in this plan.
+- `npm --workspace xmlui-website run build`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 14.2 verification results:
+
+- `npx playwright test tests/e2e/website-theme-parity.spec.ts tests/e2e/website-route-parity.spec.ts`
+  passed 4 tests.
+- `npm --workspace xmlui-website run build` passed after the lockfile refresh
+  and sitemap route-discovery import fix.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,580 passed and 83 skipped.
+
+#### Step 14.3: Website Build and SSG Gate
+
+Run the website build surface after route parity canaries are in place. Keep
+the known app-compat production-build blocker separate unless this step
+directly changes it.
+
+Implementation notes:
+
+- The website build commands use `tsx`, which needs to create an IPC pipe under
+  the system temp directory. In this workspace sandbox, that fails with
+  `listen EPERM`, so the website build gates were run with escalation.
+- The SSG worker now preserves the original error stack or message when route
+  rendering fails. This made the initial `document is not defined` failure
+  actionable instead of reporting only a generic worker error.
+- The generated SSG entry wraps each route render in `MemoryRouter` with
+  `initialEntries={[pathname]}`. This preserves the old route-specific render
+  behavior without letting `BrowserRouter` access `document` during SSR.
+- The generated SSG entry now passes website config fields through to
+  `XmluiRoot`, including `icons`, `resources`, `resourceMap`, `themes`, and
+  `defaultTheme`. This lets website-only themes such as `xmlui-hero-theme` and
+  `earthtone` resolve during static rendering.
+- The flaky Timer foundation test was rewritten to start disabled, prove the
+  counter does not advance, enable it through a labeled `Switch` API binding,
+  disable it and verify the count stops, then re-enable it and verify it
+  resumes. This avoids depending on a race between initial render and the first
+  interval tick.
+
+Verification:
+
+- `npm --workspace xmlui-website run build`
+- `npm --workspace xmlui-website run build-ssg`
+- `npm --workspace xmlui run test:unit`
+- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Step 14.3 verification results:
+
+- `npm --workspace xmlui-website run build` passed with existing Rolldown chunk,
+  pure annotation, direct `eval`, dynamic import, and plugin timing warnings.
+- `npm --workspace xmlui-website run build-ssg` passed, generated the website
+  assets, discovered 453 routes, rendered all routes, and wrote the fallback.
+- `npx playwright test src/components/Timer/Timer.foundation.spec.ts --repeat-each=5`
+  passed 5 runs after the Timer test rewrite.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,580 passed and 83 skipped.
 
 ### Step 15: Final Compatibility Sweep
 
@@ -2093,6 +2257,48 @@ Create `.ai/theme-style-old-pattern-closure.md` with:
 - flaky tests observed and rerun evidence;
 - commands and results;
 - follow-up risks for website visual tuning.
+
+Step 15 implementation and closure notes:
+
+- Fixed stale compatibility expectations found by the sweep:
+  `packageInfrastructure.test.ts` now matches the current root build scripts,
+  artifact compatibility accepts the current `./testing` export and HSL primary
+  color format, and the VS Code semantic-token malformed-attribute fixture now
+  expects the current `XP011` quoted-value diagnostic.
+- Fixed the full-suite flakes that remained after Step 14.3:
+  `Select.foundation.spec.ts` now asserts `onDidChange` through rendered app
+  state instead of a stale API value read, and the affected Switch string-value
+  API tests dispatch button click events directly to avoid shared-page action
+  timing races.
+- Added `.ai/theme-style-old-pattern-closure.md` with the final changed-file
+  inventory, command results, fixed flakes, and remaining blockers.
+
+Verification results:
+
+- `npm --workspace xmlui run test` passed 39 files / 312 tests.
+- `npm --workspace xmlui run test:unit` passed 39 files / 312 tests.
+- `npm --workspace xmlui run check:metadata` passed, generating metadata for
+  237 components and 3 examples. The run still logs the known sandbox-only Vite
+  WebSocket `EPERM` warning.
+- `npm --workspace xmlui run build:production` failed on existing TypeScript
+  production-build debt, including strict-null/type mismatches, missing
+  internal module imports, Vite environment option typing, and legacy DOM type
+  gaps.
+- `npm --workspace xmlui run build:ssg` failed because it depends on the
+  blocked production build.
+- `npm --workspace xmlui run compatibility:sweep` failed because production
+  and SSG remain blocked, and the VS Code build cannot resolve the optional
+  native `@esbuild/darwin-arm64` package in this workspace. The stale unit and
+  diagnostic expectations reported by the sweep were fixed and verified
+  separately.
+- Focused verification passed:
+  `npx vitest run tests/compatibility/packageInfrastructure.test.ts tests/compatibility/artifacts/artifactCompatibility.test.ts`
+  passed 2 files / 9 tests; `npx vitest run tests/semanticTokens.test.ts`
+  passed 1 file / 10 tests; `npx playwright test src/components/Select/Select.foundation.spec.ts --grep "didChange fires when selection changes" --repeat-each=10 --workers=1`
+  passed 10 repeats; `npx playwright test src/components/Switch/Switch.spec.ts --grep "switch handles special string values correctly|switch handles string case sensitivity correctly" --repeat-each=10 --workers=1`
+  passed 20 repeats.
+- Final `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with
+  5,580 passed, 83 skipped, and no flaky retries.
 
 ## Risk Areas
 

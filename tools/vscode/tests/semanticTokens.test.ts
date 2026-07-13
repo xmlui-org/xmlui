@@ -91,12 +91,12 @@ describe("collectXmluiSemanticTokens", () => {
 
 describe("collectXmluiDiagnostics", () => {
   it("returns parser diagnostics with VS Code-friendly ranges", () => {
-    const diagnostics = collectXmluiDiagnostics("<App><Button label /></App>");
+    const diagnostics = collectXmluiDiagnostics("<App><Button label= /></App>");
 
     expect(diagnostics).toEqual([
       expect.objectContaining({
-        code: "XP010",
-        message: "Expected '=' after attribute name.",
+        code: "XP011",
+        message: "A quoted attribute value expected.",
         line: 0,
       }),
     ]);
