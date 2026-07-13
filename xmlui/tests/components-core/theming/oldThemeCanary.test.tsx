@@ -16,7 +16,6 @@ import {
   collectComponentThemeMetadata,
   createCoreComponentThemeMetadataRegistry,
 } from "../../../src/component-core";
-import { XmluiThemeRoot } from "../../../src/runtime/rendering/theme";
 import { resetThemeDiagnosticDeduplication } from "../../../src/components-core/theming/validator/emit";
 import { AppMd } from "../../../src/components/App/App";
 import { FooterMd } from "../../../src/components/Footer/Footer";
@@ -458,24 +457,22 @@ function renderCanaryProvider({
 }) {
   let capturedTheme: ThemeScope | undefined;
   const html = renderToStaticMarkup(
-    <XmluiThemeRoot>
-      <StyleProvider>
-        <LegacyThemeProvider
-          themes={themes}
-          defaultTheme={defaultTheme}
-          resources={resources}
-          resourceMap={resourceMap}
-          componentThemeMetadata={componentThemeMetadata}
-          strictTheming={strictTheming}
-          strictAccessibility={strictAccessibility}
-          enableOldThemeCanary={enableOldThemeCanary}
-        >
-          <ThemeProbe onTheme={(theme) => {
-            capturedTheme = theme;
-          }} />
-        </LegacyThemeProvider>
-      </StyleProvider>
-    </XmluiThemeRoot>,
+    <StyleProvider>
+      <LegacyThemeProvider
+        themes={themes}
+        defaultTheme={defaultTheme}
+        resources={resources}
+        resourceMap={resourceMap}
+        componentThemeMetadata={componentThemeMetadata}
+        strictTheming={strictTheming}
+        strictAccessibility={strictAccessibility}
+        enableOldThemeCanary={enableOldThemeCanary}
+      >
+        <ThemeProbe onTheme={(theme) => {
+          capturedTheme = theme;
+        }} />
+      </LegacyThemeProvider>
+    </StyleProvider>,
   );
   if (!capturedTheme) {
     throw new Error("ThemeProbe did not render.");
@@ -501,31 +498,29 @@ function renderThemeClassProvider({
   );
   const descriptors = new Map(entries);
   renderToStaticMarkup(
-    <XmluiThemeRoot>
-      <StyleProvider styleRegistry={styleRegistry}>
-        <LegacyThemeProvider
-          themes={themes}
-          defaultTheme="brand"
-          componentThemeMetadata={componentThemeMetadata}
-          enableOldThemeCanary={false}
+    <StyleProvider styleRegistry={styleRegistry}>
+      <LegacyThemeProvider
+        themes={themes}
+        defaultTheme="brand"
+        componentThemeMetadata={componentThemeMetadata}
+        enableOldThemeCanary={false}
+      >
+        <ComponentRegistryProvider
+          value={{
+            lookupComponentRenderer: (name) => ({ descriptor: descriptors.get(name) }),
+            componentThemeVars: componentThemeMetadata.componentThemeVars,
+          }}
         >
-          <ComponentRegistryProvider
-            value={{
-              lookupComponentRenderer: (name) => ({ descriptor: descriptors.get(name) }),
-              componentThemeVars: componentThemeMetadata.componentThemeVars,
+          <ThemeClassProbe
+            descriptor={descriptor}
+            explicitContributors={explicitContributors}
+            onClassName={(className) => {
+              capturedClassName = className;
             }}
-          >
-            <ThemeClassProbe
-              descriptor={descriptor}
-              explicitContributors={explicitContributors}
-              onClassName={(className) => {
-                capturedClassName = className;
-              }}
-            />
-          </ComponentRegistryProvider>
-        </LegacyThemeProvider>
-      </StyleProvider>
-    </XmluiThemeRoot>,
+          />
+        </ComponentRegistryProvider>
+      </LegacyThemeProvider>
+    </StyleProvider>,
   );
   if (!capturedClassName) {
     throw new Error("ThemeClassProbe did not render.");

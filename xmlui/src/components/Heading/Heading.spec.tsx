@@ -5,8 +5,8 @@ import { parseXmlui } from "../../compiler/parseXmlui";
 import { componentTransferModules } from "../../component-core";
 import { builtInComponentContracts } from "../../compiler/contracts";
 import { createRenderContext } from "../../runtime/rendering/renderer";
-import { XmluiThemeRoot } from "../../runtime/rendering/theme";
 import { StyleProvider } from "../../components-core/theming/StyleContext";
+import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -59,10 +59,10 @@ function renderHeadingWithLevel(level: string) {
   const HeadingRenderer = headingRenderer;
 
   return renderToStaticMarkup(
-    <XmluiThemeRoot>
-      <StyleProvider>
+    <StyleProvider>
+      <LegacyThemeProvider>
         <HeadingRenderer context={context} node={heading} scope={scope} />
-      </StyleProvider>
-    </XmluiThemeRoot>,
+      </LegacyThemeProvider>
+    </StyleProvider>,
   );
 }

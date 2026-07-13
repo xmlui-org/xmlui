@@ -93,3 +93,21 @@ export function useComponentThemeClass(
 
   return useStyles(themeVars, { layer: "themes" });
 }
+
+export function useThemeVariables(): Record<string, string> {
+  const themeScope = useTheme();
+
+  return useMemo(() => {
+    const compatibleThemeVars: Record<string, string> = {};
+    for (const [name, value] of Object.entries(themeScope.themeVars)) {
+      if (!isBorderShorthandVar(name)) {
+        compatibleThemeVars[name] = value;
+      }
+    }
+    return compatibleThemeVars;
+  }, [themeScope.themeVars]);
+}
+
+function isBorderShorthandVar(name: string): boolean {
+  return /^(border|borderHorizontal|borderVertical|borderTop|borderRight|borderBottom|borderLeft)-/.test(name);
+}

@@ -15,9 +15,7 @@ import {
   useEvaluatedProp,
   useLayoutStyle,
   useStringProp,
-  useThemeOverrideProps,
 } from "./props";
-import { ThemeScope } from "./theme";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 
 export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
@@ -120,14 +118,7 @@ export const builtInRenderers: Record<string, XmluiBuiltInRenderer> = {
       </button>
     );
   },
-  Theme: ({ context, node, scope }) => (
-    <ThemeScope
-      variables={useThemeOverrideProps(node, scope)}
-      style={useLayoutStyle(node, scope)}
-    >
-      {context.renderChildren(node.children, scope)}
-    </ThemeScope>
-  ),
+  Theme: ({ context, node, scope }) => <>{context.renderChildren(node.children, scope)}</>,
   variable: () => null,
   Slot: ({ context, node, scope }) => {
     const nameBinding = node.parsed?.props?.name;

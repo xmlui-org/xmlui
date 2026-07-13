@@ -17,7 +17,8 @@ import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutR
 import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./components/App/LinkInfoContext";
 import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
-import { useComponentThemeClass as useRuntimeComponentThemeClass, useThemeRuntime } from "./runtime/rendering/theme";
+import { useTheme as useLegacyTheme } from "./components-core/theming/ThemeContext";
+import { useComponentThemeClass as useOldComponentThemeClass } from "./components-core/theming/utils";
 import { useLayoutStyle } from "./runtime/rendering/props";
 import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
@@ -35,6 +36,16 @@ export type RegisterComponentApiFn = (api: Record<string, unknown>) => void;
 
 const UNINITIALIZED_API_VALUE = Symbol("uninitialized-api-value");
 const ExtensionRuntimeScopeContext = React.createContext<XmluiExtensionComponentProps["scope"] | undefined>(undefined);
+
+function useExtensionComponentThemeClass(
+  _name: string,
+  metadata: ComponentMetadata,
+): { className: string; style: CSSProperties } {
+  return {
+    className: useOldComponentThemeClass(metadata) ?? "",
+    style: {},
+  };
+}
 
 export {
   createMetadata,
@@ -161,7 +172,7 @@ export function wrapComponent(
       const normalizedProps = normalizeProps(runtimeProps.props, options, metadata);
       Object.assign(normalizedProps, templateProps(runtimeProps, metadata));
       Object.assign(normalizedProps, rendererProps(runtimeProps, options));
-      const themeClass = useRuntimeComponentThemeClass(name, metadata);
+      const themeClass = useExtensionComponentThemeClass(name, metadata);
       for (const propName of options.exclude ?? []) {
         delete normalizedProps[propName];
       }
@@ -319,7 +330,7 @@ function OldComponentRendererCompat({
   runtimeProps: XmluiExtensionComponentProps;
 }) {
   const form = useFormContext();
-  const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const themeClass = useExtensionComponentThemeClass(name, metadata);
   const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
   const bindTo = typeof runtimeProps.props.bindTo === "string" ? runtimeProps.props.bindTo : undefined;
   const formValue = bindTo ? form?.getValue(bindTo) : undefined;
@@ -510,11 +521,11 @@ export function useAppContext() {
 }
 
 export function useTheme() {
-  const theme = useThemeRuntime();
+  const theme = useLegacyTheme();
   return {
     ...theme,
     getThemeVar(name: string, fallback?: unknown) {
-      return theme.variables[name] ?? theme.variables[`--xmlui-${name}`] ?? fallback;
+      return theme.getThemeVar(name) ?? theme.themeVars[name] ?? theme.themeStyles[`--xmlui-${name}`] ?? fallback;
     },
   };
 }
@@ -536,7 +547,7 @@ export function useDevTools() {
 }
 
 export function useComponentThemeClass(metadata: ComponentMetadata): string {
-  return useRuntimeComponentThemeClass("ExtensionComponent", metadata).className;
+  return useOldComponentThemeClass(metadata) ?? "";
 }
 
 export function useLinkInfo(): NavHierarchyNode | undefined {
@@ -678,7 +689,7 @@ function CompoundComponentCompat({
   );
   const normalizedPropsRef = React.useRef(normalizedProps);
   normalizedPropsRef.current = normalizedProps;
-  const themeClass = useRuntimeComponentThemeClass(name, metadata);
+  const themeClass = useExtensionComponentThemeClass(name, metadata);
   const id = typeof runtimeProps.props.id === "string" ? runtimeProps.props.id : undefined;
   const scope = runtimeProps.scope;
   const didChange = runtimeProps.events.didChange;

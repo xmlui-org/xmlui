@@ -5,8 +5,8 @@ import { parseXmlui } from "../../compiler/parseXmlui";
 import { builtInComponentContracts } from "../../compiler/contracts";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
-import { XmluiThemeRoot } from "../../runtime/rendering/theme";
 import { StyleProvider } from "../../components-core/theming/StyleContext";
+import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -41,11 +41,11 @@ describe("Text migration", () => {
     const TextRenderer = textRenderer;
 
     const html = renderToStaticMarkup(
-      <XmluiThemeRoot>
-        <StyleProvider>
+      <StyleProvider>
+        <LegacyThemeProvider>
           <TextRenderer context={context} node={text} scope={scope} />
-        </StyleProvider>
-      </XmluiThemeRoot>,
+        </LegacyThemeProvider>
+      </StyleProvider>,
     );
 
     expect(html).toContain('data-xmlui-component="Text"');

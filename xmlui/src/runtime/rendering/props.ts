@@ -17,7 +17,7 @@ import type { RuntimeScope } from "../state";
 import { evaluateExpressionOrText, dependenciesForBinding } from "./bindings";
 import { useBindingRevision } from "./reactive";
 import type { RenderContext } from "./types";
-import { useThemeRuntime } from "./theme";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 export function useEvaluatedProp(
   node: XmluiElement,
@@ -80,9 +80,9 @@ export function useLayoutStyle(
       props[name] = useEvaluatedProp(node, scope, name, undefined);
     }
   }
-  const themeRuntime = useThemeRuntime();
+  const theme = useTheme();
   const viewportWidth = useViewportWidth();
-  return themeRuntime.disableInlineStyle ? {} : resolveActiveLayoutStyle(props, viewportWidth, options);
+  return theme.disableInlineStyle ? {} : resolveActiveLayoutStyle(props, viewportWidth, options);
 }
 
 export function flexStyle(

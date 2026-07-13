@@ -7,10 +7,8 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { useAppContext } from "../../components-core/AppContext";
-import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { useBooleanProp, useEvaluatedProp, useStringProp, useThemeOverrideProps } from "../../runtime/rendering/props";
-import { ThemeScope as RuntimeThemeScope } from "../../runtime/rendering/theme";
 import type { RuntimeRenderLayoutContext, XmluiBuiltInRenderer } from "../../runtime/rendering/types";
 import { isLayoutPropName, looksLikeComponentThemeVariableName } from "../../styling";
 
@@ -128,31 +126,6 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
   const shouldApplyTheme = applyIf ?? defaultProps.applyIf;
   const notifications =
     appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
-  const themeToExtend = typeof themeId === "string"
-    ? appThemes.themes.find((theme) => theme.id === themeId) ?? appThemes.activeTheme
-    : appThemes.activeTheme;
-  const runtimeTheme: import("../../abstractions/ThemingDefs").ThemeDefinition = {
-    ...themeToExtend,
-    id: "__runtime-theme-scope",
-    tones: {
-      ...themeToExtend.tones,
-      [themeTone]: {
-        ...themeToExtend.tones?.[themeTone],
-        themeVars: {
-          ...themeToExtend.tones?.[themeTone]?.themeVars,
-          ...(themeVariables as Record<string, string>),
-        },
-      },
-    },
-  };
-  const { allThemeVarsWithResolvedHierarchicalVars } = useCompiledTheme(
-    runtimeTheme,
-    themeTone,
-    appThemes.themes,
-    appThemes.resources,
-    appThemes.resourceMap,
-  );
-
   if (!shouldApplyTheme) {
     return renderThemeChildren(
       context,
@@ -179,11 +152,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
       node={node as unknown as ComponentDef}
     />
   );
-  return (
-    <RuntimeThemeScope variables={allThemeVarsWithResolvedHierarchicalVars} tone={themeTone}>
-      {themedElement}
-    </RuntimeThemeScope>
-  );
+  return themedElement;
 };
 
 function themeVariablesOnly(props: Record<string, unknown>): Record<string, unknown> {

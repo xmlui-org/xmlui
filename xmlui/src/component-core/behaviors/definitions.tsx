@@ -11,7 +11,7 @@ import { FormItemMd } from "../../components/FormItem/FormItem";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { useFormContextPart } from "../../components/Form/FormContext";
 import { parseTooltipOptions, ThemedTooltip as Tooltip } from "../../components/Tooltip/Tooltip";
-import { useComponentThemeClass } from "../../runtime/rendering/theme";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { buttonVariantValues } from "../../components/abstractions";
 import { badgeVariantValues } from "../../components/Badge/BadgeReact";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
@@ -534,11 +534,11 @@ function LabelBehavior({
   const shrinkToLabel = context.props.shrinkToLabel === undefined
     ? !hasValueApiPair
     : isTruthyWhenValue(context.props.shrinkToLabel);
-  const formItemThemeClass = useComponentThemeClass("FormItem", FormItemMd);
+  const formItemThemeClassName = useComponentThemeClass(FormItemMd);
   return (
     <ItemWithLabel
       id={stringValue(context.props.id)}
-      className={formItemThemeClass.className}
+      className={["xmlui-FormItem", formItemThemeClassName].filter(Boolean).join(" ")}
       componentName={context.componentName}
       labelPosition={stringValue(context.props.labelPosition) as any}
       label={stringValue(context.props.label)}

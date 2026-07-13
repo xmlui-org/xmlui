@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 10.3 component and extension SCSS inventory audit complete; Step 11 is next; app-compat remains blocked by existing production build errors  
+Status: Step 11.3 duplicate runtime theme module removal complete; Step 12 is next; app-compat remains blocked by existing production build errors  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -1577,21 +1577,138 @@ After old-pattern behavior is passing, remove or shrink
 `runtime/rendering/theme.tsx` so it no longer owns a conflicting theme model.
 Keep only compatibility helpers that delegate to the old provider/registry.
 
-Tasks:
+Split this step into verification-gated substeps because the duplicate runtime
+theme model is still referenced from three separate surfaces: runtime adapter
+layout decisions, extension authoring compatibility, and temporary built-in
+renderer/test helpers.
 
-- update `wrapComponent`, runtime adapter, behavior definitions, and extension
-  authoring compatibility to use the restored old hooks;
-- delete duplicated default theme variable maps from `styling/theme.ts` only
-  after all references are gone or delegated;
-- keep `styling/layout.ts` and layout resolver behavior if it is independent
-  and already compatible.
+#### Step 11.1 Completed: Delegate Runtime Theme Read Hooks to the Old Theme Context
+
+Implemented:
+
+- Stopped wrapping the root `LegacyThemeProvider` and nested `ThemeReact` scopes
+  in `RuntimeThemeProvider`.
+- Removed the temporary outer `RuntimeThemeScope` wrapper from the active
+  `Theme` renderer path; nested theme ownership now stays with the old
+  `ThemeContext`.
+- Updated runtime adapter/layout and extension-authoring compatibility to read
+  `themeVars`, `getThemeVar`, `activeThemeTone`, and `disableInlineStyle` from
+  `components-core/theming/ThemeContext`.
+- Kept temporary compatibility exports from `runtime/rendering/theme.tsx` as
+  read-through hooks while remaining references are migrated. The read-through
+  keeps the previous runtime-compatible border-shorthand filter so old
+  stylesheet theme classes remain the source of truth for shorthand borders.
+- Removed the now-unused `runtimeCompatibleThemeVars` export from the old theme
+  context and kept that temporary compatibility filter private to the runtime
+  shim.
+- Preserved `RuntimeStyleProvider` at the root and `RuntimeThemeProvider`/
+  `ThemeScope` exports in `runtime/rendering/theme.tsx` for Step 11.2/11.3,
+  where the remaining temporary built-in renderer/test references are removed
+  or collapsed.
 
 Verification:
 
 - `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
-- `npm --workspace xmlui run check:metadata`
-- `npm --workspace xmlui run test:unit`
-- `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  remains blocked by existing project-wide TypeScript errors, including
+  `src/compat/reactStickyEl.ts`, compiler IR/parser strictness,
+  `components-core/theming/layout-resolver.ts`, missing
+  `components-core/concurrency` and `abstractions/ContainerDefs` modules,
+  broad component strictness errors, and `vite-plugin/xmluiPlugin.ts`. Local
+  Step 11.1 errors in `extensionAuthoringCompat.tsx` and the stale
+  `runtimeCompatibleThemeVars` type reference were fixed before completion.
+- `npm --workspace xmlui run check:metadata` passed; Vite still logs the
+  sandboxed websocket `EPERM 0.0.0.0:24678` warning and generated
+  `dist-metadata/xmlui-metadata.json` with `237` components and `3` examples.
+- `npm --workspace xmlui run test:unit` passed (`39` files, `312` tests).
+- First full `npm --workspace xmlui run test:e2e -- --max-failures=10` exposed
+  six Avatar aggregate-border failures after the initial read-hook delegation
+  plus one tracked Timer flake. The Avatar group passed after restoring the
+  runtime-compatible border-shorthand filter:
+  `npm --workspace xmlui run test:e2e -- src/components/Avatar/Avatar.spec.ts -g "theme border(Horizontal|Left overrides borderHorizontal|Right overrides borderHorizontal|Vertical|Top overrides borderVertical|Bottom overrides borderVertical)" --max-failures=10`
+  (`10 passed`).
+- The Timer flake passed on isolated rerun:
+  `npm --workspace xmlui run test:e2e -- src/components/Timer/Timer.foundation.spec.ts --max-failures=10`
+  (`1 passed`).
+- Final full `npm --workspace xmlui run test:e2e -- --max-failures=10` passed
+  (`5550 passed`, `83 skipped`).
+
+#### Step 11.2 Completed: Remove Runtime Theme Scope Ownership from Active Render Paths
+
+Implemented:
+
+- Made the stale temporary built-in `Theme` renderer transparent because the
+  active component registry already delegates `Theme` to the migrated
+  old-context `ThemeReact` renderer.
+- Removed the root `RuntimeStyleProvider` wrapper from `runtime/index.tsx` so
+  `components-core/theming/StyleContext` is the only active style registry.
+- Collapsed `runtime/rendering/theme.tsx` to read-through compatibility hooks
+  (`useThemeRuntime` and `useThemeVariables`) that delegate to the old
+  `ThemeContext`. Removed the duplicate runtime providers, `XmluiThemeRoot`,
+  `ThemeScope`, dynamic style injection, root class injection, and flat runtime
+  `StyleRegistry`.
+- Migrated the last runtime `useComponentThemeClass` call in label behavior to
+  `components-core/theming/utils`, while explicitly preserving the stable
+  `xmlui-FormItem` class that the old behavior tests expect.
+- Replaced unit/canary/shadow test wrappers that imported
+  `XmluiThemeRoot`/`ThemeScope` with `LegacyThemeProvider` and the restored
+  old `StyleProvider`.
+
+Verification:
+
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  remains blocked by the existing project-wide TypeScript errors already noted
+  in Step 11.1. No new local errors were reported for
+  `runtime/rendering/theme.tsx`, `runtime/rendering/builtins.tsx`, or the
+  Step 11.2 test wrapper migrations.
+- `npm --workspace xmlui run check:metadata` passed; Vite still logs the
+  sandboxed websocket `EPERM 0.0.0.0:24678` warning and generated
+  `dist-metadata/xmlui-metadata.json` with `237` components and `3` examples.
+- First `npm --workspace xmlui run test:unit` run exposed one local regression:
+  `tests/compiler/componentBehaviors.test.tsx` expected the stable
+  `xmlui-FormItem` class. Restoring that class explicitly in label behavior
+  fixed the regression.
+- Final `npm --workspace xmlui run test:unit` passed (`39` files, `312` tests).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with one
+  already-tracked Timer flake
+  (`src/components/Timer/Timer.foundation.spec.ts:3:1`), reporting
+  `5549 passed`, `83 skipped`, and `1 flaky`.
+
+#### Step 11.3: Delete or Collapse the Duplicate Runtime Theme Module
+
+Completed:
+
+- Deleted `runtime/rendering/theme.tsx`; no public compatibility export still
+  imports the duplicate runtime theme module.
+- Moved the remaining filtered theme-variable read into the old theming layer
+  as `components-core/theming/utils.useThemeVariables`.
+- Repointed the remaining runtime component consumers (`Avatar`, `Badge`,
+  `Link`, `Pages`, `QRCode`, and `Spinner`) from
+  `runtime/rendering/theme` to the old theming utility hook.
+- Preserved the border-shorthand filtering used by the previous compatibility
+  shim so components that derive current border CSS do not consume shorthand
+  variables as direct leaf values.
+- Audited the duplicate default theme map helpers in `styling/theme.ts`; no
+  runtime-only imports remain, but the helpers are still active old-pattern
+  dependencies of `ThemeProvider`, `oldThemeCompiler`, component fallback
+  theme resolution, and tests, so they were intentionally left in place.
+
+Verification:
+
+- `rg -n "runtime/rendering/theme|useThemeRuntime|ThemeRuntimeContext|from \"./theme\"|from './theme'" xmlui/src xmlui/tests`
+  found no remaining deleted-module imports. The only `./theme` imports are
+  the unrelated `styling` module barrel/import.
+- `npm --workspace xmlui exec -- tsc -p tsconfig.build.json --noEmit`
+  remains blocked by the existing project-wide TypeScript errors already noted
+  in Step 11.1. No new local errors were reported for the moved hook or
+  deleted `runtime/rendering/theme.tsx` imports.
+- `npm --workspace xmlui run check:metadata` passed; Vite still logs the
+  sandboxed websocket `EPERM 0.0.0.0:24678` warning and generated
+  `dist-metadata/xmlui-metadata.json` with `237` components and `3` examples.
+- `npm --workspace xmlui run test:unit` passed (`39` files, `312` tests).
+- `npm --workspace xmlui run test:e2e -- --max-failures=10` passed with one
+  already-tracked Accordion flake
+  (`src/components/Accordion/Accordion.foundation.spec.ts:36:3`), reporting
+  `5549 passed`, `83 skipped`, and `1 flaky`.
 
 ### Step 12: Restore Inline Style Validation Runtime Wiring
 

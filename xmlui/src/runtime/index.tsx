@@ -13,7 +13,6 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
-import { StyleProvider as RuntimeStyleProvider } from "./rendering/theme";
 import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
@@ -298,58 +297,56 @@ export function XmluiRoot({
 
   return (
     <HelmetProvider>
-      <RuntimeStyleProvider>
-        <XmluiAppContextProvider value={{
-          appGlobals,
-          loggedInUser,
-          setLoggedInUser: updateLoggedInUser,
-          confirm,
-          signError,
-          mediaSize,
-        }}>
-          <IconProvider icons={icons}>
-            <LegacyStyleProvider>
-              <LegacyThemeProvider
-                resources={resources}
-                resourceMap={resourceMap}
-                themes={themes}
-                defaultTheme={resolvedThemeDefaults.defaultTheme}
-                defaultTone={resolvedThemeDefaults.defaultTone}
-                componentThemeMetadata={componentThemeMetadata}
-                strictTheming={strictTheming}
-                strictAccessibility={strictAccessibility}
-                enableOldThemeCanary={enableOldThemeCanary}
-              >
-                <ComponentRegistryProvider value={componentRegistry}>
-                  <XmluiRuntimeContent
-                    appGlobals={appGlobals}
-                    confirm={confirm}
-                    context={context}
-                    extensionFunctions={{
-                      ...(module.extensionFunctions ?? {}),
-                      ...normalizedExtensions.functions,
-                    }}
-                    i18n={i18nRef.current}
-                    loggedInUser={loggedInUser}
-                    module={module}
-                    references={referencesRef.current}
-                    rootOwnerId={rootOwnerId}
-                    routing={routingRef.current}
-                    signError={signError}
-                    store={store}
-                    toast={toastRef.current}
-                  />
-                </ComponentRegistryProvider>
-                {renderConfirmDialog(confirmDialog, (confirmed) => {
-                  confirmDialog?.resolve(confirmed);
-                  setConfirmDialog(undefined);
-                })}
-                <GlobalLiveRegion />
-              </LegacyThemeProvider>
-            </LegacyStyleProvider>
-          </IconProvider>
-        </XmluiAppContextProvider>
-      </RuntimeStyleProvider>
+      <XmluiAppContextProvider value={{
+        appGlobals,
+        loggedInUser,
+        setLoggedInUser: updateLoggedInUser,
+        confirm,
+        signError,
+        mediaSize,
+      }}>
+        <IconProvider icons={icons}>
+          <LegacyStyleProvider>
+            <LegacyThemeProvider
+              resources={resources}
+              resourceMap={resourceMap}
+              themes={themes}
+              defaultTheme={resolvedThemeDefaults.defaultTheme}
+              defaultTone={resolvedThemeDefaults.defaultTone}
+              componentThemeMetadata={componentThemeMetadata}
+              strictTheming={strictTheming}
+              strictAccessibility={strictAccessibility}
+              enableOldThemeCanary={enableOldThemeCanary}
+            >
+              <ComponentRegistryProvider value={componentRegistry}>
+                <XmluiRuntimeContent
+                  appGlobals={appGlobals}
+                  confirm={confirm}
+                  context={context}
+                  extensionFunctions={{
+                    ...(module.extensionFunctions ?? {}),
+                    ...normalizedExtensions.functions,
+                  }}
+                  i18n={i18nRef.current}
+                  loggedInUser={loggedInUser}
+                  module={module}
+                  references={referencesRef.current}
+                  rootOwnerId={rootOwnerId}
+                  routing={routingRef.current}
+                  signError={signError}
+                  store={store}
+                  toast={toastRef.current}
+                />
+              </ComponentRegistryProvider>
+              {renderConfirmDialog(confirmDialog, (confirmed) => {
+                confirmDialog?.resolve(confirmed);
+                setConfirmDialog(undefined);
+              })}
+              <GlobalLiveRegion />
+            </LegacyThemeProvider>
+          </LegacyStyleProvider>
+        </IconProvider>
+      </XmluiAppContextProvider>
     </HelmetProvider>
   );
 }

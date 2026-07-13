@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
-import { RuntimeThemeProvider } from "../../runtime/rendering/theme";
 import { checkThemeContrast } from "../accessibility/contrast";
 import { pushXsLog } from "../inspector/inspectorUtils";
 import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
@@ -20,10 +19,6 @@ import {
 } from "./themes/xmlui";
 import { useDomRoot } from "./StyleContext";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
-import {
-  generateBorderSegments,
-  generatePaddingSegments,
-} from "./transformThemeVars";
 
 type ResourceMap = Record<string, string | FontDef>;
 type ShadowThemeVarMismatch = {
@@ -187,15 +182,6 @@ export function LegacyThemeProvider({
   }, [activeTheme.id, activeThemeTone, oldCompiledTheme, shouldShadowCompile]);
   const activeThemeStyles = oldCompiledTheme.themeCssVars;
   const activeThemeVars = oldCompiledTheme.themeVars;
-  const runtimeThemeVars = useMemo(
-    () => ({
-      ...runtimeCompatibleThemeVars(activeThemeVars),
-      ...generatePaddingSegments(oldCompiledTheme.rawAllThemeVars),
-      ...runtimeCompatibleThemeVars(generateBorderSegments(oldCompiledTheme.rawAllThemeVars)),
-      ...runtimeCompatibleThemeVars(oldCompiledTheme.rawAllThemeVars),
-    }),
-    [activeThemeVars, oldCompiledTheme.rawAllThemeVars],
-  );
   const activeGetResourceUrl = oldCompiledTheme.getResourceUrl;
   const activeGetThemeVar = oldCompiledTheme.getThemeVar;
   const domRoot = useDomRoot();
@@ -312,13 +298,7 @@ export function LegacyThemeProvider({
   return (
     <ThemesContext.Provider value={appThemes}>
       <ThemeContext.Provider value={themeScope}>
-        <RuntimeThemeProvider
-          variables={runtimeThemeVars}
-          tone={activeThemeTone}
-          setTone={appThemes.setActiveThemeTone}
-        >
-          {children}
-        </RuntimeThemeProvider>
+        {children}
       </ThemeContext.Provider>
     </ThemesContext.Provider>
   );
@@ -432,20 +412,6 @@ function normalizeLegacyThemeLength(value: string): string {
     return value;
   }
   return `${Number(calcMatch[1]) * Number(calcMatch[2])}${calcMatch[3]}`;
-}
-
-export function runtimeCompatibleThemeVars(themeVars: ThemeVars): ThemeVars {
-  const compatibleThemeVars: ThemeVars = {};
-  for (const [name, value] of Object.entries(themeVars)) {
-    if (!isBorderShorthandVar(name)) {
-      compatibleThemeVars[name] = value;
-    }
-  }
-  return compatibleThemeVars;
-}
-
-function isBorderShorthandVar(name: string): boolean {
-  return /^(border|borderHorizontal|borderVertical|borderTop|borderRight|borderBottom|borderLeft)-/.test(name);
 }
 
 export function applyThemeCssVarsToRoot(

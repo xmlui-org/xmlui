@@ -2,11 +2,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import type { XmluiElement } from "../../compiler/ir";
+import { useThemeVariables } from "../../components-core/theming/utils";
 import { createRuntimeScope } from "../../runtime/state";
 import { compileRoutePattern, matchRoutePattern, type RouteSnapshot } from "../../runtime/routing";
 import { useStringProp } from "../../runtime/rendering/props";
 import type { XmluiBuiltInRenderer } from "../../runtime/rendering/types";
-import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling";
 import styles from "./Pages.module.scss";
 

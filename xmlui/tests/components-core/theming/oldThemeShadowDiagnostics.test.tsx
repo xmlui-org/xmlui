@@ -9,7 +9,6 @@ import {
 } from "../../../src/components-core/theming/ThemeContext";
 import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
 import { createCoreComponentThemeMetadataRegistry } from "../../../src/component-core";
-import { XmluiThemeRoot } from "../../../src/runtime/rendering/theme";
 
 afterEach(() => {
   globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ = undefined;
@@ -70,13 +69,11 @@ describe("old theme shadow diagnostics", () => {
 
   test("does not compute diagnostics unless explicitly enabled", () => {
     renderToStaticMarkup(
-      <XmluiThemeRoot>
-        <StyleProvider>
-          <LegacyThemeProvider>
-            <ThemeProbe />
-          </LegacyThemeProvider>
-        </StyleProvider>
-      </XmluiThemeRoot>,
+      <StyleProvider>
+        <LegacyThemeProvider>
+          <ThemeProbe />
+        </LegacyThemeProvider>
+      </StyleProvider>,
     );
 
     expect(globalThis.__XMLUI_OLD_THEME_SHADOW__).toBeUndefined();
@@ -91,18 +88,16 @@ function renderShadowProvider({
   defaultTheme: string;
 }) {
   return renderToStaticMarkup(
-    <XmluiThemeRoot>
-      <StyleProvider>
-        <LegacyThemeProvider
-          themes={themes}
-          defaultTheme={defaultTheme}
-          componentThemeMetadata={createCoreComponentThemeMetadataRegistry()}
-          enableOldThemeShadowDiagnostics
-        >
-          <ThemeProbe />
-        </LegacyThemeProvider>
-      </StyleProvider>
-    </XmluiThemeRoot>,
+    <StyleProvider>
+      <LegacyThemeProvider
+        themes={themes}
+        defaultTheme={defaultTheme}
+        componentThemeMetadata={createCoreComponentThemeMetadataRegistry()}
+        enableOldThemeShadowDiagnostics
+      >
+        <ThemeProbe />
+      </LegacyThemeProvider>
+    </StyleProvider>,
   );
 }
 
