@@ -62,6 +62,28 @@ export function StyleProvider({ children }: { children: ReactNode }) {
   );
 }
 
+export function RuntimeThemeProvider({
+  children,
+  variables,
+  tone,
+  setTone,
+}: {
+  children: ReactNode;
+  variables: Record<string, unknown>;
+  tone: ThemeTone;
+  setTone: (tone: ThemeTone) => void;
+}) {
+  const value = useMemo<ThemeRuntimeContext>(
+    () => ({ variables, tone, setTone }),
+    [setTone, tone, variables],
+  );
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
 export function XmluiThemeRoot({ children, tone: initialTone = "light" }: { children: ReactNode; tone?: ThemeTone }) {
   const [tone, setTone] = useState<ThemeTone>(initialTone);
   useEffect(() => {

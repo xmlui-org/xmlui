@@ -356,6 +356,15 @@ if (params.has("__xmluiTestBed")) {
 
   const readTestBedResources = (): Record<string, string> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedResources");
+    return readStringMap(raw);
+  };
+
+  const readTestBedResourceMap = (): Record<string, string> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedResourceMap");
+    return readStringMap(raw);
+  };
+
+  const readStringMap = (raw: string | null): Record<string, string> => {
     if (!raw) {
       return {};
     }
@@ -394,6 +403,22 @@ if (params.has("__xmluiTestBed")) {
   const readTestBedDefaultTheme = (): string | undefined => {
     const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTheme");
     return value || undefined;
+  };
+
+  const readTestBedDefaultTone = (): "light" | "dark" | undefined => {
+    const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTone");
+    return value === "light" || value === "dark" ? value : undefined;
+  };
+
+  const readOptionalBoolean = (key: string): boolean | undefined => {
+    const value = window.sessionStorage.getItem(key);
+    if (value === "true") {
+      return true;
+    }
+    if (value === "false") {
+      return false;
+    }
+    return undefined;
   };
 
   const readTestBedOldThemeCanary = (): boolean =>
@@ -447,8 +472,12 @@ if (params.has("__xmluiTestBed")) {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
     const resources = readTestBedResources();
+    const resourceMap = readTestBedResourceMap();
     const themes = readTestBedThemes();
     const defaultTheme = readTestBedDefaultTheme();
+    const defaultTone = readTestBedDefaultTone();
+    const strictTheming = readOptionalBoolean("__xmluiTestBedStrictTheming");
+    const strictAccessibility = readOptionalBoolean("__xmluiTestBedStrictAccessibility");
     const enableOldThemeCanary = readTestBedOldThemeCanary();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
@@ -457,8 +486,12 @@ if (params.has("__xmluiTestBed")) {
       testBedRoot = mountXmluiApp(module, root, {
         extensions,
         resources,
+        resourceMap,
         themes,
         defaultTheme,
+        defaultTone,
+        strictTheming,
+        strictAccessibility,
         enableOldThemeCanary,
         testProbe,
       });
@@ -469,8 +502,12 @@ if (params.has("__xmluiTestBed")) {
       module,
       extensions,
       resources,
+      resourceMap,
       themes,
       defaultTheme,
+      defaultTone,
+      strictTheming,
+      strictAccessibility,
       enableOldThemeCanary,
       testProbe,
     }));

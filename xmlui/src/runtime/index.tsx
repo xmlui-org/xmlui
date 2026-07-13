@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 import hotToast from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 
 import { evaluateExpressionOrText } from "./rendering/bindings";
 import { createRenderContext, XmluiNodeRenderer } from "./rendering/renderer";
@@ -12,7 +13,7 @@ import {
 } from "./state";
 import { RuntimeRoutingStore, type RoutingMode } from "./routing";
 import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext";
-import { StyleProvider as RuntimeStyleProvider, XmluiThemeRoot } from "./rendering/theme";
+import { StyleProvider as RuntimeStyleProvider } from "./rendering/theme";
 import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
@@ -23,9 +24,10 @@ import { Dialog } from "../components/ModalDialog/Dialog";
 import { ThemedStack as Stack } from "../components/Stack/Stack";
 import { NotificationToast } from "../components/Theme/NotificationToast";
 import { ComponentRegistryProvider } from "../components/ComponentRegistryContext";
-import { defaultProps as themeDefaultProps } from "../components/Theme/Theme.defaults";
+import { Theme as RootTheme } from "../components/Theme/ThemeReact";
 import { createRuntimeI18n, type RuntimeI18n } from "./i18n";
 import type { XmluiDocumentInput, XmluiModule, XmluiComponentModule } from "./types";
+import type { XmluiElement } from "../compiler/ir";
 import { listRegisteredExtensions, normalizeExtensions, type Extension } from "../extensions";
 import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
@@ -87,8 +89,11 @@ export type MountXmluiAppOptions = {
   appGlobals?: Record<string, unknown>;
   icons?: Record<string, string>;
   resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  strictTheming?: boolean;
+  strictAccessibility?: boolean;
   enableOldThemeCanary?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
@@ -120,8 +125,11 @@ export function mountXmluiApp(
         appGlobals={options.appGlobals}
         icons={options.icons}
         resources={options.resources}
+        resourceMap={options.resourceMap}
         themes={options.themes}
         defaultTheme={options.defaultTheme}
+        strictTheming={options.strictTheming}
+        strictAccessibility={options.strictAccessibility}
         enableOldThemeCanary={options.enableOldThemeCanary}
         testProbe={options.testProbe}
       />,
@@ -138,8 +146,11 @@ export function mountXmluiApp(
       appGlobals={options.appGlobals}
       icons={options.icons}
       resources={options.resources}
+      resourceMap={options.resourceMap}
       themes={options.themes}
       defaultTheme={options.defaultTheme}
+      strictTheming={options.strictTheming}
+      strictAccessibility={options.strictAccessibility}
       enableOldThemeCanary={options.enableOldThemeCanary}
       testProbe={options.testProbe}
     />,
@@ -156,8 +167,11 @@ export function XmluiRoot({
   appGlobals = {},
   icons = {},
   resources = {},
+  resourceMap = {},
   themes = [],
   defaultTheme,
+  strictTheming = true,
+  strictAccessibility = false,
   enableOldThemeCanary = false,
   testProbe,
 }: {
@@ -169,8 +183,11 @@ export function XmluiRoot({
   appGlobals?: Record<string, unknown>;
   icons?: Record<string, string>;
   resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  strictTheming?: boolean;
+  strictAccessibility?: boolean;
   enableOldThemeCanary?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
@@ -274,25 +291,33 @@ export function XmluiRoot({
     [module.components, module.extensionRenderers, normalizedExtensions.renderers],
   );
   const mediaSize = useRuntimeMediaSize();
+  const resolvedThemeDefaults = useMemo(
+    () => resolveStoredTheme(module.root, defaultTheme, defaultTone),
+    [defaultTheme, defaultTone, module.root],
+  );
 
   return (
-    <RuntimeStyleProvider>
-      <XmluiAppContextProvider value={{
-        appGlobals,
-        loggedInUser,
-        setLoggedInUser: updateLoggedInUser,
-        confirm,
-        signError,
-        mediaSize,
-      }}>
-        <IconProvider icons={icons}>
-          <XmluiThemeRoot tone={defaultTone}>
+    <HelmetProvider>
+      <RuntimeStyleProvider>
+        <XmluiAppContextProvider value={{
+          appGlobals,
+          loggedInUser,
+          setLoggedInUser: updateLoggedInUser,
+          confirm,
+          signError,
+          mediaSize,
+        }}>
+          <IconProvider icons={icons}>
             <LegacyStyleProvider>
               <LegacyThemeProvider
                 resources={resources}
+                resourceMap={resourceMap}
                 themes={themes}
-                defaultTheme={defaultTheme}
+                defaultTheme={resolvedThemeDefaults.defaultTheme}
+                defaultTone={resolvedThemeDefaults.defaultTone}
                 componentThemeMetadata={componentThemeMetadata}
+                strictTheming={strictTheming}
+                strictAccessibility={strictAccessibility}
                 enableOldThemeCanary={enableOldThemeCanary}
               >
                 <ComponentRegistryProvider value={componentRegistry}>
@@ -320,16 +345,12 @@ export function XmluiRoot({
                   setConfirmDialog(undefined);
                 })}
                 <GlobalLiveRegion />
-                <NotificationToast
-                  toastDuration={themeDefaultProps.toastDuration}
-                  notificationPosition={themeDefaultProps.notificationPosition}
-                />
               </LegacyThemeProvider>
             </LegacyStyleProvider>
-          </XmluiThemeRoot>
-        </IconProvider>
-      </XmluiAppContextProvider>
-    </RuntimeStyleProvider>
+          </IconProvider>
+        </XmluiAppContextProvider>
+      </RuntimeStyleProvider>
+    </HelmetProvider>
   );
 }
 
@@ -418,7 +439,11 @@ function XmluiRuntimeContent({
     initializedRef.current = true;
   }
 
-  return <XmluiNodeRenderer context={context} node={module.root} scope={scope} />;
+  return (
+    <RootTheme isRoot applyIf={true}>
+      <XmluiNodeRenderer context={context} node={module.root} scope={scope} />
+    </RootTheme>
+  );
 }
 
 function errorMessage(error: unknown): string {
@@ -567,4 +592,69 @@ function routeModeFromApp(value: string | undefined, configValue: unknown): Rout
     return "history";
   }
   return "hash";
+}
+
+function resolveStoredTheme(
+  root: XmluiElement,
+  defaultTheme: string | undefined,
+  defaultTone: ThemeTone | undefined,
+): { defaultTheme: string | undefined; defaultTone: ThemeTone | undefined } {
+  if (typeof localStorage === "undefined") {
+    return { defaultTheme, defaultTone };
+  }
+  const appNode = findNodeOfType(root, "App");
+  if (!appNode) {
+    return { defaultTheme, defaultTone };
+  }
+  const props = appNode.props ?? {};
+  if (!isTruthyPersistTheme(props.persistTheme)) {
+    return { defaultTheme, defaultTone };
+  }
+  const themeKey = typeof props.themeStorageKey === "string" && props.themeStorageKey
+    ? props.themeStorageKey
+    : "appTheme";
+  const toneKey = typeof props.toneStorageKey === "string" && props.toneStorageKey
+    ? props.toneStorageKey
+    : "appTone";
+  return {
+    defaultTheme: storedString(themeKey) ?? defaultTheme,
+    defaultTone: storedTone(toneKey) ?? defaultTone,
+  };
+}
+
+function findNodeOfType(node: XmluiElement, type: string): XmluiElement | undefined {
+  if (node.type === type) {
+    return node;
+  }
+  for (const child of node.children) {
+    if (typeof child === "object" && child.kind === "element") {
+      const found = findNodeOfType(child, type);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return undefined;
+}
+
+function isTruthyPersistTheme(value: unknown): boolean {
+  return value === true || value === "true" || value === 1 || value === "{true}";
+}
+
+function storedString(key: string): string | undefined {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored === null) {
+      return undefined;
+    }
+    const parsed = JSON.parse(stored);
+    return typeof parsed === "string" && parsed.length > 0 ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function storedTone(key: string): ThemeTone | undefined {
+  const value = storedString(key);
+  return value === "dark" || value === "light" ? value : undefined;
 }

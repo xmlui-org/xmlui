@@ -10,6 +10,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import {
   builtInThemes,
+  runtimeCompatibleThemeVars,
   ThemeContext,
   useTheme,
   useThemes,
@@ -39,6 +40,7 @@ import baseStyles from "../../index.scss?inline";
 import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
 import { useAppContext } from "../../components-core/AppContext";
 import type { ThemeVarMetadata } from "../../component-core/metadata";
+import { RuntimeThemeProvider } from "../../runtime/rendering/theme";
 
 const STYLE_ID = "xmlui-base-styles";
 const THEME_CSS_VAR_PREFIX = `--${THEME_VAR_PREFIX}-`;
@@ -75,7 +77,7 @@ export function Theme({
   const generatedId = useId();
   const appContext = useAppContext();
 
-  const { themes, resources, resourceMap, activeThemeId } = useThemes();
+  const { themes, resources, resourceMap, activeThemeId, setActiveThemeTone } = useThemes();
   const { activeTheme, activeThemeTone, root } = useTheme();
   const themeTone = tone || activeThemeTone;
   const generatedThemeVars = useMemo(
@@ -120,6 +122,17 @@ export function Theme({
     resources,
     resourceMap,
     appContext?.xmluiConfig?.strictTheming !== false,
+  );
+  const scopedThemeVars = useMemo(
+    () => ({
+      ...allThemeVarsWithResolvedHierarchicalVars,
+      ...generatedThemeVars,
+    }),
+    [allThemeVarsWithResolvedHierarchicalVars, generatedThemeVars],
+  );
+  const scopedRuntimeThemeVars = useMemo(
+    () => runtimeCompatibleThemeVars(scopedThemeVars),
+    [scopedThemeVars],
   );
   const componentRegistry = useComponentRegistry();
 
@@ -171,7 +184,7 @@ export function Theme({
           // even though "Inc" is not a registered component name.
           inComponentThemeVars;
         if (allowed) {
-          const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
+          const resolvedValue = scopedThemeVars[rawKey] ?? value;
           filteredThemeCssVars[key] = resolvedValue;
         }
       });
@@ -183,7 +196,7 @@ export function Theme({
       if (invalidThemeVarNames.has(key)) {
         return;
       }
-      const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[key] ?? value;
+      const resolvedValue = scopedThemeVars[key] ?? value;
       filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = resolvedValue;
     });
 
@@ -240,7 +253,7 @@ export function Theme({
     themeTone,
     isRoot,
     componentRegistry,
-    allThemeVarsWithResolvedHierarchicalVars,
+    scopedThemeVars,
     invalidThemeVarNames,
     getThemeVar,
   ]);
@@ -265,7 +278,7 @@ export function Theme({
       activeThemeTone: themeTone,
       activeTheme: currentTheme,
       themeStyles: themeCssVars,
-      themeVars: allThemeVarsWithResolvedHierarchicalVars,
+      themeVars: scopedThemeVars,
       getResourceUrl,
       getThemeVar,
       disableInlineStyle,
@@ -273,11 +286,11 @@ export function Theme({
     return themeVal;
   }, [
     activeThemeId,
-    allThemeVarsWithResolvedHierarchicalVars,
     currentTheme,
     currentThemeRoot,
     getResourceUrl,
     getThemeVar,
+    scopedThemeVars,
     themeCssVars,
     themeTone,
     disableInlineStyle,
@@ -334,28 +347,34 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      {needsWrapper ? (
-        <>
-          <div className={classnames(styles.themeWrapper, className)}>
-            {renderChild &&
-              renderChild(node.children, { ...layoutContext, themeClassName: className })}
+      <RuntimeThemeProvider
+        variables={scopedRuntimeThemeVars}
+        tone={themeTone}
+        setTone={setActiveThemeTone}
+      >
+        {needsWrapper ? (
+          <>
+            <div className={classnames(styles.themeWrapper, className)}>
+              {renderChild &&
+                renderChild(node.children, { ...layoutContext, themeClassName: className })}
+              {children}
+            </div>
+            {root &&
+              createPortal(
+                <div
+                  className={classnames(styles.themeWrapper, className)}
+                  ref={updatePortalThemeRoot}
+                ></div>,
+                root,
+              )}
+          </>
+        ) : (
+          <>
+            {renderChild && renderChild(node.children, layoutContext)}
             {children}
-          </div>
-          {root &&
-            createPortal(
-              <div
-                className={classnames(styles.themeWrapper, className)}
-                ref={updatePortalThemeRoot}
-              ></div>,
-              root,
-            )}
-        </>
-      ) : (
-        <>
-          {renderChild && renderChild(node.children, layoutContext)}
-          {children}
-        </>
-      )}
+          </>
+        )}
+      </RuntimeThemeProvider>
     </ThemeContext.Provider>
   );
 }

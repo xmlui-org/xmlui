@@ -171,12 +171,12 @@ export function generateButtonTones(theme?: OldThemeVars) {
 
   variants.forEach((variant) => {
     const solidTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-solid`), (tones) => ({
-      [`backgroundColor-Button-${variant}-solid`]: toCssVar(`$backgroundColor-Button-${variant}`),
+      [`backgroundColor-Button-${variant}-solid`]: tones.base,
       [`backgroundColor-Button-${variant}-solid--hover`]: tones.tone1,
       [`backgroundColor-Button-${variant}-solid--active`]: tones.tone2,
-      [`borderColor-Button-${variant}-solid`]: toCssVar(`$borderColor-Button-${variant}`),
-      [`borderColor-Button-${variant}-solid--hover`]: toCssVar(`$borderColor-Button-${variant}`),
-      [`borderColor-Button-${variant}-solid--active`]: toCssVar(`$borderColor-Button-${variant}`),
+      [`borderColor-Button-${variant}-solid`]: tones.base,
+      [`borderColor-Button-${variant}-solid--hover`]: tones.base,
+      [`borderColor-Button-${variant}-solid--active`]: tones.base,
       [`textColor-Button-${variant}-solid`]: tones.tone3,
       [`textColor-Button-${variant}-solid--hover`]: tones.tone3,
       [`textColor-Button-${variant}-solid--active`]: tones.tone3,

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 
 import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
-import { useThemeRuntime } from "../../runtime/rendering/theme";
+import { RuntimeThemeProvider } from "../../runtime/rendering/theme";
 import { checkThemeContrast } from "../accessibility/contrast";
 import { pushXsLog } from "../inspector/inspectorUtils";
 import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
@@ -18,6 +18,12 @@ import {
   XmlUiThemeDefinition,
   XmlUiWebThemeDefinition,
 } from "./themes/xmlui";
+import { useDomRoot } from "./StyleContext";
+import { useIsomorphicLayoutEffect } from "../utils/hooks";
+import {
+  generateBorderSegments,
+  generatePaddingSegments,
+} from "./transformThemeVars";
 
 type ResourceMap = Record<string, string | FontDef>;
 type ShadowThemeVarMismatch = {
@@ -101,6 +107,7 @@ export function LegacyThemeProvider({
   resourceMap = {},
   themes = [],
   defaultTheme,
+  defaultTone = "light",
   componentThemeMetadata = EMPTY_COMPONENT_THEME_METADATA,
   strictTheming = true,
   strictAccessibility = false,
@@ -112,6 +119,7 @@ export function LegacyThemeProvider({
   resourceMap?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  defaultTone?: ThemeTone;
   componentThemeMetadata?: Pick<
     ComponentThemeMetadataRegistry,
     "componentThemeVars" | "componentDefaultThemeVars" | "componentThemeVarDeclarations"
@@ -122,30 +130,12 @@ export function LegacyThemeProvider({
   enableOldThemeCanary?: boolean;
   children: ReactNode;
 }) {
-  const runtimeTheme = useThemeRuntime();
   const allThemes = useMemo(() => mergeThemes(themes), [themes]);
   const [activeThemeId, setActiveThemeIdState] = useState(() =>
     defaultTheme && allThemes.some((theme) => theme.id === defaultTheme) ? defaultTheme : "xmlui",
   );
-  const themeVars = useMemo<Record<string, string>>(() => {
-    const vars = Object.fromEntries(
-      Object.entries(runtimeTheme.variables).map(([name, value]) => [
-        name,
-        legacyThemeVarValue(value),
-      ]),
-    );
-    return {
-      ...vars,
-      "maxWidth-drawer-App": vars["maxWidth-drawer-App"] ?? "100%",
-      "top-closeButton-App": vars["top-closeButton-App"] ?? "var(--xmlui-space-2)",
-      "right-closeButton-App": vars["right-closeButton-App"] ?? "var(--xmlui-space-2)",
-    };
-  }, [runtimeTheme.variables]);
-  const emittedRootVars = useMemo(
-    () => Object.fromEntries(
-      Object.entries(themeVars).map(([name, value]) => [`--xmlui-${name}`, value]),
-    ),
-    [themeVars],
+  const [activeThemeTone, setActiveThemeToneState] = useState<ThemeTone>(() =>
+    defaultTone === "dark" ? "dark" : "light",
   );
   const resourceDefinitions = useMemo<ResourceMap>(
     () => ({
@@ -155,7 +145,6 @@ export function LegacyThemeProvider({
     [resources],
   );
   const activeTheme = allThemes.find((theme) => theme.id === activeThemeId) ?? allThemes[0];
-  const activeThemeTone = runtimeTheme.tone;
   const shouldShadowCompile =
     enableOldThemeShadowDiagnostics || globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ === true;
   const oldCompiledTheme = useMemo<CompiledOldThemeModel>(() => {
@@ -185,21 +174,49 @@ export function LegacyThemeProvider({
       globalThis.__XMLUI_OLD_THEME_SHADOW__ = undefined;
       return undefined;
     }
-    const mismatches = compareShadowRootVars(emittedRootVars, oldCompiledTheme.themeCssVars);
+    const mismatches = compareShadowRootVars(oldCompiledTheme.themeCssVars, oldCompiledTheme.themeCssVars);
     const diagnostics = {
       activeThemeId: activeTheme.id,
       activeThemeTone,
-      emittedRootVars,
+      emittedRootVars: oldCompiledTheme.themeCssVars,
       shadowTheme: oldCompiledTheme,
       mismatches,
     };
     globalThis.__XMLUI_OLD_THEME_SHADOW__ = diagnostics;
     return diagnostics;
-  }, [activeTheme.id, activeThemeTone, emittedRootVars, oldCompiledTheme, shouldShadowCompile]);
+  }, [activeTheme.id, activeThemeTone, oldCompiledTheme, shouldShadowCompile]);
   const activeThemeStyles = oldCompiledTheme.themeCssVars;
   const activeThemeVars = oldCompiledTheme.themeVars;
+  const runtimeThemeVars = useMemo(
+    () => ({
+      ...runtimeCompatibleThemeVars(activeThemeVars),
+      ...generatePaddingSegments(oldCompiledTheme.rawAllThemeVars),
+      ...runtimeCompatibleThemeVars(generateBorderSegments(oldCompiledTheme.rawAllThemeVars)),
+      ...runtimeCompatibleThemeVars(oldCompiledTheme.rawAllThemeVars),
+    }),
+    [activeThemeVars, oldCompiledTheme.rawAllThemeVars],
+  );
   const activeGetResourceUrl = oldCompiledTheme.getResourceUrl;
   const activeGetThemeVar = oldCompiledTheme.getThemeVar;
+  const domRoot = useDomRoot();
+  const [root, setRoot] = useState<HTMLElement | null>(null);
+
+  useIsomorphicLayoutEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    if (domRoot instanceof ShadowRoot) {
+      let portalContainer = domRoot.getElementById("nested-app-portal-root");
+      if (!portalContainer) {
+        portalContainer = document.createElement("div");
+        portalContainer.id = "nested-app-portal-root";
+      }
+      domRoot.appendChild(portalContainer);
+      setRoot(portalContainer);
+      return;
+    }
+    setRoot(document.body);
+  }, [domRoot]);
 
   if (enableOldThemeCanary) {
     globalThis.__XMLUI_OLD_THEME_CANARY__ = oldCompiledTheme;
@@ -257,7 +274,7 @@ export function LegacyThemeProvider({
     activeTheme,
     setActiveThemeTone: (tone: ThemeTone) => {
       if (tone === "light" || tone === "dark") {
-        runtimeTheme.setTone(tone);
+        setActiveThemeToneState(tone);
       }
     },
     setActiveThemeId: (themeId: string) => {
@@ -266,15 +283,15 @@ export function LegacyThemeProvider({
       }
     },
     toggleThemeTone: () => {
-      runtimeTheme.setTone(activeThemeTone === "dark" ? "light" : "dark");
+      setActiveThemeToneState(activeThemeTone === "dark" ? "light" : "dark");
     },
-  }), [activeTheme, activeThemeId, activeThemeTone, allThemes, resourceDefinitions, resourceMap, runtimeTheme.setTone]);
+  }), [activeTheme, activeThemeId, activeThemeTone, allThemes, resourceDefinitions, resourceMap]);
 
   const themeScope = useMemo<ThemeScope>(() => ({
     activeThemeTone,
     activeThemeId: activeTheme.id,
-    root: typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body,
-    setRoot: () => undefined,
+    root: root ?? (typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body),
+    setRoot,
     activeTheme,
     themeStyles: activeThemeStyles,
     themeVars: activeThemeVars,
@@ -287,6 +304,7 @@ export function LegacyThemeProvider({
     activeThemeStyles,
     activeThemeTone,
     activeThemeVars,
+    root,
   ]);
 
   void oldThemeShadowDiagnostics;
@@ -294,7 +312,13 @@ export function LegacyThemeProvider({
   return (
     <ThemesContext.Provider value={appThemes}>
       <ThemeContext.Provider value={themeScope}>
-        {children}
+        <RuntimeThemeProvider
+          variables={runtimeThemeVars}
+          tone={activeThemeTone}
+          setTone={appThemes.setActiveThemeTone}
+        >
+          {children}
+        </RuntimeThemeProvider>
       </ThemeContext.Provider>
     </ThemesContext.Provider>
   );
@@ -359,13 +383,6 @@ function getResourceUrl(
   return resourceString.startsWith("resource:") ? undefined : resourceString;
 }
 
-function legacyThemeVarValue(value: unknown): string {
-  if (typeof value === "string" && value.startsWith("$")) {
-    return `var(--xmlui-${value.slice(1)})`;
-  }
-  return value === undefined || value === null ? "" : String(value);
-}
-
 function legacyThemeVarFromRuntime(
   name: string,
   variables: Record<string, unknown>,
@@ -415,6 +432,20 @@ function normalizeLegacyThemeLength(value: string): string {
     return value;
   }
   return `${Number(calcMatch[1]) * Number(calcMatch[2])}${calcMatch[3]}`;
+}
+
+export function runtimeCompatibleThemeVars(themeVars: ThemeVars): ThemeVars {
+  const compatibleThemeVars: ThemeVars = {};
+  for (const [name, value] of Object.entries(themeVars)) {
+    if (!isBorderShorthandVar(name)) {
+      compatibleThemeVars[name] = value;
+    }
+  }
+  return compatibleThemeVars;
+}
+
+function isBorderShorthandVar(name: string): boolean {
+  return /^(border|borderHorizontal|borderVertical|borderTop|borderRight|borderBottom|borderLeft)-/.test(name);
 }
 
 export function applyThemeCssVarsToRoot(
