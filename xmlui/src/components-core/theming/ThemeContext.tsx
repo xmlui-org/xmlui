@@ -1,7 +1,9 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
+import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
 import { useThemeRuntime } from "../../runtime/rendering/theme";
+import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
 import {
   XmlUiBlogThemeDefinition,
   XmlUiCyanThemeDefinition,
@@ -15,12 +17,38 @@ import {
 } from "./themes/xmlui";
 
 type ResourceMap = Record<string, string | FontDef>;
+type ShadowThemeVarMismatch = {
+  name: string;
+  emittedValue: string | undefined;
+  shadowValue: string | undefined;
+};
+
+export type OldThemeShadowDiagnostics = {
+  activeThemeId: string;
+  activeThemeTone: ThemeTone;
+  emittedRootVars: Record<string, string>;
+  shadowTheme: CompiledOldThemeModel;
+  mismatches: ShadowThemeVarMismatch[];
+};
+
+declare global {
+  var __XMLUI_ENABLE_OLD_THEME_SHADOW__: boolean | undefined;
+  var __XMLUI_OLD_THEME_SHADOW__: OldThemeShadowDiagnostics | undefined;
+}
 
 const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   logo: "/resources/xmlui-logo.svg",
   "logo-light": "/resources/xmlui-logo.svg",
   "logo-dark": "/resources/xmlui-logo-dark.svg",
   favicon: "/resources/favicon.ico",
+};
+
+const EMPTY_COMPONENT_THEME_METADATA: Pick<
+  ComponentThemeMetadataRegistry,
+  "componentThemeVars" | "componentDefaultThemeVars"
+> = {
+  componentThemeVars: new Set<string>(),
+  componentDefaultThemeVars: {},
 };
 
 export const builtInThemes: Array<ThemeDefinition> = [
@@ -68,12 +96,19 @@ export function LegacyThemeProvider({
   resourceMap = {},
   themes = [],
   defaultTheme,
+  componentThemeMetadata = EMPTY_COMPONENT_THEME_METADATA,
+  enableOldThemeShadowDiagnostics = false,
   children,
 }: {
-  resources?: Record<string, string>;
+  resources?: Record<string, string | FontDef>;
   resourceMap?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  componentThemeMetadata?: Pick<
+    ComponentThemeMetadataRegistry,
+    "componentThemeVars" | "componentDefaultThemeVars"
+  >;
+  enableOldThemeShadowDiagnostics?: boolean;
   children: ReactNode;
 }) {
   const runtimeTheme = useThemeRuntime();
@@ -95,6 +130,12 @@ export function LegacyThemeProvider({
       "right-closeButton-App": vars["right-closeButton-App"] ?? "var(--xmlui-space-2)",
     };
   }, [runtimeTheme.variables]);
+  const emittedRootVars = useMemo(
+    () => Object.fromEntries(
+      Object.entries(themeVars).map(([name, value]) => [`--xmlui-${name}`, value]),
+    ),
+    [themeVars],
+  );
   const resourceDefinitions = useMemo<ResourceMap>(
     () => ({
       ...DEFAULT_RESOURCE_URLS,
@@ -104,6 +145,44 @@ export function LegacyThemeProvider({
   );
   const activeTheme = allThemes.find((theme) => theme.id === activeThemeId) ?? allThemes[0];
   const activeThemeTone = runtimeTheme.tone;
+  const shouldShadowCompile =
+    enableOldThemeShadowDiagnostics || globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ === true;
+  const oldThemeShadowDiagnostics = useMemo<OldThemeShadowDiagnostics | undefined>(() => {
+    if (!shouldShadowCompile) {
+      globalThis.__XMLUI_OLD_THEME_SHADOW__ = undefined;
+      return undefined;
+    }
+    const shadowTheme = compileOldThemeModel({
+      builtInThemes,
+      customThemes: themes,
+      activeThemeId: activeTheme.id,
+      defaultTheme,
+      defaultTone: activeThemeTone,
+      componentThemeMetadata,
+      resources: resourceDefinitions,
+      resourceMap,
+    });
+    const mismatches = compareShadowRootVars(emittedRootVars, shadowTheme.themeCssVars);
+    const diagnostics = {
+      activeThemeId: activeTheme.id,
+      activeThemeTone,
+      emittedRootVars,
+      shadowTheme,
+      mismatches,
+    };
+    globalThis.__XMLUI_OLD_THEME_SHADOW__ = diagnostics;
+    return diagnostics;
+  }, [
+    activeTheme.id,
+    activeThemeTone,
+    componentThemeMetadata,
+    defaultTheme,
+    emittedRootVars,
+    resourceDefinitions,
+    resourceMap,
+    shouldShadowCompile,
+    themes,
+  ]);
 
   const appThemes = useMemo<AppThemes>(() => ({
     activeThemeTone,
@@ -134,9 +213,7 @@ export function LegacyThemeProvider({
     root: typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body,
     setRoot: () => undefined,
     activeTheme,
-    themeStyles: Object.fromEntries(
-      Object.entries(themeVars).map(([name, value]) => [`--xmlui-${name}`, value]),
-    ),
+    themeStyles: emittedRootVars,
     themeVars,
     getThemeVar: (name: string) => {
       const themeVarName = name.startsWith("$") ? name.slice(1) : name;
@@ -146,7 +223,9 @@ export function LegacyThemeProvider({
       );
     },
     getResourceUrl: (name?: string) => getResourceUrl(name, resourceDefinitions, resourceMap),
-  }), [activeTheme, activeThemeTone, resourceDefinitions, resourceMap, runtimeTheme.variables, themeVars]);
+  }), [activeTheme, activeThemeTone, emittedRootVars, resourceDefinitions, resourceMap, runtimeTheme.variables, themeVars]);
+
+  void oldThemeShadowDiagnostics;
 
   return (
     <ThemesContext.Provider value={appThemes}>
@@ -174,6 +253,24 @@ function mergeThemes(themes: Array<ThemeDefinition>): Array<ThemeDefinition> {
     merged.set(theme.id, theme);
   }
   return Array.from(merged.values());
+}
+
+function compareShadowRootVars(
+  emittedRootVars: Record<string, string>,
+  shadowThemeCssVars: Record<string, string>,
+): ShadowThemeVarMismatch[] {
+  const names = new Set([
+    ...Object.keys(emittedRootVars),
+    ...Object.keys(shadowThemeCssVars),
+  ]);
+  return [...names]
+    .filter((name) => emittedRootVars[name] !== shadowThemeCssVars[name])
+    .sort()
+    .map((name) => ({
+      name,
+      emittedValue: emittedRootVars[name],
+      shadowValue: shadowThemeCssVars[name],
+    }));
 }
 
 function getResourceUrl(

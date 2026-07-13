@@ -1,6 +1,6 @@
 # Theme and Style Old-Pattern Migration Plan
 
-Status: Step 4.5 implemented and verified; Step 5 resequenced after rollback  
+Status: Step 5.3 implemented and verified; next step is Step 5.4 opt-in old compiler canary path  
 Source baseline: `/Users/dotneteer/source/xmlui`  
 Rewrite workspace: `/Users/dotneteer/source/xmlui-rs`  
 Primary gates:
@@ -442,6 +442,29 @@ The E2E suite should be unchanged by this substep. Any deterministic E2E
 failure means the substep accidentally changed runtime behavior and must be
 bisected before continuing.
 
+Implementation checkpoint:
+
+- Ported the old pure helper surface into
+  `xmlui/src/components-core/theming/transformThemeVars.ts` without wiring it
+  into React context or emitted runtime CSS.
+- Covered `$var` chain resolution, embedded `$var` to CSS var conversion,
+  generated spacing, bootstrap columns, base font sizes, text font sizes,
+  padding segmentation, border segmentation, base tone key generation, button
+  tone key generation, hierarchical `matchThemeVar` fallback behavior, and
+  old-style theme-chain collection with explicit root input.
+- Kept `matchThemeVar` in the already ported `hvar.ts` module.
+- Did not add the old `color` package dependency in this substep. Tone helpers
+  preserve the old generated key contract and deterministic output, while exact
+  old `Color(...).toString()` formatting remains a compatibility decision for
+  the later inert compiler/provider switch.
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+  (`14 passed`),
+  `npm --workspace xmlui run build:standalone`,
+  `npm --workspace xmlui run test:unit` (`308 passed`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5534 passed`, `83 skipped`).
+
 #### Step 5.2: Add an Inert Old Compiler Entry
 
 Add a buildable old-pattern compiler entry, such as `compileOldThemeModel`,
@@ -461,6 +484,34 @@ Verification:
 - `npm --workspace xmlui run check:metadata`
 - `npm --workspace xmlui run test:unit`
 - `npm --workspace xmlui run test:e2e -- --max-failures=10`
+
+Implementation checkpoint:
+
+- Added inert `compileOldThemeModel` in
+  `xmlui/src/components-core/theming/oldThemeCompiler.ts`.
+- The compiler accepts explicit built-in themes, custom themes, active/default
+  theme id, default tone, component theme metadata, resources, and resource map.
+  It returns old provider-shaped output: active theme/tone, available theme ids,
+  theme chain, raw theme layers, resolved theme vars, emitted CSS vars,
+  resource lookup, font links, and invalid theme var tracking.
+- Kept the compiler pure and unwired from React context, `ThemeContext`, and
+  emitted runtime CSS. Runtime theme behavior remains unchanged in this step.
+- Added focused tests in
+  `xmlui/tests/components-core/theming/oldThemeCompiler.test.ts` for old-shaped
+  output, custom-before-built-in theme precedence, generated-variable layering,
+  resource and font handling, representative component metadata/defaults, and
+  namespaced extension variables.
+- Hardened old-style variable resolution so unresolved, nullish, or cyclic
+  `$var` references do not recurse forever while the inert compiler builds
+  hierarchical fallbacks.
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+  (`19 passed`),
+  `npm --workspace xmlui run check:metadata` (passed; known sandbox-only Vite
+  WebSocket `EPERM` warning),
+  `npm --workspace xmlui run test:unit` (`308 passed`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5533 passed`, `83 skipped`, `1 flaky`).
 
 #### Step 5.3: Shadow the Compiler Without Applying It
 
@@ -482,6 +533,40 @@ Verification:
 
 Full E2E should remain behaviorally unchanged. Any broad E2E failure here
 means the shadow path is not side-effect free.
+
+Implementation checkpoint:
+
+- Added an opt-in old compiler shadow diagnostic path to
+  `xmlui/src/components-core/theming/ThemeContext.tsx`.
+- The shadow path computes `compileOldThemeModel` output and stores a
+  test-readable snapshot on `globalThis.__XMLUI_OLD_THEME_SHADOW__` only when
+  `enableOldThemeShadowDiagnostics` or
+  `globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__` is explicitly enabled.
+- The snapshot records active theme id/tone, currently emitted root variables,
+  old compiler output, and sorted mismatches between current emitted root vars
+  and old compiler CSS vars. It does not apply old CSS variables, font links,
+  classes, root ownership, or resource lookups.
+- Kept runtime side effects out of the default app path by injecting
+  `componentThemeMetadata` into the diagnostic provider instead of importing the
+  metadata registry from `ThemeContext`. A first canary attempt with a static
+  `component-core` import produced a browser circular-initialization failure
+  around `FormItemMd`; this was removed before completing the step.
+- Added `xmlui/tests/components-core/theming/oldThemeShadowDiagnostics.test.tsx`
+  to prove the shadow compiler runs with an explicit core metadata registry,
+  captures known root-var mismatches, and remains disabled by default.
+- Hardened `createCoreComponentThemeMetadataRegistry` and
+  `createComponentThemeMetadataRegistry` against partially initialized renderer
+  entries so metadata collection remains robust during circular module loading.
+- Verification passed:
+  `npm --workspace xmlui exec -- vitest run tests/components-core/theming`
+  (`22 passed`),
+  `npm --workspace xmlui run test:unit` (`308 passed`),
+  `npm --workspace xmlui run check:metadata` (passed; known sandbox-only Vite
+  WebSocket `EPERM` warning),
+  focused Playwright canary
+  (`568 passed`, `7 skipped`), and
+  `npm --workspace xmlui run test:e2e -- --max-failures=10`
+  (`5534 passed`, `83 skipped`).
 
 #### Step 5.4: Add an Opt-In Old Compiler Canary Path
 

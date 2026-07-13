@@ -34,7 +34,7 @@ export function createCoreComponentThemeMetadataRegistry(): ComponentThemeMetada
   return collectComponentThemeMetadata(
     runtimeRendererEntries.map(({ name, renderer }) => ({
       name,
-      metadata: (renderer as RendererWithMetadata).metadata,
+      metadata: (renderer as RendererWithMetadata | undefined)?.metadata,
     })),
   );
 }
@@ -48,7 +48,7 @@ export function createComponentThemeMetadataRegistry(
   return collectComponentThemeMetadata([
     ...runtimeRendererEntries.map(({ name, renderer }) => ({
       name,
-      metadata: (renderer as RendererWithMetadata).metadata,
+      metadata: (renderer as RendererWithMetadata | undefined)?.metadata,
     })),
     ...normalizedExtensions.components.map((component) => ({
       name: component.localName,
