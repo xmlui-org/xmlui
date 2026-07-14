@@ -9,9 +9,14 @@ import React, {
 
 import { attachBehaviors } from "../../component-core/behaviors";
 import type { ComponentMetadata } from "../../component-core/metadata";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { emitThemeDiagnostics } from "../../components-core/theming/validator/emit";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
   resolveLayoutStyle,
   resolveResponsiveLayoutStyles,
   responsiveBreakpoints,
@@ -19,10 +24,11 @@ import {
   supportedResponsiveLayoutPropNames,
   type LayoutOrientation,
 } from "../../styling";
+import { useXmluiAppContext } from "../appContext";
 import type { RuntimeScope } from "../state";
 import { evaluateProps, runEvent } from "./bindings";
 import { useBindingRevision } from "./reactive";
-import { useComponentThemeClass } from "./theme";
+import { inlineStyleValidationOptions, validateRuntimeStyleProps } from "./styleValidation";
 import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 
 export type XmluiAdapterRendererProps = {
@@ -46,6 +52,11 @@ export type XmluiWrappedRenderer = (props: {
   scope: RuntimeScope;
   [key: string]: unknown;
 }) => ReactNode;
+
+export type XmluiWrappedRendererMetadata = {
+  metadata: ComponentMetadata;
+  themeContributors?: readonly ComponentMetadata[];
+};
 
 export type XmluiComponentAdapter = {
   name: string;
@@ -92,6 +103,10 @@ export function wrapComponent(options: XmluiComponentAdapterOptions): XmluiWrapp
       layoutContext: extraProps.layoutContext as Record<string, unknown> | undefined,
     }, rendered)}</>;
   }
+  Object.assign(WrappedXmluiComponent, {
+    metadata: options.metadata,
+    themeContributors: options.themeContributors,
+  } satisfies XmluiWrappedRendererMetadata);
   return WrappedXmluiComponent;
 }
 
@@ -138,16 +153,45 @@ export function useXmluiComponentAdapter({
   const explicitRootPart = typeof props.__xmluiPartId === "string" && props.__xmluiPartId.length > 0;
   const apiRef = useRef<Record<string, unknown>>({});
   const registeredIdRef = useRef<string>();
-  const variant = typeof props.variant === "string" ? props.variant : undefined;
-  const themeClass = useComponentThemeClass(name, metadata, themeContributors, variant);
+  const themeClassName = useComponentThemeClass(metadata, themeContributors);
+  const theme = useTheme();
+  const appContext = useXmluiAppContext();
+  const validationOptions = useMemo(() => inlineStyleValidationOptions(appContext.xmluiConfig), [
+    appContext.xmluiConfig?.allowInlineRawCss,
+    appContext.xmluiConfig?.maxZIndex,
+    appContext.xmluiConfig?.strictTheming,
+  ]);
+  const validatedStyleProps = useMemo(
+    () => validateRuntimeStyleProps(props, name, validationOptions),
+    [name, props, validationOptions],
+  );
+  useEffect(() => {
+    emitThemeDiagnostics(validatedStyleProps.diagnostics);
+  }, [validatedStyleProps.diagnostics]);
   const viewportWidth = useViewportWidth();
+  const inlineStylesDisabled = isInlineStyleDisabled(
+    theme.disableInlineStyle,
+    appGlobalsForScope(scope) ?? appContext.appGlobals,
+    theme.disableInlineStyleIsExplicit,
+  );
   const layoutStyle = useMemo(
-    () => resolveActiveLayoutStyle(props, viewportWidth, layoutOrientation),
-    [layoutOrientation, props, viewportWidth],
+    () => resolveActiveLayoutStyle(
+      inlineStylesDisabled
+        ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+        : validatedStyleProps.props,
+      viewportWidth,
+      layoutOrientation,
+    ),
+    [inlineStylesDisabled, layoutOrientation, validatedStyleProps.props, viewportWidth],
   );
   const layoutStyles = useMemo(
-    () => resolveResponsiveLayoutStyles(props, { orientation: layoutOrientation }),
-    [layoutOrientation, props],
+    () => resolveResponsiveLayoutStyles(
+      inlineStylesDisabled
+        ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+        : validatedStyleProps.props,
+      { orientation: layoutOrientation },
+    ),
+    [inlineStylesDisabled, layoutOrientation, validatedStyleProps.props],
   );
   const layoutStyleForPart = useCallback((part: string): CSSProperties | undefined => {
     if (part === defaultPart || part === rootPart) {
@@ -159,10 +203,23 @@ export function useXmluiComponentAdapter({
     return resolveActiveLayoutStyleForPart(layoutStyles, part, viewportWidth);
   }, [defaultPart, layoutStyle, layoutStyles, rootPart, viewportWidth]);
   const registerApi = useCallback((api: Record<string, unknown>) => {
-    const changed = Object.entries(api).some(([key, value]) =>
-      apiRef.current[key] !== value
-    );
-    Object.assign(apiRef.current, api);
+    const descriptors = Object.getOwnPropertyDescriptors(api);
+    const changed = Object.entries(descriptors).some(([key, descriptor]) => {
+      const currentDescriptor = Object.getOwnPropertyDescriptor(apiRef.current, key);
+      if ("value" in descriptor) {
+        if (!currentDescriptor || !("value" in currentDescriptor)) {
+          return true;
+        }
+        if (typeof currentDescriptor.value === "function" && typeof descriptor.value === "function") {
+          return false;
+        }
+        return currentDescriptor.value !== descriptor.value;
+      }
+      return !currentDescriptor ||
+        currentDescriptor.get !== descriptor.get ||
+        currentDescriptor.set !== descriptor.set;
+    });
+    Object.defineProperties(apiRef.current, descriptors);
     const id = typeof props.id === "string" ? props.id : undefined;
     if (id) {
       const alreadyRegistered = scope.references[id] === apiRef.current;
@@ -211,6 +268,7 @@ export function useXmluiComponentAdapter({
     };
   }, [props.id, scope.references, scope.store]);
 
+  const componentClassName = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
   const adapter = useMemo<XmluiComponentAdapter>(() => ({
     name,
     metadata,
@@ -220,9 +278,8 @@ export function useXmluiComponentAdapter({
     props,
     events,
     api: apiRef.current,
-    className: themeClass.className,
+    className: componentClassName,
     style: {
-      ...themeClass.style,
       ...layoutStyle,
     },
     rootAttrs: (part = rootPart) => ({
@@ -233,9 +290,8 @@ export function useXmluiComponentAdapter({
       "data-part-id": explicitRootPart ? part : undefined,
       "data-xmlui-id": props.id,
       "data-testid": props.testId ?? props.id,
-      className: themeClass.className,
+      className: componentClassName,
       style: {
-        ...themeClass.style,
         ...layoutStyleForPart(part),
       },
     }),
@@ -280,22 +336,29 @@ export function useXmluiComponentAdapter({
     resourceUrl: (value) => value == null || value === "" ? undefined : String(value),
   }), [
     context,
+    componentClassName,
     events,
     explicitRootPart,
+    layoutStyle,
     layoutStyleForPart,
     metadata,
-    themeContributors,
     name,
     node,
     props,
     registerApi,
     rootPart,
     scope,
-    themeClass.className,
-    themeClass.style,
   ]);
 
   return adapter;
+}
+
+function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
+  const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return scope?.parent ? appGlobalsForScope(scope.parent) : undefined;
 }
 
 function resolveActiveLayoutStyle(

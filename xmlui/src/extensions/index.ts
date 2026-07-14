@@ -3,6 +3,7 @@ export {
   extensionComponentNames,
   globalExtensionManager,
   listRegisteredExtensions,
+  namespaceThemeVariableName,
   normalizeExtensions,
   registerExtension,
   type ExtensionRegisteredCallback,
@@ -16,4 +17,3 @@ export type {
   XmluiExtensionComponent,
   XmluiExtensionComponentProps,
 } from "./types";
-

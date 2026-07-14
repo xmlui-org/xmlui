@@ -1,0 +1,11 @@
+<Component name="ChangeLog">
+    <DataSource id="releases" url="/resources/files/releases.json" method="GET" />
+    <DocumentPageNoTOC>
+        <ReleaseList
+            items="{releases.value}"
+            title="Change Log"
+            commitBaseUrl="https://github.com/xmlui-org/xmlui/commit"
+            downloadLabel="Download"
+        />
+    </DocumentPageNoTOC>
+</Component>

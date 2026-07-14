@@ -55,6 +55,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
   .stepper {
     display: flex;
     width: 100%;
+    min-height: 1px;
     background-color: $backgroundColor-Stepper;
     padding: $padding-Stepper;
 

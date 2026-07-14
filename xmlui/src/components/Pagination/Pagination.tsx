@@ -317,7 +317,7 @@ export const paginationRenderer = wrapRuntimeComponent({
           void adapter.event("pageDidChange")(pageIndex, pageSize, totalItemCount)}
         onPageSizeDidChange={(pageSize) => void adapter.event("pageSizeDidChange")(pageSize)}
         registerComponentApi={adapter.registerApi}
-        updateState={(state) => adapter.registerApi(state)}
+        updateState={adapter.registerApi}
         classes={{ root: adapter.className }}
       />
     );

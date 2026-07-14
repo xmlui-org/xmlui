@@ -29,9 +29,9 @@ describe("compatibility artifact shape", () => {
     const exports = Object.keys(packageJson.exports ?? {});
 
     expect(exports).toContain(".");
+    expect(exports).toContain("./testing");
     expect(exports).not.toContain("./parser");
     expect(exports).not.toContain("./language-server");
-    expect(exports).not.toContain("./testing");
     expect(debt).toContain("COMP-0002");
   });
 
@@ -70,7 +70,7 @@ describe("compatibility artifact shape", () => {
       });
       expect(artifact.styleStates).toContain("hover");
       expect(artifact.defaultThemeVariables["color-primary"]).toBe("$const-color-primary-500");
-      expect(artifact.defaultThemeVariables["const-color-primary-500"]).toBe("#206bc4");
+      expect(artifact.defaultThemeVariables["const-color-primary-500"]).toMatch(/^hsl\(212(?:\.6+|\.\d+)?,\s*71\.9%,\s*45\.4%\)$/);
       expect(artifact.deferred).toContain("Full visual regression suite");
     }
   });

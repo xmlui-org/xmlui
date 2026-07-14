@@ -7,7 +7,8 @@ import { builtInComponentContracts } from "../../compiler/contracts";
 import { appRuntimeRenderer } from "./App";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
-import { ThemeScope, XmluiThemeRoot } from "../../runtime/rendering/theme";
+import { StyleProvider } from "../../components-core/theming/StyleContext";
+import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -40,19 +41,26 @@ describe("App main content layout migration", () => {
     const context = createRenderContext({}, {});
     const AppRenderer = appRuntimeRenderer;
     const html = renderToStaticMarkup(
-      <XmluiThemeRoot>
-        <ThemeScope
-          variables={{
-            "paddingHorizontal-content-App": "28px",
-            "paddingVertical-content-App": "32px",
-            "gap-content-App": "24px",
-          }}
+      <StyleProvider>
+        <LegacyThemeProvider
+          themes={[
+            {
+              id: "app-spec",
+              extends: "xmlui",
+              themeVars: {
+              "paddingHorizontal-content-App": "28px",
+              "paddingVertical-content-App": "32px",
+              "gap-content-App": "24px",
+              },
+            },
+          ]}
+          defaultTheme="app-spec"
         >
           <MemoryRouter>
             <AppRenderer context={context} node={document.root} scope={scope} />
           </MemoryRouter>
-        </ThemeScope>
-      </XmluiThemeRoot>,
+        </LegacyThemeProvider>
+      </StyleProvider>,
     );
 
     expect(html).toContain('data-xmlui-component="App"');

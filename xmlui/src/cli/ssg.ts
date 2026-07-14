@@ -93,7 +93,7 @@ for (let i = 0; i < routes.length; i++) {
     const html = mod.renderPath(route);
     results.push({ route, html });
   } catch (err) {
-    results.push({ route, error: err?.message || String(err) });
+    results.push({ route, error: err?.stack || err?.message || String(err) });
   }
 }
 
@@ -265,7 +265,7 @@ export const ssg = async ({
     const allResults = (await Promise.all(workerPromises)).flat();
 
     // Sort results back into route order and write files
-    const resultMap = new Map<string, string>();
+    const resultMap = new Map<string, SsgRenderResult>();
     const errors: string[] = [];
     for (const result of allResults) {
       if (result.error) {
@@ -330,7 +330,14 @@ export const ssg = async ({
 /**
  * Run a worker thread that imports the SSR bundle and renders a batch of routes.
  */
-type WorkerResult = { route: string; html?: string; error?: string };
+type SsgRenderResult = string | {
+  markup: string;
+  ssrStyles?: string;
+  ssrHashes?: string;
+  htmlClasses?: string;
+};
+
+type WorkerResult = { route: string; html?: SsgRenderResult; error?: string };
 
 function runWorker(
   workerScript: string,
@@ -367,28 +374,72 @@ function chunkArray<T>(arr: T[], numChunks: number): T[][] {
 }
 
 /**
- * Applies rendered page markup into the HTML shell.
- * Simplified version: the new runtime doesn't use Helmet/StyleRegistry,
- * so we just inject the rendered markup into the #root div.
+ * Applies rendered page markup into the HTML shell and preserves the old
+ * StyleRegistry SSG contract by injecting collected registry CSS into <head>.
  */
-function applyRenderToShell(shellHtml: string, renderedMarkup: string): string {
+function applyRenderToShell(shellHtml: string, renderResult: SsgRenderResult): string {
+  const renderedMarkup = typeof renderResult === "string" ? renderResult : renderResult.markup;
+  let html = shellHtml;
+  if (typeof renderResult !== "string") {
+    html = mergeHtmlClasses(html, renderResult.htmlClasses ?? "");
+    html = injectSsrStyles(html, renderResult.ssrStyles ?? "", renderResult.ssrHashes ?? "");
+  }
+
   // Wrap markup in the #root div (replacing any existing placeholder content)
   const rootRe = /(<div\s+id="root")([^>]*)(>)(.*?)(<\/div>)/is;
-  const match = rootRe.exec(shellHtml);
+  const match = rootRe.exec(html);
   if (match) {
     return (
-      shellHtml.slice(0, match.index) +
+      html.slice(0, match.index) +
       match[1] +
       match[2] +
       match[3] +
       renderedMarkup +
       match[5] +
-      shellHtml.slice(match.index + match[0].length)
+      html.slice(match.index + match[0].length)
     );
   }
 
   // Fallback: insert before </body>
-  return shellHtml.replace(/<\/body>/i, `${renderedMarkup}</body>`);
+  return html.replace(/<\/body>/i, `${renderedMarkup}</body>`);
+}
+
+function injectSsrStyles(shellHtml: string, ssrStyles: string, ssrHashes: string): string {
+  if (!ssrStyles.trim()) {
+    return shellHtml;
+  }
+  const styleTag = `<style data-style-registry="true" data-ssr-hashes="${escapeHtmlAttribute(ssrHashes)}">${ssrStyles}</style>`;
+  if (/<\/head>/i.test(shellHtml)) {
+    return shellHtml.replace(/<\/head>/i, `${styleTag}\n</head>`);
+  }
+  return `${styleTag}${shellHtml}`;
+}
+
+function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
+  const classes = htmlClasses.trim();
+  if (!classes) {
+    return shellHtml;
+  }
+  const htmlTagRe = /<html\b([^>]*)>/i;
+  const match = htmlTagRe.exec(shellHtml);
+  if (!match) {
+    return shellHtml;
+  }
+  const attributes = match[1] ?? "";
+  const classRe = /\sclass=(["'])(.*?)\1/i;
+  const classMatch = classRe.exec(attributes);
+  const nextAttributes = classMatch
+    ? attributes.replace(classRe, ` class=${classMatch[1]}${`${classMatch[2]} ${classes}`.trim()}${classMatch[1]}`)
+    : `${attributes} class="${classes}"`;
+  return `${shellHtml.slice(0, match.index)}<html${nextAttributes}>${shellHtml.slice(match.index + match[0].length)}`;
+}
+
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 async function loadSsgExtensionNames(cwd: string): Promise<string[]> {

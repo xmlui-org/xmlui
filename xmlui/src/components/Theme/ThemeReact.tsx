@@ -8,8 +8,13 @@ import styles from "./Theme.module.scss";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
-import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import {
+  builtInThemes,
+  ThemeContext,
+  useTheme,
+  useThemes,
+} from "../../components-core/theming/ThemeContext";
+import { compileOldThemeModel } from "../../components-core/theming/oldThemeCompiler";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { defaultProps } from "./Theme.defaults";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
@@ -25,10 +30,15 @@ import {
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
+import {
+  generateBorderSegments,
+  generatePaddingSegments,
+} from "../../components-core/theming/transformThemeVars";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
 import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
 import { useAppContext } from "../../components-core/AppContext";
+import type { ThemeVarMetadata } from "../../component-core/metadata";
 
 const STYLE_ID = "xmlui-base-styles";
 const THEME_CSS_VAR_PREFIX = `--${THEME_VAR_PREFIX}-`;
@@ -38,6 +48,7 @@ type Props = {
   isRoot?: boolean;
   applyIf?: boolean;
   disableInlineStyle?: boolean;
+  disableInlineStyleExplicit?: boolean;
   layoutContext?: LayoutContext;
   renderChild?: RenderChildFn;
   node?: ComponentDef;
@@ -48,26 +59,46 @@ type Props = {
   children?: ReactNode;
 };
 
-export function Theme({
-  id,
-  isRoot = defaultProps.isRoot,
-  applyIf,
-  disableInlineStyle,
-  renderChild,
-  node,
-  tone,
-  toastDuration = defaultProps.toastDuration,
-  notificationPosition = defaultProps.notificationPosition,
-  themeVars = defaultProps.themeVars,
-  layoutContext,
-  children,
-}: Props) {
+export function Theme(props: Props) {
+  const hasExplicitDisableInlineStyle = props.disableInlineStyleExplicit ??
+    Object.prototype.hasOwnProperty.call(props, "disableInlineStyle");
+  const {
+    id,
+    isRoot = defaultProps.isRoot,
+    applyIf,
+    disableInlineStyle,
+    disableInlineStyleExplicit: _disableInlineStyleExplicit,
+    renderChild,
+    node,
+    tone,
+    toastDuration,
+    notificationPosition,
+    themeVars = defaultProps.themeVars,
+    layoutContext,
+    children,
+  } = props;
   const generatedId = useId();
   const appContext = useAppContext();
+  const notifications =
+    appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
+  const resolvedToastDuration =
+    toastDuration ?? (typeof notifications?.duration === "number" ? notifications.duration : undefined) ?? defaultProps.toastDuration;
+  const resolvedNotificationPosition =
+    notificationPosition ?? notifications?.position ?? defaultProps.notificationPosition;
 
-  const { themes, resources, resourceMap, activeThemeId } = useThemes();
-  const { activeTheme, activeThemeTone, root } = useTheme();
+  const { themes, resources, resourceMap, activeThemeId, setActiveThemeTone } = useThemes();
+  const {
+    activeTheme,
+    activeThemeTone,
+    root,
+    disableInlineStyle: parentDisableInlineStyle,
+    disableInlineStyleIsExplicit: parentDisableInlineStyleIsExplicit,
+  } = useTheme();
   const themeTone = tone || activeThemeTone;
+  const generatedThemeVars = useMemo(
+    () => generateBorderSegments(generatePaddingSegments(themeVars)),
+    [themeVars],
+  );
   const currentTheme: ThemeDefinition = useMemo(() => {
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
     if (!themeToExtend) {
@@ -84,13 +115,13 @@ export function Theme({
           ...themeToExtend.tones?.[themeTone],
           themeVars: {
             ...themeToExtend.tones?.[themeTone]?.themeVars,
-            ...themeVars,
+            ...generatedThemeVars,
           },
         },
       },
     };
     return foundTheme;
-  }, [activeTheme, generatedId, id, themeTone, themeVars, themes]);
+  }, [activeTheme, generatedId, generatedThemeVars, id, themeTone, themes]);
 
   const {
     themeCssVars,
@@ -99,14 +130,20 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     invalidThemeVarNames,
     getThemeVar,
-  } = useCompiledTheme(
+  } = useScopedOldTheme(
     currentTheme,
     themeTone,
     themes,
     resources,
     resourceMap,
     appContext?.xmluiConfig?.strictTheming !== false,
-    appContext?.xmluiConfig?.strictAccessibility === true,
+  );
+  const scopedThemeVars = useMemo(
+    () => ({
+      ...allThemeVarsWithResolvedHierarchicalVars,
+      ...generatedThemeVars,
+    }),
+    [allThemeVarsWithResolvedHierarchicalVars, generatedThemeVars],
   );
   const componentRegistry = useComponentRegistry();
 
@@ -126,10 +163,10 @@ export function Theme({
     const needsCompiledVars =
       tone !== undefined ||
       id !== undefined ||
-      Object.keys(themeVars).some((key) => !parseHVar(key)?.component);
+      Object.keys(generatedThemeVars).some((key) => !parseHVar(key)?.component);
 
     if (needsCompiledVars) {
-      Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
+      Object.entries({ ...themeCssVars, ...generatedThemeVars }).forEach(([key, value]) => {
         // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
         // parseHVar correctly identifies the component part of a theme var name.
         // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
@@ -158,7 +195,7 @@ export function Theme({
           // even though "Inc" is not a registered component name.
           inComponentThemeVars;
         if (allowed) {
-          const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
+          const resolvedValue = scopedThemeVars[rawKey] ?? value;
           filteredThemeCssVars[key] = resolvedValue;
         }
       });
@@ -166,11 +203,12 @@ export function Theme({
 
     // Always add the explicitly specified themeVars with the correct prefix,
     // even if they don't match the componentName pattern
-    Object.entries(themeVars).forEach(([key, value]) => {
+    Object.entries(generatedThemeVars).forEach(([key, value]) => {
       if (invalidThemeVarNames.has(key)) {
         return;
       }
-      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
+      const resolvedValue = scopedThemeVars[key] ?? value;
+      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = resolvedValue;
     });
 
     const ret = {
@@ -222,11 +260,11 @@ export function Theme({
     return ret;
   }, [
     themeCssVars,
-    themeVars,
+    generatedThemeVars,
     themeTone,
     isRoot,
     componentRegistry,
-    allThemeVarsWithResolvedHierarchicalVars,
+    scopedThemeVars,
     invalidThemeVarNames,
     getThemeVar,
   ]);
@@ -251,22 +289,27 @@ export function Theme({
       activeThemeTone: themeTone,
       activeTheme: currentTheme,
       themeStyles: themeCssVars,
-      themeVars: allThemeVarsWithResolvedHierarchicalVars,
+      themeVars: scopedThemeVars,
       getResourceUrl,
       getThemeVar,
-      disableInlineStyle,
+      disableInlineStyle: disableInlineStyle ?? parentDisableInlineStyle,
+      disableInlineStyleIsExplicit:
+        hasExplicitDisableInlineStyle ? true : parentDisableInlineStyleIsExplicit,
     };
     return themeVal;
   }, [
     activeThemeId,
-    allThemeVarsWithResolvedHierarchicalVars,
     currentTheme,
     currentThemeRoot,
     getResourceUrl,
     getThemeVar,
+    scopedThemeVars,
     themeCssVars,
     themeTone,
     disableInlineStyle,
+    hasExplicitDisableInlineStyle,
+    parentDisableInlineStyle,
+    parentDisableInlineStyleIsExplicit,
   ]);
 
   const { indexing } = useIndexerContext();
@@ -308,7 +351,10 @@ export function Theme({
           {renderChild && renderChild(node.children)}
           {children}
         </ErrorBoundary>
-        <NotificationToast toastDuration={toastDuration} notificationPosition={notificationPosition} />
+        <NotificationToast
+          toastDuration={resolvedToastDuration}
+          notificationPosition={resolvedNotificationPosition}
+        />
       </>
     );
   }
@@ -348,6 +394,42 @@ export function Theme({
 
 function stripThemeCssVarPrefix(key: string): string {
   return key.startsWith(THEME_CSS_VAR_PREFIX) ? key.slice(THEME_CSS_VAR_PREFIX.length) : key;
+}
+
+function useScopedOldTheme(
+  currentTheme: ThemeDefinition,
+  themeTone: ThemeTone,
+  themes: Array<ThemeDefinition>,
+  resources: Record<string, string | import("../../abstractions/ThemingDefs").FontDef>,
+  resourceMap: Record<string, string>,
+  strictTheming: boolean,
+) {
+  const componentRegistry = useComponentRegistry();
+  return useMemo(() => {
+    const compiled = compileOldThemeModel({
+      builtInThemes,
+      customThemes: [currentTheme, ...themes],
+      activeThemeId: currentTheme.id,
+      defaultTone: themeTone,
+      componentThemeMetadata: {
+        componentThemeVars: componentRegistry.componentThemeVars,
+        componentDefaultThemeVars: (componentRegistry.componentDefaultThemeVars ?? {}) as Record<string, any>,
+        componentThemeVarDeclarations:
+          (componentRegistry.componentThemeVarDeclarations ?? new Map()) as Map<string, ThemeVarMetadata>,
+      },
+      strictTheming,
+      resources,
+      resourceMap,
+    });
+    return {
+      themeCssVars: compiled.themeCssVars,
+      getResourceUrl: compiled.getResourceUrl,
+      fontLinks: compiled.fontLinks,
+      allThemeVarsWithResolvedHierarchicalVars: compiled.themeVars,
+      invalidThemeVarNames: compiled.invalidThemeVarNames,
+      getThemeVar: compiled.getThemeVar,
+    };
+  }, [componentRegistry, currentTheme, resourceMap, resources, strictTheming, themeTone, themes]);
 }
 
 type HtmlClassProps = {

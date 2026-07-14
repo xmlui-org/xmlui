@@ -98,9 +98,13 @@ export function stateDependencies(
 }
 
 function isRouteContextName(name: string): boolean {
-  return name === "$pathname" ||
+  return name === "pathname" ||
+    name === "$pathname" ||
+    name === "routeParams" ||
     name === "$routeParams" ||
+    name === "queryParams" ||
     name === "$queryParams" ||
+    name === "queryString" ||
     name === "$queryString";
 }
 
@@ -230,7 +234,13 @@ function executeEvent(event: ParsedEvent, scope: RuntimeScope, args: unknown[]):
     }
   }
   if (event.execute && !hasNestedWrites(event)) {
-    return completeEvent(event.execute(context));
+    return completeEvent(
+      Promise.resolve(event.execute(context)).then((result) =>
+        typeof result === "function"
+          ? (result as (...args: unknown[]) => unknown | Promise<unknown>)(...args)
+          : result
+      ),
+    );
   }
   if (!event.ir) {
     throw new Error(`XMLUI event handler was not compiled: ${event.source}`);

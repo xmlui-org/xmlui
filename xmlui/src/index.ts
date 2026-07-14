@@ -70,3 +70,5 @@ export {
   type XmluiExtensionComponent,
   type XmluiExtensionComponentProps,
 } from "./extensions";
+export { StyleProvider } from "./components-core/theming/StyleContext";
+export { StyleRegistry, type StyleObjectType, type StyleCacheEntry } from "./components-core/theming/StyleRegistry";

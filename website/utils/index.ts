@@ -48,13 +48,6 @@ const { content: docsContent, plainTextContent: plainTextDocsContent } = buildCo
   frontmatter: Record<string, Record<string, unknown>>;
 };
 
-const normalizeStaticMarkdown = (value: string) =>
-  value.replaceAll("```xmlui-pg", "```xmlui").replaceAll("appGlobals.", "$appGlobals.");
-
-const docsContentStaticCode = Object.fromEntries(
-  Object.entries(docsContent).map(([key, value]) => [key, normalizeStaticMarkdown(value)]),
-);
-
 let {
   content: blogContent,
   plainTextContent: plainTextBlogContent,
@@ -130,10 +123,10 @@ Object.keys(blogContent).forEach((fileName) => {
 // Populate prefetched homepage content
 Object.keys(rawHomepageContent).forEach((filePath) => {
   const fileName = filePath.split("/").pop() || "";
-  prefetchedContent[`/pages/${fileName}`] = normalizeStaticMarkdown(rawHomepageContent[filePath].default);
+  prefetchedContent[`/pages/${fileName}`] = rawHomepageContent[filePath].default;
 });
 
-export { prefetchedContent, docsContent, docsContentStaticCode, staticSearchData, posts, allPosts };
+export { prefetchedContent, docsContent, staticSearchData, posts, allPosts };
 
 // --- Icon loader utility
 

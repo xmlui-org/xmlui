@@ -3,12 +3,12 @@ import styles from "./QRCode.module.scss";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useThemeVariables } from "../../components-core/theming/utils";
 import { defaultProps } from "./QRCode.defaults";
 import { QRCode } from "./QRCodeReact";
 import { createMetadata, dInit } from "../metadata-helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { useThemeVariables } from "../../runtime/rendering/theme";
 import { collectComponentThemeDefaults, mergeThemeVariableLayers, resolveThemeReferences, resolveThemeVariable } from "../../styling/theme";
 
 const COMP = "QRCode";

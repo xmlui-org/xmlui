@@ -5,13 +5,12 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { defaultProps } from "./Spinner.defaults";
 import { Spinner } from "./SpinnerReact";
 import { createMetadata } from "../metadata-helpers";
-import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { useComponentThemeClass, useThemeVariables } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import type { CSSProperties } from "react";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { useThemeVariables } from "../../runtime/rendering/theme";
 import { collectComponentThemeDefaults, mergeThemeVariableLayers, resolveThemeReferences, resolveThemeVariable } from "../../styling/theme";
 
 const COMP = "Spinner";

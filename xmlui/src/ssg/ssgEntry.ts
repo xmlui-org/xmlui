@@ -5,9 +5,9 @@
  * whose `renderPath(url)` function renders the app for a given route
  * using react-dom/server's renderToString.
  *
- * Compared to the old implementation, this is much simpler because
- * the new runtime uses XmluiRoot directly instead of needing
- * StaticRouter, HelmetProvider, StyleProvider, etc.
+ * The generated entry mirrors the old style-registry SSG contract: a
+ * per-route registry wraps the rendered app and returns the collected SSR
+ * styles and hashes alongside the markup.
  */
 
 export function getSsgEntrySource(extensionNames: string[] = []): string {
@@ -19,7 +19,8 @@ export function getSsgEntrySource(extensionNames: string[] = []): string {
   return `
 import React from "react";
 import { renderToString } from "react-dom/server";
-import { XmluiRoot } from "xmlui";
+import { MemoryRouter } from "react-router-dom";
+import { StyleProvider, StyleRegistry, XmluiRoot } from "xmlui";
 import type { XmluiModule, Extension } from "xmlui";
 ${extensionImports}
 
@@ -52,21 +53,57 @@ const appModule = findAppModule();
 const appConfig = findAppConfig();
 
 export function renderPath(pathname: string) {
-  return renderToString(
-    React.createElement(XmluiRoot, {
-      module: appModule,
-      initialUrl: pathname,
-      extensions: loadedExtensions,
-      appGlobals: { ...(appConfig?.appGlobals ?? {}), isSsg: true },
-    })
+  const registry = new StyleRegistry();
+  const markup = renderToString(
+    React.createElement(
+      StyleProvider,
+      { styleRegistry: registry },
+      React.createElement(
+        MemoryRouter,
+        { initialEntries: [pathname] },
+        React.createElement(XmluiRoot, {
+          module: appModule,
+        initialUrl: pathname,
+        extensions: loadedExtensions,
+        appGlobals: { ...(appConfig?.appGlobals ?? {}), isSsg: true },
+        icons: appConfig?.icons,
+        resources: appConfig?.resources,
+        resourceMap: appConfig?.resourceMap,
+        themes: appConfig?.themes,
+        defaultTheme: appConfig?.defaultTheme,
+      })
+      )
+    )
   );
+  return {
+    markup,
+    ssrStyles: registry.getSsrStyles(),
+    ssrHashes: Array.from(registry.cache.keys()).join(","),
+    htmlClasses: registry.getRootClasses(),
+  };
 }
 
-function findAppConfig(): { appGlobals?: Record<string, unknown> } | undefined {
+type AppConfig = {
+  appGlobals?: Record<string, unknown>;
+  icons?: Record<string, string>;
+  resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+  themes?: Array<any>;
+  defaultTheme?: string;
+};
+
+function findAppConfig(): AppConfig | undefined {
   for (const value of Object.values(runtime)) {
     const config = (value as any)?.default;
-    if (config && typeof config === "object" && config.appGlobals && typeof config.appGlobals === "object") {
-      return config as { appGlobals?: Record<string, unknown> };
+    if (config && typeof config === "object" && (
+      config.appGlobals ||
+      config.themes ||
+      config.defaultTheme ||
+      config.icons ||
+      config.resources ||
+      config.resourceMap
+    )) {
+      return config as AppConfig;
     }
   }
   return undefined;

@@ -2,7 +2,6 @@ import {
   componentsSection,
   extensionsSection,
   docsContent,
-  docsContentStaticCode,
   staticSearchData,
   prefetchedContent,
   posts,
@@ -46,14 +45,10 @@ const App: StandaloneAppDescription = {
       extensions: extensionsSection,
     },
     docsContent,
-    docsContentStaticCode,
     staticSearchData,
     prefetchedContent,
     posts,
     allPosts,
-    blog: {
-      posts,
-    },
     codeHighlighter: docsCodeHighlighter,
     lintSeverity: "skip", // Turn off xmlui linting
     popOutUrl: "https://playground.xmlui.org/#/playground",

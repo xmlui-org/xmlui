@@ -336,12 +336,16 @@ function readRouteContext(scope: RuntimeScope, name: string): unknown {
     return undefined;
   }
   switch (name) {
+    case "pathname":
     case "$pathname":
       return snapshot.pathname;
+    case "queryParams":
     case "$queryParams":
       return snapshot.queryParams;
+    case "queryString":
     case "$queryString":
       return snapshot.search;
+    case "routeParams":
     case "$routeParams":
       return {};
     default:

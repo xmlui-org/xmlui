@@ -130,7 +130,10 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
   border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
   border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
@@ -285,6 +288,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   .paginationPageSizeTrigger {
     color: createThemeVar("Input:textColor-#{$componentName}") !important;
     font-size: inherit !important;
+    box-shadow: none;
   }
 
   /**

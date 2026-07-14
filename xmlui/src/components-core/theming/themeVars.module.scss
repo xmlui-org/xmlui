@@ -1,0 +1,8 @@
+@use "./_themes.scss" as t;
+
+$themeVars: ();
+
+:export {
+  keyPrefix: #{t.$THEME-VAR-PREFIX};
+  themeVars: t.json-stringify($themeVars);
+}

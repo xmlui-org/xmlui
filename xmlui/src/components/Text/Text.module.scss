@@ -135,7 +135,10 @@ $textColor-Text-secondary: createThemeVar("textColor-#{$component}-secondary");
 $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-secondary--hover");
 
 @mixin textVariant($variant) {
-  $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
+  $variantName: "#{$component}-#{$variant}";
+  @if $variant == "" {
+    $variantName: "#{$component}";
+  }
   $themeVars: t.composePaddingVars($themeVars, $variantName);
   $themeVars: t.composeBorderVars($themeVars, $variantName);
   $themeVars: t.composeTextVars($themeVars, $variantName, $component);

@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, type CSSProperties, type ReactNode } from "react";
+import { cloneElement, isValidElement, type CSSProperties, type ReactElement, type ReactNode } from "react";
 
 import { canBehaviorAttachToComponent, hasTriggeredBehaviorProp } from "./conditions";
 import type { Behavior, BehaviorAttachContext, BehaviorMetadata } from "./types";
@@ -11,7 +11,13 @@ import { FormItemMd } from "../../components/FormItem/FormItem";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { useFormContextPart } from "../../components/Form/FormContext";
 import { parseTooltipOptions, ThemedTooltip as Tooltip } from "../../components/Tooltip/Tooltip";
-import { useComponentThemeClass } from "../../runtime/rendering/theme";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { buttonVariantValues } from "../../components/abstractions";
+import { badgeVariantValues } from "../../components/Badge/BadgeReact";
+import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
+import { parseLayoutProperty, toCssPropertyName } from "../../components-core/theming/parse-layout-props";
+import { useStyles } from "../../components-core/theming/StyleContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 const responsiveWhenProps = {
   "when-xs": {
@@ -169,20 +175,133 @@ export const variantBehavior: Behavior = {
     },
     condition: { type: "visual" },
   },
-  canAttach: canAttachWhenTriggered("variant"),
+  canAttach: (context) => {
+    if (!canAttachWhenTriggered("variant")(context)) {
+      return false;
+    }
+    const variant = stringValue(context.props.variant);
+    if (!variant) {
+      return false;
+    }
+    if (context.componentName === "Button") {
+      return !buttonVariantValues.includes(variant as any);
+    }
+    if (context.componentName === "Badge") {
+      return !badgeVariantValues.includes(variant as any);
+    }
+    return true;
+  },
   attach: (context, node) => {
+    const variant = stringValue(context.props.variant);
+    if (!variant) {
+      return node;
+    }
+    if (!context.metadata.themeVars) {
+      if (isValidElement(node)) {
+        return cloneElement(node, {
+          "data-xmlui-variant": variant,
+        } as Record<string, unknown>);
+      }
+      return (
+        <span data-xmlui-behavior="variant" data-xmlui-variant={variant}>
+          {node}
+        </span>
+      );
+    }
     if (isValidElement(node)) {
-      return cloneElement(node, {
-        "data-xmlui-variant": stringValue(context.props.variant),
-      } as Record<string, unknown>);
+      return (
+        <VariantWrapper
+          componentType={context.componentName}
+          themeVars={context.metadata.themeVars}
+          variant={variant}
+        >
+          {cloneElement(node, {
+            "data-xmlui-variant": variant,
+          } as Record<string, unknown>)}
+        </VariantWrapper>
+      );
     }
     return (
-      <span data-xmlui-behavior="variant" data-xmlui-variant={stringValue(context.props.variant)}>
+      <span data-xmlui-behavior="variant" data-xmlui-variant={variant}>
         {node}
       </span>
     );
   },
 };
+
+function VariantWrapper({
+  children,
+  componentType,
+  themeVars,
+  variant,
+}: {
+  children: ReactElement;
+  componentType: string;
+  themeVars: Record<string, unknown>;
+  variant: string;
+}) {
+  const themeScope = useTheme();
+  const subject = `-${componentType}-${variant}`;
+  const variantSpec: Record<string, Record<string, string>> = {
+    "&": {},
+    "&:hover": {},
+    "&:active": {},
+    "&:disabled": {},
+  };
+
+  for (const themeVar of Object.keys(themeVars)) {
+    const normalizedThemeVar = themeVar.replace("Input:", "").replace("Heading:", "");
+    const parsed = parseLayoutProperty(normalizedThemeVar, true);
+    if (typeof parsed === "string") {
+      continue;
+    }
+    const { property, component, states } = parsed;
+    if (component && component !== componentType) {
+      continue;
+    }
+    const cssProperty = toCssPropertyName(property);
+    if (!cssProperty) {
+      continue;
+    }
+    const variantKey = `${property}${subject}`;
+    let selector = "&";
+    let stateSuffix = "";
+    if (states && states.length > 0) {
+      const [state] = states;
+      stateSuffix = `--${states.join("--")}`;
+      if (state === "hover") {
+        selector = "&:hover";
+      } else if (state === "active") {
+        selector = "&:active";
+      } else if (state === "disabled") {
+        selector = "&:disabled";
+      } else if (state === "focus") {
+        selector = "&:focus";
+      }
+    }
+    const variantThemeVar = themeScope.themeVars[`${variantKey}${stateSuffix}`];
+    if (typeof variantThemeVar !== "string" || variantThemeVar.trim() === "") {
+      continue;
+    }
+    variantSpec[selector] ??= {};
+    variantSpec[selector][`--${THEME_VAR_PREFIX}-${property}-${componentType}${stateSuffix}`] =
+      variantThemeVar;
+  }
+
+  const variantClassName = useStyles(variantSpec, { layer: "dynamic" });
+  if (children.type === ItemWithLabel && children.props?.children) {
+    const innerChild = children.props.children as ReactElement;
+    return cloneElement(children, {
+      children: cloneElement(innerChild, {
+        className: [innerChild.props?.className, variantClassName].filter(Boolean).join(" "),
+        "data-xmlui-variant": variant,
+      }),
+    });
+  }
+  return cloneElement(children, {
+    className: [children.props.className, variantClassName].filter(Boolean).join(" "),
+  });
+}
 
 export const animationBehavior: Behavior = {
   metadata: {
@@ -415,11 +534,11 @@ function LabelBehavior({
   const shrinkToLabel = context.props.shrinkToLabel === undefined
     ? !hasValueApiPair
     : isTruthyWhenValue(context.props.shrinkToLabel);
-  const formItemThemeClass = useComponentThemeClass("FormItem", FormItemMd);
+  const formItemThemeClassName = useComponentThemeClass(FormItemMd);
   return (
     <ItemWithLabel
       id={stringValue(context.props.id)}
-      className={formItemThemeClass.className}
+      className={["xmlui-FormItem", formItemThemeClassName].filter(Boolean).join(" ")}
       componentName={context.componentName}
       labelPosition={stringValue(context.props.labelPosition) as any}
       label={stringValue(context.props.label)}

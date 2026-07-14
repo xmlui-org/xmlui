@@ -356,6 +356,15 @@ if (params.has("__xmluiTestBed")) {
 
   const readTestBedResources = (): Record<string, string> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedResources");
+    return readStringMap(raw);
+  };
+
+  const readTestBedResourceMap = (): Record<string, string> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedResourceMap");
+    return readStringMap(raw);
+  };
+
+  const readStringMap = (raw: string | null): Record<string, string> => {
     if (!raw) {
       return {};
     }
@@ -391,10 +400,59 @@ if (params.has("__xmluiTestBed")) {
     }
   };
 
+  const readTestBedAppGlobals = (): Record<string, unknown> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedAppGlobals");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed as Record<string, unknown>
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const readTestBedXmluiConfig = (): Record<string, unknown> => {
+    const raw = window.sessionStorage.getItem("__xmluiTestBedXmluiConfig");
+    if (!raw) {
+      return {};
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? parsed as Record<string, unknown>
+        : {};
+    } catch {
+      return {};
+    }
+  };
+
   const readTestBedDefaultTheme = (): string | undefined => {
     const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTheme");
     return value || undefined;
   };
+
+  const readTestBedDefaultTone = (): "light" | "dark" | undefined => {
+    const value = window.sessionStorage.getItem("__xmluiTestBedDefaultTone");
+    return value === "light" || value === "dark" ? value : undefined;
+  };
+
+  const readOptionalBoolean = (key: string): boolean | undefined => {
+    const value = window.sessionStorage.getItem(key);
+    if (value === "true") {
+      return true;
+    }
+    if (value === "false") {
+      return false;
+    }
+    return undefined;
+  };
+
+  const readTestBedOldThemeCanary = (): boolean =>
+    window.sessionStorage.getItem("__xmluiTestBedOldThemeCanary") === "true";
 
   const readTestBedExtensions = async (): Promise<Extension[]> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
@@ -444,8 +502,15 @@ if (params.has("__xmluiTestBed")) {
     const key = testBedRenderKey++;
     const extensions = await readTestBedExtensions();
     const resources = readTestBedResources();
+    const resourceMap = readTestBedResourceMap();
     const themes = readTestBedThemes();
+    const appGlobals = readTestBedAppGlobals();
+    const xmluiConfig = readTestBedXmluiConfig();
     const defaultTheme = readTestBedDefaultTheme();
+    const defaultTone = readTestBedDefaultTone();
+    const strictTheming = readOptionalBoolean("__xmluiTestBedStrictTheming");
+    const strictAccessibility = readOptionalBoolean("__xmluiTestBedStrictAccessibility");
+    const enableOldThemeCanary = readTestBedOldThemeCanary();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
@@ -453,8 +518,15 @@ if (params.has("__xmluiTestBed")) {
       testBedRoot = mountXmluiApp(module, root, {
         extensions,
         resources,
+        resourceMap,
         themes,
+        appGlobals,
+        xmluiConfig,
         defaultTheme,
+        defaultTone,
+        strictTheming,
+        strictAccessibility,
+        enableOldThemeCanary,
         testProbe,
       });
       return;
@@ -464,8 +536,15 @@ if (params.has("__xmluiTestBed")) {
       module,
       extensions,
       resources,
+      resourceMap,
       themes,
+      appGlobals,
+      xmluiConfig,
       defaultTheme,
+      defaultTone,
+      strictTheming,
+      strictAccessibility,
+      enableOldThemeCanary,
       testProbe,
     }));
   };

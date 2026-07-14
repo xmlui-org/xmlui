@@ -1,9 +1,16 @@
 import { type ComponentType, type ReactNode, useState } from "react";
 
 import type { ComponentMetadata } from "../component-core/metadata";
+import { useComponentThemeClass } from "./theming/utils";
+import { useTheme } from "./theming/ThemeContext";
+import { useAppContext } from "./AppContext";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "../extensions";
 import { COMPONENT_PART_KEY } from "../styling/layout";
-import { useComponentThemeClass } from "../runtime/rendering/theme";
+import {
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
+  isInlineStylePropName,
+} from "../styling";
 
 type ExtractValueCompat = ((value: unknown) => any) & {
   asString(value: unknown, fallback?: string): string;
@@ -80,8 +87,21 @@ export function wrapComponent(
     events: Object.keys(metadata.events ?? {}),
     apis: Object.keys(metadata.apis ?? {}),
     allowsChildren: true,
+    metadata,
+    themeVars: metadata.themeVars,
+    defaultThemeVars: metadata.defaultThemeVars,
+    toneSpecificThemeVars: metadata.toneSpecificThemeVars,
+    themeVarContributorComponents: metadata.themeVarContributorComponents,
     component: (runtimeProps: XmluiExtensionComponentProps) => {
-      const themeClass = useComponentThemeClass(name, metadata);
+      const { disableInlineStyle, disableInlineStyleIsExplicit } = useTheme();
+      const appContext = useAppContext();
+      const inlineStylesDisabled = isInlineStyleDisabled(
+        disableInlineStyle,
+        appContext.appGlobals,
+        disableInlineStyleIsExplicit,
+      );
+      const themeClassName = useComponentThemeClass(metadata);
+      const themeClass = ["xmlui-" + name, themeClassName].filter(Boolean).join(" ");
       const props = { ...runtimeProps.props };
       const [state, setState] = useState<Record<string, any>>({});
       for (const name of options.exclude ?? []) {
@@ -94,6 +114,7 @@ export function wrapComponent(
         }
       }
       if (options.customRender) {
+        const renderedProps = inlineStylesDisabled ? removeInlineStyleProps(props) : props;
         const extractValue = ((value: unknown) => value) as ExtractValueCompat;
         extractValue.asString = (value, fallback = "") =>
           value === undefined || value === null ? fallback : String(value);
@@ -119,10 +140,10 @@ export function wrapComponent(
           value === undefined || value === null ? fallback : String(value);
         extractValue.asSize = (value, fallback) =>
           value === undefined || value === null || value === "" ? fallback : String(value);
-        return options.customRender(props, {
-          className: themeClass.className,
-          classes: { [COMPONENT_PART_KEY]: themeClass.className },
-          node: { ...runtimeProps.node, props: runtimeProps.props },
+        return options.customRender(renderedProps, {
+          className: themeClass,
+          classes: { [COMPONENT_PART_KEY]: themeClass },
+          node: { ...runtimeProps.node, props: renderedProps },
           extractValue,
           extractResourceUrl: (url) =>
             url === undefined || url === null || /^https?:\/\//.test(url) ? url : `/${url}`,
@@ -161,12 +182,20 @@ export function wrapComponent(
         <Component
           {...props}
           uid={options.passUid ? runtimeProps.props.id : undefined}
-          className={themeClass.className}
-          style={themeClass.style}
+          className={themeClass}
         >
           {runtimeProps.children}
         </Component>
       );
     },
   };
+}
+
+function removeInlineStyleProps(props: Record<string, unknown>): Record<string, unknown> {
+  const allowedProps = filterPropsForDisabledInlineStyle(props);
+  return Object.fromEntries(
+    Object.entries(props).filter(([name]) =>
+      !isInlineStylePropName(name) || Object.prototype.hasOwnProperty.call(allowedProps, name)
+    ),
+  );
 }

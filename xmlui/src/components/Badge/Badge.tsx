@@ -3,9 +3,9 @@ import styles from "./Badge.module.scss";
 import type { CSSProperties } from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useThemeVariables } from "../../components-core/theming/utils";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
 import {
   Badge,

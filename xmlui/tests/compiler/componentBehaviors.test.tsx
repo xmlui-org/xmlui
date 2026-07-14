@@ -12,6 +12,7 @@ import {
   dEnabled,
 } from "../../src/component-core";
 import { PartMd } from "../../src/components/Part/Part";
+import { StyleProvider } from "../../src/components-core/theming/StyleContext";
 
 describe("component behavior metadata compatibility", () => {
   it("evaluates old behavior conditions against component metadata", () => {
@@ -128,7 +129,7 @@ describe("component behavior attachment", () => {
       <input data-base-renderer="yes" />,
     );
 
-    const markup = renderToStaticMarkup(<>{node}</>);
+    const markup = renderToStaticMarkup(<StyleProvider>{node}</StyleProvider>);
 
     expect(markup).toContain('data-xmlui-behavior="tooltip"');
     expect(markup).toContain('title="Helpful text"');

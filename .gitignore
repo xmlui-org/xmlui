@@ -5,6 +5,7 @@ dist-ssg/
 dist-metadata/
 dist-docs-reference/
 xmlui/.compatibility-report/
+xmlui/standalone-samples/*/xmlui/xmlui-latest.js
 packages/*/dist/
 packages/*/dist-metadata/
 .xmlui-production/

@@ -5,41 +5,96 @@
     <Theme themeId="xmlui-hero-theme"
            minHeight-Button="0">
     <Markdown>
-```xmlui-pg splitView="true" height="534px" immediate="true" withSplashScreen="true"
+        <![CDATA[
+```xmlui-pg splitView height="534px" immediate withSplashScreen
 ---config
 {
   "defaultTheme": "xmlui-hero-theme"
 }
 ---app display
-&lt;App layout="condensed-sticky"&gt;
-    &lt;AppHeader&gt;
-      &lt;Text variant="strong"&gt;Our Team&lt;/Text&gt;
-      &lt;SpaceFiller /&gt;
-      &lt;ToneSwitch /&gt;
-    &lt;/AppHeader&gt;
+<App layout="condensed-sticky">
+    <AppHeader>
+      <Text variant="strong">Our Team</Text>
+      <SpaceFiller />
+      <ToneSwitch />
+    </AppHeader>
 
-    &lt;List data="/api/users"&gt;
-      &lt;Card title="{$item.username}" subtitle="{$item.email}"
-        orientation="horizontal" avatarUrl="{$item.avatar_url}"&gt;
-        &lt;SpaceFiller /&gt;
-        &lt;Badge when-md="{true}" value="{$item.status}" /&gt;
-        &lt;Button variant="ghost" icon="close" tooltip="Delete {$item.username}"&gt;
-          &lt;event name="click"&gt;
-            &lt;APICall url="/api/users/{$item.id}" method="delete"
+    <List data="/api/users">
+      <Card title="{$item.username}" subtitle="{$item.email}"
+        orientation="horizontal" avatarUrl="{$item.avatar_url}">
+        <SpaceFiller />
+        <Badge when-md value="{$item.status}" />
+        <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
+          <event name="click">
+            <APICall url="/api/users/{$item.id}" method="delete"
               confirmTitle="Delete {$item.username}?"
-              completedNotificationMessage="{$item.username} deleted" /&gt;
-          &lt;/event&gt;
-        &lt;/Button&gt;
-      &lt;/Card&gt;
-    &lt;/List&gt;
-&lt;/App&gt;
+              completedNotificationMessage="{$item.username} deleted" />
+          </event>
+        </Button>
+      </Card>
+    </List>
+</App>
 ---api
 {
   "apiUrl": "/api",
   "artificialDelay": 0,
-  "useWorker": false
+  "useWorker": false,
+  "initialize": "$state.users = [
+        {
+          id: 1,
+          username: 'Coder Gal',
+          email: 'ava.davis@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=ava.davis@example.com',
+          status: 'active'
+        },
+        {
+          id: 2,
+          username: 'Tech Ninja',
+          email: 'liam.miller@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=liam.miller@example.com',
+          status: 'active'
+        },
+        {
+          id: 3,
+          username: 'Design Diva',
+          email: 'olivia.wilson@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=olivia.wilson@example.com',
+          status: 'pending'
+        },
+        {
+          id: 4,
+          username: 'Data King',
+          email: 'noah.jones@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=noah.jones@example.com',
+          status: 'pending'
+        },
+        {
+          id: 5,
+          username: 'Pixel Pioneer',
+          email: 'emma.brown@example.com',
+          avatar_url: 'https://i.pravatar.cc/150?u=emma.brown@example.com',
+          status: 'active'
+        },
+      ]",
+  "operations": {
+    "get-users": {
+      "url": "/users",
+      "method": "get",
+      "handler": "$state.users"
+    },
+    "delete-user": {
+      "url": "/users/:id",
+      "method": "delete",
+      "handler": "if ($state.users.length < 5) {
+        throw Errors.HttpError(500, 'This sample does not allow you to delete more users');
+      }
+      $state.users = $state.users.filter(u => u.id.toString() !== $pathParams.id);"
+    }
+  }
 }
 ```
+    ]]>
     </Markdown>
     </Theme>
 </Component>
+

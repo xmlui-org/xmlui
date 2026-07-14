@@ -128,6 +128,208 @@ test("Themed H1 regression", async ({ page, initTestBed }) => {
   expect(h2Color).toBe("rgb(0, 255, 0)");
 });
 
+test.describe("root provider topology", () => {
+  test("uses config defaultTheme in the root theme provider", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="theme-id">{activeThemeId}</Text>
+      </App>
+    `,
+      {
+        themes: [
+          {
+            id: "brand",
+            extends: "xmlui",
+            themeVars: {
+              "brand-marker": "yes",
+            },
+          },
+        ],
+        defaultTheme: "brand",
+      },
+    );
+
+    await expect(page.getByTestId("theme-id")).toHaveText("brand");
+  });
+
+  test("uses config defaultTone in the root theme provider", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="tone">{activeThemeTone}</Text>
+      </App>
+    `,
+      { defaultTone: "dark" },
+    );
+
+    await expect(page.getByTestId("tone")).toHaveText("dark");
+  });
+
+  test("restores persisted theme and tone before root content renders", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("appTheme", JSON.stringify("stored"));
+      localStorage.setItem("appTone", JSON.stringify("dark"));
+    });
+
+    await initTestBed(
+      `
+      <App persistTheme="true">
+        <Text testId="theme-id">{activeThemeId}</Text>
+        <Text testId="tone">{activeThemeTone}</Text>
+      </App>
+    `,
+      {
+        themes: [
+          {
+            id: "brand",
+            extends: "xmlui",
+            themeVars: {
+              "brand-marker": "yes",
+            },
+          },
+          {
+            id: "stored",
+            extends: "xmlui",
+            themeVars: {
+              "stored-marker": "yes",
+            },
+          },
+        ],
+        defaultTheme: "brand",
+        defaultTone: "light",
+      },
+    );
+
+    await expect(page.getByTestId("theme-id")).toHaveText("stored");
+    await expect(page.getByTestId("tone")).toHaveText("dark");
+  });
+
+  test("ToneSwitch changes the authoritative root tone", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <App>
+        <ToneSwitch />
+        <Text testId="tone">{activeThemeTone}</Text>
+      </App>
+    `);
+
+    await expect(page.getByTestId("tone")).toHaveText("light");
+    await page.getByRole("switch").locator("xpath=ancestor::label[1]").click();
+    await expect(page.getByTestId("tone")).toHaveText("dark");
+  });
+
+  test("scoped Theme styles Select portal content through the theme root mirror", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme
+          backgroundColor-item-Select="rgb(12, 34, 56)"
+          backgroundColor-item-Select--hover="rgb(12, 34, 56)"
+          backgroundColor-item-Select--active="rgb(12, 34, 56)"
+        >
+          <Select testId="scoped-select">
+            <Option value="one" label="One" />
+          </Select>
+        </Theme>
+      </App>
+    `);
+
+    await page.getByTestId("scoped-select").click();
+    const option = page.getByRole("option", { name: "One" });
+
+    await expect(option).toBeVisible();
+    await expect(option).toHaveCSS("background-color", "rgb(12, 34, 56)");
+  });
+
+  test("root notification config controls toast position and duration", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Button testId="show-toast" onClick="toast('Saved')">Show toast</Button>
+      </App>
+    `,
+      {
+        appGlobals: {
+          notifications: {
+            position: "bottom-start",
+            duration: 300,
+          },
+        },
+      },
+    );
+
+    await page.getByTestId("show-toast").click();
+    const status = page.getByRole("status").filter({ hasText: "Saved" }).last();
+    await expect(status).toBeVisible();
+
+    const box = await status.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeLessThan(PAGE_WIDTH / 2);
+    expect(box!.y).toBeGreaterThan(PAGE_HEIGHT / 2);
+
+    await expect(status).toBeHidden({ timeout: 2500 });
+  });
+
+  test("scoped Theme portal mirror is stable across unrelated rerenders", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <App var.count="{0}">
+        <Button testId="rerender" onClick="count = count + 1">Rerender {count}</Button>
+        <Theme
+          backgroundColor-item-Select="rgb(12, 34, 56)"
+          backgroundColor-item-Select--hover="rgb(12, 34, 56)"
+          backgroundColor-item-Select--active="rgb(12, 34, 56)"
+        >
+          <Select testId="scoped-select">
+            <Option value="one" label="One" />
+          </Select>
+        </Theme>
+      </App>
+    `);
+
+    const initialMirrorCount = await page.evaluate(() => {
+      const mirrors = [...document.querySelectorAll('div[class*="themeWrapper"]')].filter((element) =>
+        element instanceof HTMLElement &&
+        element.childElementCount === 0
+      );
+      if (mirrors[0] instanceof HTMLElement) {
+        mirrors[0].dataset.step93Mirror = "stable";
+      }
+      return mirrors.length;
+    });
+
+    expect(initialMirrorCount).toBe(1);
+
+    await page.getByTestId("rerender").click();
+    await page.getByTestId("rerender").click();
+
+    const stableMirrorCount = await page.evaluate(() => {
+      const mirrors = [...document.querySelectorAll('div[class*="themeWrapper"]')].filter((element) =>
+        element instanceof HTMLElement &&
+        element.childElementCount === 0
+      );
+      return {
+        total: mirrors.length,
+        tagged: mirrors.filter(
+          (element) => element instanceof HTMLElement && element.dataset.step93Mirror === "stable",
+        ).length,
+      };
+    });
+
+    expect(stableMirrorCount).toEqual({ total: 1, tagged: 1 });
+  });
+});
+
 // =============================================================================
 // APPLYIF PROPERTY TESTS
 // =============================================================================

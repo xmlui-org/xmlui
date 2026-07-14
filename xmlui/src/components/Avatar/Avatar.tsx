@@ -2,11 +2,10 @@ import styles from "./Avatar.module.scss";
 
 import React, { type CSSProperties } from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { useComponentThemeClass, useThemeVariables } from "../../components-core/theming/utils";
 import { sizeMd } from "../../components/abstractions";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { useThemeVariables } from "../../runtime/rendering/theme";
 import { resolveThemeReferences } from "../../styling/theme";
 import { defaultProps } from "./Avatar.defaults";
 import { Avatar } from "./AvatarReact";

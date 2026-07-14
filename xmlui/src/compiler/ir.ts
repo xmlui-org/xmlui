@@ -16,7 +16,7 @@ export type SourceRange = {
 
 export type ParsedExpression = {
   source: string;
-  ast: ScriptNode;
+  ast?: ScriptNode;
   range: SourceRange;
   ir?: XmluiScriptIr;
   compiledSource?: string;
@@ -27,11 +27,11 @@ export type ParsedExpression = {
 
 export type ParsedEvent = {
   source: string;
-  ast: ProgramNode;
+  ast?: ProgramNode;
   range: SourceRange;
   ir?: XmluiEventHandlerIr;
   compiledSource?: string;
-  execute?: (context: CompiledEventContext) => Promise<void>;
+  execute?: (context: CompiledEventContext) => Promise<unknown>;
   options?: XmluiHandlerOptions;
   dependencies?: BoundDependency[];
   writes?: BoundWriteTarget[];
@@ -49,7 +49,7 @@ export type MixedTextSegment =
       source: string;
       range: SourceRange;
       expressionRange: SourceRange;
-      ast: ScriptNode;
+      ast?: ScriptNode;
       ir?: XmluiScriptIr;
       compiledSource?: string;
       bindingMode?: "source" | "derived";

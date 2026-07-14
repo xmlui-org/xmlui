@@ -88,7 +88,7 @@ export const timerRenderer = wrapRuntimeComponent({
       interval={adapter.numberProp("interval", defaultProps.interval)}
       initialDelay={adapter.numberProp("initialDelay", defaultProps.initialDelay)}
       once={adapter.booleanProp("once", defaultProps.once)}
-      onTick={() => void adapter.event("tick")()}
+      onTick={adapter.event("tick")}
       registerComponentApi={adapter.registerApi}
     />
   ),

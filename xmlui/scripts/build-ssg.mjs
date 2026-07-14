@@ -59,9 +59,9 @@ const searchEntries = [];
 const generatedRoutes = [];
 
 for (const route of routes) {
-  const markup = renderModule.renderSsgExample(route.example, route.route);
+  const renderResult = normalizeRenderResult(renderModule.renderSsgExample(route.example, route.route));
   const html = injectSsgMarkup(shellHtml, {
-    markup,
+    renderResult,
     example: route.example,
     route: route.route,
     relativeRoot: relativeRootForOutput(route.output),
@@ -69,10 +69,10 @@ for (const route of routes) {
   const outputPath = path.join(ssgDir, route.output);
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, html);
-  const text = textContent(markup);
+  const text = textContent(renderResult.markup);
   searchEntries.push({
     path: route.route,
-    title: firstHeading(markup) ?? route.title,
+    title: firstHeading(renderResult.markup) ?? route.title,
     content: text,
     category: categoryForRoute(route.route),
   });
@@ -84,7 +84,7 @@ for (const route of routes) {
 }
 
 await writeFile(path.join(ssgDir, fallbackFile), injectSsgMarkup(shellHtml, {
-  markup: renderModule.renderSsgExample("routingState", "/"),
+  renderResult: normalizeRenderResult(renderModule.renderSsgExample("routingState", "/")),
   example: "routingState",
   route: "/",
   relativeRoot: ".",
@@ -106,7 +106,6 @@ const manifest = {
     "content directory route discovery",
     "dynamic route prerendering",
     "full head/search metadata parity",
-    "style registry SSR parity",
   ],
 };
 
@@ -120,12 +119,71 @@ for (const route of generatedRoutes) {
   console.log(`  ${route.path} -> ${route.file}`);
 }
 
-function injectSsgMarkup(shellHtml, { markup, example, route, relativeRoot }) {
-  const adjusted = shellHtml
+function injectSsgMarkup(shellHtml, { renderResult, example, route, relativeRoot }) {
+  const adjusted = injectSsrStyles(
+    mergeHtmlClasses(shellHtml, renderResult.htmlClasses),
+    renderResult.ssrStyles,
+    renderResult.ssrHashes,
+  )
     .replaceAll('src="./internal/', `src="${relativeRoot}/internal/`)
     .replaceAll('href="./internal/', `href="${relativeRoot}/internal/`);
   const rootOpen = `<div id="root" data-xmlui-ssg="true" data-xmlui-example="${example}" data-xmlui-ssg-path="${route}" data-xmlui-ssg-search-index-file="${searchIndexFile}">`;
-  return adjusted.replace(/<div id="root"><\/div>/, `${rootOpen}${markup}</div>`);
+  return adjusted.replace(/<div id="root"><\/div>/, `${rootOpen}${renderResult.markup}</div>`);
+}
+
+function normalizeRenderResult(value) {
+  if (typeof value === "string") {
+    return {
+      markup: value,
+      ssrStyles: "",
+      ssrHashes: "",
+      htmlClasses: "",
+    };
+  }
+  return {
+    markup: value.markup || "",
+    ssrStyles: value.ssrStyles || "",
+    ssrHashes: value.ssrHashes || "",
+    htmlClasses: value.htmlClasses || "",
+  };
+}
+
+function injectSsrStyles(shellHtml, ssrStyles, ssrHashes) {
+  if (!ssrStyles.trim()) {
+    return shellHtml;
+  }
+  const styleTag = `<style data-style-registry="true" data-ssr-hashes="${escapeHtmlAttribute(ssrHashes)}">${ssrStyles}</style>`;
+  if (/<\/head>/i.test(shellHtml)) {
+    return shellHtml.replace(/<\/head>/i, `${styleTag}\n</head>`);
+  }
+  return `${styleTag}${shellHtml}`;
+}
+
+function mergeHtmlClasses(shellHtml, htmlClasses) {
+  const classes = htmlClasses.trim();
+  if (!classes) {
+    return shellHtml;
+  }
+  const htmlTagRe = /<html\b([^>]*)>/i;
+  const match = htmlTagRe.exec(shellHtml);
+  if (!match) {
+    return shellHtml;
+  }
+  const attributes = match[1] || "";
+  const classRe = /\sclass=(["'])(.*?)\1/i;
+  const classMatch = classRe.exec(attributes);
+  const nextAttributes = classMatch
+    ? attributes.replace(classRe, ` class=${classMatch[1]}${`${classMatch[2]} ${classes}`.trim()}${classMatch[1]}`)
+    : `${attributes} class="${classes}"`;
+  return `${shellHtml.slice(0, match.index)}<html${nextAttributes}>${shellHtml.slice(match.index + match[0].length)}`;
+}
+
+function escapeHtmlAttribute(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 function relativeRootForOutput(output) {

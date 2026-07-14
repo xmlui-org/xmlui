@@ -215,6 +215,28 @@ describe("rendering binding evaluation", () => {
     expect(store.readLocal("root", "selected")).toBe("alpha");
   });
 
+  it("passes event payloads to generated callback handlers without interpreter IR", async () => {
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({ store });
+    const received: unknown[] = [];
+
+    await runEvent(
+      {
+        source: "(id) => received.push(id)",
+        range: { start: 0, end: 24 },
+        execute: async () => (id: unknown) => {
+          received.push(id);
+        },
+        dependencies: [],
+        writes: [],
+      },
+      scope,
+      ["alpha"],
+    );
+
+    expect(received).toEqual(["alpha"]);
+  });
+
   it("invalidates state mutated by arrow event handler method calls", async () => {
     const document = parseXmlui(`
       <App var.newItems="{[]}">

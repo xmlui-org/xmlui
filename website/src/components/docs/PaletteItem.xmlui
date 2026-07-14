@@ -1,0 +1,6 @@
+<Component name="PaletteItem">
+  <VStack horizontalAlignment="center" gap="$space-1">
+    <Text width="100%" fontSize="$fontSize-2xl" backgroundColor="${$props.color}">&nbsp;</Text>
+    <Text>{$props.color}</Text>
+  </VStack>
+</Component>

@@ -57,8 +57,15 @@ export type InitTestBedOptions = {
   extensionIds?: string | string[];
   mainXs?: string;
   resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
   themes?: Array<ThemeDefinition>;
   defaultTheme?: string;
+  defaultTone?: "light" | "dark";
+  appGlobals?: Record<string, unknown>;
+  xmluiConfig?: Record<string, unknown>;
+  strictTheming?: boolean;
+  strictAccessibility?: boolean;
+  oldThemeCanary?: boolean;
   apiInterceptor?: {
     initialize?: string;
     operations?: Record<string, {
@@ -245,7 +252,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       await initTestBed(page, markup, options);
       const viewport = page.viewportSize();
       return {
-        width: await page.locator("#root").evaluate((element) => element.getBoundingClientRect().width),
+        width: viewport?.width ?? 0,
         height: viewport?.height ?? 0,
         clipboard: createClipboardHelper(page),
         testStateDriver: {
@@ -761,11 +768,25 @@ async function initTestBed(
       ...defaultTestResources,
       ...(options.resources ?? {}),
     },
+    resourceMap: options.resourceMap ?? {},
     themes: options.themes ?? [],
     defaultTheme: options.defaultTheme,
+    defaultTone: options.defaultTone,
+    appGlobals: options.appGlobals ?? {},
+    xmluiConfig: options.xmluiConfig ?? {},
+    strictTheming: options.strictTheming,
+    strictAccessibility: options.strictAccessibility,
+    oldThemeCanary: options.oldThemeCanary === true,
   };
   await installApiInterceptor(page, options.apiInterceptor);
   const installTestBedSource = (payload: TestBedPayload) => {
+    const setOptionalBooleanSessionValue = (key: string, value: boolean | undefined) => {
+      if (value === undefined) {
+        window.sessionStorage.removeItem(key);
+        return;
+      }
+      window.sessionStorage.setItem(key, value ? "true" : "false");
+    };
     window.__xmluiClipboardText = "";
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -780,11 +801,26 @@ async function initTestBed(
     window.sessionStorage.setItem("__xmluiTestBedComponents", JSON.stringify(payload.components));
     window.sessionStorage.setItem("__xmluiTestBedExtensionIds", JSON.stringify(payload.extensionIds));
     window.sessionStorage.setItem("__xmluiTestBedResources", JSON.stringify(payload.resources));
+    window.sessionStorage.setItem("__xmluiTestBedResourceMap", JSON.stringify(payload.resourceMap));
     window.sessionStorage.setItem("__xmluiTestBedThemes", JSON.stringify(payload.themes));
+    window.sessionStorage.setItem("__xmluiTestBedAppGlobals", JSON.stringify(payload.appGlobals));
+    window.sessionStorage.setItem("__xmluiTestBedXmluiConfig", JSON.stringify(payload.xmluiConfig));
     if (payload.defaultTheme) {
       window.sessionStorage.setItem("__xmluiTestBedDefaultTheme", payload.defaultTheme);
     } else {
       window.sessionStorage.removeItem("__xmluiTestBedDefaultTheme");
+    }
+    if (payload.defaultTone) {
+      window.sessionStorage.setItem("__xmluiTestBedDefaultTone", payload.defaultTone);
+    } else {
+      window.sessionStorage.removeItem("__xmluiTestBedDefaultTone");
+    }
+    setOptionalBooleanSessionValue("__xmluiTestBedStrictTheming", payload.strictTheming);
+    setOptionalBooleanSessionValue("__xmluiTestBedStrictAccessibility", payload.strictAccessibility);
+    if (payload.oldThemeCanary) {
+      window.sessionStorage.setItem("__xmluiTestBedOldThemeCanary", "true");
+    } else {
+      window.sessionStorage.removeItem("__xmluiTestBedOldThemeCanary");
     }
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
@@ -841,8 +877,15 @@ type TestBedPayload = {
   components: string[];
   extensionIds: string[];
   resources: Record<string, string>;
+  resourceMap: Record<string, string>;
   themes: Array<ThemeDefinition>;
   defaultTheme?: string;
+  defaultTone?: "light" | "dark";
+  appGlobals: Record<string, unknown>;
+  xmluiConfig: Record<string, unknown>;
+  strictTheming?: boolean;
+  strictAccessibility?: boolean;
+  oldThemeCanary: boolean;
 };
 
 async function clearManagedFetchCache(page: Page): Promise<void> {

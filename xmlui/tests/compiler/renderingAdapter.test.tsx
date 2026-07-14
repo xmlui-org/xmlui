@@ -10,6 +10,7 @@ import {
   createRuntimeScope,
   createRuntimeStateStore,
 } from "../../src/runtime/state";
+import { StyleProvider } from "../../src/components-core/theming/StyleContext";
 import { parseXmlui } from "../../src/compiler/parseXmlui";
 import { createMetadata, dClick, dComponent, dEnabled } from "../../src/component-core";
 
@@ -80,7 +81,11 @@ describe("XMLUI rendering adapter", () => {
       ),
     });
     const context = createRenderContext({}, {});
-    const html = renderToStaticMarkup(<Dummy context={context} node={dummyNode} scope={scope} />);
+    const html = renderToStaticMarkup(
+      <StyleProvider>
+        <Dummy context={context} node={dummyNode} scope={scope} />
+      </StyleProvider>,
+    );
 
     expect(html).toContain('data-xmlui-behavior="tooltip"');
     expect(html).toContain('title="Adapter tooltip"');
@@ -121,7 +126,11 @@ describe("XMLUI rendering adapter", () => {
       },
     });
     const context = createRenderContext({}, {});
-    const html = renderToStaticMarkup(<Dummy context={context} node={dummyNode} scope={scope} />);
+    const html = renderToStaticMarkup(
+      <StyleProvider>
+        <Dummy context={context} node={dummyNode} scope={scope} />
+      </StyleProvider>,
+    );
 
     expect(html).toContain('data-resource="/assets/logo.svg"');
     expect(html).toContain('data-has-api="true"');

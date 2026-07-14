@@ -130,7 +130,10 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
 
 // --- CSS properties of a particular TextBox variant
 @mixin variant($variantName) {
-  $suffix: if($variantName != "", "--#{$variantName}", "");
+  $suffix: "";
+  @if $variantName != "" {
+    $suffix: "--#{$variantName}";
+  }
   border-radius: createThemeVar("Input:borderRadius-Checkbox#{$suffix}");
   border-color: createThemeVar("Input:borderColor-Checkbox#{$suffix}");
 

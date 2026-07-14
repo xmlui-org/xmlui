@@ -315,6 +315,56 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false):
   };
 };
 
+function parseColumnCssLength(
+  value: string,
+  seen = new Set<string>(),
+  resolveThemeVar?: (name: string) => string | undefined,
+): number | undefined {
+  const trimmed = value.trim();
+  const pixelMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)px$/);
+  if (pixelMatch) {
+    return Number(pixelMatch[1]);
+  }
+  const remEmMatch = trimmed.match(/^(-?\d+(?:\.\d+)?)(rem|em)$/);
+  if (remEmMatch) {
+    const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    return Number(remEmMatch[1]) * (Number.isNaN(rootFontSize) ? 16 : rootFontSize);
+  }
+  const varMatch = trimmed.match(/^var\((--xmlui-[A-Za-z0-9_-]+)\)$/);
+  if (varMatch) {
+    return parseCssVariableLength(varMatch[1], seen, resolveThemeVar);
+  }
+  const calcVarMultiplyMatch = trimmed.match(
+    /^calc\(\s*(-?\d+(?:\.\d+)?)\s*\*\s*var\((--xmlui-[A-Za-z0-9_-]+)\)\s*\)$/,
+  );
+  if (calcVarMultiplyMatch) {
+    const cssVarValue = parseCssVariableLength(calcVarMultiplyMatch[2], seen, resolveThemeVar);
+    return cssVarValue === undefined ? undefined : Number(calcVarMultiplyMatch[1]) * cssVarValue;
+  }
+  return undefined;
+}
+
+function parseCssVariableLength(
+  name: string,
+  seen: Set<string>,
+  resolveThemeVar?: (name: string) => string | undefined,
+): number | undefined {
+  if (seen.has(name)) {
+    return undefined;
+  }
+  seen.add(name);
+  const themeVarName = name.replace(/^--xmlui-/, "");
+  const themeVarValue = resolveThemeVar?.(themeVarName);
+  if (themeVarValue) {
+    return parseColumnCssLength(themeVarValue, seen, resolveThemeVar);
+  }
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  if (value) {
+    return parseColumnCssLength(value, seen, resolveThemeVar);
+  }
+  return undefined;
+}
+
 /**
  * Custom hook to handle keyboard actions for the Table component
  * Merges user-provided key bindings with defaults and detects conflicts
@@ -819,9 +869,14 @@ export const Table = memo(forwardRef(function Table(
                     );
                     width = parseFloat(remEmMatch[1]) * (isNaN(rootFontSize) ? 16 : rootFontSize);
                   } else {
-                    throw new Error(
-                      `Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`,
-                    );
+                    const calcWidth = parseColumnCssLength(resolvedWidth, undefined, getThemeVar);
+                    if (calcWidth !== undefined) {
+                      width = calcWidth;
+                    } else {
+                      throw new Error(
+                        `Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`,
+                      );
+                    }
                   }
                 }
               }
@@ -833,7 +888,7 @@ export const Table = memo(forwardRef(function Table(
           return { width, starSizedWidth };
         }
       });
-    }, [getThemeVar, safeColumns]);
+  }, [getThemeVar, safeColumns]);
 
     // --- Prepare the selection column separately so hover-driven updates stay isolated to it
     const selectColumn: ColumnDef<any> = useMemo(() => {

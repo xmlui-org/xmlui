@@ -1,8 +1,15 @@
 import { createContext, useContext, type ReactNode } from "react";
 
+import type { ComponentMetadata } from "../component-core/metadata";
+
 type ComponentRegistryValue = {
-  lookupComponentRenderer: (name: string) => { isCompoundComponent?: boolean } | undefined;
+  lookupComponentRenderer: (name: string) => {
+    descriptor?: ComponentMetadata;
+    isCompoundComponent?: boolean;
+  } | undefined;
   componentThemeVars: Set<string>;
+  componentDefaultThemeVars?: Record<string, unknown>;
+  componentThemeVarDeclarations?: Map<string, unknown>;
 };
 
 const defaultRegistry: ComponentRegistryValue = {

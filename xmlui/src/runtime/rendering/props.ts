@@ -1,10 +1,13 @@
 import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { emitThemeDiagnostics } from "../../components-core/theming/validator/emit";
 import type { XmluiElement } from "../../compiler/ir";
 import {
   COMPONENT_PART_KEY,
   isLayoutPropName,
+  filterPropsForDisabledInlineStyle,
+  isInlineStyleDisabled,
   looksLikeComponentThemeVariableName,
   parseStyleSelectorKey,
   responsiveBreakpoints,
@@ -13,10 +16,13 @@ import {
   supportedLayoutPropNames,
   type LayoutOrientation,
 } from "../../styling";
+import { useXmluiAppContext } from "../appContext";
 import type { RuntimeScope } from "../state";
 import { evaluateExpressionOrText, dependenciesForBinding } from "./bindings";
 import { useBindingRevision } from "./reactive";
+import { inlineStyleValidationOptions, validateRuntimeStyleProps } from "./styleValidation";
 import type { RenderContext } from "./types";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 export function useEvaluatedProp(
   node: XmluiElement,
@@ -79,8 +85,29 @@ export function useLayoutStyle(
       props[name] = useEvaluatedProp(node, scope, name, undefined);
     }
   }
+  const appContext = useXmluiAppContext();
+  const validationOptions = useMemo(() => inlineStyleValidationOptions(appContext.xmluiConfig), [
+    appContext.xmluiConfig?.allowInlineRawCss,
+    appContext.xmluiConfig?.maxZIndex,
+    appContext.xmluiConfig?.strictTheming,
+  ]);
+  const validatedStyleProps = useMemo(
+    () => validateRuntimeStyleProps(props, node.type, validationOptions),
+    [node.type, props, validationOptions],
+  );
+  useEffect(() => {
+    emitThemeDiagnostics(validatedStyleProps.diagnostics);
+  }, [validatedStyleProps.diagnostics]);
+  const theme = useTheme();
   const viewportWidth = useViewportWidth();
-  return resolveActiveLayoutStyle(props, viewportWidth, options);
+  const activeProps = isInlineStyleDisabled(
+    theme.disableInlineStyle,
+    appGlobalsForScope(scope) ?? appContext.appGlobals,
+    theme.disableInlineStyleIsExplicit,
+  )
+    ? filterPropsForDisabledInlineStyle(validatedStyleProps.props)
+    : validatedStyleProps.props;
+  return resolveActiveLayoutStyle(activeProps, viewportWidth, options);
 }
 
 export function flexStyle(
@@ -136,6 +163,14 @@ function coerceBoolean(value: unknown, fallback: boolean): boolean {
     }
   }
   return value == null ? fallback : Boolean(value);
+}
+
+function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
+  const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return scope?.parent ? appGlobalsForScope(scope.parent) : undefined;
 }
 
 function resolveActiveLayoutStyle(

@@ -222,4 +222,85 @@ test.describe("Theme foundation", () => {
 
     expect(new Set(indicatorColors).size).toBe(3);
   });
+
+  test("dynamic themeId updates the scoped theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.themeId="{'xmlui-green'}">
+        <Button testId="toggle" onClick="themeId = themeId === 'xmlui-green' ? 'xmlui-red' : 'xmlui-green'">Toggle</Button>
+        <Theme themeId="{themeId}">
+          <ProgressBar testId="progress" value="0.6" />
+        </Theme>
+      </App>
+    `);
+
+    const indicator = page.getByTestId("progress").locator('[role="progressbar"]');
+    const initialColor = await indicator.evaluate((element) =>
+      getComputedStyle(element).backgroundColor,
+    );
+
+    await page.getByTestId("toggle").click();
+
+    await expect
+      .poll(() => indicator.evaluate((element) => getComputedStyle(element).backgroundColor))
+      .not.toBe(initialColor);
+  });
+
+  test("dynamic tone updates the scoped wrapper color scheme", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.tone="{'light'}">
+        <Button testId="toggle" onClick="tone = tone === 'light' ? 'dark' : 'light'">Toggle</Button>
+        <Theme tone="{tone}">
+          <Text testId="inside">Inside</Text>
+        </Theme>
+      </App>
+    `);
+
+    const wrapper = page.locator('[class*="themeWrapper"]').last();
+    await expect(wrapper).toHaveCSS("color-scheme", "light");
+
+    await page.getByTestId("toggle").click();
+
+    await expect(wrapper).toHaveCSS("color-scheme", "dark");
+  });
+
+  test("dynamic theme variables update scoped runtime component styles", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.color="{'rgb(20, 40, 60)'}">
+        <Button testId="toggle" onClick="color = 'rgb(120, 40, 20)'">Toggle</Button>
+        <Theme textColor-Text="{color}">
+          <Text testId="inside">Inside</Text>
+        </Theme>
+      </App>
+    `);
+
+    await expect(page.getByTestId("inside")).toHaveCSS("color", "rgb(20, 40, 60)");
+
+    await page.getByTestId("toggle").click();
+
+    await expect(page.getByTestId("inside")).toHaveCSS("color", "rgb(120, 40, 20)");
+  });
+
+  test("disableInlineStyle inherits through scoped Theme and can be overridden", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme disableInlineStyle="true">
+          <Text testId="disabled" color="rgb(255, 0, 0)">Disabled inline color</Text>
+          <Theme disableInlineStyle="false">
+            <Text testId="enabled" color="rgb(0, 128, 0)">Enabled inline color</Text>
+          </Theme>
+        </Theme>
+      </App>
+    `);
+
+    const disabledInlineStyle = await page.getByTestId("disabled").getAttribute("style");
+    const enabledInlineStyle = await page.getByTestId("enabled").getAttribute("style");
+    expect(disabledInlineStyle ?? "").not.toContain("color");
+    expect(enabledInlineStyle ?? "").toContain("color");
+  });
 });

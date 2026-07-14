@@ -479,6 +479,33 @@ test.describe("Theme Variables", () => {
     expect(computedStyle.width).toBe("40px"); // Fallback value used
     expect(computedStyle.height).toBe("40px");
   });
+
+  test("resolves theme variable references in width and height props", async ({
+    initTestBed,
+    createIconDriver,
+  }) => {
+    await initTestBed(`<Icon testId="icon" name="home" width="$size-icon-Benefit" height="$size-icon-Benefit"/>`, {
+      testThemeVars: {
+        "size-icon-Benefit": "24px",
+      },
+    });
+
+    const icon = await createIconDriver("icon");
+    const values = await icon.svgIcon.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        widthAttr: el.getAttribute("width"),
+        heightAttr: el.getAttribute("height"),
+        width: style.width,
+        height: style.height,
+      };
+    });
+
+    expect(values.widthAttr).toBe("var(--xmlui-size-icon-Benefit)");
+    expect(values.heightAttr).toBe("var(--xmlui-size-icon-Benefit)");
+    expect(values.width).toBe("24px");
+    expect(values.height).toBe("24px");
+  });
 });
 
 // =============================================================================

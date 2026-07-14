@@ -2,6 +2,7 @@ import React, { createContext, type ReactNode, useContext } from "react";
 
 export type XmluiAppContextValue = {
   appGlobals: Record<string, unknown>;
+  xmluiConfig: Record<string, unknown>;
   loggedInUser: unknown;
   setLoggedInUser: (user: unknown) => void;
   confirm: (
@@ -28,6 +29,7 @@ export type XmluiAppContextValue = {
 
 const defaultAppContext: XmluiAppContextValue = {
   appGlobals: {},
+  xmluiConfig: {},
   loggedInUser: undefined,
   setLoggedInUser: () => {},
   confirm: () => Promise.resolve(false),

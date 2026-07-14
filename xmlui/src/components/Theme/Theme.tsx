@@ -7,10 +7,8 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { useAppContext } from "../../components-core/AppContext";
-import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { useBooleanProp, useEvaluatedProp, useStringProp, useThemeOverrideProps } from "../../runtime/rendering/props";
-import { ThemeScope as RuntimeThemeScope } from "../../runtime/rendering/theme";
 import type { RuntimeRenderLayoutContext, XmluiBuiltInRenderer } from "../../runtime/rendering/types";
 import { isLayoutPropName, looksLikeComponentThemeVariableName } from "../../styling";
 
@@ -96,6 +94,7 @@ export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
         isRoot={isRoot}
         applyIf={applyIf}
         disableInlineStyle={disableInlineStyle}
+        disableInlineStyleExplicit={hasDisableInlineStyle}
         layoutContext={layoutContext}
         renderChild={renderChild}
         tone={themeTone as ThemeTone}
@@ -116,7 +115,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
   const themeTone = tone ?? appThemes.activeThemeTone;
   const themeId = useEvaluatedProp(node, scope, "themeId", undefined);
   const root = useBooleanProp(node, scope, "root", false);
-  const disableInlineStyle = useEvaluatedProp(node, scope, "disableInlineStyle", undefined);
+  const disableInlineStyle = useBooleanProp(node, scope, "disableInlineStyle", undefined);
   const themeVariables = themeVariablesOnly(useThemeOverrideProps(node, scope));
   const authoredProps = node.props;
   const hasExplicitApplyIf = Object.prototype.hasOwnProperty.call(authoredProps, "applyIf");
@@ -128,31 +127,6 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
   const shouldApplyTheme = applyIf ?? defaultProps.applyIf;
   const notifications =
     appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
-  const themeToExtend = typeof themeId === "string"
-    ? appThemes.themes.find((theme) => theme.id === themeId) ?? appThemes.activeTheme
-    : appThemes.activeTheme;
-  const runtimeTheme: import("../../abstractions/ThemingDefs").ThemeDefinition = {
-    ...themeToExtend,
-    id: "__runtime-theme-scope",
-    tones: {
-      ...themeToExtend.tones,
-      [themeTone]: {
-        ...themeToExtend.tones?.[themeTone],
-        themeVars: {
-          ...themeToExtend.tones?.[themeTone]?.themeVars,
-          ...(themeVariables as Record<string, string>),
-        },
-      },
-    },
-  };
-  const { allThemeVarsWithResolvedHierarchicalVars } = useCompiledTheme(
-    runtimeTheme,
-    themeTone,
-    appThemes.themes,
-    appThemes.resources,
-    appThemes.resourceMap,
-  );
-
   if (!shouldApplyTheme) {
     return renderThemeChildren(
       context,
@@ -167,7 +141,8 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
       id={typeof themeId === "string" ? themeId : undefined}
       isRoot={root}
       applyIf={applyIf}
-      disableInlineStyle={typeof disableInlineStyle === "boolean" ? disableInlineStyle : undefined}
+      disableInlineStyle={disableInlineStyle}
+      disableInlineStyleExplicit={hasDisableInlineStyle}
       layoutContext={layoutContext as LayoutContext | undefined}
       renderChild={(children, childLayoutContext) =>
         renderThemeChildren(context, scope, children, childLayoutContext)
@@ -179,11 +154,7 @@ export const themeRenderer: XmluiBuiltInRenderer = ({ context, node, scope, layo
       node={node as unknown as ComponentDef}
     />
   );
-  return (
-    <RuntimeThemeScope variables={allThemeVarsWithResolvedHierarchicalVars} tone={themeTone}>
-      {themedElement}
-    </RuntimeThemeScope>
-  );
+  return themedElement;
 };
 
 function themeVariablesOnly(props: Record<string, unknown>): Record<string, unknown> {

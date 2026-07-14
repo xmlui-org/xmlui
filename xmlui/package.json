@@ -19,6 +19,7 @@
     "build:xmlui-metadata": "npm run build:metadata",
     "build:production": "npm run build:metadata && tsc -p tsconfig.build.json --noEmit && vite build --config vite.production.config.ts && node scripts/verify-production-output.mjs",
     "build:ssg": "npm run build:production && vite build --config vite.ssg-render.config.ts && node scripts/build-ssg.mjs",
+    "build:ssg:focused": "npm run build:metadata && vite build --config vite.production.config.ts && node scripts/verify-production-output.mjs && vite build --config vite.ssg-render.config.ts && node scripts/build-ssg.mjs",
     "build:metadata": "node scripts/build-metadata.mjs",
     "build:docs-reference": "npm run build:metadata && node scripts/generate-docs-reference.mjs",
     "build:standalone": "vite build --config vite.standalone.config.ts",

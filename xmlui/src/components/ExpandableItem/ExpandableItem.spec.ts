@@ -1123,19 +1123,6 @@ test.describe("Edge cases", () => {
   });
 
   test("component API methods work correctly", async ({ initTestBed, page }) => {
-    await initTestBed(
-      `
-    <Fragment>
-      <ExpandableItem id="expandable" summary="Test">Content</ExpandableItem>
-      <Button testId="expandBtn" onClick="expandable.expand()">Expand</Button>
-      <Button testId="collapseBtn" onClick="expandable.collapse()">Collapse</Button>
-      <Button testId="toggleBtn" onClick="expandable.toggle()">Toggle</Button>
-      <Button testId="checkBtn" onClick="testState = expandable.isExpanded()">Check</Button>
-    </Fragment>
-  `,
-      {},
-    );
-
     const { testStateDriver } = await initTestBed(
       `
     <Fragment>
@@ -1149,9 +1136,11 @@ test.describe("Edge cases", () => {
       {},
     );
 
+    const contentRegion = page.getByRole("region", { name: "Test" });
+
     // Test expand API
     await page.getByTestId("expandBtn").click();
-    await expect(page.locator('[class*="_content_"]')).toBeVisible();
+    await expect(contentRegion).toBeVisible();
 
     // Test isExpanded API
     await page.getByTestId("checkBtn").click();
@@ -1159,11 +1148,11 @@ test.describe("Edge cases", () => {
 
     // Test collapse API
     await page.getByTestId("collapseBtn").click();
-    await expect(page.locator('[class*="_content_"]')).not.toBeVisible();
+    await expect(contentRegion).not.toBeVisible();
 
     // Test toggle API
     await page.getByTestId("toggleBtn").click();
-    await expect(page.locator('[class*="_content_"]')).toBeVisible();
+    await expect(contentRegion).toBeVisible();
   });
 
   test("component works with forms", async ({ initTestBed, createExpandableItemDriver }) => {

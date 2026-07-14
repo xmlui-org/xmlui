@@ -1965,7 +1965,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
 
       // Use deep hierarchy to test expandToLevel properly
       const deepHierarchyData = [
@@ -2100,7 +2100,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
 
       // Use deep hierarchy to test individual node expansion
       const deepHierarchyData = [
@@ -2346,7 +2346,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
 
       // Use deep hierarchy to test individual node collapse
       const deepHierarchyData = [
@@ -2836,7 +2836,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
 
       // Rich hierarchy data for testing getNodeById API
       const hierarchyData = [
@@ -2980,7 +2980,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
 
       // Hierarchy with nested structure to test collapsed nodes
       const hierarchyData = [
@@ -3177,7 +3177,7 @@ test.describe("Imperative API", () => {
       createTreeDriver,
       createButtonDriver,
     }) => {
-      test.setTimeout(60_000);
+      test.setTimeout(30_000);
       // Hierarchy data for testing expanded nodes tracking
       const hierarchyData = [
         {

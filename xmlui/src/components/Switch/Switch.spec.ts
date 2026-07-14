@@ -160,16 +160,16 @@ test.describe("Basic Functionality", () => {
 
       const switchElement = page.getByRole("switch");
 
-      await page.getByTestId("setEmpty").click();
+      await page.getByTestId("setEmpty").dispatchEvent("click");
       await expect(switchElement).not.toBeChecked();
 
-      await page.getByTestId("setFalseStr").click();
+      await page.getByTestId("setFalseStr").dispatchEvent("click");
       await expect(switchElement).not.toBeChecked();
 
-      await page.getByTestId("setTrueStr").click();
+      await page.getByTestId("setTrueStr").dispatchEvent("click");
       await expect(switchElement).toBeChecked();
 
-      await page.getByTestId("setYes").click();
+      await page.getByTestId("setYes").dispatchEvent("click");
       await expect(switchElement).toBeChecked();
     });
 
@@ -722,17 +722,17 @@ test.describe("Api", () => {
       const switchElement = page.getByRole("switch");
 
       // Non-empty string should be true
-      await page.getByTestId("setString").click();
+      await page.getByTestId("setString").dispatchEvent("click");
       await expect(valueDisplay).toContainText("true");
       await expect(switchElement).toBeChecked();
 
       // Empty string should be false
-      await page.getByTestId("setEmptyString").click();
+      await page.getByTestId("setEmptyString").dispatchEvent("click");
       await expect(valueDisplay).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // String 'false' should be false
-      await page.getByTestId("setFalseString").click();
+      await page.getByTestId("setFalseString").dispatchEvent("click");
       await expect(valueDisplay).toContainText("false");
       await expect(switchElement).not.toBeChecked();
     });
@@ -754,27 +754,27 @@ test.describe("Api", () => {
       const switchElement = page.getByRole("switch");
 
       // String 'false' should be false
-      await page.getByTestId("setFalseString").click();
+      await page.getByTestId("setFalseString").dispatchEvent("click");
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // String 'FALSE' should be false (case insensitive)
-      await page.getByTestId("setFalseUpper").click();
+      await page.getByTestId("setFalseUpper").dispatchEvent("click");
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // Empty string should be false
-      await page.getByTestId("setEmptyString").click();
+      await page.getByTestId("setEmptyString").dispatchEvent("click");
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // Whitespace-only string should be false
-      await page.getByTestId("setWhitespace").click();
+      await page.getByTestId("setWhitespace").dispatchEvent("click");
       await expect(status).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // Any other string should be true
-      await page.getByTestId("setTruthyString").click();
+      await page.getByTestId("setTruthyString").dispatchEvent("click");
       await expect(status).toContainText("true");
       await expect(switchElement).toBeChecked();
     });

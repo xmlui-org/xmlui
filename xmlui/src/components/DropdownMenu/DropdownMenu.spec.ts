@@ -354,6 +354,45 @@ test("applies theme variables correctly", async ({ initTestBed, createDropdownMe
   await expect(menuContent).toHaveCSS("min-width", "200px");
 });
 
+test("old compiler canary applies root DropdownMenu content variables", async ({
+  initTestBed,
+  createDropdownMenuDriver,
+}) => {
+  await initTestBed(
+    `<DropdownMenu label="Themed Menu">
+      <MenuItem>Item 1</MenuItem>
+    </DropdownMenu>`,
+    {
+      oldThemeCanary: true,
+      defaultTheme: "dropdown-root-canary",
+      themes: [
+        {
+          id: "dropdown-root-canary",
+          extends: "xmlui",
+          themeVars: {
+            "backgroundColor-DropdownMenu": "rgb(255, 0, 0)",
+            "minWidth-DropdownMenu": "200px",
+            "borderColor-DropdownMenu-content": "rgb(0, 128, 0)",
+            "borderWidth-DropdownMenu-content": "3px",
+            "borderStyle-DropdownMenu-content": "dotted",
+          },
+        },
+      ],
+    },
+  );
+  const driver = await createDropdownMenuDriver();
+
+  await driver.open();
+
+  const menuContent = driver.getMenuContent();
+  await expect(menuContent).toBeVisible();
+  await expect(menuContent).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  await expect(menuContent).toHaveCSS("min-width", "200px");
+  await expect(menuContent).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(menuContent).toHaveCSS("border-top-width", "3px");
+  await expect(menuContent).toHaveCSS("border-top-style", "dotted");
+});
+
 // =============================================================================
 // EDGE CASE TESTS
 // =============================================================================
@@ -701,13 +740,20 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
+    const nestedItem1 = page.getByRole("menuitem", { name: "Item 1" });
     await expect(async () => {
       const listbox = page.getByRole("listbox");
       if (!(await listbox.isVisible().catch(() => false))) {
         await selectDriver.toggleOptionsVisibility();
       }
-      await listbox.getByTestId("openActionsBtn").click();
-      await expect(page.getByText("Item 1")).toBeVisible({ timeout: 1000 });
+      const openActions = listbox.getByTestId("openActionsBtn");
+      await expect(openActions).toBeVisible({ timeout: 1000 });
+      await openActions.focus();
+      await page.keyboard.press("ArrowDown");
+      if (!(await nestedItem1.isVisible().catch(() => false))) {
+        await openActions.click();
+      }
+      await expect(nestedItem1).toBeVisible({ timeout: 1000 });
     }).toPass({ timeout: 10_000 });
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 

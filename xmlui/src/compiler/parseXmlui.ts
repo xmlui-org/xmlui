@@ -611,7 +611,7 @@ function scriptFunctionDeclarations(script: string, blockRange: SourceRange): Sc
 
 function scriptVariableDeclarations(script: string, blockRange: SourceRange): ScriptDeclaration[] {
   const declarations: ScriptDeclaration[] = [];
-  const pattern = /\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*([^;]+))?;/g;
+  const pattern = /\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*(?:=\s*([^;]+?))?\s*(?:;|$)/g;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(script))) {
     declarations.push({

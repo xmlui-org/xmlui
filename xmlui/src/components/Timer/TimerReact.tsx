@@ -49,7 +49,6 @@ export const Timer = memo(forwardRef(function Timer(
   const hasExecutedOnceRef = useRef(hasExecutedOnce);
   const hasEverStartedRef = useRef(hasEverStarted);
 
-  // Update refs when values change
   enabledRef.current = enabled;
   isPausedRef.current = isPaused;
   intervalValueRef.current = interval;
