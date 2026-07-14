@@ -1,15 +1,15 @@
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 import { type HVar, parseHVar } from "./hvar";
 
-export type OldThemeVars = Record<string, string>;
+export type ThemeVars = Record<string, string>;
 
-export function isThemeVarName(varName: unknown) {
+export function isThemeVarName(varName: unknown): varName is string {
   return typeof varName === "string" && varName.startsWith("$");
 }
 
 export function resolveThemeVar(
   varName: string | undefined,
-  theme: OldThemeVars = {},
+  theme: ThemeVars = {},
   seen: Set<string> = new Set(),
 ): string | undefined {
   let safeVarName = varName;
@@ -27,8 +27,8 @@ export function resolveThemeVar(
   return value;
 }
 
-export function resolveThemeVarsWithCssVars(theme: OldThemeVars = {}): OldThemeVars {
-  const ret: OldThemeVars = {};
+export function resolveThemeVarsWithCssVars(theme: ThemeVars = {}): ThemeVars {
+  const ret: ThemeVars = {};
   Object.entries(theme).forEach(([key, value]) => {
     if (value === undefined || value === null) {
       return;
@@ -42,7 +42,7 @@ export function resolveThemeVarsWithCssVars(theme: OldThemeVars = {}): OldThemeV
   return ret;
 }
 
-export function generateBaseTones(theme: OldThemeVars | undefined) {
+export function generateBaseTones(theme: ThemeVars | undefined) {
   if (!theme) {
     return {};
   }
@@ -58,7 +58,7 @@ export function generateBaseTones(theme: OldThemeVars | undefined) {
   };
 }
 
-export function generateBaseSpacings(theme: OldThemeVars | undefined) {
+export function generateBaseSpacings(theme: ThemeVars | undefined) {
   if (!theme) {
     return {};
   }
@@ -75,7 +75,7 @@ export function generateBaseSpacings(theme: OldThemeVars | undefined) {
     0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
     44, 48, 52, 56, 60, 64, 72, 80, 96,
   ];
-  const ret: OldThemeVars = {};
+  const ret: ThemeVars = {};
 
   scale.forEach((step) => {
     ret[`space-${(`${step}`).replace(".", "_")}`] = `${step * parsed.value}${parsed.unit}`;
@@ -84,18 +84,18 @@ export function generateBaseSpacings(theme: OldThemeVars | undefined) {
   return ret;
 }
 
-export function generateBootstrapBaseColumns(theme: OldThemeVars | undefined = {}) {
+export function generateBootstrapBaseColumns(theme: ThemeVars | undefined = {}) {
   if (!theme) {
     return {};
   }
-  const ret: OldThemeVars = {};
+  const ret: ThemeVars = {};
   for (let i = 1; i <= 12; i++) {
     ret[`col-${i}`] = `${((100 / 12) * i).toFixed(4)}%`;
   }
   return ret;
 }
 
-export function generateBaseFontSizes(theme: OldThemeVars | undefined) {
+export function generateBaseFontSizes(theme: ThemeVars | undefined) {
   if (!theme) {
     return {};
   }
@@ -114,7 +114,7 @@ export function generateBaseFontSizes(theme: OldThemeVars | undefined) {
     baseNum = 16;
   }
 
-  const ret: OldThemeVars = {};
+  const ret: ThemeVars = {};
   ret["const-fontSize-tiny"] = `${0.625 * baseNum}${baseUnit}`;
   ret["const-fontSize-xs"] = `${0.75 * baseNum}${baseUnit}`;
   ret["const-fontSize-code"] = `${0.85 * baseNum}${baseUnit}`;
@@ -133,7 +133,7 @@ export function generateBaseFontSizes(theme: OldThemeVars | undefined) {
   return ret;
 }
 
-export function generateTextFontSizes(theme: OldThemeVars | undefined) {
+export function generateTextFontSizes(theme: ThemeVars | undefined) {
   if (!theme) {
     return {};
   }
@@ -143,7 +143,7 @@ export function generateTextFontSizes(theme: OldThemeVars | undefined) {
     return {};
   }
 
-  const ret: OldThemeVars = {};
+  const ret: ThemeVars = {};
   ret["fontSize-Text-keyboard"] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
   ret["fontSize-Text-sample"] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
   ret["fontSize-Text-sup"] = `calc(${toCssVar("$fontSize-Text")} * 0.625)`;
@@ -160,14 +160,14 @@ export function generateTextFontSizes(theme: OldThemeVars | undefined) {
   return ret;
 }
 
-export function generateButtonTones(theme?: OldThemeVars) {
+export function generateButtonTones(theme?: ThemeVars) {
   if (!theme) {
     return {};
   }
   const resolvedTheme = resolveThemeVars(theme);
   const variants = ["primary", "secondary", "attention"];
 
-  let ret: OldThemeVars = {};
+  let ret: ThemeVars = {};
 
   variants.forEach((variant) => {
     const solidTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-solid`), (tones) => ({
@@ -214,7 +214,7 @@ const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-
 const paddingHorizontalRegEx = /^paddingHorizontal-(.+)$/;
 const paddingVerticalRegEx = /^paddingVertical-(.+)$/;
 
-export function generatePaddingSegments(theme?: OldThemeVars) {
+export function generatePaddingSegments(theme?: ThemeVars) {
   if (!theme) {
     return {};
   }
@@ -296,7 +296,7 @@ const colorBorderRegEx = /^borderColor-(.+)$/;
 const colorBorderHorizontalRegEx = /^borderHorizontalColor-(.+)$/;
 const colorBorderVerticalRegEx = /^borderVerticalColor-(.+)$/;
 
-export function generateBorderSegments(theme?: OldThemeVars) {
+export function generateBorderSegments(theme?: ThemeVars) {
   if (!theme) {
     return {};
   }
@@ -312,9 +312,9 @@ export function generateBorderSegments(theme?: OldThemeVars) {
       result[`borderBottom-${remainder}`] = value;
 
       const border = getBorderSegments(value);
-      result[`borderWidth-${remainder}`] ??= border.thickness;
-      result[`borderStyle-${remainder}`] ??= border.style;
-      result[`borderColor-${remainder}`] ??= border.color;
+      assignThemeVar(result, `borderWidth-${remainder}`, border.thickness);
+      assignThemeVar(result, `borderStyle-${remainder}`, border.style);
+      assignThemeVar(result, `borderColor-${remainder}`, border.color);
     }
 
     match = thicknessBorderRegEx.exec(key);
@@ -472,7 +472,7 @@ type BorderSide = "Left" | "Right" | "Top" | "Bottom";
 
 const BORDER_SIDES: BorderSide[] = ["Left", "Right", "Top", "Bottom"];
 
-function normalizeBorderSideSegments(theme: OldThemeVars, result: OldThemeVars) {
+function normalizeBorderSideSegments(theme: ThemeVars, result: ThemeVars) {
   const remainders = new Set<string>();
   Object.keys(theme).forEach((key) => {
     const match =
@@ -508,8 +508,8 @@ function normalizeBorderSideSegments(theme: OldThemeVars, result: OldThemeVars) 
 }
 
 function applyBorderSideSegment(
-  theme: OldThemeVars,
-  result: OldThemeVars,
+  theme: ThemeVars,
+  result: ThemeVars,
   remainder: string,
   side: BorderSide,
   axis: "Horizontal" | "Vertical",
@@ -529,6 +529,12 @@ function applyBorderSideSegment(
   }
 }
 
+function assignThemeVar(result: ThemeVars, key: string, value: string | undefined): void {
+  if (value !== undefined && result[key] === undefined) {
+    result[key] = value;
+  }
+}
+
 function getBorderSegment(value: string | undefined, segment: BorderSegment) {
   if (!value) {
     return undefined;
@@ -536,29 +542,29 @@ function getBorderSegment(value: string | undefined, segment: BorderSegment) {
   return getBorderSegments(value)[segment];
 }
 
-export type OldThemeDefinitionDetails = {
-  themeVars?: OldThemeVars;
+export type ThemeDefinitionModelDetails = {
+  themeVars?: ThemeVars;
   resources?: Record<string, unknown>;
 };
 
-export type OldThemeDefinition = OldThemeDefinitionDetails & {
+export type ThemeDefinitionModel = ThemeDefinitionModelDetails & {
   id: string;
   name?: string;
   extends?: string | string[];
-  tones?: Record<string, OldThemeDefinitionDetails>;
+  tones?: Record<string, ThemeDefinitionModelDetails>;
   color?: string;
 };
 
-export type OldDefaultThemeVars = Record<string, string | Record<string, string>>;
+export type DefaultThemeVars = Record<string, string | Record<string, string>>;
 
 export function collectThemeChainByExtends(
-  customTheme: OldThemeDefinition,
-  allThemes: OldThemeDefinition[],
-  componentDefaultThemeVars: OldDefaultThemeVars,
-  rootTheme: OldThemeDefinition = { id: "root", themeVars: {}, resources: {}, tones: {} },
+  customTheme: ThemeDefinitionModel,
+  allThemes: ThemeDefinitionModel[],
+  componentDefaultThemeVars: DefaultThemeVars,
+  rootTheme: ThemeDefinitionModel = { id: "root", themeVars: {}, resources: {}, tones: {} },
 ) {
-  const rootThemeVars: OldThemeVars = { ...(rootTheme.themeVars ?? {}) };
-  const rootTones: Record<string, OldThemeDefinitionDetails> = cloneThemeDetails(rootTheme.tones ?? {});
+  const rootThemeVars: ThemeVars = { ...(rootTheme.themeVars ?? {}) };
+  const rootTones: Record<string, ThemeDefinitionModelDetails> = cloneThemeDetails(rootTheme.tones ?? {});
   Object.entries(componentDefaultThemeVars).forEach(([key, value]) => {
     if (typeof value === "string") {
       rootThemeVars[key.trim()] = value;
@@ -575,7 +581,7 @@ export function collectThemeChainByExtends(
     }
   });
 
-  const root: OldThemeDefinition = {
+  const root: ThemeDefinitionModel = {
     ...rootTheme,
     id: "root",
     themeVars: rootThemeVars,
@@ -640,7 +646,7 @@ function tokenizeBorderValue(value: string): string[] {
   return tokens;
 }
 
-function findClosest(theme: OldThemeVars, themeVarName: string) {
+function findClosest(theme: ThemeVars, themeVarName: string) {
   if (theme[themeVarName]) {
     return theme[themeVarName];
   }
@@ -672,17 +678,20 @@ function findClosest(theme: OldThemeVars, themeVarName: string) {
   return null;
 }
 
-function resolveThemeVars(theme: OldThemeVars) {
-  const ret: OldThemeVars = {};
+function resolveThemeVars(theme: ThemeVars) {
+  const ret: ThemeVars = {};
   Object.keys(theme).forEach((key) => {
-    ret[key] = resolveThemeVar(key, theme);
+    const resolved = resolveThemeVar(key, theme);
+    if (resolved !== undefined) {
+      ret[key] = resolved;
+    }
   });
   return ret;
 }
 
 function generateBaseTonesForColor(
   varName: string,
-  theme: OldThemeVars,
+  theme: ThemeVars,
   options = { distributeEven: false },
 ) {
   const color = parseCssColor(theme[varName]);
@@ -720,7 +729,7 @@ function generateBaseTonesForColor(
 
 function mapTones(
   baseColor: string | undefined | null,
-  mapper: (tones: ColorTones) => OldThemeVars,
+  mapper: (tones: ColorTones) => ThemeVars,
 ) {
   const tones = generateTones(baseColor);
   if (!tones) {
@@ -787,12 +796,12 @@ function parseCssNumber(value: string): { value: number; unit: string } | undefi
   };
 }
 
-function collectExtends(cTheme: OldThemeDefinition | undefined, allThemes: OldThemeDefinition[]) {
+function collectExtends(cTheme: ThemeDefinitionModel | undefined, allThemes: ThemeDefinitionModel[]) {
   if (!cTheme || !cTheme.extends) {
     return [];
   }
   const arrayExtends = typeof cTheme.extends === "string" ? [cTheme.extends] : cTheme.extends;
-  const ret: OldThemeDefinition[] = [];
+  const ret: ThemeDefinitionModel[] = [];
 
   arrayExtends.forEach((ext) => {
     const parentTheme = allThemes.find((theme) => theme.id === ext);
@@ -804,7 +813,7 @@ function collectExtends(cTheme: OldThemeDefinition | undefined, allThemes: OldTh
   return ret;
 }
 
-function cloneThemeDetails(value: Record<string, OldThemeDefinitionDetails>) {
+function cloneThemeDetails(value: Record<string, ThemeDefinitionModelDetails>) {
   return Object.fromEntries(
     Object.entries(value).map(([key, details]) => [
       key,

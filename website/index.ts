@@ -1,4 +1,5 @@
 import { startApp } from "xmlui";
+import appConfig from "./src/config";
 import search from "xmlui-search";
 import websiteBlocks from "xmlui-website-blocks";
 import docsBlocks from "xmlui-docs-blocks";
@@ -22,10 +23,10 @@ const usedExtensions = [
     tiptap,
 ];
 
-startApp(runtime, usedExtensions);
+startApp(runtime, usedExtensions, appConfig);
 
 if (import.meta.hot) {
     import.meta.hot.accept((newModule) => {
-        startApp(newModule?.runtime ?? runtime, usedExtensions);
+        startApp(newModule?.runtime ?? runtime, usedExtensions, appConfig);
     });
 }

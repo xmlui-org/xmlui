@@ -8,7 +8,7 @@ import { appRuntimeRenderer } from "./App";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { StyleProvider } from "../../components-core/theming/StyleContext";
-import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
+import { XmluiThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -42,7 +42,7 @@ describe("App main content layout migration", () => {
     const AppRenderer = appRuntimeRenderer;
     const html = renderToStaticMarkup(
       <StyleProvider>
-        <LegacyThemeProvider
+        <XmluiThemeProvider
           themes={[
             {
               id: "app-spec",
@@ -59,7 +59,7 @@ describe("App main content layout migration", () => {
           <MemoryRouter>
             <AppRenderer context={context} node={document.root} scope={scope} />
           </MemoryRouter>
-        </LegacyThemeProvider>
+        </XmluiThemeProvider>
       </StyleProvider>,
     );
 

@@ -850,7 +850,7 @@ test.describe("Theme Variables", () => {
   await expect(menuContent).toHaveCSS("min-width", "200px");
   });
 
-  test("old compiler canary applies root ContextMenu content variables", async ({
+  test("theme compiler applies root ContextMenu content variables", async ({
     initTestBed,
     createContextMenuDriver,
     page,
@@ -865,11 +865,10 @@ test.describe("Theme Variables", () => {
       </ContextMenu>
       `,
       {
-        oldThemeCanary: true,
-        defaultTheme: "context-root-canary",
+        defaultTheme: "context-root-provider",
         themes: [
           {
-            id: "context-root-canary",
+            id: "context-root-provider",
             extends: "xmlui",
             themeVars: {
               "backgroundColor-ContextMenu": "rgb(255, 0, 0)",

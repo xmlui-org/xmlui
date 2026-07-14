@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import type { ThemeDefinition, ThemeScope } from "../../../src/abstractions/ThemingDefs";
 import {
   applyThemeCssVarsToRoot,
-  LegacyThemeProvider,
+  XmluiThemeProvider,
   useTheme,
 } from "../../../src/components-core/theming/ThemeContext";
 import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
@@ -33,49 +33,36 @@ import {
 import type { ComponentMetadata } from "../../../src/component-core/metadata";
 
 afterEach(() => {
-  globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ = undefined;
-  globalThis.__XMLUI_OLD_THEME_SHADOW__ = undefined;
-  globalThis.__XMLUI_OLD_THEME_CANARY__ = undefined;
   resetThemeDiagnosticDeduplication();
 });
 
-describe("old theme compiler canary", () => {
-  test("uses old root custom and generated variables by default", () => {
-    const theme = createCanaryTheme();
+describe("XmluiThemeProvider", () => {
+  test("uses root custom and generated variables by default", () => {
+    const theme = createProviderTheme();
 
-    const current = renderCanaryProvider({
+    const result = renderThemeProvider({
       themes: [theme],
       defaultTheme: "brand",
-      enableOldThemeCanary: false,
     });
-    expect(current.html).toContain("theme:brand");
-    expect(current.theme.themeStyles["--xmlui-brand-canary-marker"]).toBe("yes");
-    expect(current.theme.themeStyles["--xmlui-paddingLeft-Card"]).toBe("8px");
-    expect(current.theme.themeStyles["--xmlui-borderLeftWidth-Card"]).toBe("2px");
-    expect(current.theme.themeStyles["--xmlui-fontSize-Text-title"]).toBe(
+    expect(result.html).toContain("theme:brand");
+    expect(result.theme.themeStyles["--xmlui-brand-provider-marker"]).toBe("yes");
+    expect(result.theme.themeStyles["--xmlui-paddingLeft-Card"]).toBe("8px");
+    expect(result.theme.themeStyles["--xmlui-borderLeftWidth-Card"]).toBe("2px");
+    expect(result.theme.themeStyles["--xmlui-fontSize-Text-title"]).toBe(
       "calc(var(--xmlui-fontSize-Text) * 1.5)",
     );
-    expect(current.theme.themeStyles["--xmlui-const-color-primary-500"]).toBe(
+    expect(result.theme.themeStyles["--xmlui-const-color-primary-500"]).toBe(
       "hsl(210, 50%, 40%)",
     );
-    expect(current.theme.themeStyles["--xmlui-backgroundColor-Button-primary-solid"]).toBe(
+    expect(result.theme.themeStyles["--xmlui-backgroundColor-Button-primary-solid"]).toBe(
       "#336699",
     );
-    expect(current.theme.getThemeVar("$paddingLeft-Card")).toBe("8px");
-    expect(globalThis.__XMLUI_OLD_THEME_CANARY__).toBeUndefined();
-
-    const canary = renderCanaryProvider({
-      themes: [theme],
-      defaultTheme: "brand",
-      enableOldThemeCanary: true,
-    });
-    expect(canary.theme.themeStyles).toEqual(current.theme.themeStyles);
-    expect(globalThis.__XMLUI_OLD_THEME_CANARY__?.themeCssVars).toEqual(current.theme.themeStyles);
+    expect(result.theme.getThemeVar("$paddingLeft-Card")).toBe("8px");
   });
 
-  test("uses old resource lookup and exposes font link output in the canary snapshot", () => {
-    const theme = createCanaryTheme();
-    const canary = renderCanaryProvider({
+  test("uses resource lookup from the active theme", () => {
+    const theme = createProviderTheme();
+    const result = renderThemeProvider({
       themes: [theme],
       defaultTheme: "brand",
       resources: {
@@ -85,20 +72,15 @@ describe("old theme compiler canary", () => {
         "/theme/logo.svg": "/assets/logo.hash.svg",
         "fonts/demo.woff2": "/assets/demo.hash.woff2",
       },
-      enableOldThemeCanary: true,
     });
 
-    expect(canary.theme.getResourceUrl("resource:logo")).toBe("/assets/logo.hash.svg");
-    expect(canary.theme.getResourceUrl("resource:font.demo")).toBe("/assets/demo.hash.woff2");
-    expect(canary.theme.getResourceUrl("resource:fallback")).toBe("/fallback.svg");
-    expect(globalThis.__XMLUI_OLD_THEME_CANARY__?.fontLinks).toEqual([
-      "https://example.test/font.css",
-      "/fonts/demo.woff2",
-    ]);
+    expect(result.theme.getResourceUrl("resource:logo")).toBe("/assets/logo.hash.svg");
+    expect(result.theme.getResourceUrl("resource:font.demo")).toBe("/assets/demo.hash.woff2");
+    expect(result.theme.getResourceUrl("resource:fallback")).toBe("/fallback.svg");
   });
 
   test("supports an explicit custom default theme without a nested Theme wrapper", () => {
-    const canary = renderCanaryProvider({
+    const result = renderThemeProvider({
       themes: [
         {
           id: "brand",
@@ -109,15 +91,14 @@ describe("old theme compiler canary", () => {
         },
       ],
       defaultTheme: "brand",
-      enableOldThemeCanary: true,
     });
 
-    expect(canary.html).toContain("theme:brand");
-    expect(canary.theme.themeStyles["--xmlui-backgroundColor-App"]).toBe("#123456");
-    expect(canary.theme.getThemeVar("$backgroundColor-App")).toBe("#123456");
+    expect(result.html).toContain("theme:brand");
+    expect(result.theme.themeStyles["--xmlui-backgroundColor-App"]).toBe("#123456");
+    expect(result.theme.getThemeVar("$backgroundColor-App")).toBe("#123456");
   });
 
-  test("applies and cleans up canary CSS variables on a root style object", () => {
+  test("applies and cleans up CSS variables on a root style object", () => {
     const style = new FakeStyleDeclaration({
       "--xmlui-existing": "previous",
     });
@@ -172,7 +153,7 @@ describe("old theme compiler canary", () => {
           },
         },
       ]);
-      const result = renderCanaryProvider({
+      const result = renderThemeProvider({
         themes: [
           {
             id: "brand",
@@ -183,7 +164,6 @@ describe("old theme compiler canary", () => {
         ],
         defaultTheme: "brand",
         componentThemeMetadata: registry,
-        enableOldThemeCanary: false,
       });
 
       expect(result.theme.themeStyles["--xmlui-backgroundColor-Panel"]).toBeUndefined();
@@ -228,7 +208,7 @@ describe("old theme compiler canary", () => {
         },
       },
     ]);
-    const result = renderCanaryProvider({
+    const result = renderThemeProvider({
       themes: [
         {
           id: "brand",
@@ -240,14 +220,13 @@ describe("old theme compiler canary", () => {
       defaultTheme: "brand",
       componentThemeMetadata: registry,
       strictTheming: false,
-      enableOldThemeCanary: false,
     });
 
     expect(result.theme.themeStyles["--xmlui-backgroundColor-Panel"]).toBe("not-a-color");
     expect(result.theme.themeVars["backgroundColor-Panel"]).toBe("not-a-color");
   });
 
-  test("emits strict accessibility contrast diagnostics through the old theme path", () => {
+  test("emits strict accessibility contrast diagnostics through the theme path", () => {
     const previousWindow = globalThis.window;
     const previousDocument = globalThis.document;
     const fakeWindow = { _xsLogs: [] as Array<Record<string, unknown>> } as unknown as Window &
@@ -270,7 +249,7 @@ describe("old theme compiler canary", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
-      renderCanaryProvider({
+      renderThemeProvider({
         themes: [
           {
             id: "brand",
@@ -283,7 +262,6 @@ describe("old theme compiler canary", () => {
         ],
         defaultTheme: "brand",
         strictAccessibility: true,
-        enableOldThemeCanary: false,
       });
 
       expect(fakeWindow._xsLogs).toEqual(
@@ -414,12 +392,12 @@ describe("old theme compiler canary", () => {
   });
 });
 
-function createCanaryTheme(): ThemeDefinition {
+function createProviderTheme(): ThemeDefinition {
   return {
     id: "brand",
     extends: "xmlui",
     themeVars: {
-      "brand-canary-marker": "yes",
+      "brand-provider-marker": "yes",
       "space-base": "4px",
       fontSize: "16px",
       "fontSize-Text": "$fontSize",
@@ -436,7 +414,7 @@ function createCanaryTheme(): ThemeDefinition {
   };
 }
 
-function renderCanaryProvider({
+function renderThemeProvider({
   themes,
   defaultTheme,
   resources,
@@ -444,7 +422,6 @@ function renderCanaryProvider({
   componentThemeMetadata = createCoreComponentThemeMetadataRegistry(),
   strictTheming,
   strictAccessibility,
-  enableOldThemeCanary,
 }: {
   themes: ThemeDefinition[];
   defaultTheme: string;
@@ -453,12 +430,11 @@ function renderCanaryProvider({
   componentThemeMetadata?: ReturnType<typeof createCoreComponentThemeMetadataRegistry>;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  enableOldThemeCanary: boolean;
 }) {
   let capturedTheme: ThemeScope | undefined;
   const html = renderToStaticMarkup(
     <StyleProvider>
-      <LegacyThemeProvider
+      <XmluiThemeProvider
         themes={themes}
         defaultTheme={defaultTheme}
         resources={resources}
@@ -466,12 +442,11 @@ function renderCanaryProvider({
         componentThemeMetadata={componentThemeMetadata}
         strictTheming={strictTheming}
         strictAccessibility={strictAccessibility}
-        enableOldThemeCanary={enableOldThemeCanary}
       >
         <ThemeProbe onTheme={(theme) => {
           capturedTheme = theme;
         }} />
-      </LegacyThemeProvider>
+      </XmluiThemeProvider>
     </StyleProvider>,
   );
   if (!capturedTheme) {
@@ -499,11 +474,10 @@ function renderThemeClassProvider({
   const descriptors = new Map(entries);
   renderToStaticMarkup(
     <StyleProvider styleRegistry={styleRegistry}>
-      <LegacyThemeProvider
+      <XmluiThemeProvider
         themes={themes}
         defaultTheme="brand"
         componentThemeMetadata={componentThemeMetadata}
-        enableOldThemeCanary={false}
       >
         <ComponentRegistryProvider
           value={{
@@ -519,7 +493,7 @@ function renderThemeClassProvider({
             }}
           />
         </ComponentRegistryProvider>
-      </LegacyThemeProvider>
+      </XmluiThemeProvider>
     </StyleProvider>,
   );
   if (!capturedClassName) {

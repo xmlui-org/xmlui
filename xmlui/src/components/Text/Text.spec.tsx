@@ -6,7 +6,7 @@ import { builtInComponentContracts } from "../../compiler/contracts";
 import { componentTransferModules } from "../../component-core";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { StyleProvider } from "../../components-core/theming/StyleContext";
-import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
+import { XmluiThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -42,9 +42,9 @@ describe("Text migration", () => {
 
     const html = renderToStaticMarkup(
       <StyleProvider>
-        <LegacyThemeProvider>
+        <XmluiThemeProvider>
           <TextRenderer context={context} node={text} scope={scope} />
-        </LegacyThemeProvider>
+        </XmluiThemeProvider>
       </StyleProvider>,
     );
 
@@ -58,6 +58,85 @@ describe("Text migration", () => {
     expect(renderTextVariant("em")).toContain("<em");
     expect(renderTextVariant("code")).toContain("<code");
     expect(renderTextVariant("paragraph")).toContain("<p");
+  });
+
+  it("preserves source whitespace before nested inline Text children", () => {
+    const document = parseXmlui(`
+      <App>
+        <Text fontWeight="400">
+          This site is an
+          <Text variant="strong">
+            XMLUI™
+          </Text>
+          app.
+        </Text>
+      </App>
+    `);
+    const text = document.root.children[0];
+    if (text.kind !== "element") {
+      throw new Error("Expected Text element.");
+    }
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({ store });
+    const context = createRenderContext({ Text: textRenderer }, {});
+    const TextRenderer = textRenderer;
+
+    const html = renderToStaticMarkup(
+      <StyleProvider>
+        <XmluiThemeProvider>
+          <TextRenderer context={context} node={text} scope={scope} />
+        </XmluiThemeProvider>
+      </StyleProvider>,
+    );
+
+    expect(html).toContain("This site is an <strong");
+    expect(html).toContain("XMLUI™</strong> app.");
+    expect(html).not.toContain("an<strong");
+    expect(html).not.toContain("</strong>app.");
+  });
+
+  it("preserves source whitespace between nested inline elements with expression text", () => {
+    const document = parseXmlui(`
+      <App>
+        <Text fontSize="$fontSize-lg">
+          {$props.children}
+          <Text variant="strong" fontSize="$fontSize-lg">
+            {$props.title}
+          </Text>
+          <Slot>
+            {$props.benefit}
+          </Slot>
+        </Text>
+      </App>
+    `);
+    const text = document.root.children[0];
+    if (text.kind !== "element") {
+      throw new Error("Expected Text element.");
+    }
+    const store = createRuntimeStateStore();
+    const scope = createRuntimeScope({
+      store,
+      props: {
+        children: "Build faster with",
+        title: "XMLUI",
+        benefit: "today.",
+      },
+    });
+    const context = createRenderContext({ Text: textRenderer }, {});
+    const TextRenderer = textRenderer;
+
+    const html = renderToStaticMarkup(
+      <StyleProvider>
+        <XmluiThemeProvider>
+          <TextRenderer context={context} node={text} scope={scope} />
+        </XmluiThemeProvider>
+      </StyleProvider>,
+    );
+
+    expect(html).toContain("Build faster with <strong");
+    expect(html).toContain("XMLUI</strong> today.");
+    expect(html).not.toContain("with<strong");
+    expect(html).not.toContain("</strong>today.");
   });
 });
 

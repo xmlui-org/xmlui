@@ -24,6 +24,7 @@ export type NestedAppProps = {
 
 export function NestedAppComponent({
   activeTone,
+  activeTheme,
   app,
   allowReset = false,
   className,
@@ -111,6 +112,8 @@ export function NestedAppComponent({
   } as CSSProperties;
   const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
   const defaultTone = normalizeThemeTone(activeTone);
+  const resolvedConfig = normalizeNestedConfig(config);
+  const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
   const Root = compiled?.Root;
   const appView = compiled?.error ? (
     <pre className={styles.error} data-testid={testId ? `${testId}-error` : undefined}>
@@ -123,6 +126,9 @@ export function NestedAppComponent({
       initialUrl="/"
       isolateRouting
       defaultTone={defaultTone}
+      defaultTheme={defaultTheme}
+      themes={resolvedConfig.themes}
+      applyDocumentThemeVars={false}
     />
   ) : null;
   const content = showCode ? (
@@ -222,6 +228,20 @@ export const IndexAwareNestedApp = NestedAppComponent;
 
 function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
   return value === "dark" || value === "light" ? value : undefined;
+}
+
+function normalizeNestedConfig(config: unknown): {
+  defaultTheme?: string;
+  themes?: Array<any>;
+} {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    return {};
+  }
+  const normalized = config as Record<string, unknown>;
+  return {
+    defaultTheme: typeof normalized.defaultTheme === "string" ? normalized.defaultTheme : undefined,
+    themes: Array.isArray(normalized.themes) ? normalized.themes : undefined,
+  };
 }
 
 function injectConfigGlobals(source: string, config: unknown): string {

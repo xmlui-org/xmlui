@@ -15,7 +15,7 @@ import {
   resolveThemeVarsWithCssVars,
 } from "../../../src/components-core/theming/transformThemeVars";
 
-describe("old theme variable transform helpers", () => {
+describe("theme variable transform helpers", () => {
   test("resolves pure $var chains without converting embedded references", () => {
     const theme = {
       color: "#112233",
@@ -29,7 +29,7 @@ describe("old theme variable transform helpers", () => {
     expect(resolveThemeVarsWithCssVars(theme).mixed).toBe("1px solid var(--xmlui-alias)");
   });
 
-  test("generates old base spacing and bootstrap column variables", () => {
+  test("generates base spacing and bootstrap column variables", () => {
     expect(generateBaseSpacings({ "space-base": ".25rem" })).toMatchObject({
       "space-0": "0rem",
       "space-0_5": "0.125rem",
@@ -41,7 +41,7 @@ describe("old theme variable transform helpers", () => {
     expect(generateBootstrapBaseColumns({})["col-12"]).toBe("100.0000%");
   });
 
-  test("generates old base and text font-size variables", () => {
+  test("generates base and text font-size variables", () => {
     expect(generateBaseFontSizes({ fontSize: "20px" })).toMatchObject({
       "const-fontSize-tiny": "12.5px",
       "const-fontSize-base": "20px",
@@ -94,7 +94,7 @@ describe("old theme variable transform helpers", () => {
     });
   });
 
-  test("generates base tone names and button tone names from closest old-style color variables", () => {
+  test("generates base tone names and button tone names from closest color variables", () => {
     expect(generateBaseTones({ "color-primary": "#336699" })).toMatchObject({
       "const-color-primary-0": "hsl(210, 50%, 100%)",
       "const-color-primary-500": "hsl(210, 50%, 40%)",
@@ -115,7 +115,7 @@ describe("old theme variable transform helpers", () => {
     });
   });
 
-  test("matches hierarchical theme variables using old fallback order", () => {
+  test("matches hierarchical theme variables using fallback order", () => {
     const match = matchThemeVar("textColor-Button-primary-solid--hover", [
       { "textColor-Button": "black" },
       { "textColor-Button-primary": "blue" },
@@ -133,7 +133,7 @@ describe("old theme variable transform helpers", () => {
     ]);
   });
 
-  test("collects old theme chain with root defaults before inherited themes", () => {
+  test("collects theme chain with root defaults before inherited themes", () => {
     const baseTheme = {
       id: "base",
       themeVars: { color: "base" },

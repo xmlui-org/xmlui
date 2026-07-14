@@ -174,6 +174,11 @@ export function renderChildren(
       previous?.kind === "element" &&
       child.range.start > previous.range.end &&
       !child.value.startsWith(" ");
+    const needsFollowingBoundarySpace =
+      child.kind === "text" &&
+      next?.kind === "element" &&
+      textContentEnd(child) < next.range.start &&
+      !child.value.endsWith(" ");
     const needsTrailingBoundarySpace =
       child.kind === "text" &&
       previous?.kind === "element" &&
@@ -191,7 +196,7 @@ export function renderChildren(
             node={child}
             scope={scope}
             textPrefix={needsBoundarySpace ? " " : undefined}
-            textSuffix={needsTrailingBoundarySpace ? " " : undefined}
+            textSuffix={needsFollowingBoundarySpace || needsTrailingBoundarySpace ? " " : undefined}
             layoutContext={layoutContext}
           />
         );
@@ -206,6 +211,13 @@ export function renderChildren(
       </React.Fragment>
     );
   });
+}
+
+function textContentEnd(node: XmluiText): number {
+  const segments = node.segments;
+  return segments && segments.length > 0
+    ? segments[segments.length - 1].range.end
+    : node.range.end;
 }
 
 function XmluiTextRenderer({

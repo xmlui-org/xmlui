@@ -924,16 +924,15 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("old compiler canary applies root AutoComplete input variables", async ({
+  test("theme compiler applies root AutoComplete input variables", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(`<AutoComplete testId="test" />`, {
-      oldThemeCanary: true,
-      defaultTheme: "autocomplete-root-canary",
+      defaultTheme: "autocomplete-root-provider",
       themes: [
         {
-          id: "autocomplete-root-canary",
+          id: "autocomplete-root-provider",
           extends: "xmlui",
           themeVars: {
             "borderColor-AutoComplete": "rgb(255, 0, 0)",

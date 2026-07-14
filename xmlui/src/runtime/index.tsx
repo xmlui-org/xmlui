@@ -16,8 +16,8 @@ import { XmluiAppContextProvider, type XmluiAppContextValue } from "./appContext
 import { createToastService, type ToastService } from "./services/toast";
 import { GlobalLiveRegion } from "../components/LiveRegion/LiveRegionReact";
 import { IconProvider } from "../components/IconProvider";
-import { LegacyThemeProvider, useThemes } from "../components-core/theming/ThemeContext";
-import { StyleProvider as LegacyStyleProvider } from "../components-core/theming/StyleContext";
+import { XmluiThemeProvider, useThemes } from "../components-core/theming/ThemeContext";
+import { StyleProvider } from "../components-core/theming/StyleContext";
 import { ThemedButton as Button } from "../components/Button/Button";
 import { Dialog } from "../components/ModalDialog/Dialog";
 import { ThemedStack as Stack } from "../components/Stack/Stack";
@@ -32,7 +32,7 @@ import { ensureXmluiDebugBridge } from "./debug";
 import type { ThemeTone } from "../styling";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { responsiveBreakpoints } from "../styling/contracts";
-import { createCoreComponentThemeMetadataRegistry, runtimeRendererEntries } from "../component-core";
+import { createComponentThemeMetadataRegistry, runtimeRendererEntries } from "../component-core";
 
 ensureXmluiDebugBridge();
 
@@ -94,7 +94,7 @@ export type MountXmluiAppOptions = {
   defaultTheme?: string;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  enableOldThemeCanary?: boolean;
+  applyDocumentThemeVars?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 };
 
@@ -131,7 +131,7 @@ export function mountXmluiApp(
         defaultTheme={options.defaultTheme}
         strictTheming={options.strictTheming}
         strictAccessibility={options.strictAccessibility}
-        enableOldThemeCanary={options.enableOldThemeCanary}
+        applyDocumentThemeVars={options.applyDocumentThemeVars}
         testProbe={options.testProbe}
       />,
     );
@@ -153,7 +153,7 @@ export function mountXmluiApp(
       defaultTheme={options.defaultTheme}
       strictTheming={options.strictTheming}
       strictAccessibility={options.strictAccessibility}
-      enableOldThemeCanary={options.enableOldThemeCanary}
+      applyDocumentThemeVars={options.applyDocumentThemeVars}
       testProbe={options.testProbe}
     />,
   );
@@ -175,7 +175,7 @@ export function XmluiRoot({
   defaultTheme,
   strictTheming = true,
   strictAccessibility = false,
-  enableOldThemeCanary = false,
+  applyDocumentThemeVars = true,
   testProbe,
 }: {
   module: Extract<XmluiModule, { kind: "app" }>;
@@ -192,7 +192,7 @@ export function XmluiRoot({
   defaultTheme?: string;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  enableOldThemeCanary?: boolean;
+  applyDocumentThemeVars?: boolean;
   testProbe?: (probe: XmluiRuntimeTestProbe) => void;
 }) {
   const store = useRuntimeStateStore();
@@ -236,7 +236,17 @@ export function XmluiRoot({
     ]),
     [extensions],
   );
-  const componentThemeMetadata = useMemo(() => createCoreComponentThemeMetadataRegistry(), []);
+  const componentThemeMetadata = useMemo(
+    () => createComponentThemeMetadataRegistry(normalizedExtensions),
+    [normalizedExtensions],
+  );
+  const themesWithExtensions = useMemo(
+    () => [
+      ...themes,
+      ...(normalizedExtensions.themes as Array<ThemeDefinition>),
+    ],
+    [normalizedExtensions.themes, themes],
+  );
   const componentRegistry = useMemo(() => {
     const entries = new Map<string, { descriptor?: any; isCompoundComponent?: boolean }>();
     for (const { name, renderer } of runtimeRendererEntries) {
@@ -319,17 +329,17 @@ export function XmluiRoot({
         mediaSize,
       }}>
         <IconProvider icons={icons}>
-          <LegacyStyleProvider>
-            <LegacyThemeProvider
+          <StyleProvider>
+            <XmluiThemeProvider
               resources={resources}
               resourceMap={resourceMap}
-              themes={themes}
+              themes={themesWithExtensions}
               defaultTheme={resolvedThemeDefaults.defaultTheme}
               defaultTone={resolvedThemeDefaults.defaultTone}
               componentThemeMetadata={componentThemeMetadata}
               strictTheming={strictTheming}
               strictAccessibility={strictAccessibility}
-              enableOldThemeCanary={enableOldThemeCanary}
+              applyDocumentThemeVars={applyDocumentThemeVars}
             >
               <ComponentRegistryProvider value={componentRegistry}>
                 <XmluiRuntimeContent
@@ -356,8 +366,8 @@ export function XmluiRoot({
                 setConfirmDialog(undefined);
               })}
               <GlobalLiveRegion />
-            </LegacyThemeProvider>
-          </LegacyStyleProvider>
+            </XmluiThemeProvider>
+          </StyleProvider>
         </IconProvider>
       </XmluiAppContextProvider>
     </HelmetProvider>

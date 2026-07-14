@@ -354,7 +354,7 @@ test("applies theme variables correctly", async ({ initTestBed, createDropdownMe
   await expect(menuContent).toHaveCSS("min-width", "200px");
 });
 
-test("old compiler canary applies root DropdownMenu content variables", async ({
+test("theme compiler applies root DropdownMenu content variables", async ({
   initTestBed,
   createDropdownMenuDriver,
 }) => {
@@ -363,11 +363,10 @@ test("old compiler canary applies root DropdownMenu content variables", async ({
       <MenuItem>Item 1</MenuItem>
     </DropdownMenu>`,
     {
-      oldThemeCanary: true,
-      defaultTheme: "dropdown-root-canary",
+      defaultTheme: "dropdown-root-provider",
       themes: [
         {
-          id: "dropdown-root-canary",
+          id: "dropdown-root-provider",
           extends: "xmlui",
           themeVars: {
             "backgroundColor-DropdownMenu": "rgb(255, 0, 0)",

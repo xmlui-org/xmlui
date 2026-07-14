@@ -14,7 +14,7 @@ import {
   useTheme,
   useThemes,
 } from "../../components-core/theming/ThemeContext";
-import { compileOldThemeModel } from "../../components-core/theming/oldThemeCompiler";
+import { compileThemeModel } from "../../components-core/theming/themeCompiler";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { defaultProps } from "./Theme.defaults";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
@@ -27,6 +27,7 @@ import {
   useStyleRegistry,
   useStyles,
 } from "../../components-core/theming/StyleContext";
+import type { StyleObjectType } from "../../components-core/theming/StyleRegistry";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
@@ -130,7 +131,7 @@ export function Theme(props: Props) {
     allThemeVarsWithResolvedHierarchicalVars,
     invalidThemeVarNames,
     getThemeVar,
-  } = useScopedOldTheme(
+  } = useScopedTheme(
     currentTheme,
     themeTone,
     themes,
@@ -148,7 +149,7 @@ export function Theme(props: Props) {
   const componentRegistry = useComponentRegistry();
 
   const transformedStyles = useMemo(() => {
-    const filteredThemeCssVars = {};
+    const filteredThemeCssVars: StyleObjectType = {};
 
     // Only populate the full compiled theme CSS vars on the wrapper div when:
     //   1. An explicit `tone` is set — the wrapper must lock in a different tone's colors, OR
@@ -211,15 +212,16 @@ export function Theme(props: Props) {
       filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = resolvedValue;
     });
 
-    const ret = {
-      "&": {
-        ...filteredThemeCssVars,
-        colorScheme: themeTone,
-      },
+    const rootStyles: StyleObjectType = {
+      ...filteredThemeCssVars,
+      colorScheme: themeTone,
+    };
+    const ret: StyleObjectType = {
+      "&": rootStyles,
     };
 
     if (isRoot) {
-      ret["&"]["--screenSize"] = 0;
+      rootStyles["--screenSize"] = 0;
 
       const maxWidthPhone = getThemeVar("maxWidth-phone");
       const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
@@ -332,7 +334,7 @@ export function Theme(props: Props) {
   if (!shouldApplyTheme) {
     return (
       <>
-        {renderChild && renderChild(node.children)}
+        {renderChild && renderChild(node?.children)}
         {children}
       </>
     );
@@ -348,7 +350,7 @@ export function Theme(props: Props) {
         </Helmet>
         <RootClasses classNames={rootClasses} />
         <ErrorBoundary node={node} location={"theme-root"}>
-          {renderChild && renderChild(node.children)}
+          {renderChild && renderChild(node?.children)}
           {children}
         </ErrorBoundary>
         <NotificationToast
@@ -370,7 +372,7 @@ export function Theme(props: Props) {
         <>
           <div className={classnames(styles.themeWrapper, className)}>
             {renderChild &&
-              renderChild(node.children, { ...layoutContext, themeClassName: className })}
+              renderChild(node?.children, { ...layoutContext, themeClassName: className })}
             {children}
           </div>
           {root &&
@@ -384,7 +386,7 @@ export function Theme(props: Props) {
         </>
       ) : (
         <>
-          {renderChild && renderChild(node.children, layoutContext)}
+          {renderChild && renderChild(node?.children, layoutContext)}
           {children}
         </>
       )}
@@ -396,7 +398,7 @@ function stripThemeCssVarPrefix(key: string): string {
   return key.startsWith(THEME_CSS_VAR_PREFIX) ? key.slice(THEME_CSS_VAR_PREFIX.length) : key;
 }
 
-function useScopedOldTheme(
+function useScopedTheme(
   currentTheme: ThemeDefinition,
   themeTone: ThemeTone,
   themes: Array<ThemeDefinition>,
@@ -406,7 +408,7 @@ function useScopedOldTheme(
 ) {
   const componentRegistry = useComponentRegistry();
   return useMemo(() => {
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes,
       customThemes: [currentTheme, ...themes],
       activeThemeId: currentTheme.id,
@@ -454,7 +456,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
       let documentElement = insideShadowRoot
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
-      documentElement.classList.add(...classNames);
+      documentElement?.classList.add(...classNames);
       const portalContainer = insideShadowRoot
         ? domRoot.getElementById("nested-app-portal-root")
         : null;
@@ -467,7 +469,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
 
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
-        documentElement.classList.remove(...classNames);
+        documentElement?.classList.remove(...classNames);
         portalContainer?.classList.remove(...classNames);
         // Skip removeCSS for shadow roots: unmounting one island must not strip
         // styles from all others. Shadow root GC reclaims styles when destroyed.

@@ -65,7 +65,6 @@ export type InitTestBedOptions = {
   xmluiConfig?: Record<string, unknown>;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  oldThemeCanary?: boolean;
   apiInterceptor?: {
     initialize?: string;
     operations?: Record<string, {
@@ -776,7 +775,6 @@ async function initTestBed(
     xmluiConfig: options.xmluiConfig ?? {},
     strictTheming: options.strictTheming,
     strictAccessibility: options.strictAccessibility,
-    oldThemeCanary: options.oldThemeCanary === true,
   };
   await installApiInterceptor(page, options.apiInterceptor);
   const installTestBedSource = (payload: TestBedPayload) => {
@@ -817,11 +815,6 @@ async function initTestBed(
     }
     setOptionalBooleanSessionValue("__xmluiTestBedStrictTheming", payload.strictTheming);
     setOptionalBooleanSessionValue("__xmluiTestBedStrictAccessibility", payload.strictAccessibility);
-    if (payload.oldThemeCanary) {
-      window.sessionStorage.setItem("__xmluiTestBedOldThemeCanary", "true");
-    } else {
-      window.sessionStorage.removeItem("__xmluiTestBedOldThemeCanary");
-    }
   };
   const isReady = await page.evaluate(() => !!window.__xmluiTestBedReady).catch(() => false);
   if (isReady) {
@@ -885,7 +878,6 @@ type TestBedPayload = {
   xmluiConfig: Record<string, unknown>;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  oldThemeCanary: boolean;
 };
 
 async function clearManagedFetchCache(page: Page): Promise<void> {

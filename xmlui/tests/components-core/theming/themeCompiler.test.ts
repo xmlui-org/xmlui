@@ -16,7 +16,7 @@ import {
   createCoreComponentThemeMetadataRegistry,
 } from "../../../src/component-core";
 import type { ComponentMetadata } from "../../../src/component-core/metadata";
-import { compileOldThemeModel } from "../../../src/components-core/theming/oldThemeCompiler";
+import { compileThemeModel } from "../../../src/components-core/theming/themeCompiler";
 import { normalizeExtensions, type Extension } from "../../../src/extensions";
 
 const representativeComponentMetadata: Array<[string, ComponentMetadata]> = [
@@ -31,10 +31,10 @@ const representativeComponentMetadata: Array<[string, ComponentMetadata]> = [
   ["Markdown", MarkdownMd as ComponentMetadata],
 ];
 
-describe("compileOldThemeModel", () => {
-  test("returns the old provider-shaped output without using React runtime context", () => {
+describe("compileThemeModel", () => {
+  test("returns provider-shaped output without using React runtime context", () => {
     const registry = createCoreComponentThemeMetadataRegistry();
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes: [
         {
           id: "xmlui",
@@ -96,7 +96,7 @@ describe("compileOldThemeModel", () => {
 
   test("orders custom themes before built-ins and lets the final theme override generated vars", () => {
     const registry = collectComponentThemeMetadata([]);
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       customThemes: [
         {
           id: "brand",
@@ -131,7 +131,7 @@ describe("compileOldThemeModel", () => {
     const registry = collectComponentThemeMetadata(
       representativeComponentMetadata.map(([name, metadata]) => ({ name, metadata })),
     );
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes: [
         {
           id: "xmlui",
@@ -195,7 +195,7 @@ describe("compileOldThemeModel", () => {
       ],
     };
     const registry = createComponentThemeMetadataRegistry(normalizeExtensions([extension]));
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes: [
         {
           id: "xmlui",
@@ -228,7 +228,7 @@ describe("compileOldThemeModel", () => {
         },
       },
     ]);
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes: [
         {
           id: "xmlui",
@@ -270,7 +270,7 @@ describe("compileOldThemeModel", () => {
         },
       },
     ]);
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       builtInThemes: [
         {
           id: "xmlui",
@@ -290,7 +290,7 @@ describe("compileOldThemeModel", () => {
   });
 
   test("falls back to the first available theme when the requested theme is missing", () => {
-    const compiled = compileOldThemeModel({
+    const compiled = compileThemeModel({
       customThemes: [{ id: "custom", themeVars: { color: "custom" } }],
       builtInThemes: [{ id: "xmlui", themeVars: { color: "xmlui" } }],
       activeThemeId: "missing",

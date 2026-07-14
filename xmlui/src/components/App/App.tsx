@@ -5,13 +5,14 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { createMetadata, dComponent } from "../metadata-helpers";
-import { appLayoutMd } from "../App/AppLayoutContext";
+import { appLayoutMd, type AppLayoutType } from "../App/AppLayoutContext";
 import { defaultProps } from "./App.defaults";
 import { App as AppComponent } from "./AppReact";
 import { useRef } from "react";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import type { RendererContext } from "../../abstractions/RendererDefs";
 
 const COMP = "App";
 
@@ -314,6 +315,16 @@ export const AppMd = createMetadata({
   },
 });
 
+type AppNodeProps = Pick<
+  RendererContext,
+  | "node"
+  | "extractValue"
+  | "renderChild"
+  | "classes"
+  | "lookupEventHandler"
+  | "registerComponentApi"
+>;
+
 function AppNode({
   node,
   extractValue,
@@ -321,7 +332,7 @@ function AppNode({
   classes,
   lookupEventHandler,
   registerComponentApi,
-}) {
+}: AppNodeProps) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -333,6 +344,7 @@ function AppNode({
   const { NavPanel: originalNavPanel } = extracted;
 
   let NavPanel = originalNavPanel;
+  const props = node.props ?? {};
 
   if (Pages && !processedNavRef.current) {
     processedNavRef.current = true;
@@ -359,15 +371,15 @@ function AppNode({
 
   // Determine if default content padding should be applied
   // Only apply if Pages is not present AND padding/paddingTop is not explicitly set
-  const hasExplicitPadding = node.props.padding !== undefined;
+  const hasExplicitPadding = props.padding !== undefined;
   const applyDefaultContentPadding = !Pages && !hasExplicitPadding;
   const footerSticky =
     Footer?.props?.sticky !== undefined
       ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
       : true;
-  const logoContentDef = node.props.logoTemplate;
-  const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
-  const fitContent = extractValue.asOptionalBoolean(node.props.fitContent, false);
+  const logoContentDef = props.logoTemplate;
+  const scrollWholePage = extractValue.asOptionalBoolean(props.scrollWholePage, true) ?? true;
+  const fitContent = extractValue.asOptionalBoolean(props.fitContent, false) ?? false;
 
   // When scrollWholePage is false, pageContentContainer is a vertical flex container
   // Pass layout context so children can properly resolve star sizing
@@ -376,15 +388,13 @@ function AppNode({
     : undefined;
 
   return (
-    <>
-    <HorizontalAppBandStyle />
     <AppComponent
       scrollWholePage={scrollWholePage}
       fitContent={fitContent}
-      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+      noScrollbarGutters={extractValue.asOptionalBoolean(props.noScrollbarGutters, false) ?? false}
       classes={classes}
-      layout={extractValue(node.props.layout)}
-      loggedInUser={extractValue(node.props.loggedInUser)}
+      layout={extractValue(props.layout) as AppLayoutType}
+      loggedInUser={extractValue(props.loggedInUser)}
       onReady={lookupEventHandler("ready")}
       onMessageReceived={lookupEventHandler("messageReceived")}
       onKeyDown={lookupEventHandler("keyDown")}
@@ -392,22 +402,31 @@ function AppNode({
       onWillNavigate={lookupEventHandler("willNavigate")}
       onDidNavigate={lookupEventHandler("didNavigate")}
       onError={lookupEventHandler("error")}
-      name={extractValue(node.props.name)}
-      logo={extractValue(node.props.logo)}
-      logoDark={extractValue(node.props["logo-dark"])}
-      logoLight={extractValue(node.props["logo-light"])}
-      defaultTone={extractValue(node.props.defaultTone)}
-      defaultTheme={extractValue(node.props.defaultTheme)}
-      autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
-      persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
-      themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
-      toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
-      locale={extractValue(node.props.locale)}
-      localeBundles={extractValue(node.props.localeBundles)}
-      auditPolicy={extractValue(node.props.auditPolicy)}
-      direction={extractValue.asOptionalString(node.props.direction, "auto")}
-      scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
-      maxQueuedPerTrace={extractValue.asOptionalNumber(node.props.maxQueuedPerTrace, 64)}
+      name={extractValue(props.name)}
+      logo={extractValue(props.logo)}
+      logoDark={extractValue(props["logo-dark"])}
+      logoLight={extractValue(props["logo-light"])}
+      defaultTone={extractValue(props.defaultTone)}
+      defaultTheme={extractValue(props.defaultTheme)}
+      autoDetectTone={extractValue.asOptionalBoolean(props.autoDetectTone, false)}
+      persistTheme={extractValue.asOptionalBoolean(props.persistTheme, false)}
+      themeStorageKey={extractValue(props.themeStorageKey) ?? defaultProps.themeStorageKey}
+      toneStorageKey={extractValue(props.toneStorageKey) ?? defaultProps.toneStorageKey}
+      locale={extractValue(props.locale)}
+      localeBundles={extractValue(props.localeBundles)}
+      auditPolicy={extractValue(props.auditPolicy)}
+      direction={
+        (extractValue.asOptionalString(props.direction, "auto") ?? "auto") as
+          | "ltr"
+          | "rtl"
+          | "auto"
+      }
+      scheduler={
+        (extractValue.asOptionalString(props.scheduler, "concurrent") ?? "concurrent") as
+          | "concurrent"
+          | "fifo"
+      }
+      maxQueuedPerTrace={extractValue.asOptionalNumber(props.maxQueuedPerTrace, 64)}
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader, {})}
       footer={renderChild(Footer, {})}
@@ -421,7 +440,6 @@ function AppNode({
       {renderChild(restChildren, contentLayoutContext)}
       <SearchIndexCollector Pages={Pages} NavPanel={NavPanel} renderChild={renderChild} />
     </AppComponent>
-    </>
   );
 }
 
@@ -502,7 +520,6 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
 
     return (
       <RuntimeAppProviders>
-      <HorizontalAppBandStyle />
       <AppComponent
         {...adapter.rootAttrs()}
         scrollWholePage={scrollWholePage}
@@ -545,7 +562,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
         navPanelDef={navPanel as any}
         logoContentDef={logoContentDef as any}
         renderChild={renderChild as any}
-        registerComponentApi={(api) => adapter.registerApi(api as Record<string, unknown>)}
+        registerComponentApi={(api: Record<string, unknown>) => adapter.registerApi(api)}
       >
         {renderChild(restChildren, contentLayoutContext)}
       </AppComponent>
@@ -553,32 +570,6 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
     );
   },
 });
-
-function HorizontalAppBandStyle() {
-  return (
-    <style>
-      {`
-        [data-xmlui-component="App"] > header > div,
-        [data-xmlui-component="App"] > header nav > div,
-        [data-xmlui-component="App"] > [data-xmlui-component="Footer"] > div {
-          width: 100%;
-          max-width: var(--xmlui-maxWidth-content, 1280px);
-          margin-inline: auto;
-        }
-        [data-xmlui-component="App"] .xmlui-Pages {
-          display: flex !important;
-          flex-direction: column;
-          width: 100%;
-          max-width: var(--xmlui-maxWidth-content, 1280px);
-          margin-inline: auto;
-        }
-        [data-xmlui-component="App"][class*="_vertical_"] > [class*="_navPanelWrapper_"] {
-          min-height: 100%;
-        }
-      `}
-    </style>
-  );
-}
 
 function RuntimeAppProviders({ children }: { children: React.ReactNode }) {
   const isInRouterContext = useInRouterContext();
@@ -619,9 +610,17 @@ function applyRuntimeLayoutContext(
     ...child,
     props: {
       ...child.props,
-      ...layoutContext,
+      ...toRuntimeLayoutProps(layoutContext),
     },
   };
+}
+
+function toRuntimeLayoutProps(layoutContext: Record<string, unknown>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(layoutContext)
+      .filter(([, value]) => value !== undefined && value !== null)
+      .map(([key, value]) => [key, typeof value === "string" ? value : String(value)]),
+  );
 }
 
 function isRuntimeShellChild(
