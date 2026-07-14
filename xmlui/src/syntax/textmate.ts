@@ -1,18 +1,14 @@
+import xmluiThemeDarkSource from "./textMate/xmlui-dark.json" with { type: "json" };
+import xmluiThemeLightSource from "./textMate/xmlui-light.json" with { type: "json" };
+import xmluiThemeSource from "./textMate/xmlui.json" with { type: "json" };
+import xmluiGrammarSource from "./textMate/xmlui.tmLanguage.json" with { type: "json" };
+
 export const xmluiGrammar = {
-  scopeName: "source.xmlui",
-  patterns: [],
+  ...xmluiGrammarSource,
+  name: "xmlui",
+  aliases: ["xmlui-pg"],
 };
 
-export const xmluiThemeLight = {
-  name: "xmlui-light",
-  type: "light",
-  settings: [],
-};
-
-export const xmluiThemeDark = {
-  name: "xmlui-dark",
-  type: "dark",
-  settings: [],
-};
-
-export const xmluiTheme = xmluiThemeLight;
+export const xmluiThemeLight = xmluiThemeLightSource;
+export const xmluiThemeDark = xmluiThemeDarkSource;
+export const xmluiTheme = xmluiThemeSource;

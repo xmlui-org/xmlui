@@ -127,6 +127,34 @@ describe("compileThemeModel", () => {
     expect(compiled.themeCssVars["--xmlui-paddingLeft-Button"]).toBe("999px");
   });
 
+  test("uses custom base surface colors for generated text color tones", () => {
+    const registry = collectComponentThemeMetadata([]);
+    const compiled = compileThemeModel({
+      customThemes: [
+        {
+          id: "brand",
+          extends: "xmlui",
+          themeVars: {
+            "color-surface": "rgb(111, 110, 119)",
+          },
+        },
+      ],
+      builtInThemes: [
+        {
+          id: "xmlui",
+          themeVars: {
+            "textColor-Text": "$color-surface-600",
+          },
+        },
+      ],
+      defaultTheme: "brand",
+      componentThemeMetadata: registry,
+    });
+
+    expect(compiled.getThemeVar("$color-surface-600")).toBe("hsl(246.6667, 3.9301%, 40%)");
+    expect(compiled.getThemeVar("$textColor-Text")).toBe("hsl(246.6667, 3.9301%, 40%)");
+  });
+
   test("produces output for representative component metadata and contributor defaults", () => {
     const registry = collectComponentThemeMetadata(
       representativeComponentMetadata.map(([name, metadata]) => ({ name, metadata })),

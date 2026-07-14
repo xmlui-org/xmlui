@@ -464,6 +464,7 @@ export const appRenderer = wrapComponent(COMP, AppNode, AppMd, {
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { evaluateProps } from "../../runtime/rendering/bindings";
 import { BrowserRouter, useInRouterContext } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
@@ -482,6 +483,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
       (pages ? findRuntimeNavPanelInPages(pages) : undefined);
     const logoContentDef = adapter.prop("logoTemplate");
     const scrollWholePage = adapter.booleanProp("scrollWholePage", defaultProps.scrollWholePage);
+    const footerSticky = runtimeFooterSticky(footer, adapter.scope);
     const contentLayoutContext = !scrollWholePage
       ? { type: "Stack" as const, orientation: "vertical" as const }
       : undefined;
@@ -558,6 +560,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
         applyDefaultContentPadding={!pages && adapter.prop("padding") === undefined}
         header={renderChild(appHeader, {})}
         footer={renderChild(footer, {})}
+        footerSticky={footerSticky}
         navPanel={renderChild(navPanel, {})}
         navPanelDef={navPanel as any}
         logoContentDef={logoContentDef as any}
@@ -790,6 +793,39 @@ function isTransparentRuntimeFragment(child: XmluiElement): boolean {
     Object.keys(child.methods).length === 0 &&
     child.props.when === undefined
   );
+}
+
+function runtimeFooterSticky(footer: XmluiElement | undefined, scope: Parameters<typeof evaluateProps>[2]): boolean {
+  const footerElement = unwrapRuntimeFooterElement(footer);
+  if (!footerElement || footerElement.props.sticky === undefined) {
+    return true;
+  }
+  const value = evaluateProps(
+    { sticky: footerElement.props.sticky },
+    footerElement.parsed?.props,
+    scope,
+  ).sticky;
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value === "true";
+  }
+  return value === undefined || value === null ? true : Boolean(value);
+}
+
+function unwrapRuntimeFooterElement(element: XmluiElement | undefined): XmluiElement | undefined {
+  if (!element) {
+    return undefined;
+  }
+  if (element.type === "Footer") {
+    return element;
+  }
+  if ((element.type === "Theme" || element.type === "Fragment") && element.children.length === 1) {
+    const [child] = element.children;
+    return child.kind === "element" ? unwrapRuntimeFooterElement(child) : undefined;
+  }
+  return undefined;
 }
 
 function findRuntimeNavPanelInPages(pages: XmluiElement): XmluiElement | undefined {

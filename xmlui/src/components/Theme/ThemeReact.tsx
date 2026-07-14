@@ -350,8 +350,10 @@ export function Theme(props: Props) {
         </Helmet>
         <RootClasses classNames={rootClasses} />
         <ErrorBoundary node={node} location={"theme-root"}>
-          {renderChild && renderChild(node?.children)}
-          {children}
+          <div className={classnames(styles.themeWrapper, rootClasses)}>
+            {renderChild && renderChild(node?.children)}
+            {children}
+          </div>
         </ErrorBoundary>
         <NotificationToast
           toastDuration={resolvedToastDuration}

@@ -446,6 +446,7 @@ export const markdownRenderer = wrapRuntimeComponent({
         {...rootAttrs}
         removeIndents={removeIndents}
         removeBr={adapter.booleanProp("removeBr", defaultProps.removeBr)}
+        codeHighlighter={adapter.prop("codeHighlighter") as CodeHighlighter | undefined}
         showHeadingAnchors={adapter.booleanProp("showHeadingAnchors", false)}
         grayscale={adapter.booleanProp("grayscale", false)}
         truncateLinks={adapter.booleanProp("truncateLinks", false)}
@@ -477,18 +478,47 @@ function removeRuntimeMarkdownIndents(input: string): string {
     return "";
   }
   const lines = input.split("\n");
-  const indents = lines
-    .filter((line) => line.trim())
-    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const indents = collectMarkdownAuthoringIndents(lines);
   const minIndent = Math.min(...indents);
-  const effectiveIndent = minIndent > 0
-    ? minIndent
-    : Math.min(...indents.filter((indent) => indent > 0));
-  if (!Number.isFinite(effectiveIndent) || effectiveIndent <= 0) {
+  if (!Number.isFinite(minIndent) || minIndent <= 0) {
     return input;
   }
-  const indent = " ".repeat(effectiveIndent);
-  return lines.map((line) => line.startsWith(indent) ? line.slice(effectiveIndent) : line).join("\n");
+  const indent = " ".repeat(minIndent);
+  return lines.map((line) => line.startsWith(indent) ? line.slice(minIndent) : line).join("\n");
+}
+
+function collectMarkdownAuthoringIndents(lines: string[]): number[] {
+  const indents: number[] = [];
+  let inFence = false;
+  let fenceMarker: string | undefined;
+  for (const line of lines) {
+    if (!line.trim()) {
+      continue;
+    }
+    const match = line.match(/^(\s*)(`{3,}|~{3,})/);
+    if (!inFence || match) {
+      indents.push(line.match(/^\s*/)?.[0].length ?? 0);
+    }
+    if (match) {
+      const marker = match[2][0];
+      if (!inFence) {
+        inFence = true;
+        fenceMarker = marker;
+      } else if (marker === fenceMarker) {
+        inFence = false;
+        fenceMarker = undefined;
+      }
+    }
+  }
+  const minIndent = Math.min(...indents);
+  if (Number.isFinite(minIndent) && minIndent > 0) {
+    return indents;
+  }
+  const positiveIndents = indents.filter((indent) => indent > 0);
+  if (positiveIndents.length > 0 && indents.filter((indent) => indent === 0).length === 1) {
+    return positiveIndents;
+  }
+  return indents;
 }
 
 function isTextNode(node: XmluiNode): node is Extract<XmluiNode, { kind: "text" }> {
@@ -547,7 +577,7 @@ function recoverCollapsedMarkdown(value: string): string {
       return `\n\`\`\`\n${trimmed}\n\`\`\`\n`;
     }
     const info = trimmed.slice(0, firstSpace);
-    const content = trimmed.slice(firstSpace).trim();
+    const content = trimmed.slice(firstSpace).replace(/^\s/, "");
     return `\n\`\`\`${info}\n${content}\n\`\`\`\n`;
   });
 }

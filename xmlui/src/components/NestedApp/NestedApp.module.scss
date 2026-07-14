@@ -170,7 +170,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     flex-direction: column;
     gap: var(--xmlui-gap-frame-#{$component}, 0);
     background-color: var(--xmlui-backgroundColor-frame-#{$component}, var(--xmlui-color-surface-100));
-    color: var(--xmlui-textColor-#{$component}, #000);
+    color: var(--xmlui-textColor-#{$component}, inherit);
     align-content: center;
     box-shadow: var(--xmlui-boxShadow-#{$component}, 0px 0px 32px 0px rgba(0, 0, 0, 0.05));
     overflow: hidden;

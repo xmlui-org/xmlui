@@ -427,9 +427,9 @@ export const Markdown = memo(
                 </Text>
               );
             },
-            code({ id, children }) {
+            code({ id, children, node, ...props }) {
               return (
-                <Text uid={id} className={className} variant="code">
+                <Text {...(props as any)} uid={id} className={className} variant="code">
                   {children}
                 </Text>
               );
@@ -884,22 +884,51 @@ function removeTextIndents(input: string): string {
 
   const lines = input.split("\n");
 
-  const indents = lines
-    .filter((line) => line.trim())
-    .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+  const indents = collectMarkdownAuthoringIndents(lines);
   const minIndent = Math.min(...indents);
-  const effectiveIndent = minIndent > 0
-    ? minIndent
-    : Math.min(...indents.filter((indent) => indent > 0));
 
-  if (!Number.isFinite(effectiveIndent) || effectiveIndent <= 0) {
+  if (!Number.isFinite(minIndent) || minIndent <= 0) {
     return input;
   }
 
   // Remove the shortest starting whitespace length from each line
   const trimmedLines = lines.map((line) =>
-    line.startsWith(" ".repeat(effectiveIndent)) ? line.slice(effectiveIndent) : line,
+    line.startsWith(" ".repeat(minIndent)) ? line.slice(minIndent) : line,
   );
 
   return trimmedLines.join("\n");
+}
+
+function collectMarkdownAuthoringIndents(lines: string[]): number[] {
+  const indents: number[] = [];
+  let inFence = false;
+  let fenceMarker: string | undefined;
+  for (const line of lines) {
+    if (!line.trim()) {
+      continue;
+    }
+    const match = line.match(/^(\s*)(`{3,}|~{3,})/);
+    if (!inFence || match) {
+      indents.push(line.match(/^\s*/)?.[0].length ?? 0);
+    }
+    if (match) {
+      const marker = match[2][0];
+      if (!inFence) {
+        inFence = true;
+        fenceMarker = marker;
+      } else if (marker === fenceMarker) {
+        inFence = false;
+        fenceMarker = undefined;
+      }
+    }
+  }
+  const minIndent = Math.min(...indents);
+  if (Number.isFinite(minIndent) && minIndent > 0) {
+    return indents;
+  }
+  const positiveIndents = indents.filter((indent) => indent > 0);
+  if (positiveIndents.length > 0 && indents.filter((indent) => indent === 0).length === 1) {
+    return positiveIndents;
+  }
+  return indents;
 }

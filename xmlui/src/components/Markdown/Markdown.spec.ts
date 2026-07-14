@@ -275,6 +275,19 @@ Selectable code fence
   );
 });
 
+test("plain markdown text does not show a pointer cursor", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Markdown>
+      <![CDATA[
+Plain paragraph text with a [link](https://example.com).
+      ]]>
+    </Markdown>
+  `);
+
+  await expect(page.getByText("Plain paragraph text with a")).not.toHaveCSS("cursor", "pointer");
+  await expect(page.getByRole("link", { name: "link" })).toHaveCSS("cursor", "pointer");
+});
+
 test("4space/1 tab indent is not code block by default", async ({
   initTestBed,
   createMarkdownDriver,
@@ -287,6 +300,24 @@ test("4space/1 tab indent is not code block by default", async ({
   const driver = await createMarkdownDriver();
   await expect(driver.component).toHaveText("I did not expect this");
   expect(await driver.hasHtmlElement("em")).toBeTruthy();
+});
+
+test("authoring indent after an unindented first line is not code block by default", async ({
+  initTestBed,
+  createMarkdownDriver,
+  page,
+}) => {
+  const code = `# Markdown Foundation
+    Count: 1
+
+    \`\`\`js
+    const doubled = 1 * 2;
+    \`\`\``;
+  await initTestBed(`<Markdown><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(page.getByRole("heading", { name: "Markdown Foundation" })).toBeVisible();
+  await expect(driver.component).toContainText("Count: 1");
+  await expect(page.locator("pre > code")).toContainText("const doubled = 1 * 2;");
 });
 
 test("removeIndents=false: 4space/1 tab indent is accounted for", async ({

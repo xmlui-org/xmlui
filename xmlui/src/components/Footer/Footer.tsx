@@ -1,4 +1,5 @@
 import styles from "./Footer.module.scss";
+import type { CSSProperties } from "react";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -67,13 +68,46 @@ import { defaultProps } from "./Footer.defaults";
 export const footerRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: FooterMd as ComponentMetadata,
-  renderer: ({ adapter }) => (
-    <Footer
-      {...adapter.rootAttrs()}
-      sticky={adapter.booleanProp("sticky", defaultProps.sticky)}
-      classes={{ [COMPONENT_PART_KEY]: adapter.className }}
-    >
-      {adapter.renderChildren()}
-    </Footer>
-  ),
+  renderer: ({ adapter }) => {
+    const rootAttrs = adapter.rootAttrs();
+    const { rootStyle, contentStyle } = splitRuntimeFooterStyles(rootAttrs.style);
+    return (
+      <Footer
+        {...rootAttrs}
+        style={rootStyle}
+        contentStyle={contentStyle}
+        sticky={adapter.booleanProp("sticky", defaultProps.sticky)}
+        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
+      >
+        {adapter.renderChildren()}
+      </Footer>
+    );
+  },
 });
+
+function splitRuntimeFooterStyles(style: unknown): {
+  rootStyle?: CSSProperties;
+  contentStyle?: CSSProperties;
+} {
+  if (!style || typeof style !== "object") {
+    return {};
+  }
+  const rootStyle = { ...(style as CSSProperties) };
+  const contentStyle: CSSProperties = {};
+  for (const key of [
+    "padding",
+    "paddingTop",
+    "paddingRight",
+    "paddingBottom",
+    "paddingLeft",
+  ] as const) {
+    if (rootStyle[key] !== undefined) {
+      contentStyle[key] = rootStyle[key];
+      delete rootStyle[key];
+    }
+  }
+  return {
+    rootStyle,
+    contentStyle: Object.keys(contentStyle).length ? contentStyle : undefined,
+  };
+}

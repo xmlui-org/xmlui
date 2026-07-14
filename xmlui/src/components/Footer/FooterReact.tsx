@@ -16,6 +16,7 @@ export const Footer = memo(forwardRef(function Footer(
   {
     children,
     style,
+    contentStyle,
     className,
     classes,
     sticky = defaultProps.sticky,
@@ -23,6 +24,7 @@ export const Footer = memo(forwardRef(function Footer(
   }: {
     children: ReactNode;
     style?: React.CSSProperties;
+    contentStyle?: React.CSSProperties;
     className?: string;
     classes?: Record<string, string>;
     sticky?: boolean;
@@ -45,6 +47,7 @@ export const Footer = memo(forwardRef(function Footer(
         className={classnames(styles.wrapper, {
           [styles.full]: !canRestrictContentWidth,
         })}
+        style={contentStyle}
       >
         {children}
       </div>

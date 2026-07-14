@@ -128,6 +128,7 @@ export function NestedAppComponent({
       defaultTone={defaultTone}
       defaultTheme={defaultTheme}
       themes={resolvedConfig.themes}
+      appGlobals={{ ...resolvedConfig.appGlobals, isNested: true }}
       applyDocumentThemeVars={false}
     />
   ) : null;
@@ -231,6 +232,7 @@ function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
 }
 
 function normalizeNestedConfig(config: unknown): {
+  appGlobals?: Record<string, unknown>;
   defaultTheme?: string;
   themes?: Array<any>;
 } {
@@ -239,9 +241,16 @@ function normalizeNestedConfig(config: unknown): {
   }
   const normalized = config as Record<string, unknown>;
   return {
+    appGlobals: isPlainRecord(normalized.appGlobals)
+      ? normalized.appGlobals
+      : undefined,
     defaultTheme: typeof normalized.defaultTheme === "string" ? normalized.defaultTheme : undefined,
     themes: Array.isArray(normalized.themes) ? normalized.themes : undefined,
   };
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
 function injectConfigGlobals(source: string, config: unknown): string {

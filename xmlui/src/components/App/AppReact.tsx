@@ -562,6 +562,7 @@ export const App = memo(function App({
 
   const tableOfContentsEnabled = getThemeVar("tableOfContents") !== "false";
   const isBlogPageWithToc =
+    !appGlobals?.isNested &&
     tableOfContentsEnabled &&
     (location.pathname === "/" ||
       location.pathname === "/blog" ||

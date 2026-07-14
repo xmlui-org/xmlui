@@ -6,6 +6,36 @@ const nestedCounterSource =
   "&lt;Button testId=&quot;nested-button&quot; onClick=&quot;count++&quot;&gt;Increment nested&lt;/Button&gt;" +
   "&lt;/App&gt;";
 
+const pickThemeSource = escapeNestedSource(`
+<App var.theme="default">
+  <VStack gap="$space-4" padding="$space-4">
+    <HStack verticalAlignment="center">
+      <Text variant="strong">Theme</Text>
+      <Select initialValue="default" width="160px" onDidChange="(v) => theme = v">
+        <Option value="default" label="Default" />
+        <Option value="earthtone" label="Earthtone" />
+      </Select>
+    </HStack>
+    <Theme>
+      <VStack gap="$space-4">
+        <HStack gap="$space-2">
+          <Button label="Primary" />
+          <Button label="Secondary" themeColor="secondary" />
+          <Button label="Outlined" variant="outlined" />
+        </HStack>
+        <HStack gap="$space-4" verticalAlignment="center">
+          <Badge value="Active" />
+          <Badge value="Pending" variant="pill" />
+          <Checkbox label="Enable notifications" initialValue="{true}" />
+        </HStack>
+        <ProgressBar value="0.6" />
+        <TextBox placeholder="Enter your name" label="Name" />
+      </VStack>
+    </Theme>
+  </VStack>
+</App>
+`);
+
 test.describe("NestedApp foundation", () => {
   test("renders nested XMLUI source and keeps its local state isolated", async ({ initTestBed, page }) => {
     await initTestBed(`
@@ -178,4 +208,122 @@ test.describe("NestedApp foundation", () => {
     await page.getByTestId("nested-reset").click();
     await expect(page.getByTestId("nested-count")).toHaveText("Nested: 0");
   });
+
+  test("framed website sample inherits shell text color and does not show nested app scrollbars", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <VStack testId="host" width="900px">
+          <NestedApp
+            testId="nested"
+            title="Pick a theme"
+            withFrame="{true}"
+            height="400px"
+            activeTheme="nested-spacing"
+            config="{{
+              defaultTheme: 'nested-spacing',
+              themes: [{
+                id: 'nested-spacing',
+                extends: 'xmlui',
+                themeVars: {
+                  'paddingHorizontal-content-App': '80px',
+                  'textColor-Text': 'rgb(99, 98, 106)'
+                }
+              }]
+            }}"
+            app="{'${pickThemeSource}'}"
+          />
+        </VStack>
+      </App>
+    `);
+
+    await page.getByTestId("host").evaluate((element) => {
+      (element as HTMLElement).style.color = "rgb(99, 98, 106)";
+    });
+
+    await expect(page.getByText("Pick a theme")).toHaveCSS("color", "rgb(99, 98, 106)");
+
+    const nestedAppMetrics = await page.getByTestId("nested").locator('[data-xmlui-component="App"]').evaluate((element) => {
+      const app = element as HTMLElement;
+      const style = getComputedStyle(app);
+      const pageContent = app.querySelector('[class*="pageContentContainer"]') as HTMLElement;
+      const pageContentStyle = getComputedStyle(pageContent);
+      return {
+        clientHeight: app.clientHeight,
+        clientWidth: app.clientWidth,
+        overflowX: style.overflowX,
+        overflowY: style.overflowY,
+        pagePaddingLeft: pageContentStyle.paddingLeft,
+        scrollbarGutter: style.scrollbarGutter,
+        scrollHeight: app.scrollHeight,
+        scrollWidth: app.scrollWidth,
+      };
+    });
+
+    expect(nestedAppMetrics.overflowX).toBe("hidden");
+    expect(nestedAppMetrics.overflowY).toBe("auto");
+    expect(nestedAppMetrics.pagePaddingLeft).toBe("80px");
+    expect(nestedAppMetrics.scrollbarGutter).toBe("stable both-edges");
+    expect(nestedAppMetrics.scrollHeight).toBeLessThanOrEqual(nestedAppMetrics.clientHeight + 1);
+    expect(nestedAppMetrics.scrollWidth).toBeGreaterThanOrEqual(nestedAppMetrics.clientWidth);
+  });
+
+  test("framed playground reserves the nested app scrollbar gutter", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg height="400px" name="Pick a theme"',
+      unescapeNestedSource(pickThemeSource),
+      "```",
+    ].join("\n");
+    await initTestBed(`
+      <App>
+        <VStack testId="host" width="1760px">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    const frameMetrics = await page.getByText("Pick a theme").evaluate((element) => {
+      const frame = (element as HTMLElement).closest('[class*="nestedAppContainer"]') as HTMLElement;
+      const app = frame.querySelector('[data-xmlui-component="App"]') as HTMLElement;
+      const pageContent = app.querySelector('[class*="pageContentContainer"]') as HTMLElement;
+      const label = [...frame.querySelectorAll('[data-xmlui-component="Text"]')]
+        .find((candidate) => candidate.textContent?.trim() === "Theme") as HTMLElement;
+      const frameBox = frame.getBoundingClientRect();
+      const appBox = app.getBoundingClientRect();
+      const pageContentBox = pageContent.getBoundingClientRect();
+      const labelBox = label.getBoundingClientRect();
+      return {
+        appGutterLeft: pageContentBox.left - appBox.left,
+        labelInset: labelBox.left - frameBox.left,
+        scrollbarGutter: getComputedStyle(app).scrollbarGutter,
+      };
+    });
+
+    expect(frameMetrics.scrollbarGutter).toBe("stable both-edges");
+    expect(frameMetrics.appGutterLeft).toBeGreaterThanOrEqual(14);
+    expect(frameMetrics.labelInset).toBeGreaterThanOrEqual(45);
+  });
 });
+
+function escapeNestedSource(source: string): string {
+  return source
+    .trim()
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "");
+}
+
+function unescapeNestedSource(source: string): string {
+  return source
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&");
+}
