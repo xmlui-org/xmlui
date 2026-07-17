@@ -22,6 +22,7 @@ import { useComponentThemeClass as useOldComponentThemeClass } from "./component
 import { useLayoutStyle } from "./runtime/rendering/props";
 import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
+import { isLayoutPropName } from "./styling/contracts";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
 import { useInspectMode } from "./components-core/InspectorContext";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
@@ -231,7 +232,7 @@ export function wrapComponent(
         themeClass.style,
       );
       const componentProps = {
-        ...withoutKeys(normalizedProps, ["data-testid", "aria-label"]),
+        ...withoutLayoutProps(withoutKeys(normalizedProps, ["data-testid", "aria-label"])),
         ...registerApiProp,
         ...nativeEventProp,
         classes: { [COMPONENT_PART_KEY]: themeClass.className },
@@ -1007,6 +1008,16 @@ function withoutKeys<T extends Record<string, unknown>>(props: T, keys: string[]
   const result = { ...props };
   for (const key of keys) {
     delete result[key];
+  }
+  return result;
+}
+
+function withoutLayoutProps<T extends Record<string, unknown>>(props: T): Record<string, unknown> {
+  const result = { ...props };
+  for (const key of Object.keys(result)) {
+    if (isLayoutPropName(key)) {
+      delete result[key];
+    }
   }
   return result;
 }

@@ -45,4 +45,35 @@ test.describe("Select foundation", () => {
     await expect(page.getByRole("option")).toHaveText(["Alpha", "Beta"]);
     expect(await driver.value()).toBe("b");
   });
+
+  test("stretches to the available width by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack testId="container" width="420px">
+        <Select testId="select" initialValue="bakerloo">
+          <Option value="bakerloo" label="Bakerloo" />
+          <Option value="central" label="Central" />
+        </Select>
+      </VStack>
+    `);
+
+    const delta = await page.getByTestId("select").evaluate((select) => {
+      const container = document.querySelector('[data-testid="container"]') as HTMLElement;
+      return Math.abs(select.getBoundingClientRect().width - container.getBoundingClientRect().width);
+    });
+
+    expect(delta).toBeLessThan(1);
+  });
+
+  test("honors an explicit authored width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack width="420px">
+        <Select testId="select" width="180px" initialValue="bakerloo">
+          <Option value="bakerloo" label="Bakerloo" />
+          <Option value="central" label="Central" />
+        </Select>
+      </VStack>
+    `);
+
+    await expect(page.getByTestId("select")).toHaveCSS("width", "180px");
+  });
 });

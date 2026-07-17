@@ -52,8 +52,6 @@ $gap-content-App: createThemeVar("gap-content-App");
     scroll-padding-block: $scrollPaddingBlockPage;
 
     &:not(.verticalFullHeader) {
-      > .headerWrapper > div,
-      > .headerWrapper nav > div,
       > .footerWrapper > div {
         width: 100%;
         max-width: var(--xmlui-maxWidth-content, 1280px);

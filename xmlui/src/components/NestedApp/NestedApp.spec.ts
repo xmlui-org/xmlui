@@ -64,6 +64,16 @@ const teamListSource = escapeNestedSource(`
   </List>
 </App>
 `);
+const tubeTableSource = escapeNestedSource(`
+<App>
+  <Table data="https://api.example.test/line/mode/tube/status" testId="tube-table">
+    <Column bindTo="name" />
+    <Column header="status">
+      {$item.lineStatuses[0].statusSeverityDescription}
+    </Column>
+  </Table>
+</App>
+`);
 
 const teamApi = {
   apiUrl: "/api",
@@ -77,6 +87,18 @@ const teamApi = {
   },
 };
 const teamApiExpression = `{JSON.parse('${JSON.stringify(teamApi).replace(/"/g, "&quot;")}')}`;
+const tubeStatusInterceptor = {
+  operations: {
+    "tube-status": {
+      url: "https://api.example.test/line/mode/tube/status",
+      method: "get",
+      handler: `return [
+        { id: "bakerloo", name: "Bakerloo", lineStatuses: [{ statusSeverityDescription: "Good Service" }] },
+        { id: "central", name: "Central", lineStatuses: [{ statusSeverityDescription: "Minor Delays" }] }
+      ];`,
+    },
+  },
+};
 
 test.describe("NestedApp foundation", () => {
   test("renders nested XMLUI source and keeps its local state isolated", async ({ initTestBed, page }) => {
@@ -121,6 +143,27 @@ test.describe("NestedApp foundation", () => {
     await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
   });
 
+  test("keeps playground api mocks from intercepting sibling URL data samples", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp testId="team" app="{'${teamListSource}'}" api="${teamApiExpression}" />
+        <NestedApp testId="tube" app="{'${tubeTableSource}'}" />
+      </App>
+    `, { apiInterceptor: tubeStatusInterceptor });
+
+    await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
+    await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+    const tubeSample = page.getByTestId("tube");
+    await expect(tubeSample.locator("td").filter({ hasText: "Bakerloo" }).first()).toBeVisible();
+    await expect(tubeSample.locator("td").filter({ hasText: "Good Service" }).first()).toBeVisible();
+    await expect(tubeSample.locator("td").filter({ hasText: "Central" }).first()).toBeVisible();
+    await expect(tubeSample.locator("td").filter({ hasText: "Minor Delays" }).first()).toBeVisible();
+    await expect(tubeSample.getByText("No data available")).toHaveCount(0);
+  });
+
   test("renders the website HeroApp team list through markdown playground api", async ({
     initTestBed,
     page,
@@ -138,6 +181,28 @@ test.describe("NestedApp foundation", () => {
     await expect(heroPlayground.getByText("Coder Gal")).toBeVisible();
     await expect(heroPlayground.getByText("Tech Ninja")).toBeVisible();
     await expect(heroPlayground.getByText("No data available")).toHaveCount(0);
+    await expect(heroPlayground.locator('[data-xmlui-component="AppHeader"] img[alt="Logo"]')).toHaveCount(0);
+    const appHeader = heroPlayground.locator('[data-xmlui-component="AppHeader"]').first();
+    await expect(appHeader).toHaveCSS("flex-shrink", "0");
+    const headerOverflow = await appHeader.evaluate((shell) => {
+      const wrapper = shell.closest("header") ?? shell.parentElement;
+      if (!wrapper) {
+        return Number.POSITIVE_INFINITY;
+      }
+      return Math.abs(shell.getBoundingClientRect().width - wrapper.getBoundingClientRect().width);
+    });
+    expect(headerOverflow).toBeLessThan(1);
+    const headerSpacer = heroPlayground.locator('[data-part-id="content"] > div').first();
+    await expect(headerSpacer).toHaveCSS("flex", "1 1 0px");
+    await expect(headerSpacer).not.toHaveAttribute("data-xmlui-component", /.+/);
+    await expect(headerSpacer).not.toHaveClass(/xmlui-SpaceFiller/);
+
+    const firstCard = heroPlayground.locator('[data-xmlui-component="Card"]').first();
+    await expect(firstCard).toBeVisible();
+    const firstCardBox = await firstCard.boundingBox();
+    expect(firstCardBox?.height).toBeLessThan(100);
+    await expect(firstCard.locator("h2")).toHaveCSS("margin-top", "0px");
+    await expect(firstCard.locator("h2")).toHaveCSS("margin-bottom", "0px");
   });
 
   test("shows a compile error inside the nested app boundary", async ({ initTestBed, page }) => {

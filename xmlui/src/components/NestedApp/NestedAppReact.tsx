@@ -111,11 +111,11 @@ export function NestedAppComponent({
   }, [app, components, config]);
 
   useLayoutEffect(() => {
-    const adapter = createNestedApiAdapter(api);
+    const previousAdapter = managedFetchService.getAdapter();
+    const adapter = createNestedApiAdapter(api, previousAdapter);
     if (!adapter) {
       return;
     }
-    const previousAdapter = managedFetchService.getAdapter();
     managedFetchService.setAdapter(adapter);
     return () => {
       if (managedFetchService.getAdapter() === adapter) {
@@ -145,6 +145,7 @@ export function NestedAppComponent({
       defaultTone={defaultTone}
       defaultTheme={defaultTheme}
       themes={resolvedConfig.themes}
+      resources={resolvedConfig.resources}
       appGlobals={{ ...resolvedConfig.appGlobals, isNested: true }}
       applyDocumentThemeVars={false}
     />
@@ -251,10 +252,13 @@ function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
 function normalizeNestedConfig(config: unknown): {
   appGlobals?: Record<string, unknown>;
   defaultTheme?: string;
+  resources?: Record<string, string>;
   themes?: Array<any>;
 } {
   if (!config || typeof config !== "object" || Array.isArray(config)) {
-    return {};
+    return {
+      resources: normalizeNestedResources(undefined),
+    };
   }
   const normalized = config as Record<string, unknown>;
   return {
@@ -262,7 +266,20 @@ function normalizeNestedConfig(config: unknown): {
       ? normalized.appGlobals
       : undefined,
     defaultTheme: typeof normalized.defaultTheme === "string" ? normalized.defaultTheme : undefined,
+    resources: normalizeNestedResources(normalized.resources),
     themes: Array.isArray(normalized.themes) ? normalized.themes : undefined,
+  };
+}
+
+function normalizeNestedResources(resources: unknown): Record<string, string> {
+  const normalizedResources = isPlainRecord(resources) ? resources : {};
+  return {
+    logo: "",
+    "logo-light": "",
+    "logo-dark": "",
+    ...Object.fromEntries(
+      Object.entries(normalizedResources).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+    ),
   };
 }
 
@@ -270,7 +287,10 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
-function createNestedApiAdapter(api: unknown): ManagedFetchAdapter | undefined {
+function createNestedApiAdapter(
+  api: unknown,
+  fallbackAdapter: ManagedFetchAdapter,
+): ManagedFetchAdapter | undefined {
   const normalizedApi = normalizeNestedApi(api);
   if (!normalizedApi || !isPlainRecord(normalizedApi.operations)) {
     return undefined;
@@ -289,7 +309,10 @@ function createNestedApiAdapter(api: unknown): ManagedFetchAdapter | undefined {
     }))
     .filter((operation) => operation.url);
 
-  return async (request) => {
+  return async (request, signal) => {
+    if (!isNestedApiRequest(request, apiUrl)) {
+      return fallbackAdapter(request, signal);
+    }
     const normalizedPath = nestedRequestPath(request, apiUrl);
     const operation = operations.find((candidate) =>
       candidate.method === request.method &&
@@ -319,6 +342,15 @@ function createNestedApiAdapter(api: unknown): ManagedFetchAdapter | undefined {
       });
     }
   };
+}
+
+function isNestedApiRequest(request: ManagedRequest, apiUrl: string): boolean {
+  if (!apiUrl) {
+    return true;
+  }
+  const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
+  const pathname = new URL(request.url || "/", origin).pathname;
+  return pathname === apiUrl || pathname.startsWith(`${apiUrl}/`);
 }
 
 function normalizeNestedApi(api: unknown): Record<string, unknown> | undefined {
