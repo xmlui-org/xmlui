@@ -122,6 +122,7 @@ export const nestedAppRenderer = wrapRuntimeComponent({
       activeTone={adapter.stringProp("activeTone")}
       allowReset={adapter.booleanProp("allowReset", false)}
       app={adapter.stringProp("app", "")}
+      api={adapter.prop("api")}
       components={adapter.prop("components", []) as unknown[]}
       config={adapter.prop("config")}
       height={adapter.prop("height")}

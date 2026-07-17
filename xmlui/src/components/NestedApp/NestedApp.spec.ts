@@ -1,4 +1,25 @@
 import { expect, test } from "../../testing/fixtures";
+import { readFileSync } from "node:fs";
+
+const heroAppSource = readFileSync(
+  new URL("../../../../website/src/components/home/HeroApp.xmlui", import.meta.url),
+  "utf8",
+);
+const xmluiHeroTheme = {
+  id: "xmlui-hero-theme",
+  name: "XMLUI Hero Theme",
+  extends: "xmlui",
+  color: "$color-primary-500",
+  themeVars: {
+    "color-surface": "rgb(111, 110, 119)",
+    "marginTop-CodeBlock": "0",
+    "marginBottom-CodeBlock": "0",
+    "backgroundColor-CodeBlock": "$color-surface-100",
+    "borderRadius-CodeBlock": "0",
+    "border-CodeBlock": "0",
+  },
+  resources: {},
+};
 
 const nestedCounterSource =
   "&lt;App var.count=&quot;{0}&quot;&gt;" +
@@ -36,6 +57,27 @@ const pickThemeSource = escapeNestedSource(`
 </App>
 `);
 
+const teamListSource = escapeNestedSource(`
+<App>
+  <List data="/api/users">
+    <Text testId="user-{$item.id}">{$item.username}</Text>
+  </List>
+</App>
+`);
+
+const teamApi = {
+  apiUrl: "/api",
+  operations: {
+    "get-users": {
+      url: "/users",
+      method: "get",
+      handler:
+        "return [{ id: 1, username: String.fromCharCode(67,111,100,101,114,32,71,97,108) }, { id: 2, username: String.fromCharCode(84,101,99,104,32,78,105,110,106,97) }]",
+    },
+  },
+};
+const teamApiExpression = `{JSON.parse('${JSON.stringify(teamApi).replace(/"/g, "&quot;")}')}`;
+
 test.describe("NestedApp foundation", () => {
   test("renders nested XMLUI source and keeps its local state isolated", async ({ initTestBed, page }) => {
     await initTestBed(`
@@ -66,6 +108,36 @@ test.describe("NestedApp foundation", () => {
     `);
 
     await expect(page.getByTestId("nested")).toHaveCSS("height", "120px");
+  });
+
+  test("uses playground api blocks for URL data in nested apps", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp testId="nested" app="{'${teamListSource}'}" api="${teamApiExpression}" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
+    await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+  });
+
+  test("renders the website HeroApp team list through markdown playground api", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <HeroApp />
+      </App>
+    `, {
+      components: [heroAppSource],
+      themes: [xmluiHeroTheme],
+    });
+
+    const heroPlayground = page.locator('[data-xmlui-component="NestedApp"]').first();
+    await expect(heroPlayground.getByText("Coder Gal")).toBeVisible();
+    await expect(heroPlayground.getByText("Tech Ninja")).toBeVisible();
+    await expect(heroPlayground.getByText("No data available")).toHaveCount(0);
   });
 
   test("shows a compile error inside the nested app boundary", async ({ initTestBed, page }) => {

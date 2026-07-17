@@ -1,6 +1,7 @@
-import { useEffect, useState, type ComponentType, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useState, type ComponentType, type CSSProperties } from "react";
 
 import type { ThemeTone } from "../../styling";
+import { ManagedFetchError, managedFetchService, type ManagedFetchAdapter, type ManagedRequest } from "../../runtime/data";
 import styles from "./NestedApp.module.scss";
 
 export type NestedAppProps = {
@@ -20,12 +21,14 @@ export type NestedAppProps = {
   testId?: string;
   title?: string;
   withFrame?: boolean;
+  api?: unknown;
 };
 
 export function NestedAppComponent({
   activeTone,
   activeTheme,
   app,
+  api,
   allowReset = false,
   className,
   components = [],
@@ -106,6 +109,20 @@ export function NestedAppComponent({
       cancelled = true;
     };
   }, [app, components, config]);
+
+  useLayoutEffect(() => {
+    const adapter = createNestedApiAdapter(api);
+    if (!adapter) {
+      return;
+    }
+    const previousAdapter = managedFetchService.getAdapter();
+    managedFetchService.setAdapter(adapter);
+    return () => {
+      if (managedFetchService.getAdapter() === adapter) {
+        managedFetchService.setAdapter(previousAdapter);
+      }
+    };
+  }, [api]);
   const mergedStyle = {
     ...style,
     ...(height !== undefined ? { height } : null),
@@ -251,6 +268,141 @@ function normalizeNestedConfig(config: unknown): {
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function createNestedApiAdapter(api: unknown): ManagedFetchAdapter | undefined {
+  const normalizedApi = normalizeNestedApi(api);
+  if (!normalizedApi || !isPlainRecord(normalizedApi.operations)) {
+    return undefined;
+  }
+  const apiUrl = typeof normalizedApi.apiUrl === "string" ? normalizedApi.apiUrl.replace(/\/$/, "") : "";
+  const state: Record<string, unknown> = {};
+  if (typeof normalizedApi.initialize === "string" && normalizedApi.initialize.trim()) {
+    runNestedApiHandler(normalizedApi.initialize, { $state: state });
+  }
+  const operations = Object.values(normalizedApi.operations)
+    .filter(isPlainRecord)
+    .map((operation) => ({
+      url: typeof operation.url === "string" ? operation.url : "",
+      method: typeof operation.method === "string" ? operation.method.toLowerCase() : "get",
+      handler: typeof operation.handler === "string" ? operation.handler : "",
+    }))
+    .filter((operation) => operation.url);
+
+  return async (request) => {
+    const normalizedPath = nestedRequestPath(request, apiUrl);
+    const operation = operations.find((candidate) =>
+      candidate.method === request.method &&
+      matchNestedApiPath(candidate.url, normalizedPath) !== undefined
+    );
+    if (!operation) {
+      throw new ManagedFetchError("Not Found", 404, { message: `No nested API operation for ${request.method.toUpperCase()} ${request.url}` });
+    }
+    const pathParams = matchNestedApiPath(operation.url, normalizedPath) ?? {};
+    try {
+      const data = operation.handler
+        ? runNestedApiHandler(operation.handler, {
+            $state: state,
+            $requestBody: request.body,
+            $pathParams: pathParams,
+            $queryParams: request.queryParams ?? {},
+            $requestHeaders: request.headers,
+          })
+        : { success: true };
+      return { data };
+    } catch (error) {
+      if (isNestedHttpError(error)) {
+        throw new ManagedFetchError("Nested API Error", error.status, error.body);
+      }
+      throw new ManagedFetchError("Internal Server Error", 500, {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+}
+
+function normalizeNestedApi(api: unknown): Record<string, unknown> | undefined {
+  if (isPlainRecord(api)) {
+    return api;
+  }
+  if (typeof api !== "string" || !api.trim()) {
+    return undefined;
+  }
+  for (const source of [api, api.replace(/\r?\n/g, " ")]) {
+    try {
+      const parsed = JSON.parse(source);
+      if (isPlainRecord(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // Try the next legacy playground form.
+    }
+  }
+  return undefined;
+}
+
+function nestedRequestPath(request: ManagedRequest, apiUrl: string): string {
+  const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
+  const pathname = new URL(request.url || "/", origin).pathname;
+  return apiUrl && pathname.startsWith(`${apiUrl}/`)
+    ? pathname.slice(apiUrl.length)
+    : pathname;
+}
+
+function matchNestedApiPath(pattern: string, pathname: string): Record<string, string> | undefined {
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = pathname.split("/").filter(Boolean);
+  if (patternParts.length !== pathParts.length) {
+    return undefined;
+  }
+  const params: Record<string, string> = {};
+  for (let index = 0; index < patternParts.length; index++) {
+    const patternPart = patternParts[index];
+    const pathPart = pathParts[index];
+    if (patternPart.startsWith(":")) {
+      params[patternPart.slice(1)] = decodeURIComponent(pathPart);
+    } else if (patternPart !== pathPart) {
+      return undefined;
+    }
+  }
+  return params;
+}
+
+function runNestedApiHandler(source: string, context: Record<string, unknown>): unknown {
+  const trimmed = source.trim();
+  const body = shouldReturnNestedApiExpression(trimmed) ? `return (${source});` : source;
+  return new Function(
+    "$state",
+    "$requestBody",
+    "$pathParams",
+    "$queryParams",
+    "$requestHeaders",
+    "Errors",
+    body,
+  )(
+    context.$state,
+    context.$requestBody,
+    context.$pathParams,
+    context.$queryParams,
+    context.$requestHeaders,
+    {
+      HttpError: (status: number, body: unknown) => {
+        throw { __xmluiHttpError: true, status, body };
+      },
+    },
+  );
+}
+
+function shouldReturnNestedApiExpression(source: string): boolean {
+  return !/[;{}]/.test(source) && !/^(return|if|for|while|switch|const|let|var)\b/.test(source);
+}
+
+function isNestedHttpError(error: unknown): error is {
+  __xmluiHttpError: true;
+  status: number;
+  body: unknown;
+} {
+  return Boolean(error && typeof error === "object" && (error as { __xmluiHttpError?: unknown }).__xmluiHttpError);
 }
 
 function injectConfigGlobals(source: string, config: unknown): string {

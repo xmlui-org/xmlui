@@ -786,15 +786,42 @@ export function invalidateDataSources(
   scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
   invalidates: unknown,
 ): void {
+  if (invalidates === undefined || invalidates === null || invalidates === "") {
+    for (const api of Object.values(scope.references)) {
+      if (isRefetchableDataSource(api)) {
+        void api.refetch?.();
+      }
+    }
+    return;
+  }
   const names = Array.isArray(invalidates)
     ? invalidates
     : typeof invalidates === "string"
       ? invalidates.split(",").map((name) => name.trim()).filter(Boolean)
       : [];
   for (const name of names) {
-    const api = scope.references[String(name)] as { refetch?: () => unknown } | undefined;
+    const text = String(name);
+    const api = scope.references[text] as { refetch?: () => unknown } | undefined;
     void api?.refetch?.();
+    for (const candidate of Object.values(scope.references)) {
+      if (isRefetchableDataSource(candidate) && candidate.url === text) {
+        void candidate.refetch?.();
+      }
+    }
   }
+}
+
+function isRefetchableDataSource(value: unknown): value is {
+  __xmluiDataSource?: boolean;
+  url?: unknown;
+  refetch?: () => unknown;
+} {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    (value as { __xmluiDataSource?: unknown }).__xmluiDataSource &&
+    typeof (value as { refetch?: unknown }).refetch === "function",
+  );
 }
 
 type LatestApiCall = {

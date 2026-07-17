@@ -73,6 +73,55 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
   });
 
+  test("treats a string data property as an API-bound DataSource URL", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Table data="/api/produce" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="quantity" header="Quantity"/>
+      </Table>
+    `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-produce": {
+              url: "/api/produce",
+              method: "get",
+              handler: `return [
+                { name: "Apple", quantity: 5 },
+                { name: "Banana", quantity: 3 }
+              ];`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Banana" }).first()).toBeVisible();
+  });
+
+  test("uses a DataSource reference as the data property value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <DataSource id="stations" mockData="{[
+        { name: 'Baker Street', modes: 'tube' },
+        { name: 'Marylebone', modes: 'tube' }
+      ]}" />
+      <Table data="{stations}" testId="table">
+        <Column bindTo="name" header="Name"/>
+        <Column bindTo="modes" header="Modes"/>
+      </Table>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Baker Street" }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Marylebone" }).first()).toBeVisible();
+  });
+
   test("invokes onRowDoubleClick when row is double-clicked", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table" onRowDoubleClick="(item) => testState = item.name">
