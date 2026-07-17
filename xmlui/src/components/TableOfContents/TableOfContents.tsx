@@ -107,7 +107,6 @@ export const TableOfContentsMd = createMetadata({
     [`fontWeight-${COMP_CHILD}-level-4`]: "$fontWeight-normal",
     [`fontWeight-${COMP_CHILD}-level-5`]: "$fontWeight-normal",
     [`fontWeight-${COMP_CHILD}-level-6`]: "$fontWeight-normal",
-    [`fontWeight-${COMP_CHILD}--hover`]: "$fontWeight-bold",
     [`fontWeight-${COMP_CHILD}--active`]: "$fontWeight-bold",
     [`borderLeft-${COMP_CHILD}`]: "2px solid $color-surface-100",
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",

@@ -133,6 +133,19 @@ import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/a
 import { createRuntimeScope } from "../../runtime/state";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 
+function scopedRuntimePage(page: XmluiElement): XmluiElement {
+  return {
+    ...page,
+    type: "Fragment",
+    props: {},
+    globals: {},
+    events: {},
+    methods: {},
+    children: page.children,
+    parsed: page.parsed?.vars ? { vars: page.parsed.vars } : undefined,
+  };
+}
+
 export const pagesRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: PagesMd as ComponentMetadata,
@@ -186,7 +199,7 @@ export const pagesRuntimeRenderer = wrapRuntimeComponent({
           data-xmlui-page-url={matched.url}
         >
           {adapter.context.renderChildren(
-            matched.page.children,
+            [scopedRuntimePage(matched.page)],
             createRuntimeScope({
               store: adapter.scope.store,
               parent: adapter.scope,

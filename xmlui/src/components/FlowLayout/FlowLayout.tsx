@@ -220,6 +220,40 @@ export const flowLayoutRenderer = wrapRuntimeComponent({
       resolveCssSize(adapter.stringProp("itemWidth")) ??
       resolveCssSize(adapter.stringProp("itemWidth", defaultProps.itemWidth));
     const children = nonPropertyChildren(adapter.node.children);
+    const flowLayoutContext = {
+      type: "FlowLayout",
+      ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+      wrapChild: (
+        { node }: { node: XmluiElement },
+        renderedChild: React.ReactNode,
+      ) => {
+        if (isOpaqueComponent(node.type) || isNonVisualComponent(node.type)) {
+          return renderedChild;
+        }
+        if (node.type === "SpaceFiller") {
+          return <FlowItemBreak force={true} />;
+        }
+        const childProps = evaluateProps(node.props, node.parsed?.props, adapter.scope);
+        const width = resolveCssSize(childProps.width);
+        const minWidth = resolveCssSize(childProps.minWidth);
+        const maxWidth = resolveCssSize(childProps.maxWidth);
+        const responsiveWidthProps = collectResponsiveWidthProps(
+          childProps,
+          valueAsString,
+        );
+        return (
+          <FlowItemWrapper
+            width={width}
+            minWidth={minWidth}
+            maxWidth={maxWidth}
+            responsiveWidthProps={responsiveWidthProps}
+            forceBreak={node.type === "SpaceFiller"}
+          >
+            {renderedChild}
+          </FlowItemWrapper>
+        );
+      },
+    };
 
     return (
       <ThemedFlowLayout
@@ -241,7 +275,12 @@ export const flowLayoutRenderer = wrapRuntimeComponent({
             return adapter.context.renderChildren([child], adapter.scope, adapter.node.range.end);
           }
           if (isOpaqueComponent(child.type) || isNonVisualComponent(child.type)) {
-            return adapter.context.renderChildren([child], adapter.scope, adapter.node.range.end);
+            return adapter.context.renderChildren(
+              [child],
+              adapter.scope,
+              adapter.node.range.end,
+              flowLayoutContext,
+            );
           }
           const childProps = evaluateProps(child.props, child.parsed?.props, adapter.scope);
           const width = resolveCssSize(childProps.width);
@@ -261,7 +300,9 @@ export const flowLayoutRenderer = wrapRuntimeComponent({
               forceBreak={child.type === "SpaceFiller"}
             >
               {adapter.context.renderChildren(
-                [stripFlowItemLayoutProps(child)],
+                [shouldPreserveLayoutPropsForSingleRootForwarding(adapter, child)
+                  ? child
+                  : stripFlowItemLayoutProps(child)],
                 adapter.scope,
                 adapter.node.range.end,
               )}
@@ -339,4 +380,11 @@ function stripFlowItemLayoutProps(child: XmluiElement): XmluiElement {
     props,
     parsed: child.parsed ? { ...child.parsed, props: parsedProps } : child.parsed,
   };
+}
+
+function shouldPreserveLayoutPropsForSingleRootForwarding(
+  adapter: { context: { components: Record<string, unknown> } },
+  child: XmluiElement,
+): boolean {
+  return Object.prototype.hasOwnProperty.call(adapter.context.components, child.type);
 }

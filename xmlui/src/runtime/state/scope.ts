@@ -122,6 +122,7 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     readGlobal: (name) => readGlobal(scope, name),
     readContext: (name) => readContext(scope, name),
     readReference: (name) => readBuiltInReference(scope, name) ?? readReference(scope, name),
+    callFunction: (name, args) => scope?.extensionFunctions[name]?.(...args),
     debug: getXmluiDebugBridge(),
   };
 }
@@ -142,7 +143,6 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
     },
     complete: completeValue,
     navigate: (target, queryParams) => scope.routing?.navigate(target, queryParams),
-    callFunction: (name, args) => scope.extensionFunctions[name]?.(...args),
     yieldIfNeeded: (iteration) => {
       if (iteration % 100 !== 0) {
         return undefined;
@@ -242,15 +242,45 @@ function actionConfirmationMessage(input: Record<string, unknown>): string {
 }
 
 function invalidateActionDataSources(scope: RuntimeScope | undefined, invalidates: unknown): void {
+  if (!scope) {
+    return;
+  }
+  if (invalidates === undefined || invalidates === null || invalidates === "") {
+    for (const api of Object.values(scope.references)) {
+      if (isRefetchableDataSource(api)) {
+        void api.refetch?.();
+      }
+    }
+    return;
+  }
   const names = Array.isArray(invalidates)
     ? invalidates
     : typeof invalidates === "string"
       ? invalidates.split(",").map((name) => name.trim()).filter(Boolean)
       : [];
   for (const name of names) {
-    const api = readReference(scope, String(name)) as { refetch?: () => unknown } | undefined;
+    const text = String(name);
+    const api = readReference(scope, text) as { refetch?: () => unknown } | undefined;
     void api?.refetch?.();
+    for (const candidate of Object.values(scope.references)) {
+      if (isRefetchableDataSource(candidate) && candidate.url === text) {
+        void candidate.refetch?.();
+      }
+    }
   }
+}
+
+function isRefetchableDataSource(value: unknown): value is {
+  __xmluiDataSource?: boolean;
+  url?: unknown;
+  refetch?: () => unknown;
+} {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    (value as { __xmluiDataSource?: unknown }).__xmluiDataSource &&
+    typeof (value as { refetch?: unknown }).refetch === "function",
+  );
 }
 
 function showActionToast(
@@ -347,10 +377,54 @@ function readRouteContext(scope: RuntimeScope, name: string): unknown {
       return snapshot.search;
     case "routeParams":
     case "$routeParams":
-      return {};
+      return undefined;
+    case "linkInfo":
+    case "$linkInfo":
+      return readLinkInfoContext(scope, snapshot.pathname, snapshot.search);
     default:
       return undefined;
   }
+}
+
+function readLinkInfoContext(
+  scope: RuntimeScope | undefined,
+  pathname: string,
+  search: string,
+): unknown {
+  const linkMap = findContextValue(scope, "$linkMap");
+  if (!(linkMap instanceof Map)) {
+    return undefined;
+  }
+  return (
+    linkMap.get(pathname) ??
+    linkMap.get(`${pathname}${search}`) ??
+    [...linkMap.values()].find((node) => {
+      if (!node || typeof node !== "object") {
+        return false;
+      }
+      return normalizeLinkInfoPath((node as { to?: unknown }).to) === pathname;
+    })
+  );
+}
+
+function findContextValue(scope: RuntimeScope | undefined, name: string): unknown {
+  if (!scope) {
+    return undefined;
+  }
+  if (Object.prototype.hasOwnProperty.call(scope.contextValues, name)) {
+    return scope.contextValues[name];
+  }
+  return findContextValue(scope.parent, name);
+}
+
+function normalizeLinkInfoPath(to: unknown): string | undefined {
+  if (typeof to !== "string" || to.length === 0) {
+    return undefined;
+  }
+  if (to.startsWith("#/")) {
+    return to.slice(1);
+  }
+  return to;
 }
 
 function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwnerId | undefined {

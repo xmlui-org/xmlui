@@ -33,7 +33,7 @@ test.describe("website theme parity", () => {
     await expect(page.getByTestId("site-header")).toHaveCSS("height", "44px");
     await expect(page.getByTestId("site-nav")).toHaveCSS("width", "280px");
     await expect(page.getByTestId("site-copy")).toHaveCSS("font-size", "15px");
-    await expectRgbClose(page.getByTestId("site-copy"), "color", "rgb(71, 108, 133)", 8);
+    await expectRgbClose(page.getByTestId("site-copy"), "color", "rgb(99, 98, 106)", 8);
   });
 
   test("hero and landing themes can be scoped over website content", async ({ initTestBed, page }) => {

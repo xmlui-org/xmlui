@@ -70,6 +70,10 @@ export class ManagedFetchService {
     this.adapter = adapter;
   }
 
+  getAdapter(): ManagedFetchAdapter {
+    return this.adapter;
+  }
+
   buildRequest(input: ManagedRequestInput): ManagedRequest {
     const method = normalizeMethod(input.method);
     return {

@@ -653,6 +653,39 @@ test.describe("Theme Variables", () => {
     ]);
   });
 
+  test("keeps default item font weight on hover", async ({ initTestBed, page }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Heading level="h2" value="First Heading" />
+            <Heading level="h2" value="Hover Test" />
+            bottom of the page text
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    await page.getByRole("link", { name: "Hover Test" }).click();
+
+    const firstHeading = page.getByRole("link", { name: "First Heading" });
+    const fontWeightBeforeHover = await firstHeading.evaluate(
+      (el) => getComputedStyle(el).fontWeight,
+    );
+
+    await expect
+      .poll(
+        async () => {
+          await firstHeading.hover().catch(() => {});
+          return firstHeading.evaluate((el) => getComputedStyle(el).fontWeight);
+        },
+        { timeout: 10000 },
+      )
+      .toBe(fontWeightBeforeHover);
+  });
+
   test("applies hover state theme variables", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(

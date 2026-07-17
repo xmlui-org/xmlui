@@ -6,7 +6,7 @@ import { componentTransferModules } from "../../component-core";
 import { builtInComponentContracts } from "../../compiler/contracts";
 import { createRenderContext } from "../../runtime/rendering/renderer";
 import { StyleProvider } from "../../components-core/theming/StyleContext";
-import { LegacyThemeProvider } from "../../components-core/theming/ThemeContext";
+import { XmluiThemeProvider } from "../../components-core/theming/ThemeContext";
 import {
   createRuntimeScope,
   createRuntimeStateStore,
@@ -60,9 +60,9 @@ function renderHeadingWithLevel(level: string) {
 
   return renderToStaticMarkup(
     <StyleProvider>
-      <LegacyThemeProvider>
+      <XmluiThemeProvider>
         <HeadingRenderer context={context} node={heading} scope={scope} />
-      </LegacyThemeProvider>
+      </XmluiThemeProvider>
     </StyleProvider>,
   );
 }

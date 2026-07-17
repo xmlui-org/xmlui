@@ -330,6 +330,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       @include t.paddingVars($themeVars, $variantName);
       @include t.borderVars($themeVars, $variantName);
       @include t.textVars($themeVars, $variantName);
+      color: inherit;
       margin-top: $marginTop-Text-markdown;
       margin-bottom: $marginBottom-Text-markdown;
       margin-inline-start: $marginLeft-Text-markdown;
@@ -373,6 +374,44 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       margin-top: $marginTop-H6-markdown !important;
       margin-bottom: $marginBottom-H6-markdown !important;
       font-size: $fontSize-H6-markdown !important;
+    }
+
+    :global([data-xmlui-component="NestedApp"]) {
+      h1 {
+        margin-top: var(--xmlui-marginTop-H1) !important;
+        margin-bottom: var(--xmlui-marginBottom-H1) !important;
+        font-size: var(--xmlui-fontSize-H1) !important;
+      }
+
+      h2 {
+        margin-top: var(--xmlui-marginTop-H2) !important;
+        margin-bottom: var(--xmlui-marginBottom-H2) !important;
+        font-size: var(--xmlui-fontSize-H2) !important;
+      }
+
+      h3 {
+        margin-top: var(--xmlui-marginTop-H3) !important;
+        margin-bottom: var(--xmlui-marginBottom-H3) !important;
+        font-size: var(--xmlui-fontSize-H3) !important;
+      }
+
+      h4 {
+        margin-top: var(--xmlui-marginTop-H4) !important;
+        margin-bottom: var(--xmlui-marginBottom-H4) !important;
+        font-size: var(--xmlui-fontSize-H4) !important;
+      }
+
+      h5 {
+        margin-top: var(--xmlui-marginTop-H5) !important;
+        margin-bottom: var(--xmlui-marginBottom-H5) !important;
+        font-size: var(--xmlui-fontSize-H5) !important;
+      }
+
+      h6 {
+        margin-top: var(--xmlui-marginTop-H6) !important;
+        margin-bottom: var(--xmlui-marginBottom-H6) !important;
+        font-size: var(--xmlui-fontSize-H6) !important;
+      }
     }
 
     // --- Image

@@ -43,6 +43,36 @@ test.describe("Footer foundation", () => {
     await expect((await createFooterDriver("notSticky")).component).toHaveAttribute("data-sticky", "false");
   });
 
+  test("expression sticky=false makes the app footer slot non-sticky", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme>
+        <App layout="condensed-sticky">
+          <Pages fallbackPath="/">
+            <Page url="/">
+              <Stack height="1200px"><Text>Long content</Text></Stack>
+            </Page>
+          </Pages>
+          <Footer testId="footer" sticky="{false}">Not sticky</Footer>
+        </App>
+      </Theme>
+    `);
+
+    await expect(page.getByTestId("footer")).toHaveAttribute("data-sticky", "false");
+    await expect(page.getByTestId("footer").locator("xpath=..")).toHaveCSS("position", "static");
+  });
+
+  test("runtime padding props apply to the footer content wrapper", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Footer testId="footer" paddingVertical="20px">Padded footer</Footer>
+      </App>
+    `);
+
+    await expect(page.getByTestId("footer")).toHaveCSS("padding-top", "0px");
+    await expect(page.getByTestId("footer").locator("[data-part-id=content]")).toHaveCSS("padding-top", "20px");
+    await expect(page.getByTestId("footer").locator("[data-part-id=content]")).toHaveCSS("padding-bottom", "20px");
+  });
+
   test("applies foundation theme variables", async ({ initTestBed, createFooterDriver }) => {
     await initTestBed(`<App><Footer testId="footer">Themed footer</Footer></App>`, {
       testThemeVars: {

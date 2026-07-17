@@ -274,7 +274,7 @@ function PagesRenderer({ context, node, scope }: Parameters<XmluiBuiltInRenderer
 
   const pageContent = matched
     ? context.renderChildren(
-        matched.page.children,
+        [scopedPageNode(matched.page)],
         createRuntimeScope({
           store: scope.store,
           parent: scope,
@@ -299,6 +299,19 @@ function PagesRenderer({ context, node, scope }: Parameters<XmluiBuiltInRenderer
       {context.renderChildren(restChildren, scope)}
     </>
   );
+}
+
+function scopedPageNode(page: XmluiElement): XmluiElement {
+  return {
+    ...page,
+    type: "Fragment",
+    props: {},
+    globals: {},
+    events: {},
+    methods: {},
+    children: page.children,
+    parsed: page.parsed?.vars ? { vars: page.parsed.vars } : undefined,
+  };
 }
 
 function NavLinkRenderer({ context, node, scope }: Parameters<XmluiBuiltInRenderer>[0]) {

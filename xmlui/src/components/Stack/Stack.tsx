@@ -219,6 +219,15 @@ function createStackRenderer(
       const children = nonPropertyChildren(adapter.node.children);
       const scrollStyle = adapter.stringProp("scrollStyle", defaultProps.scrollStyle);
       const showScrollerFade = adapter.booleanProp("showScrollerFade", defaultProps.showScrollerFade);
+      const onClick = adapter.events.click
+        ? () => void adapter.event("click")()
+        : undefined;
+      const onContextMenu = adapter.events.contextMenu
+        ? () => void adapter.event("contextMenu")()
+        : undefined;
+      const onMount = adapter.events.mounted
+        ? () => void adapter.event("mounted")()
+        : undefined;
       if (children.some((child) => isDockedElement(child))) {
         return renderDockStack({
           adapter,
@@ -227,6 +236,9 @@ function createStackRenderer(
           children,
           scrollStyle,
           showScrollerFade,
+          onClick,
+          onContextMenu,
+          onMount,
         });
       }
       if (actualOrientation === "horizontal" && adapter.booleanProp("wrapContent", false)) {
@@ -263,7 +275,7 @@ function createStackRenderer(
             rowGap={resolvedGap ?? "var(--xmlui-gap-Stack, var(--xmlui-gap-layout, 0px))"}
             itemWidth={resolvedItemWidth}
             verticalAlignment={verticalAlignment || "start"}
-            onContextMenu={() => void adapter.event("contextMenu")()}
+            onContextMenu={onContextMenu}
             registerComponentApi={adapter.registerApi}
           >
             {adapter.context.renderChildren(
@@ -289,9 +301,9 @@ function createStackRenderer(
           desktopOnly={adapter.booleanProp("desktopOnly", defaultProps.desktopOnly)}
           scrollStyle={scrollStyle as any}
           showScrollerFade={showScrollerFade}
-          onClick={() => void adapter.event("click")()}
-          onContextMenu={() => void adapter.event("contextMenu")()}
-          onMount={() => void adapter.event("mounted")()}
+          onClick={onClick}
+          onContextMenu={onContextMenu}
+          onMount={onMount}
           registerComponentApi={adapter.registerApi}
         >
           {renderStackChildren(
@@ -437,6 +449,9 @@ function renderDockStack({
   children,
   scrollStyle,
   showScrollerFade,
+  onClick,
+  onContextMenu,
+  onMount,
 }: {
   adapter: XmluiComponentAdapter;
   attrs: Record<string, unknown>;
@@ -444,6 +459,9 @@ function renderDockStack({
   children: XmluiNode[];
   scrollStyle?: string;
   showScrollerFade: boolean;
+  onClick?: () => void;
+  onContextMenu?: () => void;
+  onMount?: () => void;
 }) {
   const top: XmluiNode[] = [];
   const bottom: XmluiNode[] = [];
@@ -467,9 +485,9 @@ function renderDockStack({
       style={style}
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
-      onClick={() => void adapter.event("click")()}
-      onContextMenu={() => void adapter.event("contextMenu")()}
-      onMount={() => void adapter.event("mounted")()}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      onMount={onMount}
       registerComponentApi={adapter.registerApi}
     >
       {top.map((child, index) => (

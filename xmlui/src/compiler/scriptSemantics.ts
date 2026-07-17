@@ -723,7 +723,7 @@ export function bindScriptExpression(node: ScriptNode, scope: XmluiScope): Bound
       pushUnresolved(name, span);
       return;
     }
-    if (binding.kind === "special") {
+    if (binding.kind === "special" && isCoreSpecialName(name)) {
       return;
     }
     result.dependencies.push({
@@ -1734,6 +1734,15 @@ function isAllowedBuiltInCallName(name: string): boolean {
   return name === "Date" || name === "getDate" || name === "Symbol" || name === "BigInt";
 }
 
+function isCoreSpecialName(name: string): boolean {
+  return name === "$props" ||
+    name === "delay" ||
+    name === "emitEvent" ||
+    name === "navigate" ||
+    name === "NaN" ||
+    name === "Infinity";
+}
+
 function isBuiltInReferenceName(name: string): boolean {
   return name === "App" ||
     name === "Actions" ||
@@ -2180,6 +2189,9 @@ function emitCallExpression(ir: XmluiCallExpressionIr): string {
   }
   if (ir.callee.kind === "IdentifierRead" && isAllowedBuiltInCallName(ir.callee.name)) {
     return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${emitRead(ir.callee.dependency, ir.callee.name)})`;
+  }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "special") {
+    return `ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])`;
   }
   if (
     ir.callee.kind === "IdentifierRead" &&

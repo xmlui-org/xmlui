@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { defaultProps } from "./NavPanel.defaults";
-import { NavPanel, buildNavHierarchy } from "./NavPanelReact";
+import { NavPanel, buildLinkMap, buildNavHierarchy } from "./NavPanelReact";
 import { useMemo } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -29,7 +29,7 @@ type AppNavData = {
   items?: AppNavItem[];
 };
 
-type AppNavSections = Record<string, unknown>;
+export type AppNavSections = Record<string, unknown>;
 const MOBILE_ONLY_WHEN = "{mediaSize.sizeIndex <= 2}";
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -370,18 +370,288 @@ export const navPanelRenderer = wrapComponent(COMP, NavPanel, NavPanelMd, {
 });
 
 import type { ComponentMetadata } from "../../component-core/metadata/types";
-import type { XmluiNode } from "../../compiler/ir";
+import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { useXmluiAppContext } from "../../runtime/appContext";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { evaluateProps } from "../../runtime/rendering/bindings";
+import type { RuntimeScope } from "../../runtime/state";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
 
 const runtimeTemplateNames = new Set(["logoTemplate", "footerTemplate"]);
+
+function runtimeNavElement(
+  type: "NavGroup" | "NavLink",
+  props: Record<string, unknown>,
+  sourceNode: XmluiElement,
+  children: XmluiNode[] = [],
+): XmluiElement {
+  return {
+    kind: "element",
+    type,
+    props: props as Record<string, string>,
+    vars: {},
+    globals: {},
+    events: {},
+    methods: {},
+    children,
+    range: sourceNode.range,
+  };
+}
+
+function toRuntimeNavNode(
+  item: AppNavItem,
+  sourceNode: XmluiElement,
+  uidPrefix: string,
+  idx: number,
+): XmluiElement | undefined {
+  if (Array.isArray(item.children)) {
+    if (!item.label) return undefined;
+    const children = item.children
+      .map((child, childIdx) => toRuntimeNavNode(child, sourceNode, `${uidPrefix}-group-${idx}`, childIdx))
+      .filter(Boolean) as XmluiNode[];
+    return runtimeNavElement(
+      "NavGroup",
+      {
+        label: item.label,
+        to: item.to,
+        icon: item.icon,
+        initiallyExpanded: item.initiallyExpanded,
+        iconAlignment: item.iconAlignment,
+      },
+      sourceNode,
+      children,
+    );
+  }
+
+  if (!item.label || !item.to) return undefined;
+  return runtimeNavElement(
+    "NavLink",
+    {
+      label: item.label,
+      to: item.to,
+      icon: item.icon,
+      target: item.target,
+      active: item.active,
+      noIndicator: item.noIndicator,
+      iconAlignment: item.iconAlignment,
+    },
+    sourceNode,
+  );
+}
+
+function buildRuntimeSectionNavNodes(
+  rawSection: unknown,
+  sourceNode: XmluiElement,
+  uidPrefix: string,
+): XmluiNode[] {
+  const section = normalizeSectionData(rawSection);
+  if (!section) return [];
+  return section.items
+    ?.map((item, idx) => toRuntimeNavNode(item, sourceNode, `${uidPrefix}-main`, idx))
+    .filter(Boolean) as XmluiNode[];
+}
+
+function resolveRuntimeNavSectionNodes(
+  children: XmluiNode[],
+  appNavSections: AppNavSections | undefined,
+  uidPrefix = "nav-section",
+): XmluiNode[] {
+  const resolvedChildren: XmluiNode[] = [];
+
+  children.forEach((child, idx) => {
+    if (child.kind !== "element") {
+      resolvedChildren.push(child);
+      return;
+    }
+
+    if (child.type === "IncludeNavSection") {
+      const sectionId = child.props.sectionId;
+      const sectionData = sectionId && appNavSections ? appNavSections[sectionId] : undefined;
+      resolvedChildren.push(...buildRuntimeSectionNavNodes(sectionData, child, `${uidPrefix}-${sectionId || idx}`));
+      return;
+    }
+
+    if (child.children.length > 0) {
+      resolvedChildren.push({
+        ...child,
+        children: resolveRuntimeNavSectionNodes(child.children, appNavSections, `${uidPrefix}-${idx}`),
+      });
+      return;
+    }
+
+    resolvedChildren.push(child);
+  });
+
+  return resolvedChildren;
+}
+
+export function getRuntimeNavPanelContentNodes(node: XmluiElement): XmluiNode[] {
+  return node.children.filter((child) => !isRuntimeTemplateProperty(child));
+}
+
+export function resolveRuntimeNavPanelContentNodes(
+  children: XmluiNode[],
+  appNavSections: AppNavSections | undefined,
+): XmluiNode[] {
+  return resolveRuntimeNavSectionNodes(children, appNavSections);
+}
+
+export function buildRuntimeNavPanelLinkMap(
+  navPanelNode: XmluiElement | undefined,
+  appNavSections: AppNavSections | undefined,
+  scope: RuntimeScope,
+) {
+  if (!navPanelNode) {
+    return new Map();
+  }
+  const navChildren = resolveRuntimeNavPanelContentNodes(
+    getRuntimeNavPanelContentNodes(navPanelNode),
+    appNavSections,
+  );
+  return buildLinkMap(buildRuntimeNavHierarchy(navChildren, scope));
+}
+
+function buildRuntimeNavHierarchy(
+  children: XmluiNode[] | undefined,
+  scope: RuntimeScope,
+): NavHierarchyNode[] {
+  const hierarchy = buildRuntimeNavHierarchyInner(children, scope);
+  setRuntimeNavigationProperties(hierarchy);
+  return hierarchy;
+}
+
+function buildRuntimeNavHierarchyInner(
+  children: XmluiNode[] | undefined,
+  scope: RuntimeScope,
+  parent?: NavHierarchyNode,
+  pathSegments: NavHierarchyNode[] = [],
+): NavHierarchyNode[] {
+  if (!children) return [];
+
+  const hierarchy: NavHierarchyNode[] = [];
+  children.forEach((child) => {
+    if (child.kind !== "element") return;
+
+    if (child.type === "NavLink") {
+      const props = evaluateProps(child.props as Record<string, string>, child.parsed?.props, scope);
+      const label = optionalString(props.label) ?? textChildLabel(child);
+      const to = optionalString(props.to);
+      const icon = optionalString(props.icon);
+      if (label && to) {
+        hierarchy.push({
+          type: "NavLink",
+          label,
+          to,
+          icon,
+          parent,
+          pathSegments: [...pathSegments],
+        });
+      }
+      return;
+    }
+
+    if (child.type === "NavGroup") {
+      const props = evaluateProps(child.props as Record<string, string>, child.parsed?.props, scope);
+      const label = optionalString(props.label);
+      const to = optionalString(props.to);
+      const icon = optionalString(props.icon);
+      if (label) {
+        const groupNode: NavHierarchyNode = {
+          type: "NavGroup",
+          label,
+          to,
+          icon,
+          parent,
+          pathSegments: [...pathSegments],
+          children: [],
+        };
+        groupNode.children = buildRuntimeNavHierarchyInner(
+          child.children,
+          scope,
+          groupNode,
+          [...pathSegments, groupNode],
+        );
+        hierarchy.push(groupNode);
+      } else if (child.children.length > 0) {
+        hierarchy.push(...buildRuntimeNavHierarchyInner(child.children, scope, parent, pathSegments));
+      }
+      return;
+    }
+
+    if (child.children.length > 0) {
+      hierarchy.push(...buildRuntimeNavHierarchyInner(child.children, scope, parent, pathSegments));
+    }
+  });
+
+  return hierarchy;
+}
+
+function setRuntimeNavigationProperties(hierarchy: NavHierarchyNode[]) {
+  const allNavLinks: NavHierarchyNode[] = [];
+
+  function collectNavLinks(nodes: NavHierarchyNode[]) {
+    nodes.forEach((node) => {
+      if (node.type === "NavLink") {
+        allNavLinks.push(node);
+      }
+      if (node.children) {
+        collectNavLinks(node.children);
+      }
+    });
+  }
+
+  collectNavLinks(hierarchy);
+  allNavLinks.forEach((link, index) => {
+    if (index > 0) {
+      link.prevLink = allNavLinks[index - 1];
+    }
+    if (index < allNavLinks.length - 1) {
+      link.nextLink = allNavLinks[index + 1];
+    }
+  });
+
+  function setFirstLastProperties(nodes: NavHierarchyNode[]) {
+    const navLinks = nodes.filter((node) => node.type === "NavLink");
+    if (navLinks.length > 0) {
+      navLinks[0].firstLink = true;
+      navLinks[navLinks.length - 1].lastLink = true;
+    }
+    nodes.forEach((node) => {
+      if (node.children) {
+        setFirstLastProperties(node.children);
+      }
+    });
+  }
+
+  setFirstLastProperties(hierarchy);
+}
+
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function textChildLabel(node: XmluiElement): string | undefined {
+  if (node.children.length !== 1 || node.children[0].kind !== "text") {
+    return undefined;
+  }
+  const value = node.children[0].value.trim();
+  return value.length > 0 ? value : undefined;
+}
 
 export const navPanelRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: NavPanelMd as ComponentMetadata,
   themeContributors: [AppHeaderMd as ComponentMetadata],
   renderer: ({ adapter }) => {
-    const children = adapter.node.children.filter((child) => !isRuntimeTemplateProperty(child));
+    const appContext = useXmluiAppContext();
+    const children = getRuntimeNavPanelContentNodes(adapter.node);
+    const navChildren = resolveRuntimeNavPanelContentNodes(
+      children,
+      appContext.appGlobals?.navSections as AppNavSections | undefined,
+    );
+    const navLinks = useMemo(() => {
+      return buildRuntimeNavHierarchy(navChildren, adapter.scope);
+    }, [adapter.scope, navChildren]);
     const hasLogoTemplate = hasRuntimeTemplate(adapter.node.children, "logoTemplate");
     const hasFooterTemplate = hasRuntimeTemplate(adapter.node.children, "footerTemplate");
     return (
@@ -403,9 +673,10 @@ export const navPanelRuntimeRenderer = wrapRuntimeComponent({
         syncWithContent={adapter.booleanProp("syncWithContent", defaultProps.syncWithContent)}
         syncScrollBehavior={adapter.stringProp("syncScrollBehavior", defaultProps.syncScrollBehavior) as any}
         syncScrollPosition={adapter.stringProp("syncScrollPosition", defaultProps.syncScrollPosition) as any}
+        navLinks={navLinks}
         classes={{ [COMPONENT_PART_KEY]: adapter.className }}
       >
-        {adapter.context.renderChildren(children, adapter.scope)}
+        {adapter.context.renderChildren(navChildren, adapter.scope)}
       </NavPanel>
     );
   },

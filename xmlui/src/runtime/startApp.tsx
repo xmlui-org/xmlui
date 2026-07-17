@@ -23,9 +23,12 @@ let hmrKey = 0;
 export function startApp(
   runtime: Record<string, unknown>,
   extensions: Extension[] = [],
+  appConfigOverride?: StandaloneAppConfig,
 ): Root {
   const appModule = findAppModule(runtime);
-  const appConfig = findAppConfig(runtime);
+  const appConfig = normalizeAppConfig(
+    appConfigOverride ?? findPreferredRuntimeAppConfig(runtime) ?? findAppConfig(runtime),
+  );
   return renderApp(appModule, extensions, appConfig);
 }
 
@@ -59,6 +62,7 @@ function renderApp(
 }
 
 type StandaloneAppConfig = {
+  name?: string;
   appGlobals?: Record<string, unknown>;
   xmluiConfig?: Record<string, unknown>;
   icons?: Record<string, string>;
@@ -68,7 +72,40 @@ type StandaloneAppConfig = {
   defaultTone?: ThemeTone;
 };
 
+function normalizeAppConfig(appConfig: StandaloneAppConfig | undefined): StandaloneAppConfig | undefined {
+  if (!appConfig) {
+    return undefined;
+  }
+  return {
+    ...appConfig,
+    appGlobals: {
+      ...(appConfig.name ? { name: appConfig.name } : {}),
+      ...(appConfig.appGlobals ?? {}),
+    },
+    xmluiConfig: appConfig.xmluiConfig ? { ...appConfig.xmluiConfig } : undefined,
+    icons: appConfig.icons ? { ...appConfig.icons } : undefined,
+    resources: appConfig.resources ? { ...appConfig.resources } : undefined,
+    themes: appConfig.themes ? appConfig.themes.map((theme) => ({ ...theme })) : undefined,
+  };
+}
+
+function findPreferredRuntimeAppConfig(
+  runtime: Record<string, unknown>,
+): StandaloneAppConfig | undefined {
+  const config = (runtime["/src/config.ts"] as any)?.default;
+  return isStandaloneAppConfig(config) ? config : undefined;
+}
+
 function findAppConfig(runtime: Record<string, unknown>): StandaloneAppConfig | undefined {
+  for (const [path, value] of Object.entries(runtime)) {
+    if (!isPreferredAppConfigPath(path)) {
+      continue;
+    }
+    const config = (value as any)?.default;
+    if (isStandaloneAppConfig(config)) {
+      return config;
+    }
+  }
   for (const value of Object.values(runtime)) {
     const config = (value as any)?.default;
     if (isStandaloneAppConfig(config)) {
@@ -83,6 +120,9 @@ function isStandaloneAppConfig(value: unknown): value is StandaloneAppConfig {
     return false;
   }
   const config = value as StandaloneAppConfig;
+  if (isThemeDefinitionOnly(config)) {
+    return false;
+  }
   return Boolean(
     config.appGlobals ||
       config.xmluiConfig ||
@@ -91,6 +131,35 @@ function isStandaloneAppConfig(value: unknown): value is StandaloneAppConfig {
       config.themes ||
       config.defaultTheme ||
       config.defaultTone,
+  );
+}
+
+function isPreferredAppConfigPath(path: string): boolean {
+  return /(^|\/)src\/config\.(cjs|cts|js|jsx|mjs|mts|ts|tsx)$/.test(path);
+}
+
+function isThemeDefinitionOnly(value: StandaloneAppConfig): boolean {
+  const maybeTheme = value as StandaloneAppConfig & Partial<ThemeDefinition>;
+  if (typeof maybeTheme.id !== "string") {
+    return false;
+  }
+  const hasAppConfigShape = Boolean(
+    value.appGlobals ||
+      value.xmluiConfig ||
+      value.icons ||
+      value.themes ||
+      value.defaultTheme ||
+      value.defaultTone,
+  );
+  if (hasAppConfigShape) {
+    return false;
+  }
+  return Boolean(
+    maybeTheme.themeVars ||
+      maybeTheme.tones ||
+      maybeTheme.extends ||
+      maybeTheme.color ||
+      maybeTheme.resources,
   );
 }
 

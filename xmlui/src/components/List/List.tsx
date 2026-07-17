@@ -1,11 +1,10 @@
-import { memo, useEffect, useMemo, useRef, useState, startTransition } from "react";
+import { memo, useMemo, useRef, startTransition } from "react";
 
 import styles from "./List.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createRuntimeScope, hasLocalName, readLocal, writeLocal } from "../../runtime/state";
 import { nonPropertyChildren, templateChildren, wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { managedFetchService } from "../../runtime/data";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
@@ -742,7 +741,7 @@ export const listRenderer = wrapRuntimeComponent({
     const idKey = adapter.stringProp("idKey", defaultProps.idKey) ?? defaultProps.idKey;
     const explicitItems = adapter.prop("items");
     const data = adapter.prop("data");
-    const { items, loading: remoteDataLoading } = useListItems(explicitItems, data);
+    const items = explicitItems !== undefined ? explicitItems : data;
     const syncWithVar = adapter.stringProp("syncWithVar");
     const rootAttrs = adapter.rootAttrs();
     const hasItemTemplate = Array.isArray(itemTemplate) ? itemTemplate.length > 0 : !!itemTemplate;
@@ -790,7 +789,7 @@ export const listRenderer = wrapRuntimeComponent({
         {...rootAttrs}
         style={{ minHeight: "1px", ...(rootAttrs.style as Record<string, unknown> | undefined) }}
         registerComponentApi={adapter.registerApi}
-        loading={adapter.booleanProp("loading", false) || remoteDataLoading}
+        loading={adapter.booleanProp("loading", false)}
         items={Array.isArray(items) ? items : []}
         limit={adapter.numberProp("limit", 0)}
         groupBy={adapter.prop("groupBy") as any}
@@ -858,54 +857,6 @@ export const listRenderer = wrapRuntimeComponent({
     return listContent;
   },
 });
-
-function useListItems(explicitItems: unknown, data: unknown): { items: unknown; loading: boolean } {
-  const dataUrl = explicitItems === undefined && typeof data === "string" ? data : undefined;
-  const [remoteState, setRemoteState] = useState<{
-    url?: string;
-    items?: unknown;
-    loading: boolean;
-  }>({ loading: false });
-
-  useEffect(() => {
-    if (!dataUrl) {
-      setRemoteState((current) =>
-        current.loading || current.url ? { loading: false } : current,
-      );
-      return;
-    }
-
-    let cancelled = false;
-    setRemoteState({ url: dataUrl, loading: true });
-    const request = managedFetchService.buildRequest({ url: dataUrl });
-    void managedFetchService.load(request).then(
-      (entry) => {
-        if (!cancelled) {
-          setRemoteState({ url: dataUrl, items: entry.value, loading: false });
-        }
-      },
-      () => {
-        if (!cancelled) {
-          setRemoteState({ url: dataUrl, items: undefined, loading: false });
-        }
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [dataUrl]);
-
-  if (explicitItems !== undefined) {
-    return { items: explicitItems, loading: false };
-  }
-  if (dataUrl) {
-    return {
-      items: remoteState.url === dataUrl ? remoteState.items : undefined,
-      loading: remoteState.url === dataUrl && remoteState.loading,
-    };
-  }
-  return { items: data, loading: false };
-}
 
 function arrayValue(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];

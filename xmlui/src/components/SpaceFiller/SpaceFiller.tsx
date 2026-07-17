@@ -8,7 +8,6 @@ import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
-import { COMPONENT_PART_KEY } from "../../styling/layout";
 
 const COMP = "SpaceFiller";
 
@@ -43,13 +42,6 @@ export const spaceFillerComponentRenderer = wrapComponent(COMP, SpaceFiller, Spa
 export const spaceFillerRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: SpaceFillerMd as ComponentMetadata,
-  renderer: ({ adapter }) => {
-    const { style, ...rootAttrs } = adapter.rootAttrs();
-    return (
-      <SpaceFiller
-        {...rootAttrs}
-        classes={{ [COMPONENT_PART_KEY]: adapter.className }}
-      />
-    );
-  },
+  // Match the classic renderer: SpaceFiller is a pure flex spacer and ignores props.
+  renderer: () => <SpaceFiller />,
 });

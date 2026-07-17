@@ -9,6 +9,7 @@ import { ContentSeparator } from "./ContentSeparatorReact";
 import { createMetadata } from "../metadata-helpers";
 import type { ComponentMetadata } from "../../component-core/metadata/types";
 import { wrapComponent as wrapRuntimeComponent } from "../../runtime/rendering/adapter";
+import { resolveThemeReferences } from "../../styling/theme";
 
 const COMP = "ContentSeparator";
 
@@ -86,7 +87,7 @@ export const contentSeparatorRenderer = wrapRuntimeComponent({
   metadata: ContentSeparatorMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const orientation = adapter.stringProp("orientation");
-    const length = adapter.stringProp("length");
+    const length = runtimeSizeProp(adapter.stringProp("length"));
     const hasExplicitLength = length !== undefined ||
       (orientation === "vertical" && adapter.props.height !== undefined) ||
       (orientation === "horizontal" && adapter.props.width !== undefined);
@@ -109,7 +110,7 @@ export const contentSeparatorRenderer = wrapRuntimeComponent({
         {...rootAttrs}
         data-testid={adapter.stringProp("testId", "test-id-component")}
         orientation={orientation}
-        thickness={adapter.stringProp("thickness")}
+        thickness={runtimeSizeProp(adapter.stringProp("thickness"))}
         length={length}
         hasExplicitLength={hasExplicitLength}
         style={{ ...rootStyle, flexShrink: 0 }}
@@ -117,3 +118,7 @@ export const contentSeparatorRenderer = wrapRuntimeComponent({
     );
   },
 });
+
+function runtimeSizeProp(value: string | undefined): string | undefined {
+  return value === undefined ? undefined : String(resolveThemeReferences(value));
+}

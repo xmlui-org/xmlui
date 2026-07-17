@@ -1,6 +1,10 @@
-import { useEffect, useState, type ComponentType, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, type ComponentType, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import type { ThemeTone } from "../../styling";
+import { ManagedFetchError, managedFetchService, type ManagedFetchAdapter, type ManagedRequest } from "../../runtime/data";
+import { StyleInjectionTargetContext } from "../../components-core/theming/StyleContext";
+import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import styles from "./NestedApp.module.scss";
 
 export type NestedAppProps = {
@@ -20,11 +24,14 @@ export type NestedAppProps = {
   testId?: string;
   title?: string;
   withFrame?: boolean;
+  api?: unknown;
 };
 
 export function NestedAppComponent({
   activeTone,
+  activeTheme,
   app,
+  api,
   allowReset = false,
   className,
   components = [],
@@ -105,14 +112,30 @@ export function NestedAppComponent({
       cancelled = true;
     };
   }, [app, components, config]);
+
+  useLayoutEffect(() => {
+    const previousAdapter = managedFetchService.getAdapter();
+    const adapter = createNestedApiAdapter(api, previousAdapter);
+    if (!adapter) {
+      return;
+    }
+    managedFetchService.setAdapter(adapter);
+    return () => {
+      if (managedFetchService.getAdapter() === adapter) {
+        managedFetchService.setAdapter(previousAdapter);
+      }
+    };
+  }, [api]);
   const mergedStyle = {
     ...style,
     ...(height !== undefined ? { height } : null),
   } as CSSProperties;
   const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
   const defaultTone = normalizeThemeTone(activeTone);
+  const resolvedConfig = normalizeNestedConfig(config);
+  const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
   const Root = compiled?.Root;
-  const appView = compiled?.error ? (
+  const runtimeView = compiled?.error ? (
     <pre className={styles.error} data-testid={testId ? `${testId}-error` : undefined}>
       {compiled.error}
     </pre>
@@ -123,8 +146,14 @@ export function NestedAppComponent({
       initialUrl="/"
       isolateRouting
       defaultTone={defaultTone}
+      defaultTheme={defaultTheme}
+      themes={resolvedConfig.themes}
+      resources={resolvedConfig.resources}
+      appGlobals={{ ...resolvedConfig.appGlobals, isNested: true }}
+      applyDocumentThemeVars={false}
     />
   ) : null;
+  const appView = runtimeView ? <NestedAppShadowRoot>{runtimeView}</NestedAppShadowRoot> : null;
   const content = showCode ? (
     <pre className={styles.code} data-testid={testId ? `${testId}-code` : undefined}>
       {String(app ?? "")}
@@ -220,8 +249,267 @@ export const NestedApp = NestedAppComponent;
 export const LazyNestedApp = NestedAppComponent;
 export const IndexAwareNestedApp = NestedAppComponent;
 
+function NestedAppShadowRoot({ children }: { children: ReactNode }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [shadowRoot, setShadowRoot] = useState<ShadowRoot | null>(null);
+
+  useLayoutEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    const root = host.shadowRoot ?? host.attachShadow({ mode: "open" });
+    copyDocumentStylesToShadowRoot(root);
+    setShadowRoot(root);
+  }, []);
+
+  return (
+    <div className={[styles.nestedAppRoot, styles.initialized].join(" ")} ref={hostRef}>
+      {shadowRoot
+        ? createPortal(
+            <StyleInjectionTargetContext.Provider value={shadowRoot}>
+              <TableOfContentsContext.Provider value={null}>
+                {children}
+              </TableOfContentsContext.Provider>
+            </StyleInjectionTargetContext.Provider>,
+            shadowRoot,
+          )
+        : null}
+    </div>
+  );
+}
+
+function copyDocumentStylesToShadowRoot(shadowRoot: ShadowRoot): void {
+  if (typeof document === "undefined") return;
+  if (shadowRoot.querySelector("style[data-nested-app-style-reset]")) return;
+
+  const layerStyle = document.createElement("style");
+  layerStyle.setAttribute("data-nested-app-style-reset", "true");
+  layerStyle.textContent = "@layer reset, base, components, themes, dynamic;";
+  shadowRoot.appendChild(layerStyle);
+
+  const constructedSheets: CSSStyleSheet[] = [];
+  for (const sheet of Array.from(document.styleSheets)) {
+    const owner = sheet.ownerNode;
+    if (owner instanceof Element && owner.hasAttribute("data-style-hash")) {
+      continue;
+    }
+    if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
+      continue;
+    }
+    try {
+      const cssText = Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n");
+      if (!cssText.trim()) {
+        continue;
+      }
+      if ("adoptedStyleSheets" in shadowRoot && "replaceSync" in CSSStyleSheet.prototype) {
+        const constructed = new CSSStyleSheet();
+        constructed.replaceSync(cssText);
+        constructedSheets.push(constructed);
+      } else {
+        const style = document.createElement("style");
+        style.textContent = cssText;
+        shadowRoot.appendChild(style);
+      }
+    } catch {
+      // Cross-origin and transient Vite stylesheets can be unreadable; skip them.
+    }
+  }
+
+  if (constructedSheets.length > 0 && "adoptedStyleSheets" in shadowRoot) {
+    shadowRoot.adoptedStyleSheets = [...shadowRoot.adoptedStyleSheets, ...constructedSheets];
+  }
+}
+
 function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
   return value === "dark" || value === "light" ? value : undefined;
+}
+
+function normalizeNestedConfig(config: unknown): {
+  appGlobals?: Record<string, unknown>;
+  defaultTheme?: string;
+  resources?: Record<string, string>;
+  themes?: Array<any>;
+} {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    return {
+      resources: normalizeNestedResources(undefined),
+    };
+  }
+  const normalized = config as Record<string, unknown>;
+  return {
+    appGlobals: isPlainRecord(normalized.appGlobals)
+      ? normalized.appGlobals
+      : undefined,
+    defaultTheme: typeof normalized.defaultTheme === "string" ? normalized.defaultTheme : undefined,
+    resources: normalizeNestedResources(normalized.resources),
+    themes: Array.isArray(normalized.themes) ? normalized.themes : undefined,
+  };
+}
+
+function normalizeNestedResources(resources: unknown): Record<string, string> {
+  const normalizedResources = isPlainRecord(resources) ? resources : {};
+  return {
+    logo: "",
+    "logo-light": "",
+    "logo-dark": "",
+    ...Object.fromEntries(
+      Object.entries(normalizedResources).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+    ),
+  };
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function createNestedApiAdapter(
+  api: unknown,
+  fallbackAdapter: ManagedFetchAdapter,
+): ManagedFetchAdapter | undefined {
+  const normalizedApi = normalizeNestedApi(api);
+  if (!normalizedApi || !isPlainRecord(normalizedApi.operations)) {
+    return undefined;
+  }
+  const apiUrl = typeof normalizedApi.apiUrl === "string" ? normalizedApi.apiUrl.replace(/\/$/, "") : "";
+  const state: Record<string, unknown> = {};
+  if (typeof normalizedApi.initialize === "string" && normalizedApi.initialize.trim()) {
+    runNestedApiHandler(normalizedApi.initialize, { $state: state });
+  }
+  const operations = Object.values(normalizedApi.operations)
+    .filter(isPlainRecord)
+    .map((operation) => ({
+      url: typeof operation.url === "string" ? operation.url : "",
+      method: typeof operation.method === "string" ? operation.method.toLowerCase() : "get",
+      handler: typeof operation.handler === "string" ? operation.handler : "",
+    }))
+    .filter((operation) => operation.url);
+
+  return async (request, signal) => {
+    if (!isNestedApiRequest(request, apiUrl)) {
+      return fallbackAdapter(request, signal);
+    }
+    const normalizedPath = nestedRequestPath(request, apiUrl);
+    const operation = operations.find((candidate) =>
+      candidate.method === request.method &&
+      matchNestedApiPath(candidate.url, normalizedPath) !== undefined
+    );
+    if (!operation) {
+      throw new ManagedFetchError("Not Found", 404, { message: `No nested API operation for ${request.method.toUpperCase()} ${request.url}` });
+    }
+    const pathParams = matchNestedApiPath(operation.url, normalizedPath) ?? {};
+    try {
+      const data = operation.handler
+        ? runNestedApiHandler(operation.handler, {
+            $state: state,
+            $requestBody: request.body,
+            $pathParams: pathParams,
+            $queryParams: request.queryParams ?? {},
+            $requestHeaders: request.headers,
+          })
+        : { success: true };
+      return { data };
+    } catch (error) {
+      if (isNestedHttpError(error)) {
+        throw new ManagedFetchError("Nested API Error", error.status, error.body);
+      }
+      throw new ManagedFetchError("Internal Server Error", 500, {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  };
+}
+
+function isNestedApiRequest(request: ManagedRequest, apiUrl: string): boolean {
+  if (!apiUrl) {
+    return true;
+  }
+  const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
+  const pathname = new URL(request.url || "/", origin).pathname;
+  return pathname === apiUrl || pathname.startsWith(`${apiUrl}/`);
+}
+
+function normalizeNestedApi(api: unknown): Record<string, unknown> | undefined {
+  if (isPlainRecord(api)) {
+    return api;
+  }
+  if (typeof api !== "string" || !api.trim()) {
+    return undefined;
+  }
+  for (const source of [api, api.replace(/\r?\n/g, " ")]) {
+    try {
+      const parsed = JSON.parse(source);
+      if (isPlainRecord(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // Try the next legacy playground form.
+    }
+  }
+  return undefined;
+}
+
+function nestedRequestPath(request: ManagedRequest, apiUrl: string): string {
+  const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
+  const pathname = new URL(request.url || "/", origin).pathname;
+  return apiUrl && pathname.startsWith(`${apiUrl}/`)
+    ? pathname.slice(apiUrl.length)
+    : pathname;
+}
+
+function matchNestedApiPath(pattern: string, pathname: string): Record<string, string> | undefined {
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = pathname.split("/").filter(Boolean);
+  if (patternParts.length !== pathParts.length) {
+    return undefined;
+  }
+  const params: Record<string, string> = {};
+  for (let index = 0; index < patternParts.length; index++) {
+    const patternPart = patternParts[index];
+    const pathPart = pathParts[index];
+    if (patternPart.startsWith(":")) {
+      params[patternPart.slice(1)] = decodeURIComponent(pathPart);
+    } else if (patternPart !== pathPart) {
+      return undefined;
+    }
+  }
+  return params;
+}
+
+function runNestedApiHandler(source: string, context: Record<string, unknown>): unknown {
+  const trimmed = source.trim();
+  const body = shouldReturnNestedApiExpression(trimmed) ? `return (${source});` : source;
+  return new Function(
+    "$state",
+    "$requestBody",
+    "$pathParams",
+    "$queryParams",
+    "$requestHeaders",
+    "Errors",
+    body,
+  )(
+    context.$state,
+    context.$requestBody,
+    context.$pathParams,
+    context.$queryParams,
+    context.$requestHeaders,
+    {
+      HttpError: (status: number, body: unknown) => {
+        throw { __xmluiHttpError: true, status, body };
+      },
+    },
+  );
+}
+
+function shouldReturnNestedApiExpression(source: string): boolean {
+  return !/[;{}]/.test(source) && !/^(return|if|for|while|switch|const|let|var)\b/.test(source);
+}
+
+function isNestedHttpError(error: unknown): error is {
+  __xmluiHttpError: true;
+  status: number;
+  body: unknown;
+} {
+  return Boolean(error && typeof error === "object" && (error as { __xmluiHttpError?: unknown }).__xmluiHttpError);
 }
 
 function injectConfigGlobals(source: string, config: unknown): string {

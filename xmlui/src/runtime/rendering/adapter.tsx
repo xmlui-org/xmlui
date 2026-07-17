@@ -13,6 +13,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { emitThemeDiagnostics } from "../../components-core/theming/validator/emit";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { managedFetchService } from "../data";
 import {
   COMPONENT_PART_KEY,
   filterPropsForDisabledInlineStyle,
@@ -132,13 +133,14 @@ export function useXmluiComponentAdapter({
       : parsed.dependencies ?? [],
   );
   useBindingRevision(propDependencies, scope);
-  const props = useMemo(
+  const evaluatedProps = useMemo(
     () => ({
       ...evaluateProps(node.props, node.parsed?.props, scope),
       ...extraProps,
     }),
     [extraProps, node.props, node.parsed?.props, scope, scope.store.getSnapshot()],
   );
+  const props = useApiBoundDataProp(evaluatedProps, scope, node);
   const events = useMemo(
     () => Object.fromEntries(Object.keys(node.events).map((eventName) => [
       eventName,
@@ -352,6 +354,173 @@ export function useXmluiComponentAdapter({
 
   return adapter;
 }
+
+function useApiBoundDataProp(
+  props: Record<string, unknown>,
+  scope: RuntimeScope,
+  node: XmluiElement,
+): Record<string, unknown> {
+  const shouldResolveRemoteData = remoteDataComponents.has(node.type);
+  const hasRawData = Object.prototype.hasOwnProperty.call(props, "raw_data");
+  const normalizedRawProps = useMemo(
+    () =>
+      shouldResolveRemoteData && hasRawData
+        ? {
+            ...props,
+            __DATA_RESOLVED: true,
+            data: props.raw_data,
+          }
+        : props,
+    [hasRawData, props, shouldResolveRemoteData],
+  );
+  const referencedDataSource = shouldResolveRemoteData && isDataSourceReference(normalizedRawProps.data)
+    ? normalizedRawProps.data
+    : undefined;
+  const dataUrl =
+    !shouldResolveRemoteData || normalizedRawProps.__DATA_RESOLVED || referencedDataSource
+      ? undefined
+      : typeof normalizedRawProps.data === "string"
+        ? normalizedRawProps.data
+        : undefined;
+  const referenceId = useMemo(
+    () => dataUrl ? `__xmlui_${node.irId}_data`.replace(/[^a-zA-Z0-9_$-]/g, "_") : undefined,
+    [dataUrl, node.irId],
+  );
+  const [remoteState, setRemoteState] = React.useState<{
+    url?: string;
+    value?: unknown;
+    loading: boolean;
+    responseHeaders?: Record<string, string>;
+  }>({ loading: false });
+  const loadRemoteData = useCallback((url: string, force = false) => {
+    setRemoteState((current) => ({
+      url,
+      value: current.url === url ? current.value : undefined,
+      loading: true,
+      responseHeaders: current.url === url ? current.responseHeaders : undefined,
+    }));
+    const request = managedFetchService.buildRequest({ url, method: "get" });
+    return managedFetchService.load(request, { force }).then(
+      (entry) => {
+        setRemoteState({
+          url,
+          value: entry.value,
+          loading: false,
+          responseHeaders: entry.responseHeaders,
+        });
+      },
+      () => {
+        setRemoteState({ url, value: undefined, loading: false });
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!dataUrl) {
+      setRemoteState((current) =>
+        current.url || current.loading ? { loading: false } : current,
+      );
+      return;
+    }
+
+    let cancelled = false;
+    setRemoteState((current) => ({
+      url: dataUrl,
+      value: current.url === dataUrl ? current.value : undefined,
+      loading: true,
+      responseHeaders: current.url === dataUrl ? current.responseHeaders : undefined,
+    }));
+    const request = managedFetchService.buildRequest({ url: dataUrl, method: "get" });
+    void managedFetchService.load(request).then(
+      (entry) => {
+        if (!cancelled) {
+          setRemoteState({
+            url: dataUrl,
+            value: entry.value,
+            loading: false,
+            responseHeaders: entry.responseHeaders,
+          });
+        }
+      },
+      () => {
+        if (!cancelled) {
+          setRemoteState({ url: dataUrl, value: undefined, loading: false });
+        }
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [dataUrl]);
+
+  useEffect(() => {
+    if (!dataUrl || !referenceId) {
+      return;
+    }
+    const api = {
+      __xmluiDataSource: true,
+      url: dataUrl,
+      get value() {
+        return remoteState.url === dataUrl ? remoteState.value : undefined;
+      },
+      get inProgress() {
+        return remoteState.url === dataUrl ? remoteState.loading : true;
+      },
+      get loaded() {
+        return remoteState.url === dataUrl && !remoteState.loading;
+      },
+      refetch: () => loadRemoteData(dataUrl, true),
+    };
+    scope.references[referenceId] = api;
+    return () => {
+      if (scope.references[referenceId] === api) {
+        delete scope.references[referenceId];
+      }
+    };
+  }, [dataUrl, loadRemoteData, referenceId, remoteState, scope.references]);
+
+  return useMemo(() => {
+    if (referencedDataSource) {
+      return {
+        ...normalizedRawProps,
+        __DATA_RESOLVED: true,
+        data: referencedDataSource.value,
+        loading: Boolean(referencedDataSource.inProgress),
+        responseHeaders: referencedDataSource.responseHeaders,
+        pageInfo: referencedDataSource.pageInfo,
+      };
+    }
+    if (!dataUrl) {
+      return normalizedRawProps;
+    }
+    const remoteMatches = remoteState.url === dataUrl;
+    return {
+      ...normalizedRawProps,
+      __DATA_RESOLVED: true,
+      _data_url: dataUrl,
+      data: remoteMatches ? remoteState.value : undefined,
+      loading: remoteMatches ? remoteState.loading : true,
+      responseHeaders: remoteMatches ? remoteState.responseHeaders : undefined,
+    };
+  }, [dataUrl, normalizedRawProps, referencedDataSource, remoteState]);
+}
+
+function isDataSourceReference(value: unknown): value is Record<string, unknown> {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    ("refetch" in value || "loaded" in value || "inProgress" in value) &&
+    "value" in value,
+  );
+}
+
+const remoteDataComponents = new Set([
+  "Items",
+  "List",
+  "Select",
+  "Table",
+  "Tree",
+]);
 
 function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
   const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;

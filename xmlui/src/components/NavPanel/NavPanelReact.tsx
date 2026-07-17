@@ -1,5 +1,6 @@
 import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
+import { useLocation } from "react-router-dom";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_NAV_PANEL_FOOTER } from "../../components-core/parts";
 
@@ -361,6 +362,7 @@ export const NavPanel = memo(forwardRef(function NavPanel(
   const linkInfoContext = useLinkInfoContext();
   const localRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   // True when the current navigation was initiated by a click inside the NavPanel.
   // In that case the user already sees the clicked link, so we skip scrolling.
   const clickedInsideRef = useRef(false);
@@ -389,14 +391,21 @@ export const NavPanel = memo(forwardRef(function NavPanel(
     }
 
     const panel = localRef.current;
-    const innerScroller = scrollerRef.current;
-    const innerOverflowY = innerScroller ? getComputedStyle(innerScroller).overflowY : "";
-    const scrollContainer =
-      innerScroller && /^(auto|scroll|overlay)$/.test(innerOverflowY)
-        ? innerScroller
-        : panel;
+    let scrolled = false;
+    const getScrollContainer = (target: HTMLElement): HTMLElement => {
+      let element: HTMLElement | null = target.parentElement;
+      while (element && element !== panel) {
+        const overflowY = getComputedStyle(element).overflowY;
+        if (element.scrollHeight > element.clientHeight && /^(auto|scroll|overlay)$/.test(overflowY)) {
+          return element;
+        }
+        element = element.parentElement;
+      }
+      return panel;
+    };
     const scrollIntoPanel = (element: Element) => {
       const target = element as HTMLElement;
+      const scrollContainer = getScrollContainer(target);
       const targetRect = target.getBoundingClientRect();
       const containerRect = scrollContainer.getBoundingClientRect();
       let top = scrollContainer.scrollTop;
@@ -443,9 +452,14 @@ export const NavPanel = memo(forwardRef(function NavPanel(
       return true;
     };
 
-    const scheduleSyncScroll = () => {
+    const retryTimers: number[] = [];
+    const scheduleSyncScroll = (attempt = 0) => {
       requestAnimationFrame(() => {
-        findAndScrollToActiveLink();
+        if (scrolled) return;
+        scrolled = findAndScrollToActiveLink();
+        if (!scrolled && attempt < 20) {
+          retryTimers.push(window.setTimeout(() => scheduleSyncScroll(attempt + 1), 50));
+        }
       });
     };
 
@@ -456,32 +470,27 @@ export const NavPanel = memo(forwardRef(function NavPanel(
     // to complete before scrolling to the leaf link.
     const handleTransitionEnd = (e: TransitionEvent) => {
       if (e.propertyName !== "grid-template-rows") return;
+      scrolled = false;
       scheduleSyncScroll();
     };
 
-    const observer = new MutationObserver(scheduleSyncScroll);
-    observer.observe(panel, {
-      attributes: true,
-      attributeFilter: ["class", "aria-hidden"],
-      childList: true,
-      subtree: true,
-    });
-
     panel.addEventListener("transitionend", handleTransitionEnd);
     return () => {
-      observer.disconnect();
+      retryTimers.forEach((timer) => window.clearTimeout(timer));
       panel.removeEventListener("transitionend", handleTransitionEnd);
     };
-  }, [syncWithContent, syncScrollBehavior, syncScrollPosition]);
+  }, [syncWithContent, syncScrollBehavior, syncScrollPosition, location.hash, location.pathname, location.search]);
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const collapsed = !!appLayoutContext?.navPanelCollapsed && vertical;
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
+  const suppressNavPanelLogo = appLayoutContext?.layout === "vertical-full-header";
   const showLogo =
-    !!safeLogoContent ||
-    appLayoutContext?.layout === "vertical" ||
-    appLayoutContext?.layout === "vertical-sticky";
+    !suppressNavPanelLogo &&
+    (!!safeLogoContent ||
+      appLayoutContext?.layout === "vertical" ||
+      appLayoutContext?.layout === "vertical-sticky");
   const hasFooter = !!footerContent;
 
   // Register the linkMap when navLinks change

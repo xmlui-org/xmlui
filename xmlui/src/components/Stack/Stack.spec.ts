@@ -63,6 +63,34 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
   });
 
+  test("does not show a pointer cursor without a click handler", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="outer">
+        <VStack testId="inner">
+          <Markdown>
+            <![CDATA[
+Plain markdown text.
+            ]]>
+          </Markdown>
+        </VStack>
+      </HStack>
+    `);
+
+    await expect(page.getByTestId("outer")).not.toHaveCSS("cursor", "pointer");
+    await expect(page.getByTestId("inner")).not.toHaveCSS("cursor", "pointer");
+    await expect(page.getByText("Plain markdown text.")).not.toHaveCSS("cursor", "pointer");
+  });
+
+  test("shows a pointer cursor with a click handler", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack testId="stack" onClick="testState = 'clicked'">
+        <Text>Clickable stack text</Text>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("stack")).toHaveCSS("cursor", "pointer");
+  });
+
   test("showScrollerFade is true by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Stack testId="stack" height="200px" scrollStyle="overlay">

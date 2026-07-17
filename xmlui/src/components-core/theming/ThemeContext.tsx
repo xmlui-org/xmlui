@@ -1,10 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import type { AppThemes, FontDef, ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import type { ComponentThemeMetadataRegistry } from "../../component-core/themeMetadata";
 import { checkThemeContrast } from "../accessibility/contrast";
 import { pushXsLog } from "../inspector/inspectorUtils";
-import { compileOldThemeModel, type CompiledOldThemeModel } from "./oldThemeCompiler";
+import { compileThemeModel, type CompiledThemeModel } from "./themeCompiler";
 import { emitThemeDiagnostics } from "./validator/emit";
 import {
   XmlUiBlogThemeDefinition,
@@ -22,25 +31,6 @@ import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { useXmluiAppContext } from "../../runtime/appContext";
 
 type ResourceMap = Record<string, string | FontDef>;
-type ShadowThemeVarMismatch = {
-  name: string;
-  emittedValue: string | undefined;
-  shadowValue: string | undefined;
-};
-
-export type OldThemeShadowDiagnostics = {
-  activeThemeId: string;
-  activeThemeTone: ThemeTone;
-  emittedRootVars: Record<string, string>;
-  shadowTheme: CompiledOldThemeModel;
-  mismatches: ShadowThemeVarMismatch[];
-};
-
-declare global {
-  var __XMLUI_ENABLE_OLD_THEME_SHADOW__: boolean | undefined;
-  var __XMLUI_OLD_THEME_SHADOW__: OldThemeShadowDiagnostics | undefined;
-  var __XMLUI_OLD_THEME_CANARY__: CompiledOldThemeModel | undefined;
-}
 
 const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   logo: "/resources/xmlui-logo.svg",
@@ -48,6 +38,10 @@ const DEFAULT_RESOURCE_URLS: Record<string, string> = {
   "logo-dark": "/resources/xmlui-logo-dark.svg",
   favicon: "/resources/favicon.ico",
 };
+
+function fallbackThemeRoot(): HTMLElement {
+  return typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body;
+}
 
 const EMPTY_COMPONENT_THEME_METADATA: Pick<
   ComponentThemeMetadataRegistry,
@@ -73,7 +67,7 @@ export const builtInThemes: Array<ThemeDefinition> = [
 const defaultThemeScope: ThemeScope = {
   activeThemeTone: "light",
   activeThemeId: "xmlui",
-  root: typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body,
+  root: fallbackThemeRoot(),
   setRoot: () => undefined,
   activeTheme: builtInThemes[0],
   themeStyles: {},
@@ -98,7 +92,7 @@ const defaultAppThemes: AppThemes = {
 export const ThemeContext = createContext<ThemeScope>(defaultThemeScope);
 const ThemesContext = createContext<AppThemes>(defaultAppThemes);
 
-export function LegacyThemeProvider({
+export function XmluiThemeProvider({
   resources = {},
   resourceMap = {},
   themes = [],
@@ -107,8 +101,7 @@ export function LegacyThemeProvider({
   componentThemeMetadata = EMPTY_COMPONENT_THEME_METADATA,
   strictTheming = true,
   strictAccessibility = false,
-  enableOldThemeShadowDiagnostics = false,
-  enableOldThemeCanary = false,
+  applyDocumentThemeVars = true,
   children,
 }: {
   resources?: Record<string, string | FontDef>;
@@ -122,12 +115,12 @@ export function LegacyThemeProvider({
   >;
   strictTheming?: boolean;
   strictAccessibility?: boolean;
-  enableOldThemeShadowDiagnostics?: boolean;
-  enableOldThemeCanary?: boolean;
+  applyDocumentThemeVars?: boolean;
   children: ReactNode;
 }) {
   const appContext = useXmluiAppContext();
   const allThemes = useMemo(() => mergeThemes(themes), [themes]);
+  const activeThemeSetExplicitly = useRef(false);
   const [activeThemeId, setActiveThemeIdState] = useState(() =>
     defaultTheme && allThemes.some((theme) => theme.id === defaultTheme) ? defaultTheme : "xmlui",
   );
@@ -142,10 +135,8 @@ export function LegacyThemeProvider({
     [resources],
   );
   const activeTheme = allThemes.find((theme) => theme.id === activeThemeId) ?? allThemes[0];
-  const shouldShadowCompile =
-    enableOldThemeShadowDiagnostics || globalThis.__XMLUI_ENABLE_OLD_THEME_SHADOW__ === true;
-  const oldCompiledTheme = useMemo<CompiledOldThemeModel>(() => {
-    return compileOldThemeModel({
+  const compiledTheme = useMemo<CompiledThemeModel>(() => {
+    return compileThemeModel({
       builtInThemes,
       customThemes: themes,
       activeThemeId: activeTheme.id,
@@ -166,28 +157,19 @@ export function LegacyThemeProvider({
     strictTheming,
     themes,
   ]);
-  const oldThemeShadowDiagnostics = useMemo<OldThemeShadowDiagnostics | undefined>(() => {
-    if (!shouldShadowCompile) {
-      globalThis.__XMLUI_OLD_THEME_SHADOW__ = undefined;
-      return undefined;
-    }
-    const mismatches = compareShadowRootVars(oldCompiledTheme.themeCssVars, oldCompiledTheme.themeCssVars);
-    const diagnostics = {
-      activeThemeId: activeTheme.id,
-      activeThemeTone,
-      emittedRootVars: oldCompiledTheme.themeCssVars,
-      shadowTheme: oldCompiledTheme,
-      mismatches,
-    };
-    globalThis.__XMLUI_OLD_THEME_SHADOW__ = diagnostics;
-    return diagnostics;
-  }, [activeTheme.id, activeThemeTone, oldCompiledTheme, shouldShadowCompile]);
-  const activeThemeStyles = oldCompiledTheme.themeCssVars;
-  const activeThemeVars = oldCompiledTheme.themeVars;
-  const activeGetResourceUrl = oldCompiledTheme.getResourceUrl;
-  const activeGetThemeVar = oldCompiledTheme.getThemeVar;
+  const activeThemeStyles = compiledTheme.themeCssVars;
+  const activeThemeVars = compiledTheme.themeVars;
+  const activeGetResourceUrl = compiledTheme.getResourceUrl;
+  const activeGetThemeVar = compiledTheme.getThemeVar;
   const domRoot = useDomRoot();
   const [root, setRoot] = useState<HTMLElement | null>(null);
+  const themeRoot = root ?? fallbackThemeRoot();
+  const setThemeRoot = useCallback<ThemeScope["setRoot"]>((value) => {
+    setRoot((previousRoot) => {
+      const previousThemeRoot = previousRoot ?? fallbackThemeRoot();
+      return typeof value === "function" ? value(previousThemeRoot) : value;
+    });
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     if (typeof document === "undefined") {
@@ -206,25 +188,19 @@ export function LegacyThemeProvider({
     setRoot(document.body);
   }, [domRoot]);
 
-  if (enableOldThemeCanary) {
-    globalThis.__XMLUI_OLD_THEME_CANARY__ = oldCompiledTheme;
-  } else {
-    globalThis.__XMLUI_OLD_THEME_CANARY__ = undefined;
-  }
-
   useMemo(() => {
     if (strictTheming) {
-      emitThemeDiagnostics(oldCompiledTheme.themeDiagnostics);
+      emitThemeDiagnostics(compiledTheme.themeDiagnostics);
     }
-  }, [oldCompiledTheme.themeDiagnostics, strictTheming]);
+  }, [compiledTheme.themeDiagnostics, strictTheming]);
 
   useMemo(() => {
     if (!strictAccessibility && !import.meta.env.DEV) {
       return;
     }
     const resolvedForContrast = new Map<string, string>();
-    for (const key of Object.keys(oldCompiledTheme.rawAllThemeVars)) {
-      const value = oldCompiledTheme.getThemeVar(key);
+    for (const key of Object.keys(compiledTheme.rawAllThemeVars)) {
+      const value = compiledTheme.getThemeVar(key);
       if (value !== undefined) {
         resolvedForContrast.set(key, value);
       }
@@ -243,14 +219,26 @@ export function LegacyThemeProvider({
         console.error(`[XMLUI Accessibility] ${diagnostic.message}`);
       }
     }
-  }, [oldCompiledTheme, strictAccessibility]);
+  }, [compiledTheme, strictAccessibility]);
 
   useEffect(() => {
-    if (typeof document === "undefined") {
+    if (!applyDocumentThemeVars || typeof document === "undefined") {
       return;
     }
-    return applyThemeCssVarsToRoot(document.documentElement, oldCompiledTheme.themeCssVars);
-  }, [oldCompiledTheme]);
+    return applyThemeCssVarsToRoot(document.documentElement, compiledTheme.themeCssVars);
+  }, [applyDocumentThemeVars, compiledTheme]);
+
+  useEffect(() => {
+    if (
+      activeThemeSetExplicitly.current ||
+      !defaultTheme ||
+      activeThemeId === defaultTheme ||
+      !allThemes.some((theme) => theme.id === defaultTheme)
+    ) {
+      return;
+    }
+    setActiveThemeIdState(defaultTheme);
+  }, [activeThemeId, allThemes, defaultTheme]);
 
   const appThemes = useMemo<AppThemes>(() => ({
     activeThemeTone,
@@ -267,6 +255,7 @@ export function LegacyThemeProvider({
     },
     setActiveThemeId: (themeId: string) => {
       if (themeId && allThemes.some((theme) => theme.id === themeId)) {
+        activeThemeSetExplicitly.current = true;
         setActiveThemeIdState(themeId);
       }
     },
@@ -278,8 +267,8 @@ export function LegacyThemeProvider({
   const themeScope = useMemo<ThemeScope>(() => ({
     activeThemeTone,
     activeThemeId: activeTheme.id,
-    root: root ?? (typeof document === "undefined" ? undefined as unknown as HTMLElement : document.body),
-    setRoot,
+    root: themeRoot,
+    setRoot: setThemeRoot,
     activeTheme,
     themeStyles: activeThemeStyles,
     themeVars: activeThemeVars,
@@ -294,10 +283,9 @@ export function LegacyThemeProvider({
     activeThemeTone,
     activeThemeVars,
     appContext.appGlobals.disableInlineStyle,
-    root,
+    setThemeRoot,
+    themeRoot,
   ]);
-
-  void oldThemeShadowDiagnostics;
 
   return (
     <ThemesContext.Provider value={appThemes}>
@@ -331,24 +319,6 @@ function mergeThemes(themes: Array<ThemeDefinition>): Array<ThemeDefinition> {
   return Array.from(merged.values());
 }
 
-function compareShadowRootVars(
-  emittedRootVars: Record<string, string>,
-  shadowThemeCssVars: Record<string, string>,
-): ShadowThemeVarMismatch[] {
-  const names = new Set([
-    ...Object.keys(emittedRootVars),
-    ...Object.keys(shadowThemeCssVars),
-  ]);
-  return [...names]
-    .filter((name) => emittedRootVars[name] !== shadowThemeCssVars[name])
-    .sort()
-    .map((name) => ({
-      name,
-      emittedValue: emittedRootVars[name],
-      shadowValue: shadowThemeCssVars[name],
-    }));
-}
-
 function getResourceUrl(
   resourceString: string | undefined,
   resources: ResourceMap,
@@ -369,57 +339,6 @@ function getResourceUrl(
     return resource.src;
   }
   return resourceString.startsWith("resource:") ? undefined : resourceString;
-}
-
-function legacyThemeVarFromRuntime(
-  name: string,
-  variables: Record<string, unknown>,
-  seen = new Set<string>(),
-): string | undefined {
-  if (seen.has(name)) {
-    return undefined;
-  }
-  seen.add(name);
-  const value = variables[name];
-  if (value === undefined || value === null || value === "") {
-    return undefined;
-  }
-  return normalizeLegacyThemeLength(resolveLegacyThemeValue(value, variables, seen));
-}
-
-function resolveLegacyThemeValue(
-  value: unknown,
-  variables: Record<string, unknown>,
-  seen: Set<string>,
-): string {
-  if (typeof value !== "string") {
-    return String(value);
-  }
-  if (value.startsWith("$")) {
-    return legacyThemeVarFromRuntime(value.slice(1), variables, seen) ?? value;
-  }
-  return value.replace(/var\(--xmlui-([A-Za-z][A-Za-z0-9_-]*)\)/g, (match, name: string) =>
-    legacyThemeVarFromRuntime(name, variables, seen) ?? match,
-  );
-}
-
-function legacyThemeVarFromDocument(name: string): string | undefined {
-  if (typeof document === "undefined") {
-    return undefined;
-  }
-  const cssVar = `--xmlui-${name}`;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
-  return value ? normalizeLegacyThemeLength(value) : undefined;
-}
-
-function normalizeLegacyThemeLength(value: string): string {
-  const calcMatch = value.match(
-    /^\s*calc\(\s*(-?\d+(?:\.\d+)?)\s*\*\s*(-?\d+(?:\.\d+)?)(px|rem|em)\s*\)\s*$/,
-  );
-  if (!calcMatch) {
-    return value;
-  }
-  return `${Number(calcMatch[1]) * Number(calcMatch[2])}${calcMatch[3]}`;
 }
 
 export function applyThemeCssVarsToRoot(

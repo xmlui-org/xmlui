@@ -90,10 +90,9 @@ function deriveLinkInfoFromNavDom(): NavHierarchyNode | undefined {
   if (!link || !label) {
     if (document.body.textContent?.includes("Learn XMLUI") && document.body.textContent?.includes("Intro content")) {
       return {
-        type: "NavLink",
         label: "Introduction",
         to: "/intro",
-        pathSegments: [{ type: "NavGroup", label: "Learn XMLUI" }],
+        pathSegments: [{ label: "Learn XMLUI" }],
       };
     }
     return undefined;
@@ -105,9 +104,8 @@ function deriveLinkInfoFromNavDom(): NavHierarchyNode | undefined {
   const rawGroupLabel = groups.at(-1)?.textContent?.trim();
   const groupLabel = rawGroupLabel?.includes("Learn XMLUI") ? "Learn XMLUI" : rawGroupLabel;
   return {
-    type: "NavLink",
     label,
     to: (link.getAttribute("href") ?? "").replace(/^#/, ""),
-    pathSegments: groupLabel ? [{ type: "NavGroup", label: groupLabel }] : [],
+    pathSegments: groupLabel ? [{ label: groupLabel }] : [],
   };
 }

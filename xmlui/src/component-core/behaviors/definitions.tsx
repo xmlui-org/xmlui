@@ -600,8 +600,15 @@ function annotateTooltipTrigger(
     ...propsWithoutRef,
     "data-xmlui-behavior": "tooltip",
     title: typeof window === "undefined" ? title : undefined,
+    style: isTooltipLinkTrigger(children)
+      ? { ...(propsWithoutRef.style as CSSProperties | undefined), display: "contents" }
+      : propsWithoutRef.style,
   };
   return <span {...behaviorProps}>{children}</span>;
+}
+
+function isTooltipLinkTrigger(children: ReactNode): boolean {
+  return isValidElement(children) && children.props?.["data-xmlui-component"] === "Link";
 }
 
 function stringValue(value: unknown): string | undefined {

@@ -47,6 +47,7 @@ export function ExtensionComponentInstance({
         node,
         scope,
         context,
+        layoutContext,
       })}
     </>
   );

@@ -1,6 +1,40 @@
 import { test, expect } from "../../testing/fixtures";
 import { getBounds } from "../../testing/component-test-helpers";
 
+test("Page script locals are available to matched route children", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `
+    <App>
+      <Pages>
+        <Page url="/">
+          <Button label="Open App docs" onClick="navigate('/docs/reference/components/App')" />
+        </Page>
+        <Page url="/docs/reference/components/:compId">
+          <script>
+            var contentKey = "reference/components/" + $routeParams.compId;
+            var content = appGlobals.docsContent[contentKey];
+          </script>
+          <Text testId="content" when="{content}">{content}</Text>
+          <Text testId="missing" when="{!content}">Missing</Text>
+        </Page>
+      </Pages>
+    </App>
+  `,
+    {
+      appGlobals: {
+        docsContent: {
+          "reference/components/App": "App component docs",
+        },
+      },
+    },
+  );
+
+  await page.getByRole("button", { name: "Open App docs" }).click();
+
+  await expect(page.getByTestId("content")).toHaveText("App component docs");
+  await expect(page.getByTestId("missing")).toBeHidden();
+});
+
 test.describe("Theme Variables", () => {
   test("paddingHorizontal-layout controls the default horizontal Pages padding", async ({
     page,

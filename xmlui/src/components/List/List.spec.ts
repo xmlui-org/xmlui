@@ -38,6 +38,35 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toContainText("Banana");
   });
 
+  test("renders URL data through the shared data property loader", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    await initTestBed(
+      `
+      <List data="/api/users">
+        <Text>{$item.username}</Text>
+      </List>
+    `,
+      {
+        apiInterceptor: {
+          initialize: "$state.users = [{ id: 1, username: 'Coder Gal' }, { id: 2, username: 'Tech Ninja' }]",
+          operations: {
+            "get-users": {
+              url: "/api/users",
+              method: "get",
+              handler: "return $state.users",
+            },
+          },
+        },
+      },
+    );
+
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Coder Gal");
+    await expect(driver.component).toContainText("Tech Ninja");
+  });
+
   test("renders array of primitives correctly", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`
       <List data="{['Apple', 'Banana', 'Cherry']}">

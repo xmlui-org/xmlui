@@ -64,6 +64,83 @@ test.describe("CodeText", () => {
       await expect(page.locator("pre")).toContainText("return 1;");
     });
 
+    test("code fence textContent preserves leading indentation", async ({
+      initTestBed,
+      page,
+    }) => {
+      const src = codefence("<App>\n  <Button>Save</Button>\n</App>", "xmlui");
+      await initTestBed(`<Markdown><![CDATA[${src}]]></Markdown>`);
+      const codeText = await page.locator("pre > code").evaluate((el) => el.textContent);
+      expect(codeText).toContain("\n  <Button>Save</Button>");
+    });
+
+    test("runtime codeHighlighter prop highlights XMLUI code fences", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Markdown />`);
+      await page.evaluate(() => {
+        (window as any).__xmluiCodeHighlighter = {
+          availableLangs: ["xmlui"],
+          highlight(code: string, language: string) {
+            const escaped = code
+              .replaceAll("&", "&amp;")
+              .replaceAll("<", "&lt;")
+              .replaceAll(">", "&gt;");
+            return `<pre class="shiki"><code><span class="line"><span data-language="${language}">${escaped}</span></span></code></pre>`;
+          },
+        };
+      });
+
+      const src = codefence("<App />", "xmlui");
+      await initTestBed(`<Markdown><![CDATA[${src}]]></Markdown>`);
+
+      await expect(page.locator("pre > code > span.line")).toBeVisible();
+      await expect(page.locator("pre > code > span.line span")).toHaveAttribute(
+        "data-language",
+        "xmlui",
+      );
+      await expect(page.locator("pre > code")).toContainText("<App />");
+
+      await page.evaluate(() => {
+        delete (window as any).__xmluiCodeHighlighter;
+      });
+    });
+
+    test("runtime codeHighlighter prop highlights displayed XMLUI playground code", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`<Markdown />`);
+      await page.evaluate(() => {
+        (window as any).__xmluiCodeHighlighter = {
+          availableLangs: ["xmlui", "xmlui-pg"],
+          highlight(code: string, language: string) {
+            const escaped = code
+              .replaceAll("&", "&amp;")
+              .replaceAll("<", "&lt;")
+              .replaceAll(">", "&gt;");
+            return `<pre class="shiki"><code><span class="line"><span data-language="${language}">${escaped}</span></span></code></pre>`;
+          },
+        };
+      });
+
+      const src = codefence("<Button>Hello</Button>", "xmlui-pg display");
+      await initTestBed(`<Markdown><![CDATA[${src}]]></Markdown>`);
+
+      const firstHighlightedLine = page.locator("pre > code > span.line").first();
+      await expect(firstHighlightedLine).toBeVisible();
+      await expect(firstHighlightedLine.locator("span").first()).toHaveAttribute(
+        "data-language",
+        "xmlui",
+      );
+      await expect(page.locator("pre > code").first()).toContainText("<Button>Hello</Button>");
+
+      await page.evaluate(() => {
+        delete (window as any).__xmluiCodeHighlighter;
+      });
+    });
+
     test("inline code does not produce a pre element", async ({ initTestBed, page }) => {
       // Inline `code` in Markdown renders as a bare <code> inside a <p>, not via CodeText
       await initTestBed(`<Markdown><![CDATA[Use \`myVar\` here.]]></Markdown>`);

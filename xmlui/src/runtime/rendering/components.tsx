@@ -7,6 +7,8 @@ import { evaluateExpressionOrText, evaluateProps, normalizeDependencies, runEven
 import type { RenderContext, RuntimeRenderLayoutContext } from "./types";
 import { useBindingRevision } from "./reactive";
 import type { XmluiElement, XmluiNode } from "../../compiler/ir";
+import { supportedLayoutPropNames } from "../../styling";
+import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 
 export type RenderFragment = {
   children: XmluiNode[];
@@ -220,6 +222,14 @@ export function ComponentInstance({
         : context,
     [component.components, context],
   );
+  const childLayoutContext = useMemo(
+    () => stripDirectChildProps(layoutContext as any) as RuntimeRenderLayoutContext | undefined,
+    [layoutContext],
+  );
+  const renderedRootChildren = useMemo(
+    () => forwardSingleRootLayoutProps(component.root.children, props),
+    [component.root.children, props],
+  );
 
   useEffect(() => {
     const id = typeof props.id === "string" ? props.id : undefined;
@@ -234,7 +244,34 @@ export function ComponentInstance({
     };
   }, [api, props.id, scope.references]);
 
-  return <>{componentContext.renderChildren(component.root.children, componentScope, undefined, layoutContext)}</>;
+  return <>{componentContext.renderChildren(renderedRootChildren, componentScope, undefined, childLayoutContext)}</>;
+}
+
+const layoutPropNames = new Set([
+  ...supportedLayoutPropNames,
+]);
+
+function forwardSingleRootLayoutProps(
+  children: XmluiNode[],
+  props: Record<string, unknown>,
+): XmluiNode[] {
+  if (children.length !== 1 || children[0].kind !== "element") {
+    return children;
+  }
+  const forwardedProps = Object.fromEntries(
+    Object.entries(props).filter(([name]) => layoutPropNames.has(name as never)),
+  );
+  if (Object.keys(forwardedProps).length === 0) {
+    return children;
+  }
+  const [root] = children;
+  return [{
+    ...root,
+    props: {
+      ...forwardedProps,
+      ...root.props,
+    },
+  }];
 }
 
 function createSlots(node: XmluiElement, scope: RuntimeScope): Record<string, RenderFragment> {

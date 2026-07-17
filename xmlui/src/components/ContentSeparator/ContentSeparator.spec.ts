@@ -172,6 +172,18 @@ test.describe("Visual States & Themes", () => {
     const height = await driver.getComputedHeight();
     expect(height).toBe("10px");
   });
+
+  test("vertical length prop accepts theme variables", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack verticalAlignment="center">
+        <Text>Before</Text>
+        <ContentSeparator testId="separator" length="$space-3_5" orientation="vertical" />
+        <Text>After</Text>
+      </HStack>
+    `);
+
+    await expect(page.getByTestId("separator")).toHaveCSS("height", "14px");
+  });
 });
 
 // =============================================================================

@@ -1,5 +1,7 @@
 import { test, expect } from "../../testing/fixtures";
 
+const spaceFillerLocator = (page: any) => page.locator('div[class*="_spacer_"]');
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -7,7 +9,7 @@ import { test, expect } from "../../testing/fixtures";
 test.describe("Basic Functionality", () => {
   test("renders without props", async ({ initTestBed, page }) => {
     await initTestBed(`<SpaceFiller/>`);
-    const spaceFiller = page.getByTestId("test-id-component");
+    const spaceFiller = spaceFillerLocator(page).first();
     
     // SpaceFiller exists in DOM but may not be "visible" due to zero dimensions
     await expect(spaceFiller).toBeAttached();
@@ -26,7 +28,7 @@ test.describe("Basic Functionality", () => {
     
     const redBox = page.getByTestId("red-box");
     const blueBox = page.getByTestId("blue-box");
-    const spaceFiller = page.getByTestId("spacer");
+    const spaceFiller = spaceFillerLocator(page).first();
     
     await expect(spaceFiller).toBeAttached();
     await expect(redBox).toBeVisible();
@@ -48,7 +50,7 @@ test.describe("Basic Functionality", () => {
     
     const redBox = page.getByTestId("red-box");
     const blueBox = page.getByTestId("blue-box");
-    const spaceFiller = page.getByTestId("spacer");
+    const spaceFiller = spaceFillerLocator(page).first();
     
     await expect(spaceFiller).toBeAttached();
     await expect(redBox).toBeVisible();
@@ -111,8 +113,9 @@ test.describe("Basic Functionality", () => {
     const redBox = page.getByTestId("red-box");
     const greenBox = page.getByTestId("green-box");
     const blueBox = page.getByTestId("blue-box");
-    const spaceFiller1 = page.getByTestId("spacer1");
-    const spaceFiller2 = page.getByTestId("spacer2");
+    const spaceFillers = spaceFillerLocator(page);
+    const spaceFiller1 = spaceFillers.nth(0);
+    const spaceFiller2 = spaceFillers.nth(1);
     
     await expect(spaceFiller1).toBeVisible();
     await expect(spaceFiller2).toBeVisible();
@@ -132,7 +135,7 @@ test.describe("Basic Functionality", () => {
       </HStack>
     `);
     
-    const spaceFiller = page.getByTestId("spacer");
+    const spaceFiller = spaceFillerLocator(page).first();
     await expect(spaceFiller).toBeAttached();
     
     // SpaceFiller should not apply any styling properties
@@ -166,8 +169,9 @@ test.describe("Other Edge Cases", () => {
       </VStack>
     `);
     
-    const spaceFiller1 = page.getByTestId("spacer1");
-    const spaceFiller2 = page.getByTestId("spacer2");
+    const spaceFillers = spaceFillerLocator(page);
+    const spaceFiller1 = spaceFillers.nth(0);
+    const spaceFiller2 = spaceFillers.nth(1);
     
     await expect(spaceFiller1).toBeAttached();
     await expect(spaceFiller2).toBeAttached();
@@ -184,7 +188,7 @@ test.describe("Other Edge Cases", () => {
       </HStack>
     `);
     
-    const spaceFiller = page.getByTestId("spacer");
+    const spaceFiller = spaceFillerLocator(page).first();
     await expect(spaceFiller).toBeAttached();
     await expect(spaceFiller).toHaveCSS("flex", "1 1 0px");
     await expect(spaceFiller).toHaveCSS("place-self", "stretch");
@@ -199,7 +203,7 @@ test.describe("Other Edge Cases", () => {
       </HStack>
     `);
     
-    const spaceFiller = page.getByTestId("spacer");
+    const spaceFiller = spaceFillerLocator(page).first();
     await expect(spaceFiller).toBeAttached();
     
     // SpaceFiller should maintain its flex properties regardless of parent alignment

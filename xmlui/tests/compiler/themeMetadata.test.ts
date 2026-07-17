@@ -33,7 +33,7 @@ const representativeComponents: Array<[string, ComponentMetadata]> = [
 ];
 
 describe("component theme metadata registry", () => {
-  it("reconnects representative component metadata to the old theme registry contract", () => {
+  it("reconnects representative component metadata to the theme registry contract", () => {
     const registry = createCoreComponentThemeMetadataRegistry();
 
     for (const [name, metadata] of representativeComponents) {

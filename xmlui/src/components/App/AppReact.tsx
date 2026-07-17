@@ -263,7 +263,7 @@ export const App = memo(function App({
   // Set navigation event handlers
   useEffect(() => {
     if (setNavigationHandlers) {
-      setNavigationHandlers(onWillNavigate, onDidNavigate);
+      setNavigationHandlers({ onWillNavigate, onDidNavigate });
     }
   }, [onWillNavigate, onDidNavigate, setNavigationHandlers]);
 
@@ -500,7 +500,7 @@ export const App = memo(function App({
     };
   }, [forceRefreshAnchorScroll]);
 
-  const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
+  const [subNavPanelSlot, setSubNavPanelSlot] = useState<HTMLElement | null>(null);
 
   const registerSubNavPanelSlot = useCallback((element: HTMLElement | null) => {
     setSubNavPanelSlot(element);
@@ -562,6 +562,7 @@ export const App = memo(function App({
 
   const tableOfContentsEnabled = getThemeVar("tableOfContents") !== "false";
   const isBlogPageWithToc =
+    !appGlobals?.isNested &&
     tableOfContentsEnabled &&
     (location.pathname === "/" ||
       location.pathname === "/blog" ||
@@ -591,7 +592,7 @@ export const App = memo(function App({
           config.headerClasses,
         )}
       >
-        {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
+        {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && renderChild && (
           <AppContextAwareAppHeader renderChild={renderChild} className={appHeaderThemeClass} />
         )}
         {header}

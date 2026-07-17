@@ -28,6 +28,7 @@ $size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-#{$component}");
 @layer components {
   .header {
     position: relative;
+    flex-shrink: 0;
     height: $height-AppHeader;
     box-sizing: content-box;
     background-color: $backgroundColor-AppHeader;

@@ -4,7 +4,7 @@ import type { XmluiElement } from "../compiler/ir";
 import type { XmluiComponentContract } from "../compiler/contracts";
 import type { ComponentMetadata, DefaultThemeVars } from "../component-core/metadata";
 import type { RuntimeScope } from "../runtime/state";
-import type { RenderContext } from "../runtime/rendering/types";
+import type { RenderContext, RuntimeRenderLayoutContext } from "../runtime/rendering/types";
 
 export type XmluiExtensionComponentProps = {
   props: Record<string, unknown>;
@@ -13,6 +13,7 @@ export type XmluiExtensionComponentProps = {
   node: XmluiElement;
   scope: RuntimeScope;
   context: RenderContext;
+  layoutContext?: RuntimeRenderLayoutContext;
 };
 
 export type XmluiExtensionComponent = (props: XmluiExtensionComponentProps) => ReactNode;

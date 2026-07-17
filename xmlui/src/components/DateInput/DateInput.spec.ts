@@ -1428,16 +1428,15 @@ test.describe("Behaviors and Parts", () => {
     await expect(component).toHaveCSS("border-color", "rgb(255, 0, 0)");
   });
 
-  test("old compiler canary applies root DateInput custom variant variables", async ({
+  test("theme compiler applies root DateInput custom variant variables", async ({
     page,
     initTestBed,
   }) => {
     await initTestBed(`<DateInput testId="test" variant="CustomVariant" />`, {
-      oldThemeCanary: true,
-      defaultTheme: "dateinput-root-canary",
+      defaultTheme: "dateinput-root-provider",
       themes: [
         {
-          id: "dateinput-root-canary",
+          id: "dateinput-root-provider",
           extends: "xmlui",
           themeVars: {
             "borderColor-DateInput-CustomVariant": "rgb(255, 0, 0)",

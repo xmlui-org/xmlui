@@ -51,6 +51,21 @@ $gap-content-App: createThemeVar("gap-content-App");
     isolation: isolate;
     scroll-padding-block: $scrollPaddingBlockPage;
 
+    &:not(.verticalFullHeader) {
+      > .footerWrapper > div {
+        width: 100%;
+        max-width: var(--xmlui-maxWidth-content, 1280px);
+        margin-inline: auto;
+      }
+    }
+
+    :global(.xmlui-Pages) {
+      display: flex !important;
+      flex-direction: column;
+      width: 100%;
+      max-width: var(--xmlui-maxWidth-content, 1280px);
+      margin-inline: auto;
+    }
 
     &.vertical {
       flex-direction: row;
@@ -72,6 +87,7 @@ $gap-content-App: createThemeVar("gap-content-App");
         width: $width-navPanel-App;
         flex-shrink: 0;
         border-right: $borderRight-navPanelWrapper-App;
+        min-height: 100%;
 
         &.navPanelWrapperCollapsed {
           width: $width-navPanel-collapsed-App;
@@ -87,6 +103,7 @@ $gap-content-App: createThemeVar("gap-content-App");
 
     &.horizontal {
       overflow: auto;
+      overflow-x: hidden;
       .footerWrapper {
         position: static;
       }
@@ -279,6 +296,13 @@ $gap-content-App: createThemeVar("gap-content-App");
 
     &.scrollWholePage {
       scrollbar-gutter: stable both-edges;
+
+      &:global(.nested-app) {
+        .pagesContainer,
+        .pageContentContainer {
+          min-height: 0;
+        }
+      }
 
       .headerWrapper {
         margin-inline: calc(-1 * var(--scrollbar-width));

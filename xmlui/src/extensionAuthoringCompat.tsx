@@ -3,17 +3,17 @@ import React, { type ComponentType, type CSSProperties, type ReactNode } from "r
 import { createMetadata, type ComponentMetadata } from "./component-core/metadata";
 import type { ComponentExtension, XmluiExtensionComponentProps } from "./extensions";
 import type { XmluiElement, XmluiNode } from "./compiler/ir";
-import { Button } from "./components/Button/ButtonReact";
-import { Icon } from "./components/Icon/IconReact";
-import { LinkNative } from "./components/Link/LinkReact";
-import { Text } from "./components/Text/TextReact";
-import { TextBox } from "./components/TextBox/TextBoxReact";
-import { Heading } from "./components/Heading/HeadingReact";
-import { Image } from "./components/Image/ImageReact";
+import { ThemedButton as Button } from "./components/Button/Button";
+import { ThemedIcon as Icon } from "./components/Icon/Icon";
+import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
+import { ThemedText as Text } from "./components/Text/Text";
+import { ThemedTextBox as TextBox } from "./components/TextBox/TextBox";
+import { ThemedHeading as Heading } from "./components/Heading/Heading";
+import { ThemedImage as Image } from "./components/Image/Image";
 import { TableOfContents } from "./components/TableOfContents/TableOfContentsReact";
-import { Tabs as TabsComponent } from "./components/Tabs/TabsReact";
-import { TabItemComponent } from "./components/Tabs/TabItemReact";
-import { FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayoutReact";
+import { ThemedTabs as TabsComponent } from "./components/Tabs/Tabs";
+import { ThemedTabItem as TabItemComponent } from "./components/Tabs/TabItem";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
 import { useLinkInfo as useRuntimeLinkInfo, useLinkInfoContext } from "./components/App/LinkInfoContext";
 import { useFormContext } from "./components/Form/FormContext";
 import { useXmluiAppContext } from "./runtime/appContext";
@@ -22,6 +22,7 @@ import { useComponentThemeClass as useOldComponentThemeClass } from "./component
 import { useLayoutStyle } from "./runtime/rendering/props";
 import { createRuntimeScope } from "./runtime/state";
 import { COMPONENT_PART_KEY } from "./styling/layout";
+import { isLayoutPropName } from "./styling/contracts";
 import { dClick, dComponent, dGotFocus, dLostFocus } from "./component-core/metadata/helpers";
 import { useInspectMode } from "./components-core/InspectorContext";
 import { compileXmluiSource, throwFirstCompilerDiagnostic } from "./compiler/compileXmluiSource";
@@ -231,7 +232,7 @@ export function wrapComponent(
         themeClass.style,
       );
       const componentProps = {
-        ...withoutKeys(normalizedProps, ["data-testid", "aria-label"]),
+        ...withoutLayoutProps(withoutKeys(normalizedProps, ["data-testid", "aria-label"])),
         ...registerApiProp,
         ...nativeEventProp,
         classes: { [COMPONENT_PART_KEY]: themeClass.className },
@@ -441,38 +442,64 @@ export function createUserDefinedComponentRenderer(
   metadata: ComponentMetadata,
   componentSource: string,
 ): ComponentExtension {
-  const compiledComponent = compileUserDefinedComponent(componentSource);
   return {
-    name: compiledComponent?.name ?? extractUserComponentName(componentSource) ?? "UserDefinedComponent",
+    name: extractUserComponentName(componentSource) ?? "UserDefinedComponent",
     description: metadata.description,
     props: Object.keys(metadata.props ?? {}),
     events: Object.keys(metadata.events ?? {}),
     allowsChildren: true,
     component: (runtimeProps) => (
-      compiledComponent ? (
-        <ComponentInstance
-          component={compiledComponent}
-          context={runtimeProps.context}
-          node={runtimeProps.node}
-          scope={runtimeProps.scope}
-        />
-      ) : (
-        <UserDefinedComponentFallback
-          metadata={metadata}
-          source={componentSource}
-          runtimeProps={runtimeProps}
-        />
-      )
+      <UserDefinedExtensionComponent
+        metadata={metadata}
+        source={componentSource}
+        runtimeProps={runtimeProps}
+      />
     ),
   };
 }
 
-function compileUserDefinedComponent(componentSource: string): XmluiComponentModule | undefined {
+function UserDefinedExtensionComponent({
+  metadata,
+  source,
+  runtimeProps,
+}: {
+  metadata: ComponentMetadata;
+  source: string;
+  runtimeProps: XmluiExtensionComponentProps;
+}) {
+  const extensionFunctionKey = Object.keys(runtimeProps.scope.extensionFunctions).sort().join("\n");
+  const compiledComponent = React.useMemo(
+    () => compileUserDefinedComponent(source, Object.keys(runtimeProps.scope.extensionFunctions)),
+    [extensionFunctionKey, source, runtimeProps.scope.extensionFunctions],
+  );
+
+  return compiledComponent ? (
+    <ComponentInstance
+      component={compiledComponent}
+      context={runtimeProps.context}
+      node={runtimeProps.node}
+      scope={runtimeProps.scope}
+      layoutContext={runtimeProps.layoutContext}
+    />
+  ) : (
+    <UserDefinedComponentFallback
+      metadata={metadata}
+      source={source}
+      runtimeProps={runtimeProps}
+    />
+  );
+}
+
+function compileUserDefinedComponent(
+  componentSource: string,
+  extensionFunctions: Iterable<string> = [],
+): XmluiComponentModule | undefined {
   try {
     const normalizedSource = normalizeUserDefinedComponentSource(componentSource);
     const compiled = compileXmluiSource({
       id: `extension-component:${extractUserComponentName(componentSource) ?? "UserDefinedComponent"}.xmlui`,
       source: normalizedSource,
+      extensionFunctions,
       validateComponentReferences: false,
     });
     throwFirstCompilerDiagnostic(compiled);
@@ -1007,6 +1034,16 @@ function withoutKeys<T extends Record<string, unknown>>(props: T, keys: string[]
   const result = { ...props };
   for (const key of keys) {
     delete result[key];
+  }
+  return result;
+}
+
+function withoutLayoutProps<T extends Record<string, unknown>>(props: T): Record<string, unknown> {
+  const result = { ...props };
+  for (const key of Object.keys(result)) {
+    if (isLayoutPropName(key)) {
+      delete result[key];
+    }
   }
   return result;
 }

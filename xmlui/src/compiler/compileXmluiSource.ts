@@ -13,6 +13,7 @@ export type CompileXmluiSourceOptions = {
   source: string;
   knownComponents?: Iterable<string>;
   extensionComponents?: Iterable<XmluiComponentContract>;
+  extensionFunctions?: Iterable<string>;
   extensions?: Iterable<Extension>;
   validateComponentReferences?: boolean;
 };
@@ -29,6 +30,7 @@ export function compileXmluiSource({
   source,
   knownComponents = [],
   extensionComponents = [],
+  extensionFunctions = [],
   extensions = [],
   validateComponentReferences = true,
 }: CompileXmluiSourceOptions): CompiledXmluiSource {
@@ -39,7 +41,10 @@ export function compileXmluiSource({
   ];
   const document = parseXmlui(source, {
     sourceId: id,
-    extensionFunctions: normalizedExtensions.functionNames,
+    extensionFunctions: [
+      ...normalizedExtensions.functionNames,
+      ...extensionFunctions,
+    ],
   });
   const userComponents = new Set(knownComponents);
   for (const contract of allExtensionContracts) {

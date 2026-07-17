@@ -130,7 +130,9 @@ export const appHeaderRuntimeRenderer = wrapRuntimeComponent({
         profileMenu={
           profileTemplate
             ? adapter.renderTemplate("profileMenuTemplate")
-            : <ProfileMenu loggedInUser={loggedInUser as any} />
+            : loggedInUser
+              ? <ProfileMenu loggedInUser={loggedInUser as any} />
+              : undefined
         }
         classes={{ [COMPONENT_PART_KEY]: adapter.className }}
         renderChild={(child: any) => child ? adapter.context.renderElement(child, adapter.scope) : undefined}

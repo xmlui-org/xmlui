@@ -52,7 +52,7 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
       data-xmlui-page-url={matched.url}
     >
       {context.renderChildren(
-        matched.page.children,
+        [scopedPageNode(matched.page)],
         createRuntimeScope({
           store: scope.store,
           parent: scope,
@@ -79,6 +79,19 @@ export const pagesRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) =>
     </>
   );
 };
+
+function scopedPageNode(page: XmluiElement): XmluiElement {
+  return {
+    ...page,
+    type: "Fragment",
+    props: {},
+    globals: {},
+    events: {},
+    methods: {},
+    children: page.children,
+    parsed: page.parsed?.vars ? { vars: page.parsed.vars } : undefined,
+  };
+}
 
 export const pageRenderer: XmluiBuiltInRenderer = ({ context, node, scope }) => (
   <PageRoot>

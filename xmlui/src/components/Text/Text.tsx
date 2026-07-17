@@ -321,7 +321,11 @@ export const textRenderer = wrapRuntimeComponent({
       textStyle.flexShrink = textStyle.flexShrink ?? 1;
     }
 
-    const children = valueText || adapter.renderChildren();
+    const children = valueText ?? adapter.context.renderChildren(
+      textChildrenWithBoundarySpaces(adapter.node.children),
+      adapter.scope,
+      adapter.node.range.end,
+    );
     const childText = valueText === undefined
       ? textFromXmluiChildren(adapter.node.children, adapter.scope)
       : undefined;
@@ -331,7 +335,7 @@ export const textRenderer = wrapRuntimeComponent({
 
     return (
       <>
-        <Text
+        <ThemedText
         {...rootAttrs}
         variant={textVariant}
         maxLines={maxLines}
@@ -355,7 +359,7 @@ export const textRenderer = wrapRuntimeComponent({
         {...variantSpecificProps}
       >
           {children}
-        </Text>
+        </ThemedText>
         {liveRegionMessage !== undefined
           ? (
             <span
@@ -445,6 +449,31 @@ function textFromXmluiChildren(children: XmluiNode[], scope: RuntimeScope): stri
     .map((child) => renderMixedText(child.segments, child.value, scope))
     .join("");
   return text === "" ? undefined : text;
+}
+
+function textChildrenWithBoundarySpaces(children: XmluiNode[]): XmluiNode[] {
+  const result: XmluiNode[] = [];
+  children.forEach((child) => {
+    const previous = result[result.length - 1];
+    if (
+      previous?.kind === "element" &&
+      child.kind === "element" &&
+      previous.range.end < child.range.start
+    ) {
+      result.push({
+        kind: "text",
+        value: " ",
+        range: { start: previous.range.end, end: child.range.start },
+        segments: [{
+          kind: "literal",
+          value: " ",
+          range: { start: previous.range.end, end: child.range.start },
+        }],
+      });
+    }
+    result.push(child);
+  });
+  return result;
 }
 
 function textFromReactNode(node: React.ReactNode): string | undefined {

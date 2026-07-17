@@ -204,7 +204,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
    */
   .selectTrigger {
     outline: none;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     height: max-content;
     display: flex;

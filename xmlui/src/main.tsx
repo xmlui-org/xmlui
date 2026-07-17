@@ -451,9 +451,6 @@ if (params.has("__xmluiTestBed")) {
     return undefined;
   };
 
-  const readTestBedOldThemeCanary = (): boolean =>
-    window.sessionStorage.getItem("__xmluiTestBedOldThemeCanary") === "true";
-
   const readTestBedExtensions = async (): Promise<Extension[]> => {
     const raw = window.sessionStorage.getItem("__xmluiTestBedExtensionIds");
     if (!raw) {
@@ -510,7 +507,6 @@ if (params.has("__xmluiTestBed")) {
     const defaultTone = readTestBedDefaultTone();
     const strictTheming = readOptionalBoolean("__xmluiTestBedStrictTheming");
     const strictAccessibility = readOptionalBoolean("__xmluiTestBedStrictAccessibility");
-    const enableOldThemeCanary = readTestBedOldThemeCanary();
     const testProbe: MountXmluiAppOptions["testProbe"] = (probe) => {
       window.__xmluiTestBedProbe = probe;
     };
@@ -526,7 +522,6 @@ if (params.has("__xmluiTestBed")) {
         defaultTone,
         strictTheming,
         strictAccessibility,
-        enableOldThemeCanary,
         testProbe,
       });
       return;
@@ -544,7 +539,6 @@ if (params.has("__xmluiTestBed")) {
       defaultTone,
       strictTheming,
       strictAccessibility,
-      enableOldThemeCanary,
       testProbe,
     }));
   };
