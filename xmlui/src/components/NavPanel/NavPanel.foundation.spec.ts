@@ -38,6 +38,26 @@ test.describe("NavPanel foundation", () => {
     await expect(panel.getFooter()).toContainText("Footer area");
   });
 
+  test("does not render logo template in vertical full header layout", async ({
+    initTestBed,
+    createNavPanelDriver,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical-full-header">
+        <NavPanel testId="panel">
+          <property name="logoTemplate">
+            <Text>Logo area</Text>
+          </property>
+          <NavLink to="/">Home</NavLink>
+        </NavPanel>
+      </App>
+    `);
+
+    const panel = await createNavPanelDriver("panel");
+    await expect(panel.getLogo()).toHaveCount(0);
+    await expect(panel.getContent().getByText("Home")).toBeVisible();
+  });
+
   test("NavLink inside NavPanel navigates and mutates state", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App var.message="{'idle'}">

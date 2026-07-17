@@ -8,11 +8,12 @@ import { createMetadata, dComponent } from "../metadata-helpers";
 import { appLayoutMd, type AppLayoutType } from "../App/AppLayoutContext";
 import { defaultProps } from "./App.defaults";
 import { App as AppComponent } from "./AppReact";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { RendererContext } from "../../abstractions/RendererDefs";
+import { buildRuntimeNavPanelLinkMap, type AppNavSections } from "../NavPanel/NavPanel";
 
 const COMP = "App";
 
@@ -470,6 +471,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
 import { FooterMd } from "../Footer/Footer";
 import { PagesMd } from "../Pages/Pages";
+import { useXmluiAppContext } from "../../runtime/appContext";
 
 export const appRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
@@ -477,6 +479,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
   themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
   layoutOrientation: "vertical",
   renderer: ({ adapter }) => {
+    const appContext = useXmluiAppContext();
     const extracted = extractRuntimeAppComponents(adapter.node.children);
     const { appHeader, footer, pages, restChildren } = extracted;
     const navPanel = extracted.navPanel ??
@@ -504,6 +507,15 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
         bundles: adapter.prop("localeBundles"),
       });
     }
+    const linkMap = useMemo(
+      () => buildRuntimeNavPanelLinkMap(
+        navPanel,
+        appContext.appGlobals?.navSections as AppNavSections | undefined,
+        adapter.scope,
+      ),
+      [adapter.scope, appContext.appGlobals?.navSections, navPanel],
+    );
+    adapter.scope.contextValues.$linkMap = linkMap;
 
     const renderChild = (
       child?: XmluiNode | XmluiNode[],

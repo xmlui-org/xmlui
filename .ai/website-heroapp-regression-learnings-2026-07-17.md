@@ -168,3 +168,186 @@ Useful regression tests:
 Live Chrome verification after the fix measured the reactive sample combobox at
 about `741.82px`, matching the available content width inside its padded nested
 app page container, rather than the selected label's intrinsic width.
+
+## Docs Page Markdown And NavPanel Regression
+
+On `/docs`, the rendered markdown paragraph text in the main content panel
+turned black in the rewrite while the old site used the website text color
+`rgb(99, 98, 106)`. Live DOM showed the markdown wrapper already had the right
+color; the paragraph rendered through `Text variant="paragraph"` overrode it.
+The compatibility fix was localized to `Markdown.module.scss`: markdown
+paragraph text should inherit the markdown content color.
+
+The docs nav top spacing regression was not caused by padding. The website app
+uses `layout="vertical-full-header"` and supplies a `NavPanel` `logoTemplate`,
+but the old runtime only rendered the NavPanel logo for `vertical` and
+`vertical-sticky` layouts. The rewrite rendered any available logo content,
+creating one AppHeader-height of empty-looking space above the nav items. Keep
+`NavPanel` logo rendering limited to the old `vertical` and `vertical-sticky`
+layouts.
+
+Live Chrome measurements after the fix:
+
+- First docs nav item `Learn XMLUI`: old `y=59.91`, new `y=59.91`.
+- First markdown paragraph color: old `rgb(99, 98, 106)`, new
+  `rgb(99, 98, 106)`.
+
+## Docs Reference IncludeNavSection Regression
+
+On `/docs`, the `Reference` `NavGroup` should include generated sections from:
+
+- `<IncludeNavSection sectionId="components" />`
+- `<IncludeNavSection sectionId="extensions" />`
+
+The old DOM under the `Reference` group contains `Components` followed by the
+component entries, and later `Extensions` followed by extension entries. The
+rewrite initially rendered only the literal children after the placeholders
+(`Themes`, etc.) because the active renderer path registered
+`IncludeNavSection` as a null component.
+
+Important implementation detail:
+
+- The active rewrite renderer is `navPanelRuntimeRenderer` in
+  `xmlui/src/components/NavPanel/NavPanel.tsx`, imported by
+  `component-core/runtimeRegistry.ts`.
+- `xmlui/src/components/NavPanel/NavPanel.renderer.tsx` and the legacy
+  `navPanelRenderer`/`ComponentProvider` compatibility path are not the path
+  used by the website runtime here.
+
+Compatibility fix:
+
+- Expand `IncludeNavSection` nodes inside `navPanelRuntimeRenderer` before
+  calling `adapter.context.renderChildren`.
+- Use `appGlobals.navSections[sectionId]` and convert its JSON items into
+  runtime `NavGroup`/`NavLink` nodes.
+
+Live Chrome verification after the fix:
+
+- Old and new `Reference` group DOM both contain `Components`.
+- Old and new `Reference` group DOM both contain `Extensions`.
+- In both old and new, `Components` starts at index `10` and `Extensions`
+  starts at index `1011` within the normalized `Reference` group text.
+
+## Docs Component Reference 404 Regression
+
+The docs component pages use a parameterized route:
+
+- `Page url="/docs/reference/components/:compId"`
+
+The page-local `<script>` block derives `contentKey` from
+`$routeParams.compId`, then reads `appGlobals.docsContent[contentKey]`. In the
+runtime renderer, `<script>` declarations are stored as local variables on the
+`Page` element itself. Rendering only `matched.page.children` skips those local
+variables, so `content` stays undefined and the docs page redirects to `/404`.
+
+Compatibility fix:
+
+- Runtime `Pages` rendering must preserve the matched `Page` element's local
+  scope before rendering its children. A scoped synthetic `Fragment` carrying
+  the matched page's `vars`/`parsed.vars` is enough and avoids adding wrapper
+  DOM.
+- `readRouteContext` must not synthesize `{}` for `$routeParams` before parent
+  context lookup. Otherwise nested local scopes cannot inherit route params
+  supplied by the matched page route scope.
+
+Useful regression test:
+
+- A `Page url="/docs/reference/components/:compId"` whose script derives
+  `content` from `$routeParams.compId` and `appGlobals.docsContent` should make
+  that page-local `content` visible to child `when` expressions and text.
+
+## NestedApp Host Separation Regression
+
+Old XMLUI playground/nested apps render the live nested app into an open shadow
+root. The frame/header controls stay in the host document, but the nested XMLUI
+runtime, its component DOM, and injected dynamic styles live behind that
+boundary. This prevents host layout/theme rules from leaking into the nested
+app and prevents nested app layout rules from becoming part of the host DOM.
+
+The rewrite initially rendered `XmluiRoot` directly in the host DOM. On docs
+pages such as `/docs/reference/components/App`, layout examples like
+`Example: 'horizontal' layout` then showed serious separation problems:
+host-page sizing and nested app layout interacted, and the host DOM contained
+the nested `App` tree inline.
+
+Compatibility fix:
+
+- Restore an open shadow-root host inside `NestedApp` for the live runtime view.
+- Copy readable document stylesheets into the shadow root, preserving the
+  XMLUI layer declaration.
+- Wrap the nested `XmluiRoot` with `StyleInjectionTargetContext.Provider` so
+  runtime-generated dynamic styles are injected into the shadow root instead of
+  `document.head`.
+- Keep the frame shell and code view in the host DOM; only the live app view
+  needs the shadow boundary.
+
+Useful verification:
+
+- Live DOM should show one shadow host per rendered `NestedApp`.
+- `NestedApp` light DOM should not contain inline
+  `[data-xmlui-component="App"]` descendants.
+- Playwright locators can pierce open shadow roots, but manual
+  `element.querySelector(...)` in tests cannot. Tests that inspect nested app
+  internals from host elements should explicitly traverse `shadowRoot`.
+
+Follow-up TOC isolation issue:
+
+- React context crosses portals even when DOM is isolated by an open shadow
+  root. Without an explicit context reset, nested `Heading` components can
+  still see the host `TableOfContentsProvider` and register nested headings in
+  the host docs TOC.
+- `NestedApp` must wrap the portal content with
+  `TableOfContentsContext.Provider value={null}` to match the old separate
+  React-root behavior.
+- Live verification on `/docs/reference/components/App` should show nested
+  headings such as `Horizontal Splitter Example` absent from
+  `nav[aria-label="Table of Contents"]`.
+
+## TableOfContents Hover Font Weight Regression
+
+Old `TableOfContents` declares hover font-weight theme variables, but the
+default value for `fontWeight-TableOfContentsItem--hover` is `null`/unset. The
+new metadata briefly added a default of `$fontWeight-bold`, which made hovered
+TOC items look heavier on the website.
+
+Compatibility fix:
+
+- Keep the hover font-weight theme variable declared so explicit theme
+  overrides still work.
+- Do not add `fontWeight-TableOfContentsItem--hover` to
+  `TableOfContentsMd.defaultThemeVars`.
+- Regression coverage should verify both paths: default hover keeps the
+  pre-hover computed font weight, and an explicit
+  `fontWeight-TableOfContentsItem--hover` override still applies.
+
+Verification caution:
+
+- The docs left navigation can look like a TOC during DOM queries. When
+  checking this regression, target the actual `TableOfContents` rendered by the
+  page or a focused component test, not arbitrary `nav`/anchor fallbacks.
+
+## NavGroup Group-Level Route Regression
+
+Old XMLUI supports `NavGroup` entries with their own `to` target. In the docs
+site, `Guides` uses `to="/docs/guides"` and the matching page route renders
+`<Overview />`, which dynamically shows cards for the nested guide pages. There
+is no hidden special-case card rendering in the old NavGroup; the important
+behavior is that clicking the group header both toggles the group and navigates
+through XMLUI routing.
+
+Compatibility fix:
+
+- Runtime `NavGroup` must use `scope.routing.navigate(to)` for internal group
+  targets, just like runtime `NavLink` does.
+- A browser-only URL change is insufficient: `Pages` subscribes to XMLUI's
+  runtime routing store, so relying on the default React Router link path can
+  leave the old page content mounted while the address bar changes.
+- Preserve the existing mobile behavior: NavGroup headers toggle only on mobile
+  and do not navigate.
+
+Useful verification:
+
+- Reproduce the website flow: open `/docs`, click `Reactive Data`, then click
+  `Guides`. The URL should become `/docs/guides`, the `Reactive data binding`
+  content should disappear, and the guide overview cards such as `App
+  Structure`, `Markup`, and `Scripting` should be present.

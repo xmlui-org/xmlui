@@ -1,5 +1,6 @@
 import styles from "./NavGroup.module.scss";
 import navLinkStyles from "../NavLink/NavLink.module.scss";
+import { useSyncExternalStore } from "react";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -147,12 +148,22 @@ export const navGroupRuntimeRenderer = wrapRuntimeComponent({
   metadata: NavGroupMd as ComponentMetadata,
   renderer: ({ adapter }) => {
     const iconName = adapter.stringProp("icon");
+    const to = adapter.stringProp("to");
+    const routing = adapter.scope.routing;
+    const routeSnapshot = useSyncExternalStore(
+      (listener) => routing?.subscribe(listener) ?? (() => undefined),
+      () => routing?.getSnapshot(),
+      () => routing?.getSnapshot(),
+    );
+    const activeRouteKey = routeSnapshot
+      ? `${routeSnapshot.pathname}${routeSnapshot.search}${routeSnapshot.hash}:${routeSnapshot.revision}`
+      : undefined;
     return (
       <NavGroup
         {...adapter.rootAttrs()}
         label={adapter.stringProp("label", "") ?? ""}
         disabled={!adapter.booleanProp("enabled", true)}
-        to={adapter.stringProp("to")}
+        to={to}
         icon={iconName ? <ThemedIcon name={iconName} className={navLinkStyles.icon} /> : undefined}
         node={adapter.node as any}
         initiallyExpanded={adapter.booleanProp("initiallyExpanded", false)}
@@ -170,8 +181,20 @@ export const navGroupRuntimeRenderer = wrapRuntimeComponent({
         iconVerticalCollapsed={adapter.stringProp("iconVerticalCollapsed")}
         iconAlignment={adapter.stringProp("iconAlignment", defaultProps.iconAlignment) as any}
         expandIconAlignment={adapter.stringProp("expandIconAlignment") as any}
+        activeRouteKey={activeRouteKey}
+        onNavigate={
+          to && routing && !isRuntimeExternalUrl(to)
+            ? () => {
+                routing.navigate(to);
+              }
+            : undefined
+        }
         classes={{ [COMPONENT_PART_KEY]: adapter.className }}
       />
     );
   },
 });
+
+function isRuntimeExternalUrl(to: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(to);
+}

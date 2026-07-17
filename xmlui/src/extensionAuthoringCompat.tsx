@@ -442,38 +442,64 @@ export function createUserDefinedComponentRenderer(
   metadata: ComponentMetadata,
   componentSource: string,
 ): ComponentExtension {
-  const compiledComponent = compileUserDefinedComponent(componentSource);
   return {
-    name: compiledComponent?.name ?? extractUserComponentName(componentSource) ?? "UserDefinedComponent",
+    name: extractUserComponentName(componentSource) ?? "UserDefinedComponent",
     description: metadata.description,
     props: Object.keys(metadata.props ?? {}),
     events: Object.keys(metadata.events ?? {}),
     allowsChildren: true,
     component: (runtimeProps) => (
-      compiledComponent ? (
-        <ComponentInstance
-          component={compiledComponent}
-          context={runtimeProps.context}
-          node={runtimeProps.node}
-          scope={runtimeProps.scope}
-        />
-      ) : (
-        <UserDefinedComponentFallback
-          metadata={metadata}
-          source={componentSource}
-          runtimeProps={runtimeProps}
-        />
-      )
+      <UserDefinedExtensionComponent
+        metadata={metadata}
+        source={componentSource}
+        runtimeProps={runtimeProps}
+      />
     ),
   };
 }
 
-function compileUserDefinedComponent(componentSource: string): XmluiComponentModule | undefined {
+function UserDefinedExtensionComponent({
+  metadata,
+  source,
+  runtimeProps,
+}: {
+  metadata: ComponentMetadata;
+  source: string;
+  runtimeProps: XmluiExtensionComponentProps;
+}) {
+  const extensionFunctionKey = Object.keys(runtimeProps.scope.extensionFunctions).sort().join("\n");
+  const compiledComponent = React.useMemo(
+    () => compileUserDefinedComponent(source, Object.keys(runtimeProps.scope.extensionFunctions)),
+    [extensionFunctionKey, source, runtimeProps.scope.extensionFunctions],
+  );
+
+  return compiledComponent ? (
+    <ComponentInstance
+      component={compiledComponent}
+      context={runtimeProps.context}
+      node={runtimeProps.node}
+      scope={runtimeProps.scope}
+      layoutContext={runtimeProps.layoutContext}
+    />
+  ) : (
+    <UserDefinedComponentFallback
+      metadata={metadata}
+      source={source}
+      runtimeProps={runtimeProps}
+    />
+  );
+}
+
+function compileUserDefinedComponent(
+  componentSource: string,
+  extensionFunctions: Iterable<string> = [],
+): XmluiComponentModule | undefined {
   try {
     const normalizedSource = normalizeUserDefinedComponentSource(componentSource);
     const compiled = compileXmluiSource({
       id: `extension-component:${extractUserComponentName(componentSource) ?? "UserDefinedComponent"}.xmlui`,
       source: normalizedSource,
+      extensionFunctions,
       validateComponentReferences: false,
     });
     throwFirstCompilerDiagnostic(compiled);

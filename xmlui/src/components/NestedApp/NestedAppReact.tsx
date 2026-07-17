@@ -1,7 +1,10 @@
-import { useEffect, useLayoutEffect, useState, type ComponentType, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, type ComponentType, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import type { ThemeTone } from "../../styling";
 import { ManagedFetchError, managedFetchService, type ManagedFetchAdapter, type ManagedRequest } from "../../runtime/data";
+import { StyleInjectionTargetContext } from "../../components-core/theming/StyleContext";
+import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import styles from "./NestedApp.module.scss";
 
 export type NestedAppProps = {
@@ -132,7 +135,7 @@ export function NestedAppComponent({
   const resolvedConfig = normalizeNestedConfig(config);
   const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
   const Root = compiled?.Root;
-  const appView = compiled?.error ? (
+  const runtimeView = compiled?.error ? (
     <pre className={styles.error} data-testid={testId ? `${testId}-error` : undefined}>
       {compiled.error}
     </pre>
@@ -150,6 +153,7 @@ export function NestedAppComponent({
       applyDocumentThemeVars={false}
     />
   ) : null;
+  const appView = runtimeView ? <NestedAppShadowRoot>{runtimeView}</NestedAppShadowRoot> : null;
   const content = showCode ? (
     <pre className={styles.code} data-testid={testId ? `${testId}-code` : undefined}>
       {String(app ?? "")}
@@ -244,6 +248,77 @@ export function NestedAppComponent({
 export const NestedApp = NestedAppComponent;
 export const LazyNestedApp = NestedAppComponent;
 export const IndexAwareNestedApp = NestedAppComponent;
+
+function NestedAppShadowRoot({ children }: { children: ReactNode }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [shadowRoot, setShadowRoot] = useState<ShadowRoot | null>(null);
+
+  useLayoutEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    const root = host.shadowRoot ?? host.attachShadow({ mode: "open" });
+    copyDocumentStylesToShadowRoot(root);
+    setShadowRoot(root);
+  }, []);
+
+  return (
+    <div className={[styles.nestedAppRoot, styles.initialized].join(" ")} ref={hostRef}>
+      {shadowRoot
+        ? createPortal(
+            <StyleInjectionTargetContext.Provider value={shadowRoot}>
+              <TableOfContentsContext.Provider value={null}>
+                {children}
+              </TableOfContentsContext.Provider>
+            </StyleInjectionTargetContext.Provider>,
+            shadowRoot,
+          )
+        : null}
+    </div>
+  );
+}
+
+function copyDocumentStylesToShadowRoot(shadowRoot: ShadowRoot): void {
+  if (typeof document === "undefined") return;
+  if (shadowRoot.querySelector("style[data-nested-app-style-reset]")) return;
+
+  const layerStyle = document.createElement("style");
+  layerStyle.setAttribute("data-nested-app-style-reset", "true");
+  layerStyle.textContent = "@layer reset, base, components, themes, dynamic;";
+  shadowRoot.appendChild(layerStyle);
+
+  const constructedSheets: CSSStyleSheet[] = [];
+  for (const sheet of Array.from(document.styleSheets)) {
+    const owner = sheet.ownerNode;
+    if (owner instanceof Element && owner.hasAttribute("data-style-hash")) {
+      continue;
+    }
+    if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
+      continue;
+    }
+    try {
+      const cssText = Array.from(sheet.cssRules).map((rule) => rule.cssText).join("\n");
+      if (!cssText.trim()) {
+        continue;
+      }
+      if ("adoptedStyleSheets" in shadowRoot && "replaceSync" in CSSStyleSheet.prototype) {
+        const constructed = new CSSStyleSheet();
+        constructed.replaceSync(cssText);
+        constructedSheets.push(constructed);
+      } else {
+        const style = document.createElement("style");
+        style.textContent = cssText;
+        shadowRoot.appendChild(style);
+      }
+    } catch {
+      // Cross-origin and transient Vite stylesheets can be unreadable; skip them.
+    }
+  }
+
+  if (constructedSheets.length > 0 && "adoptedStyleSheets" in shadowRoot) {
+    shadowRoot.adoptedStyleSheets = [...shadowRoot.adoptedStyleSheets, ...constructedSheets];
+  }
+}
 
 function normalizeThemeTone(value: string | undefined): ThemeTone | undefined {
   return value === "dark" || value === "light" ? value : undefined;

@@ -21,6 +21,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { useLocation } from "react-router-dom";
 
 import styles from "./NavGroup.module.scss";
 import navLinkStyles from "../NavLink/NavLink.module.scss";
@@ -62,6 +63,8 @@ type Props = {
   iconVerticalCollapsed?: string;
   iconAlignment?: "baseline" | "start" | "center" | "end";
   expandIconAlignment?: "start" | "end";
+  activeRouteKey?: string;
+  onNavigate?: () => void | Promise<void>;
 };
 
 import { defaultProps } from "./NavGroup.defaults";
@@ -85,6 +88,8 @@ export const NavGroup = memo(forwardRef(function NavGroup(
     iconVerticalExpanded,
     iconAlignment = "center",
     expandIconAlignment,
+    activeRouteKey,
+    onNavigate,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -151,6 +156,8 @@ export const NavGroup = memo(forwardRef(function NavGroup(
           noIndicator={noIndicator}
           iconAlignment={iconAlignment}
           expandIconAlignment={effectiveExpandIconAlignment}
+          activeRouteKey={activeRouteKey}
+          onNavigate={onNavigate}
         />
       ) : (
         <DropDownNavGroup
@@ -169,6 +176,7 @@ export const NavGroup = memo(forwardRef(function NavGroup(
           noIndicator={noIndicator}
           expandIconAlignment={effectiveExpandIconAlignment}
           iconAlignment={iconAlignment}
+          onNavigate={onNavigate}
         />
       )}
     </NavGroupContext.Provider>
@@ -189,6 +197,8 @@ type ExpandableNavGroupProps = {
   noIndicator?: boolean;
   iconAlignment?: "baseline" | "start" | "center" | "end";
   expandIconAlignment?: "start" | "end";
+  activeRouteKey?: string;
+  onNavigate?: () => void | Promise<void>;
 };
 
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
@@ -206,6 +216,8 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     noIndicator = false,
     iconAlignment = "center",
     expandIconAlignment = "start",
+    activeRouteKey,
+    onNavigate,
     ...rest
   }: ExpandableNavGroupProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -215,14 +227,16 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   const { mediaSize } = useAppContext();
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const groupContentInnerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
   useEffect(() => {
     if (!groupContentInnerRef.current) return;
     const hasActiveNavLink =
       groupContentInnerRef.current.querySelector(".xmlui-navlink-active") !== null;
-    if (hasActiveNavLink && !expanded) {
+    if (hasActiveNavLink) {
       setExpanded(true);
     }
-  });
+  }, [activeRouteKey, location.hash, location.pathname, location.search]);
 
   const toggleStyle = useMemo(() => ({
     ...style,
@@ -233,12 +247,17 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   const handleClick = (e: React.MouseEvent) => {
     const isMobile = mediaSize.sizeIndex <= 2;
 
+    const shouldNavigate = !isMobile && !!to;
+
     // On mobile, NavGroup headers should not act as navigation links at all,
-    // only toggle expand/collapse. On larger screens, we only prevent navigation
-    // when there is no `to` target.
-    if (isMobile || !to) {
+    // only toggle expand/collapse. On larger screens, route through XMLUI's
+    // runtime navigation when provided so Pages and browser location stay in sync.
+    if (!shouldNavigate) {
       e.preventDefault();
       e.stopPropagation();
+    } else if (onNavigate) {
+      e.preventDefault();
+      void onNavigate();
     }
     setExpanded((prev) => {
       const newExpanded = !prev;
@@ -315,6 +334,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     noIndicator = false,
     iconAlignment = "center",
     expandIconAlignment = "start",
+    onNavigate,
     ...rest
   }: {
     style?: CSSProperties;
@@ -330,6 +350,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     noIndicator?: boolean;
     iconAlignment?: "baseline" | "start" | "center" | "end";
     expandIconAlignment?: "start" | "end";
+    onNavigate?: () => void | Promise<void>;
   },
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -422,7 +443,12 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
             ref={ref as ForwardedRef<HTMLAnchorElement>}
             href={to}
             aria-expanded={expanded}
-            onClick={(event) => event.preventDefault()}
+            onClick={(event) => {
+              event.preventDefault();
+              if (onNavigate) {
+                void onNavigate();
+              }
+            }}
             className={classnames(
               navLinkStyles.content,
               navLinkStyles.base,

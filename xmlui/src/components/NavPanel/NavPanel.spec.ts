@@ -124,6 +124,141 @@ test.describe("discover NavGroups and NavLinks", () => {
     const link3 = page.getByRole("menuitem", { name: "link3" });
     await expect(link3).toHaveAttribute("href", /path3/);
   });
+
+  test("IncludeNavSection expands appGlobals nav section items inside NavGroup", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<NavPanel>
+          <NavGroup label="Reference">
+            <IncludeNavSection sectionId="components" />
+            <NavLink to="/themes">Themes</NavLink>
+          </NavGroup>
+        </NavPanel>`,
+      {
+        appGlobals: {
+          navSections: {
+            components: {
+              items: [
+                {
+                  label: "Components",
+                  to: "/components",
+                  children: [
+                    {
+                      label: "App",
+                      to: "/components/App",
+                    },
+                  ],
+                },
+                {
+                  label: "Extensions",
+                  to: "/extensions",
+                },
+              ],
+            },
+          },
+        },
+      },
+    );
+
+    await page.getByRole("button", { name: "Reference" }).click();
+    await expect(page.getByRole("menuitem", { name: "Components" })).toBeVisible();
+    await page.getByRole("menuitem", { name: "Components" }).click();
+    await expect(page.getByRole("menuitem", { name: "App" })).toHaveAttribute(
+      "href",
+      /components\/App$/,
+    );
+    await expect(page.getByRole("menuitem", { name: "Extensions" })).toHaveAttribute(
+      "href",
+      /extensions$/,
+    );
+    await expect(page.getByRole("menuitem", { name: "Themes" })).toHaveAttribute(
+      "href",
+      /themes$/,
+    );
+  });
+
+  test("NavGroup with to registers linkInfo for its group route", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <Stack gap="0">
+            <NavLink label="Reactive Data" to="/docs/reactive-intro" />
+            <NavGroup testId="guides" label="Guides" to="/docs/guides">
+              <NavLink label="App Structure" to="/docs/guides/app-structure" />
+            </NavGroup>
+          </Stack>
+        </NavPanel>
+        <Pages fallbackPath="/docs/reactive-intro">
+          <Page url="/docs/reactive-intro">
+            <Text testId="content">Reactive data binding</Text>
+          </Page>
+          <Page url="/docs/guides">
+            <Text testId="linkInfoLabel">{$linkInfo.label}</Text>
+            <Text testId="linkInfoChildren">{$linkInfo.children.length}</Text>
+          </Page>
+        </Pages>
+      </App>`);
+
+    await expect(page.getByTestId("content")).toContainText("Reactive data binding");
+
+    await page.getByTestId("guides").locator("[aria-expanded]").click();
+
+    await expect(page).toHaveURL(/\/docs\/guides$/);
+    await expect(page.getByTestId("linkInfoLabel")).toContainText("Guides");
+    await expect(page.getByTestId("linkInfoChildren")).toContainText("1");
+  });
+
+  test("Overview renders cards for a NavGroup route", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App layout="vertical">
+        <NavPanel>
+          <Stack gap="0">
+            <NavLink label="Reactive Data" to="/docs/reactive-intro" />
+            <NavGroup label="Guides" to="/docs/guides">
+              <NavLink label="App Structure" to="/docs/guides/app-structure" />
+              <NavLink label="Markup" to="/docs/guides/markup" />
+            </NavGroup>
+          </Stack>
+        </NavPanel>
+        <Pages fallbackPath="/docs/reactive-intro">
+          <Page url="/docs/reactive-intro">
+            <Text testId="content">Reactive data binding</Text>
+          </Page>
+          <Page url="/docs/guides">
+            <Overview />
+          </Page>
+        </Pages>
+      </App>`,
+      {
+        extensionIds: "xmlui-docs-blocks",
+        appGlobals: {
+          navSections: {},
+        },
+      },
+    );
+
+    await page.goto(page.url().replace(/\/docs\/reactive-intro.*$/, "/docs/guides"));
+
+    const pageRoot = page.locator('[data-xmlui-page-url="/docs/guides"]');
+    await expect(page.getByRole("heading", { name: "Guides" })).toBeVisible();
+    await expect(pageRoot.getByRole("link", { name: "App Structure" })).toHaveAttribute(
+      "href",
+      /\/docs\/guides\/app-structure$/,
+    );
+    await expect(pageRoot.getByRole("link", { name: "Markup" })).toHaveAttribute(
+      "href",
+      /\/docs\/guides\/markup$/,
+    );
+  });
 });
 
 test("border", async ({ initTestBed, createNavPanelDriver }) => {

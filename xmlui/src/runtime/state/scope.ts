@@ -122,6 +122,7 @@ export function createExpressionContext(scope: RuntimeScope | undefined): Compil
     readGlobal: (name) => readGlobal(scope, name),
     readContext: (name) => readContext(scope, name),
     readReference: (name) => readBuiltInReference(scope, name) ?? readReference(scope, name),
+    callFunction: (name, args) => scope?.extensionFunctions[name]?.(...args),
     debug: getXmluiDebugBridge(),
   };
 }
@@ -142,7 +143,6 @@ export function createEventContext(scope: RuntimeScope): CompiledEventContext {
     },
     complete: completeValue,
     navigate: (target, queryParams) => scope.routing?.navigate(target, queryParams),
-    callFunction: (name, args) => scope.extensionFunctions[name]?.(...args),
     yieldIfNeeded: (iteration) => {
       if (iteration % 100 !== 0) {
         return undefined;
@@ -377,10 +377,54 @@ function readRouteContext(scope: RuntimeScope, name: string): unknown {
       return snapshot.search;
     case "routeParams":
     case "$routeParams":
-      return {};
+      return undefined;
+    case "linkInfo":
+    case "$linkInfo":
+      return readLinkInfoContext(scope, snapshot.pathname, snapshot.search);
     default:
       return undefined;
   }
+}
+
+function readLinkInfoContext(
+  scope: RuntimeScope | undefined,
+  pathname: string,
+  search: string,
+): unknown {
+  const linkMap = findContextValue(scope, "$linkMap");
+  if (!(linkMap instanceof Map)) {
+    return undefined;
+  }
+  return (
+    linkMap.get(pathname) ??
+    linkMap.get(`${pathname}${search}`) ??
+    [...linkMap.values()].find((node) => {
+      if (!node || typeof node !== "object") {
+        return false;
+      }
+      return normalizeLinkInfoPath((node as { to?: unknown }).to) === pathname;
+    })
+  );
+}
+
+function findContextValue(scope: RuntimeScope | undefined, name: string): unknown {
+  if (!scope) {
+    return undefined;
+  }
+  if (Object.prototype.hasOwnProperty.call(scope.contextValues, name)) {
+    return scope.contextValues[name];
+  }
+  return findContextValue(scope.parent, name);
+}
+
+function normalizeLinkInfoPath(to: unknown): string | undefined {
+  if (typeof to !== "string" || to.length === 0) {
+    return undefined;
+  }
+  if (to.startsWith("#/")) {
+    return to.slice(1);
+  }
+  return to;
 }
 
 function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwnerId | undefined {

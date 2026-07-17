@@ -335,7 +335,7 @@ export const textRenderer = wrapRuntimeComponent({
 
     return (
       <>
-        <Text
+        <ThemedText
         {...rootAttrs}
         variant={textVariant}
         maxLines={maxLines}
@@ -359,7 +359,7 @@ export const textRenderer = wrapRuntimeComponent({
         {...variantSpecificProps}
       >
           {children}
-        </Text>
+        </ThemedText>
         {liveRegionMessage !== undefined
           ? (
             <span

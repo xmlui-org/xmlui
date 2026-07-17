@@ -68,6 +68,69 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       </App>`);
     await expect(page.getByText("link-to-current-page")).toBeVisible();
   });
+
+  test("route change expands collapsed group containing active child link", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavLink label="Home" to="/home" />
+          <NavGroup testId="guides" label="Guides">
+            <NavLink label="First Guide" to="/guides/first" />
+          </NavGroup>
+        </NavPanel>
+        <Pages fallbackPath="/home">
+          <Page url="/home"><Text testId="content">Home</Text></Page>
+          <Page url="/guides/first"><Text testId="content">First Guide</Text></Page>
+        </Pages>
+      </App>`);
+
+    const guides = page.getByTestId("guides").locator("[aria-expanded]");
+    await expect(guides).toHaveAttribute("aria-expanded", "false");
+
+    await page.goto(page.url().replace(/\/home.*$/, "/guides/first"));
+    await expect(page.getByTestId("content")).toContainText("First Guide");
+    await expect(guides).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("link", { name: "First Guide" })).toBeVisible();
+  });
+
+  test("clicking group with to navigates to group route and expands children", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel>
+          <NavLink label="Reactive Data" to="/docs/reactive-intro" />
+          <NavGroup testId="guides" label="Guides" to="/docs/guides">
+            <NavLink label="App Structure" to="/docs/guides/app-structure" />
+          </NavGroup>
+        </NavPanel>
+        <Pages fallbackPath="/docs/reactive-intro">
+          <Page url="/docs/reactive-intro">
+            <Text testId="content">Reactive data binding</Text>
+          </Page>
+          <Page url="/docs/guides">
+            <Text testId="content">Guides summary cards</Text>
+          </Page>
+          <Page url="/docs/guides/app-structure">
+            <Text testId="content">App Structure</Text>
+          </Page>
+        </Pages>
+      </App>`);
+
+    await expect(page.getByTestId("content")).toContainText("Reactive data binding");
+
+    const guides = page.getByTestId("guides").locator("[aria-expanded]");
+    await guides.click();
+
+    await expect(page).toHaveURL(/\/docs\/guides$/);
+    await expect(page.getByTestId("content")).toContainText("Guides summary cards");
+    await expect(guides).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("link", { name: "App Structure" })).toBeVisible();
+  });
 });
 
 test("nested disabled navgroup can't open", async ({ initTestBed, page }) => {

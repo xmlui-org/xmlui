@@ -357,6 +357,9 @@ function emitCallExpression(ir: Extract<XmluiScriptIr, { kind: "CallExpression" 
       : emitRead(ir.callee.dependency, ir.callee.name);
     return `((__xmluiBuiltInFn) => typeof __xmluiBuiltInFn === "function" ? __xmluiBuiltInFn(${args}) : undefined)(${builtInSource})`;
   }
+  if (ir.callee.kind === "IdentifierRead" && ir.callee.dependency?.kind === "special") {
+    return `ctx.callFunction?.(${JSON.stringify(ir.callee.name)}, [${args}])`;
+  }
   if (
     ir.callee.kind === "IdentifierRead" &&
     (ir.callee.dependency?.kind === "local" || ir.callee.dependency?.kind === "global")

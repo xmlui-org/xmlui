@@ -10,6 +10,16 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toBeAttached();
   });
 
+  test("paragraph text inherits the Markdown content color", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Theme textColor-Text="rgb(99, 98, 106)">
+        <Markdown>Plain paragraph.</Markdown>
+      </Theme>
+    `);
+
+    await expect(page.getByText("Plain paragraph.")).toHaveCSS("color", "rgb(99, 98, 106)");
+  });
+
   test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\@{}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");

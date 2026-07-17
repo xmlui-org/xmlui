@@ -112,6 +112,13 @@ test.describe("NestedApp foundation", () => {
 
     await expect(page.getByTestId("outer-count")).toHaveText("Outer: 10");
     await expect(page.getByTestId("nested-count")).toHaveText("Nested: 0");
+    await expect
+      .poll(() => page.evaluate(() =>
+        [...document.querySelectorAll("*")].some((element) =>
+          !!element.shadowRoot?.querySelector('[data-testid="nested-count"]')
+        )
+      ))
+      .toBe(true);
 
     await page.getByTestId("nested-button").click();
     await expect(page.getByTestId("outer-count")).toHaveText("Outer: 10");
@@ -120,6 +127,30 @@ test.describe("NestedApp foundation", () => {
     await page.getByTestId("outer-button").click();
     await expect(page.getByTestId("outer-count")).toHaveText("Outer: 11");
     await expect(page.getByTestId("nested-count")).toHaveText("Nested: 1");
+  });
+
+  test("does not register nested headings in the host TableOfContents", async ({
+    initTestBed,
+    page,
+  }) => {
+    const source = escapeNestedSource(`
+      <App>
+        <Heading level="h2">Nested Section</Heading>
+      </App>
+    `);
+
+    await initTestBed(`
+      <App>
+        <TableOfContents />
+        <Heading level="h2">Host Section</Heading>
+        <NestedApp testId="nested" app="{'${source}'}" />
+      </App>
+    `);
+
+    await expect(page.getByText("Nested Section")).toBeVisible();
+    const toc = page.getByRole("navigation", { name: "Table of Contents" });
+    await expect(toc.getByRole("link", { name: "Host Section" })).toBeVisible();
+    await expect(toc.getByRole("link", { name: "Nested Section" })).toHaveCount(0);
   });
 
   test("applies the height prop to the nested app container", async ({ initTestBed, page }) => {
@@ -425,10 +456,13 @@ test.describe("NestedApp foundation", () => {
     `);
 
     const frameMetrics = await page.getByText("Pick a theme").evaluate((element) => {
-      const frame = (element as HTMLElement).closest('[class*="nestedAppContainer"]') as HTMLElement;
-      const app = frame.querySelector('[data-xmlui-component="App"]') as HTMLElement;
+      const shadowHost = [...document.querySelectorAll("*")]
+        .find((candidate) => candidate.shadowRoot?.querySelector('[data-xmlui-component="App"]')) as HTMLElement;
+      const shadowRoot = shadowHost.shadowRoot as ShadowRoot;
+      const app = shadowRoot.querySelector('[data-xmlui-component="App"]') as HTMLElement;
+      const frame = shadowHost.closest('[class*="nestedAppContainer"]') as HTMLElement;
       const pageContent = app.querySelector('[class*="pageContentContainer"]') as HTMLElement;
-      const label = [...frame.querySelectorAll('[data-xmlui-component="Text"]')]
+      const label = [...shadowRoot.querySelectorAll('[data-xmlui-component="Text"]')]
         .find((candidate) => candidate.textContent?.trim() === "Theme") as HTMLElement;
       const frameBox = frame.getBoundingClientRect();
       const appBox = app.getBoundingClientRect();

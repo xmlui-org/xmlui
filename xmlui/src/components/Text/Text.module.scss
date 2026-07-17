@@ -309,6 +309,7 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     }
 
     &.subtitle {
+      color: createThemeVar("textColor-#{$component}");
       font-size: $fontSize-Text-subtitle;
     }
 
@@ -369,7 +370,9 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     }
 
     &.strong{
-      font-weight: t.$fontWeight-bold;
+      color: createThemeVar("textColor-#{$component}");
+      font-weight: createThemeVar("fontWeight-#{$component}-strong");
+      line-height: createThemeVar("lineHeight-#{$component}");
     }
 
     // --- Break mode classes (nested to match .text.default specificity 0,2,0)

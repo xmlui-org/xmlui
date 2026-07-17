@@ -330,6 +330,7 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       @include t.paddingVars($themeVars, $variantName);
       @include t.borderVars($themeVars, $variantName);
       @include t.textVars($themeVars, $variantName);
+      color: inherit;
       margin-top: $marginTop-Text-markdown;
       margin-bottom: $marginBottom-Text-markdown;
       margin-inline-start: $marginLeft-Text-markdown;

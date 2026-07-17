@@ -360,23 +360,24 @@ function useApiBoundDataProp(
   scope: RuntimeScope,
   node: XmluiElement,
 ): Record<string, unknown> {
+  const shouldResolveRemoteData = remoteDataComponents.has(node.type);
   const hasRawData = Object.prototype.hasOwnProperty.call(props, "raw_data");
   const normalizedRawProps = useMemo(
     () =>
-      hasRawData
+      shouldResolveRemoteData && hasRawData
         ? {
             ...props,
             __DATA_RESOLVED: true,
             data: props.raw_data,
           }
         : props,
-    [hasRawData, props],
+    [hasRawData, props, shouldResolveRemoteData],
   );
-  const referencedDataSource = isDataSourceReference(normalizedRawProps.data)
+  const referencedDataSource = shouldResolveRemoteData && isDataSourceReference(normalizedRawProps.data)
     ? normalizedRawProps.data
     : undefined;
   const dataUrl =
-    normalizedRawProps.__DATA_RESOLVED || referencedDataSource
+    !shouldResolveRemoteData || normalizedRawProps.__DATA_RESOLVED || referencedDataSource
       ? undefined
       : typeof normalizedRawProps.data === "string"
         ? normalizedRawProps.data
@@ -512,6 +513,14 @@ function isDataSourceReference(value: unknown): value is Record<string, unknown>
     "value" in value,
   );
 }
+
+const remoteDataComponents = new Set([
+  "Items",
+  "List",
+  "Select",
+  "Table",
+  "Tree",
+]);
 
 function appGlobalsForScope(scope: RuntimeScope | undefined): Record<string, unknown> | undefined {
   const value = scope?.contextValues.appGlobals ?? scope?.contextValues.$appGlobals;
