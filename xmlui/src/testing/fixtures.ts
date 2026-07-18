@@ -1228,11 +1228,13 @@ function findOpeningAppTagEnd(markup: string): number {
 
 function normalizeLegacyTestMarkup(markup: string): string {
   return stripLegacyTryCatchBlocks(escapeGtInQuotedAttributes(stripLegacyIframePostMessageScript(markup)))
+    .replaceAll("&amp;nbsp;", "__XMLUI_ESCAPED_NBSP__")
     .replace(/(<CodeBlock\b[^>]*>)([\s\S]*?)(<\/CodeBlock>)/g, (_match, open, content, close) =>
       `${open}${content.replaceAll("{", "&#123;").replaceAll("}", "&#125;")}${close}`
     )
 	    .replaceAll("&nbsp;", "\u00a0")
 	    .replaceAll("&amp;", "&")
+    .replaceAll("__XMLUI_ESCAPED_NBSP__", "&amp;nbsp;")
 	    .replace(/\sboolean(?=[\s>])/g, ` boolean="true"`)
 	    .replace(/\s(itemClickExpands)(?=[\s>])/g, ` $1="true"`)
     .replace(/^<Heading(?=[\s/>])/, (match) =>
