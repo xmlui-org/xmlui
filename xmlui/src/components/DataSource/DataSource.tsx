@@ -289,6 +289,8 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     const load = async (force = false) => {
       const sequence = ++loadSequence;
       updateApi(apiRef.current!, id, scopeRef.current, {
+        url: latest.current.request.url,
+        method: latest.current.request.method,
         inProgress: true,
         isRefetching: Boolean(apiRef.current!.loaded),
         error: undefined,
@@ -443,6 +445,9 @@ export function createDataSourceApi(
   scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
 ): Record<string, unknown> {
   const api: Record<string, unknown> = {
+    __xmluiDataSource: true,
+    url: undefined,
+    method: undefined,
     value: undefined,
     error: undefined,
     inProgress: false,

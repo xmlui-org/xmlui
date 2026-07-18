@@ -210,7 +210,8 @@ export class RuntimeStateStore {
     this.recomputeReactiveDependents({ kind: "prop", ownerId, name });
   }
 
-  invalidateReference(_name: string): void {
+  invalidateReference(name: string): void {
+    this.recomputeReactiveDependents({ kind: "reference", name });
     this.revision += 1;
     for (const listener of this.allSubscribers) {
       listener();

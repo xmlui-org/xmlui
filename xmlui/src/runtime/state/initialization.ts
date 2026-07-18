@@ -134,13 +134,17 @@ export function runtimeDependenciesForBinding(
         ownerId: scope.localOwnerId,
         name: dependency.path[0] ?? dependency.name,
       };
+    } else if (dependency.kind === "reference") {
+      runtimeDependency = { kind: "reference", name: dependency.name };
     }
     if (!runtimeDependency) {
       continue;
     }
     const key = runtimeDependency.kind === "prop"
       ? `prop:${runtimeDependency.ownerId ?? ""}:${runtimeDependency.name}`
-      : `${runtimeDependency.kind}:${runtimeDependency.ownerId ?? ""}:${runtimeDependency.name}`;
+      : runtimeDependency.kind === "reference"
+        ? `reference:${runtimeDependency.name}`
+        : `${runtimeDependency.kind}:${runtimeDependency.ownerId ?? ""}:${runtimeDependency.name}`;
     if (!seen.has(key)) {
       seen.add(key);
       dependencies.push(runtimeDependency);

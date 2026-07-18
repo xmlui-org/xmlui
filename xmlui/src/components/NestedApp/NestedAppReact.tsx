@@ -394,7 +394,7 @@ function createNestedApiAdapter(
       matchNestedApiPath(candidate.url, normalizedPath) !== undefined
     );
     if (!operation) {
-      throw new ManagedFetchError("Not Found", 404, { message: `No nested API operation for ${request.method.toUpperCase()} ${request.url}` });
+      return fallbackAdapter(request, signal);
     }
     const pathParams = matchNestedApiPath(operation.url, normalizedPath) ?? {};
     try {

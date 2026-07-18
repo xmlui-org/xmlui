@@ -500,6 +500,18 @@ function transformElement(
       children.push(child);
       continue;
     }
+    if (child.kind === "element" && child.type === "global") {
+      const globalName = child.props.name;
+      if (globalName) {
+        globals[globalName] = child.props.value ?? "";
+        const parsedValue = child.parsed?.props?.value;
+        if (parsedValue) {
+          const parsedGlobals = (parsed.globals ??= {});
+          parsedGlobals[globalName] = parsedValue;
+        }
+      }
+      continue;
+    }
     if (child.kind === "element" && child.type === "event") {
       const eventName = child.props.name;
       if (!eventName) {

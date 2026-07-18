@@ -52,4 +52,23 @@ describe("parser compatibility hardening", () => {
       ast: expect.objectContaining({ kind: "Literal", value: 0 }),
     });
   });
+
+  it("treats global helper tags as root global declarations", () => {
+    const document = parseXmlui(
+      `<App><global name="stations" value="{[ 'Bakerloo', 'Central', 'Circle' ]}" /><Text>{stations.join(', ')}</Text></App>`,
+    );
+
+    expect(document.root.globals).toEqual({
+      stations: "{[ 'Bakerloo', 'Central', 'Circle' ]}",
+    });
+    expect(document.root.parsed?.globals?.stations).toMatchObject({
+      source: "[ 'Bakerloo', 'Central', 'Circle' ]",
+      ast: expect.objectContaining({ kind: "ArrayExpression" }),
+    });
+    expect(document.root.children).toHaveLength(1);
+    expect(document.root.children[0]).toMatchObject({
+      kind: "element",
+      type: "Text",
+    });
+  });
 });

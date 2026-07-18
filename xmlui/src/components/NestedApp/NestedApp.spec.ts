@@ -105,6 +105,57 @@ const teamApi = {
   },
 };
 const teamApiExpression = `{JSON.parse('${JSON.stringify(teamApi).replace(/"/g, "&quot;")}')}`;
+const decoupledDataSourceSource = escapeNestedSource(`
+<App>
+  <DataSource id="apiResult" url="/api/names-with-activity-decoupled" />
+  <APICall
+    id="addItem"
+    method="post"
+    url="/api/names-with-activity-decoupled"
+    invalidates="/api/names-with-activity-decoupled"
+  />
+
+  <variable name="items" value="{apiResult.value ?? []}" />
+
+  <Text testId="datasource-count">DataSource count: {(apiResult.value ?? []).length}</Text>
+  <Text testId="items-count">items count: {items.length}</Text>
+
+  <Button
+    testId="snapshot"
+    label="Take snapshot of active items"
+    onClick="items = (apiResult.value ?? []).filter(i => i.active)"
+  />
+  <Button
+    testId="add-active"
+    label="Add active item"
+    onClick="addItem.execute()"
+  />
+
+  <Items data="{items}">
+    <Text testId="item-{$item.id}">{$item.name}</Text>
+  </Items>
+</App>
+`);
+const decoupledDataSourceApi = {
+  apiUrl: "/api",
+  initialize:
+    "$state.items = [{ id: 1, name: String.fromCharCode(65,110,110,97), active: true }, { id: 2, name: String.fromCharCode(72,101,108,103,97), active: false }, { id: 3, name: String.fromCharCode(66,111,98), active: true }, { id: 4, name: String.fromCharCode(74,111,104,110), active: false }]",
+  operations: {
+    "get-names-with-activity-decoupled": {
+      url: "/names-with-activity-decoupled",
+      method: "get",
+      handler: "return $state.items",
+    },
+    "add-names-with-activity-decoupled": {
+      url: "/names-with-activity-decoupled",
+      method: "post",
+      handler:
+        "$state.items = [...$state.items, { id: $state.items.length + 1, name: String.fromCharCode(70,114,97,110,107), active: true }]",
+    },
+  },
+};
+const decoupledDataSourceApiExpression =
+  `{JSON.parse('${JSON.stringify(decoupledDataSourceApi).replace(/"/g, "&quot;")}')}`;
 const tubeStatusInterceptor = {
   operations: {
     "tube-status": {
@@ -208,6 +259,62 @@ test.describe("NestedApp foundation", () => {
 
     await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
     await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+  });
+
+  test("keeps assigned variables decoupled from nested DataSource refetches", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="nested"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 4");
+    await expect(page.getByTestId("item-1")).toHaveText("Anna");
+    await expect(page.getByTestId("item-2")).toHaveText("Helga");
+
+    await page.getByTestId("snapshot").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 2");
+    await expect(page.getByTestId("item-1")).toHaveText("Anna");
+    await expect(page.getByTestId("item-3")).toHaveText("Bob");
+    await expect(page.getByTestId("item-2")).toHaveCount(0);
+
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 2");
+    await expect(page.getByTestId("item-5")).toHaveCount(0);
+  });
+
+  test("falls through same-prefix playground api adapters until an operation matches", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="decoupled"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+        <NestedApp testId="team" app="{'${teamListSource}'}" api="${teamApiExpression}" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 4");
+    await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
+    await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
   });
 
   test("resolves global transformResult functions by bare name in nested apps", async ({

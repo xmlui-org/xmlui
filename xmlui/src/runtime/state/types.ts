@@ -16,7 +16,12 @@ export type PropDependencyKey = {
   name: string;
 };
 
-export type RuntimeDependencyKey = StateSlotKey | PropDependencyKey;
+export type ReferenceDependencyKey = {
+  kind: "reference";
+  name: string;
+};
+
+export type RuntimeDependencyKey = StateSlotKey | PropDependencyKey | ReferenceDependencyKey;
 
 export type ReactiveVariableMode = "source" | "derived" | "assigned";
 
@@ -59,6 +64,9 @@ export function dependencyKeyId(dependency: RuntimeDependencyKey): string {
     return dependency.ownerId
       ? `prop:${dependency.ownerId}:${dependency.name}`
       : `prop:${dependency.name}`;
+  }
+  if (dependency.kind === "reference") {
+    return `reference:${dependency.name}`;
   }
   return slotKeyId(dependency);
 }
