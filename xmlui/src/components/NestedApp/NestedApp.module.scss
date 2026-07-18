@@ -261,6 +261,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
 
     .headerButton {
       padding: t.$space-2 t.$space-3;
+      cursor: pointer;
     }
 
     .spacer {

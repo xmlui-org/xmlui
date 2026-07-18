@@ -153,6 +153,7 @@ export function AppWithCodeViewReact({
                   <Tooltip
                     trigger={
                       <button
+                        type="button"
                         className={styles.headerButton}
                         onClick={() => {
                           void openPlayground();
@@ -168,6 +169,7 @@ export function AppWithCodeViewReact({
                   <Tooltip
                     trigger={
                       <button
+                        type="button"
                         className={styles.headerButton}
                         onClick={() => {
                           setShowCode(false);

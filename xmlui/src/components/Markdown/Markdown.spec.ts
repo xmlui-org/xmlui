@@ -692,6 +692,31 @@ test.describe("xmlui-pg nested code fences (four-backtick delimiter)", () => {
     await expect(page.getByRole("button", { name: "Hello" })).toBeVisible();
   });
 
+  test("xmlui-pg header buttons use pointer cursor and reset the app", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg name="Reset demo"',
+      '<App var.count="{0}">',
+      '  <Text testId="count">Count: {count}</Text>',
+      '  <Button testId="increment" onClick="count++">Increment</Button>',
+      "</App>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const headerButtons = page.locator('button[class*="headerButton"]');
+    await expect(headerButtons.first()).toHaveCSS("cursor", "pointer");
+    await expect(headerButtons.nth(1)).toHaveCSS("cursor", "pointer");
+
+    await page.getByTestId("increment").click();
+    await expect(page.getByTestId("count")).toHaveText("Count: 1");
+
+    await headerButtons.nth(1).click();
+    await expect(page.getByTestId("count")).toHaveText("Count: 0");
+  });
+
   test("four-backtick fence inside xmlui-pg does not close the outer fence", async ({
     initTestBed,
     page,

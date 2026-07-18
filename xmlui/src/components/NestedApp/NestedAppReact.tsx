@@ -113,24 +113,26 @@ export function NestedAppComponent({
     };
   }, [app, components, config]);
 
+  const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
+
   useLayoutEffect(() => {
     const previousAdapter = managedFetchService.getAdapter();
     const adapter = createNestedApiAdapter(api, previousAdapter);
     if (!adapter) {
       return;
     }
+    invalidateNestedApiCache(api);
     managedFetchService.setAdapter(adapter);
     return () => {
       if (managedFetchService.getAdapter() === adapter) {
         managedFetchService.setAdapter(previousAdapter);
       }
     };
-  }, [api]);
+  }, [api, effectiveRefreshVersion]);
   const mergedStyle = {
     ...style,
     ...(height !== undefined ? { height } : null),
   } as CSSProperties;
-  const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
   const defaultTone = normalizeThemeTone(activeTone);
   const resolvedConfig = normalizeNestedConfig(config);
   const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
@@ -419,12 +421,45 @@ function createNestedApiAdapter(
   };
 }
 
+function invalidateNestedApiCache(api: unknown): void {
+  const normalizedApi = normalizeNestedApi(api);
+  if (!normalizedApi || !isPlainRecord(normalizedApi.operations)) {
+    return;
+  }
+  const apiUrl = typeof normalizedApi.apiUrl === "string" ? normalizedApi.apiUrl.replace(/\/$/, "") : "";
+  const operations = Object.values(normalizedApi.operations)
+    .filter(isPlainRecord)
+    .map((operation) => ({
+      url: typeof operation.url === "string" ? operation.url : "",
+      method: typeof operation.method === "string" ? operation.method.toLowerCase() : "get",
+    }))
+    .filter((operation) => operation.url);
+  if (operations.length === 0) {
+    return;
+  }
+
+  managedFetchService.invalidateMatching((request) => {
+    if (!isNestedApiUrl(request.url, apiUrl)) {
+      return false;
+    }
+    const normalizedPath = nestedRequestPathFromUrl(request.url, apiUrl);
+    return operations.some((operation) =>
+      operation.method === request.method &&
+      matchNestedApiPath(operation.url, normalizedPath) !== undefined
+    );
+  });
+}
+
 function isNestedApiRequest(request: ManagedRequest, apiUrl: string): boolean {
+  return isNestedApiUrl(request.url, apiUrl);
+}
+
+function isNestedApiUrl(url: string, apiUrl: string): boolean {
   if (!apiUrl) {
     return true;
   }
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
-  const pathname = new URL(request.url || "/", origin).pathname;
+  const pathname = new URL(url || "/", origin).pathname;
   return pathname === apiUrl || pathname.startsWith(`${apiUrl}/`);
 }
 
@@ -449,8 +484,12 @@ function normalizeNestedApi(api: unknown): Record<string, unknown> | undefined {
 }
 
 function nestedRequestPath(request: ManagedRequest, apiUrl: string): string {
+  return nestedRequestPathFromUrl(request.url, apiUrl);
+}
+
+function nestedRequestPathFromUrl(url: string, apiUrl: string): string {
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
-  const pathname = new URL(request.url || "/", origin).pathname;
+  const pathname = new URL(url || "/", origin).pathname;
   return apiUrl && pathname.startsWith(`${apiUrl}/`)
     ? pathname.slice(apiUrl.length)
     : pathname;

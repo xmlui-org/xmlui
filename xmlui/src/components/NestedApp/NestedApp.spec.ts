@@ -317,6 +317,27 @@ test.describe("NestedApp foundation", () => {
     await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
   });
 
+  test("refreshVersion resets nested playground api state", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.version="{0}">
+        <Button testId="refresh-api" onClick="version++">Refresh API sample</Button>
+        <NestedApp
+          testId="nested"
+          refreshVersion="{version}"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
+
+    await page.getByTestId("refresh-api").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+  });
+
   test("resolves global transformResult functions by bare name in nested apps", async ({
     initTestBed,
     page,

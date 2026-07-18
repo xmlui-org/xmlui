@@ -139,6 +139,29 @@ export function ComponentInstance({
   const initializedRef = useRef(false);
   const componentScopeRef = useRef<RuntimeScope>();
   const componentReferences = useMemo<Record<string, unknown>>(() => ({}), []);
+  const createComponentScope = (
+    options: {
+      props: Record<string, unknown>;
+      slots?: Record<string, RenderFragment>;
+      emitEvent?: RuntimeScope["emitEvent"];
+    },
+  ) =>
+    createRuntimeScope({
+      store: scope.store,
+      localOwnerId: ownerId,
+      parent: scope,
+      inheritLocals: false,
+      inheritReferences: false,
+      props: options.props,
+      contextValues: scope.contextValues,
+      references: componentReferences,
+      slots: options.slots,
+      routing: scope.routing,
+      toast: scope.toast,
+      i18n: scope.i18n,
+      emitEvent: options.emitEvent,
+      extensionFunctions: scope.extensionFunctions,
+    });
   const api = useMemo<Record<string, (...args: unknown[]) => Promise<unknown>>>(() => {
     const methods: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
     for (const [name, method] of Object.entries(component.root.parsed?.methods ?? {})) {
@@ -151,14 +174,7 @@ export function ComponentInstance({
   }, [component.root.parsed?.methods]);
 
   if (!initializedRef.current) {
-    const initialScope = createRuntimeScope({
-      store: scope.store,
-      localOwnerId: ownerId,
-      parent: scope,
-      props,
-      references: componentReferences,
-      i18n: scope.i18n,
-    });
+    const initialScope = createComponentScope({ props });
     scope.store.createLocalOwner(ownerId);
     initializeStateValuesIntoStore({
       kind: "local",
@@ -172,14 +188,7 @@ export function ComponentInstance({
   }
 
   useEffect(() => {
-    const latestScope = createRuntimeScope({
-      store: scope.store,
-      localOwnerId: ownerId,
-      parent: scope,
-      props,
-      references: componentReferences,
-      i18n: scope.i18n,
-    });
+    const latestScope = createComponentScope({ props });
     for (const [name, value] of Object.entries(component.root.vars)) {
       const parsed = component.root.parsed?.vars?.[name];
       scope.store.updateReactiveEvaluator(
@@ -201,14 +210,9 @@ export function ComponentInstance({
 
   const componentScope = useMemo<RuntimeScope>(
     () =>
-      createRuntimeScope({
-        store: scope.store,
-        localOwnerId: ownerId,
-        parent: scope,
-        props,
-        references: componentReferences,
+      createComponentScope({
         slots: createSlots(node, scope),
-        i18n: scope.i18n,
+        props,
         emitEvent: (eventName, args) => runEvent(node.parsed?.events?.[eventName], scope, args),
       }),
     [componentReferences, node, ownerId, props, scope],
