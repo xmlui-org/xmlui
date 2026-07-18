@@ -434,6 +434,11 @@ test.describe("NestedApp foundation", () => {
     expect(firstCardBox?.height).toBeLessThan(100);
     await expect(firstCard.locator("h2")).toHaveCSS("margin-top", "0px");
     await expect(firstCard.locator("h2")).toHaveCSS("margin-bottom", "0px");
+
+    const nestedHeroAppOverflow = await heroPlayground
+      .locator('[data-xmlui-component="App"]')
+      .evaluate((element) => getComputedStyle(element).overflowX);
+    expect(nestedHeroAppOverflow).toBe("hidden");
   });
 
   test("shows a compile error inside the nested app boundary", async ({ initTestBed, page }) => {
@@ -577,7 +582,7 @@ test.describe("NestedApp foundation", () => {
     await expect(page.getByTestId("nested-count")).toHaveText("Nested: 0");
   });
 
-  test("framed website sample inherits shell text color and does not show nested app scrollbars", async ({
+  test("framed fixed-height website sample inherits shell text color and hides horizontal app overflow", async ({
     initTestBed,
     page,
   }) => {
@@ -678,6 +683,161 @@ test.describe("NestedApp foundation", () => {
     expect(frameMetrics.scrollbarGutter).toBe("stable both-edges");
     expect(frameMetrics.appGutterLeft).toBeGreaterThanOrEqual(14);
     expect(frameMetrics.labelInset).toBeGreaterThanOrEqual(45);
+  });
+
+  test("framed playground content scrolls horizontally when the nested app overflows", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg name="Example: HStack with percentage width (overflow)"',
+      "---app copy display",
+      "<App>",
+      "  <HStack>",
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      "  </HStack>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack width="360px">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.querySelector('[data-xmlui-component="HStack"]'),
+      ),
+    );
+
+    const metrics = await page
+      .getByText("Example: HStack with percentage width (overflow)")
+      .evaluate((element) => {
+        const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+        const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+          .find((candidate) => candidate.shadowRoot) as HTMLElement;
+        const app = host.shadowRoot?.querySelector('[data-xmlui-component="App"]') as HTMLElement;
+        const style = getComputedStyle(app);
+        return {
+          clientWidth: app.clientWidth,
+          overflowX: style.overflowX,
+          scrollWidth: app.scrollWidth,
+        };
+      });
+
+    expect(metrics.overflowX).toBe("auto");
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+  });
+
+  test("fixed-height playground lets percentage-height splitter fill the frame", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg copy display height="200px" name="Example: Splitter"',
+      "<HSplitter",
+      '  height="100%"',
+      '  minPrimarySize="15%"',
+      '  maxPrimarySize="85%">',
+      '  <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>',
+      '  <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>',
+      "</HSplitter>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack testId="host">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.querySelector(
+          '[data-xmlui-component="HSplitter"], [data-xmlui-component="Splitter"]',
+        ),
+      ),
+    );
+
+    const metrics = await page.evaluate(() => {
+      const frame = [...document.querySelectorAll('[class*="nestedAppContainer"]')]
+        .find((candidate) => candidate.textContent?.includes("Example: Splitter")) as HTMLElement;
+      const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+        .find((candidate) => candidate.shadowRoot) as HTMLElement;
+      const shadowRoot = host.shadowRoot as ShadowRoot;
+      const splitter = shadowRoot.querySelector(
+        '[data-xmlui-component="HSplitter"], [data-xmlui-component="Splitter"]',
+      ) as HTMLElement;
+      return {
+        frameHeight: frame.getBoundingClientRect().height,
+        hostHeight: host.getBoundingClientRect().height,
+        splitterHeight: splitter.getBoundingClientRect().height,
+      };
+    });
+
+    expect(metrics.frameHeight).toBe(200);
+    expect(metrics.hostHeight).toBeGreaterThan(100);
+    expect(metrics.splitterHeight).toBe(metrics.hostHeight);
+  });
+
+  test("root nested theme keeps inherited text color for plain stack text", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg name="Example: default container width"',
+      "<VStack",
+      '  backgroundColor="cyan"',
+      '  horizontalAlignment="center"',
+      '  verticalAlignment="center">',
+      "  This is some text within a VStack",
+      "</VStack>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack testId="host">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.textContent?.includes("This is some text within a VStack"),
+      ),
+    );
+
+    await page.getByText("Example: default container width").evaluate((element) => {
+      const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+      frame.style.color = "rgb(99, 98, 106)";
+    });
+
+    const color = await page.getByText("Example: default container width").evaluate((element) => {
+      const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+      const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+        .find((candidate) => candidate.shadowRoot) as HTMLElement;
+      const shadowRoot = host.shadowRoot as ShadowRoot;
+      const walker = document.createTreeWalker(shadowRoot, NodeFilter.SHOW_TEXT);
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        if (node.nodeValue?.includes("This is some text within a VStack")) {
+          return getComputedStyle(node.parentElement as HTMLElement).color;
+        }
+      }
+      return "";
+    });
+
+    expect(color).toBe("rgb(99, 98, 106)");
   });
 });
 

@@ -17,6 +17,7 @@ export type NestedAppProps = {
   height?: string | number;
   initiallyShowCode?: boolean;
   noHeader?: boolean;
+  allowHorizontalOverflow?: boolean;
   allowReset?: boolean;
   refreshVersion?: string | number;
   splitView?: boolean;
@@ -39,6 +40,7 @@ export function NestedAppComponent({
   height,
   initiallyShowCode = false,
   noHeader = false,
+  allowHorizontalOverflow,
   refreshVersion,
   splitView = false,
   style,
@@ -135,6 +137,7 @@ export function NestedAppComponent({
   } as CSSProperties;
   const defaultTone = normalizeThemeTone(activeTone);
   const resolvedConfig = normalizeNestedConfig(config);
+  const nestedAllowHorizontalOverflow = allowHorizontalOverflow ?? height === undefined;
   const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
   const Root = compiled?.Root;
   const runtimeView = compiled?.error ? (
@@ -151,7 +154,11 @@ export function NestedAppComponent({
       defaultTheme={defaultTheme}
       themes={resolvedConfig.themes}
       resources={resolvedConfig.resources}
-      appGlobals={{ ...resolvedConfig.appGlobals, isNested: true }}
+      appGlobals={{
+        ...resolvedConfig.appGlobals,
+        isNested: true,
+        nestedAllowHorizontalOverflow,
+      }}
       applyDocumentThemeVars={false}
     />
   ) : null;
@@ -270,7 +277,12 @@ function NestedAppShadowRoot({ children }: { children: ReactNode }) {
         ? createPortal(
             <StyleInjectionTargetContext.Provider value={shadowRoot}>
               <TableOfContentsContext.Provider value={null}>
-                {children}
+                <div
+                  className={`${styles.shadowRoot} xmlui-nested-app-shadow-root`}
+                  id="nested-app-root"
+                >
+                  <div className={`${styles.content} xmlui-nested-app-content`}>{children}</div>
+                </div>
               </TableOfContentsContext.Provider>
             </StyleInjectionTargetContext.Provider>,
             shadowRoot,
@@ -282,6 +294,30 @@ function NestedAppShadowRoot({ children }: { children: ReactNode }) {
 
 function copyDocumentStylesToShadowRoot(shadowRoot: ShadowRoot): void {
   if (typeof document === "undefined") return;
+  if (!shadowRoot.querySelector("style[data-nested-app-layout]")) {
+    const layoutStyle = document.createElement("style");
+    layoutStyle.setAttribute("data-nested-app-layout", "true");
+    layoutStyle.textContent = `
+      .xmlui-nested-app-shadow-root {
+        transform: scale(1);
+        width: 100%;
+        height: 100%;
+        position: relative;
+        isolation: isolate;
+        background-color: transparent;
+      }
+      #nested-app-root {
+        color: inherit;
+      }
+      .xmlui-nested-app-content {
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+    `;
+    shadowRoot.appendChild(layoutStyle);
+  }
   if (shadowRoot.querySelector("style[data-nested-app-style-reset]")) return;
 
   const layerStyle = document.createElement("style");

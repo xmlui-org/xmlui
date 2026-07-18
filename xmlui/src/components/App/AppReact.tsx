@@ -84,6 +84,7 @@ type Props = {
   children: ReactNode;
   logoContent?: ReactNode;
   header?: ReactNode;
+  hasRegisteredHeader?: boolean;
   footer?: ReactNode;
   navPanel?: ReactNode;
   navPanelInDrawer?: ReactNode;
@@ -156,6 +157,7 @@ export const App = memo(function App({
   onDidNavigate,
   onError,
   header,
+  hasRegisteredHeader: hasRegisteredHeaderProp,
   navPanel,
   footer,
   navPanelDef,
@@ -205,7 +207,7 @@ export const App = memo(function App({
     : "condensed-sticky";
   const appContext = useAppContext();
   const { setLoggedInUser, setNavigationHandlers, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
-  const hasRegisteredHeader = header !== undefined;
+  const hasRegisteredHeader = hasRegisteredHeaderProp ?? header !== undefined;
 
   // Check if NavPanel exists and is actually displayed
   // navPanel is null when the 'when' condition evaluates to false
@@ -591,6 +593,10 @@ export const App = memo(function App({
       "media-phone": mediaSize.phone,
       "media-tablet": mediaSize.tablet,
       "nested-app": appGlobals?.isNested || false,
+      [styles.nestedAppAllowHorizontalOverflow]:
+        !!appGlobals?.isNested &&
+        appGlobals?.nestedAllowHorizontalOverflow !== false &&
+        !hasRegisteredHeader,
     },
   ];
 

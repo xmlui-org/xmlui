@@ -27,6 +27,7 @@ import { defaultProps } from "./Heading.defaults";
 
 export type HeadingProps = {
   uid?: string;
+  anchorId?: string;
   level?: HeadingLevel;
   children: ReactNode;
   sx?: CSSProperties;
@@ -46,6 +47,7 @@ export type HeadingProps = {
 export const Heading = memo(forwardRef(function Heading(
   {
     uid,
+    anchorId: anchorIdProp,
     level = defaultProps.level,
     children,
     sx,
@@ -112,21 +114,10 @@ export const Heading = memo(forwardRef(function Heading(
 
   useEffect(() => {
     if (elementRef.current) {
-      let newAnchorId = elementRef.current.textContent
-        ?.trim()
-        ?.replace(/[^\w\s-]/g, "")
-        ?.replace(/\s+/g, "-")
-        ?.toLowerCase();
-
-      // Ensure ID starts with a letter or underscore (not a digit)
-      // This is required for querySelector to work without escaping
-      if (newAnchorId && /^[0-9]/.test(newAnchorId)) {
-        newAnchorId = "heading-" + newAnchorId;
-      }
-
+      const newAnchorId = anchorIdProp ?? createHeadingAnchorId(elementRef.current.textContent);
       setAnchorId(newAnchorId || null);
     }
-  }, []);
+  }, [anchorIdProp]);
 
   useIsomorphicLayoutEffect(() => {
     if (elementRef.current && anchorId && !omitFromToc) {
@@ -143,7 +134,7 @@ export const Heading = memo(forwardRef(function Heading(
     <Element
       {...furtherProps}
       ref={ref}
-      id={uid}
+      id={uid && uid !== anchorId ? uid : undefined}
       title={title}
       style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
       className={classnames(styles.heading, styles[Element], classes?.[COMPONENT_PART_KEY], className, {
@@ -180,3 +171,19 @@ export const Heading = memo(forwardRef(function Heading(
     </Element>
   );
 }));
+
+function createHeadingAnchorId(text: string | null): string | null {
+  let anchorId = text
+    ?.trim()
+    ?.replace(/[^\w\s-]/g, "")
+    ?.replace(/\s+/g, "-")
+    ?.toLowerCase();
+
+  // Ensure ID starts with a letter or underscore (not a digit).
+  // This is required for querySelector to work without escaping.
+  if (anchorId && /^[0-9]/.test(anchorId)) {
+    anchorId = "heading-" + anchorId;
+  }
+
+  return anchorId || null;
+}

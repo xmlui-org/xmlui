@@ -104,6 +104,7 @@ $gap-content-App: createThemeVar("gap-content-App");
     &.horizontal {
       overflow: auto;
       overflow-x: hidden;
+
       .footerWrapper {
         position: static;
       }
@@ -421,6 +422,10 @@ $gap-content-App: createThemeVar("gap-content-App");
       .mainContentArea {
         scrollbar-gutter: auto;
       }
+    }
+
+    &.nestedAppAllowHorizontalOverflow {
+      overflow-x: auto;
     }
   }
 

@@ -202,6 +202,7 @@ export function AppWithCodeViewReact({
               activeTone={activeTone}
               activeTheme={effectiveActiveTheme}
               refreshVersion={refreshVersion}
+              allowHorizontalOverflow={height === undefined}
               withSplashScreen={withSplashScreen}
               immediate={immediate}
             />

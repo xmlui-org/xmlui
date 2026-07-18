@@ -298,6 +298,14 @@ export const Markdown = memo(
       return null;
     }
     children = removeIndents ? removeTextIndents(children) : children;
+    const headingAnchorCounts = new Map<string, number>();
+
+    const createHeadingProps = (children: React.ReactNode) => {
+      const { label, uid } = removeGeneratedAnchorSuffix(children);
+      const baseAnchorId = uid ?? createHeadingAnchorId(getHeadingText(label));
+      const anchorId = createUniqueHeadingAnchorId(baseAnchorId, headingAnchorCounts);
+      return { label, uid, anchorId };
+    };
 
     // markdownImgParser only reads imageInfo.current (a stable ref) — safe with empty deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -391,28 +399,28 @@ export const Markdown = memo(
               }
             },
             h1({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h1" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h2({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h2" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h3({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h3" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h4({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h4" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h5({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h5" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h6({ children }) {
-              const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
+              const { label, uid, anchorId } = createHeadingProps(children);
+              return <Heading className={className} level="h6" uid={uid} anchorId={anchorId} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
@@ -820,6 +828,32 @@ function removeGeneratedAnchorSuffix(children: React.ReactNode): {
   }
 
   return { label: children };
+}
+
+function createHeadingAnchorId(text: string): string | null {
+  let anchorId = text
+    ?.trim()
+    ?.replace(/[^\w\s-]/g, "")
+    ?.replace(/\s+/g, "-")
+    ?.toLowerCase();
+
+  if (anchorId && /^[0-9]/.test(anchorId)) {
+    anchorId = "heading-" + anchorId;
+  }
+
+  return anchorId || null;
+}
+
+function createUniqueHeadingAnchorId(
+  baseAnchorId: string | null,
+  headingAnchorCounts: Map<string, number>,
+): string | undefined {
+  if (!baseAnchorId) {
+    return undefined;
+  }
+  const count = headingAnchorCounts.get(baseAnchorId) ?? 0;
+  headingAnchorCounts.set(baseAnchorId, count + 1);
+  return count === 0 ? baseAnchorId : `${baseAnchorId}-${count}`;
 }
 
 function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): React.ReactNode {
