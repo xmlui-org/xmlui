@@ -478,7 +478,6 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: AppMd as ComponentMetadata,
   themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
-  layoutOrientation: "vertical",
   renderer: ({ adapter }) => {
     const appContext = useXmluiAppContext();
     const extracted = extractRuntimeAppComponents(adapter.node.children);

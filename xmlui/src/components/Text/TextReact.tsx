@@ -169,11 +169,14 @@ export const Text = memo(forwardRef(function Text(
   const isCustomVariant = useMemo(() => {
     return variant && !TextVariantElement[variant];
   }, [variant]);
+  const needsVariantClass = useMemo(() => {
+    return Boolean(isCustomVariant || variant === "sup" || variant === "sub" || variant === "mono");
+  }, [isCustomVariant, variant]);
 
   // Always call useComponentStyle (React hook rule: no conditional hooks)
   const variantSpec = useMemo(
     () => {
-      if (!variant) return EMPTY_OBJECT;
+      if (!variant || !needsVariantClass) return EMPTY_OBJECT;
       const cssInput = {
         color: toVariantCssVar("textColor", variant),
         "font-family": toVariantCssVar("fontFamily", variant),
@@ -215,7 +218,7 @@ export const Text = memo(forwardRef(function Text(
       };
       return cssInput;
     },
-    [variant],
+    [needsVariantClass, variant],
   );
   const variantClassName = useComponentStyle(variantSpec);
 

@@ -255,7 +255,7 @@ When you start the app, the route is "/" (by default) and matches the Home page'
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
 ```xmlui-pg copy display {4-5}
-<App display layout="vertical">
+<App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
     <NavLink to="/report?from=December&to=February">Winter Report</NavLink>

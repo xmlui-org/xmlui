@@ -159,7 +159,6 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   @layer components {
   .text {
     display: inline-block;
-    position: relative;
     margin: 0;
     padding: 0;
     vertical-align: baseline;
@@ -297,12 +296,14 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     }
 
     &.sup {
+      position: relative;
       font-size: $fontSize-Text-sup;
       vertical-align: $verticalAlignment-Text-sup;
       top: -0.5em;
     }
 
     &.sub {
+      position: relative;
       font-size: $fontSize-Text-sub;
       vertical-align: $verticalAlignment-Text-sub;
       top: 0.5em;

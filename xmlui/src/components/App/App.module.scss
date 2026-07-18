@@ -426,6 +426,7 @@ $gap-content-App: createThemeVar("gap-content-App");
 
     &.nestedAppAllowHorizontalOverflow {
       overflow-x: auto;
+      scrollbar-gutter: auto;
     }
   }
 

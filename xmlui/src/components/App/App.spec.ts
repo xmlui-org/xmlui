@@ -36,6 +36,40 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("test text")).toBeVisible();
   });
 
+  test("vertical layout keeps Pages beside the NavPanel", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App layout="vertical" testId="app">
+        <NavPanel testId="nav">
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/contacts">Contacts</NavLink>
+          <NavLink to="about">About</NavLink>
+        </NavPanel>
+        <Pages>
+          <Page url="/">
+            <Text testId="home">Home</Text>
+          </Page>
+          <Page url="contacts">
+            <Text>Contacts</Text>
+          </Page>
+          <Page url="about">
+            <Text>About</Text>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    const app = page.getByTestId("app");
+    const appBounds = await getBounds(app);
+    const navBounds = await getBounds(page.getByTestId("nav"));
+    const pageBounds = await getBounds(page.getByTestId("home"));
+
+    await expect(app).toBeVisible();
+    await expect(app).not.toHaveCSS("flex-direction", "column");
+    expect(Math.abs(navBounds.left - appBounds.left)).toBeLessThan(1);
+    expect(pageBounds.left).toBeGreaterThan(navBounds.left + navBounds.width);
+    expect(pageBounds.top).toBeLessThan(navBounds.bottom);
+  });
+
   test("renders with vertical-sticky layout", async ({ initTestBed, page }) => {
     await initTestBed(`<App layout="vertical-sticky">test text</App>`);
     await expect(page.getByText("test text")).toBeVisible();
