@@ -27,6 +27,8 @@ export const websiteThemes: ThemeDefinition[] = [
       backgroundColor: "$color-surface-0",
       fontSize: "15px",
       "textColor-Text": "$color-surface-600",
+      "textColor-Text-code": "$color-surface-600",
+      "textColor-Table": "$color-surface-600",
       "textColor-NavLink": "$color-surface-500",
       "textColor-NavLink--active": "$color-surface-900",
       "backgroundColor-NavLink--active": "$color-surface-100",

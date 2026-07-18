@@ -164,6 +164,50 @@ test.describe("Scroll Restoration", () => {
     expect(Math.abs(restoredScroll - initialScroll)).toBeLessThan(50);
   });
 
+  test("resets scroll position when pushing a new page", async ({
+    page,
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`
+      <App testId="app-scroll-container">
+        <Pages defaultScrollRestoration="true">
+          <Page url="/">
+            <VStack>
+              <Text>Top of Home</Text>
+              <VStack height="2000px" backgroundColor="#eee">
+                <Text>Spacer</Text>
+              </VStack>
+              <Button label="Go to Details" onClick="navigate('/details')" testId="btn-details" />
+            </VStack>
+          </Page>
+          <Page url="/details">
+            <VStack>
+              <Text>Top of Details</Text>
+              <VStack height="2000px" backgroundColor="#ddd">
+                <Text>Details Spacer</Text>
+              </VStack>
+            </VStack>
+          </Page>
+        </Pages>
+      </App>
+    `);
+
+    const appContainer = page.getByTestId("app-scroll-container");
+    await appContainer.evaluate((el, y) => {
+      el.scrollTo({ top: y, behavior: "instant" });
+    }, 1500);
+
+    const initialScroll = await appContainer.evaluate((el) => el.scrollTop);
+    expect(initialScroll).toBeGreaterThan(100);
+
+    const btn = await createButtonDriver("btn-details");
+    await btn.click();
+
+    await expect(page.getByText("Top of Details")).toBeVisible();
+    await expect.poll(() => appContainer.evaluate((el) => el.scrollTop)).toBe(0);
+  });
+
   test("does NOT restore scroll position when defaultScrollRestoration is not set", async ({
     page,
     initTestBed,

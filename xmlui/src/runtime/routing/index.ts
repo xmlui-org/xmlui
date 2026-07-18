@@ -83,6 +83,7 @@ export class RuntimeRoutingStore {
       window.history.go(target);
       return true;
     }
+    const current = this.snapshot;
     const url = this.createUrl(String(target ?? "/"), queryParams);
     const willResult = await this.navigationHandlers.onWillNavigate?.(String(target ?? "/"), queryParams);
     if (willResult === false) {
@@ -100,10 +101,12 @@ export class RuntimeRoutingStore {
     if (this.mode === "hash") {
       window.location.hash = url;
       this.syncFromBrowser();
+      dispatchRuntimeRouteNavigationIfPageChanged(current, url, "PUSH");
       return true;
     }
     window.history.pushState({}, "", url);
     this.syncFromBrowser();
+    dispatchRuntimeRouteNavigationIfPageChanged(current, url, "PUSH");
     return true;
   }
 
@@ -161,6 +164,26 @@ export class RuntimeRoutingStore {
 
 function snapshotToUrl(snapshot: RouteSnapshot): string {
   return `${snapshot.pathname}${snapshot.search}${snapshot.hash}`;
+}
+
+function dispatchRuntimeRouteNavigationIfPageChanged(
+  current: RouteSnapshot,
+  url: string,
+  navigationType: "PUSH" | "POP",
+) {
+  const next = snapshotFromUrl(url, current.revision);
+  if (next.pathname === current.pathname && next.search === current.search) {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("xmlui:routing:navigate", {
+      detail: {
+        url,
+        navigationType,
+      },
+    }),
+  );
 }
 
 export function compileRoutePattern(pattern: string): CompiledRoutePattern {

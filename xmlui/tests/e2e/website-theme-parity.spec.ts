@@ -18,6 +18,10 @@ test.describe("website theme parity", () => {
             <NavLink to="/">Home</NavLink>
           </NavPanel>
           <Text testId="site-copy">Website copy</Text>
+          <Markdown testId="site-markdown"><![CDATA[Here \`$item\` implicitly.]]></Markdown>
+          <Table data='{[{ id: 1, name: "Bakerloo" }]}' testId="site-table">
+            <Column bindTo="name" />
+          </Table>
         </App>
       `,
       {
@@ -29,11 +33,14 @@ test.describe("website theme parity", () => {
     await expect(page.getByTestId("site-header")).toBeVisible();
     await expect(page.getByTestId("site-nav")).toBeVisible();
     await expect(page.getByTestId("site-copy")).toBeVisible();
+    await expect(page.getByTestId("site-table")).toBeVisible();
 
     await expect(page.getByTestId("site-header")).toHaveCSS("height", "44px");
     await expect(page.getByTestId("site-nav")).toHaveCSS("width", "280px");
     await expect(page.getByTestId("site-copy")).toHaveCSS("font-size", "15px");
     await expectRgbClose(page.getByTestId("site-copy"), "color", "rgb(99, 98, 106)", 8);
+    await expectRgbClose(page.getByTestId("site-markdown").locator("code"), "color", "rgb(99, 98, 106)", 8);
+    await expectRgbClose(page.locator("tbody td").first(), "color", "rgb(99, 98, 106)", 8);
   });
 
   test("hero and landing themes can be scoped over website content", async ({ initTestBed, page }) => {

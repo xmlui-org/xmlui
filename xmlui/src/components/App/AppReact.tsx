@@ -72,6 +72,12 @@ const AppNavPanelSlot = createSlot(styles.navPanelWrapper);
 const AppContentSlot = createSlot(styles.mainContentArea);
 const AppPagesSlot = createSlot(styles.pagesContainer);
 
+type RuntimeRouteNavigation = {
+  key: string;
+  navigationType: "PUSH" | "POP";
+  revision: number;
+};
+
 // --- Component Types ---
 
 type Props = {
@@ -388,6 +394,8 @@ export const App = memo(function App({
   const location = useLocation();
   const navigationType = useNavigationType();
   const [browserScrollRouteKey, setBrowserScrollRouteKey] = useState(readBrowserScrollRouteKey);
+  const [runtimeRouteNavigation, setRuntimeRouteNavigation] =
+    useState<RuntimeRouteNavigation | null>(null);
   const [scrollRestorationEnabled, setScrollRestorationEnabled] = useState(false);
   const { drawerVisible, toggleDrawer, handleOpenChange, showDrawer, hideDrawer } = useDrawerState(
     location,
@@ -406,22 +414,43 @@ export const App = memo(function App({
   useEffect(() => {
     const updateRouteKey = () => {
       setBrowserScrollRouteKey(readBrowserScrollRouteKey());
+      setRuntimeRouteNavigation(null);
+    };
+    const updateRuntimeRouteKey = (event: Event) => {
+      const detail = (event as CustomEvent<{ url?: unknown; navigationType?: unknown }>).detail;
+      const routeKey = routeKeyFromRuntimeUrl(detail?.url);
+      if (!routeKey) {
+        return;
+      }
+      setBrowserScrollRouteKey(routeKey);
+      setRuntimeRouteNavigation((current) => ({
+        key: routeKey,
+        navigationType: detail?.navigationType === "POP" ? "POP" : "PUSH",
+        revision: (current?.revision ?? 0) + 1,
+      }));
+      if (detail?.navigationType !== "POP") {
+        scrollContainerToTop(scrollContainerRef.current);
+      }
     };
     window.addEventListener("hashchange", updateRouteKey);
     window.addEventListener("popstate", updateRouteKey);
+    window.addEventListener("xmlui:routing:navigate", updateRuntimeRouteKey);
     return () => {
       window.removeEventListener("hashchange", updateRouteKey);
       window.removeEventListener("popstate", updateRouteKey);
+      window.removeEventListener("xmlui:routing:navigate", updateRuntimeRouteKey);
     };
-  }, []);
+  }, [scrollContainerRef]);
 
   useIsomorphicLayoutEffect(() => {
     if (window.history.scrollRestoration !== "manual") {
       window.history.scrollRestoration = "manual";
     }
 
-    const isHashRoute = browserScrollRouteKey !== location.pathname + location.search;
-    if (scrollRestorationEnabled && (navigationType === "POP" || isHashRoute)) {
+    const locationRouteKey = location.pathname + location.search;
+    const isHashRoute = browserScrollRouteKey !== locationRouteKey;
+    const isRuntimePush = runtimeRouteNavigation?.navigationType === "PUSH";
+    if (scrollRestorationEnabled && !isRuntimePush && (navigationType === "POP" || isHashRoute)) {
       const saved = isHashRoute
         ? sessionStorage.getItem(scrollStorageKey(browserScrollRouteKey))
         : sessionStorage.getItem(scrollStorageKey(location.key)) ??
@@ -444,14 +473,19 @@ export const App = memo(function App({
         }
       }
     }
-    if (navigationType !== "POP" || isHashRoute) {
-      scrollContainerRef.current?.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "instant", // Optional if you want to skip the scrolling animation
-      });
+    if (isRuntimePush || (navigationType !== "POP" && (!location.hash || isHashRoute))) {
+      scrollContainerToTop(scrollContainerRef.current);
     }
-  }, [browserScrollRouteKey, location.key, location.pathname, location.search, navigationType, scrollRestorationEnabled]);
+  }, [
+    browserScrollRouteKey,
+    location.hash,
+    location.key,
+    location.pathname,
+    location.search,
+    navigationType,
+    runtimeRouteNavigation,
+    scrollRestorationEnabled,
+  ]);
 
   useEffect(() => {
     const hash = location.hash ? location.hash.slice(1) : "";
@@ -748,6 +782,34 @@ function safeDecodeHash(hash: string): string {
 
 function scrollStorageKey(key: string) {
   return `xmlui_scroll_${key}`;
+}
+
+function routeKeyFromRuntimeUrl(url: unknown): string | undefined {
+  if (typeof url !== "string") {
+    return undefined;
+  }
+  try {
+    const parsed = new URL(url, window.location.origin);
+    return `${parsed.pathname}${parsed.search}`;
+  } catch {
+    const [pathAndSearch] = url.split("#");
+    return pathAndSearch || undefined;
+  }
+}
+
+function scrollContainerToTop(container: HTMLElement | null) {
+  const scrollToTop = () => {
+    container?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Optional if you want to skip the scrolling animation
+    });
+  };
+  scrollToTop();
+  requestAnimationFrame(() => {
+    scrollToTop();
+    requestAnimationFrame(scrollToTop);
+  });
 }
 
 function readBrowserScrollRouteKey() {

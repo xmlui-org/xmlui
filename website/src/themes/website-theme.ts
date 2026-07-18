@@ -35,6 +35,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "font-feature-settings": "normal",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
+    "textColor-Text-code": "$color-surface-600",
+    "textColor-Table": "$color-surface-600",
 
     // --- Navigation layout
     "iconAlignment-NavLink": "baseline",
