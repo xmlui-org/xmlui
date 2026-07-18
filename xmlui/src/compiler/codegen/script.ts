@@ -661,7 +661,7 @@ function emitRead(dependency: BoundDependency | undefined, name: string): string
     case "local":
       return `ctx.readLocal(${JSON.stringify(name)})`;
     case "global":
-      return `ctx.readGlobal(${JSON.stringify(name)})`;
+      return `(ctx.readGlobal(${JSON.stringify(name)}) ?? ctx.readReference?.(${JSON.stringify(name)}))`;
     case "context":
       return `ctx.readContext?.(${JSON.stringify(name)})`;
     case "reference":

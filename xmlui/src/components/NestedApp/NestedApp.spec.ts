@@ -74,6 +74,24 @@ const tubeTableSource = escapeNestedSource(`
   </Table>
 </App>
 `);
+const transformedTableSource = escapeNestedSource(`
+<App>
+  <TransformedRows />
+</App>
+`);
+const transformedRowsComponentSource = escapeNestedSource(`
+<Component name="TransformedRows">
+  <DataSource
+    id="rows"
+    url="https://api.example.test/raw-rows"
+    transformResult="{transformRows}"
+  />
+  <Table data="{rows}" testId="transformed-table">
+    <Column bindTo="name" />
+    <Column bindTo="zone" />
+  </Table>
+</Component>
+`);
 
 const teamApi = {
   apiUrl: "/api",
@@ -95,6 +113,24 @@ const tubeStatusInterceptor = {
       handler: `return [
         { id: "bakerloo", name: "Bakerloo", lineStatuses: [{ statusSeverityDescription: "Good Service" }] },
         { id: "central", name: "Central", lineStatuses: [{ statusSeverityDescription: "Minor Delays" }] }
+      ];`,
+    },
+  },
+};
+const rawRowsInterceptor = {
+  operations: {
+    "raw-rows": {
+      url: "https://api.example.test/raw-rows",
+      method: "get",
+      handler: `return [
+        {
+          commonName: "Oxford Circus Underground Station",
+          additionalProperties: [{ key: "Zone", value: "1" }]
+        },
+        {
+          commonName: "Waterloo Underground Station",
+          additionalProperties: [{ key: "Zone", value: "1" }]
+        }
       ];`,
     },
   },
@@ -172,6 +208,42 @@ test.describe("NestedApp foundation", () => {
 
     await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
     await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+  });
+
+  test("resolves global transformResult functions by bare name in nested apps", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).transformRows = (rows: any[]) =>
+        rows.map((row) => ({
+          name: row.commonName,
+          zone:
+            row.additionalProperties?.find((property: { key: string }) => property.key === "Zone")
+              ?.value ?? "",
+        }));
+    });
+
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="nested"
+          app="{'${transformedTableSource}'}"
+          components="{['${transformedRowsComponentSource}']}"
+        />
+      </App>
+    `, { apiInterceptor: rawRowsInterceptor });
+
+    const table = page.getByTestId("transformed-table");
+    await expect(
+      table.locator("td").filter({ hasText: "Oxford Circus Underground Station" }).first(),
+    ).toBeVisible();
+    await expect(
+      table.locator("td").filter({ hasText: "Waterloo Underground Station" }).first(),
+    ).toBeVisible();
+    await expect(
+      table.locator("td").filter({ hasText: "1" }).first(),
+    ).toBeVisible();
   });
 
   test("keeps playground api mocks from intercepting sibling URL data samples", async ({

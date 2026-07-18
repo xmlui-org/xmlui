@@ -722,17 +722,17 @@ test.describe("Api", () => {
       const switchElement = page.getByRole("switch");
 
       // Non-empty string should be true
-      await page.getByTestId("setString").dispatchEvent("click");
+      await page.getByTestId("setString").click();
       await expect(valueDisplay).toContainText("true");
       await expect(switchElement).toBeChecked();
 
       // Empty string should be false
-      await page.getByTestId("setEmptyString").dispatchEvent("click");
+      await page.getByTestId("setEmptyString").click();
       await expect(valueDisplay).toContainText("false");
       await expect(switchElement).not.toBeChecked();
 
       // String 'false' should be false
-      await page.getByTestId("setFalseString").dispatchEvent("click");
+      await page.getByTestId("setFalseString").click();
       await expect(valueDisplay).toContainText("false");
       await expect(switchElement).not.toBeChecked();
     });

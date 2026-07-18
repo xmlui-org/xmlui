@@ -172,12 +172,13 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
 
 export function readReference(scope: RuntimeScope | undefined, name: string): unknown {
   if (!scope) {
-    return undefined;
+    return readGlobalObjectReference(name);
   }
   if (Object.prototype.hasOwnProperty.call(scope.references, name)) {
     return scope.references[name];
   }
-  return readReference(scope.parent, name);
+  const parentValue = readReference(scope.parent, name);
+  return parentValue === undefined ? readGlobalObjectReference(name) : parentValue;
 }
 
 async function completeValue(value: unknown): Promise<unknown> {
@@ -320,6 +321,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "window") {
     return typeof window === "undefined" ? undefined : window;
   }
+  if (name === "globalThis") {
+    return typeof globalThis === "undefined" ? undefined : globalThis;
+  }
   if (name === "Array") {
     return Array;
   }
@@ -354,6 +358,15 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
     return scope?.toast?.reference;
   }
   return undefined;
+}
+
+function readGlobalObjectReference(name: string): unknown {
+  if (typeof globalThis === "undefined") {
+    return undefined;
+  }
+  return Object.prototype.hasOwnProperty.call(globalThis, name)
+    ? (globalThis as Record<string, unknown>)[name]
+    : undefined;
 }
 
 function getDate(date?: string | number | Date): Date {

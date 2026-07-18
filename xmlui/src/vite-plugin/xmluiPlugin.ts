@@ -73,6 +73,18 @@ export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
     configureServer(server) {
       devServer = server;
     },
+    handleHotUpdate(ctx) {
+      if (!isCompilerSource(ctx.file)) {
+        return;
+      }
+      for (const module of ctx.server.moduleGraph.idToModuleMap.values()) {
+        if (module.file && XMLUI_RE.test(module.file)) {
+          ctx.server.moduleGraph.invalidateModule(module);
+        }
+      }
+      ctx.server.ws.send({ type: "full-reload" });
+      return [];
+    },
     async buildEnd() {
       await buildCompilerServer?.close();
       buildCompilerServer = undefined;
@@ -110,6 +122,10 @@ export function xmluiPlugin(options: XmluiPluginOptions = {}): Plugin {
 function isPackageXmlui(id: string): boolean {
   const normalized = id.replaceAll("\\", "/");
   return normalized.includes("/packages/") || normalized.includes("/node_modules/");
+}
+
+function isCompilerSource(file: string): boolean {
+  return file.replaceAll("\\", "/").includes("/src/compiler/");
 }
 
 function buildCompilerCssStubPlugin(): Plugin {
