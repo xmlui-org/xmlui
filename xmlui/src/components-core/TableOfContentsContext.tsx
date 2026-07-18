@@ -268,12 +268,24 @@ function scrollElementIntoContainer(
   }
   const targetRect = target.getBoundingClientRect();
   const containerRect = container.getBoundingClientRect();
-  const top = targetRect.top - containerRect.top + container.scrollTop;
+  const containerStyle = getComputedStyle(container);
+  const targetStyle = getComputedStyle(target);
+  const top =
+    targetRect.top -
+    containerRect.top +
+    container.scrollTop -
+    readCssPixelValue(containerStyle.scrollPaddingTop) -
+    readCssPixelValue(targetStyle.scrollMarginTop);
   container.scrollTo({
     top,
     behavior: "auto",
   });
   container.scrollTop = top;
+}
+
+function readCssPixelValue(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function findScrollParent(element: HTMLElement): HTMLElement | null {

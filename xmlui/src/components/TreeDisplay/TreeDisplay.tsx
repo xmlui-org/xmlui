@@ -14,6 +14,7 @@ $border-TreeDisplay: createThemeVar("border-TreeDisplay");
 $borderRadius-TreeDisplay: createThemeVar("borderRadius-TreeDisplay");
 $boxShadow-TreeDisplay: createThemeVar("boxShadow-TreeDisplay");
 $color-TreeDisplay: createThemeVar("color-TreeDisplay");
+$color-connect-TreeDisplay: createThemeVar("color-connect-TreeDisplay");
 $fontFamily-TreeDisplay: createThemeVar("fontFamily-TreeDisplay");
 $fontSize-TreeDisplay: createThemeVar("fontSize-TreeDisplay");
 $fontWeight-TreeDisplay: createThemeVar("fontWeight-TreeDisplay");
@@ -39,6 +40,7 @@ export const TreeDisplayMd = createMetadata({
     "borderRadius-TreeDisplay": "8px",
     "boxShadow-TreeDisplay": "none",
     "color-TreeDisplay": "$textColor-primary",
+    "color-connect-TreeDisplay": "$color-surface-200",
     "fontFamily-TreeDisplay": "$fontFamily-monospace",
     "fontSize-TreeDisplay": "$fontSize-code",
     "fontWeight-TreeDisplay": "$fontWeight-normal",
