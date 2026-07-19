@@ -18,13 +18,11 @@ This theme is available in several color variants through these theme IDs:
 - `xmlui-red`
 
 ```xmlui-pg name="Theme: xmlui (light)"
----app
     <Theme tone="light" themeId="xmlui">
       <App>
         <ThemeGallery />
       </App>
     </Theme>
----comp
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -86,13 +84,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui (dark)"
----app
-    <Theme tone="dark" themeId="xmlui">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -156,13 +152,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-green`
 
 ```xmlui-pg name="Theme: xmlui-green (light)"
----app
-    <Theme tone="light" themeId="xmlui-green">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-green">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -224,13 +218,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-green (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-green">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-green">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -294,13 +286,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-gray`
 
 ```xmlui-pg name="Theme: xmlui-gray (light)"
----app
-    <Theme tone="light" themeId="xmlui-gray">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-gray">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -362,13 +352,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-gray (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-gray">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-gray">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -432,13 +420,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-orange`
 
 ```xmlui-pg name="Theme: xmlui-orange (light)"
----app
-    <Theme tone="light" themeId="xmlui-orange">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-orange">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -500,13 +486,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-orange (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-orange">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-orange">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -570,13 +554,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-purple`
 
 ```xmlui-pg name="Theme: xmlui-purple (light)"
----app
-    <Theme tone="light" themeId="xmlui-purple">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-purple">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -638,13 +620,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-purple (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-purple">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-purple">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -708,13 +688,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-cyan`
 
 ```xmlui-pg name="Theme: xmlui-cyan (light)"
----app
-    <Theme tone="light" themeId="xmlui-cyan">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-cyan">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -776,13 +754,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-cyan (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-cyan">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-cyan">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -846,13 +822,11 @@ This theme is available in several color variants through these theme IDs:
 ### `xmlui-red`
 
 ```xmlui-pg name="Theme: xmlui-red (light)"
----app
-    <Theme tone="light" themeId="xmlui-red">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="light" themeId="xmlui-red">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>
@@ -914,13 +888,11 @@ This theme is available in several color variants through these theme IDs:
 ``` 
 
 ```xmlui-pg name="Theme: xmlui-red (dark)"
----app
-    <Theme tone="dark" themeId="xmlui-red">
-      <App>
-        <ThemeGallery />
-      </App>
-    </Theme>
----comp
+<Theme tone="dark" themeId="xmlui-red">
+  <App>
+    <ThemeGallery />
+  </App>
+</Theme>
 <Component name="ThemeGallery">
   <VStack>
     <HStack>

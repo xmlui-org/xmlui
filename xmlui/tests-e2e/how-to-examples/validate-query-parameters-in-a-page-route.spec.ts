@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Validate ticket list query parameters", { tag: "@website" }, () => {
+test.describe("validate-ticket-list-query-parameters", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "validate-ticket-list-query-parameters",

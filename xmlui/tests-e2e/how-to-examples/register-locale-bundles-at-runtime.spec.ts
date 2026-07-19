@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Load a Spanish bundle from an action", { tag: "@website" }, () => {
+test.describe("load-a-spanish-bundle-from-an-action", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "load-a-spanish-bundle-from-an-action",

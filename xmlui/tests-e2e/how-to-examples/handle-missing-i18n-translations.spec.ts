@@ -13,7 +13,7 @@ const markdown = getExampleSource(
 );
 
 // display-only example — no interaction to test
-test.describe("Show fallback text for missing i18n messages", { tag: "@website" }, () => {
+test.describe("show-fallback-text-for-missing-i18n-messages", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "show-fallback-text-for-missing-i18n-messages",

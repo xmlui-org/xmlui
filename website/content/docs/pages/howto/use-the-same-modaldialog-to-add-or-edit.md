@@ -4,8 +4,7 @@ Drive a single dialog and form into either "add" or "edit" mode based on whether
 
 Maintaining two separate dialogs for create and update leads to duplicated markup that drifts out of sync. Instead, wrap the `ModalDialog` and `Form` in a user-defined component, expose a custom `open(data?)` method, and let the presence or absence of `data` determine which mode the form operates in. Everything else — the URL, HTTP method, title, and pre-filled values — adapts automatically through conditional expressions.
 
-```xmlui-pg copy height="440px" name="Use the same ModalDialog to add or edit"
----app display {35-48}
+```xmlui-pg copy display {35-48} height="440px" name="Use the same ModalDialog to add or edit"
 <App var.editingProductId="{null}" var.showAddModal="{false}">
   <DataSource id="products" url="/api/products" />
 
@@ -47,7 +46,7 @@ Maintaining two separate dialogs for create and update leads to duplicated marku
   </Table>
 
 </App>
----comp display
+
 <Component name="ProductModal"
   var.editItem="{null}"
   method.open="(data) => { editItem = data; detailsDialog.open() }">

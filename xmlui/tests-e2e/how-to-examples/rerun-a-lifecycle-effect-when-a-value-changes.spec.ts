@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Re-arm a side effect when the active room changes", { tag: "@website" }, () => {
+test.describe("re-arm-a-side-effect-when-the-active-room-changes", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "re-arm-a-side-effect-when-the-active-room-changes",

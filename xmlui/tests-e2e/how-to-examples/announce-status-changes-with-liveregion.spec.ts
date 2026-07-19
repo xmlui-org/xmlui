@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/announce-status-changes-with-liveregion.md"),
 );
 
-test.describe("Announce save status", { tag: "@website" }, () => {
+test.describe("announce-save-status", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "announce-save-status");
 
   test("initial state shows the save button and initial status", async ({ initTestBed, page }) => {

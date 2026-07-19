@@ -1,5 +1,35 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { ModuleResolver } from "../../src/parsers/scripting/ModuleResolver";
+import viteXmluiPlugin from "../../src/nodejs/vite-xmlui-plugin";
+
+async function importGeneratedModule(code: string) {
+  const encoded = Buffer.from(code).toString("base64");
+  return import(`data:text/javascript;base64,${encoded}#${Math.random()}`);
+}
+
+async function transformXmlui(code: string, id: string, root = "/project") {
+  const plugin = viteXmluiPlugin({
+    analyze: "off",
+    reactiveCycles: "off",
+    accessibility: "off",
+    typeContracts: "off",
+  });
+  (plugin.configResolved as any)?.({ root });
+  const ctx = {
+    warn: vi.fn(),
+    error: (message: string) => {
+      throw new Error(String(message));
+    },
+  };
+  const result = await (plugin.transform as any).call(ctx, code, id, {});
+  return {
+    result,
+    warnings: ctx.warn,
+  };
+}
 
 describe("Vite Plugin Import Integration (Built Mode)", () => {
   beforeEach(() => {
@@ -9,6 +39,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     ModuleResolver.clearCache();
     ModuleResolver.resetImportStack();
     ModuleResolver.setCustomFetcher(null);
@@ -49,6 +80,82 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const resolved = ModuleResolver.resolvePath(importPath, componentFile);
 
       expect(resolved).toBe("/utils/helpers.xs");
+    });
+  });
+
+  describe("Inline components in entrypoint files", () => {
+    it("emits inlineComponents for Main.xmlui", async () => {
+      const { result } = await transformXmlui(
+        `
+          <Component name='MyInline'><Text value="inline" /></Component>
+          <App>
+            <MyInline />
+          </App>
+        `,
+        "/project/src/Main.xmlui",
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component).toMatchObject({
+        type: "App",
+        children: [{ type: "MyInline" }],
+      });
+      expect(mod.default.inlineComponents).toHaveLength(1);
+      expect(mod.default.inlineComponents[0]).toMatchObject({
+        name: "MyInline",
+        component: {
+          type: "Text",
+          props: {
+            value: "inline",
+          },
+        },
+      });
+    });
+
+    it("resolves inline component codeBehind relative to the entrypoint file", async () => {
+      const dir = await mkdtemp(join(tmpdir(), "xmlui-vite-inline-"));
+      const srcDir = join(dir, "src");
+      await mkdir(srcDir);
+      await writeFile(join(srcDir, "Inline.xs"), `var message = "hello";`);
+
+      const { result } = await transformXmlui(
+        `
+          <Component name='WithCodeBehind' codeBehind='Inline.xs'>
+            <Text value="{message}" />
+          </Component>
+          <App>
+            <WithCodeBehind />
+          </App>
+        `,
+        join(srcDir, "Main.xmlui"),
+        dir,
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const inlineComponent = mod.default.inlineComponents[0];
+      expect(inlineComponent.name).toBe("WithCodeBehind");
+      expect(inlineComponent.component.vars.message).toBeDefined();
+      expect(inlineComponent.codeBehindSource).toContain(`var message`);
+    });
+
+    it("serializes empty-app inline component warnings for the browser runtime", async () => {
+      const { result, warnings } = await transformXmlui(
+        `<Component name='OnlyInline'><Text value="inline" /></Component>`,
+        "/project/src/Main.xmlui",
+      );
+
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const mod = await importGeneratedModule(result.code);
+      expect(warnings).toHaveBeenCalledWith(
+        "[xmlui] /src/Main.xmlui contains only inline component definitions; rendering an empty Fragment.",
+      );
+      expect(warn).toHaveBeenCalledWith(
+        "[xmlui] /src/Main.xmlui contains only inline component definitions; rendering an empty Fragment.",
+      );
+      expect(mod.default.component).toMatchObject({ type: "Fragment" });
+      expect(mod.default.warnings).toEqual([
+        "/src/Main.xmlui contains only inline component definitions; rendering an empty Fragment.",
+      ]);
     });
   });
 

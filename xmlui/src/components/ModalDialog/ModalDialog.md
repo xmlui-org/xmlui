@@ -43,7 +43,7 @@ The `when` property accepts a primitive boolean or a binding expression resolvin
 Using the `when` property in a `ModalDialog` dialog component is commonly used with deep linking:
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
-```xmlui-pg height="220px"
+```xmlui-pg name="With when" height="220px"
 ---app copy display name="Example: when"
 <App>
   <variable name="isDialogShown" value="{false}"/>
@@ -82,7 +82,7 @@ The `ModalDialog` component is also a container such as the [`Card`](/docs/refer
 
 %-PROP-START fullScreen
 
-```xmlui-pg height="220px"
+```xmlui-pg name="The ModalDialog as a Container" height="220px"
 ---app copy display name="Example: fullScreen"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
@@ -107,7 +107,7 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 %-PROP-START closeButtonVisible
 
-```xmlui-pg height="220px"
+```xmlui-pg name="The ModalDialog as a Container 2" height="220px"
 ---app copy display name="Example: closeButtonVisible"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
@@ -123,7 +123,7 @@ Click outside the dialog to close it.
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```xmlui-pg height="220px"
+```xmlui-pg name="The ModalDialog as a Container 3" height="220px"
 ---app copy {6-8} display name="Example: open/close events"
 <App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
@@ -145,7 +145,7 @@ Open and close the dialog several times to test that it changes the counter.
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```xmlui-pg height="220px"
+```xmlui-pg name="The ModalDialog as a Container 4" height="220px"
 ---app copy {6-8} display name="Example: open/close events"
 <App>
   <Button label="Open Dialog" onClick="myDialog.open()" />

@@ -24,7 +24,7 @@ Or you can use the `xmlui-pg` directive to define a live XMLUI playground. This 
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="XMLUI codefences and playgrounds"
 <Button label="Hello World" onClick="toast('click')"/>
 ```
 
@@ -62,7 +62,7 @@ Use the `---app` directive to show a complete app with full `App` context and a 
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Application context" height="160px"
 ---app
 <App>
   <NavPanel>
@@ -110,7 +110,7 @@ Use the `---comp` directive to define a component. This markup:
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Component context" height="160px"
 ---app
 <App>
   <NavPanel>
@@ -131,6 +131,39 @@ produces this rendering:
   <Button label="Hello World" onClick="toast('click')" />
 </Component>
 ```
+
+## Inline component definitions
+
+For small examples, you can keep reusable component definitions in the same
+app block. Top-level `<Component>` declarations in an `xmlui-pg` app work like
+top-level inline components in `Main.xmlui`: they are registered
+as reusable components, and the single non-`Component` top-level element is the
+app to render.
+
+```xmlui-pg copy display name="Inline component in playground"
+<Component name="StatusPill">
+  <Badge value="{$props.value}" variant="pill" />
+</Component>
+
+<App>
+  <VStack gap="8px">
+    <StatusPill value="Ready" />
+    <StatusPill value="Synced" />
+  </VStack>
+</App>
+```
+
+An app block can contain zero, one, or many top-level `<Component>`
+declarations, but it can contain only one top-level non-`Component` app root.
+The top-level declarations and the app root can appear in any order; this
+example puts the component first because inline component definitions are the
+focus.
+If the app block contains only `<Component>` declarations, XMLUI renders an
+empty app and logs a browser warning. `---comp` sections remain strict reusable
+component definitions; when a `---comp` component and an inline app component
+use the same name, the `---comp` component wins.
+
+For app files, the same pattern is documented in [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) and [User-defined components](/docs/guides/user-defined-components#where-to-declare-components).
 
 
 ## Description block
@@ -169,7 +202,7 @@ We define a `HelloButton` component for use in the app.
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Description block" height="160px"
 ---app display
 <App>
   <NavPanel>
@@ -266,7 +299,7 @@ Use `display` to show source. This markup:
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="display"
 ---app display
 <App>
   <Button label="Hello World" />
@@ -289,7 +322,7 @@ Use `copy` with `display` to add a button that copies the source.
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="copy"
 ---app display copy
 <App>
   <Button label="Hello World" />
@@ -313,7 +346,7 @@ This markup:
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="name"
 ---app display
 <App>
   <Text>This is a named example</Text>
@@ -364,7 +397,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Single line"
 ---app display {3}
 <App>
   <VStack>
@@ -393,7 +426,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Multiple lines (comma-separated)"
 ---app display {3, 4}
 <App>
   <VStack>
@@ -423,7 +456,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Line ranges"
 ---app display {3-5}
 <App>
   <VStack>
@@ -453,7 +486,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Mixed ranges and individual lines"
 ---app display {1, 3-5, 7}
 <App>
   <VStack>
@@ -483,7 +516,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Attribute name and value"
 ---app display  /variant="outlined"/
 <App>
   <Button label="Highlighted Attribute" variant="outlined" themeColor="primary" />
@@ -507,7 +540,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Attribute names"
 ---app display /name/ /size/
 <App>
   <Icon name="star" size="lg" />
@@ -531,7 +564,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Red border highlighting"
 ---app display !/{ 6 * 7 }/
 <App>
   <Text value="Life, the universe, and everything: { 6 * 7 }" />
@@ -581,4 +614,3 @@ Modifiers can be combined in various ways.
 | `{2-4, 7}` | Mixed ranges and individual lines |
 | `/pattern/` | Highlight pattern matches |
 | `!/pattern/` | Red border highlight for pattern |
-

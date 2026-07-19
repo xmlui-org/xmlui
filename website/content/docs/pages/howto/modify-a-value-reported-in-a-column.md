@@ -4,13 +4,8 @@ Format or replace the raw cell value by adding child content to a `Column` — u
 
 A `Column` with no children renders its `bindTo` value as plain text. Add children to take full control: an expression wrapped in curly braces for formatting, or a component tag to render icons, badges, or buttons. Both approaches have access to `$item` (the full row object) and `$cell` (the bound column value).
 
-```xmlui-pg noHeader name="Modify a value reported in a Column"
----app
+```xmlui-pg display noHeader name="Modify a value reported in a Column"
 <App>
-  <Test />
-</App>
----comp display
-<Component name="Test">
   <DataSource
     id="invoices_with_badges"
     url="/resources/files/invoices.json"
@@ -29,21 +24,21 @@ A `Column` with no children renders its `bindTo` value as plain text. Add childr
         <StatusBadge status="{$item.status}" /> <!-- embed component, pass value -->
     </Column>
   </Table>
-</Component>
----comp display
+</App>
+
 <Component
-    name="StatusBadge"
-    var.statusColors="{{
-        draft: { background: '#f59e0b', label: 'white' },
-        sent: { background: '#3b82f6', label: 'white' },
-        paid: { background: '#10b981', label: 'white' }
-    }}"
+  name="StatusBadge"
+  var.statusColors="{{
+      draft: { background: '#f59e0b', label: 'white' },
+      sent: { background: '#3b82f6', label: 'white' },
+      paid: { background: '#10b981', label: 'white' }
+  }}"
 >
-    <Badge
-        value="{$props.status}"
-        colorMap="{statusColors}"
-        variant="pill"
-    />
+  <Badge
+      value="{$props.status}"
+      colorMap="{statusColors}"
+      variant="pill"
+  />
 </Component>
 ```
 

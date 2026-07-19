@@ -37,14 +37,11 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 
 ## User-defined components
 
-You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
+You'll also create your own components to combine and extend the built-ins. In `Main.xmlui`, short app-specific components can live in the same file as the app markup. The app root and the top-level `<Component>` declarations can appear in any order; this chapter puts the component definition first because the component itself is the focus.
 
-```xmlui-pg id="built-in-components-eafb"
----app display /line/
-<App>
-  <TubeStops line="Bakerloo"/>
-</App>
----comp display /line/
+For example, here's a component that represents the stops on a London tube line:
+
+```xmlui-pg name="User-defined components" display /line/ id="built-in-components-eafb"
 <Component name="TubeStops">
   <DataSource
     id="stops"
@@ -68,14 +65,41 @@ You'll also create your own components to combine and extend the built-ins. For 
       </Fragment>
     </Column>
   </Table>
-
 </Component>
+
+<App>
+  <TubeStops line="Bakerloo"/>
+</App>
 ```
 
 An instance of `TubeStops` extracts details for a given tube line. Multiple instances can be arranged on the display using layout components. For example, here's a two-column layout.
 
-```xmlui-pg display id="user-defined-components-eab5"
----app display
+```xmlui-pg name="User-defined components 2" display id="user-defined-components-eab5"
+<Component name="TubeStops">
+  <DataSource
+    id="stops"
+    when="{$props.line}"
+    url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
+    transformResult="{transformStops}"
+  />
+  <Text variant="strong">{$props.line}</Text>
+
+  <Table data="{stops}">
+    <Column width="3*" bindTo="name" />
+    <Column bindTo="zone" />
+    <Column bindTo="wifi" >
+      <Fragment when="{$item.wifi === 'yes'}">
+        <Icon name="checkmark"/>
+      </Fragment>
+    </Column>
+    <Column bindTo="toilets" >
+      <Fragment when="{$item.toilets === 'yes'}">
+        <Icon name="checkmark"/>
+      </Fragment>
+    </Column>
+  </Table>
+</Component>
+
 <App>
     <FlowLayout>
       <Stack width="*">
@@ -86,38 +110,12 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
       </Stack>
     </FlowLayout>
 </App>
----comp
-<Component name="TubeStops">
-  <DataSource
-    id="stops"
-    when="{$props.line}"
-    url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
-    transformResult="{transformStops}"
-  />
-  <Text variant="strong">{$props.line}</Text>
-
-  <Table data="{stops}">
-    <Column width="3*" bindTo="name" />
-    <Column bindTo="zone" />
-    <Column bindTo="wifi" >
-      <Fragment when="{$item.wifi === 'yes'}">
-        <Icon name="checkmark"/>
-      </Fragment>
-    </Column>
-    <Column bindTo="toilets" >
-      <Fragment when="{$item.toilets === 'yes'}">
-        <Icon name="checkmark"/>
-      </Fragment>
-    </Column>
-  </Table>
-
-</Component>
 ```
 
 
 The `TubeStops` component:
 
-**Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`.
+**Lives in `Main.xmlui` here**. Because this is a short, local example, `TubeStops` is declared inline in the same entry file as the app that uses it. For larger or shared components, move the same `<Component name="TubeStops">` markup into `components/TubeStops.xmlui`; see [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file).
 
 **Can handle any properties passed in the `$props` [context variable](/context-variables)**. A calling component can send one or more `name="value"` pairs like `line="Bakerloo"`.
 

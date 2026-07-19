@@ -155,7 +155,7 @@ The same proxy + `error_page 404` pattern also works for an app served at the ro
 
 XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
 
-```xmlui-pg display
+```xmlui-pg name="Links" display
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -182,7 +182,7 @@ Here, `/` and `/contacts` are absolute links within the app, `about` is a relati
 
 You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/docs/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
-```xmlui-pg display copy
+```xmlui-pg name="Dynamic route segments" display copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -254,7 +254,7 @@ When you start the app, the route is "/" (by default) and matches the Home page'
 
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
-```xmlui-pg copy display {4-5}
+```xmlui-pg name="Active links" copy display {4-5}
 <App display layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>

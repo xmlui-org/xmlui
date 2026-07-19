@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Collect app errors in a global status panel", { tag: "@website" }, () => {
+test.describe("collect-app-errors-in-a-global-status-panel", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "collect-app-errors-in-a-global-status-panel",

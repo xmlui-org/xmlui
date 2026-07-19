@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("FormItem regex validation with severity", { tag: "@website" }, () => {
+test.describe("formitem-regex-validation-with-severity", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "formitem-regex-validation-with-severity",

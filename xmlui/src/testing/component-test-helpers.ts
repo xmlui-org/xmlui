@@ -26,6 +26,7 @@ export function parseComponentIfNecessary(
   }
   return {
     component: rawComponent,
+    inlineComponents: [],
     errors: [],
     warnings: [],
     erroneousCompoundComponentName: undefined,

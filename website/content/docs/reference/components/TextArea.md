@@ -314,6 +314,12 @@ This method sets the focus on the `TextArea` component.
 </App>
 ```
 
+### `insert` [#insert]
+
+This method inserts the specified text at the current cursor position of the `TextArea` component, leaving the caret just after the inserted text.
+
+**Signature**: `insert(text: string): void`
+
 ### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).

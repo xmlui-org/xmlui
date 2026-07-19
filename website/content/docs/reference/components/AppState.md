@@ -18,7 +18,7 @@ Variables in xmlui are a straightforward tool for managing states. However, a va
 
 In the following example, the main file of the app declares a variable, `enhancedMode`, which is toggled with a checkbox:
 
-```xmlui-pg
+```xmlui-pg name="Storing State in Variables"
 ---app copy display filename="Main.xmlui"
 <App var.enhancedMode="{false}">
   <VStack gap="$space-4" padding="$space-4">
@@ -57,7 +57,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```xmlui-pg 
+```xmlui-pg name="Storing State in AppState" 
 ---app copy display filename="Main.xmlui"
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>

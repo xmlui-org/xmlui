@@ -174,7 +174,7 @@ Sometimes you want to preserve line breaks, as when inspecting a JSON object.
 
 In addition to the theme variables that govern the `Text` component, you can use the [`variant`](/docs/reference/components/Text#variant) property to control styles directly.
 
-```xmlui-pg
+```xmlui-pg name="Variants of the Text component"
 <App>
   <HStack>
     <Text width="150px">default:</Text>

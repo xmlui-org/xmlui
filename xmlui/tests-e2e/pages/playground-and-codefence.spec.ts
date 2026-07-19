@@ -1,8 +1,12 @@
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { expect, test } from "../../src/testing/fixtures";
+import { extractXmluiExample, getExampleSource } from "../../src/testing/website-example-utils";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const markdown = getExampleSource(
+  path.join(__dirname, "../../../website/content/docs/pages/playground-and-codefence.md"),
+);
 
 // The "list of fruits" example has a multiline initialize string in its ---api
 // section that isn't parseable by extractXmluiExample. We construct the pieces
@@ -28,5 +32,23 @@ test.describe("list of fruits", { tag: "@website" }, () => {
     await expect(page.getByText("Orange")).toBeVisible();
     await expect(page.getByText("Apple")).toBeVisible();
     await expect(page.getByText("Pear")).toBeVisible();
+  });
+});
+
+test.describe("Inline component in playground", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(
+    markdown,
+    "Inline component in playground",
+  );
+
+  test("renders inline components declared in the app block", async ({ initTestBed, page }) => {
+    await initTestBed(app, {
+      components,
+      apiInterceptor,
+      noFragmentWrapper: true,
+      parserOptions: { role: "entrypoint" },
+    });
+    await expect(page.getByText("Ready")).toBeVisible();
+    await expect(page.getByText("Synced")).toBeVisible();
   });
 });

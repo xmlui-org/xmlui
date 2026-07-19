@@ -5,8 +5,6 @@ Gate the entire app behind a login screen so unauthenticated users see only a si
 Use a reactive boolean variable (`var.authenticated`) to toggle between a login view and the real application. When the variable is `false`, render a sign-in prompt; when `true`, render the `App` with its `NavPanel` and `Pages`. Because the condition is reactive, flipping the variable immediately swaps the view — no page reload needed.
 
 ```xmlui-pg copy display name="Auth gate with conditional App rendering" height="200px"
----app display
-<!-- In Main.xmlui -->
 <Fragment var.authenticated="{false}">
 
   <AuthenticatedApp when="{authenticated}" />
@@ -21,7 +19,6 @@ Use a reactive boolean variable (`var.authenticated`) to toggle between a login 
 
 </Fragment>
 
----comp display
 <Component name="AuthenticatedApp">
   <App name="Authenticated App">
     <NavPanel>

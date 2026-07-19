@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/add-a-skip-link-to-main-content.md"),
 );
 
-test.describe("Skip repeated navigation", { tag: "@website" }, () => {
+test.describe("skip-repeated-navigation", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "skip-repeated-navigation");
 
   async function tabToSkipLink(page: any, skipLink: any) {

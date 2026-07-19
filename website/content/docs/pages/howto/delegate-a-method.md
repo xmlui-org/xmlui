@@ -4,13 +4,12 @@ Forward a user-defined component's API surface to an internal built-in component
 
 A `TaskDialog` component wraps a `ModalDialog` internally. The parent needs to open and close it by calling `taskDialog.open()` and `taskDialog.close()`, but it should not reach inside the component to talk to the `ModalDialog` directly. The `method.` shorthand on `<Component>` wires those two names to the internal dialog calls with no JavaScript required.
 
-```xmlui-pg copy display name="TaskDialog with delegated open and close methods" height="400px"
----app display /method\./ /MyModalWrapper/
+```xmlui-pg copy display /method\./ /MyModalWrapper/ name="TaskDialog with delegated open and close methods" height="400px"
 <App>
   <Button label="Open Task" onClick="taskDialog.open()" />
   <TaskDialog id="taskDialog" title="Fix login bug" assignee="Alice" />
 </App>
----comp display /method\./ TaskDialog
+
 <Component
   name="TaskDialog"
   method.open="internalModal.open()"

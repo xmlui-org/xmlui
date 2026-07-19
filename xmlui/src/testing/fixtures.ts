@@ -68,6 +68,7 @@ import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
 import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
+import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -200,6 +201,7 @@ export type TestBedDescription = Omit<
   /** @deprecated Use globalsXs instead. Alias kept for backward compatibility. */
   mainXs?: string;
   noFragmentWrapper?: boolean;
+  parserOptions?: XmluiParserOptions;
   extensionIds?: string | string[];
 };
 
@@ -336,7 +338,13 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           </Fragment>
         `;
 
-      const { errors, warnings, component } = xmlUiMarkupToComponent(markup);
+      const { errors, warnings, component, inlineComponents } = xmlUiMarkupToComponent(
+        markup,
+        undefined,
+        undefined,
+        undefined,
+        description?.parserOptions,
+      );
 
       if (warnings.length > 0) {
         console.group(`[xmlui] Warnings in markup:`);
@@ -363,7 +371,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           );
         }
         return component as CompoundComponentDef;
-      });
+      }) ?? inlineComponents;
 
       let runtime: any;
       const globalsXsSource = description?.globalsXs ?? description?.mainXs;

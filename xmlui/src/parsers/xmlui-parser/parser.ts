@@ -201,6 +201,12 @@ class ParseStack {
 
 export type GetText = (n: Node, ignoreTrivia?: boolean) => string;
 
+export type XmluiFileRole = "component" | "entrypoint";
+
+export type XmluiParserOptions = {
+  role?: XmluiFileRole;
+};
+
 export type ParseResult = { node: Node; errors: ParserDiag[] };
 
 const RECOVER_FILE = [SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNodeStart] as const;
@@ -252,18 +258,22 @@ const HELPER_NAMES = new Set([
 const ON_PREFIX_REGEX = /^on[A-Z]/;
 const UPPERCASE_REGEX = /^[A-Z]/;
 
-export function createXmlUiParser(source: string): {
+export function createXmlUiParser(source: string, options: XmluiParserOptions = {}): {
   parse: () => ParseResult;
   getText: GetText;
 } {
   return {
-    parse: () => parseXmlUiMarkup(source),
+    parse: () => parseXmlUiMarkup(source, options),
     getText: (n: { pos?: number; start?: number; end: number }, ignoreTrivia: boolean = true) =>
       source.substring(ignoreTrivia ? (n.pos ?? n.start ?? 0) : (n.start ?? n.pos ?? 0), n.end),
   };
 }
 
-export function parseXmlUiMarkup(text: string): ParseResult {
+export function parseXmlUiMarkup(
+  text: string,
+  options: XmluiParserOptions = {},
+): ParseResult {
+  const role = options.role ?? "component";
   const cursor = new DocumentCursor(text);
   const stack = new ParseStack(cursor);
   let peekedToken: Node | undefined;
@@ -292,7 +302,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         case SyntaxKind.EndOfFileToken:
           bumpAny();
           const fileContentListNode = createNode(SyntaxKind.ContentListNode, stack.node.children!);
-          validateSingleRootElement(fileContentListNode);
+          validateTopLevelElements(fileContentListNode);
           return fileContentListNode;
         case SyntaxKind.CData:
           bumpAny();
@@ -758,10 +768,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       return;
     }
 
-    if (!stack.hasNonHelperChildren()) {
-      errorAt(DIAGS_PARSER.compDefNesedElem, errReportNode.pos, errReportNode.end);
-    }
-
     for (const attr of attrs) {
       if (attr.namespace === "xmlns") {
         continue;
@@ -881,6 +887,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+  function validateTopLevelElements(fileContentListNode: Node) {
+    if (role === "entrypoint") {
+      validateEntrypointTopLevelElements(fileContentListNode);
+      return;
+    }
+    validateSingleRootElement(fileContentListNode);
+  }
+
   function validateSingleRootElement(fileContentListNode: Node) {
     const children = fileContentListNode.children ?? [];
     // --- Check that the nodes contains exactly only a single component root element before the EoF token
@@ -889,6 +903,32 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
     if (children.length > 2) {
       errorAt(DIAGS_PARSER.singleRootElem, children[1].pos, children[1].end);
+    }
+  }
+
+  function validateEntrypointTopLevelElements(fileContentListNode: Node) {
+    const children = fileContentListNode.children ?? [];
+    let appRoot: Node | undefined;
+
+    for (const child of children) {
+      if (child.kind === SyntaxKind.EndOfFileToken) {
+        continue;
+      }
+
+      if (child.kind !== SyntaxKind.ElementNode) {
+        errorAt(DIAGS_PARSER.singleRootElem, child.pos, child.end);
+        continue;
+      }
+
+      if (getElementName(child) === COMPOUND_COMPONENT_NAME) {
+        continue;
+      }
+
+      if (appRoot) {
+        errorAt(DIAGS_PARSER.singleRootElem, child.pos, child.end);
+        continue;
+      }
+      appRoot = child;
     }
   }
 

@@ -1096,6 +1096,11 @@
                     <NavGroup label="User-Defined Components">
                         <NavLink
                             icon="article"
+                            label="Keep a small app in one file"
+                            to="/docs/howto/keep-a-small-app-in-one-file"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Create a reusable component"
                             to="/docs/howto/create-a-reusable-component"
                         />
@@ -2612,6 +2617,11 @@
             </Page>
 
             <!-- New how-to articles: User-Defined Components -->
+            <Page url="/docs/howto/keep-a-small-app-in-one-file">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-a-small-app-in-one-file.md']}"
+                />
+            </Page>
             <Page url="/docs/howto/create-a-reusable-component">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/create-a-reusable-component.md']}"

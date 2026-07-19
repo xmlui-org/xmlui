@@ -4,7 +4,7 @@ When placing items, particularly input fields, in an `HStack` or a `Stack` with 
 
 Without the `width` property set:
 
-```xmlui-pg copy display id="set-the-width-of-an-input-field-in-an-hstack-b6ec"
+```xmlui-pg name="Set the Width of an Input Field in an HStack" copy display id="set-the-width-of-an-input-field-in-an-hstack-b6ec"
 <App>
   <HStack>
     <TextBox initialValue="First" />
@@ -15,7 +15,7 @@ Without the `width` property set:
 
 With the property set:
 
-```xmlui-pg copy display /width="*"/
+```xmlui-pg name="Set the Width of an Input Field in an HStack 2" copy display /width="*"/
 <App>
   <HStack>
     <TextBox initialValue="First" width="*" />
@@ -26,7 +26,7 @@ With the property set:
 
 You can set the width of all items at the `HStack` level:
 
-```xmlui-pg copy display /width="*"/
+```xmlui-pg name="Set the Width of an Input Field in an HStack 3" copy display /width="*"/
 <App>
   <HStack itemWidth="*">
     <TextBox initialValue="First" />

@@ -14,6 +14,7 @@ import { clearAllModuleCaches } from "../parsers/scripting/ModuleCache";
 import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
+import path from "node:path";
 import {
   errReportComponent,
   xmlUiMarkupToComponent,
@@ -32,7 +33,12 @@ import { lintComponentDef } from "../components-core/accessibility/linter";
 import type { A11yRegistry } from "../components-core/accessibility";
 import { verifyComponentDef } from "../components-core/type-contracts/verifier";
 import { filterSuppressedTypeContractDiagnostics } from "../components-core/type-contracts/suppression";
-import type { ComponentDef, ComponentMetadata, OptimizerMetadataView } from "../abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  ComponentMetadata,
+  CompoundComponentDef,
+  OptimizerMetadataView,
+} from "../abstractions/ComponentDefs";
 import { metadataRegistry } from "../language-server/metadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 
@@ -151,6 +157,25 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
+  const isComponentsPath = (p: string) => p.includes("/components/");
+  const isEntrypointPath = (p: string) => !isComponentsPath(p) && /\/Main\.xmlui$/.test(p);
+  const rootForAnalysis = (component: ComponentDef | CompoundComponentDef): ComponentDef =>
+    (component as CompoundComponentDef).component &&
+    typeof (component as CompoundComponentDef).component === "object"
+      ? (component as CompoundComponentDef).component
+      : (component as ComponentDef);
+  const inlineComponentFileName = (entrypointFile: string, componentName: string) =>
+    `${entrypointFile}#components/${componentName}.${componentFileExtension}`;
+  const browserWarningLogCode = (warnings: string[]) => {
+    if (warnings.length === 0) {
+      return "";
+    }
+    return (
+      warnings
+        .map((msg) => `console.warn("[xmlui] " + ${JSON.stringify(msg)});`)
+        .join("\n") + "\n"
+    );
+  };
 
   // Build optimizer metadata lookup for extension packages.
   // When optimizerSourceDirs are provided, scan them and merge with the built-in
@@ -196,6 +221,46 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     // Merged lookup: extension packages first, then built-in components (including DataLoader).
     extensionMetadataLookup = (type: string) =>
       extensionMetadata[type] ?? getOptimizerMetadata(type);
+  }
+
+  async function resolveInlineComponentCodeBehind(
+    inlineComponents: CompoundComponentDef[],
+    entrypointFile: string,
+  ) {
+    for (const inlineComponent of inlineComponents) {
+      if (!inlineComponent.codeBehind) {
+        continue;
+      }
+      const codeBehindPath = normalizePath(
+        path.resolve(path.dirname(entrypointFile), inlineComponent.codeBehind),
+      );
+      const code = await fs.readFile(codeBehindPath, "utf-8");
+      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+        try {
+          return await fs.readFile(modulePath, "utf-8");
+        } catch (e) {
+          throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
+        }
+      };
+      clearAllModuleCaches();
+      const codeBehind = await collectCodeBehindFromSourceWithImports(
+        codeBehindPath,
+        code,
+        moduleFetcher,
+      );
+      removeCodeBehindTokensFromTree(codeBehind);
+      inlineComponent.component = {
+        ...inlineComponent.component,
+        vars: {
+          ...inlineComponent.component.vars,
+          ...codeBehind.vars,
+        },
+        functions: codeBehind.functions || inlineComponent.component.functions,
+        scriptError: codeBehind.moduleErrors,
+      };
+      (inlineComponent as any).codeBehindSource = code;
+      (inlineComponent as any).resolvedCodeBehind = codeBehindPath;
+    }
   }
 
   return {
@@ -259,10 +324,21 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           }
         }
 
-        let { component, errors, warnings, erroneousCompoundComponentName } =
-          xmlUiMarkupToComponent(code, fileId, codeBehind, extensionMetadataLookup);
+        const parserOptions = isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {};
+        let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
+          xmlUiMarkupToComponent(
+            code,
+            fileId,
+            codeBehind,
+            extensionMetadataLookup,
+            parserOptions,
+          );
+        if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
+          await resolveInlineComponentCodeBehind(inlineComponents, normalizedId);
+        }
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
+          inlineComponents = [];
         }
         if (warnings.length > 0) {
           warnings.forEach((msg) => this.warn(`[xmlui] ${msg}`));
@@ -272,7 +348,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         if (analyzeMode !== "off") {
           try {
             const strict = analyzeMode === "strict";
-            const analyzerDiags = analyze({ files: [{ file: fileId, source: code }], strict });
+            const analyzerFiles = component
+              ? [
+                  { file: fileId, source: code, markupAst: rootForAnalysis(component) },
+                  ...inlineComponents.map((inlineComponent) => ({
+                    file: inlineComponentFileName(fileId, inlineComponent.name),
+                    source: code,
+                    markupAst: inlineComponent.component,
+                  })),
+                ]
+              : [{ file: fileId, source: code }];
+            const analyzerDiags = analyze({ files: analyzerFiles, strict });
             for (const diag of analyzerDiags) {
               if (diag.severity === "error" && strict) {
                 this.error(`[xmlui-check] ${diag.code}: ${diag.message}`);
@@ -290,15 +376,20 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // and report any cycles found. The same root is retained for the
         // aggregate buildEnd scan below.
         if (cyclesMode !== "off" && component) {
-          const root =
-            (component as any).component &&
-            typeof (component as any).component === "object"
-              ? (component as any).component
-              : (component as any);
-          reactiveCycleRoots.set(fileId, root);
+          const roots = [
+            { file: fileId, root: rootForAnalysis(component) },
+            ...inlineComponents.map((inlineComponent) => ({
+              file: inlineComponentFileName(fileId, inlineComponent.name),
+              root: inlineComponent.component,
+            })),
+          ];
           let cycleHits: ReturnType<typeof findCycles> | null = null;
           try {
-            const graph = collectComponentDefGraph(root);
+            roots.forEach(({ file, root }) => reactiveCycleRoots.set(file, root));
+            const graph = collectComponentDefGraph({
+              type: "Fragment",
+              children: roots.map(({ root }) => root),
+            });
             cycleHits = findCycles(graph);
           } catch (_cyclesErr) {
             // Analyzer failure must never break the build.
@@ -331,24 +422,28 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // are warnings; in strict mode must-have codes call this.error().
         if (a11yMode !== "off" && component) {
           try {
-            const root: any =
-              (component as any).component &&
-              typeof (component as any).component === "object"
-                ? (component as any).component
-                : component;
+            const roots = [
+              { file: fileId, root: rootForAnalysis(component) },
+              ...inlineComponents.map((inlineComponent) => ({
+                file: inlineComponentFileName(fileId, inlineComponent.name),
+                root: inlineComponent.component,
+              })),
+            ];
             const strictA11y = a11yMode === "strict";
-            const a11yHits = lintComponentDef(root, a11yRegistry, {
-              strict: strictA11y,
-              skipUnknown: true,
-            });
-            for (const hit of a11yHits) {
-              const message = `[xmlui:a11y] ${fileId}: [${hit.code}] ${hit.message}${hit.fix ? ` Suggestion: ${hit.fix}` : ""}`;
-              if (strictA11y && hit.severity === "error") {
-                a11yErrorCount++;
-                this.error(message);
-              } else {
-                a11yWarnCount++;
-                this.warn(message);
+            for (const { file, root } of roots) {
+              const a11yHits = lintComponentDef(root, a11yRegistry, {
+                strict: strictA11y,
+                skipUnknown: true,
+              });
+              for (const hit of a11yHits) {
+                const message = `[xmlui:a11y] ${file}: [${hit.code}] ${hit.message}${hit.fix ? ` Suggestion: ${hit.fix}` : ""}`;
+                if (strictA11y && hit.severity === "error") {
+                  a11yErrorCount++;
+                  this.error(message);
+                } else {
+                  a11yWarnCount++;
+                  this.warn(message);
+                }
               }
             }
           } catch (_a11yErr) {
@@ -363,11 +458,13 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         if (typeContractMode !== "off" && component) {
           let hits: ReturnType<typeof verifyComponentDef> = [];
           try {
-            const root: any =
-              (component as any).component &&
-              typeof (component as any).component === "object"
-                ? (component as any).component
-                : component;
+            const root: ComponentDef = {
+              type: "Fragment",
+              children: [
+                rootForAnalysis(component),
+                ...inlineComponents.map((inlineComponent) => inlineComponent.component),
+              ],
+            };
             const strictTypes = typeContractMode === "strict";
             hits = verifyComponentDef(root, typeContractRegistry, {
               strict: strictTypes,
@@ -392,6 +489,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         const file = {
           component,
+          inlineComponents,
           src: code,
           ...codeBehind,
           file: fileId,
@@ -399,7 +497,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         };
 
         return {
-          code: dataToEsm(file),
+          code: browserWarningLogCode(warnings) + dataToEsm(file),
           map: { mappings: "" },
           moduleType: "js",
         };
@@ -594,4 +692,5 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       return undefined;
     },
   };
+
 }

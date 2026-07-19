@@ -6,7 +6,7 @@ Such refactoring requires you to create and name new `.xmlui` files, identify in
 
 Here's a simple component to package a name/value pair.
 
-```xmlui-pg display noHeader id="user-defined-components-b6c8"
+```xmlui-pg name="User-defined components" display noHeader id="user-defined-components-b6c8"
 ---app display
 <App>
   <NameValue name="Mary" value="123" />
@@ -20,7 +20,47 @@ Here's a simple component to package a name/value pair.
 </Component>
 ```
 
-The component's name must start with an uppercase letter followed by letters, digits, the underscore (`_`), or the dollar sign (`$`) character. Components must be placed into separate files in the `components` folder within the app's root folder. The component's name must match its filename.
+The component's name must start with an uppercase letter followed by letters, digits, the underscore (`_`), or the dollar sign (`$`) character.
+
+## Where to declare components
+
+Most user-defined components live in separate files under the `components` folder. A file-based component is discovered automatically, and its filename must match the component name: `components/NameValue.xmlui`
+
+```xmlui
+<Component name="NameValue">
+  <Card width="20%">
+    <Text>Name: {$props.name}</Text>
+    <Text>Value: {$props.value}</Text>
+  </Card>
+</Component>
+```
+
+For short, app-specific components, you can also declare one or more top-level `<Component>` definitions directly in `Main.xmlui`, together with the app markup:
+
+```xmlui
+<Component name="NameValue">
+  <Card width="20%">
+    <Text>Name: {$props.name}</Text>
+    <Text>Value: {$props.value}</Text>
+  </Card>
+</Component>
+
+<App>
+  <NameValue name="Mary" value="123" />
+</App>
+```
+
+Use inline components when the component is small and local to the entry file. Move it into `components/NameValue.xmlui` when it is shared across pages, grows large, or should have its own file-local code-behind. See [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) for the task-oriented version of this pattern.
+
+Entry files have these top-level rules:
+
+- `Main.xmlui` can contain zero, one, or many top-level `<Component>` declarations.
+- The single top-level non-`Component` element is the app markup.
+- The app markup and top-level `<Component>` declarations can appear in any order. The examples on this page put the component first because the component definition is the focus.
+- Multiple top-level non-`Component` elements are an error.
+- If the file contains only `<Component>` declarations, XMLUI renders an empty app as if the file contained `<Fragment />`, and logs a browser warning.
+- Component files under `components/` remain strict: they contain one `<Component>` definition, not app markup plus component declarations.
+- If an inline component and a file-based component have the same name, the file-based component wins.
 
 Here's how you can define default values for properties.
 
@@ -37,7 +77,7 @@ Here's how you can define default values for properties.
 
 The `<IncButton>` component increments its value for every click, and notifies its environment by firing an event. The event's handler receives the current counter as an event parameter.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Events" noHeader
 ---app display
 <App>
   <Card width="30%">
@@ -61,7 +101,7 @@ The `<IncButton>` component increments its value for every click, and notifies i
 This section describes how to expose a component's internal [methods](/docs/helper-tags#method).
 The `<UsingInternalModal>` component exports the `open` method of the `ModalDialog` that it defines.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Methods" noHeader
 ---app display
 <App height="300px" >
   <UsingInternalModal id="component"/>
@@ -84,7 +124,7 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
 
 A component can call its own exported methods internally using the reserved name `$self`:
 
-```xmlui-pg
+```xmlui-pg name="Methods 2"
 ---app display
 <App>
   <Counter id="counter1"/>
@@ -110,7 +150,7 @@ A component can pass data back to the slot content that the parent provides. Thi
 
 Add extra attributes to the `<Slot>` tag. Each attribute becomes a context variable (prefixed with `$`) inside the parent's template content.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Passing data into slot content" noHeader
 ---app display
 <App>
   <StatusList

@@ -2,6 +2,24 @@
 
 When you write XML markup to create an XMLUI app, you use XML tags to name components. And you use XML attributes to set properties that govern their behavior.
 
+## App file roots
+
+In `Main.xmlui`, the top-level markup can include reusable component declarations as well as the app markup. Top-level `<Component>` elements define user-defined components. The single top-level element that is not `<Component>` is the app to render.
+
+```xmlui
+<App>
+  <StatusPill value="Ready" />
+</App>
+
+<Component name="StatusPill">
+  <Badge value="{ $props.value }" variant="pill" />
+</Component>
+```
+
+An entry file can contain zero, one, or many top-level `<Component>` declarations, but it can contain only one top-level app root. Their order does not matter: put the app first when you want readers to understand the page flow, or put component definitions first when the reusable building blocks are the focus. If the file contains only `<Component>` declarations, XMLUI renders an empty app as if the file contained `<Fragment />`, and logs a browser warning.
+
+This mixed top-level form is entry-file only. A component file in the `components` folder still contains a single `<Component>` definition. See [User-defined components](/docs/guides/user-defined-components#where-to-declare-components) for the component rules and [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) for a practical example.
+
 ## Properties
 
 An attribute may be a literal string that sets the value of a property.
@@ -76,18 +94,20 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
   >
     <Text>Search for station amenities</Text>
     <HStack verticalAlignment="center" >
-      <FormItem bindTo="station" />
+      <FormItem bindTo="station" width="*" />
       <FormItem
         type="checkbox"
         label="wifi"
         bindTo="wifi"
         labelPosition="start"
+        width="fit-content"
       />
       <FormItem
         type="checkbox"
         label="toilets"
         bindTo="toilets"
         labelPosition="start"
+        width="fit-content"
       />
     </HStack>
     <property name="buttonRowTemplate">
@@ -153,8 +173,7 @@ This is intentional: explicit assignment means "from now on, use this runtime va
 A common place this surprises developers is when a variable mirrors a `DataSource` result.
 In this example, `items` starts reactive (`apiResult.value ?? []`) and then gets reassigned to a filtered snapshot. After that reassignment, `items` does not follow refetches:
 
-```xmlui-pg copy name="Snapshot decouples from DataSource after assignment" display
----app
+```xmlui-pg copy display name="Snapshot decouples from DataSource after assignment" display
 <App>
   <DataSource id="apiResult" url="/api/names-with-activity-decoupled" />
   <APICall
@@ -203,8 +222,7 @@ In this example, `items` starts reactive (`apiResult.value ?? []`) and then gets
 
 If you need the variable to stay reactive while also supporting local overrides, keep the override in a separate variable and combine them in the binding expression:
 
-```xmlui-pg copy name="Keeping reactivity with a separate override variable" display
----app
+```xmlui-pg copy display name="Keeping reactivity with a separate override variable"
 <App>
   <DataSource id="apiResult" url="/api/names-with-activity-live" />
   <APICall
@@ -275,8 +293,7 @@ The same variable name can be declared in nested scopes. The engine resolves the
 
 <Text>Each counter is a separate instance of `CounterTest` with its own local component variables.</Text>
 
-```xmlui-pg name="Isolated component instances"
----app display
+```xmlui-pg display name="Isolated component instances"
 <App>
     <HStack horizontalAlignment="center">
       <VStack>
@@ -290,7 +307,7 @@ The same variable name can be declared in nested scopes. The engine resolves the
       </VStack>
     </HStack>
 </App>
----comp display
+
 <Component name="CounterTest" var.count="{0}">
     <Text>Counter ID: {$props.instance}</Text>
     <Text>Count: {count}</Text>
@@ -345,13 +362,12 @@ A component may declare a *global variable* that's visible everywhere in the app
 > [!IMPORTANT] Globals must be declared in one of two places: the root element of `Main.xmlui` (using `global.` or `<global>`) or as top-level declarations in a `Globals.xs` code-behind file. They **cannot** be declared in user-defined component files. See [Scoping › Declaring globals in Globals.xs](/docs/guides/scoping#declaring-globals-in-globalsxs) for the code-behind form.
 You can declare a variable using the `global` prefix.
 
-```xmlui-pg name="Declaring a global variable with global"
----app copy display /global/ /stations/
+```xmlui-pg display /global/ /stations/ name="Declaring a global variable with global"
 <App global.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
   <H2>Station List</H2>
   <Stations />
 </App>
----comp display copy /stations/
+
 <Component name="Stations">
   <Items data="{stations}">
     <Text> {$item} </Text>
@@ -361,14 +377,13 @@ You can declare a variable using the `global` prefix.
 
 Alternatively, you can use the `<global>` helper tag.
 
-```xmlui-pg name="Declaring a global variable with <global>"
----app copy display /<global/ /stations/
+```xmlui-pg display /<global/ /stations/ name="Declaring a global variable with <global>"
 <App>
   <global name="stations" value="{ [ 'Bakerloo', 'Central', 'Circle'] }" />
   <H2>Station List</H2>
   <Stations />
 </App>
----comp display copy /stations/
+
 <Component name="Stations">
   <Items data="{stations}">
     <Text> {$item} </Text>

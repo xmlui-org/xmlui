@@ -4,8 +4,7 @@ Declare defaults in the component definition so callers only override what they 
 
 A `PriorityBadge` component is used in many places across a task tracker: inside `TaskCard`, in a legend panel, and in a filter bar. All call sites need to pass a `level`, but the shape (`variant`) and whether a text label appears alongside the badge (`showLabel`) should have sensible defaults so that most callers can write just `<PriorityBadge level="high" />` without repeating the same options every time.
 
-```xmlui-pg copy display name="PriorityBadge with default property values"
----app display
+```xmlui-pg copy display /\?\?/ /showLabel/ name="PriorityBadge with default property values"
 <App>
   <VStack>
     <H4>Defaults in effect</H4>
@@ -23,7 +22,7 @@ A `PriorityBadge` component is used in many places across a task tracker: inside
     <PriorityBadge />
   </VStack>
 </App>
----comp display /\?\?/ /showLabel/ PriorityBadge
+
 <Component name="PriorityBadge">
   <HStack>
     <Badge

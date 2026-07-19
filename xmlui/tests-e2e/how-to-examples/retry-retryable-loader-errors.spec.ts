@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Retry a retryable report load", { tag: "@website" }, () => {
+test.describe("retry-a-retryable-report-load", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "retry-a-retryable-report-load",

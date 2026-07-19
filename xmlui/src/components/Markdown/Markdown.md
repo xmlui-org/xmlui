@@ -124,6 +124,33 @@ Function calls are executed: @{x()}
 </App>
 ```
 
+## XMLUI playground apps
+
+`xmlui-pg` fences accept the same entrypoint format as `Main.xmlui`.
+The fence can contain just the app markup, or it can also contain top-level
+`<Component>` declarations that are reusable inside that app.
+
+```xmlui-pg name="XMLUI playground apps" copy display
+<Component name="StatusPill">
+  <Badge value="{$props.value}" variant="pill" />
+</Component>
+
+<App>
+  <VStack gap="8px">
+    <StatusPill value="Ready" />
+    <StatusPill value="Synced" />
+  </VStack>
+</App>
+```
+
+An entrypoint may contain zero, one, or many top-level `<Component>` declarations,
+but it may contain only one top-level non-`Component` app root. The declarations
+and app root can appear in any order. If it contains only `<Component>`
+declarations, XMLUI renders an empty `Fragment` and logs a browser warning.
+Component files and `---comp` playground sections remain strict component
+definitions; if a strict component section or component file has the same name as
+an inline entrypoint component, the strict component definition wins.
+
 %-DESC-END
 
 %-STYLE-START

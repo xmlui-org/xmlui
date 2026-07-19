@@ -9,7 +9,7 @@
 
 %-PROP-START initialValue
 
-```xmlui-pg
+```xmlui-pg name="Slider"
 <Slider initialValue="5" />
 ```
 
@@ -17,7 +17,7 @@
 
 %-PROP-START minValue
 
-```xmlui-pg
+```xmlui-pg name="Slider 2"
 <Slider minValue="10" />
 ```
 
@@ -25,7 +25,7 @@
 
 %-PROP-START maxValue
 
-```xmlui-pg
+```xmlui-pg name="Slider 3"
 <Slider maxValue="30" />
 ```
 

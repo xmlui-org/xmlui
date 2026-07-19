@@ -1,5 +1,8 @@
 import * as fs from "fs";
 import type { ApiInterceptorDefinition } from "../../src/components-core/interception/abstractions";
+import { parseXmlUiMarkup } from "../parsers/xmlui-parser/parser";
+import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
+import type { Node } from "../parsers/xmlui-parser/syntax-node";
 
 export function getExampleSource(absoluteFilePath: string) {
   try {
@@ -39,7 +42,7 @@ export function extractXmluiExample(markdown: string, nameOrId: string): Extract
 function parseXmluiExampleContent(content: string): ExtractedExample {
   // If no section markers, the whole content is the app source
   if (!/^---(?:app|comp|api|desc|config)\b/m.test(content)) {
-    return { app: content.trim() };
+    return splitInlineEntrypoint(content.trim());
   }
 
   // Parse ---app / ---comp / ---api sections (mirrors parsePlaygroundPattern in utils.ts)
@@ -62,6 +65,10 @@ function parseXmluiExampleContent(content: string): ExtractedExample {
         result.apiInterceptor = JSON.parse(trimmed) as ApiInterceptorDefinition;
         break;
       // ---desc and other sections are ignored for testing purposes
+      default:
+        if (!result.app) {
+          result.app = trimmed;
+        }
     }
   }
 
@@ -84,7 +91,7 @@ function parseXmluiExampleContent(content: string): ExtractedExample {
   }
   closeSection();
 
-  return result;
+  return splitInlineEntrypoint(result);
 }
 
 type ExtractedExample = {
@@ -92,3 +99,45 @@ type ExtractedExample = {
   components?: string[];
   apiInterceptor?: ApiInterceptorDefinition;
 };
+
+function splitInlineEntrypoint(example: ExtractedExample | string): ExtractedExample {
+  const result = typeof example === "string" ? { app: example } : example;
+  if (!result.app.includes("<Component")) {
+    return result;
+  }
+
+  const parsed = parseXmlUiMarkup(result.app, { role: "entrypoint" });
+  if (parsed.errors.length > 0) {
+    return result;
+  }
+
+  const topLevelElements = (parsed.node.children ?? []).filter(
+    (child) => child.kind === SyntaxKind.ElementNode,
+  );
+  const inlineComponents: string[] = [];
+  const appElements: Node[] = [];
+
+  for (const element of topLevelElements) {
+    if (getElementName(result.app, element) === "Component") {
+      inlineComponents.push(result.app.substring(element.pos, element.end).trim());
+    } else {
+      appElements.push(element);
+    }
+  }
+
+  if (inlineComponents.length === 0 || appElements.length !== 1) {
+    return result;
+  }
+
+  return {
+    ...result,
+    app: result.app.substring(appElements[0].pos, appElements[0].end).trim(),
+    components: [...inlineComponents, ...(result.components ?? [])],
+  };
+}
+
+function getElementName(source: string, element: Node): string | undefined {
+  const tagNameNode = element.children?.find((child) => child.kind === SyntaxKind.TagNameNode);
+  const identifier = tagNameNode?.children?.[tagNameNode.children.length - 1];
+  return identifier ? source.substring(identifier.pos, identifier.end) : undefined;
+}

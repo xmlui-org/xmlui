@@ -1,6 +1,10 @@
-import type { ComponentDef, CompoundComponentDef, OptimizerMetadataView } from "../abstractions/ComponentDefs";
-import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
-import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  OptimizerMetadataView,
+} from "../abstractions/ComponentDefs";
+import { createXmlUiParser, type XmluiParserOptions } from "../parsers/xmlui-parser/parser";
+import { nodeToComponentDef, nodeToXmluiAppParts } from "../parsers/xmlui-parser/transform";
 import { computeUsesForTree } from "./optimization/computedUses";
 import { getOptimizerMetadata } from "./optimization/metadataLookup";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
@@ -21,6 +25,7 @@ interface ErrorForDisplay extends GeneralDiag {
 
 export type ParserResult = {
   component: null | ComponentDef | CompoundComponentDef;
+  inlineComponents: CompoundComponentDef[];
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
   warnings: string[];
@@ -36,8 +41,9 @@ export function xmlUiMarkupToComponent(
   fileId: string | number = 0,
   preResolvedImports?: CollectedDeclarations,
   metadataLookup?: (type: string) => OptimizerMetadataView | undefined,
+  parserOptions: XmluiParserOptions = {},
 ): ParserResult {
-  const { parse, getText } = createXmlUiParser(source);
+  const { parse, getText } = createXmlUiParser(source, parserOptions);
   const { node, errors } = parse();
   const cursor = new DocumentCursor(source);
 
@@ -50,17 +56,36 @@ export function xmlUiMarkupToComponent(
       component: null,
       errors: errorsToDisplay as ErrorForDisplay[],
       erroneousCompoundComponentName,
+      inlineComponents: [],
       warnings: [],
     };
   }
 
   try {
     const warnings: string[] = [];
-    const component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
+    let component: ComponentDef | CompoundComponentDef | null;
+    let inlineComponents: CompoundComponentDef[] = [];
+    if (parserOptions.role === "entrypoint") {
+      const appParts = nodeToXmluiAppParts(
+        node,
+        getText,
+        fileId,
+        preResolvedImports,
+        warnings,
+        cursor,
+      );
+      component = appParts.entrypoint;
+      inlineComponents = appParts.inlineComponents;
+    } else {
+      component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
+    }
     if (component) {
       computeUsesForTree(component as ComponentDef, metadataLookup ?? getOptimizerMetadata);
     }
-    const transformResult = { component, errors: [], warnings };
+    for (const inlineComponent of inlineComponents) {
+      computeUsesForTree(inlineComponent.component, metadataLookup ?? getOptimizerMetadata);
+    }
+    const transformResult = { component, inlineComponents, errors: [], warnings };
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
@@ -96,6 +121,7 @@ export function xmlUiMarkupToComponent(
       return {
         component: null,
         erroneousCompoundComponentName,
+        inlineComponents: [],
         errors: [errForDisplay],
         warnings: [],
       };

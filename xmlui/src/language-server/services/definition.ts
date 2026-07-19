@@ -1,6 +1,11 @@
 import { type Location, type Range } from "vscode-languageserver";
 import type { Project } from "../base/project";
-import type { DocumentUri, Position, TextDocument } from "../base/text-document";
+import {
+  getXmluiFileRole,
+  type DocumentUri,
+  type Position,
+  type TextDocument,
+} from "../base/text-document";
 import { findTokenAtOffset } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser";
 import path from "path";
@@ -88,6 +93,43 @@ function getComponentDeclaredName(targetDoc: TextDocument): string | null {
   return null;
 }
 
+function getAttrValue(
+  elementNode: any,
+  attrName: string,
+  getText: (node: any) => string,
+): string | null {
+  const attrList = elementNode.children?.find((c) => c.kind === SyntaxKind.AttributeListNode);
+  if (!attrList) return null;
+  for (const attrNode of attrList.children ?? []) {
+    if (attrNode.kind !== SyntaxKind.AttributeNode) continue;
+    const keyNode = attrNode.children?.find((c) => c.kind === SyntaxKind.AttributeKeyNode);
+    const keyIdent = keyNode?.children?.find((c) => c.kind === SyntaxKind.Identifier);
+    if (!keyIdent || getText(keyIdent) !== attrName) continue;
+    const valueLit = attrNode.children?.find((c) => c.kind === SyntaxKind.StringLiteral);
+    if (!valueLit) continue;
+    const raw = getText(valueLit);
+    return raw.length >= 2 ? raw.slice(1, -1) : null;
+  }
+  return null;
+}
+
+function findInlineComponentDeclaration(doc: TextDocument, componentName: string): Range | null {
+  const {
+    parseResult: { node },
+    getText,
+  } = doc.parse();
+
+  for (const child of node.children ?? []) {
+    if (child.kind !== SyntaxKind.ElementNode) continue;
+    const tagNameNode = child.children?.find((c) => c.kind === SyntaxKind.TagNameNode);
+    if (!tagNameNode || getText(tagNameNode) !== "Component") continue;
+    if (getAttrValue(child, "name", getText) !== componentName) continue;
+    return doc.cursor.rangeAt({ pos: tagNameNode.pos, end: tagNameNode.end });
+  }
+
+  return null;
+}
+
 export function handleDefinition(
   project: Project,
   uri: DocumentUri,
@@ -129,6 +171,7 @@ export function handleDefinition(
       continue;
     }
     if (!candidatePath.endsWith(".xmlui")) continue;
+    if (getXmluiFileRole(candidateUri) === "entrypoint") continue;
     const targetDoc = project.documents.get(candidateUri);
     if (!targetDoc) continue;
     // Prefer the declared name attribute; fall back to the filename stem
@@ -140,5 +183,13 @@ export function handleDefinition(
       range: findComponentTagRange(targetDoc),
     };
   }
+
+  if (getXmluiFileRole(uri) === "entrypoint") {
+    const range = findInlineComponentDeclaration(doc, targetCompName);
+    if (range) {
+      return { uri, range };
+    }
+  }
+
   return null;
 }

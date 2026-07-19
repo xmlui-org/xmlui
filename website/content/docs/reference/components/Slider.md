@@ -39,7 +39,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-```xmlui-pg
+```xmlui-pg name="initialValue"
 <Slider initialValue="5" />
 ```
 
@@ -49,7 +49,7 @@ This property sets the component's initial value.
 
 This property specifies the maximum value of the allowed input range.
 
-```xmlui-pg
+```xmlui-pg name="maxValue"
 <Slider maxValue="30" />
 ```
 
@@ -65,7 +65,7 @@ This property sets the minimum number of steps required between multiple thumbs 
 
 This property specifies the minimum value of the allowed input range.
 
-```xmlui-pg
+```xmlui-pg name="minValue"
 <Slider minValue="10" />
 ```
 

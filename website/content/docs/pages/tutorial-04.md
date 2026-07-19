@@ -8,17 +8,16 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
     {  value:  [ { outstanding: 3569, paid_this_year: 1745} ]  }
   }"
 >
-
-<HStack>
-  <Card>
+  <HStack>
+    <Card>
       <Text>Outstanding</Text>
       <Text>{ dashboardStats.value[0].outstanding } </Text>
-  </Card>
-  <Card>
+    </Card>
+    <Card>
       <Text>Paid this year</Text>
       <Text>{ dashboardStats.value[0].paid_this_year } </Text>
-  </Card>
-</HStack>
+    </Card>
+  </HStack>
 </App>
 ```
 
@@ -41,25 +40,20 @@ There are five infocards on the XMLUI Invoice dashboard. To style them all in a 
 
 ```xmlui
 <Component name="InfoCard">
-
-    <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
-
-        <Text>{$props.title}</Text>
-
-        <Text fontWeight="$fontWeight-extra-bold" fontSize="larger">
-            { $props.currency === 'true' ? '$' + $props.value : $props.value }
-        </Text>
-    </Card>
-
+  <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
+    <Text>{$props.title}</Text>
+    <Text fontWeight="$fontWeight-extra-bold" fontSize="larger">
+        { $props.currency === 'true' ? '$' + $props.value : $props.value }
+    </Text>
+  </Card>
 </Component>
 ```
 
- These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag for `$` formatting.
+These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag for `$` formatting.
 
 
 ```xmlui
 <Component name="Dashboard">
-
   <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET"/>
 
   <HStack>
@@ -95,7 +89,6 @@ There are five infocards on the XMLUI Invoice dashboard. To style them all in a 
   </FlowLayout>
 
   <DailyRevenue title="Daily Revenue"/>
-
 </Component>
 ```
 
@@ -104,27 +97,21 @@ A [user-defined component](/docs/reference/components-intro) like `Dashboard` ca
 Here's a more complete version of the row of `InfoCard`s used in the Invoices app.
 
 
-```xmlui-pg  noHeader
----app display
+```xmlui-pg display name="A custom Card"  noHeader
 <App>
   <Dashboard />
 </App>
----comp
+
 <Component name="InfoCard">
-
-    <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
-
-        <Text>{$props.title}</Text>
-
-        <Text fontWeight="$fontWeight-extra-bold" fontSize="larger">
-            { $props.currency === 'true' ? '$' + $props.value : $props.value }
-        </Text>
-    </Card>
-
+  <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
+    <Text>{$props.title}</Text>
+    <Text fontWeight="$fontWeight-extra-bold" fontSize="larger">
+        { $props.currency === 'true' ? '$' + $props.value : $props.value }
+    </Text>
+  </Card>
 </Component>
----comp
-<Component name="Dashboard">
 
+<Component name="Dashboard">
   <variable name="dashboardStats" value="{
     {
       value:
@@ -140,37 +127,34 @@ Here's a more complete version of the row of `InfoCard`s used in the Invoices ap
     }
   }" />
 
-
   <HStack>
-      <InfoCard
-          width="20%"
-          title="Outstanding"
-          value="{ dashboardStats.value[0].outstanding }"
-          currency='true'
-      />
-      <InfoCard
-          width="*"
-          title="Paid"
-          value="{dashboardStats.value[0].paid_this_year}"
-          currency='true'
-      />
-      <InfoCard
-          width="*"
-          title="Draft"
-          value="{dashboardStats.value[0].draft_invoices}"
-      />
-      <InfoCard
-          width="*"
-          title="Sent"
-          value="{dashboardStats.value[0].sent_invoices}"
-      />
-      <InfoCard
-          width="*"
-          title="Paid"
-          value="{dashboardStats.value[0].paid_invoices}"
-      />
+    <InfoCard
+      width="20%"
+      title="Outstanding"
+      value="{ dashboardStats.value[0].outstanding }"
+      currency='true'
+    />
+    <InfoCard
+      width="*"
+      title="Paid"
+      value="{dashboardStats.value[0].paid_this_year}"
+      currency='true'
+    />
+    <InfoCard
+      width="*"
+      title="Draft"
+      value="{dashboardStats.value[0].draft_invoices}"
+    />
+    <InfoCard
+      width="*"
+      title="Sent"
+      value="{dashboardStats.value[0].sent_invoices}"
+    />
+    <InfoCard
+      width="*"
+      title="Paid"
+      value="{dashboardStats.value[0].paid_invoices}"
+    />
   </HStack>
-
 </Component>
 ```
-

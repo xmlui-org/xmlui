@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Switch direction automatically from locale", { tag: "@website" }, () => {
+test.describe("switch-direction-automatically-from-locale", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "switch-direction-automatically-from-locale",

@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Route a raw GET form through willNavigate", { tag: "@website" }, () => {
+test.describe("route-a-raw-get-form-through-willnavigate", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "route-a-raw-get-form-through-willnavigate",

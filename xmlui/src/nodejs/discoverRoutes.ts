@@ -37,13 +37,21 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
   let pagesComp: ComponentDef | null = null;
 
   try {
-    const mainContent = await readFile(mainXmluiPath, "utf-8");
-    const result = xmlUiMarkupToComponent(mainContent, mainXmluiPath);
+    const entrypointContent = await readFile(mainXmluiPath, "utf-8");
+    const result = xmlUiMarkupToComponent(
+      entrypointContent,
+      mainXmluiPath,
+      undefined,
+      undefined,
+      { role: "entrypoint" },
+    );
     if (result.errors.length === 0 && result.component) {
       compDef = result.component as ComponentDef;
       pagesComp = getPagesComponent(compDef);
     }
-  } catch {}
+  } catch {
+    // Main.xmlui is optional for route discovery; fall back to scanning components.
+  }
 
   if (!pagesComp) {
     const componentFiles = await glob("**/*.xmlui", {
@@ -52,8 +60,15 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
 
     for (const file of componentFiles) {
       try {
+        if (/(?:^|[/\\])App\.xmlui$/i.test(file)) {
+          continue;
+        }
         const content = await readFile(file, "utf-8");
-        const result = xmlUiMarkupToComponent(content, file);
+        const isEntrypoint = /(?:^|[/\\])Main\.xmlui$/i.test(file) &&
+          !/(?:^|[/\\])components[/\\]/i.test(file);
+        const result = xmlUiMarkupToComponent(content, file, undefined, undefined, {
+          role: isEntrypoint ? "entrypoint" : "component",
+        });
         if (result.errors.length === 0) {
           const component =
             "component" in result.component ? result.component.component : result.component;

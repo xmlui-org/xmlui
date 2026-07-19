@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { collectImportsFromStandaloneSources } from "../../src/components-core/StandaloneApp";
+import {
+  collectImportsFromStandaloneSources,
+  collectMissingComponents,
+} from "../../src/components-core/StandaloneApp";
 import type { CompoundComponentDef } from "../../src/abstractions/ComponentDefs";
 import type { StandaloneAppDescription } from "../../src/components-core/abstractions/standalone";
 import type { ProjectCompilation } from "../../src/abstractions/scripting/Compilation";
 import { transformSource } from "../parsers/xmlui/xmlui";
 import { computeUsesForTree } from "../../src/components-core/optimization/computedUses";
+import { xmlUiMarkupToComponent } from "../../src/components-core/xmlui-parser";
 
 describe("collectImportsFromStandaloneSources", () => {
   it("resolves nested imports and enables narrowing", async () => {
@@ -185,5 +189,56 @@ describe("collectImportsFromStandaloneSources", () => {
     expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
     computeUsesForTree(actualComponent, () => ({}) as any, new Set(["events"]));
     expect(actualComponent.computedGlobalUses).toBeUndefined();
+  });
+});
+
+describe("standalone inline components", () => {
+  it("treats entrypoint inline components as loaded during missing-component discovery", () => {
+    const parsed = xmlUiMarkupToComponent(
+      `
+        <Component name="MyInline">
+          <Text value="inline" />
+        </Component>
+        <App>
+          <MyInline />
+          <StillMissing />
+        </App>
+      `,
+      "/app/Main.xmlui",
+      undefined,
+      undefined,
+      { role: "entrypoint" },
+    );
+
+    const missing = collectMissingComponents(
+      parsed.component!,
+      parsed.inlineComponents,
+      undefined,
+      undefined,
+    );
+
+    expect(missing.has("MyInline")).toBe(false);
+    expect(missing.has("StillMissing")).toBe(true);
+  });
+
+  it("keeps component files strict during missing-component discovery", () => {
+    const parsed = xmlUiMarkupToComponent(
+      `
+        <Component name="FileBacked">
+          <Text value="file" />
+        </Component>
+      `,
+      "/app/components/FileBacked.xmlui",
+    );
+
+    const missing = collectMissingComponents(
+      { type: "App", children: [{ type: "FileBacked" }, { type: "StillMissing" }] },
+      [parsed.component],
+      undefined,
+      undefined,
+    );
+
+    expect(missing.has("FileBacked")).toBe(false);
+    expect(missing.has("StillMissing")).toBe(true);
   });
 });

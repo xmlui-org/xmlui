@@ -616,6 +616,54 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
   });
 
+  it("entrypoint accepts inline component before app root", () => {
+    const { errors } = parseSource(
+      "<Component name='MyComp'><Text /></Component><App />",
+      false,
+      { role: "entrypoint" },
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it("entrypoint accepts inline component after app root", () => {
+    const { errors } = parseSource(
+      "<App /><Component name='MyComp'><Text /></Component>",
+      false,
+      { role: "entrypoint" },
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it("entrypoint accepts only inline component declarations", () => {
+    const { errors } = parseSource(
+      "<Component name='MyComp'><Text /></Component><Component name='OtherComp'><Stack /></Component>",
+      false,
+      { role: "entrypoint" },
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it("entrypoint rejects multiple non-Component app roots", () => {
+    const { errors } = parseSource(
+      "<Component name='MyComp'><Text /></Component><App /><Stack />",
+      false,
+      { role: "entrypoint" },
+    );
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+    expect(errors[0].pos).toBe(52);
+    expect(errors[0].end).toBe(61);
+  });
+
+  it("component role rejects inline component plus app root", () => {
+    const { errors } = parseSource(
+      "<Component name='MyComp'><Text /></Component><App />",
+      false,
+      { role: "component" },
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+  });
+
   it("missing name in compound component", () => {
     const { errors } = parseSource("<Component />");
     expect(errors[0].code).toBe(ErrCodesParser.compDefNameExp);
@@ -703,9 +751,9 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
   });
 
-  it("compound component with no children triggers compDefNesedElem", () => {
+  it("compound component with no children is valid", () => {
     const { errors } = parseSource("<Component name='MyComp'></Component>");
-    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+    expect(errors).toHaveLength(0);
   });
 
   it("duplicate xmlns key triggers duplXmlns", () => {
@@ -744,9 +792,9 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
   });
 
-  it("compound component with only comment child triggers compDefNesedElem", () => {
+  it("compound component with only comment child is valid", () => {
     const { errors } = parseSource("<Component name='MyComp'><!-- comment--></Component>");
-    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+    expect(errors).toHaveLength(0);
   });
 
   it("variable helper requires name attribute", () => {

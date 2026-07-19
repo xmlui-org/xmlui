@@ -309,6 +309,14 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
         pattern.descriptions[pattern.descriptions.length - 1].content = resolved;
         pattern.descriptions[pattern.descriptions.length - 1].order = order++;
         break;
+      default:
+        if (resolved.trim() && !pattern.app) {
+          pattern.app = {
+            ...pattern.default,
+            content: resolved,
+            order: order++,
+          };
+        }
     }
     segmentContent = "";
     currentMode = newMode;

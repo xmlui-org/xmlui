@@ -2,7 +2,11 @@ import { DiagnosticSeverity, type Diagnostic } from "vscode-languageserver";
 import type { ParserDiag } from "../../parsers/xmlui-parser/diagnostics";
 import type { ParseResult } from "../../parsers/xmlui-parser/parser";
 import type { Project } from "../base/project";
-import type { DocumentUri, DocumentCursor } from "../base/text-document";
+import {
+  getXmluiParserOptionsForUri,
+  type DocumentUri,
+  type DocumentCursor,
+} from "../base/text-document";
 import { analyze } from "../../components-core/analyzer";
 import { xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { getReactiveCycleDiagnostics } from "./reactive-cycle-diagnostic";
@@ -10,6 +14,7 @@ import { getA11yDiagnostics } from "./a11y-diagnostic";
 import { getTypeContractDiagnostics } from "./type-contract-diagnostic";
 import { getVersioningDiagnostics } from "./versioning-diagnostic";
 import type { MetadataProvider } from "./common/metadata-utils";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 
 export type DiagnosticsContext = {
   cursor: DocumentCursor;
@@ -35,7 +40,23 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
   const analyzerDiags: Diagnostic[] = [];
   if (ctx.source && ctx.uri) {
     try {
-      const findings = analyze({ files: [{ file: ctx.uri, source: ctx.source }], strict: false });
+      const parsed = parseMarkupForDiagnostics(ctx);
+      const files =
+        parsed.component && parsed.errors.length === 0
+          ? [
+              {
+                file: ctx.uri,
+                source: ctx.source,
+                markupAst: rootForDiagnostics(parsed.component),
+              },
+              ...parsed.inlineComponents.map((inlineComponent) => ({
+                file: `${ctx.uri}#components/${inlineComponent.name}.xmlui`,
+                source: ctx.source,
+                markupAst: inlineComponent.component,
+              })),
+            ]
+          : [{ file: ctx.uri, source: ctx.source }];
+      const findings = analyze({ files, strict: false });
       for (const d of findings) {
         const line = Math.max(0, (d.line ?? 1) - 1);
         const col = Math.max(0, (d.column ?? 1) - 1);
@@ -79,7 +100,7 @@ function getDiagnosticsInternal(ctx: DiagnosticsContext): Diagnostic[] {
 function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source) return [];
   try {
-    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    const { component } = parseMarkupForDiagnostics(ctx);
     return getReactiveCycleDiagnostics(component, { uri: ctx.uri });
   } catch {
     return [];
@@ -96,7 +117,7 @@ function reactiveCycleDiags(ctx: DiagnosticsContext): Diagnostic[] {
 function a11yDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source || !ctx.metadataProvider) return [];
   try {
-    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    const { component } = parseMarkupForDiagnostics(ctx);
     return getA11yDiagnostics(component, ctx.metadataProvider, /* strict */ false);
   } catch {
     return [];
@@ -109,8 +130,13 @@ function a11yDiags(ctx: DiagnosticsContext): Diagnostic[] {
 function typeContractDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source || !ctx.metadataProvider) return [];
   try {
-    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
-    return getTypeContractDiagnostics(component, ctx.metadataProvider, /* strict */ false, ctx.source);
+    const { component } = parseMarkupForDiagnostics(ctx);
+    return getTypeContractDiagnostics(
+      component,
+      ctx.metadataProvider,
+      /* strict */ false,
+      ctx.source,
+    );
   } catch {
     return [];
   }
@@ -125,11 +151,27 @@ function typeContractDiags(ctx: DiagnosticsContext): Diagnostic[] {
 function versioningDiags(ctx: DiagnosticsContext): Diagnostic[] {
   if (!ctx.source || !ctx.metadataProvider) return [];
   try {
-    const { component } = xmlUiMarkupToComponent(ctx.source, ctx.uri ?? 0);
+    const { component } = parseMarkupForDiagnostics(ctx);
     return getVersioningDiagnostics(component, ctx.metadataProvider, /* strict */ false);
   } catch {
     return [];
   }
+}
+
+function parseMarkupForDiagnostics(ctx: DiagnosticsContext) {
+  return xmlUiMarkupToComponent(
+    ctx.source!,
+    ctx.uri ?? 0,
+    undefined,
+    undefined,
+    ctx.uri ? getXmluiParserOptionsForUri(ctx.uri) : undefined,
+  );
+}
+
+function rootForDiagnostics(component: ComponentDef | CompoundComponentDef): ComponentDef {
+  return (component as CompoundComponentDef).component
+    ? (component as CompoundComponentDef).component
+    : (component as ComponentDef);
 }
 
 export function errorToLspDiag(e: ParserDiag, cursor: DocumentCursor): Diagnostic {

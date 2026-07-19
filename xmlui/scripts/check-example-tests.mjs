@@ -4,8 +4,8 @@
  *
  * Scans hand-authored documentation markdown files under
  * `website/content/docs/pages/` (excluding `reference/`) and reports
- * which files have named `xmlui-pg` codefences that lack a corresponding
- * Playwright spec file or whose spec is stale (codefence names have changed).
+ * which files have identified `xmlui-pg` codefences that lack a corresponding
+ * Playwright spec file or whose spec is stale (example ids changed).
  *
  * Usage:
  *   node xmlui/scripts/check-example-tests.mjs [options]
@@ -71,26 +71,28 @@ function* walkFiles(dir, ext) {
 }
 
 /**
- * Extract all named xmlui-pg codefences from markdown content.
- * Returns an array of { name, interactive } objects.
+ * Extract all xmlui-pg codefences from markdown content.
+ * Returns an array of { name, id, testName, interactive, hasName } objects.
  *
  * "Interactive" means the codefence body contains an event-handler attribute
  * (on[A-Z]...) or a ---api section marker.
- * 
- * Codefences are considered "named" if they have either:
- *   - A name="..." attribute (preferred for display)
- *   - An id="..." attribute (stable identifier for testing)
+ *
+ * Every docs example should have a name="..." attribute for display. The id="..."
+ * attribute marks examples that are covered by specs and provides their stable
+ * test identity. Existing name-based spec titles are still accepted as legacy
+ * test identities.
  */
-function extractNamedCodefences(content) {
+function extractCodefences(content) {
   const results = [];
-  // Match codefences with either name or id attribute
-  const pattern = /```xmlui-pg[^\n]*(?:\bname="([^"]+)"|\bid="([^"]+)")[^\n]*\n([\s\S]*?)```/g;
+  const pattern = /```xmlui-pg([^\n]*)\n([\s\S]*?)```/g;
   let match;
   while ((match = pattern.exec(content)) !== null) {
-    const name = match[1] || match[2]; // Use name if present, otherwise use id
-    const body = match[3];
+    const attrs = match[1];
+    const body = match[2];
+    const name = attrs.match(/\bname="([^"]+)"/)?.[1];
+    const id = attrs.match(/\bid="([^"]+)"/)?.[1];
     const interactive = /\bon[A-Z]|^---api\b/m.test(body);
-    results.push({ name, interactive });
+    results.push({ name, id, testName: id || name, interactive, hasName: Boolean(name) });
   }
   return results;
 }
@@ -101,10 +103,10 @@ function extractNamedCodefences(content) {
  */
 function extractDescribeNames(content) {
   const names = new Set();
-  const pattern = /test\.describe\(\s*["'`]([^"'`]+)["'`]/g;
+  const pattern = /test\.describe\(\s*(["'`])((?:\\.|(?!\1)[\s\S])*)\1/g;
   let match;
   while ((match = pattern.exec(content)) !== null) {
-    names.add(match[1]);
+    names.add(match[2].replace(/\\(["'`\\])/g, "$1"));
   }
   return names;
 }
@@ -149,28 +151,37 @@ function scanFile(mdPath) {
     return { kind: "noExamples", mdRel: relFromPages };
   }
 
-  const examples = extractNamedCodefences(content);
-  if (examples.length === 0) {
+  const allExamples = extractCodefences(content);
+  const examplesWithoutName = allExamples.filter((example) => !example.hasName);
+  if (examplesWithoutName.length > 0) {
+    return { kind: "unnamedExamples", mdRel: relFromPages, examples: examplesWithoutName };
+  }
+
+  if (allExamples.length === 0) {
     return { kind: "noNamedExamples", mdRel: relFromPages };
   }
 
   const specPath = markdownToSpecPath(mdPath);
   const specRel = relative(XMLUI_ROOT, specPath).replace(/\\/g, "/");
+  const idBackedExamples = allExamples.filter((example) => example.id);
 
   if (!existsSync(specPath)) {
-    return { kind: "missingSpec", mdRel: relFromPages, specRel, examples };
+    if (idBackedExamples.length === 0) {
+      return { kind: "ok", mdRel: relFromPages, specRel };
+    }
+    return { kind: "missingSpec", mdRel: relFromPages, specRel, examples: idBackedExamples };
   }
 
   const specContent = readFileSync(specPath, "utf8");
   const describedNames = extractDescribeNames(specContent);
 
-  const added = examples.filter(({ name }) => !describedNames.has(name));
+  const added = idBackedExamples.filter(({ id }) => !describedNames.has(id));
   const removed = [...describedNames].filter(
-    (name) => !examples.some((e) => e.name === name),
+    (name) => !allExamples.some((e) => e.id === name || e.name === name),
   );
 
   if (added.length > 0 || removed.length > 0) {
-    return { kind: "staleSpec", mdRel: relFromPages, specRel, added, removed, examples };
+    return { kind: "staleSpec", mdRel: relFromPages, specRel, added, removed, examples: idBackedExamples };
   }
   return { kind: "ok", mdRel: relFromPages, specRel };
 }
@@ -184,6 +195,7 @@ function runFullScan() {
     missingSpec: [],
     staleSpec: [],
     ok: [],
+    unnamedExamples: [],
     noNamedExamples: [],
     noExamples: [],
   };
@@ -212,13 +224,16 @@ function summarizeCounts(examples) {
   const parts = [];
   if (interactive > 0) parts.push(`${interactive} interactive`);
   if (display > 0) parts.push(`${display} display-only`);
-  return `${examples.length} named example${examples.length !== 1 ? "s" : ""}: ${parts.join(", ")}`;
+  return `${examples.length} test-identified example${examples.length !== 1 ? "s" : ""}: ${parts.join(", ")}`;
 }
 
 function printReport(report) {
   const actionableMissing = report.missingSpec.filter(isActionable);
   const actionableStale = report.staleSpec.filter(isActionable);
-  const hasFailures = actionableMissing.length > 0 || actionableStale.length > 0;
+  const hasFailures =
+    report.unnamedExamples.length > 0 ||
+    actionableMissing.length > 0 ||
+    actionableStale.length > 0;
 
   if (JSON_OUTPUT) {
     console.log(
@@ -227,6 +242,7 @@ function printReport(report) {
           missingSpec: report.missingSpec,
           staleSpec: report.staleSpec,
           ok: report.ok,
+          unnamedExamples: report.unnamedExamples,
           noNamedExamples: report.noNamedExamples,
           interactiveOnlyMode: INTERACTIVE_ONLY,
           actionableFailures: hasFailures,
@@ -239,6 +255,18 @@ function printReport(report) {
   }
 
   const interactiveLabel = INTERACTIVE_ONLY ? " (interactive examples only)" : "";
+
+  if (report.unnamedExamples.length > 0) {
+    console.log(`\n❌  Unnamed xmlui-pg examples:\n`);
+    for (const { mdRel, examples } of report.unnamedExamples) {
+      console.log(`  ❌  ${mdRel}`);
+      for (const example of examples) {
+        const idSuffix = example.id ? ` id="${example.id}"` : "";
+        console.log(`       missing name attribute${idSuffix}`);
+      }
+      console.log("");
+    }
+  }
 
   if (report.missingSpec.length > 0) {
     console.log(`\n❌  Missing spec files${interactiveLabel}:\n`);
@@ -258,7 +286,7 @@ function printReport(report) {
       if (added.length > 0) {
         console.log(`       + added examples (need test.describe):`);
         for (const e of added) {
-          console.log(`         • "${e.name}"${e.interactive ? "" : "  [display-only]"}`);
+          console.log(`         • "${e.testName}"${e.interactive ? "" : "  [display-only]"}`);
         }
       }
       if (removed.length > 0) {
@@ -278,6 +306,7 @@ function printReport(report) {
     report.missingSpec.length +
     report.staleSpec.length +
     report.ok.length +
+    report.unnamedExamples.length +
     report.noNamedExamples.length;
 
   if (!WATCH_MODE) {
@@ -286,7 +315,8 @@ function printReport(report) {
     console.log(`   ✅ OK:           ${report.ok.length}`);
     console.log(`   ❌ Missing spec: ${report.missingSpec.length} (${actionableMissing.length} actionable)`);
     console.log(`   ⚠️  Stale spec:  ${report.staleSpec.length} (${actionableStale.length} actionable)`);
-    console.log(`   ℹ️  Unnamed:     ${report.noNamedExamples.length}`);
+    console.log(`   ❌ Unnamed:      ${report.unnamedExamples.length}`);
+    console.log(`   ℹ️  Unidentified: ${report.noNamedExamples.length}`);
   }
 
   if (!hasFailures) {
@@ -353,6 +383,7 @@ if (WATCH_MODE) {
           missingSpec: result.kind === "missingSpec" ? [result] : [],
           staleSpec: result.kind === "staleSpec" ? [result] : [],
           ok: result.kind === "ok" ? [result] : [],
+          unnamedExamples: result.kind === "unnamedExamples" ? [result] : [],
           noNamedExamples: result.kind === "noNamedExamples" ? [result] : [],
           noExamples: [],
         };

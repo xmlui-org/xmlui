@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Handle a button action error locally", { tag: "@website" }, () => {
+test.describe("handle-a-button-action-error-locally", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "handle-a-button-action-error-locally",

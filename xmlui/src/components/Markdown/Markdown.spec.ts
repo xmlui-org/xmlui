@@ -702,3 +702,172 @@ test.describe("xmlui-pg nested code fences (four-backtick delimiter)", () => {
     await expect(page.locator("code").filter({ hasText: "echo hello" }).first()).toBeVisible();
   });
 });
+
+test.describe("xmlui-pg inline components", () => {
+  test("renders an inline component declared in the app segment", async ({ initTestBed, page }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      '<Component name="HelloButton">',
+      '  <Button label="Hello inline" />',
+      "</Component>",
+      "<App>",
+      "  <HelloButton />",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Hello inline" })).toBeVisible();
+  });
+
+  test("renders multiple inline components and the main app from one app block", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      '<Component name="StatusPill">',
+      '  <Badge value="{$props.value}" variant="pill" />',
+      "</Component>",
+      '<Component name="ToolbarAction">',
+      '  <Button label="{$props.label}" />',
+      "</Component>",
+      "<App>",
+      "  <VStack>",
+      '    <StatusPill value="Ready" />',
+      '    <StatusPill value="Synced" />',
+      '    <ToolbarAction label="Refresh" />',
+      "  </VStack>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByText("Ready")).toBeVisible();
+    await expect(page.getByText("Synced")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Refresh" })).toBeVisible();
+  });
+
+  test("still renders playgrounds without inline components", async ({ initTestBed, page }) => {
+    const SOURCE = "```xmlui-pg\n<Button label=\"Plain playground\" />\n```";
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Plain playground" })).toBeVisible();
+  });
+
+  test("renders an empty app and warns when the app segment has only inline components", async ({
+    initTestBed,
+    page,
+  }) => {
+    const warningPromise = page.waitForEvent("console", (message) => {
+      return (
+        message.type() === "warning" &&
+        message.text().includes("contains only inline component definitions")
+      );
+    });
+    const SOURCE = [
+      "```xmlui-pg",
+      '<Component name="OnlyInline">',
+      '  <Text value="not rendered" />',
+      "</Component>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await warningPromise;
+    await expect(page.getByText("not rendered")).toHaveCount(0);
+  });
+
+  test("renders a parse error when the app segment has multiple app roots", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      '<Component name="InlineOk">',
+      '  <Text value="inline" />',
+      "</Component>",
+      '<Text value="first root" />',
+      '<Text value="second root" />',
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(
+      page.getByText("A component definition must have exactly one XMLUI element.").first(),
+    ).toBeVisible();
+  });
+
+  test("renders both inline components and ---comp segment components", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "---app",
+      '<Component name="InlinePart">',
+      '  <Text value="inline part" />',
+      "</Component>",
+      "<App>",
+      "  <InlinePart />",
+      "  <SegmentPart />",
+      "</App>",
+      "---comp",
+      '<Component name="SegmentPart">',
+      '  <Text value="segment part" />',
+      "</Component>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByText("inline part")).toBeVisible();
+    await expect(page.getByText("segment part")).toBeVisible();
+  });
+
+  test("---comp segment wins over a same-name inline component", async ({ initTestBed, page }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "---app",
+      '<Component name="Dupe">',
+      '  <Text value="inline dupe" />',
+      "</Component>",
+      "<App>",
+      "  <Dupe />",
+      "</App>",
+      "---comp",
+      '<Component name="Dupe">',
+      '  <Text value="segment dupe" />',
+      "</Component>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByText("segment dupe")).toBeVisible();
+    await expect(page.getByText("inline dupe")).toHaveCount(0);
+  });
+
+  test("renders reusable-component errors for invalid inline component declarations", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Component>",
+      '  <Text value="invalid inline" />',
+      "</Component>",
+      "<App />",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByText("A reusable component must have a non-empty name.")).toBeVisible();
+  });
+});

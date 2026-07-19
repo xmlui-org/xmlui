@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/keep-keyboard-focus-inside-a-custom-panel.md"),
 );
 
-test.describe("Restore focus after editing", { tag: "@website" }, () => {
+test.describe("restore-focus-after-editing", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "restore-focus-after-editing");
 
   test("initial state shows the opener buttons and hides the editor", async ({ initTestBed, page }) => {

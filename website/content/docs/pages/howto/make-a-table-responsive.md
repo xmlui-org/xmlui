@@ -4,13 +4,8 @@ Use `when-sm`, `when-md`, and `when-lg` on `Column` to progressively hide less i
 
 A wide table with many columns becomes unreadable on a phone. Rather than building a separate mobile layout, apply `when-*` breakpoint attributes directly on each `Column`. Columns marked `when-sm` appear only on screens 576 px and wider; `when-md` requires 768 px; `when-lg` requires 992 px. Columns with no `when-*` attribute are always visible, making them the essential "anchor" columns for every breakpoint.
 
-```xmlui-pg name="Make a Table responsive"
----app
-<App>
-  <ResponsiveTable />
-</App>
----comp display
-<Component name="ResponsiveTable" var.people="{[
+```xmlui-pg display name="Make a Table responsive"
+<App var.people="{[
   { 
     name: 'Alice Johnson', email: 'alice@company.com', department: 'Engineering', 
     status: 'active', salary: '95k' 
@@ -32,62 +27,59 @@ A wide table with many columns becomes unreadable on a phone. Rather than buildi
     'active', salary: '75k' 
   }
 ]}">
-  <VStack>
-    <HStack>
-      <Text size="lg">Responsive People Table</Text>
-      <Badge value="Current: {mediaSize.size}" color="blue" />
-    </HStack>
-    <Text size="sm">
-      Resize your browser window to see columns progressively hide
-    </Text>
+  <HStack>
+    <Text size="lg">Responsive People Table</Text>
+    <Badge value="Current: {mediaSize.size}" color="blue" />
+  </HStack>
+  <Text size="sm">
+    Resize your browser window to see columns progressively hide
+  </Text>
 
-    <Table data="{people}">
-      <!-- Essential: Avatar - always show -->
-      <Column header="" width="50px">
-        <Avatar name="{$item.name}" size="xs" />
-      </Column>
+  <Table data="{people}">
+    <!-- Essential: Avatar - always show -->
+    <Column header="" width="50px">
+      <Avatar name="{$item.name}" size="xs" />
+    </Column>
 
-      <!-- Essential: Name - always show -->
-      <Column header="Name" bindTo="name" width="120px">
-        <Text>{$item.name}</Text>
-      </Column>
+    <!-- Essential: Name - always show -->
+    <Column header="Name" bindTo="name" width="120px">
+      <Text>{$item.name}</Text>
+    </Column>
 
-      <!-- Priority: Email - hide on xs screens -->
-      <Column header="Email" bindTo="email" when-sm width="160px">
-        <Text size="sm" color="gray">{$item.email}</Text>
-      </Column>
+    <!-- Priority: Email - hide on xs screens -->
+    <Column header="Email" bindTo="email" when-sm width="160px">
+      <Text size="sm" color="gray">{$item.email}</Text>
+    </Column>
 
-      <!-- Secondary: Department - hide on xs/sm screens -->
-      <Column header="Department" bindTo="department" when-md width="120px" />
+    <!-- Secondary: Department - hide on xs/sm screens -->
+    <Column header="Department" bindTo="department" when-md width="120px" />
 
-      <!-- Tertiary: Status - only show on md+ screens -->
-      <Column header="Status" bindTo="status" when-md width="80px">
-        <Badge
-          value="{$item.status}"
-          color="{$item.status === 'active' ? 'lightgreen' : 'white'}"
-          variant="pill"
-        />
-      </Column>
+    <!-- Tertiary: Status - only show on md+ screens -->
+    <Column header="Status" bindTo="status" when-md width="80px">
+      <Badge
+        value="{$item.status}"
+        color="{$item.status === 'active' ? 'lightgreen' : 'white'}"
+        variant="pill"
+      />
+    </Column>
 
-      <!-- Low Priority: Salary - only show on lg+ screens -->
-      <Column header="Salary" bindTo="salary" when-lg width="100px">
-        <Text size="sm" weight="medium">${$item.salary}</Text>
-      </Column>
-    </Table>
+    <!-- Low Priority: Salary - only show on lg+ screens -->
+    <Column header="Salary" bindTo="salary" when-lg width="100px">
+      <Text size="sm" weight="medium">${$item.salary}</Text>
+    </Column>
+  </Table>
 
-    <VStack gap="$gap-tight">
-      <Text variant="strong">Column Visibility by Screen Size:</Text>
-      <Text>xs: Avatar + Name only</Text>
-      <Text>sm: + Email</Text>
-      <Text>md: + Department + Status</Text>
-      <Text>lg+: + Salary</Text>
-    </VStack>
+  <VStack gap="$gap-tight">
+    <Text variant="strong">Column Visibility by Screen Size:</Text>
+    <Text>xs: Avatar + Name only</Text>
+    <Text>sm: + Email</Text>
+    <Text>md: + Department + Status</Text>
+    <Text>lg+: + Salary</Text>
   </VStack>
-</Component>
----desc
-To test the responsive behaviour, open the example in the full-screen playground (the expand icon in the top-right corner of the playground), then resize the browser window. The `Current:` badge updates in real time as you cross each breakpoint.
+</App>
 ```
 
+To test the responsive behaviour, open the example in the full-screen playground (the expand icon in the top-right corner of the playground), then resize the browser window. The `Current:` badge updates in real time as you cross each breakpoint.
 
 ## Key points
 

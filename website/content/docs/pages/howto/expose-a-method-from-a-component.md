@@ -4,8 +4,7 @@ Use the `<method>` element to export imperative actions and state accessors from
 
 A `ModalTracker` component wraps a modal dialog and privately tracks how many times it has been opened. The parent has no direct access to that counter — it lives entirely inside the component. Two exported methods bridge the gap: `open()` increments the counter and opens the dialog, while `getOpenCount()` returns the current count so the parent can display it.
 
-```xmlui-pg copy display name="Modal that tracks and exposes its open count" height="350px"
----app display /method/ /getOpenCount/ /openCount/
+```xmlui-pg copy display /method/ /getOpenCount/ /openCount/ /method name/ name="Modal that tracks and exposes its open count" height="350px"
 <App var.openCount="{0}">
   <HStack>
     <Button
@@ -19,7 +18,7 @@ A `ModalTracker` component wraps a modal dialog and privately tracks how many ti
   </HStack>
   <ModalTracker id="tracker" title="Task Details" />
 </App>
----comp display /method name/ ModalTracker
+
 <Component name="ModalTracker" var.openCount="{0}">
   <ModalDialog id="internalModal" title="{$props.title ?? 'Details'}">
     <VStack>

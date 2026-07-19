@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Render fallback UI from a failed orders load", { tag: "@website" }, () => {
+test.describe("render-fallback-ui-from-a-failed-orders-load", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "render-fallback-ui-from-a-failed-orders-load",

@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Show a lifecycle setup error in the page", { tag: "@website" }, () => {
+test.describe("show-a-lifecycle-setup-error-in-the-page", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "show-a-lifecycle-setup-error-in-the-page",

@@ -1809,7 +1809,7 @@ through a global variable. Selecting a row in either list immediately reflects i
 >[!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all Lists in the sync have that variable in their scope.
 
-```xmlui-pg
+```xmlui-pg name="List"
 ---app copy display /global.selState/ filename="Main.xmlui"
 <App global.selState="{{}}">
   <MyList />
