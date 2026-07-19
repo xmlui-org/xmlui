@@ -1499,6 +1499,28 @@ test.describe("itemWidth property", () => {
     expect(item3Width).toBeCloseTo(expectedWidth, -1);
   });
 
+  test("HStack wrapContent uses child width for the flow slot only", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="600px" wrapContent="true" gap="0">
+        <Stack width="50%">
+          <Theme themeId="xmlui">
+            <Card testId="card">
+              <Text>themed card</Text>
+            </Card>
+          </Theme>
+        </Stack>
+      </HStack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: cardWidth } = await getBounds(page.getByTestId("card"));
+
+    expect(cardWidth).toBeCloseTo(stackWidth * 0.5, -1);
+  });
+
   test("wrapContent with explicit child width overrides itemWidth", async ({ page, initTestBed }) => {
     await initTestBed(`
       <HStack testId="stack" width="400px" wrapContent="true" itemWidth="100px" gap="0">

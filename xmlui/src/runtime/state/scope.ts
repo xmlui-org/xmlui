@@ -11,6 +11,8 @@ export type RuntimeScope = {
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
+  inheritLocals: boolean;
+  inheritReferences: boolean;
   props: Record<string, unknown>;
   contextValues: Record<string, unknown>;
   references: Record<string, unknown>;
@@ -26,6 +28,8 @@ export function createRuntimeScope({
   store,
   localOwnerId,
   parent,
+  inheritLocals = true,
+  inheritReferences = true,
   props = {},
   contextValues = {},
   references = {},
@@ -39,6 +43,8 @@ export function createRuntimeScope({
   store: RuntimeStateStore;
   localOwnerId?: StateOwnerId;
   parent?: RuntimeScope;
+  inheritLocals?: boolean;
+  inheritReferences?: boolean;
   props?: Record<string, unknown>;
   contextValues?: Record<string, unknown>;
   references?: Record<string, unknown>;
@@ -53,6 +59,8 @@ export function createRuntimeScope({
     store,
     localOwnerId,
     parent,
+    inheritLocals,
+    inheritReferences,
     props,
     contextValues,
     references,
@@ -72,6 +80,9 @@ export function hasLocalName(scope: RuntimeScope | undefined, name: string): boo
   if (scope.store.hasLocal(scope.localOwnerId, name)) {
     return true;
   }
+  if (!scope.inheritLocals) {
+    return false;
+  }
   return hasLocalName(scope.parent, name);
 }
 
@@ -82,7 +93,7 @@ export function readLocal(scope: RuntimeScope | undefined, name: string): unknow
   if (scope.store.hasLocal(scope.localOwnerId, name)) {
     return scope.store.readLocal(scope.localOwnerId, name);
   }
-  if (scope.parent) {
+  if (scope.inheritLocals && scope.parent) {
     const parentValue = readLocal(scope.parent, name);
     if (parentValue !== undefined || hasLocalName(scope.parent, name)) {
       return parentValue;
@@ -172,12 +183,16 @@ export function readContext(scope: RuntimeScope | undefined, name: string): unkn
 
 export function readReference(scope: RuntimeScope | undefined, name: string): unknown {
   if (!scope) {
-    return undefined;
+    return readGlobalObjectReference(name);
   }
   if (Object.prototype.hasOwnProperty.call(scope.references, name)) {
     return scope.references[name];
   }
-  return readReference(scope.parent, name);
+  if (!scope.inheritReferences) {
+    return readGlobalObjectReference(name);
+  }
+  const parentValue = readReference(scope.parent, name);
+  return parentValue === undefined ? readGlobalObjectReference(name) : parentValue;
 }
 
 async function completeValue(value: unknown): Promise<unknown> {
@@ -320,6 +335,9 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
   if (name === "window") {
     return typeof window === "undefined" ? undefined : window;
   }
+  if (name === "globalThis") {
+    return typeof globalThis === "undefined" ? undefined : globalThis;
+  }
   if (name === "Array") {
     return Array;
   }
@@ -354,6 +372,15 @@ function readBuiltInReference(scope: RuntimeScope | undefined, name: string): un
     return scope?.toast?.reference;
   }
   return undefined;
+}
+
+function readGlobalObjectReference(name: string): unknown {
+  if (typeof globalThis === "undefined") {
+    return undefined;
+  }
+  return Object.prototype.hasOwnProperty.call(globalThis, name)
+    ? (globalThis as Record<string, unknown>)[name]
+    : undefined;
 }
 
 function getDate(date?: string | number | Date): Date {
@@ -433,6 +460,9 @@ function findLocalOwner(scope: RuntimeScope | undefined, name: string): StateOwn
   }
   if (scope.store.hasLocal(scope.localOwnerId, name)) {
     return scope.localOwnerId;
+  }
+  if (!scope.inheritLocals) {
+    return undefined;
   }
   return findLocalOwner(scope.parent, name);
 }

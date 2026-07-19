@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type React from "react";
 import { createContext, useContext, useEffect, useInsertionEffect, useMemo, useState } from "react";
 import type { StyleObjectType } from "./StyleRegistry";
@@ -41,7 +40,7 @@ export function StyleProvider({
   return <StyleContext.Provider value={registry}>{children}</StyleContext.Provider>;
 }
 
-export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CSSProperties]>) {
+export function useComponentStyle(styles?: StyleObjectType) {
   const rootStyle = useMemo(() => {
     return !styles || Object.keys(styles).length === 0
       ? EMPTY_OBJECT

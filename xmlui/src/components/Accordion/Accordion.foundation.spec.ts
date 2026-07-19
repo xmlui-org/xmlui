@@ -46,7 +46,11 @@ test.describe("Accordion foundation", () => {
       </Accordion>
     `);
 
-    await page.getByRole("button", { name: /Templated header/ }).click();
+    const header = page.getByRole("button", { name: /Templated header/ });
+    await expect(header).toBeVisible();
+    await expect(page.getByTestId("value")).not.toBeVisible();
+
+    await header.click();
     await expect(page.getByTestId("value")).toContainText("Count: 0");
     await page.getByTestId("increment").click();
     await expect(page.getByTestId("value")).toContainText("Count: 1");

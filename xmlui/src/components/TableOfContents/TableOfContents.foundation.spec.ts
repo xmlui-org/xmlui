@@ -43,3 +43,32 @@ test("TableOfContents foundation navigates to heading links", async ({ initTestB
   await page.getByRole("link", { name: "Details" }).click();
   await expect(page).toHaveURL(/#details$/);
 });
+
+test("TableOfContents keeps duplicate markdown headings with unique anchors", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
+    <App>
+      <TableOfContents testId="toc" />
+      <Markdown><![CDATA[
+# Layout
+
+## Alignment
+
+First alignment section.
+
+## Stack
+
+### Alignment
+
+Nested alignment section.
+      ]]></Markdown>
+    </App>
+  `);
+
+  const alignmentLinks = page.getByTestId("toc").getByRole("link", { name: "Alignment" });
+  await expect(alignmentLinks).toHaveCount(2);
+  await expect(alignmentLinks.nth(0)).toHaveAttribute("href", /#alignment$/);
+  await expect(alignmentLinks.nth(1)).toHaveAttribute("href", /#alignment-1$/);
+});

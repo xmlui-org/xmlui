@@ -250,6 +250,8 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   const pollIntervalInSeconds = Number(useEvaluatedProp(node, scope, "pollIntervalInSeconds", 0) ?? 0);
   const retryPolicy = useRetryPolicy();
   const apiRef = useRef<Record<string, unknown>>();
+  const scopeRef = useRef(scope);
+  scopeRef.current = scope;
   const mockDataKey = stableDataKey(mockData);
   const transformResultKey = stableDataKey(transformResult);
   const request = useMemo(
@@ -272,7 +274,11 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
   if (!apiRef.current) {
     apiRef.current = createDataSourceApi(id, scope);
   }
-  useEffect(() => registerReference(scope, id, apiRef.current!), [id, scope]);
+  useEffect(() => registerReference(scopeRef.current, id, apiRef.current!), [
+    id,
+    scope.references,
+    scope.store,
+  ]);
 
   useEffect(() => {
     if (!id) {
@@ -282,7 +288,9 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     let loadSequence = 0;
     const load = async (force = false) => {
       const sequence = ++loadSequence;
-      updateApi(apiRef.current!, id, scope, {
+      updateApi(apiRef.current!, id, scopeRef.current, {
+        url: latest.current.request.url,
+        method: latest.current.request.method,
         inProgress: true,
         isRefetching: Boolean(apiRef.current!.loaded),
         error: undefined,
@@ -293,7 +301,7 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
           current,
           force,
           node,
-          scope,
+          scope: scopeRef.current,
         }), retryPolicy);
         let value = loaded.value;
         const responseHeaders = loaded.responseHeaders;
@@ -306,7 +314,7 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
         if (cancelled || sequence !== loadSequence) {
           return;
         }
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, scopeRef.current, {
           value,
           loaded: true,
           inProgress: false,
@@ -318,19 +326,19 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
           hasPrevPage: prevPage != null && prevPage !== false,
           hasNextPage: nextPage != null && nextPage !== false,
         });
-        void runEvent(node.parsed?.events?.loaded, scope, [value, force]);
+        void runEvent(node.parsed?.events?.loaded, scopeRef.current, [value, force]);
       } catch (error) {
         if (cancelled || sequence !== loadSequence) {
           return;
         }
         const dataSourceError = normalizeDataSourceError(error);
-        updateApi(apiRef.current!, id, scope, {
+        updateApi(apiRef.current!, id, scopeRef.current, {
           error: dataSourceError,
           inProgress: false,
           isRefetching: false,
         });
-        void runEvent(node.parsed?.events?.error, scope, [dataSourceError]);
-        showToast(scope, "error", latest.current.errorNotificationMessage, { error: dataSourceError });
+        void runEvent(node.parsed?.events?.error, scopeRef.current, [dataSourceError]);
+        showToast(scopeRef.current, "error", latest.current.errorNotificationMessage, { error: dataSourceError });
       }
     };
     apiRef.current!.refetch = () => load(true);
@@ -357,7 +365,8 @@ export const dataSourceRenderer: XmluiBuiltInRenderer = ({ node, scope }) => {
     prevPageSelector,
     resultSelector,
     structuralSharing,
-    scope,
+    scope.references,
+    scope.store,
     transformResultKey,
   ]);
 
@@ -436,6 +445,9 @@ export function createDataSourceApi(
   scope: Parameters<XmluiBuiltInRenderer>[0]["scope"],
 ): Record<string, unknown> {
   const api: Record<string, unknown> = {
+    __xmluiDataSource: true,
+    url: undefined,
+    method: undefined,
     value: undefined,
     error: undefined,
     inProgress: false,

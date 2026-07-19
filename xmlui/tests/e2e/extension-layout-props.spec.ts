@@ -19,6 +19,7 @@ test("extension components do not forward layout props to their native DOM", asy
 
   const button = page.getByRole("button", { name: "Scroll to top" });
   await expect(button).toBeVisible();
+  await expect(button).toHaveCSS("margin-bottom", "16px");
   await expect(button).not.toHaveAttribute("marginBottom", /.+/);
   await expect(button).not.toHaveAttribute("marginbottom", /.+/);
   expect(reactPropWarnings).toEqual([]);

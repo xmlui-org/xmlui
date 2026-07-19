@@ -62,6 +62,7 @@ type InFlightRequest = {
 
 export class ManagedFetchService {
   private readonly cache = new Map<string, ManagedCacheEntry>();
+  private readonly cacheRequests = new Map<string, ManagedRequest>();
   private readonly inFlight = new Map<string, InFlightRequest>();
   private adapter: ManagedFetchAdapter = defaultFetchAdapter;
   private revision = 0;
@@ -107,6 +108,7 @@ export class ManagedFetchService {
 
   async load(request: ManagedRequest, options: { force?: boolean } = {}): Promise<ManagedCacheEntry> {
     const key = this.requestKey(request);
+    this.cacheRequests.set(key, request);
     const entry = this.ensureEntry(key);
     if (entry.loaded && !options.force) {
       return entry;
@@ -173,10 +175,20 @@ export class ManagedFetchService {
 
   invalidate(key: string): void {
     this.cache.delete(key);
+    this.cacheRequests.delete(key);
     const existing = this.inFlight.get(key);
     if (existing) {
       existing.controller.abort();
       this.inFlight.delete(key);
+    }
+  }
+
+  invalidateMatching(predicate: (request: ManagedRequest, entry: ManagedCacheEntry) => boolean): void {
+    for (const entry of Array.from(this.cache.values())) {
+      const request = this.cacheRequests.get(entry.key);
+      if (request && predicate(request, entry)) {
+        this.invalidate(entry.key);
+      }
     }
   }
 
@@ -186,6 +198,7 @@ export class ManagedFetchService {
     }
     this.inFlight.clear();
     this.cache.clear();
+    this.cacheRequests.clear();
   }
 
   private ensureEntry(key: string): ManagedCacheEntry {

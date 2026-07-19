@@ -1614,6 +1614,7 @@ test.describe("Theme Variables", () => {
     const component = page.getByTestId("text");
     await expect(component).toHaveCSS("font-size", "12px");
     await expect(component).toHaveCSS("vertical-align", "super");
+    await expect(component).toHaveCSS("top", "-6px");
   });
 
   test("variant='sub' applies subscript theme variables", async ({ initTestBed, page }) => {
@@ -1629,6 +1630,7 @@ test.describe("Theme Variables", () => {
     const component = page.getByTestId("text");
     await expect(component).toHaveCSS("font-size", "12px");
     await expect(component).toHaveCSS("vertical-align", "sub");
+    await expect(component).toHaveCSS("top", "6px");
   });
 
   test("variant='var' applies variable theme variables", async ({ initTestBed, page }) => {
@@ -1662,6 +1664,10 @@ test.describe("Theme Variables", () => {
 
     const component = page.getByTestId("text");
     await expect(component).toHaveCSS("font-family", "monospace");
+    await expect(component).toHaveCSS("display", "block");
+    await expect(component).toHaveCSS("white-space", "pre");
+    expect(await component.evaluate((element) => getComputedStyle(element, "::before").content)).toBe("\" \"");
+    expect(await component.evaluate((element) => getComputedStyle(element, "::after").content)).toBe("\" \"");
   });
 
   test("variant='title' applies title theme variables", async ({ initTestBed, page }) => {

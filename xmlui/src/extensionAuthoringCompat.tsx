@@ -882,7 +882,8 @@ function usesComponentAsExtensionRoot(name: string): boolean {
     name === "Backdrop" ||
     name === "Breakout" ||
     name === "Carousel" ||
-    name === "CarouselItem"
+    name === "CarouselItem" ||
+    name === "ScrollToTop"
   );
 }
 

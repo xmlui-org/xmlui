@@ -156,6 +156,12 @@ describe("script function generation", () => {
       locals: { count: 7 },
       globals: { total: 11 },
     })).toBe(11);
+    expect(generateExpressionFunction(totalExpression.ir!).body).toBe(
+      `return (ctx.readGlobal("total") ?? ctx.readReference?.("total"));`,
+    );
+    expect(runGeneratedExpression(generateExpressionFunction(totalExpression.ir!).functionSource, {
+      references: { total: 12 },
+    })).toBe(12);
   });
 
   it("generates executable expression functions for template literals", () => {

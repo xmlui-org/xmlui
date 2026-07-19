@@ -17,6 +17,7 @@ export type NestedAppProps = {
   height?: string | number;
   initiallyShowCode?: boolean;
   noHeader?: boolean;
+  allowHorizontalOverflow?: boolean;
   allowReset?: boolean;
   refreshVersion?: string | number;
   splitView?: boolean;
@@ -39,6 +40,7 @@ export function NestedAppComponent({
   height,
   initiallyShowCode = false,
   noHeader = false,
+  allowHorizontalOverflow,
   refreshVersion,
   splitView = false,
   style,
@@ -113,26 +115,29 @@ export function NestedAppComponent({
     };
   }, [app, components, config]);
 
+  const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
+
   useLayoutEffect(() => {
     const previousAdapter = managedFetchService.getAdapter();
     const adapter = createNestedApiAdapter(api, previousAdapter);
     if (!adapter) {
       return;
     }
+    invalidateNestedApiCache(api);
     managedFetchService.setAdapter(adapter);
     return () => {
       if (managedFetchService.getAdapter() === adapter) {
         managedFetchService.setAdapter(previousAdapter);
       }
     };
-  }, [api]);
+  }, [api, effectiveRefreshVersion]);
   const mergedStyle = {
     ...style,
     ...(height !== undefined ? { height } : null),
   } as CSSProperties;
-  const effectiveRefreshVersion = `${String(refreshVersion ?? "")}:${resetVersion}`;
   const defaultTone = normalizeThemeTone(activeTone);
   const resolvedConfig = normalizeNestedConfig(config);
+  const nestedAllowHorizontalOverflow = allowHorizontalOverflow ?? height === undefined;
   const defaultTheme = typeof activeTheme === "string" ? activeTheme : resolvedConfig.defaultTheme;
   const Root = compiled?.Root;
   const runtimeView = compiled?.error ? (
@@ -149,7 +154,11 @@ export function NestedAppComponent({
       defaultTheme={defaultTheme}
       themes={resolvedConfig.themes}
       resources={resolvedConfig.resources}
-      appGlobals={{ ...resolvedConfig.appGlobals, isNested: true }}
+      appGlobals={{
+        ...resolvedConfig.appGlobals,
+        isNested: true,
+        nestedAllowHorizontalOverflow,
+      }}
       applyDocumentThemeVars={false}
     />
   ) : null;
@@ -268,7 +277,12 @@ function NestedAppShadowRoot({ children }: { children: ReactNode }) {
         ? createPortal(
             <StyleInjectionTargetContext.Provider value={shadowRoot}>
               <TableOfContentsContext.Provider value={null}>
-                {children}
+                <div
+                  className={`${styles.shadowRoot} xmlui-nested-app-shadow-root`}
+                  id="nested-app-root"
+                >
+                  <div className={`${styles.content} xmlui-nested-app-content`}>{children}</div>
+                </div>
               </TableOfContentsContext.Provider>
             </StyleInjectionTargetContext.Provider>,
             shadowRoot,
@@ -280,6 +294,30 @@ function NestedAppShadowRoot({ children }: { children: ReactNode }) {
 
 function copyDocumentStylesToShadowRoot(shadowRoot: ShadowRoot): void {
   if (typeof document === "undefined") return;
+  if (!shadowRoot.querySelector("style[data-nested-app-layout]")) {
+    const layoutStyle = document.createElement("style");
+    layoutStyle.setAttribute("data-nested-app-layout", "true");
+    layoutStyle.textContent = `
+      .xmlui-nested-app-shadow-root {
+        transform: scale(1);
+        width: 100%;
+        height: 100%;
+        position: relative;
+        isolation: isolate;
+        background-color: transparent;
+      }
+      #nested-app-root {
+        color: inherit;
+      }
+      .xmlui-nested-app-content {
+        width: 100%;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+    `;
+    shadowRoot.appendChild(layoutStyle);
+  }
   if (shadowRoot.querySelector("style[data-nested-app-style-reset]")) return;
 
   const layerStyle = document.createElement("style");
@@ -394,7 +432,7 @@ function createNestedApiAdapter(
       matchNestedApiPath(candidate.url, normalizedPath) !== undefined
     );
     if (!operation) {
-      throw new ManagedFetchError("Not Found", 404, { message: `No nested API operation for ${request.method.toUpperCase()} ${request.url}` });
+      return fallbackAdapter(request, signal);
     }
     const pathParams = matchNestedApiPath(operation.url, normalizedPath) ?? {};
     try {
@@ -419,12 +457,45 @@ function createNestedApiAdapter(
   };
 }
 
+function invalidateNestedApiCache(api: unknown): void {
+  const normalizedApi = normalizeNestedApi(api);
+  if (!normalizedApi || !isPlainRecord(normalizedApi.operations)) {
+    return;
+  }
+  const apiUrl = typeof normalizedApi.apiUrl === "string" ? normalizedApi.apiUrl.replace(/\/$/, "") : "";
+  const operations = Object.values(normalizedApi.operations)
+    .filter(isPlainRecord)
+    .map((operation) => ({
+      url: typeof operation.url === "string" ? operation.url : "",
+      method: typeof operation.method === "string" ? operation.method.toLowerCase() : "get",
+    }))
+    .filter((operation) => operation.url);
+  if (operations.length === 0) {
+    return;
+  }
+
+  managedFetchService.invalidateMatching((request) => {
+    if (!isNestedApiUrl(request.url, apiUrl)) {
+      return false;
+    }
+    const normalizedPath = nestedRequestPathFromUrl(request.url, apiUrl);
+    return operations.some((operation) =>
+      operation.method === request.method &&
+      matchNestedApiPath(operation.url, normalizedPath) !== undefined
+    );
+  });
+}
+
 function isNestedApiRequest(request: ManagedRequest, apiUrl: string): boolean {
+  return isNestedApiUrl(request.url, apiUrl);
+}
+
+function isNestedApiUrl(url: string, apiUrl: string): boolean {
   if (!apiUrl) {
     return true;
   }
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
-  const pathname = new URL(request.url || "/", origin).pathname;
+  const pathname = new URL(url || "/", origin).pathname;
   return pathname === apiUrl || pathname.startsWith(`${apiUrl}/`);
 }
 
@@ -449,8 +520,12 @@ function normalizeNestedApi(api: unknown): Record<string, unknown> | undefined {
 }
 
 function nestedRequestPath(request: ManagedRequest, apiUrl: string): string {
+  return nestedRequestPathFromUrl(request.url, apiUrl);
+}
+
+function nestedRequestPathFromUrl(url: string, apiUrl: string): string {
   const origin = typeof window === "undefined" ? "http://xmlui.local" : window.location.origin;
-  const pathname = new URL(request.url || "/", origin).pathname;
+  const pathname = new URL(url || "/", origin).pathname;
   return apiUrl && pathname.startsWith(`${apiUrl}/`)
     ? pathname.slice(apiUrl.length)
     : pathname;

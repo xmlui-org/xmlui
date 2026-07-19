@@ -36,6 +36,8 @@ export function resolveLayoutStyle(
   const orientation = options.orientation ?? orientationFromProp(props.orientation);
   const parentOrientation = parentLayoutOrientation(props.layoutContext);
   const insideTableCell = isInsideLayoutType(props.layoutContext, "TableCell");
+  const ignoreLayoutProps = ignoredLayoutProps(props.layoutContext);
+  const shouldIgnore = (prop: string) => ignoreLayoutProps.has(prop);
 
   if (orientation) {
     style.display = "flex";
@@ -50,12 +52,24 @@ export function resolveLayoutStyle(
     style.flexShrink = insideTableCell ? 1 : 0;
   }
 
-  assignSize(style, "width", props.width, orientation === "horizontal");
-  assignSize(style, "minWidth", props.minWidth);
-  assignSize(style, "maxWidth", props.maxWidth);
-  assignSize(style, "height", props.height, orientation === "vertical");
-  assignSize(style, "minHeight", props.minHeight);
-  assignSize(style, "maxHeight", props.maxHeight);
+  if (!shouldIgnore("width")) {
+    assignSize(style, "width", props.width, orientation === "horizontal");
+  }
+  if (!shouldIgnore("minWidth")) {
+    assignSize(style, "minWidth", props.minWidth);
+  }
+  if (!shouldIgnore("maxWidth")) {
+    assignSize(style, "maxWidth", props.maxWidth);
+  }
+  if (!shouldIgnore("height")) {
+    assignSize(style, "height", props.height, orientation === "vertical");
+  }
+  if (!shouldIgnore("minHeight")) {
+    assignSize(style, "minHeight", props.minHeight);
+  }
+  if (!shouldIgnore("maxHeight")) {
+    assignSize(style, "maxHeight", props.maxHeight);
+  }
 
   assign(style, "gap", props.gap);
   assign(style, "backgroundColor", props.backgroundColor);
@@ -158,6 +172,7 @@ export function resolveResponsiveLayoutStyles(
   options: LayoutStyleOptions = {},
 ): ResponsiveLayoutStyles {
   const styles: ResponsiveLayoutStyles = {};
+  const ignoreLayoutProps = ignoredLayoutProps(props.layoutContext);
   for (const [key, value] of Object.entries(props)) {
     if (value === undefined || value === null || value === "") {
       continue;
@@ -167,6 +182,9 @@ export function resolveResponsiveLayoutStyles(
     }
     const selector = parseStyleSelectorKey(key);
     if (!supportedLayoutPropNames.includes(selector.property as never)) {
+      continue;
+    }
+    if (ignoreLayoutProps.has(selector.property)) {
       continue;
     }
     const part = selector.part ?? COMPONENT_PART_KEY;
@@ -192,6 +210,12 @@ export function resolveResponsiveLayoutStyles(
     }
   }
   return styles;
+}
+
+function ignoredLayoutProps(layoutContext: unknown): Set<string> {
+  const ignoreLayoutProps = (layoutContext as { ignoreLayoutProps?: unknown } | undefined)
+    ?.ignoreLayoutProps;
+  return new Set(Array.isArray(ignoreLayoutProps) ? ignoreLayoutProps.map(String) : []);
 }
 
 function assign(

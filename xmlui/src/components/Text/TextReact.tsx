@@ -16,7 +16,6 @@ import type { RegisterComponentApiFn } from "../..";
 import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { EMPTY_OBJECT } from "../../components-core/constants";
-import { toCssVar } from "../../components-core/theming/layout-resolver";
 
 // =============================================================================
 // Custom Variant CSS Cache Infrastructure
@@ -113,6 +112,10 @@ type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
 
 import { defaultProps } from "./Text.defaults";
 
+function toVariantCssVar(prop: string, variant: string): string {
+  return `var(--xmlui-${prop}-Text-${variant}, var(--xmlui-${prop}-Text))`;
+}
+
 export const Text = memo(forwardRef(function Text(
   {
     uid,
@@ -163,66 +166,76 @@ export const Text = memo(forwardRef(function Text(
     return TextVariantElement[variant];
   }, [variant]);
 
-  // Custom variant CSS generation
-  // Following React hook rules: hooks must be called unconditionally
-  // We always call useComponentStyle, passing empty object for known variants
   const isCustomVariant = useMemo(() => {
     return variant && !TextVariantElement[variant];
   }, [variant]);
+  const needsVariantClass = useMemo(() => {
+    return Boolean(isCustomVariant || variant === "sup" || variant === "sub" || variant === "mono");
+  }, [isCustomVariant, variant]);
 
   // Always call useComponentStyle (React hook rule: no conditional hooks)
-  // For now, pass empty object; later this will contain assembled CSS properties
   const variantSpec = useMemo(
     () => {
-      if (!isCustomVariant) return EMPTY_OBJECT;
-      const subject = `-Text-${variant}`;
+      if (!variant || !needsVariantClass) return EMPTY_OBJECT;
       const cssInput = {
-        color: toCssVar(`$textColor${subject}`),
-        "font-family": toCssVar(`$fontFamily${subject}`),
-        "font-size": toCssVar(`$fontSize${subject}`),
-        "font-style": toCssVar(`$fontStyle${subject}`),
-        "font-weight": toCssVar(`$fontWeight${subject}`),
-        "font-stretch": toCssVar(`$fontStretch${subject}`),
-        "text-decoration-line": toCssVar(`$textDecorationLine${subject}`),
-        "text-decoration-color": toCssVar(`$textDecorationColor${subject}`),
-        "text-decoration-style": toCssVar(`$textDecorationStyle${subject}`),
-        "text-decoration-thickness": toCssVar(`$textDecorationThickness${subject}`),
-        "text-underline-offset": toCssVar(`$textUnderlineOffset${subject}`),
-        "line-height": toCssVar(`$lineHeight${subject}`),
-        "background-color": toCssVar(`$backgroundColor${subject}`),
-        "text-transform": toCssVar(`$textTransform${subject}`),
-        "letter-spacing": toCssVar(`$letterSpacing${subject}`),
-        "word-spacing": toCssVar(`$wordSpacing${subject}`),
-        "text-shadow": toCssVar(`$textShadow${subject}`),
-        "text-indent": toCssVar(`$textIndent${subject}`),
-        "text-align": toCssVar(`$textAlign${subject}`),
-        "text-align-last": toCssVar(`$textAlignLast${subject}`),
-        "word-break": toCssVar(`$wordBreak${subject}`),
-        "word-wrap": toCssVar(`$wordWrap${subject}`),
-        direction: toCssVar(`$direction${subject}`),
-        "writing-mode": toCssVar(`$writingMode${subject}`),
-        "line-break": toCssVar(`$lineBreak${subject}`),
+        color: toVariantCssVar("textColor", variant),
+        "font-family": toVariantCssVar("fontFamily", variant),
+        "font-size": toVariantCssVar("fontSize", variant),
+        "font-style": toVariantCssVar("fontStyle", variant),
+        "font-variant": toVariantCssVar("fontVariant", variant),
+        "font-weight": toVariantCssVar("fontWeight", variant),
+        "font-stretch": toVariantCssVar("fontStretch", variant),
+        "text-decoration-line": toVariantCssVar("textDecorationLine", variant),
+        "text-decoration-color": toVariantCssVar("textDecorationColor", variant),
+        "text-decoration-style": toVariantCssVar("textDecorationStyle", variant),
+        "text-decoration-thickness": toVariantCssVar("textDecorationThickness", variant),
+        "text-underline-offset": toVariantCssVar("textUnderlineOffset", variant),
+        "line-height": toVariantCssVar("lineHeight", variant),
+        "background-color": toVariantCssVar("backgroundColor", variant),
+        "text-transform": toVariantCssVar("textTransform", variant),
+        "letter-spacing": toVariantCssVar("letterSpacing", variant),
+        "word-spacing": toVariantCssVar("wordSpacing", variant),
+        "text-shadow": toVariantCssVar("textShadow", variant),
+        "text-indent": toVariantCssVar("textIndent", variant),
+        "text-align": toVariantCssVar("textAlign", variant),
+        "text-align-last": toVariantCssVar("textAlignLast", variant),
+        "word-break": toVariantCssVar("wordBreak", variant),
+        "word-wrap": toVariantCssVar("wordWrap", variant),
+        direction: toVariantCssVar("direction", variant),
+        "writing-mode": toVariantCssVar("writingMode", variant),
+        "line-break": toVariantCssVar("lineBreak", variant),
+        "margin-top": toVariantCssVar("marginTop", variant),
+        "margin-bottom": toVariantCssVar("marginBottom", variant),
+        "margin-left": toVariantCssVar("marginLeft", variant),
+        "margin-right": toVariantCssVar("marginRight", variant),
+        "border-width": toVariantCssVar("borderWidth", variant),
+        "border-color": toVariantCssVar("borderColor", variant),
+        "border-style": toVariantCssVar("borderStyle", variant),
+        "border-radius": toVariantCssVar("borderRadius", variant),
+        "&:hover": {
+          color: `var(--xmlui-textColor-Text-${variant}--hover, var(--xmlui-textColor-Text))`,
+        },
       };
       return cssInput;
     },
-    [isCustomVariant, variant],
+    [needsVariantClass, variant],
   );
-  const customVariantClassName = useComponentStyle(variantSpec);
+  const variantClassName = useComponentStyle(variantSpec);
 
   // Store custom variant in cache if it's a new custom variant
   useEffect(() => {
-    if (isCustomVariant && variant && customVariantClassName) {
+    if (isCustomVariant && variant && variantClassName) {
       // Check if this variant is already cached
       if (!hasCustomVariantCache(variant)) {
         // TODO: When CSS generation is implemented, extract the actual CSS text
         // For now, store placeholder information
         setCustomVariantCache(variant, {
-          className: customVariantClassName,
+          className: variantClassName,
           cssText: "", // Will be populated when CSS generation is implemented
         });
       }
     }
-  }, [isCustomVariant, variant, customVariantClassName]);
+  }, [isCustomVariant, variant, variantClassName]);
 
   // Determine overflow mode classes based on overflowMode and existing props
   const overflowClasses = useMemo(() => {
@@ -313,8 +326,8 @@ export const Text = memo(forwardRef(function Text(
       className={classnames(
         syntaxHighlightClasses,
         styles.text,
-        // Use custom variant className if it's a custom variant, otherwise use predefined variant style
-        isCustomVariant ? customVariantClassName : styles[variant || "default"],
+        styles[variant || "default"],
+        variantClassName,
         {
           [styles.preserveLinebreaks]: preserveLinebreaks,
           ...overflowClasses,

@@ -35,6 +35,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "font-feature-settings": "normal",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
+    "textColor-Text-code": "$color-surface-600",
+    "textColor-Table": "$color-surface-600",
 
     // --- Navigation layout
     "iconAlignment-NavLink": "baseline",
@@ -88,6 +90,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "textColor-prevNextText-DocumentLinks": "$color-surface-500",
     "backgroundColor-Card--hover": "$color-surface-50",
     "backgroundColor-CodeBlock": "$color-surface-100",
+    "backgroundColor-Admonition-markdown-warning": "hsl(35, 100%, 94.3%)",
+    "borderColor-Admonition-markdown-warning": "hsl(35, 100%, 82.8%)",
     "textColor-Link": "$color-surface-600",
     "textColor-Link--hover": "$color-surface-900",
 

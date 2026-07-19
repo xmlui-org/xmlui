@@ -74,6 +74,24 @@ const tubeTableSource = escapeNestedSource(`
   </Table>
 </App>
 `);
+const transformedTableSource = escapeNestedSource(`
+<App>
+  <TransformedRows />
+</App>
+`);
+const transformedRowsComponentSource = escapeNestedSource(`
+<Component name="TransformedRows">
+  <DataSource
+    id="rows"
+    url="https://api.example.test/raw-rows"
+    transformResult="{transformRows}"
+  />
+  <Table data="{rows}" testId="transformed-table">
+    <Column bindTo="name" />
+    <Column bindTo="zone" />
+  </Table>
+</Component>
+`);
 
 const teamApi = {
   apiUrl: "/api",
@@ -87,6 +105,57 @@ const teamApi = {
   },
 };
 const teamApiExpression = `{JSON.parse('${JSON.stringify(teamApi).replace(/"/g, "&quot;")}')}`;
+const decoupledDataSourceSource = escapeNestedSource(`
+<App>
+  <DataSource id="apiResult" url="/api/names-with-activity-decoupled" />
+  <APICall
+    id="addItem"
+    method="post"
+    url="/api/names-with-activity-decoupled"
+    invalidates="/api/names-with-activity-decoupled"
+  />
+
+  <variable name="items" value="{apiResult.value ?? []}" />
+
+  <Text testId="datasource-count">DataSource count: {(apiResult.value ?? []).length}</Text>
+  <Text testId="items-count">items count: {items.length}</Text>
+
+  <Button
+    testId="snapshot"
+    label="Take snapshot of active items"
+    onClick="items = (apiResult.value ?? []).filter(i => i.active)"
+  />
+  <Button
+    testId="add-active"
+    label="Add active item"
+    onClick="addItem.execute()"
+  />
+
+  <Items data="{items}">
+    <Text testId="item-{$item.id}">{$item.name}</Text>
+  </Items>
+</App>
+`);
+const decoupledDataSourceApi = {
+  apiUrl: "/api",
+  initialize:
+    "$state.items = [{ id: 1, name: String.fromCharCode(65,110,110,97), active: true }, { id: 2, name: String.fromCharCode(72,101,108,103,97), active: false }, { id: 3, name: String.fromCharCode(66,111,98), active: true }, { id: 4, name: String.fromCharCode(74,111,104,110), active: false }]",
+  operations: {
+    "get-names-with-activity-decoupled": {
+      url: "/names-with-activity-decoupled",
+      method: "get",
+      handler: "return $state.items",
+    },
+    "add-names-with-activity-decoupled": {
+      url: "/names-with-activity-decoupled",
+      method: "post",
+      handler:
+        "$state.items = [...$state.items, { id: $state.items.length + 1, name: String.fromCharCode(70,114,97,110,107), active: true }]",
+    },
+  },
+};
+const decoupledDataSourceApiExpression =
+  `{JSON.parse('${JSON.stringify(decoupledDataSourceApi).replace(/"/g, "&quot;")}')}`;
 const tubeStatusInterceptor = {
   operations: {
     "tube-status": {
@@ -95,6 +164,24 @@ const tubeStatusInterceptor = {
       handler: `return [
         { id: "bakerloo", name: "Bakerloo", lineStatuses: [{ statusSeverityDescription: "Good Service" }] },
         { id: "central", name: "Central", lineStatuses: [{ statusSeverityDescription: "Minor Delays" }] }
+      ];`,
+    },
+  },
+};
+const rawRowsInterceptor = {
+  operations: {
+    "raw-rows": {
+      url: "https://api.example.test/raw-rows",
+      method: "get",
+      handler: `return [
+        {
+          commonName: "Oxford Circus Underground Station",
+          additionalProperties: [{ key: "Zone", value: "1" }]
+        },
+        {
+          commonName: "Waterloo Underground Station",
+          additionalProperties: [{ key: "Zone", value: "1" }]
+        }
       ];`,
     },
   },
@@ -174,6 +261,119 @@ test.describe("NestedApp foundation", () => {
     await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
   });
 
+  test("keeps assigned variables decoupled from nested DataSource refetches", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="nested"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 4");
+    await expect(page.getByTestId("item-1")).toHaveText("Anna");
+    await expect(page.getByTestId("item-2")).toHaveText("Helga");
+
+    await page.getByTestId("snapshot").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 2");
+    await expect(page.getByTestId("item-1")).toHaveText("Anna");
+    await expect(page.getByTestId("item-3")).toHaveText("Bob");
+    await expect(page.getByTestId("item-2")).toHaveCount(0);
+
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 2");
+    await expect(page.getByTestId("item-5")).toHaveCount(0);
+  });
+
+  test("falls through same-prefix playground api adapters until an operation matches", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="decoupled"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+        <NestedApp testId="team" app="{'${teamListSource}'}" api="${teamApiExpression}" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await expect(page.getByTestId("items-count")).toHaveText("items count: 4");
+    await expect(page.getByTestId("user-1")).toHaveText("Coder Gal");
+    await expect(page.getByTestId("user-2")).toHaveText("Tech Ninja");
+
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
+  });
+
+  test("refreshVersion resets nested playground api state", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.version="{0}">
+        <Button testId="refresh-api" onClick="version++">Refresh API sample</Button>
+        <NestedApp
+          testId="nested"
+          refreshVersion="{version}"
+          app="{'${decoupledDataSourceSource}'}"
+          api="${decoupledDataSourceApiExpression}"
+        />
+      </App>
+    `);
+
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+    await page.getByTestId("add-active").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 5");
+
+    await page.getByTestId("refresh-api").click();
+    await expect(page.getByTestId("datasource-count")).toHaveText("DataSource count: 4");
+  });
+
+  test("resolves global transformResult functions by bare name in nested apps", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).transformRows = (rows: any[]) =>
+        rows.map((row) => ({
+          name: row.commonName,
+          zone:
+            row.additionalProperties?.find((property: { key: string }) => property.key === "Zone")
+              ?.value ?? "",
+        }));
+    });
+
+    await initTestBed(`
+      <App>
+        <NestedApp
+          testId="nested"
+          app="{'${transformedTableSource}'}"
+          components="{['${transformedRowsComponentSource}']}"
+        />
+      </App>
+    `, { apiInterceptor: rawRowsInterceptor });
+
+    const table = page.getByTestId("transformed-table");
+    await expect(
+      table.locator("td").filter({ hasText: "Oxford Circus Underground Station" }).first(),
+    ).toBeVisible();
+    await expect(
+      table.locator("td").filter({ hasText: "Waterloo Underground Station" }).first(),
+    ).toBeVisible();
+    await expect(
+      table.locator("td").filter({ hasText: "1" }).first(),
+    ).toBeVisible();
+  });
+
   test("keeps playground api mocks from intercepting sibling URL data samples", async ({
     initTestBed,
     page,
@@ -234,6 +434,11 @@ test.describe("NestedApp foundation", () => {
     expect(firstCardBox?.height).toBeLessThan(100);
     await expect(firstCard.locator("h2")).toHaveCSS("margin-top", "0px");
     await expect(firstCard.locator("h2")).toHaveCSS("margin-bottom", "0px");
+
+    const nestedHeroAppOverflow = await heroPlayground
+      .locator('[data-xmlui-component="App"]')
+      .evaluate((element) => getComputedStyle(element).overflowX);
+    expect(nestedHeroAppOverflow).toBe("hidden");
   });
 
   test("shows a compile error inside the nested app boundary", async ({ initTestBed, page }) => {
@@ -377,7 +582,7 @@ test.describe("NestedApp foundation", () => {
     await expect(page.getByTestId("nested-count")).toHaveText("Nested: 0");
   });
 
-  test("framed website sample inherits shell text color and does not show nested app scrollbars", async ({
+  test("framed fixed-height website sample inherits shell text color and hides horizontal app overflow", async ({
     initTestBed,
     page,
   }) => {
@@ -478,6 +683,161 @@ test.describe("NestedApp foundation", () => {
     expect(frameMetrics.scrollbarGutter).toBe("stable both-edges");
     expect(frameMetrics.appGutterLeft).toBeGreaterThanOrEqual(14);
     expect(frameMetrics.labelInset).toBeGreaterThanOrEqual(45);
+  });
+
+  test("framed playground content scrolls horizontally when the nested app overflows", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg name="Example: HStack with percentage width (overflow)"',
+      "---app copy display",
+      "<App>",
+      "  <HStack>",
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      '    <Stack height="20px" width="180px" canShrink="{false}" backgroundColor="orangered" />',
+      "  </HStack>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack width="360px">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.querySelector('[data-xmlui-component="HStack"]'),
+      ),
+    );
+
+    const metrics = await page
+      .getByText("Example: HStack with percentage width (overflow)")
+      .evaluate((element) => {
+        const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+        const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+          .find((candidate) => candidate.shadowRoot) as HTMLElement;
+        const app = host.shadowRoot?.querySelector('[data-xmlui-component="App"]') as HTMLElement;
+        const style = getComputedStyle(app);
+        return {
+          clientWidth: app.clientWidth,
+          overflowX: style.overflowX,
+          scrollWidth: app.scrollWidth,
+        };
+      });
+
+    expect(metrics.overflowX).toBe("auto");
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+  });
+
+  test("fixed-height playground lets percentage-height splitter fill the frame", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg copy display height="200px" name="Example: Splitter"',
+      "<HSplitter",
+      '  height="100%"',
+      '  minPrimarySize="15%"',
+      '  maxPrimarySize="85%">',
+      '  <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>',
+      '  <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>',
+      "</HSplitter>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack testId="host">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.querySelector(
+          '[data-xmlui-component="HSplitter"], [data-xmlui-component="Splitter"]',
+        ),
+      ),
+    );
+
+    const metrics = await page.evaluate(() => {
+      const frame = [...document.querySelectorAll('[class*="nestedAppContainer"]')]
+        .find((candidate) => candidate.textContent?.includes("Example: Splitter")) as HTMLElement;
+      const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+        .find((candidate) => candidate.shadowRoot) as HTMLElement;
+      const shadowRoot = host.shadowRoot as ShadowRoot;
+      const splitter = shadowRoot.querySelector(
+        '[data-xmlui-component="HSplitter"], [data-xmlui-component="Splitter"]',
+      ) as HTMLElement;
+      return {
+        frameHeight: frame.getBoundingClientRect().height,
+        hostHeight: host.getBoundingClientRect().height,
+        splitterHeight: splitter.getBoundingClientRect().height,
+      };
+    });
+
+    expect(metrics.frameHeight).toBe(200);
+    expect(metrics.hostHeight).toBeGreaterThan(100);
+    expect(metrics.splitterHeight).toBe(metrics.hostHeight);
+  });
+
+  test("root nested theme keeps inherited text color for plain stack text", async ({
+    initTestBed,
+    page,
+  }) => {
+    const markdownSource = [
+      '```xmlui-pg name="Example: default container width"',
+      "<VStack",
+      '  backgroundColor="cyan"',
+      '  horizontalAlignment="center"',
+      '  verticalAlignment="center">',
+      "  This is some text within a VStack",
+      "</VStack>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`
+      <App>
+        <VStack testId="host">
+          <Markdown><![CDATA[${markdownSource}]]></Markdown>
+        </VStack>
+      </App>
+    `);
+
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("*")].some((element) =>
+        element.shadowRoot?.textContent?.includes("This is some text within a VStack"),
+      ),
+    );
+
+    await page.getByText("Example: default container width").evaluate((element) => {
+      const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+      frame.style.color = "rgb(99, 98, 106)";
+    });
+
+    const color = await page.getByText("Example: default container width").evaluate((element) => {
+      const frame = element.closest('[class*="nestedAppContainer"]') as HTMLElement;
+      const host = [...frame.querySelectorAll('[class*="nestedAppRoot"]')]
+        .find((candidate) => candidate.shadowRoot) as HTMLElement;
+      const shadowRoot = host.shadowRoot as ShadowRoot;
+      const walker = document.createTreeWalker(shadowRoot, NodeFilter.SHOW_TEXT);
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        if (node.nodeValue?.includes("This is some text within a VStack")) {
+          return getComputedStyle(node.parentElement as HTMLElement).color;
+        }
+      }
+      return "";
+    });
+
+    expect(color).toBe("rgb(99, 98, 106)");
   });
 });
 

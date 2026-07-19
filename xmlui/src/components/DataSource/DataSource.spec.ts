@@ -59,6 +59,59 @@ test.describe("Basic Functionality", () => {
     await expect(component).toHaveText("GET success");
   });
 
+  test("does not re-run indefinitely when a referenced Table refreshes after load", async ({
+    initTestBed,
+    page,
+  }) => {
+    const runtimeErrors: string[] = [];
+    page.on("pageerror", (error) => runtimeErrors.push(String(error)));
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        runtimeErrors.push(message.text());
+      }
+    });
+
+    await initTestBed(
+      `
+      <App var.line="waterloo-city">
+        <DataSource
+          id="stops"
+          when="{line}"
+          url="/Line/{line}/StopPoints"
+        />
+
+        <Text testId="line" variant="strong">
+          {line}
+        </Text>
+
+        <Table data="{stops}" testId="stopsTable">
+          <Column bindTo="name" />
+          <Column bindTo="zone" />
+        </Table>
+      </App>
+      `,
+      {
+        apiInterceptor: {
+          operations: {
+            "get-stops": {
+              url: "/Line/waterloo-city/StopPoints",
+              method: "get",
+              handler: `return [
+                { name: "Bank Underground Station", zone: "1" },
+                { name: "Waterloo Underground Station", zone: "1" }
+              ];`,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("line")).toHaveText("waterloo-city");
+    await expect(page.getByTestId("stopsTable")).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Bank Underground Station" })).toBeVisible();
+    expect(runtimeErrors.join("\n")).not.toContain("Maximum update depth exceeded");
+  });
+
   test("onError working correctly", async ({ initTestBed }) => {
     const { testStateDriver } = await initTestBed(
       `<DataSource id="ds" url="/api/error/400" onError="(error) => testState = JSON.stringify(error)" />`,

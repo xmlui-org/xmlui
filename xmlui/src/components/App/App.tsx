@@ -403,6 +403,7 @@ function AppNode({
       onWillNavigate={lookupEventHandler("willNavigate")}
       onDidNavigate={lookupEventHandler("didNavigate")}
       onError={lookupEventHandler("error")}
+      hasRegisteredHeader={AppHeader !== undefined}
       name={extractValue(props.name)}
       logo={extractValue(props.logo)}
       logoDark={extractValue(props["logo-dark"])}
@@ -477,7 +478,6 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
   name: COMP,
   metadata: AppMd as ComponentMetadata,
   themeContributors: [AppHeaderMd as ComponentMetadata, FooterMd as ComponentMetadata, PagesMd as ComponentMetadata],
-  layoutOrientation: "vertical",
   renderer: ({ adapter }) => {
     const appContext = useXmluiAppContext();
     const extracted = extractRuntimeAppComponents(adapter.node.children);
@@ -570,6 +570,7 @@ export const appRuntimeRenderer = wrapRuntimeComponent({
         scheduler={adapter.stringProp("scheduler") as any}
         maxQueuedPerTrace={adapter.numberProp("maxQueuedPerTrace", 64)}
         applyDefaultContentPadding={!pages && adapter.prop("padding") === undefined}
+        hasRegisteredHeader={appHeader !== undefined}
         header={renderChild(appHeader, {})}
         footer={renderChild(footer, {})}
         footerSticky={footerSticky}

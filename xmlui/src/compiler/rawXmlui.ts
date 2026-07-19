@@ -196,16 +196,28 @@ function rangeOf(node: MarkupSyntaxNode): SourceRange {
 }
 
 function normalizeText(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return trimWhitespaceExceptNonBreakingSpace(
+    decodeEntities(text).replace(whitespaceExceptNonBreakingSpacePattern, " "),
+  );
 }
 
 function decodeEntities(value: string): string {
   return value
+    .replace(/&nbsp;/g, "\u00a0")
     .replace(/&quot;/g, `"`)
     .replace(/&apos;/g, `'`)
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&");
+}
+
+const whitespaceExceptNonBreakingSpacePattern =
+  /[\f\n\r\t\v\u0020\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+/g;
+const edgeWhitespaceExceptNonBreakingSpacePattern =
+  /^[\f\n\r\t\v\u0020\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+|[\f\n\r\t\v\u0020\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+$/g;
+
+function trimWhitespaceExceptNonBreakingSpace(value: string): string {
+  return value.replace(edgeWhitespaceExceptNonBreakingSpacePattern, "");
 }
 
 function stripQuotes(value: string): string {
