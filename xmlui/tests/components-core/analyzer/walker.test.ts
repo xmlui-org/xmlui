@@ -123,6 +123,55 @@ describe("analyzer/rule-registry", () => {
     expect(found[0].message).toBe("test diagnostic");
   });
 
+  it("lazy-parses entrypoint files with inline component bodies", () => {
+    const uniqueCode = `test-inline-entrypoint-${Date.now()}-${Math.random()}`;
+    const rule: AnalyzerRule = {
+      code: uniqueCode,
+      description: "Emits when an inline component body is analyzed",
+      defaultSeverity: "warn",
+      strictSeverity: "error",
+      appliesTo: "markup",
+      run: (ctx: RuleContext): BuildDiagnostic[] => {
+        const root = ctx.markupAst as any;
+        const hasInlineBody = root?.children?.some((child: any) => child.type === "Button");
+        return hasInlineBody
+          ? [
+              {
+                code: uniqueCode,
+                severity: "warn",
+                file: ctx.file,
+                line: 1,
+                column: 1,
+                length: 0,
+                message: "inline body analyzed",
+              },
+            ]
+          : [];
+      },
+    };
+    registerRule(rule);
+
+    const result = analyze({
+      files: [
+        {
+          file: "Main.xmlui",
+          source: [
+            '<Component name="InlineButton">',
+            '  <Button label="inline" />',
+            "</Component>",
+            "<App><InlineButton /></App>",
+          ].join("\n"),
+        },
+      ],
+      componentRegistry: mockRegistry(),
+      strict: false,
+    });
+
+    expect(result).toEqual(
+      expect.arrayContaining([expect.objectContaining({ code: uniqueCode })]),
+    );
+  });
+
   it("suppresses diagnostics emitted by registered rules", () => {
     const uniqueCode = `test-suppress-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const rule: AnalyzerRule = {

@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { transformSource } from "./xmlui";
+import { transformEntryPointSource, transformSource } from "./xmlui";
 import type {
   ExpressionStatement,
   Identifier,
@@ -925,6 +925,51 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("Compound components", () => {
+    it("entrypoint separates inline component definitions from the app root", () => {
+      const result = transformEntryPointSource(`
+        <Component name='MyInline'><Text value="inline" /></Component>
+        <App>
+          <MyInline />
+        </App>
+      `);
+
+      expect(result.entrypoint).toMatchObject({
+        type: "App",
+        children: [
+          {
+            type: "MyInline",
+          },
+        ],
+      });
+      expect(result.inlineComponents).toHaveLength(1);
+      expect(result.inlineComponents[0]).toMatchObject({
+        name: "MyInline",
+        component: {
+          type: "Text",
+          props: {
+            value: "inline",
+          },
+        },
+      });
+    });
+
+    it("entrypoint with only inline components creates an empty Fragment", () => {
+      const warnings: string[] = [];
+      const result = transformEntryPointSource(
+        `<Component name='MyInline'><Text value="inline" /></Component>`,
+        undefined,
+        false,
+        warnings,
+      );
+
+      expect(result.entrypoint).toMatchObject({
+        type: "Fragment",
+      });
+      expect(result.entrypoint?.children).toBeUndefined();
+      expect(result.inlineComponents).toHaveLength(1);
+      expect(warnings[0]).toContain("rendering an empty Fragment");
+    });
+
     it("Compound component #1", () => {
       const cd = transformSource(`
       <Component name='MyComp'><Stack /><variable name="myVar" value="123" /></Component>

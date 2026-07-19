@@ -111,9 +111,22 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
  */
 function parseMarkupSafely(source: string, file: string): ComponentDef | undefined {
   try {
-    const result = xmlUiMarkupToComponent(source, file);
+    const isEntrypoint = /(?:^|[/\\])(?:Main|App)\.xmlui$/i.test(file) &&
+      !/(?:^|[/\\])components[/\\]/i.test(file);
+    const result = xmlUiMarkupToComponent(source, file, undefined, undefined, {
+      role: isEntrypoint ? "entrypoint" : "component",
+    });
     if (!result || !result.component || result.errors.length > 0) return undefined;
     const root = result.component as ComponentDef | CompoundComponentDef;
+    if (isEntrypoint && result.inlineComponents.length > 0) {
+      return {
+        type: "Fragment",
+        children: [
+          root as ComponentDef,
+          ...result.inlineComponents.map((inlineComponent) => inlineComponent.component),
+        ],
+      };
+    }
     // Compound components nest the actual root under `.component`.
     if ((root as CompoundComponentDef).component) {
       return (root as CompoundComponentDef).component as ComponentDef;

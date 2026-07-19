@@ -209,12 +209,19 @@ export const NestedApp = memo(function NestedApp({
   }, []);
 
   useEffect(() => {
-    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-      app,
-      PLAYGROUND_ENTRY_FILE,
-    );
+    let {
+      errors,
+      warnings,
+      component,
+      inlineComponents,
+      erroneousCompoundComponentName,
+    } = xmlUiMarkupToComponent(app, PLAYGROUND_ENTRY_FILE, undefined, undefined, {
+      role: "entrypoint",
+    });
+    warnings.forEach((msg) => console.warn(`[xmlui] ${msg}`));
     if (errors.length > 0) {
       component = errReportComponent(errors, PLAYGROUND_ENTRY_FILE, erroneousCompoundComponentName);
+      inlineComponents = [];
     }
 
     // Extract globalVars from the parsed app component
@@ -277,6 +284,30 @@ export const NestedApp = memo(function NestedApp({
 
       return component;
     });
+
+    for (const inlineComponent of inlineComponents) {
+      if (compoundComponents.some((component) => component?.name === inlineComponent.name)) {
+        console.warn(
+          `[xmlui] Inline component "${inlineComponent.name}" in ${PLAYGROUND_ENTRY_FILE} ignored because a component file with the same name exists.`,
+        );
+        continue;
+      }
+
+      const componentFile = `${PLAYGROUND_ENTRY_FILE}#components/${inlineComponent.name}.xmlui`;
+      sources[componentFile] = app;
+      compoundComponents.push(inlineComponent);
+
+      const compGlobalVars = inlineComponent.component?.globalVars;
+      if (compGlobalVars) {
+        appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
+      }
+      projectCompilation.components.push({
+        filename: componentFile,
+        definition: inlineComponent,
+        markupSource: app,
+        dependencies: new Set(),
+      });
+    }
 
     let globalProps = {
       name: config?.name,

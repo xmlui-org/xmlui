@@ -180,4 +180,65 @@ describe("Definition", () => {
     const result = handleDefinition(project, mainUri, position);
     expect(result).toBeNull();
   });
+
+  it("resolves to a top-level inline component declaration in Main.xmlui", () => {
+    const files = {
+      "Main.xmlui": `
+        <Component name="MyInline"><Text value="inline" /></Component>
+        <App><MyInline /></App>
+      `,
+    };
+    const root = makeProjectDir(files);
+    tempRoots.push(root);
+
+    const mainUri = uriOf(root, "Main.xmlui");
+    const project = Project.fromFileContets(
+      { [mainUri]: files["Main.xmlui"] },
+      mockMetadataProvider,
+    );
+
+    const source = files["Main.xmlui"];
+    const cursorOffset = source.lastIndexOf("MyInline") + 1;
+    const doc = project.documents.get(mainUri);
+    const position = doc.cursor.positionAt(cursorOffset);
+
+    const result = handleDefinition(project, mainUri, position);
+    expect(result).not.toBeNull();
+    expect(result!.uri).toBe(mainUri);
+
+    const startOffset = doc.cursor.offsetAt(result!.range.start);
+    const endOffset = doc.cursor.offsetAt(result!.range.end);
+    expect(source.slice(startOffset, endOffset)).toBe("Component");
+  });
+
+  it("prefers a file-backed component over a same-name inline component", () => {
+    const files = {
+      "Main.xmlui": `
+        <Component name="MyInline"><Text value="inline" /></Component>
+        <App><MyInline /></App>
+      `,
+      "components/MyInline.xmlui": '<Component name="MyInline"><Text value="file" /></Component>',
+    };
+    const root = makeProjectDir(files);
+    tempRoots.push(root);
+
+    const mainUri = uriOf(root, "Main.xmlui");
+    const componentUri = uriOf(root, "components/MyInline.xmlui");
+    const project = Project.fromFileContets(
+      {
+        [mainUri]: files["Main.xmlui"],
+        [componentUri]: files["components/MyInline.xmlui"],
+      },
+      mockMetadataProvider,
+    );
+
+    const source = files["Main.xmlui"];
+    const cursorOffset = source.lastIndexOf("MyInline") + 1;
+    const doc = project.documents.get(mainUri);
+    const position = doc.cursor.positionAt(cursorOffset);
+
+    const result = handleDefinition(project, mainUri, position);
+    expect(result).not.toBeNull();
+    expect(result!.uri).toBe(componentUri);
+  });
 });

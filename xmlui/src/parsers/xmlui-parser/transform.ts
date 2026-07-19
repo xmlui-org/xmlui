@@ -131,16 +131,110 @@ export function nodeToComponentDef(
   warnings?: string[],
   cursor?: DocumentCursor,
 ): ComponentDef | CompoundComponentDef | null {
+  return transformXmluiNode(
+    node,
+    originalGetText,
+    fileId,
+    preResolvedImports,
+    warnings,
+    cursor,
+    "component",
+  ).component;
+}
+
+export type XmluiAppParts = {
+  entrypoint: ComponentDef | null;
+  inlineComponents: CompoundComponentDef[];
+};
+
+export function nodeToXmluiAppParts(
+  node: Node,
+  originalGetText: GetText,
+  fileId: string | number,
+  preResolvedImports?: CollectedDeclarations,
+  warnings?: string[],
+  cursor?: DocumentCursor,
+): XmluiAppParts {
+  const { component, inlineComponents } = transformXmluiNode(
+    node,
+    originalGetText,
+    fileId,
+    preResolvedImports,
+    warnings,
+    cursor,
+    "entrypoint",
+  );
+
+  return {
+    entrypoint: component as ComponentDef | null,
+    inlineComponents,
+  };
+}
+
+function transformXmluiNode(
+  node: Node,
+  originalGetText: GetText,
+  fileId: string | number,
+  preResolvedImports: CollectedDeclarations | undefined,
+  warnings: string[] | undefined,
+  cursor: DocumentCursor | undefined,
+  role: "component" | "entrypoint",
+): {
+  component: ComponentDef | CompoundComponentDef | null;
+  inlineComponents: CompoundComponentDef[];
+} {
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
   };
 
-  const element = node.children![0];
-  const preppedElement = prepNode(element);
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
   const seenUids = new Set<string>();
-  return transformTopLvlElement(usesStack, preppedElement);
+  const topLevelElements = (node.children ?? []).filter(
+    (child) => child.kind === SyntaxKind.ElementNode,
+  );
+
+  if (role === "component") {
+    const element = topLevelElements[0];
+    if (!element) {
+      return { component: null, inlineComponents: [] };
+    }
+    const preppedElement = prepNode(element);
+    return {
+      component: transformTopLvlElement(usesStack, preppedElement),
+      inlineComponents: [],
+    };
+  }
+
+  const inlineComponents: CompoundComponentDef[] = [];
+  let appElement: Node | undefined;
+
+  for (const element of topLevelElements) {
+    const preppedElement = prepNode(element);
+    if (getComponentName(preppedElement, getText) === COMPOUND_COMP_ID) {
+      const inlineComponent = transformTopLvlElement(usesStack, preppedElement);
+      if (inlineComponent) {
+        inlineComponents.push(inlineComponent as CompoundComponentDef);
+      }
+      continue;
+    }
+    appElement = preppedElement;
+  }
+
+  if (!appElement) {
+    warnings?.push(
+      `${String(fileId)} contains only inline component definitions; rendering an empty Fragment.`,
+    );
+    return {
+      component: createEmptyFragmentComponent(),
+      inlineComponents,
+    };
+  }
+
+  return {
+    component: transformTopLvlElement(usesStack, appElement),
+    inlineComponents,
+  };
 
   function transformTopLvlElement(
     usesStack: Map<string, string>[],
@@ -163,6 +257,20 @@ export function nodeToComponentDef(
     collectTraits(usesStack, component, node, true);
     hoistScriptCollectedFromFragments(component);
     return component;
+  }
+
+  function createEmptyFragmentComponent(): ComponentDef {
+    const source = sourceLocationFor({
+      kind: SyntaxKind.ElementNode,
+      pos: 0,
+      end: 0,
+    } as Node);
+    return {
+      type: "Fragment",
+      debug: {
+        source,
+      },
+    };
   }
 
   function transformInnerElement(

@@ -15,12 +15,29 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { createXmlUiParser, type GetText, type ParseResult } from "../../parsers/xmlui-parser";
+import {
+  createXmlUiParser,
+  type GetText,
+  type ParseResult,
+  type XmluiFileRole,
+  type XmluiParserOptions,
+} from "../../parsers/xmlui-parser";
 
 /**
  * A tagging type for string properties that are actually URIs.
  */
 export type DocumentUri = string;
+
+export function getXmluiFileRole(uri: DocumentUri): XmluiFileRole {
+  const normalizedUri = decodeURIComponent(uri).replace(/\\/g, "/");
+  const isEntrypoint = /(?:^|\/)(?:Main|App)\.xmlui$/i.test(normalizedUri);
+  const isComponentFile = /(?:^|\/)components\//i.test(normalizedUri);
+  return isEntrypoint && !isComponentFile ? "entrypoint" : "component";
+}
+
+export function getXmluiParserOptionsForUri(uri: DocumentUri): XmluiParserOptions {
+  return { role: getXmluiFileRole(uri) };
+}
 
 /**
  * Position in a text document expressed as zero-based line and character offset.
@@ -429,7 +446,7 @@ class FullTextDocument implements TextDocument {
       };
     }
 
-    const parser = createXmlUiParser(this.getText());
+    const parser = createXmlUiParser(this.getText(), getXmluiParserOptionsForUri(this.uri));
     const getText = parser.getText;
 
     const parseResult = parser.parse();

@@ -200,6 +200,9 @@ An `id` on a built-in component is visible to built-in descendants at any depth.
 - Filenames match component names; placed in `components/`
 - Names start with an uppercase letter
 - Access props via `$props.name`; use `??` for defaults
+- `Main.xmlui` and its `App.xmlui` synonym may also contain top-level `<Component>` declarations before or after the single app root. These inline entrypoint components are reusable by the app in the same file.
+- Entrypoints may have zero or one non-`Component` top-level app root. If there are only top-level `<Component>` declarations, XMLUI renders an empty `Fragment` and logs a browser warning. Multiple non-`Component` top-level roots are an error.
+- Component files under `components/` stay strict: they must define one reusable component and cannot combine `<Component>` declarations with app markup. If an inline component and a component file use the same name, the component file wins.
 
 ```xml
 <Component name="NameValue">

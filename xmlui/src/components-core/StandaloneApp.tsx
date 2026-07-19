@@ -34,6 +34,7 @@ import {
 import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
 import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
+import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup, type MetadataHandler, visitComponent } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
@@ -467,6 +468,9 @@ type ParsedResponse = {
   // --- The optional code-behind source code of the component
   codeBehind?: CollectedDeclarations;
 
+  // --- Inline component definitions collected from an entrypoint file
+  inlineComponents?: CompoundComponentDef[];
+
   // --- The optional source code of the component (for debugging or learning purposes)
   src?: string;
 
@@ -544,7 +548,55 @@ async function validateResponseIsNotHtml(response: Response): Promise<Response> 
  * the component definition. Otherwise, it returns a component definition that
  * displays the errors.
  */
-async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
+async function resolveInlineComponentCodeBehindFromFetch(
+  inlineComponents: CompoundComponentDef[],
+  entrypointUrl: string,
+): Promise<void> {
+  for (const inlineComponent of inlineComponents) {
+    if (!inlineComponent.codeBehind) {
+      continue;
+    }
+    try {
+      const codeBehindUrl = new URL(inlineComponent.codeBehind, entrypointUrl).toString();
+      const response = await fetchWithoutCache(codeBehindUrl);
+      const validatedResponse = await validateResponseIsNotHtml(response);
+      const code = await validatedResponse.text();
+      const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
+        const moduleUrl = new URL(modulePath, codeBehindUrl).toString();
+        const moduleResponse = await fetchWithoutCache(moduleUrl);
+        const validatedModuleResponse = await validateResponseIsNotHtml(moduleResponse);
+        return await validatedModuleResponse.text();
+      };
+      const codeBehind = await collectCodeBehindFromSourceWithImports(
+        codeBehindUrl,
+        code,
+        moduleFetcher,
+      );
+      removeCodeBehindTokensFromTree(codeBehind);
+      inlineComponent.component = {
+        ...inlineComponent.component,
+        vars: {
+          ...inlineComponent.component.vars,
+          ...codeBehind.vars,
+        },
+        functions: codeBehind.functions || inlineComponent.component.functions,
+        scriptError: codeBehind.moduleErrors,
+      };
+      (inlineComponent as any).codeBehindSource = code;
+      (inlineComponent as any).resolvedCodeBehind = codeBehindUrl;
+    } catch (e) {
+      console.warn(
+        `[xmlui] Failed to load inline component code-behind "${inlineComponent.codeBehind}" from ${entrypointUrl}.`,
+        e,
+      );
+    }
+  }
+}
+
+async function parseComponentMarkupResponse(
+  response: Response,
+  parserOptions: XmluiParserOptions = {},
+): Promise<ParsedResponse> {
   const validatedResponse = await validateResponseIsNotHtml(response);
   const code = await validatedResponse.text();
   const fileId = response.url;
@@ -579,11 +631,11 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
     }
   }
 
-  let { component, errors, warnings, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-    code,
-    fileId,
-    codeBehind,
-  );
+  let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
+    xmlUiMarkupToComponent(code, fileId, codeBehind, undefined, parserOptions);
+  if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
+    await resolveInlineComponentCodeBehindFromFetch(inlineComponents, fileId);
+  }
   if (warnings.length > 0) {
     console.group(`[xmlui] Warnings in '${fileId}':`);
     warnings.forEach((msg) => console.warn(msg));
@@ -597,10 +649,12 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
         response.url.length - ".xmlui".length,
       );
     component = errReportComponent(errors, fileId, compName);
+    inlineComponents = [];
   }
 
   return {
     component,
+    inlineComponents,
     src: code,
     file: fileId,
     codeBehind: codeBehind,
@@ -743,6 +797,12 @@ function resolveRuntime(runtime: Record<string, any>): {
   const sources: Record<string, string> = {};
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
+  const inlineComponentEntries: Array<{
+    filename: string;
+    definition: CompoundComponentDef;
+    markupSource?: string;
+    codeBehindSource?: string;
+  }> = [];
   const themes: Array<ThemeDefinition> = [];
 
   // --- Some working variables
@@ -786,6 +846,20 @@ function resolveRuntime(runtime: Record<string, any>): {
           projectCompilation.entrypoint.markupSource = value.default.src;
           // Use key (the actual file path from Vite glob) for consistent source lookups
           sources[key] = value.default.src;
+        }
+        if (value.default?.inlineComponents) {
+          for (const inlineComponent of value.default.inlineComponents as CompoundComponentDef[]) {
+            const filename = `${key}#components/${inlineComponent.name}.${componentFileExtension}`;
+            inlineComponentEntries.push({
+              filename,
+              definition: inlineComponent,
+              markupSource: value.default?.src,
+              codeBehindSource: (inlineComponent as any).codeBehindSource,
+            });
+            if (value.default?.src) {
+              sources[filename] = value.default.src;
+            }
+          }
         }
       }
     }
@@ -907,6 +981,22 @@ function resolveRuntime(runtime: Record<string, any>): {
         },
       };
       components.push(componentWithCodeBehind);
+    });
+  }
+  for (const inlineEntry of inlineComponentEntries) {
+    if (components.some((component) => component.name === inlineEntry.definition.name)) {
+      console.warn(
+        `[xmlui] Inline component "${inlineEntry.definition.name}" in ${projectCompilation.entrypoint.filename} ignored because a component file with the same name exists.`,
+      );
+      continue;
+    }
+    components.push(inlineEntry.definition);
+    projectCompilation.components.push({
+      definition: inlineEntry.definition,
+      filename: inlineEntry.filename,
+      markupSource: inlineEntry.markupSource,
+      codeBehindSource: inlineEntry.codeBehindSource,
+      dependencies: new Set(),
     });
   }
 
@@ -1307,18 +1397,6 @@ function useStandalone(
           throw new Error("couldn't find the application metadata");
         }
 
-        // --- Display any duplicate-id or other parser warnings collected during
-        // --- the Vite transform phase. Each runtime module may carry a `warnings`
-        // --- array that was serialized by vite-xmlui-plugin.
-        Object.entries(runtime || {}).forEach(([key, module]: [string, any]) => {
-          const moduleWarnings: string[] = (module?.default ?? module)?.warnings ?? [];
-          if (moduleWarnings.length > 0) {
-            console.group(`[xmlui] Warnings in '${key}':`);
-            moduleWarnings.forEach((msg) => console.warn(msg));
-            console.groupEnd();
-          }
-        });
-
         // --- Transform Globals.xs variables into <global> tags for dependency support.
         // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
         const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
@@ -1451,10 +1529,11 @@ function useStandalone(
       const entryPointPromise = new Promise(async (resolve) => {
         try {
           const resp = await fetchWithoutCache(prefixPath(MAIN_FILE));
-          resolve(parseComponentMarkupResponse(resp));
+          resolve(parseComponentMarkupResponse(resp, { role: "entrypoint" }));
         } catch (e) {
           resolve({
             component: errReportMessage(`Failed to load the main component (${MAIN_FILE})`),
+            inlineComponents: [],
             file: MAIN_FILE,
             hasError: true,
           });
@@ -1662,7 +1741,7 @@ function useStandalone(
       }
 
       // --- Assemble the runtime for the components
-      const componentsWithCodeBehinds = loadedComponents
+      const componentsWithCodeBehinds: CompoundComponentDef[] = loadedComponents
         .filter((compWrapper) => !compWrapper?.file?.endsWith(".xmlui.xs"))
         .map((compWrapper) => {
           const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
@@ -1680,8 +1759,121 @@ function useStandalone(
                 compWrapper.codeBehind?.moduleErrors || componentCodeBehind?.moduleErrors,
             },
           };
-          return result;
+          return result as CompoundComponentDef;
         });
+
+      for (const inlineComponent of loadedEntryPoint.inlineComponents ?? []) {
+        const componentFileAlreadyLoaded = componentsWithCodeBehinds.some(
+          (component) => component.name === inlineComponent.name,
+        );
+        if (componentFileAlreadyLoaded) {
+          console.warn(
+            `[xmlui] Inline component "${inlineComponent.name}" in ${loadedEntryPoint.file} ignored because a component file with the same name exists.`,
+          );
+          continue;
+        }
+
+        let fileBackedComponent: CompoundComponentDef | null = null;
+        try {
+          const componentPath = inlineComponent.name;
+          const componentMarkup = await fetchWithoutCache(
+            prefixPath(`components/${componentPath}.${componentFileExtension}`),
+          );
+          const compWrapper = await parseComponentMarkupResponse(componentMarkup);
+          if (compWrapper.hasError) {
+            errorComponents.push(compWrapper.component as ComponentDef);
+          }
+
+          sources[compWrapper.file] = compWrapper.src;
+          const compCompilation: ComponentCompilation = {
+            dependencies: new Set(),
+            filename: compWrapper.file,
+            markupSource: compWrapper.src,
+            definition: compWrapper.component as CompoundComponentDef,
+          };
+
+          let componentCodeBehind = null;
+          if (
+            "codeBehind" in compWrapper.component &&
+            compWrapper.component?.codeBehind !== undefined
+          ) {
+            componentCodeBehind = (await new Promise(async (resolve) => {
+              try {
+                const codeBehind = await fetchWithoutCache(
+                  prefixPath(
+                    resolvePath(
+                      `components/${componentPath}`,
+                      (compWrapper.component as CompoundComponentDef)?.codeBehind ||
+                        `${componentPath}.${codeBehindFileExtension}`,
+                    ),
+                  ),
+                );
+                const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
+                if (codeBehindWrapper.hasError) {
+                  errorComponents.push(codeBehindWrapper.component as ComponentDef);
+                }
+                resolve(
+                  codeBehindWrapper.hasError
+                    ? (codeBehindWrapper.component as CompoundComponentDef)
+                    : codeBehindWrapper,
+                );
+              } catch {
+                resolve(null);
+              }
+            })) as Promise<CompoundComponentDef | ParsedResponse>;
+
+            if (componentCodeBehind && "src" in componentCodeBehind) {
+              compCompilation.codeBehindSource = componentCodeBehind.src;
+            }
+          }
+
+          const compilations = resolvedRuntime.projectCompilation.components;
+          const existingIdx = compilations.findIndex((c) => c.filename === compCompilation.filename);
+          if (existingIdx === -1) {
+            compilations.push(compCompilation);
+          } else {
+            compilations[existingIdx] = compCompilation;
+          }
+
+          fileBackedComponent = {
+            ...compWrapper.component,
+            component: {
+              ...(compWrapper.component as any).component,
+              vars: {
+                ...(compWrapper.component as any).component.vars,
+                ...componentCodeBehind?.codeBehind?.vars,
+              },
+            },
+          } as CompoundComponentDef;
+
+          if (componentCodeBehind && "codeBehind" in componentCodeBehind) {
+            fileBackedComponent.component.functions = componentCodeBehind.codeBehind.functions;
+            fileBackedComponent.component.scriptError =
+              componentCodeBehind.codeBehind.moduleErrors;
+          }
+        } catch {
+          fileBackedComponent = null;
+        }
+
+        if (fileBackedComponent) {
+          console.warn(
+            `[xmlui] Inline component "${inlineComponent.name}" in ${loadedEntryPoint.file} ignored because a component file with the same name exists.`,
+          );
+          componentsWithCodeBehinds.push(fileBackedComponent);
+          continue;
+        }
+
+        const filename = `${loadedEntryPoint.file}#components/${inlineComponent.name}.${componentFileExtension}`;
+        sources[filename] = loadedEntryPoint.src;
+        componentsWithCodeBehinds.push(inlineComponent);
+        resolvedRuntime.projectCompilation.components.push({
+          dependencies: new Set(),
+          filename,
+          markupSource: loadedEntryPoint.src,
+          codeBehindSource: (inlineComponent as any).codeBehindSource,
+          definition: inlineComponent,
+        });
+      }
 
       // --- We may have components that are not in the configuration file.
       // --- We need to load them and their code-behinds. First, we collect
@@ -1784,14 +1976,16 @@ function useStandalone(
               compoundComp.component.scriptError = componentCodeBehind.codeBehind.moduleErrors;
             }
 
-            return compoundComp;
+            return compoundComp as CompoundComponentDef;
           } catch (e) {
             componentsFailedToLoad.add(componentPath);
             return null;
           }
         });
         const componentWrappers = await Promise.all(componentPromises);
-        componentsWithCodeBehinds.push(...componentWrappers.filter((comp) => !!comp));
+        componentsWithCodeBehinds.push(
+          ...(componentWrappers.filter((comp) => !!comp) as CompoundComponentDef[]),
+        );
         componentsToLoad = collectMissingComponents(
           entryPointWithCodeBehind,
           componentsWithCodeBehinds,
@@ -1906,7 +2100,7 @@ function useStandalone(
  * @param componentsFailedToLoad The components that failed to load here
  * @returns The components that are still missing
  */
-function collectMissingComponents(
+export function collectMissingComponents(
   entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
