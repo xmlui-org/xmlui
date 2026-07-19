@@ -16,6 +16,8 @@ Marker-free `xmlui-pg` examples may still include later sections such as `---api
 
 Reusable user-defined components may be empty: `<Component name="Empty" />` or `<Component name="Empty"></Component>` is valid and represents an empty `Fragment`. Do not reintroduce a parser error requiring at least one nested component definition.
 
+Website E2E helper `xmlui/src/testing/website-example-utils.ts` must keep backward compatibility with specs that call `initTestBed(app, { components, apiInterceptor })`. When extracting marker-free one-file `xmlui-pg` examples with top-level inline `<Component>` declarations, split those declarations into `components` and return only the single non-`Component` app root as `app`.
+
 ---
 
 ## What is XMLUI

@@ -1740,6 +1740,34 @@ describe("Playground pattern parsing", () => {
     });
   });
 
+  it("Extracts marker-free inline components separately for website tests", () => {
+    // --- Act
+    const markdown = `# Example
+
+\`\`\`xmlui-pg name="One-file app"
+<Component name="StatusPill">
+  <Badge value="{$props.value}" />
+</Component>
+
+<App>
+  <StatusPill value="Ready" />
+</App>
+
+<Component name="ToolbarAction">
+  <Button label="{$props.label}" />
+</Component>
+\`\`\``;
+
+    const result = extractXmluiExample(markdown, "One-file app");
+
+    // --- Assert
+    expect(result.app).toBe('<App>\n  <StatusPill value="Ready" />\n</App>');
+    expect(result.components).toStrictEqual([
+      '<Component name="StatusPill">\n  <Badge value="{$props.value}" />\n</Component>',
+      '<Component name="ToolbarAction">\n  <Button label="{$props.label}" />\n</Component>',
+    ]);
+  });
+
   it("Handles multiple four-backtick nested code fences", () => {
     // --- Act
     const content =
