@@ -14,8 +14,8 @@ Rules:
 - Do not change the internal app representation consumed by rendering: entrypoint remains `ComponentDef`, reusable components remain `CompoundComponentDef[]`.
 - `xmlui-pg` Markdown playground fences should accept the same inline entrypoint format.
 - When an inline component and a component file define the same component name, the component file wins.
-- Inline `<Component codeBehind="...">` is supported and resolves relative to the entrypoint file (`Main.xmlui` or its `App.xmlui` synonym).
-- `App.xmlui` is treated as an entrypoint synonym for `Main.xmlui`, as it is today.
+- Inline `<Component codeBehind="...">` is supported and resolves relative to the entrypoint file (`Main.xmlui`).
+- No alternate entrypoint filename is supported; `Main.xmlui` is the entrypoint.
 - `IncludeMarkup` should continue to work as it does now; do not broaden its parsing mode as part of this feature.
 
 ## Current Shape
@@ -176,7 +176,7 @@ Files:
 Tasks:
 
 - In the Vite plugin, determine role from normalized file path:
-  - files matching `Main.xmlui` or `App.xmlui` outside `components/` use `entrypoint`.
+  - files matching `Main.xmlui` outside `components/` use `entrypoint`.
   - files under `components/` use `component`.
   - other `.xmlui` files should preserve current behavior unless already treated as app entrypoints by templates/config.
 - Include `inlineComponents` in the module payload for entrypoint files.
@@ -184,7 +184,7 @@ Tasks:
 - Use stable synthetic filenames such as `${entrypointKey}#components/${Name}.xmlui` or `/__inline__/Name.xmlui` for inspector/project compilation source tracking.
 - Enforce duplicate-name precedence: explicit `components/Name.xmlui` wins over inline `Name`; emit a warning for duplicate names.
 - Keep `Main.xmlui.xs` attached to the app root.
-- Resolve inline `<Component codeBehind="...">` relative to the entrypoint file (`Main.xmlui` or `App.xmlui`) and attach it to that inline component's body.
+- Resolve inline `<Component codeBehind="...">` relative to the entrypoint file (`Main.xmlui`) and attach it to that inline component's body.
 - Update analyzer/reactive/a11y/type-contract build passes so they run over entrypoint root and inline component bodies.
 - Serialize Vite transform warnings into entrypoint modules and emit them with `console.warn` when the compiled module is evaluated in the browser.
 
@@ -200,7 +200,6 @@ Optional manual tests:
 - Run a Vite-mode starter/docs app with an inline component in `src/Main.xmlui`; confirm initial render, refresh, and HMR edits to both the app markup and the inline component update correctly.
 - Add `src/components/Dupe.xmlui` and an inline `<Component name="Dupe">` in `Main.xmlui`; confirm the file-backed component renders and a duplicate-name warning is visible.
 - Add inline `<Component name="WithCodeBehind" codeBehind="WithCodeBehind.xs">` plus a same-folder code-behind file; confirm the method/vars from that code-behind are available to the inline component.
-- Repeat the same scenario with `App.xmlui` instead of `Main.xmlui` to confirm the synonym path did not regress.
 - Open XMLUI Inspector/devtools and confirm synthetic inline component filenames are readable enough for debugging.
 - Use an entrypoint containing only inline `<Component>` definitions; confirm both the host terminal and browser console show the empty-Fragment warning.
 
@@ -290,7 +289,7 @@ Files:
 Tasks:
 
 - Add a document-role helper, probably based on URI/path:
-  - `Main.xmlui` and `App.xmlui` outside `components/` => `entrypoint`.
+  - `Main.xmlui` outside `components/` => `entrypoint`.
   - files under `/components/` => `component`.
   - unknown/untitled documents default to current strict behavior unless VS Code can infer they are app snippets.
 - Make `TextDocument.parse()` pass the inferred role.
@@ -321,7 +320,6 @@ Optional manual tests:
 - Open `components/Foo.xmlui` with a top-level `<Component>` plus app markup; confirm the strict component-file diagnostic still appears.
 - Use completion and hover inside the inline `<Component>` body and inside the app root; confirm component and attribute metadata still appears.
 - Use go-to-definition from `<MyInline />` in the app root; confirm it jumps to the inline `<Component name="MyInline">` declaration. Then add `components/MyInline.xmlui` and confirm file-backed precedence is reflected.
-- Rename/open `App.xmlui` and repeat the diagnostic and go-to-definition checks.
 
 ### 7. Secondary Tooling and Audits - Completed
 
@@ -338,7 +336,7 @@ Files:
 Tasks:
 
 - Update `discoverRoutes()` to parse `Main.xmlui` as an entrypoint and component files as components.
-- Treat `App.xmlui` as the same entrypoint synonym wherever current code already recognizes it as such.
+- Do not treat alternate app filenames as entrypoint synonyms; `Main.xmlui` is the only entrypoint filename.
 - Update analyzer walker to use role-aware parsing or accept parsed app parts from callers.
 - Keep `compoundComponentDefFromSource()` strict component-only.
 - Keep UDC CLI tools strict component-only unless they explicitly operate on `Main.xmlui`.
@@ -398,8 +396,11 @@ npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts --workers=10
 Results:
 
 - `npx changeset status` passed and reported a patch bump for `xmlui` and dependent workspace packages.
-- `npm --prefix xmlui run check:example-tests` still fails because of pre-existing missing/stale docs example specs; the new unnamed `xmlui-pg` docs example is not reported as a missing or stale named example.
+- `npm --prefix xmlui run check:example-tests` now passes after resolving the pre-existing docs/example-test drift. The checker reports 206 scanned files, 206 OK, 0 missing specs, 0 stale specs, and 0 unnamed examples.
 - `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- `npx playwright test xmlui/tests-e2e/pages/playground-and-codefence.spec.ts --workers=1` passed with 2 tests.
+- `npx playwright test xmlui/tests-e2e/how-to-examples/keep-a-small-app-in-one-file.spec.ts --workers=1` passed with 2 tests after adding the new how-to article for single-file small apps.
+- `PLAYWRIGHT_USE_DEV_SERVER=false xargs npx playwright test --workers=10 --reporter=line < /tmp/xmlui-affected-specs.txt` passed with 107 affected website tests when run with sandbox escalation so the static testbed server could bind to port 3211.
 - `npm run test:unit -w xmlui` passed with 240 files, 10463 passed, 2 skipped, and 1 todo.
 - `npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts --workers=10` passed with 59 tests.
 
@@ -408,5 +409,25 @@ Do not run the full E2E suite without explicit user confirmation.
 Optional manual tests:
 
 - Read the new docs examples in the generated/local docs site and confirm the wording makes the component-file restriction, duplicate precedence, empty-app warning, and multiple-root error obvious.
-- Create a tiny app using the documented examples and confirm each example can be copied into `Main.xmlui` or `App.xmlui` without hidden setup.
+- Create a tiny app using the documented examples and confirm each example can be copied into `Main.xmlui` without hidden setup.
 - Smoke-test an existing app that uses only separate component files to confirm there is no behavioral or diagnostic change.
+
+## Session Notes for Future AI Work
+
+- `xmlui/scripts/check-example-tests.mjs` does not scan generated component reference docs under `xmlui/src/components/**`. It scans hand-authored website docs under `website/content/docs/pages/**` and maps named `xmlui-pg` fences to specs under `xmlui/tests-e2e/pages/**` or `xmlui/tests-e2e/how-to-examples/**`.
+- A named public docs example for this feature now lives in `website/content/docs/pages/playground-and-codefence.md` with `name="Inline component in playground"`. Its matching website spec is `xmlui/tests-e2e/pages/playground-and-codefence.spec.ts`.
+- A task-oriented how-to article now lives in `website/content/docs/pages/howto/keep-a-small-app-in-one-file.md` with the named/id'd example `small-task-tracker-in-one-file`. It is linked from the User-Defined Components how-to nav in `website/src/Main.xmlui`, and its matching website spec is `xmlui/tests-e2e/how-to-examples/keep-a-small-app-in-one-file.spec.ts`.
+- Follow-up docs edits were applied to `user-defined-components.md`, `app-structure.md`, `markup.md`, `scoping.md`, `scripting.md`, `components-intro.md`, `howto/create-a-reusable-component.md`, `vscode.md`, and `playground-and-codefence.md`. These clarify where inline components can be declared, entry-file-only parsing rules, component boundary scoping, code-behind path resolution, VS Code support, and links to the one-file how-to.
+- A later docs refinement made the ordering rule explicit: in `Main.xmlui` and `xmlui-pg` entrypoint app blocks, the main app root and top-level `<Component>` declarations can appear in any order. Documentation examples should choose app-first or component-first ordering according to the page focus.
+- The `Markdown` component reference page `xmlui/src/components/Markdown/Markdown.md` also documents the feature, but changes there do not affect `check:example-tests`.
+- `check:example-tests` originally failed because of unrelated pre-existing docs drift: 11 missing spec files and 27 stale spec files. That drift has now been resolved by adding the missing website specs and updating stale `test.describe` titles to match the current docs examples.
+- `xmlui/scripts/check-example-tests.mjs` was updated so `extractDescribeNames()` correctly handles `test.describe` titles containing a different quote character, for example the apostrophe in `Passing arguments to a component's methods`.
+- `extractXmluiExample()` returns a single `app` string for marker-free `xmlui-pg` fences. For inline-entrypoint examples, `initTestBed()` must parse that string with `{ role: "entrypoint" }` and without wrapping it in a test `Fragment`, otherwise top-level `<Component>` declarations are treated as rendered markup and fail as unknown components.
+- `xmlui/src/testing/fixtures.ts` now supports `TestBedDescription.parserOptions` and merges parser-returned `inlineComponents` into the test app components when no explicit `description.components` are supplied. Use `noFragmentWrapper: true` plus `parserOptions: { role: "entrypoint" }` for one-string entrypoint examples.
+- The useful focused verification for this docs/example-test integration is:
+
+```bash
+npx playwright test xmlui/tests-e2e/pages/playground-and-codefence.spec.ts --workers=1
+npm --prefix xmlui run check:example-tests
+npx tsc --noEmit -p xmlui/tsconfig.json
+```

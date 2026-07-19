@@ -2,6 +2,24 @@
 
 When you write XML markup to create an XMLUI app, you use XML tags to name components. And you use XML attributes to set properties that govern their behavior.
 
+## App file roots
+
+In `Main.xmlui`, the top-level markup can include reusable component declarations as well as the app markup. Top-level `<Component>` elements define user-defined components. The single top-level element that is not `<Component>` is the app to render.
+
+```xmlui
+<App>
+  <StatusPill value="Ready" />
+</App>
+
+<Component name="StatusPill">
+  <Badge value="{ $props.value }" variant="pill" />
+</Component>
+```
+
+An entry file can contain zero, one, or many top-level `<Component>` declarations, but it can contain only one top-level app root. Their order does not matter: put the app first when you want readers to understand the page flow, or put component definitions first when the reusable building blocks are the focus. If the file contains only `<Component>` declarations, XMLUI renders an empty app as if the file contained `<Fragment />`, and logs a browser warning.
+
+This mixed top-level form is entry-file only. A component file in the `components` folder still contains a single `<Component>` definition. See [User-defined components](/docs/guides/user-defined-components#where-to-declare-components) for the component rules and [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) for a practical example.
+
 ## Properties
 
 An attribute may be a literal string that sets the value of a property.

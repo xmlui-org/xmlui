@@ -101,10 +101,10 @@ function extractNamedCodefences(content) {
  */
 function extractDescribeNames(content) {
   const names = new Set();
-  const pattern = /test\.describe\(\s*["'`]([^"'`]+)["'`]/g;
+  const pattern = /test\.describe\(\s*(["'`])((?:\\.|(?!\1)[\s\S])*)\1/g;
   let match;
   while ((match = pattern.exec(content)) !== null) {
-    names.add(match[1]);
+    names.add(match[2].replace(/\\(["'`\\])/g, "$1"));
   }
   return names;
 }

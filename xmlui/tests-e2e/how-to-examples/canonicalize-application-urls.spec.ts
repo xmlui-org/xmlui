@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Rewrite a report URL to its canonical form", { tag: "@website" }, () => {
+test.describe("rewrite-a-report-url-to-its-canonical-form", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "rewrite-a-report-url-to-its-canonical-form",

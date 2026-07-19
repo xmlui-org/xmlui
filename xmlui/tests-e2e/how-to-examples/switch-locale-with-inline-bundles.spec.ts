@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Switch between English and German bundles", { tag: "@website" }, () => {
+test.describe("switch-between-english-and-german-bundles", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "switch-between-english-and-german-bundles",

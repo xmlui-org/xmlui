@@ -35,9 +35,9 @@ The [XMLUI Invoice demo app](https://github.com/xmlui-org/xmlui-invoice/releases
 | file| description |
 |---|---|
 | **`index.html`** | The default webpage to display |
-| **`Main.xmlui`** | The XMLUI app's entry point |
+| **`Main.xmlui`** | The XMLUI app's entry point; can also contain short inline component definitions |
 | **`config.json`** | The XMLUI app's configuration file |
-| **`components`** | The folder with your custom components |
+| **`components`** | The folder with your file-based custom components |
 | **`resources`** | The folder with static app resources |
 | **`themes`** | The folder with your custom themes |
 | **`xmlui`** | The folder with the XMLUI core framework and extensions  |
@@ -84,6 +84,8 @@ xmlui-minimal
 
 ## Main.xmlui
 
+`Main.xmlui` is the app entry point. The entry file usually contains the root [App](/docs/reference/components/App) markup, and it may also contain short top-level `<Component>` definitions used only by that app.
+
 ```xmlui
 <App name="XMLUI Minimal">
 
@@ -99,6 +101,22 @@ xmlui-minimal
 
 </App>
 ```
+
+For a very small app, you can keep the app and a local helper component in the same file:
+
+```xmlui
+<App name="XMLUI Minimal">
+  <Home />
+</App>
+
+<Component name="Home">
+  <Text>A minimal XMLUI app</Text>
+</Component>
+```
+
+The app root and inline component definitions can appear in any order. This guide puts the app first because the `Main.xmlui` structure is the focus.
+
+The `components` folder is still the better place for components that are shared, larger than a small helper, or maintained independently. If a component file and an inline component use the same name, the component file wins.
 
 ## Home.xmlui
 
@@ -136,4 +154,3 @@ Serving HTTP on :: port 8080 (http://[::]:8080/) ...
 In either case, visit http://localhost:8080 to view the app.
 
 See also [Hosted deployment](/docs/guides/hosted-deployment).
-

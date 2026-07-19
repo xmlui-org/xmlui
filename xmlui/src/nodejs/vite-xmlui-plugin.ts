@@ -158,8 +158,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
   const isComponentsPath = (p: string) => p.includes("/components/");
-  const isEntrypointPath = (p: string) =>
-    !isComponentsPath(p) && /\/(?:Main|App)\.xmlui$/.test(p);
+  const isEntrypointPath = (p: string) => !isComponentsPath(p) && /\/Main\.xmlui$/.test(p);
   const rootForAnalysis = (component: ComponentDef | CompoundComponentDef): ComponentDef =>
     (component as CompoundComponentDef).component &&
     typeof (component as CompoundComponentDef).component === "object"

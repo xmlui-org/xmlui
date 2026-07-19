@@ -30,7 +30,7 @@ export type DocumentUri = string;
 
 export function getXmluiFileRole(uri: DocumentUri): XmluiFileRole {
   const normalizedUri = decodeURIComponent(uri).replace(/\\/g, "/");
-  const isEntrypoint = /(?:^|\/)(?:Main|App)\.xmlui$/i.test(normalizedUri);
+  const isEntrypoint = /(?:^|\/)Main\.xmlui$/i.test(normalizedUri);
   const isComponentFile = /(?:^|\/)components\//i.test(normalizedUri);
   return isEntrypoint && !isComponentFile ? "entrypoint" : "component";
 }

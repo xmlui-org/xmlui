@@ -74,7 +74,7 @@ The next example uses all four edges at once — a toolbar at the top, a status 
     >
       <Text variant="strong">Files</Text>
       <Text>index.xmlui</Text>
-      <Text>App.xmlui</Text>
+      <Text>Main.xmlui</Text>
       <Text>Card.xmlui</Text>
     </VStack>
     <VStack

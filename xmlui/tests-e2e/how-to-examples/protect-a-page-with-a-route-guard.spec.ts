@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Cancel protected admin navigation with willNavigate", { tag: "@website" }, () => {
+test.describe("cancel-protected-admin-navigation-with-willnavigate", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "cancel-protected-admin-navigation-with-willnavigate",

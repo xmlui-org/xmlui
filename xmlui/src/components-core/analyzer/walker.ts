@@ -111,7 +111,7 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
  */
 function parseMarkupSafely(source: string, file: string): ComponentDef | undefined {
   try {
-    const isEntrypoint = /(?:^|[/\\])(?:Main|App)\.xmlui$/i.test(file) &&
+    const isEntrypoint = /(?:^|[/\\])Main\.xmlui$/i.test(file) &&
       !/(?:^|[/\\])components[/\\]/i.test(file);
     const result = xmlUiMarkupToComponent(source, file, undefined, undefined, {
       role: isEntrypoint ? "entrypoint" : "component",

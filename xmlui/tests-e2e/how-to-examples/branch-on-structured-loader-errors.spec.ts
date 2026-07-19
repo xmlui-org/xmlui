@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Show different messages for loader error categories", { tag: "@website" }, () => {
+test.describe("show-different-messages-for-loader-error-categories", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "show-different-messages-for-loader-error-categories",

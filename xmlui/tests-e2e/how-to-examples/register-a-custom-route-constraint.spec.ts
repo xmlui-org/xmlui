@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Register and use a customer-code route constraint", { tag: "@website" }, () => {
+test.describe("register-and-use-a-customer-code-route-constraint", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "register-and-use-a-customer-code-route-constraint",

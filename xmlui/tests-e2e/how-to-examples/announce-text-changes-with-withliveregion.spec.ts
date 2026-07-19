@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/announce-text-changes-with-withliveregion.md"),
 );
 
-test.describe("Announce changing text", { tag: "@website" }, () => {
+test.describe("announce-changing-text", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "announce-changing-text");
 
   test("initial state announces the text and badge values", async ({ initTestBed, page }) => {

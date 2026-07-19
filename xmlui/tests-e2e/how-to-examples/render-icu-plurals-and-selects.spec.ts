@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Render cart count and shipping status messages", { tag: "@website" }, () => {
+test.describe("render-cart-count-and-shipping-status-messages", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "render-cart-count-and-shipping-status-messages",

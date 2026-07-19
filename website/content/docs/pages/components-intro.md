@@ -37,7 +37,7 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 
 ## User-defined components
 
-You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
+You'll also create your own components to combine and extend the built-ins. User-defined components usually live in the `components` folder, and small app-specific helpers can be declared inline in `Main.xmlui`. For example, here's a component that represents the stops on a London tube line.
 
 ```xmlui-pg id="built-in-components-eafb"
 ---app display /line/
@@ -117,7 +117,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 The `TubeStops` component:
 
-**Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`.
+**Lives in the `components` folder**. The full path is `components/TubeStops.xmlui`. For short helpers that belong only to one entry file, you can also declare the component inline in `Main.xmlui`; see [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file).
 
 **Can handle any properties passed in the `$props` [context variable](/context-variables)**. A calling component can send one or more `name="value"` pairs like `line="Bakerloo"`.
 

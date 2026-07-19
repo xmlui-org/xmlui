@@ -166,3 +166,22 @@ test.describe("Example: Card variants", { tag: "@website" }, () => {
     await expect(page.getByText("Rigid Card #1")).toBeVisible();
   });
 });
+
+test.describe(`Example: live region behavior`, { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, `Example: live region behavior`);
+
+  test("renders the documented example", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.locator("body")).toBeVisible();
+  });
+});
+
+
+test.describe(`Example: liveRegionMessage`, { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, `Example: liveRegionMessage`);
+
+  test("renders the documented example", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.locator("body")).toBeVisible();
+  });
+});

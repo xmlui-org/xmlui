@@ -1979,6 +1979,36 @@ item as its only argument.
 </App>
 ```
 
+### `scroll` [#scroll]
+
+This event fires as the user scrolls the list. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the list's own programmatic and auto-follow scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior.
+
+**Signature**: `scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean }): void`
+
+- `event`: The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled to within ~1.5px of the bottom).
+
+This event fires as the user scrolls the list. The handler receives an object describing the
+current scroll state: `scrollTop` (the current scroll offset), `scrollHeight` (the total
+scrollable size), `viewportSize` (the visible size), and `atEnd` (`true` when the list is
+scrolled to within ~1.5px of the bottom).
+
+The event fires only for user-driven scrolls; the list's own programmatic scrolls and its
+`scrollAnchor="bottom"` auto-follow do **not** trigger it. This makes it suitable for
+implementing follow-newest plus read-pause: track `atEnd` from this event, and when new data
+arrives call [`scrollToBottom()`](#scrolltobottom) only while the user is still at the end.
+
+```xmlui copy {4}
+<App var.atBottom="{true}">
+  <Text>At bottom: {atBottom}</Text>
+  <List
+    data='{[...]}'
+    scrollAnchor="bottom"
+    onScroll="(e) => atBottom = e.atEnd">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
 ### `selectAllAction` [#selectallaction]
 
 This event is triggered when the user presses the select all keyboard shortcut (default: Ctrl+A/Cmd+A) and `rowsSelectable` is set to `true`. The component automatically selects all rows before invoking this handler.

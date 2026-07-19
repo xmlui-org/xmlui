@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Format numbers currency lists and relative time", { tag: "@website" }, () => {
+test.describe("format-numbers-currency-lists-and-relative-time", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "format-numbers-currency-lists-and-relative-time",

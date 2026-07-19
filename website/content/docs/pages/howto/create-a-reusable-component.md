@@ -4,6 +4,8 @@ Extract repeated markup into a `.xmlui` file with properties and slots.
 
 A project dashboard often renders the same task-card layout in several places — a *My Tasks* panel, an *All Tasks* panel, a sprint board, and so on. Copy-pasting the block is a fast start, but the copies quickly drift: one gets a status icon, another gets a wider priority badge, and soon you're maintaining four versions of the same thing. Extract the block into a single `TaskCard` component and every panel automatically benefits from any future change.
 
+For tiny helpers used only by one app, you can start with an inline component in `Main.xmlui`. Once the markup is reused, grows, or needs a dedicated code-behind file, move it into `components/TaskCard.xmlui`.
+
 ```xmlui-pg copy display name="TaskCard used in two panels"
 ---app display
 <App>
@@ -125,6 +127,7 @@ Prefer props when the same component is rendered with different data in differen
 
 **See also**
 
+- [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) — using inline components before a file split is worthwhile
 - [User-defined components](/docs/guides/user-defined-components) — fuller treatment of the reusable-component story, including slots and template properties
 - [Scoping](/docs/guides/scoping) — how variables and IDs flow across component boundaries, with rules for globals
 - [Scripting › Code-Behind files](/docs/guides/scripting#code-behind-files) — pairing a `.xmlui.xs` file with the component for shared helper functions

@@ -27,29 +27,6 @@ describe("language-server diagnostics - inline entrypoint components", () => {
     );
   });
 
-  it("allows top-level inline components in App.xmlui", () => {
-    const uri = "App.xmlui";
-    const project = Project.fromFileContets(
-      {
-        [uri]: `
-          <Component name="InlinePart">
-            <Text value="inline" />
-          </Component>
-          <App>
-            <InlinePart />
-          </App>
-        `,
-      },
-      mockMetadataProvider,
-    );
-
-    const diagnostics = getDiagnostics(project, uri);
-
-    expect(diagnostics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ code: "U035" })]),
-    );
-  });
-
   it("rejects mixed roots in component files", () => {
     const uri = "components/InlinePart.xmlui";
     const project = Project.fromFileContets(

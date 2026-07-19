@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/clean-up-when-a-panel-closes.md"),
 );
 
-test.describe("Clean up a conditional details panel", { tag: "@website" }, () => {
+test.describe("clean-up-a-conditional-details-panel", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "clean-up-a-conditional-details-panel",

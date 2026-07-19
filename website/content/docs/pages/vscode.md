@@ -5,8 +5,7 @@
 - Completion for core components
 - Code formatting for .xmlui files
 - Diagnostics for errors
+- Diagnostics and navigation understand inline components declared in `Main.xmlui`
 
 Find the extension on the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=xmlui.xmlui-vscode)
 or download the [VSIX](https://github.com/xmlui-org/xmlui/releases?q=vscode&expanded=true).
-
-

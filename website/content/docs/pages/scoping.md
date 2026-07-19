@@ -1,6 +1,6 @@
 # Scoping
 
-Variables declared on a component flow downward through all nested components in the same file. They stop at the boundary of a user-defined component file. Pass them explicitly as props, or declare them as `global.` variables if they are needed everywhere.
+Variables declared on a component flow downward through all nested built-in components. They stop at the boundary of a user-defined component, whether that component is declared in a separate file or inline in `Main.xmlui`. Pass values explicitly as props, or declare them as `global.` variables if they are needed everywhere.
 
 ## Variables
 
@@ -23,7 +23,7 @@ A variable declared in the `Main.xmlui` file is visible to built-in child compon
 </App>
 ```
 
-A variable declared in a Main.xmlui component is not automatically visible to a user-defined child component.
+A variable declared in a Main.xmlui component is not automatically visible to a user-defined child component. This is also true when the user-defined component is declared inline in the same `Main.xmlui` file.
 
 ```xmlui-pg
 ---app display filename="Main.xmlui"
@@ -98,7 +98,7 @@ A child component can redeclare a variable.
 ```
 
 
-All these rules apply within a user-defined component defined in a file like `MyComponent.xmlui`.
+All these rules apply within a user-defined component defined in a file like `MyComponent.xmlui`, and within an inline `<Component>` declared at the top level of `Main.xmlui`.
 
 ```xmlui-pg
 ---app display filename="Main.xmlui"
@@ -146,7 +146,7 @@ A variable declared in a user-defined component can be passed into another user-
 
 ## Global variables
 
-A [global variable](/docs/guides/markup#global-variables) declared in the root element of `Main.xmlui`, or in the `Globals.xs` file is visible in all files at any level.
+A [global variable](/docs/guides/markup#global-variables) declared in the root element of `Main.xmlui`, or in the `Globals.xs` file is visible in all files and inline components at any level.
 
 Local variables can shadow global variables:
 

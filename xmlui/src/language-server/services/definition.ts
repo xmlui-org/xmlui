@@ -12,7 +12,7 @@ import path from "path";
 import * as fs from "fs";
 import { fileURLToPath, pathToFileURL } from "url";
 
-const PROJECT_ROOT_MARKERS = ["Main.xmlui", "App.xmlui", "config.json"];
+const PROJECT_ROOT_MARKERS = ["Main.xmlui", "config.json"];
 
 /**
  * Walk up the file system from the directory containing `docUri` until a

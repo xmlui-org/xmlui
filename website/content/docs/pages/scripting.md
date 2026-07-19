@@ -223,6 +223,8 @@ function transformStops(stops) {
 
 > [!INFO] The `Globals.xs` file is special. All variables and functions declared there are [global variables](/docs/guides/markup#global-variables) visible to all components. `Main.xmlui.xs` declarations are local to the Main component, just like any other code-behind file.
 
+An inline component declared in `Main.xmlui` can also use a `codeBehind` attribute. In that case, the `codeBehind` path is resolved relative to `Main.xmlui`. For file-based components, the path is resolved relative to the component file.
+
 ### Globals.xs vs other code-behind files
 
 The two kinds of `.xs` file look identical syntactically — top-level `var` and `function` declarations — but their reach is different:

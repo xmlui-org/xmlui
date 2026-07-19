@@ -32,29 +32,25 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
   const cwd = process.cwd();
   const srcDir = options.srcDir ? path.resolve(cwd, options.srcDir) : path.resolve(cwd, "src");
   const mainXmluiPath = path.join(srcDir, "Main.xmlui");
-  const appXmluiPath = path.join(srcDir, "App.xmlui");
 
   let compDef: ComponentDef | null = null;
   let pagesComp: ComponentDef | null = null;
 
-  for (const entrypointPath of [mainXmluiPath, appXmluiPath]) {
-    try {
-      const entrypointContent = await readFile(entrypointPath, "utf-8");
-      const result = xmlUiMarkupToComponent(
-        entrypointContent,
-        entrypointPath,
-        undefined,
-        undefined,
-        { role: "entrypoint" },
-      );
-      if (result.errors.length === 0 && result.component) {
-        compDef = result.component as ComponentDef;
-        pagesComp = getPagesComponent(compDef);
-        break;
-      }
-    } catch {
-      continue;
+  try {
+    const entrypointContent = await readFile(mainXmluiPath, "utf-8");
+    const result = xmlUiMarkupToComponent(
+      entrypointContent,
+      mainXmluiPath,
+      undefined,
+      undefined,
+      { role: "entrypoint" },
+    );
+    if (result.errors.length === 0 && result.component) {
+      compDef = result.component as ComponentDef;
+      pagesComp = getPagesComponent(compDef);
     }
+  } catch {
+    // Main.xmlui is optional for route discovery; fall back to scanning components.
   }
 
   if (!pagesComp) {
@@ -64,8 +60,11 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
 
     for (const file of componentFiles) {
       try {
+        if (/(?:^|[/\\])App\.xmlui$/i.test(file)) {
+          continue;
+        }
         const content = await readFile(file, "utf-8");
-        const isEntrypoint = /(?:^|[/\\])(?:Main|App)\.xmlui$/i.test(file) &&
+        const isEntrypoint = /(?:^|[/\\])Main\.xmlui$/i.test(file) &&
           !/(?:^|[/\\])components[/\\]/i.test(file);
         const result = xmlUiMarkupToComponent(content, file, undefined, undefined, {
           role: isEntrypoint ? "entrypoint" : "component",

@@ -12,7 +12,7 @@ const markdown = getExampleSource(
   ),
 );
 
-test.describe("Imperative ModalDialog", { tag: "@website" }, () => {
+test.describe("imperative-modaldialog", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "imperative-modaldialog");
 
   test("initial state shows only the Open help button", async ({ initTestBed, page }) => {
@@ -32,7 +32,7 @@ test.describe("Imperative ModalDialog", { tag: "@website" }, () => {
   });
 });
 
-test.describe("State-driven ModalDialog", { tag: "@website" }, () => {
+test.describe("state-driven-modaldialog", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "state-driven-modaldialog");
 
   test("initial state shows only the Show user details button", async ({ initTestBed, page }) => {

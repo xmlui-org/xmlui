@@ -132,6 +132,39 @@ produces this rendering:
 </Component>
 ```
 
+## Inline component definitions
+
+For small examples, you can keep reusable component definitions in the same
+app block. Top-level `<Component>` declarations in an `xmlui-pg` app work like
+top-level inline components in `Main.xmlui`: they are registered
+as reusable components, and the single non-`Component` top-level element is the
+app to render.
+
+```xmlui-pg copy display name="Inline component in playground"
+<Component name="StatusPill">
+  <Badge value="{$props.value}" variant="pill" />
+</Component>
+
+<App>
+  <VStack gap="8px">
+    <StatusPill value="Ready" />
+    <StatusPill value="Synced" />
+  </VStack>
+</App>
+```
+
+An app block can contain zero, one, or many top-level `<Component>`
+declarations, but it can contain only one top-level non-`Component` app root.
+The top-level declarations and the app root can appear in any order; this
+example puts the component first because inline component definitions are the
+focus.
+If the app block contains only `<Component>` declarations, XMLUI renders an
+empty app and logs a browser warning. `---comp` sections remain strict reusable
+component definitions; when a `---comp` component and an inline app component
+use the same name, the `---comp` component wins.
+
+For app files, the same pattern is documented in [Keep a small app in one file](/docs/howto/keep-a-small-app-in-one-file) and [User-defined components](/docs/guides/user-defined-components#where-to-declare-components).
+
 
 ## Description block
 
@@ -581,4 +614,3 @@ Modifiers can be combined in various ways.
 | `{2-4, 7}` | Mixed ranges and individual lines |
 | `/pattern/` | Highlight pattern matches |
 | `!/pattern/` | Red border highlight for pattern |
-

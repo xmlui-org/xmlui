@@ -9,7 +9,7 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/howto/constrain-route-parameters.md"),
 );
 
-test.describe("Constrain an order id route parameter", { tag: "@website" }, () => {
+test.describe("constrain-an-order-id-route-parameter", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "constrain-an-order-id-route-parameter",
