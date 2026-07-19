@@ -268,6 +268,48 @@ const contextValue = {
   inDrawer: true,
 };
 
+function scrollElementIntoNavPanelView(
+  element: Element,
+  panel: HTMLElement,
+  block: ScrollLogicalPosition,
+  behavior: ScrollBehavior,
+) {
+  const overlayViewport = element.closest("[data-overlayscrollbars-viewport]");
+  const scrollContainer =
+    overlayViewport instanceof HTMLElement && panel.contains(overlayViewport)
+      ? overlayViewport
+      : panel;
+
+  const containerRect = scrollContainer.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  const currentTop = scrollContainer.scrollTop;
+  const elementTop = elementRect.top - containerRect.top + currentTop;
+  const elementBottom = elementTop + elementRect.height;
+  let nextTop = currentTop;
+
+  if (block === "start") {
+    nextTop = elementTop;
+  } else if (block === "end") {
+    nextTop = elementBottom - scrollContainer.clientHeight;
+  } else if (block === "center") {
+    nextTop = elementTop - (scrollContainer.clientHeight - elementRect.height) / 2;
+  } else {
+    const visibleTop = currentTop;
+    const visibleBottom = currentTop + scrollContainer.clientHeight;
+    if (elementTop < visibleTop || elementRect.height > scrollContainer.clientHeight) {
+      nextTop = elementTop;
+    } else if (elementBottom > visibleBottom) {
+      nextTop = elementBottom - scrollContainer.clientHeight;
+    }
+  }
+
+  const maxTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+  const clampedTop = Math.min(Math.max(nextTop, 0), maxTop);
+  if (Math.abs(clampedTop - currentTop) > 1) {
+    scrollContainer.scrollTo({ top: clampedTop, behavior });
+  }
+}
+
 const DrawerNavPanel = memo(function DrawerNavPanel({
   logoContent,
   footerContent,
@@ -409,7 +451,7 @@ export const NavPanel = memo(forwardRef(function NavPanel(
         if (el.getAttribute("aria-hidden") === "true") return false;
         el = el.parentElement;
       }
-      leafLink.scrollIntoView({ block: syncScrollPosition, behavior: syncScrollBehavior });
+      scrollElementIntoNavPanelView(leafLink, panel, syncScrollPosition, syncScrollBehavior);
       return true;
     };
 

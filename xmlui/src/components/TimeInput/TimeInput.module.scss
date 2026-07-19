@@ -265,8 +265,10 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
       }
 
       &:focus {
-        outline: 2px solid $outlineColor-TimeInput--focus;
-        outline-offset: 2px;
+        outline-width: $outlineWidth-button-TimeInput--focused;
+        outline-color: $outlineColor-button-TimeInput--focused;
+        outline-offset: $outlineOffset-button-TimeInput--focused;
+        outline-style: solid;
       }
 
       &:disabled {
@@ -337,7 +339,7 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
     }
 
     &:invalid {
-      background: $backgroundColor-input-TimeInput-invalid;
+      background-color: $backgroundColor-input-TimeInput-invalid;
     }
 
     &.invalid {
@@ -504,6 +506,11 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  button.clearButton {
+    height: auto;
+    padding-block: 0;
   }
 
   .buttonIcon {

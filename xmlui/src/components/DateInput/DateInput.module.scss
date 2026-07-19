@@ -222,7 +222,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
       color: $textColor-DateInput--disabled;
       border-color: $borderColor-DateInput--disabled;
     }
-    
+
     button {
       background: transparent;
       border: none;
@@ -230,18 +230,18 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
       color: inherit;
       padding: $padding-button-DateInput;
       border-radius: $borderRadius-DateInput;
-      
+
       &:hover {
         background-color: $backgroundColor-DateInput--hover;
       }
-      
+
       &:focus {
         outline-width: $outlineWidth-button-DateInput--focused;
         outline-color: $outlineColor-button-DateInput--focused;
         outline-offset: $outlineOffset-button-DateInput--focused;
         outline-style: solid;
       }
-      
+
       &:disabled {
         cursor: not-allowed;
         opacity: $opacity-DateInput--disabled;
@@ -288,6 +288,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     padding: $padding-input-DateInput;
     border: 0;
     background: none;
+    color: currentColor;
     box-sizing: content-box;
     border-radius: $borderRadius-input-DateInput;
     -webkit-appearance: textfield;
@@ -335,6 +336,11 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     &.invalid {
       background-color: $backgroundColor-input-DateInput-invalid;
     }
+  }
+
+  button.clearButton {
+    height: auto;
+    padding-block: 0;
   }
 }
 

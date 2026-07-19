@@ -264,6 +264,30 @@ test.describe("Basic Functionality", () => {
       await expect(driver.clearButton).toBeVisible();
     });
 
+    test("clearable input keeps the same height as non-clearable input", async ({
+      initTestBed,
+      createTimeInputDriver,
+    }) => {
+      await initTestBed(`
+        <Fragment>
+          <TimeInput testId="plain" initialValue="11:30" />
+          <TimeInput testId="clearable" clearable="true" initialValue="10:20" />
+        </Fragment>
+      `);
+      const plain = await createTimeInputDriver("plain");
+      const clearable = await createTimeInputDriver("clearable");
+
+      await expect(plain.component).toBeVisible();
+      await expect(clearable.component).toBeVisible();
+
+      const plainBox = await plain.component.boundingBox();
+      const clearableBox = await clearable.component.boundingBox();
+
+      expect(plainBox).not.toBeNull();
+      expect(clearableBox).not.toBeNull();
+      expect(clearableBox!.height).toBe(plainBox!.height);
+    });
+
     test("hides clear button when clearable is false", async ({
       initTestBed,
       createTimeInputDriver,

@@ -71,6 +71,7 @@ export const Heading = memo(forwardRef(function Heading(
 
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
+  const reserveHeadingAnchorId = tableOfContentsContext?.reserveHeadingAnchorId;
   const appContext = useAppContext();
   if (showAnchor === undefined) {
     showAnchor =
@@ -124,9 +125,16 @@ export const Heading = memo(forwardRef(function Heading(
         newAnchorId = "heading-" + newAnchorId;
       }
 
-      setAnchorId(newAnchorId || null);
+      if (!newAnchorId) {
+        setAnchorId(null);
+        return;
+      }
+
+      const reservation = reserveHeadingAnchorId?.(newAnchorId);
+      setAnchorId(reservation?.id ?? newAnchorId);
+      return reservation?.release;
     }
-  }, []);
+  }, [reserveHeadingAnchorId]);
 
   useIsomorphicLayoutEffect(() => {
     if (elementRef.current && anchorId && !omitFromToc) {

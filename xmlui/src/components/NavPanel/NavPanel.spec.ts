@@ -1499,6 +1499,21 @@ test.describe("syncWithContent", () => {
     await expect(link8).toBeInViewport();
   });
 
+  test("syncWithContent does not scroll the app container", async ({ initTestBed, page }) => {
+    await initTestBed(SYNC_APP);
+
+    const appContainer = page.locator("[class*='_appContainer_']").first();
+    await expect(appContainer).toBeVisible();
+
+    await page.goto(page.url().replace(/\/page\d.*$/, "/page8"));
+    await expect(page.getByTestId("content8")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Page 8" })).toBeInViewport();
+
+    await expect
+      .poll(async () => appContainer.evaluate((el) => (el as HTMLElement).scrollTop))
+      .toBe(0);
+  });
+
   test("syncWithContent=false does not scroll the NavPanel on navigation", async ({
     initTestBed,
     page,

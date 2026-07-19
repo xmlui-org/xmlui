@@ -151,7 +151,6 @@ export const TableOfContents = memo(forwardRef(function TableOfContents(
                 data-level={value.level}
                 to={`#${value.id}`}
                 onClick={handleLinkClick(value.id)}
-                id={value.id}
               >
                 {value.text}
               </Link>

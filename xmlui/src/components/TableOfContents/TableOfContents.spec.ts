@@ -85,6 +85,32 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("link", { name: "Summary" })).toBeVisible();
   });
 
+  test("keeps duplicate heading texts as separate links with unique anchors", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.setViewportSize({ height: 600, width: 800 });
+    await initTestBed(`
+      <Page>
+        <HStack>
+          <VStack gap="800px">
+            <Heading level="h2" value="Alignment" />
+            <Heading level="h2" value="Alignment" />
+            bottom of the page text
+          </VStack>
+          <TableOfContents />
+        </HStack>
+      </Page>
+    `);
+
+    const alignmentLinks = page.getByRole("link", { name: "Alignment" });
+    await expect(alignmentLinks).toHaveCount(2);
+    await expect(alignmentLinks.nth(0)).toHaveAttribute("href", /#alignment$/);
+    await expect(alignmentLinks.nth(1)).toHaveAttribute("href", /#alignment-1$/);
+    await expect(page.locator("#alignment")).toHaveCount(1);
+    await expect(page.locator("#alignment-1")).toHaveCount(1);
+  });
+
   // =============================================================================
   // DOCUMENTATION USAGE PATTERNS
   // =============================================================================
@@ -705,7 +731,7 @@ test.describe("Theme Variables", () => {
     ]);
   });
 
-  test("applies active state theme variables", async ({ initTestBed, page }) => {
+  test("uses hover text theme variables for the active item", async ({ initTestBed, page }) => {
     await page.setViewportSize({ height: 600, width: 800 });
     await initTestBed(
       `
@@ -723,8 +749,8 @@ test.describe("Theme Variables", () => {
       {
         testThemeVars: {
           "backgroundColor-TableOfContentsItem--active": "rgb(150, 150, 255)",
-          "textColor-TableOfContentsItem--active": "rgb(50, 50, 150)",
-          "fontWeight-TableOfContentsItem--active": "bold",
+          "textColor-TableOfContentsItem--hover": "rgb(100, 100, 100)",
+          "fontWeight-TableOfContentsItem--hover": "900",
         },
       },
     );
@@ -737,8 +763,8 @@ test.describe("Theme Variables", () => {
 
     await Promise.all([
       expect(activeListItem).toHaveCSS("background-color", "rgb(150, 150, 255)"),
-      expect(activeLinkElement).toHaveCSS("color", "rgb(50, 50, 150)"),
-      expect(activeLinkElement).toHaveCSS("font-weight", "700"), // 'bold' maps to 700
+      expect(activeLinkElement).toHaveCSS("color", "rgb(100, 100, 100)"),
+      expect(activeLinkElement).toHaveCSS("font-weight", "900"),
     ]);
   });
 });
