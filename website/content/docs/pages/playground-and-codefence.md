@@ -24,7 +24,7 @@ Or you can use the `xmlui-pg` directive to define a live XMLUI playground. This 
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="XMLUI codefences and playgrounds"
 <Button label="Hello World" onClick="toast('click')"/>
 ```
 
@@ -62,7 +62,7 @@ Use the `---app` directive to show a complete app with full `App` context and a 
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Application context" height="160px"
 ---app
 <App>
   <NavPanel>
@@ -110,7 +110,7 @@ Use the `---comp` directive to define a component. This markup:
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Component context" height="160px"
 ---app
 <App>
   <NavPanel>
@@ -202,7 +202,7 @@ We define a `HelloButton` component for use in the app.
 
 produces this rendering:
 
-```xmlui-pg height="160px"
+```xmlui-pg name="Description block" height="160px"
 ---app display
 <App>
   <NavPanel>
@@ -299,7 +299,7 @@ Use `display` to show source. This markup:
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="display"
 ---app display
 <App>
   <Button label="Hello World" />
@@ -322,7 +322,7 @@ Use `copy` with `display` to add a button that copies the source.
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="copy"
 ---app display copy
 <App>
   <Button label="Hello World" />
@@ -346,7 +346,7 @@ This markup:
 
 produces this playground:
 
-```xmlui-pg
+```xmlui-pg name="name"
 ---app display
 <App>
   <Text>This is a named example</Text>
@@ -397,7 +397,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Single line"
 ---app display {3}
 <App>
   <VStack>
@@ -426,7 +426,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Multiple lines (comma-separated)"
 ---app display {3, 4}
 <App>
   <VStack>
@@ -456,7 +456,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Line ranges"
 ---app display {3-5}
 <App>
   <VStack>
@@ -486,7 +486,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Mixed ranges and individual lines"
 ---app display {1, 3-5, 7}
 <App>
   <VStack>
@@ -516,7 +516,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Attribute name and value"
 ---app display  /variant="outlined"/
 <App>
   <Button label="Highlighted Attribute" variant="outlined" themeColor="primary" />
@@ -540,7 +540,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Attribute names"
 ---app display /name/ /size/
 <App>
   <Icon name="star" size="lg" />
@@ -564,7 +564,7 @@ This markup:
 
 produces this rendering:
 
-```xmlui-pg
+```xmlui-pg name="Red border highlighting"
 ---app display !/{ 6 * 7 }/
 <App>
   <Text value="Life, the universe, and everything: { 6 * 7 }" />

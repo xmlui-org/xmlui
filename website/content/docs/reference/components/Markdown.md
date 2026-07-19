@@ -131,7 +131,7 @@ Function calls are executed: @{x()}
 The fence can contain just the app markup, or it can also contain top-level
 `<Component>` declarations that are reusable inside that app.
 
-```xmlui-pg copy display
+```xmlui-pg name="XMLUI playground apps" copy display
 <Component name="StatusPill">
   <Badge value="{$props.value}" variant="pill" />
 </Component>

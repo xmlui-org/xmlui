@@ -4,20 +4,7 @@ Define the dialog once at the `App` level so any component in the tree can open 
 
 A `ModalDialog` defined as a direct child of `App` is in scope everywhere. Multiple triggers — a header icon, a toolbar button, a list row — can all call `dialogId.open()` independently. Pair this with an app-level `global` variable so the dialog content and every component that reads the settings always stay in sync.
 
-```xmlui-pg name="Share a ModalDialog across components"
----api
-{
-  "apiUrl": "/api",
-  "initialize": "$state.items = [{ id: 1, title: 'Mountain View' }, { id: 2, title: 'City Lights' }, { id: 3, title: 'Ocean Sunset' }]",
-  "operations": {
-    "get-items": {
-      "url": "/items",
-      "method": "get",
-      "handler": "return $state.items"
-    }
-  }
-}
----app display /settings/ /settingsDialog/ /appSettings/
+```xmlui-pg display /settings/ /settingsDialog/ /appSettings/ name="Share a ModalDialog across components"
 <App global.settings="{{
     itemSize: 'medium',
     showDetails: true
@@ -60,7 +47,6 @@ A `ModalDialog` defined as a direct child of `App` is in scope everywhere. Multi
 
 </App>
 
----comp display /settings/ /settingsDialog/ /appSettings/
 <Component name="SettingsPanel">
   <VStack>
 
@@ -82,6 +68,18 @@ A `ModalDialog` defined as a direct child of `App` is in scope everywhere. Multi
 
   </VStack>
 </Component>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [{ id: 1, title: 'Mountain View' }, { id: 2, title: 'City Lights' }, { id: 3, title: 'Ocean Sunset' }]",
+  "operations": {
+    "get-items": {
+      "url": "/items",
+      "method": "get",
+      "handler": "return $state.items"
+    }
+  }
+}
 ```
 
 ## Key points

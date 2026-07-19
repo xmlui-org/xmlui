@@ -16,7 +16,7 @@ Native event capture is comprehensive: clicks on data points, legend toggles, zo
 
 Drag the slider handles below the chart to zoom into a date range.
 
-```xmlui-pg
+```xmlui-pg name="Multi-series time series with zoom"
 ---app display
 <App>
   <EChart
@@ -63,7 +63,7 @@ Drag the slider handles below the chart to zoom into a date range.
 
 Click legend items to toggle series on and off.
 
-```xmlui-pg id="line-chart-with-toolbox-b7d5"
+```xmlui-pg name="Line chart with toolbox" id="line-chart-with-toolbox-b7d5"
 ---app display
 <App>
   <EChart
@@ -94,7 +94,7 @@ Click legend items to toggle series on and off.
 
 ## Donut chart
 
-```xmlui-pg id="donut-chart-b851"
+```xmlui-pg name="Donut chart" id="donut-chart-b851"
 ---app display
 <App>
   <EChart
@@ -123,7 +123,7 @@ Click legend items to toggle series on and off.
 
 ## Treemap -- filesystem storage
 
-```xmlui-pg
+```xmlui-pg name="Treemap -- filesystem storage"
 ---app display
 <App>
   <EChart

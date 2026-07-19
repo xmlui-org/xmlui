@@ -6,8 +6,7 @@ Variables declared on a component flow downward through all nested built-in comp
 
 A variable declared in the `Main.xmlui` file is visible to built-in child components (e.g. `Text`) at any level.
 
-```xmlui-pg
----app display filename="Main.xmlui" /grandparent/ /parent/ /child/
+```xmlui-pg display filename="Main.xmlui" /grandparent/ /parent/ /child/ name="Variables"
 <App var.message="Hello from App">
   <Card id="grandparent">
     <Text>Message: {message}</Text>
@@ -25,7 +24,7 @@ A variable declared in the `Main.xmlui` file is visible to built-in child compon
 
 A variable declared in a Main.xmlui component is not automatically visible to a user-defined child component. This is also true when the user-defined component is declared inline in the same `Main.xmlui` file.
 
-```xmlui-pg
+```xmlui-pg name="Variables 2"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <Card>
@@ -43,7 +42,7 @@ A variable declared in a Main.xmlui component is not automatically visible to a 
 
 The variable can be passed into a user-defined component.
 
-```xmlui-pg
+```xmlui-pg name="Variables 3"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <Card>
@@ -62,7 +61,7 @@ The variable can be passed into a user-defined component.
 
 Or the variable can be transposed into the user-defined component by means of the [Slot](/components/Slot) mechanism. The `Slot` content evaluates in the parent's scope, so it can see parent vars and IDs, but renders inside the child’s layout.
 
-```xmlui-pg
+```xmlui-pg name="Variables 4"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <Card>
@@ -82,7 +81,7 @@ Or the variable can be transposed into the user-defined component by means of th
 
 A child component can redeclare a variable.
 
-```xmlui-pg
+```xmlui-pg display filename="Main.xmlui" /grandparent/ /parent/ /child/ name="Variables 5"
 ---app display filename="Main.xmlui" /grandparent/ /parent/ /child/
 <App var.message="Hello from App">
   <Card id="grandparent">
@@ -100,7 +99,7 @@ A child component can redeclare a variable.
 
 All these rules apply within a user-defined component defined in a file like `MyComponent.xmlui`, and within an inline `<Component>` declared at the top level of `Main.xmlui`.
 
-```xmlui-pg
+```xmlui-pg name="Variables 6"
 ---app display filename="Main.xmlui"
 <App>
   <MyComponent />
@@ -124,7 +123,7 @@ All these rules apply within a user-defined component defined in a file like `My
 A variable declared in a user-defined component can be passed into another user-defined component.
 
 
-```xmlui-pg
+```xmlui-pg name="Variables 7"
 ---app display filename="Main.xmlui"
 <App>
   <MyComponent />
@@ -214,7 +213,7 @@ function formatStation(name) {
 
 A component ID declared on a Main.xmlui component is visible to built-in child components (e.g. `Text`) at any level.
 
-```xmlui-pg
+```xmlui-pg name="Component IDs"
 ---app display filename="Main.xmlui" /parent/ /child/ /textBox/
 <App var.message="Hello from App">
   <TextBox id="textBox" initialValue="{message}" />
@@ -234,7 +233,7 @@ A component ID declared on a Main.xmlui component is visible to built-in child c
 A component ID declared on a Main.xmlui component is not automatically visible to a user-defined child component.
 
 
-```xmlui-pg
+```xmlui-pg name="Component IDs 2"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <TextBox id="textBox" initialValue="{message}" />
@@ -250,7 +249,7 @@ A component ID declared on a Main.xmlui component is not automatically visible t
 
 The id can be passed into a user-defined component.
 
-```xmlui-pg
+```xmlui-pg name="Component IDs 3"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <TextBox id="textBox" initialValue="{message}" />
@@ -266,7 +265,7 @@ The id can be passed into a user-defined component.
 
 Or the component ID can be transposed into the user-defined component by means of the [Slot](/components/Slot) mechanism.
 
-```xmlui-pg
+```xmlui-pg name="Component IDs 4"
 ---app display filename="Main.xmlui"
 <App var.message="Hello from App">
   <TextBox id="textBox" initialValue="{message}" />

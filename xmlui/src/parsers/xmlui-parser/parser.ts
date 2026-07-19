@@ -768,10 +768,6 @@ export function parseXmlUiMarkup(
       return;
     }
 
-    if (!stack.hasNonHelperChildren()) {
-      errorAt(DIAGS_PARSER.compDefNesedElem, errReportNode.pos, errReportNode.end);
-    }
-
     for (const attr of attrs) {
       if (attr.namespace === "xmlns") {
         continue;

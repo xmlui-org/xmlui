@@ -751,9 +751,9 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
   });
 
-  it("compound component with no children triggers compDefNesedElem", () => {
+  it("compound component with no children is valid", () => {
     const { errors } = parseSource("<Component name='MyComp'></Component>");
-    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+    expect(errors).toHaveLength(0);
   });
 
   it("duplicate xmlns key triggers duplXmlns", () => {
@@ -792,9 +792,9 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
   });
 
-  it("compound component with only comment child triggers compDefNesedElem", () => {
+  it("compound component with only comment child is valid", () => {
     const { errors } = parseSource("<Component name='MyComp'><!-- comment--></Component>");
-    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+    expect(errors).toHaveLength(0);
   });
 
   it("variable helper requires name attribute", () => {

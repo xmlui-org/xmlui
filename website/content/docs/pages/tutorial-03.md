@@ -2,8 +2,7 @@
 
 Let's explore a subset of the app's navigation. The `App`'s `layout` property can be `vertical`.
 
-```xmlui-pg name="vertical layout"
----app display {3}
+```xmlui-pg display {3} name="vertical layout"
 <App
   name="XMLUI Invoice"
   layout="vertical"
@@ -23,17 +22,15 @@ Let's explore a subset of the app's navigation. The `App`'s `layout` property ca
     <Page url="/invoices">
       <Invoices />
     </Page>
-
   </Pages>
 
-<Footer>Built with XMLUI <ToneSwitch /> </Footer>
-
+  <Footer>Built with XMLUI <ToneSwitch /> </Footer>
 </App>
----comp display
+
 <Component name="Dashboard">
   This is Dashboard.
 </Component>
----comp display
+
 <Component name="Invoices">
   This is Invoices.
 </Component>
@@ -43,8 +40,7 @@ Let's explore a subset of the app's navigation. The `App`'s `layout` property ca
 
 Or it can be `horizontal`.
 
-```xmlui-pg name="horizontal layout"
----app display {3}
+```xmlui-pg display {3} name="horizontal layout"
 <App
   name="XMLUI Invoice"
   layout="horizontal"
@@ -64,17 +60,15 @@ Or it can be `horizontal`.
     <Page url="/invoices">
       <Invoices />
     </Page>
-
   </Pages>
 
-<Footer>Built with XMLUI <ToneSwitch /> </Footer>
-
+  <Footer>Built with XMLUI <ToneSwitch /> </Footer>
 </App>
----comp
+
 <Component name="Dashboard">
   This is Dashboard.
 </Component>
----comp
+
 <Component name="Invoices">
   This is Invoices.
 </Component>

@@ -213,7 +213,7 @@ If the event handler returns false, the queue does not sign the error in the UI.
 
 The following sample generates an error for every fourth item, and gives an error feedback with the `processError` event handler:
 
-```xmlui-pg
+```xmlui-pg name="Using Queue"
 ---app copy {10-12, 17} display name="Example: processError"
 <App
   var.queued="{0}"
@@ -257,7 +257,7 @@ The parameter of the event handler is an object with these properties:
 
 The following sample declares a `willProcess` event handler that will skip processing (summing) items less than 0.5; the handler counts the number of skipped items.
 
-```xmlui-pg
+```xmlui-pg name="Using Queue 2"
 ---app copy {9} display name="Example: willProcess"
 <App
   var.queued="{0}"

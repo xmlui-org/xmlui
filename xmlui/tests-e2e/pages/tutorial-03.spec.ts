@@ -9,10 +9,9 @@ const markdown = getExampleSource(
   path.join(__dirname, "../../../website/content/docs/pages/tutorial-03.md"),
 );
 
-// The Dashboard and Invoices components in tutorial-03.md contain raw text nodes which
-// the XMLUI test harness rejects with U036 (no nested component definition).
-// We use the app markup from extractXmluiExample but hardcode fixed component definitions
-// that wrap the text in <Text> elements.
+// The Dashboard and Invoices components in tutorial-03.md contain raw text nodes.
+// We use the app markup from extractXmluiExample but hardcode component definitions
+// that wrap the text in <Text> elements so the test asserts rendered text consistently.
 const fixedComponents = [
   `<Component name="Dashboard"><Text>This is Dashboard.</Text></Component>`,
   `<Component name="Invoices"><Text>This is Invoices.</Text></Component>`,

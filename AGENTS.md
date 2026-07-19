@@ -8,6 +8,14 @@ For deeper detail, refer to:
 - **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/component-architecture.md` (component authoring — metadata, renderer, native patterns), `.ai/xmlui/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing-conventions.md` (E2E + unit test conventions), `.ai/xmlui/qa-checklist.md` (QA audit checklist).
 - **`.github/prompts/`** — task-specific AI workflow prompts. Before starting component creation, bug fixes, reviews, tests, docs, extension work, or refactors, check this folder for the matching prompt and follow it.
 
+When converting documentation `xmlui-pg` examples from segmented `---app`/`---comp` form to the single-file inline-component form, preserve section-level codefence options such as `display`, `copy`, and highlight selectors (`/pattern/`, `!/pattern/`) by moving them to the opening `xmlui-pg` fence line; otherwise source display and highlights disappear.
+
+All documentation `xmlui-pg` fences should include a human-readable `name="..."` title. Keep or add `id="..."` only for examples that are covered by website example tests; `id` is the stable Playwright `test.describe(...)` identity, while `name` is display text and may change without making specs stale. Existing name-based spec titles are accepted as legacy identities.
+
+Marker-free `xmlui-pg` examples may still include later sections such as `---api`, `---config`, or `---comp`. In that form, all content before the first section marker is the app entrypoint content; do not drop it or require an explicit `---app`.
+
+Reusable user-defined components may be empty: `<Component name="Empty" />` or `<Component name="Empty"></Component>` is valid and represents an empty `Fragment`. Do not reintroduce a parser error requiring at least one nested component definition.
+
 ---
 
 ## What is XMLUI

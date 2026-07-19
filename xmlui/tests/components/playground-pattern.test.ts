@@ -5,6 +5,7 @@ import {
   parsePlaygroundPattern,
   parseSegmentProps,
 } from "../../src/components/Markdown/utils";
+import { extractXmluiExample } from "../../src/testing/website-example-utils";
 
 describe("Playground pattern parsing", () => {
   it("No playground #1", () => {
@@ -1633,6 +1634,110 @@ describe("Playground pattern parsing", () => {
     // --- Assert
     expect(result.app).toBeDefined();
     expect(result.app.content).toBe("<Markdown>\n```js\nconst x = 1;\n```\n</Markdown>\n");
+  });
+
+  it("Keeps marker-free app content before an api segment", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display name="Inline app with API"
+<App>
+  <DataSource id="items" url="/api/items" />
+  <List data="{items}" />
+</App>
+
+<Component name="ItemTitle">
+  <Text>{$props.title}</Text>
+</Component>
+---api
+{
+  "apiUrl": "/api",
+  "operations": {
+    "get-items": {
+      "url": "/items",
+      "method": "get",
+      "handler": "return []"
+    }
+  }
+}
+\`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toContain("<App>");
+    expect(result.app.content).toContain('<Component name="ItemTitle">');
+    expect(result.api).toBeDefined();
+    expect(result.api.content).toContain('"apiUrl": "/api"');
+  });
+
+  it("Converts marker-free app content before an api segment into NestedApp content", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display name="Inline app with API"
+<App>
+  <DataSource id="items" url="/api/items" />
+  <List data="{items}" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "operations": {
+    "get-items": {
+      "url": "/items",
+      "method": "get",
+      "handler": "return []"
+    }
+  }
+}
+\`\`\``;
+
+    const result = convertPlaygroundPatternToMarkdown(content);
+    const encoded = result.match(/data-pg-content="([^"]+)"/)?.[1];
+
+    // --- Assert
+    expect(encoded).toBeDefined();
+    expect(base64ToJson(encoded!)).toStrictEqual({
+      name: "Inline app with API",
+      app: '<App>\n  <DataSource id="items" url="/api/items" />\n  <List data="{items}" />\n</App>\n',
+      api: '{\n  "apiUrl": "/api",\n  "operations": {\n    "get-items": {\n      "url": "/items",\n      "method": "get",\n      "handler": "return []"\n    }\n  }\n}\n',
+    });
+  });
+
+  it("Extracts marker-free app content before an api segment for website tests", () => {
+    // --- Act
+    const markdown = `# Example
+
+\`\`\`xmlui-pg name="Inline app with API"
+<App>
+  <DataSource id="items" url="/api/items" />
+  <List data="{items}" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "operations": {
+    "get-items": {
+      "url": "/items",
+      "method": "get",
+      "handler": "return []"
+    }
+  }
+}
+\`\`\``;
+
+    const result = extractXmluiExample(markdown, "Inline app with API");
+
+    // --- Assert
+    expect(result.app).toBe('<App>\n  <DataSource id="items" url="/api/items" />\n  <List data="{items}" />\n</App>');
+    expect(result.apiInterceptor).toStrictEqual({
+      apiUrl: "/api",
+      operations: {
+        "get-items": {
+          url: "/items",
+          method: "get",
+          handler: "return []",
+        },
+      },
+    });
   });
 
   it("Handles multiple four-backtick nested code fences", () => {

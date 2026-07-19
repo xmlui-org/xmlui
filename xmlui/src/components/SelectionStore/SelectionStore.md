@@ -14,7 +14,7 @@ Some components know they are wrapped with a `SelectionStore` and manage their c
 For example, the following sample `SelectionStore` wraps a `Table` with its `rowsSelectable` property set to true.
 Whenever the user changes the selection state of a particular row, the `SelectionStore` updates its state accordingly.
 
-```xmlui-pg 
+```xmlui-pg name="Selection-Aware Components"
 ---app copy display name="Example: using SelectionStore"
 <App>
   <H3>Rockets {rockets.value.length ? "(" + rockets.value.length + " selected)" : ""}</H3>

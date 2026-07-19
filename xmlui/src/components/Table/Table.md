@@ -1873,7 +1873,7 @@ The following example demonstrates how two independent `MyTable` components shar
 >[!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
 
-```xmlui-pg
+```xmlui-pg name="Table"
 ---app copy display /global.selState/ filename="Main.xmlui"
 <App global.selState="{{}}">
   <MyTable />

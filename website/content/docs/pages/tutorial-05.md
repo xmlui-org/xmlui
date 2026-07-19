@@ -2,7 +2,7 @@
 
 The `Dashboard` page continues with a donut chart that visualizes some of the same facts reported using `InfoCard`. We define it as a `Statuses` component whose width and title are defined by its containing `Dashboard` component. Here we'll use it standalone.
 
-```xmlui-pg  noHeader id="charts-b76c"
+```xmlui-pg name="Charts" noHeader id="charts-b76c"
 ---app display
 <App>
   <Statuses />
@@ -19,13 +19,19 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
     option="{
       {
         tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-        legend: { orient: $props.layout === 'vertical' ? 'vertical' : 'horizontal', bottom: 0 },
+        legend: { 
+          orient: $props.layout === 'vertical' ? 'vertical' : 'horizontal', 
+          bottom: 0 
+        },
         series: [{
           type: 'pie',
           radius: ['40%', '70%'],
           label: { show: true, formatter: '{b}' },
           data: ($props.data || []).map(function(item) {
-            return { name: item[$props.nameKey || 'name'], value: item[$props.dataKey || 'value'] }
+            return { 
+              name: item[$props.nameKey || 'name'], 
+              value: item[$props.dataKey || 'value'] 
+            }
           })
         }]
       }
@@ -33,7 +39,9 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 </Component>
 ---comp display copy /dataKey/ /nameKey/
 <Component name="Statuses">
-  <DataSource id="dashboardStats" url="/resources/files/dashboard-stats.json" method="GET" />
+  <DataSource 
+    id="dashboardStats" 
+    url="/resources/files/dashboard-stats.json" />
   <Card title="Statuses" height="400px" width="{$props.width}">
     <SimpleDonutChart
       data="{
@@ -63,12 +71,11 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 
 The `SimpleDonutChart` works with a single series of data and uses `dataKey`. A `SimpleBarChart` wrapper can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
 
-```xmlui-pg /data/ noHeader id="multiseries-charts-b8f6"
----app display /data/ /xKey/ /yKeys/
+```xmlui-pg display /data/ /xKey/ /yKeys/ name="Multiseries charts" /data/ noHeader id="multiseries-charts-b8f6"
 <App>
   <MonthlyStatus />
 </App>
----comp display
+
 <Component name="SimpleBarChart">
   <EChart
     height="{$props.height || '100%'}"
@@ -78,45 +85,56 @@ The `SimpleDonutChart` works with a single series of data and uses `dataKey`. A 
         legend: $props.showLegend ? {} : undefined,
         grid: { containLabel: true },
         xAxis: $props.orientation === 'horizontal'
-          ? { type: 'category', data: ($props.data || []).map(function(d) { return d[$props.xKey] }), axisLabel: { formatter: $props.tickFormatterX } }
-          : { type: 'value', axisLabel: { formatter: $props.tickFormatterY } },
+          ? { 
+              type: 'category', 
+              data: ($props.data || []).map(function(d) { return d[$props.xKey] }), 
+              axisLabel: { formatter: $props.tickFormatterX } 
+            }
+          : { 
+              type: 'value', 
+              axisLabel: { formatter: $props.tickFormatterY } 
+            },
         yAxis: $props.orientation === 'horizontal'
-          ? { type: 'value', axisLabel: { formatter: $props.tickFormatterY } }
-          : { type: 'category', data: ($props.data || []).map(function(d) { return d[$props.xKey] }), axisLabel: { formatter: $props.tickFormatterX } },
+          ? { 
+              type: 'value', 
+              axisLabel: { formatter: $props.tickFormatterY } 
+            }
+          : { 
+              type: 'category', 
+              data: ($props.data || []).map(function(d) { return d[$props.xKey] }), 
+              axisLabel: { formatter: $props.tickFormatterX } 
+            },
         series: ($props.yKeys || []).map(function(k) {
           return {
             type: 'bar',
             name: k,
-            stack: ($props.stacked === 'true' || $props.stacked === true) ? 'total' : undefined,
+            stack: ($props.stacked === 'true' || $props.stacked === true) 
+              ? 'total' : undefined,
             data: ($props.data || []).map(function(d) { return d[k] })
           }
         })
       }
     }" />
 </Component>
----comp display /data/ /yKeys/
+
 <Component name="MonthlyStatus">
-
-    <DataSource
-        id="monthlyStatus"
-        url="/resources/files/monthly-status.json"
-        method="GET" />
-
-    <VStack width="{$props.width}">
-        <H1>{$props.title}</H1>
-
-        <Card height="400px">
-        <SimpleBarChart
-          orientation="horizontal"
-          data="{monthlyStatus.value}"
-          xKey="month"
-          yKeys="{['paid_revenue', 'sent_revenue']}"
-          stacked="true"
-          showLegend="true"
-          tickFormatterX="{(value) => window.formatMonth(value)}"
-        />
-        </Card>
-    </VStack>
-
+  <DataSource
+      id="monthlyStatus"
+      url="/resources/files/monthly-status.json"
+      method="GET" />
+  <VStack width="{$props.width}">
+      <H1>{$props.title}</H1>
+      <Card height="400px">
+      <SimpleBarChart
+        orientation="horizontal"
+        data="{monthlyStatus.value}"
+        xKey="month"
+        yKeys="{['paid_revenue', 'sent_revenue']}"
+        stacked="true"
+        showLegend="true"
+        tickFormatterX="{(value) => window.formatMonth(value)}"
+      />
+      </Card>
+  </VStack>
 </Component>
 ```

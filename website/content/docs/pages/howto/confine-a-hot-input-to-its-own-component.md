@@ -10,8 +10,7 @@ same container. The fix is structural, not a binding tweak: extract the input
 declare the bound variable **inside** that component. A keystroke then only
 re-evaluates bindings inside the component's subtree.
 
-```xmlui-pg copy display name="A message composer that keeps its own input state" height="360px"
----app display /onSend/ /composer.setValue/
+```xmlui-pg copy display /onSend/ /composer.setValue/ /var.draft/ /emitEvent/ /method name/ name="A message composer that keeps its own input state" height="360px"
 <App var.log="{[]}">
   <MessageComposer
     id="composer"
@@ -23,7 +22,7 @@ re-evaluates bindings inside the component's subtree.
     <Text>• {$item}</Text>
   </List>
 </App>
----comp display /var.draft/ /emitEvent/ /method name/ MessageComposer
+
 <Component name="MessageComposer" var.draft="{''}">
   <TextArea
     id="box"

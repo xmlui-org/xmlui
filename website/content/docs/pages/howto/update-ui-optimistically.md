@@ -4,8 +4,7 @@ Use local reactive variables to reflect state changes instantly, then reconcile 
 
 Users expect immediate feedback when they tap a like button or toggle a setting. Instead of waiting for the server round-trip, update local variables right away. Then refetch from the APICall's `onSuccess` event so the refresh cannot race ahead of the write. If the call fails, restore the previous local values.
 
-```xmlui-pg copy display name="Click the Like button - immediate feedback"
----app display /favoriteOverrides/ /favoritesCountOverrides/ {6-58}
+```xmlui-pg copy display /favoriteOverrides/ /favoritesCountOverrides/ {6-58} name="Click the Like button - immediate feedback"
 <App
   var.favoriteOverrides="{{}}"
   var.favoritesCountOverrides="{{}}"
@@ -121,7 +120,7 @@ Users expect immediate feedback when they tap a like button or toggle a setting.
     </Items>
   </VStack>
 </App>
----comp display {8}
+
 <Component name="SocialButton">
   <Button
     borderRadius="50%"

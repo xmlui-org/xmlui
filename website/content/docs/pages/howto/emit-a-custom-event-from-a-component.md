@@ -4,8 +4,7 @@ Define an event property in a user-defined component and fire it from an inner h
 
 A `TaskCard` component knows its own task id, but it has no business reaching into the parent's state to remove itself from a list. Instead the card emits a `done` event that carries the id, and the parent decides what to do — in this case filter the task out of its local array. This is the core data-flow pattern for user-defined components: **props flow down, events flow up**.
 
-```xmlui-pg copy display name="Mark tasks done by emitting an event"
----app display /onDone/ /emitEvent/
+```xmlui-pg copy display /onDone/ /emitEvent/ name="Mark tasks done by emitting an event"
 <App
   var.tasks="{[
     { id: 1, title: 'Write release notes', priority: 'high',   assignee: 'Alice' },
@@ -24,7 +23,7 @@ A `TaskCard` component knows its own task id, but it has no business reaching in
   </Items>
   <Text variant="secondary">{ tasks.length } task(s) remaining</Text>
 </App>
----comp display /emitEvent/ TaskCard
+
 <Component name="TaskCard">
   <Card>
     <VStack>

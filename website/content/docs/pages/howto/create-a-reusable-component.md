@@ -6,8 +6,7 @@ A project dashboard often renders the same task-card layout in several places â€
 
 For tiny helpers used only by one app, you can start with an inline component in `Main.xmlui`. Once the markup is reused, grows, or needs a dedicated code-behind file, move it into `components/TaskCard.xmlui`.
 
-```xmlui-pg copy display name="TaskCard used in two panels"
----app display
+```xmlui-pg copy display /\$props/ name="TaskCard used in two panels"
 <App>
   <HStack wrapContent itemWidth="50%">
     <VStack>
@@ -48,7 +47,7 @@ For tiny helpers used only by one app, you can start with an inline component in
     </VStack>
   </HStack>
 </App>
----comp display /\$props/ TaskCard
+
 <Component name="TaskCard">
   <Card>
     <VStack>

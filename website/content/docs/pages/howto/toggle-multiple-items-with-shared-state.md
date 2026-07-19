@@ -6,8 +6,7 @@ The example below tracks which categories are *hidden*: a `<CategoryFilter>` use
 
 The array is declared as a `global` because at least one of its consumers — the `<CategoryFilter>` user-defined component — sits below a user-defined-component boundary that subtree variables (`var.`) do not cross. If every consumer were a built-in descendant of a common ancestor, `var.hiddenCategories` on that ancestor would be enough. See [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) for the broader subtree-vs-global decision.
 
-```xmlui-pg copy display name="Toggle categories to filter articles" height="600px"
----app display /hiddenCategories/
+```xmlui-pg copy display /hiddenCategories/ name="Toggle categories to filter articles" height="600px"
 <App
   global.hiddenCategories="{[]}"
   var.articles="{[
@@ -48,7 +47,7 @@ The array is declared as a `global` because at least one of its consumers — th
     </Card>
   </List>
 </App>
----comp display /hiddenCategories/
+
 <Component name="CategoryFilter">
   <VStack gap="0">
     <H2>Categories</H2>

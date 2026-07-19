@@ -6,19 +6,30 @@ one detail trips people up: **arguments bind to a named arrow parameter, not to
 `$param` / `$params`.** Write the body as an arrow function and name the
 parameter you want:
 
-```xmlui-pg copy display name="Passing arguments to a component's methods" height="360px"
----app display /counter\./
+```xmlui-pg copy display /counter\./ /method\./ /method name/ /\(n\) =>/ name="Passing arguments to a component's methods" height="360px"
 <App var.readout="(nothing read yet)">
   <Counter id="counter" />
   <FlowLayout>
-    <Button label="add 5 (attribute form)" onClick="counter.addAttr(5)" />
-    <Button label="add 3 (element form)"   onClick="counter.addElem(3)" />
-    <Button label="reset"                  onClick="counter.reset()" />
-    <Button label="read"                   onClick="readout = 'count = ' + counter.getCount()" />
+    <Button 
+      label="add 5 (attribute form)" 
+      onClick="counter.addAttr(5)" 
+    />
+    <Button 
+      label="add 3 (element form)"   
+      onClick="counter.addElem(3)" 
+    />
+    <Button 
+      label="reset"
+      onClick="counter.reset()" 
+    />
+    <Button 
+      label="read"
+      onClick="readout = 'count = ' + counter.getCount()" 
+    />
   </FlowLayout>
   <Text>{readout}</Text>
 </App>
----comp display /method\./ /method name/ /\(n\) =>/ Counter
+
 <Component name="Counter" var.count="{0}"
   method.addAttr="(n) => count = count + n">
   <Text variant="strong">Count: {count}</Text>

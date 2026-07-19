@@ -67,6 +67,46 @@ describe("xmlUiMarkupToComponent", () => {
     expect(result.warnings[0]).toContain("rendering an empty Fragment");
   });
 
+  it("accepts an empty reusable component definition", () => {
+    const result = xmlUiMarkupToComponent(`<Component name='Empty'></Component>`);
+
+    expect(result.errors).toHaveLength(0);
+    expect(result.component).toMatchObject({
+      name: "Empty",
+      component: {
+        type: "Fragment",
+      },
+    });
+    expect((result.component as any).component.children).toBeUndefined();
+  });
+
+  it("accepts an inline empty reusable component definition in entrypoint markup", () => {
+    const result = xmlUiMarkupToComponent(
+      `<App><Empty /></App><Component name='Empty'></Component>`,
+      "Main.xmlui",
+      undefined,
+      undefined,
+      { role: "entrypoint" },
+    );
+
+    expect(result.errors).toHaveLength(0);
+    expect(result.component).toMatchObject({
+      type: "App",
+      children: [
+        {
+          type: "Empty",
+        },
+      ],
+    });
+    expect(result.inlineComponents).toHaveLength(1);
+    expect(result.inlineComponents[0]).toMatchObject({
+      name: "Empty",
+      component: {
+        type: "Fragment",
+      },
+    });
+  });
+
   it("reports an error for entrypoint markup with multiple app roots", () => {
     const result = xmlUiMarkupToComponent(
       `<Component name='MyInline'><Text value="inline" /></Component><App /><Stack />`,

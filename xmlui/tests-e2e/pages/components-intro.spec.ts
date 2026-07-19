@@ -17,7 +17,12 @@ test.describe("built-in-components-eafb", { tag: "@website" }, () => {
   );
 
   test("renders the TubeStops component for the Bakerloo line", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, {
+      components,
+      apiInterceptor,
+      noFragmentWrapper: true,
+      parserOptions: { role: "entrypoint" },
+    });
     await expect(page.getByText("Bakerloo")).toBeVisible();
   });
 });
@@ -33,7 +38,12 @@ test.describe("user-defined-components-eab5", { tag: "@website" }, () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, {
+      components,
+      apiInterceptor,
+      noFragmentWrapper: true,
+      parserOptions: { role: "entrypoint" },
+    });
     await expect(page.getByText("victoria")).toBeVisible();
     await expect(page.getByText("waterloo-city")).toBeVisible();
   });

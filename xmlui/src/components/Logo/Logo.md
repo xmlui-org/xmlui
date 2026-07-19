@@ -24,7 +24,7 @@ In the following example, you can see a custom logo definition in the `AppHeader
 There is a `Heading` with the title text "MyApp" before the logo.
 It also uses the `Logo` component within the template definition:
 
-```xmlui-pg
+```xmlui-pg name="Using Logo"
 ---app copy display name="Example: using Logo" {6} height="200px"
 <App layout="horizontal">
   <AppHeader>

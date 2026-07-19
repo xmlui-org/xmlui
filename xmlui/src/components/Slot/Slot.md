@@ -32,7 +32,7 @@ The app flows down three buttons to the `ActionBar` to render.
 
 You can provide default content for the `Slot`. If the user-defined component does not have any children, XMLUI will render the default content.
 
-```xmlui-pg
+```xmlui-pg name="Default Slot content"
 ---app copy display name="Define default Slot content"
 <App>
   <ActionBar />
@@ -54,7 +54,7 @@ You can provide default content for the `Slot`. If the user-defined component do
 
 You can add multiple slots to a user-defined component; you can have a default slot and several *named* slots. Slot names should end with `template`, and you can use the `<property>` markup syntax to declare their values.
 
-```xmlui-pg
+```xmlui-pg name="Named Slots"
 ---app copy display name="Using named Slots" {4, 7, 9-11}
 <App>
   <ActionBar>
@@ -96,7 +96,7 @@ XMLUI finds the appropriate slots by their name and transposes their content rec
 
 The user-defined component can provide properties for the actual template.
 
-```xmlui-pg
+```xmlui-pg name="Template properties"
 ---app copy display name="Using template properties" /header/ /name="headerTemplate"/ /$processedHeader/
 <App>
   <ActionBar header="Action Bar Example">

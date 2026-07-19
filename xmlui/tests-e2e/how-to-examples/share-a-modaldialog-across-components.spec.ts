@@ -17,9 +17,15 @@ test.describe("Share a ModalDialog across components", { tag: "@website" }, () =
     markdown,
     "Share a ModalDialog across components",
   );
+  const testBedOptions = {
+    components,
+    apiInterceptor,
+    noFragmentWrapper: true,
+    parserOptions: { role: "entrypoint" as const },
+  };
 
   test("initial state shows the item list and settings button", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor, noFragmentWrapper: true });
+    await initTestBed(app, testBedOptions);
     await expect(page.getByText("Mountain View")).toBeVisible();
     await expect(page.getByText("City Lights")).toBeVisible();
     await expect(page.getByText("Ocean Sunset")).toBeVisible();
@@ -28,7 +34,7 @@ test.describe("Share a ModalDialog across components", { tag: "@website" }, () =
   });
 
   test("clicking the Settings button opens the dialog", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor, noFragmentWrapper: true });
+    await initTestBed(app, testBedOptions);
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Item Size")).toBeVisible();
@@ -36,7 +42,7 @@ test.describe("Share a ModalDialog across components", { tag: "@website" }, () =
   });
 
   test("pressing Escape closes the dialog", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor, noFragmentWrapper: true });
+    await initTestBed(app, testBedOptions);
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await page.keyboard.press("Escape");
@@ -47,7 +53,7 @@ test.describe("Share a ModalDialog across components", { tag: "@website" }, () =
     initTestBed,
     page,
   }) => {
-    await initTestBed(app, { components, apiInterceptor, noFragmentWrapper: true });
+    await initTestBed(app, testBedOptions);
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await page.getByRole("combobox").click();
@@ -56,7 +62,7 @@ test.describe("Share a ModalDialog across components", { tag: "@website" }, () =
   });
 
   test("the dialog can be opened a second time after closing", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor, noFragmentWrapper: true });
+    await initTestBed(app, testBedOptions);
     await page.getByRole("button", { name: "Settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
     await page.keyboard.press("Escape");

@@ -6,7 +6,7 @@
 
 If the `itemCount` property is provided, the component shows information about the number of entries shown per page, the total number of entries, as well as the current page index:
 
-```xmlui-pg copy display
+```xmlui-pg name="Standalone" copy display
 <App>
   <Pagination itemCount="100" pageSize="10" />
 </App>
@@ -14,7 +14,7 @@ If the `itemCount` property is provided, the component shows information about t
 
 If not, the [`hasPrevPage`](#hasprevpage) and [`hasNextPage`](#hasnextpage) properties can be used to control the enabled/disabled state of the previous and next buttons, while only the previous and next buttons are displayed:
 
-```xmlui-pg copy display
+```xmlui-pg name="Standalone 2" copy display
 <App>
   <Pagination hasPrevPage="true" hasNextPage="true" />
 </App>

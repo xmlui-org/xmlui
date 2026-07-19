@@ -6,7 +6,7 @@ Such refactoring requires you to create and name new `.xmlui` files, identify in
 
 Here's a simple component to package a name/value pair.
 
-```xmlui-pg display noHeader id="user-defined-components-b6c8"
+```xmlui-pg name="User-defined components" display noHeader id="user-defined-components-b6c8"
 ---app display
 <App>
   <NameValue name="Mary" value="123" />
@@ -77,7 +77,7 @@ Here's how you can define default values for properties.
 
 The `<IncButton>` component increments its value for every click, and notifies its environment by firing an event. The event's handler receives the current counter as an event parameter.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Events" noHeader
 ---app display
 <App>
   <Card width="30%">
@@ -101,7 +101,7 @@ The `<IncButton>` component increments its value for every click, and notifies i
 This section describes how to expose a component's internal [methods](/docs/helper-tags#method).
 The `<UsingInternalModal>` component exports the `open` method of the `ModalDialog` that it defines.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Methods" noHeader
 ---app display
 <App height="300px" >
   <UsingInternalModal id="component"/>
@@ -124,7 +124,7 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
 
 A component can call its own exported methods internally using the reserved name `$self`:
 
-```xmlui-pg
+```xmlui-pg name="Methods 2"
 ---app display
 <App>
   <Counter id="counter1"/>
@@ -150,7 +150,7 @@ A component can pass data back to the slot content that the parent provides. Thi
 
 Add extra attributes to the `<Slot>` tag. Each attribute becomes a context variable (prefixed with `$`) inside the parent's template content.
 
-```xmlui-pg noHeader
+```xmlui-pg name="Passing data into slot content" noHeader
 ---app display
 <App>
   <StatusList

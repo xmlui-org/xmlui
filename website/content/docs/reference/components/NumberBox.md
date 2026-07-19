@@ -352,7 +352,7 @@ This event is triggered when the NumberBox has received the focus.
 
 This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
 
-```xmlui-pg
+```xmlui-pg name="gotFocus"
 ---app copy {3-4} display name="Example: gotFocus"
 <App var.focused="{false}">
   <NumberBox

@@ -414,7 +414,6 @@ function transformXmluiNode(
         !(getComponentName(child, getText) in HelperNode) &&
         !isDeclarationKind(getComponentName(child, getText)),
     );
-    // If nestedComponents is empty the parser will have already emitted compDefNesedElem.
 
     const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
@@ -432,27 +431,28 @@ function transformXmluiNode(
     }
 
     // --- Should we wrap with a Fragment?
-    let element: Node;
-    if (nestedComponents.length > 1 || nestedVars.length > 0) {
-      element = wrapWithFragment([...nestedVars, ...nestedComponents]);
+    let nestedComponent: ComponentDef;
+    let componentSourceNode: Node = node;
+    if (nestedComponents.length === 0 && nestedVars.length === 0) {
+      nestedComponent = createEmptyFragmentComponent();
     } else {
-      element = nestedComponents[0];
+      const element =
+        nestedComponents.length > 1 || nestedVars.length > 0
+          ? wrapWithFragment([...nestedVars, ...nestedComponents])
+          : nestedComponents[0];
+      componentSourceNode = element;
+
+      namespaceStack.push(new Map());
+      // --- Get collect namespace attributes
+      attrs
+        .filter((attr) => attr.namespace === "xmlns")
+        .forEach((attr) => {
+          addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
+        });
+
+      nestedComponent = transformInnerElement(usesStack, element, false)! as ComponentDef;
+      namespaceStack.pop();
     }
-
-    namespaceStack.push(new Map());
-    // --- Get collect namespace attributes
-    const nsAttrs = attrs
-      .filter((attr) => attr.namespace === "xmlns")
-      .forEach((attr) => {
-        addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
-      });
-
-    let nestedComponent: ComponentDef = transformInnerElement(
-      usesStack,
-      element,
-      false,
-    )! as ComponentDef;
-    namespaceStack.pop();
 
     const component: CompoundComponentDef = {
       name: compoundName.value,
@@ -493,7 +493,7 @@ function transformXmluiNode(
 
     nestedComponent.debug = {
       ...nestedComponent.debug,
-      source: sourceLocationFor(element),
+      source: sourceLocationFor(componentSourceNode),
     };
 
     const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);

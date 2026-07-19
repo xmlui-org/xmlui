@@ -39,7 +39,7 @@ One-sentence promise: what the reader will be able to do.
 > [!GIST]
 > 3 to 5 bullets that summarize the page's core ideas.
 
-```xmlui-pg
+```xmlui-pg name="Page title"
 Small live example, preferably under 25 lines.
 ```
 

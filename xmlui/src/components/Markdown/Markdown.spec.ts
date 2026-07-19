@@ -721,6 +721,35 @@ test.describe("xmlui-pg inline components", () => {
     await expect(page.getByRole("button", { name: "Hello inline" })).toBeVisible();
   });
 
+  test("renders multiple inline components and the main app from one app block", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      '<Component name="StatusPill">',
+      '  <Badge value="{$props.value}" variant="pill" />',
+      "</Component>",
+      '<Component name="ToolbarAction">',
+      '  <Button label="{$props.label}" />',
+      "</Component>",
+      "<App>",
+      "  <VStack>",
+      '    <StatusPill value="Ready" />',
+      '    <StatusPill value="Synced" />',
+      '    <ToolbarAction label="Refresh" />',
+      "  </VStack>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByText("Ready")).toBeVisible();
+    await expect(page.getByText("Synced")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Refresh" })).toBeVisible();
+  });
+
   test("still renders playgrounds without inline components", async ({ initTestBed, page }) => {
     const SOURCE = "```xmlui-pg\n<Button label=\"Plain playground\" />\n```";
 

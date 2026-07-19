@@ -62,6 +62,10 @@ function parseXmluiExampleContent(content: string): ExtractedExample {
         result.apiInterceptor = JSON.parse(trimmed) as ApiInterceptorDefinition;
         break;
       // ---desc and other sections are ignored for testing purposes
+      default:
+        if (!result.app) {
+          result.app = trimmed;
+        }
     }
   }
 

@@ -4,12 +4,11 @@ Build higher-order components that wrap others while forwarding props.
 
 Rather than placing all Kanban board markup in a single file, build it as three focused layers: `TaskCard` renders one task, `TaskColumn` groups tasks under a labelled column header, and `TaskBoard` owns the full data set and assembles the layout. Each layer has one job, accepts typed props, and is independently readable.
 
-```xmlui-pg copy display name="Kanban board built from composed components"
----app display
+```xmlui-pg copy display /\$props\.tasks/ /allTasks/ /\$props\.tasks/ /\$item/ name="Kanban board built from composed components"
 <App>
   <TaskBoard />
 </App>
----comp display /\$props\.tasks/ /allTasks/ TaskBoard
+
 <Component name="TaskBoard"
   var.allTasks="{[
     { 
@@ -47,7 +46,7 @@ Rather than placing all Kanban board markup in a single file, build it as three 
     <TaskColumn title="Done"        tasks="{doneTasks}"        />
   </HStack>
 </Component>
----comp display /\$props\.tasks/ /\$item/ TaskColumn
+
 <Component name="TaskColumn">
   <VStack>
     <HStack>
@@ -64,7 +63,7 @@ Rather than placing all Kanban board markup in a single file, build it as three 
     </Items>
   </VStack>
 </Component>
----comp display TaskCard
+
 <Component name="TaskCard">
   <Card>
     <VStack>

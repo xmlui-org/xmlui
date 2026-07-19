@@ -256,13 +256,12 @@ When you set a particular base color, xmlui creates several shade variants (usin
 For example, when you set the the `color-primary` variable to `#008000`, XMLUI creates these shades:
 
 ```xmlui-pg name="Custom primary color shades"
----app
 <App>
   <Theme color-primary="#008000">
     <Palette name="primary" />
   </Theme>
 </App>
----comp
+
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -275,7 +274,7 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
     </Stack>
   </VStack>
 </Component>
----comp
+
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -296,13 +295,11 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
 When selecting the primary color, choose one representing the middle shade (500). Otherwise, you may end up with an unuseful set of shades. For example, setting `surface-color` to `#001000` will create too many dark shades.
 
 ```xmlui-pg name="Unuseful primary color shades"
----app
 <App>
   <Theme color-primary="#001000">
     <Palette name="primary" />
   </Theme>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -315,7 +312,6 @@ When selecting the primary color, choose one representing the middle shade (500)
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -340,11 +336,9 @@ XMLUI declares these default color shade sets:
 **Surface**:
 
 ```xmlui-pg name="Surface Colors"
----app
 <App>
   <Palette name="surface" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -357,7 +351,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -378,11 +371,9 @@ XMLUI declares these default color shade sets:
 **Primary**:
 
 ```xmlui-pg name="Primary Colors"
----app
 <App>
   <Palette name="primary" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -395,7 +386,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -416,11 +406,9 @@ XMLUI declares these default color shade sets:
 **Secondary**:
 
 ```xmlui-pg name="Secondary Colors"
----app
 <App>
   <Palette name="secondary" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -433,7 +421,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -454,11 +441,9 @@ XMLUI declares these default color shade sets:
 **Warn**:
 
 ```xmlui-pg name="Warn Colors"
----app
 <App>
   <Palette name="warn" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -471,7 +456,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -492,11 +476,9 @@ XMLUI declares these default color shade sets:
 **Danger**:
 
 ```xmlui-pg name="Danger Colors"
----app
 <App>
   <Palette name="danger" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -509,7 +491,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -530,11 +511,9 @@ XMLUI declares these default color shade sets:
 **Success**:
 
 ```xmlui-pg name="Success Colors"
----app
 <App>
   <Palette name="success" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -547,7 +526,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -568,11 +546,9 @@ XMLUI declares these default color shade sets:
 **Info**:
 
 ```xmlui-pg name="Info Colors"
----app
 <App>
   <Palette name="info" />
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -585,7 +561,6 @@ XMLUI declares these default color shade sets:
     </Stack>
   </VStack>
 </Component>
----comp
 <Component name="Palette">
   <FlowLayout>
     <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
@@ -653,7 +628,6 @@ XMLUI declares these default color shade sets:
 - `backgroundColor-dropdown-item--active`: The background color of active items in dropdown containers
 
 ```xmlui-pg name="Default Background Colors"
----app
 <App>
   <FlowLayout>
       <Swatch color="$backgroundColor" width="50%" />
@@ -667,7 +641,6 @@ XMLUI declares these default color shade sets:
       <Swatch color="$backgroundColor-dropdown-item--active" width="50%" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -692,7 +665,6 @@ These colors represent validation states:
 - `color-error`: Color signing some error
 
 ```xmlui-pg name="Validation Colors"
----app
 <App>
   <FlowLayout>
     <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
@@ -701,7 +673,6 @@ These colors represent validation states:
     <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -721,14 +692,12 @@ These colors represent validation states:
 The color schemes of xmlui are tone-aware. With a light tone, the lower the indicator number for a particular shade, the lighter the rendered color. For example, `$color-surface-200` is lighter than `$color-surface-700`. However, with a dark tone, the shades are reversed, `$color-surface-200` is lighter than `$color-surface-700`.
 
 ```xmlui-pg name="Shades with light tone"
----app
 <App>
   <FlowLayout>
     <Swatch color="$color-surface-200" width="50%" textColor="$textColor-primary" />
     <Swatch color="$color-surface-700" width="50%" textColor="$const-color-primary-0" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -744,14 +713,12 @@ The color schemes of xmlui are tone-aware. With a light tone, the lower the indi
 ```
 
 ```xmlui-pg name="Shades with dark tone"
----app
 <App defaultTone="dark">
   <FlowLayout>
     <Swatch color="$color-surface-200" width="50%" textColor="$textColor-primary" />
     <Swatch color="$color-surface-700" width="50%" textColor="$textColor-primary" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -773,14 +740,12 @@ In situations when you need an absolute color scale, you can use the theme varia
 Independent of the tone, the lower the indicator number for a particular shade, the lighter the rendered color:
 
 ```xmlui-pg name="Absolute shade values with light tone"
----app
 <App>
   <FlowLayout>
     <Swatch color="$const-color-success-200" width="50%" textColor="$const-color-primary-1000" />
     <Swatch color="$const-color-success-700" width="50%" textColor="$const-color-primary-0" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack
@@ -796,14 +761,12 @@ Independent of the tone, the lower the indicator number for a particular shade, 
 ```
 
 ```xmlui-pg name="Absolute shade values with dark tone"
----app
 <App defaultTone="dark">
   <FlowLayout>
     <Swatch color="$const-color-success-200" width="50%" textColor="$const-color-primary-1000" />
     <Swatch color="$const-color-success-700" width="50%" textColor="$const-color-primary-0" />
   </FlowLayout>
 </App>
----comp
 <Component name="Swatch">
   <VStack gap="0.25rem">
     <Stack

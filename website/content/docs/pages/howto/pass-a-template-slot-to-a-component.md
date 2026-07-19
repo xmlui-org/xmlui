@@ -6,15 +6,14 @@ Templates let a caller pass *markup* into a component, not just data. Props are 
 
 The simplest template is a single `<Slot />` element inside a component. Anything the caller writes between the component's opening and closing tags renders at the `<Slot />` location.
 
-```xmlui-pg copy display name="Card wrapper with a single Slot"
----app display
+```xmlui-pg copy display /Slot/ name="Card wrapper with a single Slot"
 <App>
   <ContentCard>
     <H4>Project status</H4>
     <Text>All on track for the April release.</Text>
   </ContentCard>
 </App>
----comp display /Slot/
+
 <Component name="ContentCard">
   <Card padding="$space-4">
     <Slot />
@@ -46,8 +45,7 @@ Markup placed *inside* a `<Slot name="...">…</Slot>` element renders as a fall
 
 The richer example below has three views of the same `TaskCard` component: a manager view supplies Edit/Delete buttons, a team-member view supplies one Mark Done button, and a read-only view supplies nothing — the slot's default `"No actions"` text appears for that one.
 
-```xmlui-pg copy display name="TaskCard with an actionsTemplate slot"
----app display
+```xmlui-pg copy display /actionsTemplate/ /Slot/ name="TaskCard with an actionsTemplate slot"
 <App>
   <HStack wrapContent itemWidth="33.33%">
     <VStack>
@@ -95,7 +93,7 @@ The richer example below has three views of the same `TaskCard` component: a man
     </VStack>
   </HStack>
 </App>
----comp display /actionsTemplate/ /Slot/ TaskCard
+
 <Component name="TaskCard">
   <Card>
     <VStack>

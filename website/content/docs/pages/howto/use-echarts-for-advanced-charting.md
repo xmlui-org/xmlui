@@ -6,18 +6,26 @@ The [EChart](/docs/reference/extensions/xmlui-echart/EChart) component wraps [Ap
 
 Pass an `option` object with `xAxis`, `yAxis`, and `series` to render a chart.
 
-```xmlui-pg copy id="basic-bar-chart-b6ce"
+```xmlui-pg display name="Basic bar chart" copy id="basic-bar-chart-b6ce"
 <App>
-  <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
+  <DataSource id="monthly" url="/resources/files/monthly-status.json" />
   <Card height="400px">
     <EChart
       height="100%"
       option="{
         {
           tooltip: { trigger: 'axis' },
-          xAxis: { type: 'category', data: (monthly.value || []).map(function(d) { return d.month }) },
+          xAxis: { 
+            type: 'category', 
+            data: (monthly.value || []).map(function(d) { return d.month }) 
+          },
           yAxis: { type: 'value' },
-          series: [{ type: 'bar', data: (monthly.value || []).map(function(d) { return d.paid_revenue }) }]
+          series: [{ 
+            type: 'bar', 
+            data: (monthly.value || []).map(function(d) { 
+              return d.paid_revenue 
+            }) 
+          }]
         }
       }" />
   </Card>
@@ -28,9 +36,9 @@ Pass an `option` object with `xAxis`, `yAxis`, and `series` to render a chart.
 
 Set `series.type` to `'pie'` and use `radius` to create a donut.
 
-```xmlui-pg copy id="pie-donut-chart-b72a"
+```xmlui-pg display name="Pie / donut chart" copy id="pie-donut-chart-b72a"
 <App>
-  <DataSource id="stats" url="/resources/files/dashboard-stats.json" method="GET" />
+  <DataSource id="stats" url="/resources/files/dashboard-stats.json" />
   <Card height="400px">
     <EChart
       height="100%"
@@ -42,9 +50,18 @@ Set `series.type` to `'pie'` and use `radius` to create a donut.
             type: 'pie',
             radius: ['40%', '70%'],
             data: [
-              { name: 'sent', value: stats.value ? stats.value[0].sent_invoices : 0 },
-              { name: 'draft', value: stats.value ? stats.value[0].draft_invoices : 0 },
-              { name: 'paid', value: stats.value ? stats.value[0].paid_invoices : 0 }
+              { 
+                name: 'sent', 
+                value: stats.value ? stats.value[0].sent_invoices : 0 
+              },
+              { 
+                name: 'draft', 
+                value: stats.value ? stats.value[0].draft_invoices : 0 
+              },
+              { 
+                name: 'paid', 
+                value: stats.value ? stats.value[0].paid_invoices : 0 
+              }
             ]
           }]
         }
@@ -57,9 +74,9 @@ Set `series.type` to `'pie'` and use `radius` to create a donut.
 
 Use multiple entries in the `series` array to overlay lines.
 
-```xmlui-pg copy id="line-chart-with-multiple-series-b7b6"
+```xmlui-pg display name="Line chart with multiple series" copy id="line-chart-with-multiple-series-b7b6"
 <App>
-  <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
+  <DataSource id="monthly" url="/resources/files/monthly-status.json" />
   <Card height="400px">
     <EChart
       height="100%"
@@ -67,11 +84,24 @@ Use multiple entries in the `series` array to overlay lines.
         {
           tooltip: { trigger: 'axis' },
           legend: {},
-          xAxis: { type: 'category', data: (monthly.value || []).map(function(d) { return d.month }) },
+          xAxis: { 
+            type: 'category', 
+            data: (monthly.value || []).map(function(d) { return d.month }) 
+          },
           yAxis: { type: 'value' },
           series: [
-            { type: 'line', name: 'paid', smooth: true, data: (monthly.value || []).map(function(d) { return d.paid_revenue }) },
-            { type: 'line', name: 'sent', smooth: true, data: (monthly.value || []).map(function(d) { return d.sent_revenue }) }
+            { 
+              type: 'line', 
+              name: 'paid', 
+              smooth: true, 
+              data: (monthly.value || []).map(function(d) { return d.paid_revenue }) 
+            },
+            { 
+              type: 'line', 
+              name: 'sent', 
+              smooth: true, 
+              data: (monthly.value || []).map(function(d) { return d.sent_revenue }) 
+            }
           ]
         }
       }" />
@@ -83,9 +113,9 @@ Use multiple entries in the `series` array to overlay lines.
 
 Set `stack` on each series to the same value to stack bars.
 
-```xmlui-pg copy
+```xmlui-pg display name="Stacked bar chart" copy
 <App>
-  <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
+  <DataSource id="monthly" url="/resources/files/monthly-status.json" />
   <Card height="400px">
     <EChart
       height="100%"
@@ -94,11 +124,24 @@ Set `stack` on each series to the same value to stack bars.
           tooltip: { trigger: 'axis' },
           legend: {},
           grid: { containLabel: true },
-          xAxis: { type: 'category', data: (monthly.value || []).map(function(d) { return d.month }) },
+          xAxis: { 
+            type: 'category', 
+            data: (monthly.value || []).map(function(d) { return d.month }) 
+          },
           yAxis: { type: 'value' },
           series: [
-            { type: 'bar', name: 'paid', stack: 'total', data: (monthly.value || []).map(function(d) { return d.paid_revenue }) },
-            { type: 'bar', name: 'sent', stack: 'total', data: (monthly.value || []).map(function(d) { return d.sent_revenue }) }
+            { 
+              type: 'bar', 
+              name: 'paid', 
+              stack: 'total', 
+              data: (monthly.value || []).map(function(d) { return d.paid_revenue }) 
+            },
+            { 
+              type: 'bar', 
+              name: 'sent', 
+              stack: 'total', 
+              data: (monthly.value || []).map(function(d) { return d.sent_revenue }) 
+            }
           ]
         }
       }" />
@@ -110,10 +153,9 @@ Set `stack` on each series to the same value to stack bars.
 
 For common chart patterns, define an XMLUI component that builds the ECharts option from simple props.
 
-```xmlui-pg copy
----app display
+```xmlui-pg display name="Wrapping EChart in a reusable component" copy
 <App>
-  <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
+  <DataSource id="monthly" url="/resources/files/monthly-status.json" />
   <Card height="400px">
     <SimpleBarChart
       data="{monthly.value}"
@@ -123,7 +165,7 @@ For common chart patterns, define an XMLUI component that builds the ECharts opt
       showLegend="true" />
   </Card>
 </App>
----comp display
+
 <Component name="SimpleBarChart">
   <EChart
     height="{$props.height || '100%'}"
@@ -132,13 +174,19 @@ For common chart patterns, define an XMLUI component that builds the ECharts opt
         tooltip: { trigger: 'axis' },
         legend: $props.showLegend ? {} : undefined,
         grid: { containLabel: true },
-        xAxis: { type: 'category', data: ($props.data || []).map(function(d) { return d[$props.xKey] }) },
+        xAxis: { 
+          type: 'category', 
+          data: ($props.data || []).map(function(d) { 
+            return d[$props.xKey] 
+          }) 
+        },
         yAxis: { type: 'value' },
         series: ($props.yKeys || []).map(function(k) {
           return {
             type: 'bar',
             name: k,
-            stack: ($props.stacked === 'true' || $props.stacked === true) ? 'total' : undefined,
+            stack: ($props.stacked === 'true' || $props.stacked === true) 
+              ? 'total' : undefined,
             data: ($props.data || []).map(function(d) { return d[k] })
           }
         })
