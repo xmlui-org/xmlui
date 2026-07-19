@@ -170,26 +170,26 @@ $color-indicator-TableOfContents--active: createThemeVar("color-indicator-#{$com
           background-color: $backgroundColor-TableOfContentsItem--active;
 
           .link {
-            color: $textColor-TableOfContentsItem--active;
-            font-weight: $fontWeight-TableOfContentsItem--active;
+            color: $textColor-TableOfContentsItem--hover;
+            font-weight: $fontWeight-TableOfContentsItem--hover;
 
             &[data-level="1"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-1--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-1--hover;
             }
             &[data-level="2"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-2--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-2--hover;
             }
             &[data-level="3"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-3--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-3--hover;
             }
             &[data-level="4"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-4--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-4--hover;
             }
             &[data-level="5"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-5--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-5--hover;
             }
             &[data-level="6"] {
-              font-weight: $fontWeight-TableOfContentsItem-level-6--active;
+              font-weight: $fontWeight-TableOfContentsItem-level-6--hover;
             }
           }
         }

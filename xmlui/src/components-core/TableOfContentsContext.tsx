@@ -27,6 +27,10 @@ type HeadingItem = {
 };
 
 type ActiveAnchorChangedCallback = (id: string) => void;
+type AnchorIdReservation = {
+  id: string;
+  release: () => void;
+};
 
 // --- The context object that is used to store the hierarchy of headings.
 interface ITableOfContentsContext {
@@ -35,6 +39,9 @@ interface ITableOfContentsContext {
 
   // --- This method allows adding a new heading to the TOC.
   registerHeading: (headingItem: HeadingItem) => void;
+
+  // --- Reserves a unique generated anchor id within the current TOC page.
+  reserveHeadingAnchorId: (baseId: string) => AnchorIdReservation;
 
   // --- This flag indicates whether the intersection observer is enabled.
   hasTableOfContents: boolean;
@@ -59,6 +66,7 @@ export const TableOfContentsContext = createContext<ITableOfContentsContext | nu
 export function TableOfContentsProvider({ children }: { children: React.ReactNode }) {
   const [headings, setHeadings] = useState<Record<string, HeadingItem>>(EMPTY_OBJECT);
   const [callbacks, setCallbacks] = useState<Array<ActiveAnchorChangedCallback>>(EMPTY_ARRAY);
+  const anchorIdReservations = useRef<Map<string, Set<number>>>(new Map());
   const observer = useRef<IntersectionObserver | null>(null);
   const { forceRefreshAnchorScroll } = useAppContext();
   const thisRef = useRef({
@@ -121,6 +129,32 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
         delete newHeadings[headingItem.id];
         return newHeadings;
       });
+    };
+  }, []);
+
+  const reserveHeadingAnchorId = useCallback((baseId: string): AnchorIdReservation => {
+    let reservations = anchorIdReservations.current.get(baseId);
+    if (!reservations) {
+      reservations = new Set();
+      anchorIdReservations.current.set(baseId, reservations);
+    }
+
+    let suffix = 0;
+    while (reservations.has(suffix)) {
+      suffix++;
+    }
+    reservations.add(suffix);
+
+    return {
+      id: suffix === 0 ? baseId : `${baseId}-${suffix}`,
+      release: () => {
+        const currentReservations = anchorIdReservations.current.get(baseId);
+        if (!currentReservations) return;
+        currentReservations.delete(suffix);
+        if (currentReservations.size === 0) {
+          anchorIdReservations.current.delete(baseId);
+        }
+      },
     };
   }, []);
 
@@ -194,6 +228,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {
       registerHeading,
+      reserveHeadingAnchorId,
       headings: sortedHeadings,
       scrollToAnchor,
       subscribeToActiveAnchorChange,
@@ -202,6 +237,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     };
   }, [
     registerHeading,
+    reserveHeadingAnchorId,
     sortedHeadings,
     scrollToAnchor,
     subscribeToActiveAnchorChange,

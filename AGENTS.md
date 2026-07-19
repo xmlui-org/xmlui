@@ -5,6 +5,7 @@ For deeper detail, refer to:
 
 - **`xmlui/dev-docs/`** — architecture & subsystem reference (rendering, containers, theming, forms, etc.)
 - **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/component-architecture.md` (component authoring — metadata, renderer, native patterns), `.ai/xmlui/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing-conventions.md` (E2E + unit test conventions), `.ai/xmlui/qa-checklist.md` (QA audit checklist).
+- **`.github/prompts/`** — task-specific AI workflow prompts. Before starting component creation, bug fixes, reviews, tests, docs, extension work, or refactors, check this folder for the matching prompt and follow it.
 
 ---
 
