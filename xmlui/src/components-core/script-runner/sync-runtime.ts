@@ -68,6 +68,7 @@ export function notifySyncFunctionCallUpdate(
   phase: "will" | "did",
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
+  kind: SyncRuntimeUpdateKind = "function-call",
 ): void {
   if (!rootName) return;
   const rootExpr: Identifier = {
@@ -78,7 +79,7 @@ export function notifySyncFunctionCallUpdate(
   const rootScope = getIdentifierScope(rootExpr, evalContext, thread);
   if (!rootScope.type || rootScope.type === "block") return;
   const hook = phase === "will" ? evalContext.onWillUpdate : evalContext.onDidUpdate;
-  void hook?.({ type: rootScope.type, name: rootName }, rootName, "function-call");
+  void hook?.({ type: rootScope.type, name: rootName }, rootName, kind);
 }
 
 export function assertSyncFunctionAllowed(functionObj: any): void {
@@ -203,8 +204,8 @@ export function deleteSyncTarget(
 ): SyncRuntimeChange {
   const { valueScope, valueIndex } = ensureWritableTarget(target, "delete");
   handleMemberBan(isBannedMember(valueScope, valueIndex as string), evalContext.options);
-  delete valueScope[valueIndex];
-  return createChange(target, undefined, "delete", "assignment");
+  const deleted = delete valueScope[valueIndex];
+  return createChange(target, deleted, "delete", "assignment");
 }
 
 export function markReceiverDirty(

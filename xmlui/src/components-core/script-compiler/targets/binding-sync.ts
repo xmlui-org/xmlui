@@ -1,45 +1,69 @@
 import { Parser } from "../../../parsers/scripting/Parser";
 import {
   T_ARRAY_LITERAL,
+  T_ASSIGNMENT_EXPRESSION,
   T_BINARY_EXPRESSION,
+  T_BREAK_STATEMENT,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONTINUE_STATEMENT,
   T_CONDITIONAL_EXPRESSION,
+  T_DO_WHILE_STATEMENT,
   T_BLOCK_STATEMENT,
   T_CONST_STATEMENT,
   T_EMPTY_STATEMENT,
   T_EXPRESSION_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_FOR_STATEMENT,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_ARROW_EXPRESSION,
   T_IDENTIFIER,
+  T_IF_STATEMENT,
   T_LET_STATEMENT,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
   T_OBJECT_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
   T_RETURN_STATEMENT,
   T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
   T_TEMPLATE_LITERAL_EXPRESSION,
+  T_THROW_STATEMENT,
   T_UNARY_EXPRESSION,
+  T_WHILE_STATEMENT,
   type ArrayLiteral,
+  type AssignmentExpression,
   type ArrowExpression,
   type BinaryExpression,
   type BlockStatement,
+  type BreakStatement,
   type CalculatedMemberAccessExpression,
   type ConditionalExpression,
+  type ContinueStatement,
   type ConstStatement,
+  type DoWhileStatement,
   type Expression,
+  type ForInStatement,
+  type ForOfStatement,
+  type ForStatement,
   type FunctionInvocationExpression,
   type Identifier,
+  type IfStatement,
   type LetStatement,
   type MemberAccessExpression,
   type ObjectLiteral,
   type ObjectLiteralProp,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
   type ReturnStatement,
   type SequenceExpression,
   type Statement,
   type TemplateLiteralExpression,
+  type ThrowStatement,
   type UnaryExpression,
   type VarDeclaration,
+  type WhileStatement,
 } from "../../script-runner/ScriptingSourceTree";
 import { collectVariableDependencies } from "../../script-runner/visitors";
 import { createCompiledScriptArtifact } from "../artifact";
@@ -65,6 +89,7 @@ export function compileBindingSyncExpression(
 ): CompiledScriptArtifact {
   const writer = new CompiledScriptCodeWriter(sourceId);
   const context = createCompilerContext(sourceId);
+  writer.write("runtime.start(evalContext);");
   writer.write("return ");
   emitExpression(writer, expr, context);
   writer.write(";");
@@ -146,6 +171,13 @@ function emitExpression(
     case T_ARROW_EXPRESSION:
       emitArrowExpression(writer, expr, context);
       return;
+    case T_ASSIGNMENT_EXPRESSION:
+      emitAssignmentExpression(writer, expr, context);
+      return;
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
+      emitPrePostExpression(writer, expr, context);
+      return;
     default:
       throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
@@ -192,11 +224,84 @@ function emitUnaryExpression(
   context: CompilerContext,
 ): void {
   if (expr.op === "delete") {
-    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+    emitDeleteExpression(writer, expr.expr, context);
+    return;
   }
   writer.write(`(${expr.op} `);
   emitExpression(writer, expr.expr, context);
   writer.write(")", expr);
+}
+
+function emitAssignmentExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: AssignmentExpression,
+  context: CompilerContext,
+): void {
+  emitWriteExpression(writer, expr.leftValue, context, (writeTarget) => {
+    if (writeTarget.kind === "local-id") {
+      writer.write(`(${writeTarget.name} ${expr.op} `);
+      emitExpression(writer, expr.expr, context);
+      writer.write(")", expr);
+      return;
+    }
+    writer.write(
+      writeTarget.kind === "id"
+        ? `runtime.assignId(${JSON.stringify(writeTarget.name)}, ${JSON.stringify(expr.op)}, `
+        : "runtime.assignMember(",
+    );
+    if (writeTarget.kind === "member") {
+      writer.write(writeTarget.objName);
+      writer.write(", ");
+      writer.write(writeTarget.memberName);
+      writer.write(`, ${JSON.stringify(expr.op)}, `);
+    }
+    emitExpression(writer, expr.expr, context);
+    writer.write(", evalContext, thread");
+    if (writeTarget.kind === "member" && writeTarget.rootName) {
+      writer.write(`, ${JSON.stringify(writeTarget.rootName)}`);
+    }
+    writer.write(")", expr);
+  });
+}
+
+function emitPrePostExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: PrefixOpExpression | PostfixOpExpression,
+  context: CompilerContext,
+): void {
+  const prefix = expr.type === T_PREFIX_OP_EXPRESSION;
+  emitWriteExpression(writer, expr.expr, context, (writeTarget) => {
+    if (writeTarget.kind === "local-id") {
+      writer.write(prefix ? `${expr.op}${writeTarget.name}` : `${writeTarget.name}${expr.op}`, expr);
+      return;
+    }
+    writer.write(
+      writeTarget.kind === "id"
+        ? `runtime.prePostId(${JSON.stringify(writeTarget.name)}, ${JSON.stringify(expr.op)}, ${prefix}, evalContext, thread)`
+        : `runtime.prePostMember(${writeTarget.objName}, ${writeTarget.memberName}, ${JSON.stringify(expr.op)}, ${prefix}, evalContext, thread${
+            writeTarget.rootName ? `, ${JSON.stringify(writeTarget.rootName)}` : ""
+          })`,
+      expr,
+    );
+  });
+}
+
+function emitDeleteExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: Expression,
+  context: CompilerContext,
+): void {
+  emitWriteExpression(writer, expr, context, (writeTarget) => {
+    if (writeTarget.kind !== "member") {
+      throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+    }
+    writer.write(
+      `runtime.deleteMember(${writeTarget.objName}, ${writeTarget.memberName}, evalContext, thread${
+        writeTarget.rootName ? `, ${JSON.stringify(writeTarget.rootName)}` : ""
+      })`,
+      expr,
+    );
+  });
 }
 
 function emitBinaryExpression(
@@ -397,7 +502,10 @@ function emitArrowBody(
       writer.write("; }", expr.statement);
       return;
     case T_BLOCK_STATEMENT:
-      emitBlockStatement(writer, expr.statement, context);
+      writer.write("{ runtime.checkTimeout(evalContext); ");
+      const blockContext = extendCompilerContext(context, collectBlockLocalNames(expr.statement));
+      expr.statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
+      writer.write("}", expr.statement);
       return;
     default:
       throwUnsupportedCompiledScriptNode(expr.statement, context.sourceId);
@@ -420,6 +528,7 @@ function emitStatement(
   stmt: Statement,
   context: CompilerContext,
 ): void {
+  writer.write("runtime.checkTimeout(evalContext);", stmt);
   switch (stmt.type) {
     case T_EMPTY_STATEMENT:
       writer.write(";", stmt);
@@ -439,6 +548,33 @@ function emitStatement(
       return;
     case T_BLOCK_STATEMENT:
       emitBlockStatement(writer, stmt, context);
+      return;
+    case T_IF_STATEMENT:
+      emitIfStatement(writer, stmt, context);
+      return;
+    case T_THROW_STATEMENT:
+      emitThrowStatement(writer, stmt, context);
+      return;
+    case T_WHILE_STATEMENT:
+      emitWhileStatement(writer, stmt, context);
+      return;
+    case T_DO_WHILE_STATEMENT:
+      emitDoWhileStatement(writer, stmt, context);
+      return;
+    case T_FOR_STATEMENT:
+      emitForStatement(writer, stmt, context);
+      return;
+    case T_FOR_OF_STATEMENT:
+      emitForOfStatement(writer, stmt, context);
+      return;
+    case T_FOR_IN_STATEMENT:
+      emitForInStatement(writer, stmt, context);
+      return;
+    case T_BREAK_STATEMENT:
+      writer.write("break;", stmt as BreakStatement);
+      return;
+    case T_CONTINUE_STATEMENT:
+      writer.write("continue;", stmt as ContinueStatement);
       return;
     default:
       throwUnsupportedCompiledScriptNode(stmt, context.sourceId);
@@ -473,6 +609,156 @@ function emitDeclarationStatement(
   writer.write(";", stmt);
 }
 
+function emitIfStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: IfStatement,
+  context: CompilerContext,
+): void {
+  writer.write("if (", stmt);
+  emitExpression(writer, stmt.cond, context);
+  writer.write(")");
+  emitStatementAsBody(writer, stmt.thenB, context);
+  if (stmt.elseB) {
+    writer.write(" else ");
+    emitStatementAsBody(writer, stmt.elseB, context);
+  }
+}
+
+function emitThrowStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ThrowStatement,
+  context: CompilerContext,
+): void {
+  writer.write("throw ", stmt);
+  emitExpression(writer, stmt.expr, context);
+  writer.write(";", stmt);
+}
+
+function emitWhileStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: WhileStatement,
+  context: CompilerContext,
+): void {
+  writer.write("while (", stmt);
+  emitExpression(writer, stmt.cond, context);
+  writer.write(") { runtime.checkTimeout(evalContext);");
+  emitStatement(writer, stmt.body, context);
+  writer.write("}", stmt);
+}
+
+function emitDoWhileStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: DoWhileStatement,
+  context: CompilerContext,
+): void {
+  writer.write("do { runtime.checkTimeout(evalContext);", stmt);
+  emitStatement(writer, stmt.body, context);
+  writer.write("} while (");
+  emitExpression(writer, stmt.cond, context);
+  writer.write(");", stmt);
+}
+
+function emitForStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ForStatement,
+  context: CompilerContext,
+): void {
+  const loopContext = extendCompilerContext(
+    context,
+    stmt.init?.type === T_LET_STATEMENT ? collectDeclarationNames(stmt.init.decls) : [],
+  );
+  writer.write("for (", stmt);
+  emitForInit(writer, stmt.init, loopContext);
+  writer.write("; ");
+  if (stmt.cond) {
+    emitExpression(writer, stmt.cond, loopContext);
+  }
+  writer.write("; ");
+  if (stmt.upd) {
+    emitExpression(writer, stmt.upd, loopContext);
+  }
+  writer.write(") { runtime.checkTimeout(evalContext);");
+  emitStatement(writer, stmt.body, loopContext);
+  writer.write("}", stmt);
+}
+
+function emitForOfStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ForOfStatement,
+  context: CompilerContext,
+): void {
+  emitForEachStatement(writer, "of", stmt, context);
+}
+
+function emitForInStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ForInStatement,
+  context: CompilerContext,
+): void {
+  emitForEachStatement(writer, "in", stmt, context);
+}
+
+function emitForEachStatement(
+  writer: CompiledScriptCodeWriter,
+  op: "of" | "in",
+  stmt: ForOfStatement | ForInStatement,
+  context: CompilerContext,
+): void {
+  assertJsIdentifier(stmt.id, context.sourceId);
+  const localBinding = stmt.varB === "let" || stmt.varB === "const";
+  const loopContext = localBinding ? extendCompilerContext(context, [stmt.id.name]) : context;
+  writer.write("for (", stmt);
+  if (localBinding) {
+    writer.write(`${stmt.varB} ${stmt.id.name} ${op} `);
+    emitExpression(writer, stmt.expr, context);
+    writer.write(") { runtime.checkTimeout(evalContext);");
+    emitStatement(writer, stmt.body, loopContext);
+    writer.write("}", stmt);
+    return;
+  }
+  const itemName = context.nextTemp();
+  writer.write(`const ${itemName} ${op} `);
+  emitExpression(writer, stmt.expr, context);
+  writer.write(`) { runtime.checkTimeout(evalContext);runtime.assignId(${JSON.stringify(stmt.id.name)}, "=", ${itemName}, evalContext, thread);`);
+  emitStatement(writer, stmt.body, loopContext);
+  writer.write("}", stmt);
+}
+
+function emitForInit(
+  writer: CompiledScriptCodeWriter,
+  init: ForStatement["init"],
+  context: CompilerContext,
+): void {
+  if (!init) return;
+  if (init.type === T_EXPRESSION_STATEMENT) {
+    emitExpression(writer, init.expr, context);
+    return;
+  }
+  if (init.type === T_LET_STATEMENT) {
+    writer.write("let ");
+    init.decls.forEach((decl, index) => {
+      if (index > 0) writer.write(", ");
+      emitVarDeclaration(writer, decl, context);
+    });
+    return;
+  }
+  throwUnsupportedCompiledScriptNode(init, context.sourceId);
+}
+
+function emitStatementAsBody(
+  writer: CompiledScriptCodeWriter,
+  stmt: Statement,
+  context: CompilerContext,
+): void {
+  if (stmt.type === T_BLOCK_STATEMENT) {
+    emitBlockStatement(writer, stmt, context);
+    return;
+  }
+  writer.write("{");
+  emitStatement(writer, stmt, context);
+  writer.write("}");
+}
+
 function emitVarDeclaration(
   writer: CompiledScriptCodeWriter,
   decl: VarDeclaration,
@@ -493,14 +779,14 @@ function collectBlockLocalNames(stmt: BlockStatement): string[] {
   const names: string[] = [];
   stmt.stmts.forEach((child) => {
     if (child.type === T_LET_STATEMENT || child.type === T_CONST_STATEMENT) {
-      child.decls.forEach((decl) => {
-        if (decl.id && !decl.aDestr && !decl.oDestr) {
-          names.push(decl.id);
-        }
-      });
+      names.push(...collectDeclarationNames(child.decls));
     }
   });
   return names;
+}
+
+function collectDeclarationNames(decls: VarDeclaration[]): string[] {
+  return decls.flatMap((decl) => (decl.id && !decl.aDestr && !decl.oDestr ? [decl.id] : []));
 }
 
 function getArrowArgName(expr: Expression, sourceId: string): string {
@@ -520,6 +806,67 @@ function getNonLocalRootIdentifier(expr: Expression, context: CompilerContext): 
       return getNonLocalRootIdentifier(expr.obj, context);
     default:
       return undefined;
+  }
+}
+
+type WriteTarget =
+  | { kind: "local-id"; name: string }
+  | { kind: "id"; name: string }
+  | { kind: "member"; objName: string; memberName: string; rootName?: string };
+
+function emitWriteExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: Expression,
+  context: CompilerContext,
+  emitWithTarget: (target: WriteTarget) => void,
+): void {
+  switch (expr.type) {
+    case T_IDENTIFIER:
+      emitWithTarget(
+        context.locals.has(expr.name)
+          ? { kind: "local-id", name: expr.name }
+          : { kind: "id", name: expr.name },
+      );
+      return;
+    case T_MEMBER_ACCESS_EXPRESSION: {
+      const objName = context.nextTemp();
+      writer.write("(() => { const ");
+      writer.write(objName);
+      writer.write(" = ");
+      emitExpression(writer, expr.obj, context);
+      writer.write("; return ");
+      emitWithTarget({
+        kind: "member",
+        objName,
+        memberName: JSON.stringify(expr.member),
+        rootName: getNonLocalRootIdentifier(expr.obj, context),
+      });
+      writer.write("; })()", expr);
+      return;
+    }
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION: {
+      const objName = context.nextTemp();
+      const memberName = context.nextTemp();
+      writer.write("(() => { const ");
+      writer.write(objName);
+      writer.write(" = ");
+      emitExpression(writer, expr.obj, context);
+      writer.write("; const ");
+      writer.write(memberName);
+      writer.write(" = ");
+      emitExpression(writer, expr.member, context);
+      writer.write("; return ");
+      emitWithTarget({
+        kind: "member",
+        objName,
+        memberName,
+        rootName: getNonLocalRootIdentifier(expr.obj, context),
+      });
+      writer.write("; })()", expr);
+      return;
+    }
+    default:
+      throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
 }
 
