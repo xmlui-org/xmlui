@@ -18,6 +18,12 @@ export {
   createCompiledScriptMapping,
   sourceRangeFromNode,
 } from "./source";
+export { bindingSyncRuntime } from "./runtime";
+export {
+  compileBindingSyncExpression,
+  compileBindingSyncExpressionSource,
+  type CompileBindingSyncExpressionOptions,
+} from "./targets/binding-sync";
 export type {
   CompiledScriptArtifact,
   CompiledScriptDiagnostic,
@@ -28,4 +34,3 @@ export type {
   CompiledScriptSourceRange,
   CompiledScriptTarget,
 } from "./types";
-

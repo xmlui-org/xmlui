@@ -1,10 +1,14 @@
 import type { LogicalThread, ValueResult } from "../../abstractions/scripting/LogicalThread";
-import type { AssignmentSymbols, PrefixOpSymbol } from "./ScriptingSourceTree";
+import { T_IDENTIFIER, type AssignmentSymbols, type Identifier, type PrefixOpSymbol } from "./ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { isBannedFunction } from "./bannedFunctions";
 import { isBannedMember } from "./bannedMembers";
-import { isPromise } from "./eval-tree-common";
-import { handleMemberBan } from "./eval-tree-common";
+import {
+  checkUdcCapability,
+  getIdentifierScope,
+  handleMemberBan,
+  isPromise,
+} from "./eval-tree-common";
 
 export type SyncRuntimeUpdateKind = "assignment" | "pre-post" | "function-call";
 
@@ -30,6 +34,34 @@ export type SyncWriteTarget = Pick<ValueResult, "valueScope" | "valueIndex"> & {
   rootName?: string;
   pathArray?: Array<string | number>;
 };
+
+export function readSyncIdentifier(
+  name: string,
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThread,
+): any {
+  const expr: Identifier = {
+    type: T_IDENTIFIER,
+    nodeId: -1,
+    name,
+  };
+  const idScope = getIdentifierScope(expr, evalContext, thread);
+  if (idScope.type === "global") {
+    handleMemberBan(isBannedMember(idScope.scope, name), evalContext.options);
+  } else if (idScope.type === "app") {
+    checkUdcCapability(evalContext, name);
+  }
+  return idScope.scope[name];
+}
+
+export function readSyncMember(
+  obj: any,
+  member: string | number,
+  evalContext: BindingTreeEvaluationContext,
+): any {
+  handleMemberBan(isBannedMember(obj, member as string), evalContext.options);
+  return evalContext.options?.defaultToOptionalMemberAccess !== false ? obj?.[member] : obj[member];
+}
 
 export function assertSyncFunctionAllowed(functionObj: any): void {
   const bannedInfo = isBannedFunction(functionObj);

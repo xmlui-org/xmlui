@@ -180,7 +180,7 @@ export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThre
 
 type IdentifierScope = "global" | "app" | "localContext" | "block";
 
-function checkUdcCapability(
+export function checkUdcCapability(
   evalContext: BindingTreeEvaluationContext,
   root: string,
   member?: string,
