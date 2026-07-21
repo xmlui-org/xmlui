@@ -24,3 +24,20 @@
 - Decision: compiled function invocation goes through `runtime.call(...)`, which delegates to the shared `callSyncFunction(...)` helper for banned-function and Promise checks.
 - Decision: compiled function calls emit the same will/did function-call update hook for non-local receiver roots, while arrow-local receiver roots do not dirty parent state.
 - Future impact: event/code-behind compilation will need a richer target-specific call helper because async, cancellation, transactional commit, and handler scheduling cannot share the binding target's sync-only `runtime.call(...)` unchanged.
+
+## Step 6 - statement subset and timeout guards
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/binding-sync.ts`, `xmlui/src/components-core/script-compiler/runtime.ts`, `xmlui/src/components-core/script-runner/sync-runtime.ts`.
+- Observation: native JavaScript cannot be preempted externally, so compiled sync timeout must be generated into the code at function entry, statement boundaries, and loop bodies.
+- Observation: the shared `deleteSyncTarget(...)` helper originally returned only a dirty/change descriptor; compiled JavaScript `delete` expressions also need the boolean operator result.
+- Decision: the shared delete helper now stores the JavaScript delete result in the change descriptor's `newValue`, preserving existing path/action/kind semantics while allowing compiled `delete` to return the correct value.
+- Decision: the current statement compiler supports a deliberately scoped subset: block, expression, return, simple let/const, if/else, throw, while, do/while, for, for/of, for/in, break, and continue. Try/catch/finally, switch, function declaration hoisting, destructuring declarations, and reactive `var` remain unsupported in compiled mode for now.
+- Future impact: the timeout guard insertion points are a precursor to source-map-aware codegen and should move into a reusable statement/code writer layer before event/code-behind compilation.
+
+## Step 7 - parse-time compiled artifact opt-in
+
+- Affected modules: `xmlui/src/components-core/script-runner/ParameterParser.ts`, `xmlui/src/components-core/script-runner/AttributeValueParser.ts`, `xmlui/src/abstractions/scripting/Compilation.ts`.
+- Observation: parse-time compilation cannot be enabled unconditionally yet because unsupported compiled statement nodes would make existing valid XMLUI markup fail during parse.
+- Decision: both parameter and attribute parsers accept an opt-in `compileBindings` parse option and keep their default output compatible with existing callers.
+- Decision: compiled artifacts are stored next to the parsed expression (`ExpressionSection.compiled` and `PropertySegment.compiled`) and remain JSON-serializable, with no `nativeFn`.
+- Future impact: runtime and Vite build-time integration can use the same artifact field; the next step should decide where app-level `xmluiConfig.compileBindings` flows into these parser options.

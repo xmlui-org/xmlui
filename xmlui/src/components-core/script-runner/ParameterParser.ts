@@ -1,12 +1,22 @@
 import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
+import type { CompiledScriptArtifact } from "../script-compiler/types";
+import { compileBindingSyncExpression } from "../script-compiler/targets/binding-sync";
+
+export type ParseBindingOptions = {
+  compileBindings?: boolean;
+  sourceId?: string;
+};
 
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseParameterString (source: string): (StringLiteralSection | ExpressionSection)[] {
+export function parseParameterString (
+  source: string,
+  options: ParseBindingOptions = {},
+): (StringLiteralSection | ExpressionSection)[] {
   const result: (StringLiteralSection | ExpressionSection)[] = [];
   if (source === undefined || source === null) return result;
 
@@ -67,10 +77,13 @@ export function parseParameterString (source: string): (StringLiteralSection | E
           // --- Unclosed expression, back to its beginning
           throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
+          const segmentIndex = result.length;
+          const exprText = exprSource.substring(0, exprSource.length - tail.length);
           // --- Successfully parsed expression
           result.push({
             type: "expression",
-            value: expr!
+            value: expr!,
+            compiled: createCompiledBindingArtifact(expr!, exprText, options, segmentIndex),
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
@@ -110,6 +123,21 @@ export function parseParameterString (source: string): (StringLiteralSection | E
   return result;
 }
 
+function createCompiledBindingArtifact(
+  expr: Expression,
+  sourceText: string,
+  options: ParseBindingOptions,
+  segmentIndex: number,
+): CompiledScriptArtifact | undefined {
+  if (!options.compileBindings) {
+    return undefined;
+  }
+  return compileBindingSyncExpression(expr, {
+    sourceId: `${options.sourceId ?? "inline"}#expr-${segmentIndex}`,
+    sourceText,
+  });
+}
+
 enum ParsePhase {
   StringLiteral,
   Escape,
@@ -130,4 +158,7 @@ type ExpressionSection = {
 
   // --- The expression string to parse
   value: Expression;
+
+  // --- Optional compiled representation of the expression
+  compiled?: CompiledScriptArtifact;
 };

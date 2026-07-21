@@ -1,6 +1,8 @@
 import type { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
 import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
+import { compileBindingSyncExpression } from "../script-compiler/targets/binding-sync";
+import type { ParseBindingOptions } from "./ParameterParser";
 
 let lastParseId = 0;
 
@@ -9,7 +11,10 @@ let lastParseId = 0;
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseAttributeValue(source: string): ParsedPropertyValue {
+export function parseAttributeValue(
+  source: string,
+  options: ParseBindingOptions = {},
+): ParsedPropertyValue {
   const result: ParsedPropertyValue = {
     __PARSED: true,
     parseId: ++lastParseId,
@@ -73,9 +78,17 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
           // --- Unclosed expression, back to its beginning
           throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
+          const segmentIndex = result.segments?.length ?? 0;
+          const exprText = exprSource.substring(0, exprSource.length - tail.length);
           // --- Successfully parsed expression, get dependencies
           result.segments.push({
             expr,
+            compiled: options.compileBindings
+              ? compileBindingSyncExpression(expr!, {
+                  sourceId: `${options.sourceId ?? `attribute:${result.parseId}`}#expr-${segmentIndex}`,
+                  sourceText: exprText,
+                })
+              : undefined,
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
