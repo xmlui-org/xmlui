@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
+import { extractParam } from "../../../src/components-core/utils/extractParam";
 import {
   bindingSyncRuntime,
   compileBindingSyncExpressionSource,
@@ -257,5 +258,79 @@ describe("binding-sync expression compiler", () => {
       UnsupportedCompiledScriptNodeError,
     );
     expect(evalInterpreted("new Date(0)")).toBeInstanceOf(Date);
+  });
+
+  it("uses the interpreter when compileBindings is disabled", () => {
+    expect(
+      evalBindingExpression(
+        "new Date(0)",
+        createEvalContext({
+          localContext: {},
+          options: { defaultToOptionalMemberAccess: true, compileBindings: false },
+        }),
+      ),
+    ).toBeInstanceOf(Date);
+  });
+
+  it("uses compiled execution when compileBindings is enabled", () => {
+    expect(
+      evalBindingExpression(
+        "count + 1",
+        createEvalContext({
+          localContext: { count: 2 },
+          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        }),
+      ),
+    ).toBe(3);
+  });
+
+  it("does not fall back to the interpreter for unsupported compiled nodes", () => {
+    expect(() =>
+      evalBindingExpression(
+        "new Date(0)",
+        createEvalContext({
+          localContext: {},
+          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        }),
+      ),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
+  });
+
+  it("uses compileBindings from app config through extractParam", () => {
+    expect(
+      extractParam(
+        { count: 2 },
+        "{count + 1}",
+        { xmluiConfig: { compileBindings: true } } as any,
+      ),
+    ).toBe(3);
+  });
+
+  it("lets compiled dirty roots identify the affected dependency set", () => {
+    const bindings = [
+      compileBindingSyncExpressionSource("count + 1", "test:dirty:count"),
+      compileBindingSyncExpressionSource("label", "test:dirty:label"),
+      compileBindingSyncExpressionSource("user.name", "test:dirty:user"),
+    ];
+    const dirtyRoots = new Set<string>();
+
+    const value = evalBindingExpression(
+      "(() => { count += 1; return count; })()",
+      createEvalContext({
+        localContext: { count: 1, label: "A", user: { name: "Ada" } },
+        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        onDidUpdate: (_scope, index) => {
+          dirtyRoots.add(String(index));
+        },
+      }),
+    );
+
+    const affected = bindings
+      .filter((binding) => binding.dependencies.some((dep) => dirtyRoots.has(dep)))
+      .map((binding) => binding.sourceId);
+
+    expect(value).toBe(2);
+    expect(Array.from(dirtyRoots)).toEqual(["count"]);
+    expect(affected).toEqual(["test:dirty:count"]);
   });
 });

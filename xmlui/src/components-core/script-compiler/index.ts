@@ -24,6 +24,11 @@ export {
   compileBindingSyncExpressionSource,
   type CompileBindingSyncExpressionOptions,
 } from "./targets/binding-sync";
+export {
+  clearBindingSyncCompilerCache,
+  evaluateCompiledBinding,
+  evaluateCompiledBindingExpressionSource,
+} from "./targets/binding-sync-executor";
 export type {
   CompiledScriptArtifact,
   CompiledScriptDiagnostic,

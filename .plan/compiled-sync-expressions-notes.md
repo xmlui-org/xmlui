@@ -41,3 +41,12 @@
 - Decision: both parameter and attribute parsers accept an opt-in `compileBindings` parse option and keep their default output compatible with existing callers.
 - Decision: compiled artifacts are stored next to the parsed expression (`ExpressionSection.compiled` and `PropertySegment.compiled`) and remain JSON-serializable, with no `nativeFn`.
 - Future impact: runtime and Vite build-time integration can use the same artifact field; the next step should decide where app-level `xmluiConfig.compileBindings` flows into these parser options.
+
+## Step 8 - runtime switch
+
+- Affected modules: `xmlui/src/components-core/script-runner/eval-tree-sync.ts`, `xmlui/src/components-core/script-compiler/targets/binding-sync-executor.ts`.
+- Observation: the public sync binding entry points can switch on `evalContext.options.compileBindings` without changing callers; existing config propagation through `extractParam` is enough for app-level opt-in.
+- Decision: flag `false` or absent uses only the interpreter; flag `true` uses only compiled execution. Unsupported compiled nodes throw `UnsupportedCompiledScriptNodeError` with no interpreter fallback.
+- Decision: compiled runtime execution uses a small module-level artifact cache keyed by target, source id/source text or AST node id, compiler version, and relevant eval options.
+- Observation: dirty-root update hooks emitted by compiled assignments can drive the same dependency intersection model as the interpreter path; a unit smoke test now verifies that only bindings whose dependencies intersect the dirty root set are selected.
+- Future impact: parse-time artifacts are not consumed by the runtime switch yet; later Vite/build-time work should instantiate those serialized artifacts directly instead of recompiling from source/AST.
