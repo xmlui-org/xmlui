@@ -1,7 +1,10 @@
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
+import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import {
   applySyncAssignment,
   applySyncPrePost,
+  assertSyncResult,
   callSyncFunction,
   deleteSyncTarget,
   notifySyncFunctionCallUpdate,
@@ -13,7 +16,7 @@ import {
   type AssignmentSymbols,
   type PrefixOpSymbol,
 } from "../script-runner/ScriptingSourceTree";
-import { getIdentifierScope } from "../script-runner/eval-tree-common";
+import { getIdentifierScope, obtainClosures } from "../script-runner/eval-tree-common";
 
 const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
@@ -41,6 +44,24 @@ export const bindingSyncRuntime = {
     return readSyncMember(obj, member, evalContext);
   },
 
+  arrow(
+    expr: ArrowExpression,
+    evalContext: BindingTreeEvaluationContext,
+    thread?: any,
+  ): ArrowExpression {
+    const lazyArrow = {
+      ...expr,
+      _ARROW_EXPR_: true,
+      closureContext: obtainClosures(thread ?? evalContext.mainThread),
+    } as ArrowExpression;
+    Object.defineProperty(lazyArrow, "closureEvalContext", {
+      value: evalContext,
+      enumerable: false,
+      configurable: true,
+    });
+    return lazyArrow;
+  },
+
   call(
     functionObj: any,
     thisArg: any,
@@ -51,10 +72,32 @@ export const bindingSyncRuntime = {
   ): any {
     notifySyncFunctionCallUpdate(updateRootName, "will", evalContext, thread);
     try {
+      if (isArrowExpressionObject(functionObj)) {
+        if (!evalContext.compiledArrowInvoker) {
+          throw new Error("Cannot invoke XMLUI arrow expression from compiled binding context.");
+        }
+        const result = evalContext.compiledArrowInvoker(functionObj, args, evalContext, thread);
+        assertSyncResult(result);
+        return result;
+      }
+      const callArgs = args.map((arg) =>
+        isArrowExpressionObject(arg)
+          ? (...arrowArgs: any[]) => {
+              if (!evalContext.compiledArrowInvoker) {
+                throw new Error(
+                  "Cannot invoke XMLUI arrow expression from compiled binding context.",
+                );
+              }
+              const result = evalContext.compiledArrowInvoker(arg, arrowArgs, evalContext, thread);
+              assertSyncResult(result);
+              return result;
+            }
+          : arg,
+      );
       return callSyncFunction({
         functionObj,
         thisArg,
-        args,
+        args: callArgs,
         evalContext,
         optional: evalContext.options?.defaultToOptionalMemberAccess,
       });
@@ -96,7 +139,12 @@ export const bindingSyncRuntime = {
     notifySyncFunctionCallUpdate(rootName, "will", evalContext, thread, "assignment");
     try {
       return applySyncAssignment(
-        { valueScope: obj, valueIndex: member, rootName, pathArray: rootName ? [rootName, member] : [member] },
+        {
+          valueScope: obj,
+          valueIndex: member,
+          rootName,
+          pathArray: rootName ? [rootName, member] : [member],
+        },
         op,
         value,
         evalContext,
@@ -139,7 +187,12 @@ export const bindingSyncRuntime = {
     notifySyncFunctionCallUpdate(rootName, "will", evalContext, thread, "pre-post");
     try {
       return applySyncPrePost(
-        { valueScope: obj, valueIndex: member, rootName, pathArray: rootName ? [rootName, member] : [member] },
+        {
+          valueScope: obj,
+          valueIndex: member,
+          rootName,
+          pathArray: rootName ? [rootName, member] : [member],
+        },
         op,
         prefix,
         evalContext,
@@ -159,7 +212,12 @@ export const bindingSyncRuntime = {
     notifySyncFunctionCallUpdate(rootName, "will", evalContext, thread, "assignment");
     try {
       return deleteSyncTarget(
-        { valueScope: obj, valueIndex: member, rootName, pathArray: rootName ? [rootName, member] : [member] },
+        {
+          valueScope: obj,
+          valueIndex: member,
+          rootName,
+          pathArray: rootName ? [rootName, member] : [member],
+        },
         evalContext,
       ).newValue;
     } finally {

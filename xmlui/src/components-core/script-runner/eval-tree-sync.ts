@@ -69,10 +69,7 @@ import {
 import { ensureMainThread } from "./process-statement-common";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { assertSyncResult, callSyncFunction } from "./sync-runtime";
-import {
-  evaluateCompiledBinding,
-  evaluateCompiledBindingExpressionSource,
-} from "../script-compiler";
+import { evaluateCompiledBinding } from "../script-compiler";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -97,10 +94,6 @@ export function evalBindingExpression(
   // --- Use the main thread by default
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
-
-  if (evalContext.options?.compileBindings) {
-    return evaluateCompiledBindingExpressionSource(source, evalContext, thread);
-  }
 
   // --- Parse the source code
   const wParser = new Parser(source);
@@ -133,8 +126,20 @@ export function evalBinding(
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
-  if (evalContext.options?.compileBindings) {
-    return evaluateCompiledBinding(expr, evalContext, thread ?? evalContext.mainThread!);
+  if (evalContext.options?.compileBindings && expr.type !== T_ARROW_EXPRESSION) {
+    const previousArrowInvoker = evalContext.compiledArrowInvoker;
+    evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
+      executeArrowExpressionSync(
+        arrowExpr,
+        arrowEvalContext,
+        arrowThread ?? arrowEvalContext.mainThread,
+        ...args,
+      );
+    try {
+      return evaluateCompiledBinding(expr, evalContext, thread ?? evalContext.mainThread!);
+    } finally {
+      evalContext.compiledArrowInvoker = previousArrowInvoker;
+    }
   }
   return evalBindingExpressionTree(thisStack, expr, evalContext, thread ?? evalContext.mainThread!);
 }

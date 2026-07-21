@@ -80,6 +80,7 @@ export type CompileBindingSyncExpressionOptions = {
 type CompilerContext = {
   sourceId: string;
   locals: Set<string>;
+  arrowMode: "value" | "native";
   nextTemp(): string;
 };
 
@@ -188,6 +189,15 @@ function emitIdentifier(
   expr: Identifier,
   context: CompilerContext,
 ): void {
+  if (!context.locals.has(expr.name)) {
+    switch (expr.name) {
+      case "NaN":
+      case "Infinity":
+      case "undefined":
+        writer.write(expr.name, expr);
+        return;
+    }
+  }
   if (context.locals.has(expr.name)) {
     assertJsIdentifier(expr, context.sourceId);
     writer.write(expr.name, expr);
@@ -272,7 +282,10 @@ function emitPrePostExpression(
   const prefix = expr.type === T_PREFIX_OP_EXPRESSION;
   emitWriteExpression(writer, expr.expr, context, (writeTarget) => {
     if (writeTarget.kind === "local-id") {
-      writer.write(prefix ? `${expr.op}${writeTarget.name}` : `${writeTarget.name}${expr.op}`, expr);
+      writer.write(
+        prefix ? `${expr.op}${writeTarget.name}` : `${writeTarget.name}${expr.op}`,
+        expr,
+      );
       return;
     }
     writer.write(
@@ -441,7 +454,11 @@ function emitFunctionInvocation(
 
   const updateRootName = getNonLocalRootIdentifier(expr.obj, context);
   writer.write("runtime.call(");
-  emitExpression(writer, expr.obj, context);
+  emitExpression(
+    writer,
+    expr.obj,
+    expr.obj.type === T_ARROW_EXPRESSION ? withArrowMode(context, "native") : context,
+  );
   writer.write(", evalContext.localContext, ");
   emitArgumentArray(writer, expr.arguments, context);
   writer.write(", evalContext, thread");
@@ -463,7 +480,7 @@ function emitArgumentArray(
       writer.write("...");
       emitExpression(writer, arg.expr, context);
     } else {
-      emitExpression(writer, arg, context);
+      emitExpression(writer, arg, withArrowMode(context, "native"));
     }
   });
   writer.write("]");
@@ -476,6 +493,12 @@ function emitArrowExpression(
 ): void {
   if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  if (context.arrowMode === "value") {
+    writer.write("runtime.arrow(");
+    writer.write(JSON.stringify(expr), expr);
+    writer.write(", evalContext, thread)", expr);
+    return;
   }
   const argNames = expr.args.map((arg) => getArrowArgName(arg, context.sourceId));
   const arrowContext = extendCompilerContext(context, argNames);
@@ -719,7 +742,9 @@ function emitForEachStatement(
   const itemName = context.nextTemp();
   writer.write(`const ${itemName} ${op} `);
   emitExpression(writer, stmt.expr, context);
-  writer.write(`) { runtime.checkTimeout(evalContext);runtime.assignId(${JSON.stringify(stmt.id.name)}, "=", ${itemName}, evalContext, thread);`);
+  writer.write(
+    `) { runtime.checkTimeout(evalContext);runtime.assignId(${JSON.stringify(stmt.id.name)}, "=", ${itemName}, evalContext, thread);`,
+  );
   emitStatement(writer, stmt.body, loopContext);
   writer.write("}", stmt);
 }
@@ -874,6 +899,17 @@ function literalToJs(value: any): string {
   if (typeof value === "bigint") {
     return `${value.toString()}n`;
   }
+  if (typeof value === "number") {
+    if (Number.isNaN(value)) {
+      return "NaN";
+    }
+    if (value === Infinity) {
+      return "Infinity";
+    }
+    if (value === -Infinity) {
+      return "-Infinity";
+    }
+  }
   if (value === undefined) {
     return "undefined";
   }
@@ -885,6 +921,7 @@ function createCompilerContext(sourceId: string): CompilerContext {
   return {
     sourceId,
     locals: new Set(),
+    arrowMode: "value",
     nextTemp() {
       return `__xmlui_obj_${++tempIndex}`;
     },
@@ -895,6 +932,16 @@ function extendCompilerContext(parent: CompilerContext, locals: string[]): Compi
   return {
     ...parent,
     locals: new Set([...parent.locals, ...locals]),
+  };
+}
+
+function withArrowMode(
+  parent: CompilerContext,
+  arrowMode: CompilerContext["arrowMode"],
+): CompilerContext {
+  return {
+    ...parent,
+    arrowMode,
   };
 }
 

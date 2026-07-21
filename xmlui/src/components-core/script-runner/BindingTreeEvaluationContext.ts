@@ -41,6 +41,14 @@ export type BindingTreeEvaluationContext = {
   // --- Cached closure contexts for arrow expressions
   closureContexts?: Map<ArrowExpression, BlockScope[]>;
 
+  // --- Invokes an XMLUI arrow object from compiled binding code
+  compiledArrowInvoker?: (
+    expr: ArrowExpression,
+    args: any[],
+    evalContext: BindingTreeEvaluationContext,
+    thread?: LogicalThread,
+  ) => any;
+
   // --- Use this context wrapper with function that support implicit context
   implicitContextGetter?: ImplicitContextGetter;
 

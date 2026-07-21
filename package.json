@@ -35,6 +35,8 @@
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
     "test": "turbo run //#_e2e",
     "_e2e": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
+    "test-compiled-bindings": "turbo run //#_e2e:compiled-bindings",
+    "_e2e:compiled-bindings": "cross-env XMLUI_COMPILE_BINDINGS=true PLAYWRIGHT_USE_DEV_SERVER=false playwright test --max-failures=10",
     "test-smoke": "turbo run //#_e2e:smoke",
     "_e2e:smoke": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke",
     "test-e2e-dev": "playwright test",

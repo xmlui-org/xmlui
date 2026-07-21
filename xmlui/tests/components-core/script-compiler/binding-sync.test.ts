@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { isArrowExpressionObject } from "../../../src/abstractions/InternalMarkers";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
 import { extractParam } from "../../../src/components-core/utils/extractParam";
@@ -31,7 +32,10 @@ function evalCompiled(source: string, localContext: any = {}) {
   });
 }
 
-function evalCompiledWithContext(source: string, evalContextParts: Parameters<typeof createEvalContext>[0]) {
+function evalCompiledWithContext(
+  source: string,
+  evalContextParts: Parameters<typeof createEvalContext>[0],
+) {
   const artifact = compileBindingSyncExpressionSource(source, `test:${source}`);
   const instance = instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime);
   return instance.execute({
@@ -49,41 +53,118 @@ describe("binding-sync expression compiler", () => {
     ["literal", "123", {}, 123],
     ["identifier", "count", { count: 2 }, 2],
     ["null member access", "user.name", { user: null }, undefined],
-    ["undefined calculated member access", "user[key]", { user: undefined, key: "name" }, undefined],
-    ["nested member access", "user.address.city", { user: { address: { city: "London" } } }, "London"],
+    [
+      "undefined calculated member access",
+      "user[key]",
+      { user: undefined, key: "name" },
+      undefined,
+    ],
+    [
+      "nested member access",
+      "user.address.city",
+      { user: { address: { city: "London" } } },
+      "London",
+    ],
     ["nullish coalescing", "value ?? fallback", { value: null, fallback: "fallback" }, "fallback"],
     ["and short-circuit", "ready && user.name", { ready: false, user: null }, false],
     ["or short-circuit", "label || fallback", { label: "", fallback: "Untitled" }, "Untitled"],
-    ["ternary", "ready ? user.name : fallback", { ready: true, user: { name: "Ada" }, fallback: "N/A" }, "Ada"],
+    [
+      "ternary",
+      "ready ? user.name : fallback",
+      { ready: true, user: { name: "Ada" }, fallback: "N/A" },
+      "Ada",
+    ],
     ["sequence", "(first, second + 1)", { first: 1, second: 2 }, 3],
-    ["array literal", "[first, second, ...rest]", { first: 1, second: 2, rest: [3, 4] }, [1, 2, 3, 4]],
-    ["object literal", "{ id: user.id, [key]: value }", { user: { id: 1 }, key: "name", value: "Ada" }, { id: 1, name: "Ada" }],
+    [
+      "array literal",
+      "[first, second, ...rest]",
+      { first: 1, second: 2, rest: [3, 4] },
+      [1, 2, 3, 4],
+    ],
+    [
+      "object literal",
+      "{ id: user.id, [key]: value }",
+      { user: { id: 1 }, key: "name", value: "Ada" },
+      { id: 1, name: "Ada" },
+    ],
     ["template literal", "`Hello ${user.name}`", { user: { name: "Ada" } }, "Hello Ada"],
     ["unary", "!ready", { ready: false }, true],
     ["binary", "count * 2 + 1", { count: 3 }, 7],
     ["global function call", "Math.floor(value)", { value: 1.8 }, 1],
+    ["NaN global constant", "NaN", {}, NaN],
+    ["Infinity global constant", "Infinity", {}, Infinity],
     ["method call with this", "text.toUpperCase()", { text: "ada" }, "ADA"],
     ["map arrow callback", "items.map(item => item.id)", { items: [{ id: 1 }, { id: 2 }] }, [1, 2]],
     [
       "filter/map arrow callback chain",
       "items.filter(item => item.ready).map(item => item.id)",
-      { items: [{ id: 1, ready: true }, { id: 2, ready: false }] },
+      {
+        items: [
+          { id: 1, ready: true },
+          { id: 2, ready: false },
+        ],
+      },
       [1],
     ],
-    ["reduce arrow callback", "items.reduce((sum, item) => sum + item, 0)", { items: [1, 2, 3] }, 6],
+    [
+      "reduce arrow callback",
+      "items.reduce((sum, item) => sum + item, 0)",
+      { items: [1, 2, 3] },
+      6,
+    ],
     ["IIFE expression body", "(() => count + 1)()", { count: 2 }, 3],
-    ["IIFE block body", "(() => { let x = count + 1; const y = x * 2; return y; })()", { count: 2 }, 6],
+    [
+      "IIFE block body",
+      "(() => { let x = count + 1; const y = x * 2; return y; })()",
+      { count: 2 },
+      6,
+    ],
     ["local let shadows state", "(() => { let count = 10; return count; })()", { count: 1 }, 10],
-    ["if statement then", "(() => { if (ready) return label; return fallback; })()", { ready: true, label: "Ready", fallback: "Fallback" }, "Ready"],
-    ["if statement else", "(() => { if (ready) return label; else return fallback; })()", { ready: false, label: "Ready", fallback: "Fallback" }, "Fallback"],
+    [
+      "if statement then",
+      "(() => { if (ready) return label; return fallback; })()",
+      { ready: true, label: "Ready", fallback: "Fallback" },
+      "Ready",
+    ],
+    [
+      "if statement else",
+      "(() => { if (ready) return label; else return fallback; })()",
+      { ready: false, label: "Ready", fallback: "Fallback" },
+      "Fallback",
+    ],
     ["local assignment", "(() => { let x = 1; x += 2; return x; })()", {}, 3],
     ["local prefix/postfix", "(() => { let x = 1; return x++ + ++x; })()", {}, 4],
-    ["while loop", "(() => { let i = 0; let sum = 0; while (i < 4) { sum += i; i++; } return sum; })()", {}, 6],
+    [
+      "while loop",
+      "(() => { let i = 0; let sum = 0; while (i < 4) { sum += i; i++; } return sum; })()",
+      {},
+      6,
+    ],
     ["do while loop", "(() => { let i = 0; do { i++; } while (i < 3); return i; })()", {}, 3],
-    ["for loop", "(() => { let sum = 0; for (let i = 0; i < 4; i++) { sum += i; } return sum; })()", {}, 6],
-    ["for of loop", "(() => { let sum = 0; for (let item of items) { sum += item; } return sum; })()", { items: [1, 2, 3] }, 6],
-    ["for in loop", "(() => { let keys = ''; for (let key in obj) { keys += key; } return keys; })()", { obj: { a: 1, b: 2 } }, "ab"],
-    ["break and continue", "(() => { let sum = 0; for (let i = 0; i < 6; i++) { if (i === 2) continue; if (i === 5) break; sum += i; } return sum; })()", {}, 8],
+    [
+      "for loop",
+      "(() => { let sum = 0; for (let i = 0; i < 4; i++) { sum += i; } return sum; })()",
+      {},
+      6,
+    ],
+    [
+      "for of loop",
+      "(() => { let sum = 0; for (let item of items) { sum += item; } return sum; })()",
+      { items: [1, 2, 3] },
+      6,
+    ],
+    [
+      "for in loop",
+      "(() => { let keys = ''; for (let key in obj) { keys += key; } return keys; })()",
+      { obj: { a: 1, b: 2 } },
+      "ab",
+    ],
+    [
+      "break and continue",
+      "(() => { let sum = 0; for (let i = 0; i < 6; i++) { if (i === 2) continue; if (i === 5) break; sum += i; } return sum; })()",
+      {},
+      8,
+    ],
   ])("matches interpreter for %s", (_name, source, localContext, expected) => {
     expect(evalInterpreted(source, localContext)).toEqual(expected);
     expect(evalCompiled(source, localContext)).toEqual(expected);
@@ -114,24 +195,22 @@ describe("binding-sync expression compiler", () => {
     const instance = instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime);
 
     const value = instance.execute({
-      evalContext: createEvalContext(
-        {
-          localContext: {
-            user: { name: "Ada" },
-            count: 1,
-            ready: false,
-            label: "Ready",
-            fallback: "Fallback",
-          },
-          options: { defaultToOptionalMemberAccess: true },
-          onWillUpdate: (_scope, index, kind) => {
-            updates.push(`will:${String(index)}:${kind}`);
-          },
-          onDidUpdate: (_scope, index, kind) => {
-            updates.push(`did:${String(index)}:${kind}`);
-          },
+      evalContext: createEvalContext({
+        localContext: {
+          user: { name: "Ada" },
+          count: 1,
+          ready: false,
+          label: "Ready",
+          fallback: "Fallback",
         },
-      ),
+        options: { defaultToOptionalMemberAccess: true },
+        onWillUpdate: (_scope, index, kind) => {
+          updates.push(`will:${String(index)}:${kind}`);
+        },
+        onDidUpdate: (_scope, index, kind) => {
+          updates.push(`did:${String(index)}:${kind}`);
+        },
+      }),
     });
 
     expect(value).toEqual(["Ada", 2, "Fallback"]);
@@ -254,9 +333,12 @@ describe("binding-sync expression compiler", () => {
     expect(() => compileBindingSyncExpressionSource("new Date()", "test:unsupported")).toThrow(
       UnsupportedCompiledScriptNodeError,
     );
-    expect(() => compileBindingSyncExpressionSource("(() => { try { return 1; } finally {} })()", "test:unsupported")).toThrow(
-      UnsupportedCompiledScriptNodeError,
-    );
+    expect(() =>
+      compileBindingSyncExpressionSource(
+        "(() => { try { return 1; } finally {} })()",
+        "test:unsupported",
+      ),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
     expect(evalInterpreted("new Date(0)")).toBeInstanceOf(Date);
   });
 
@@ -284,6 +366,79 @@ describe("binding-sync expression compiler", () => {
     ).toBe(3);
   });
 
+  it("keeps top-level arrow bindings as XMLUI arrow objects in compiled mode", () => {
+    const value = evalBindingExpression(
+      "(arg) => { return arg; }",
+      createEvalContext({
+        localContext: {},
+        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+      }),
+    );
+
+    expect(isArrowExpressionObject(value)).toBe(true);
+    expect(typeof value).not.toBe("function");
+  });
+
+  it("calls XMLUI arrow objects from compiled bindings", () => {
+    const options = { defaultToOptionalMemberAccess: true, compileBindings: true };
+    const progressFn = evalBindingExpression(
+      "(cur, tot) => (Math.floor(1000 * cur / tot)) / 10",
+      createEvalContext({ localContext: {}, options }),
+    );
+    const progressLabel = evalBindingExpression(
+      "(progressCalc, cur, tot) => 'Progress: ' + progressCalc(cur, tot) + '%'",
+      createEvalContext({ localContext: {}, options }),
+    );
+
+    expect(
+      evalBindingExpression(
+        "progressLabel(progressFn, current, total)",
+        createEvalContext({
+          localContext: { progressFn, progressLabel, current: 1, total: 200 },
+          options,
+        }),
+      ),
+    ).toBe("Progress: 0.5%");
+  });
+
+  it("keeps nested arrow values as XMLUI arrow objects in compiled bindings", () => {
+    const value = evalBindingExpression(
+      "{ a: () => { return null; }, b: { c: () => 1 } }",
+      createEvalContext({
+        localContext: {},
+        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+      }),
+    );
+
+    expect(isArrowExpressionObject(value.a)).toBe(true);
+    expect(isArrowExpressionObject(value.b.c)).toBe(true);
+    expect(
+      JSON.stringify(value, (_key, val) =>
+        isArrowExpressionObject(val) ? "[xmlui function]" : val,
+      ),
+    ).toBe('{"a":"[xmlui function]","b":{"c":"[xmlui function]"}}');
+  });
+
+  it("wraps XMLUI arrow arguments when compiled bindings call native JavaScript functions", () => {
+    const callback = evalBindingExpression(
+      "(item) => item.id",
+      createEvalContext({
+        localContext: {},
+        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+      }),
+    );
+
+    expect(
+      evalBindingExpression(
+        "items.map(callback)",
+        createEvalContext({
+          localContext: { items: [{ id: 1 }, { id: 2 }], callback },
+          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        }),
+      ),
+    ).toEqual([1, 2]);
+  });
+
   it("does not fall back to the interpreter for unsupported compiled nodes", () => {
     expect(() =>
       evalBindingExpression(
@@ -298,11 +453,7 @@ describe("binding-sync expression compiler", () => {
 
   it("uses compileBindings from app config through extractParam", () => {
     expect(
-      extractParam(
-        { count: 2 },
-        "{count + 1}",
-        { xmluiConfig: { compileBindings: true } } as any,
-      ),
+      extractParam({ count: 2 }, "{count + 1}", { xmluiConfig: { compileBindings: true } } as any),
     ).toBe(3);
   });
 
