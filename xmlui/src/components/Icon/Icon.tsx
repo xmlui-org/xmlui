@@ -68,7 +68,11 @@ export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(functio
 ) {
   const themeClass = useComponentThemeClass(IconMd);
   const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
-  return <Icon {...props} className={mergedClass} ref={ref} aria-label={tooltip} />;
+  // tooltip is stripped by wrapComponent (TooltipBehavior consumes it), so an
+  // undefined aria-label here must not clobber one merged in by the Tooltip
+  // trigger (which names icon-only buttons from the tooltip text).
+  const ariaLabel = tooltip ?? (props as Record<string, any>)["aria-label"];
+  return <Icon {...props} className={mergedClass} ref={ref} aria-label={ariaLabel} />;
 });
 
 export const iconComponentRenderer = wrapComponent(

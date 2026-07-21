@@ -1,4 +1,4 @@
-import { type ForwardedRef, forwardRef, memo } from "react";
+import { type ForwardedRef, cloneElement, forwardRef, isValidElement, memo } from "react";
 import type React from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
@@ -104,10 +104,19 @@ export const Tooltip = memo(forwardRef(function Tooltip({
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
 
+  // The tooltip text doubles as the trigger's accessible name when the
+  // trigger doesn't bring its own — icon-only buttons (Icon tooltip="...")
+  // are otherwise nameless for assistive tech, and this matches the
+  // pre-behavior Icon semantics (aria-label={tooltip}).
+  const trigger =
+    text && isValidElement(children) && !(children.props as any)?.["aria-label"]
+      ? cloneElement(children as any, { "aria-label": text })
+      : children;
+
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
       <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Trigger asChild>{trigger}</RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (
             <RadixTooltip.Content
