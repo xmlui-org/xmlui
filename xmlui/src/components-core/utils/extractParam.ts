@@ -8,6 +8,7 @@ import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { layoutOptionKeys } from "../descriptorHelper";
@@ -30,6 +31,8 @@ export function extractParam(
   extractContext: { didResolve: boolean } = { didResolve: false },
   evalOptions: EvalTreeOptions = {},
 ): any {
+  const bindingEvalOptions = createBindingEvalOptions(appContext, evalOptions);
+
   if (typeof param === "string") {
     const paramSegments = parseParameterString(param);
     if (paramSegments.length === 0) {
@@ -69,7 +72,7 @@ export function extractParam(
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
-            ...evalOptions,
+            ...bindingEvalOptions,
           },
         });
       }
@@ -86,7 +89,7 @@ export function extractParam(
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
-            ...evalOptions,
+            ...bindingEvalOptions,
           },
         });
         if (exprValue?.toString) {
@@ -107,7 +110,7 @@ export function extractParam(
   if (Array.isArray(param)) {
     const arrayExtractContext = { didResolve: false };
     let resolvedChildren = param.map((childParam) =>
-      extractParam(state, childParam, appContext, false, arrayExtractContext, evalOptions),
+      extractParam(state, childParam, appContext, false, arrayExtractContext, bindingEvalOptions),
     );
     if (arrayExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -127,7 +130,7 @@ export function extractParam(
         appContext,
         false,
         objectExtractContext,
-        evalOptions,
+        bindingEvalOptions,
       );
     });
     if (objectExtractContext.didResolve) {

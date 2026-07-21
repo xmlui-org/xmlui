@@ -48,6 +48,7 @@ import { CodeBehindParseError } from "./ContainerUtils";
 import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -167,6 +168,10 @@ export const StateContainer = memo(
       appContext.xmluiConfig?.udcTrust,
       node.udcContract,
     ]);
+    const bindingEvalOptions = useMemo(
+      () => createBindingEvalOptions(appContext, udcEvalOptions),
+      [appContext, udcEvalOptions],
+    );
 
     // ========================================================================
     // STATE COMPOSITION PIPELINE DOCUMENTATION
@@ -333,7 +338,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContext,
       useRef<MemoedVars>(new Map()), // Temporary cache, discarded after this pass
-      udcEvalOptions,
+      bindingEvalOptions,
     );
 
     // Merge pre-resolved variables into context for second pass
@@ -348,7 +353,7 @@ export const StateContainer = memo(
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars, // Persistent cache for performance
-      udcEvalOptions,
+      bindingEvalOptions,
     );
 
     // ========================================================================

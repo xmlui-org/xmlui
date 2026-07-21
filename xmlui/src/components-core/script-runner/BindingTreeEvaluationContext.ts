@@ -99,6 +99,17 @@ class CancellationToken {
 export type EvalTreeOptions = {
   defaultToOptionalMemberAccess?: boolean;
   /**
+   * Experimental switch for compiled synchronous binding expressions.
+   *
+   * Default: `false`. Step 1 only propagates the option through the binding
+   * evaluation call chain; the existing AST interpreter remains the only
+   * evaluator until the compiler target is implemented.
+   *
+   * Set via `App.xmluiConfig.compileBindings` in config.json or the App
+   * component.
+   */
+  compileBindings?: boolean;
+  /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access
    * still proceeds but emits a `console.warn` and a `"sandbox:warn"` trace

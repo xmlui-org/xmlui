@@ -61,6 +61,7 @@ import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
 import { emitRuntimeTypeContractDiagnostics } from "../type-contracts/runtime";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
 
 /**
  * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
@@ -291,13 +292,17 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
+    const bindingEvalOptions = createBindingEvalOptions(
+      appContext,
+      (appContext as any)?.__udcEvalOptions,
+    );
     return createValueExtractor(
       state,
       appContext,
       referenceTrackedApi,
       memoedVarsRef,
       fnDeps,
-      (appContext as any)?.__udcEvalOptions,
+      bindingEvalOptions,
     );
   }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
