@@ -30,6 +30,11 @@ function evalCompiled(source: string, localContext: any = {}) {
   });
 }
 
+function createCompiledInstance(source: string) {
+  const artifact = compileBindingSyncExpressionSource(source, `test:${source}`);
+  return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime);
+}
+
 describe("binding-sync expression compiler", () => {
   it.each([
     ["literal", "123", {}, 123],
@@ -47,6 +52,19 @@ describe("binding-sync expression compiler", () => {
     ["template literal", "`Hello ${user.name}`", { user: { name: "Ada" } }, "Hello Ada"],
     ["unary", "!ready", { ready: false }, true],
     ["binary", "count * 2 + 1", { count: 3 }, 7],
+    ["global function call", "Math.floor(value)", { value: 1.8 }, 1],
+    ["method call with this", "text.toUpperCase()", { text: "ada" }, "ADA"],
+    ["map arrow callback", "items.map(item => item.id)", { items: [{ id: 1 }, { id: 2 }] }, [1, 2]],
+    [
+      "filter/map arrow callback chain",
+      "items.filter(item => item.ready).map(item => item.id)",
+      { items: [{ id: 1, ready: true }, { id: 2, ready: false }] },
+      [1],
+    ],
+    ["reduce arrow callback", "items.reduce((sum, item) => sum + item, 0)", { items: [1, 2, 3] }, 6],
+    ["IIFE expression body", "(() => count + 1)()", { count: 2 }, 3],
+    ["IIFE block body", "(() => { let x = count + 1; const y = x * 2; return y; })()", { count: 2 }, 6],
+    ["local let shadows state", "(() => { let count = 10; return count; })()", { count: 1 }, 10],
   ])("matches interpreter for %s", (_name, source, localContext, expected) => {
     expect(evalInterpreted(source, localContext)).toEqual(expected);
     expect(evalCompiled(source, localContext)).toEqual(expected);
@@ -101,11 +119,67 @@ describe("binding-sync expression compiler", () => {
     expect(updates).toEqual([]);
   });
 
+  it("notifies function-call updates for non-local receiver roots", () => {
+    const updates: string[] = [];
+    const localContext = { items: [1, 2] };
+    const instance = createCompiledInstance("items.push(3)");
+
+    const value = instance.execute({
+      evalContext: createEvalContext({
+        localContext,
+        options: { defaultToOptionalMemberAccess: true },
+        onWillUpdate: (_scope, index, kind) => {
+          updates.push(`will:${String(index)}:${kind}`);
+        },
+        onDidUpdate: (_scope, index, kind) => {
+          updates.push(`did:${String(index)}:${kind}`);
+        },
+      }),
+    });
+
+    expect(value).toBe(3);
+    expect(localContext.items).toEqual([1, 2, 3]);
+    expect(updates).toEqual(["will:items:function-call", "did:items:function-call"]);
+  });
+
+  it("does not notify function-call updates for arrow-local receiver roots", () => {
+    const updates: string[] = [];
+    const instance = createCompiledInstance("items.map(item => item.tags.join(','))");
+
+    const value = instance.execute({
+      evalContext: createEvalContext({
+        localContext: { items: [{ tags: ["a", "b"] }] },
+        options: { defaultToOptionalMemberAccess: true },
+        onWillUpdate: (_scope, index, kind) => {
+          updates.push(`will:${String(index)}:${kind}`);
+        },
+        onDidUpdate: (_scope, index, kind) => {
+          updates.push(`did:${String(index)}:${kind}`);
+        },
+      }),
+    });
+
+    expect(value).toEqual(["a,b"]);
+    expect(updates).toEqual(["will:items:function-call", "did:items:function-call"]);
+  });
+
+  it("rejects banned functions through the compiled runtime call helper", () => {
+    expect(() => evalCompiled("setTimeout(() => 1, 0)")).toThrow("not allowed to call");
+  });
+
+  it("rejects promises returned from compiled binding calls", () => {
+    expect(() => evalCompiled("load()", { load: () => Promise.resolve(1) })).toThrow(
+      "Promises (async function calls) are not allowed in binding expressions.",
+    );
+  });
+
   it("throws unsupported-node errors instead of falling back to the interpreter", () => {
     expect(() => compileBindingSyncExpressionSource("new Date()", "test:unsupported")).toThrow(
       UnsupportedCompiledScriptNodeError,
     );
-    expect(() => compileBindingSyncExpressionSource("Math.floor(1.2)", "test:unsupported")).toThrow(
+    expect(() =>
+      compileBindingSyncExpressionSource("(() => { count = 2; return count; })()", "test:unsupported"),
+    ).toThrow(
       UnsupportedCompiledScriptNodeError,
     );
     expect(evalInterpreted("new Date(0)")).toBeInstanceOf(Date);

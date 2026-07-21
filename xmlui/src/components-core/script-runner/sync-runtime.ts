@@ -63,6 +63,24 @@ export function readSyncMember(
   return evalContext.options?.defaultToOptionalMemberAccess !== false ? obj?.[member] : obj[member];
 }
 
+export function notifySyncFunctionCallUpdate(
+  rootName: string | undefined,
+  phase: "will" | "did",
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThread,
+): void {
+  if (!rootName) return;
+  const rootExpr: Identifier = {
+    type: T_IDENTIFIER,
+    nodeId: -1,
+    name: rootName,
+  };
+  const rootScope = getIdentifierScope(rootExpr, evalContext, thread);
+  if (!rootScope.type || rootScope.type === "block") return;
+  const hook = phase === "will" ? evalContext.onWillUpdate : evalContext.onDidUpdate;
+  void hook?.({ type: rootScope.type, name: rootName }, rootName, "function-call");
+}
+
 export function assertSyncFunctionAllowed(functionObj: any): void {
   const bannedInfo = isBannedFunction(functionObj);
   if (bannedInfo.banned) {
