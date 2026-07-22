@@ -20,7 +20,7 @@ describe("event-async compiled script target", () => {
       dependencies: [],
       diagnostics: [],
     });
-    expect(artifact.js).toContain('runtime.unsupported("event-async"');
+    expect(artifact.js).toContain("return (async () =>");
     expect(serializeCompiledScriptArtifact(artifact)).not.toContain("nativeFn");
   });
 
@@ -44,14 +44,21 @@ describe("event-async compiled script target", () => {
     });
   });
 
-  it("throws a structured unsupported error when executed", async () => {
+  it("executes the supported statement subset", async () => {
     const artifact = compileEventAsyncStatementSource("count = count + 1;", "Main.xmlui#event-3");
+    const evalContext = {
+      localContext: { count: 1 },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
 
-    await expect(
-      executeCompiledEventAsyncArtifact(artifact, {
-        localContext: { count: 1 },
-        options: { compileEventHandlers: true },
-      } as any),
-    ).rejects.toThrow(UnsupportedCompiledScriptNodeError);
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.count).toBe(2);
+  });
+
+  it("throws a structured unsupported error for unsupported nodes", () => {
+    expect(() =>
+      compileEventAsyncStatementSource("while (true) { count++; }", "Main.xmlui#event-4"),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 });

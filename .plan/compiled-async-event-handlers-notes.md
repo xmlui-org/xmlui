@@ -17,3 +17,22 @@
 - Decision: the first generated artifact is intentionally executable only as an unsupported skeleton. Running it throws `UnsupportedCompiledScriptNodeError`, with source id and source range preserved.
 - Observation: statement source ranges currently follow the scripting AST token ranges; an expression statement's range may exclude the trailing semicolon.
 - Future impact: parse-time artifacts are now available for Vite build-time compilation, source maps, and browser debug plumbing before the async runtime/codegen is implemented.
+
+## Step 3 - async event runtime helper contract
+
+- Affected modules: `xmlui/src/components-core/script-compiler/event-runtime.ts`, `xmlui/src/components-core/script-compiler/targets/event-async-executor.ts`.
+- Decision: `eventAsyncRuntime` is a standalone target runtime, shared by the unsupported executor skeleton and future generated event code.
+- Decision: the first helper surface covers `start`, `beforeStatement`, `afterStatement`, `yield`, `checkCancel`, identifier/member reads, `complete`, `call`, `construct`, and write/pre-post/delete helpers.
+- Decision: `call(...)` is async by contract. It rejects banned functions, invokes lazy XMLUI arrows through `executeArrowExpression`, uses existing async array proxies, and completes nested promises with `completePromise()`.
+- Observation: generated event code will need to pass root names into `call(...)` and write helpers so runtime hooks can preserve state-update notification semantics.
+- Future impact: Step 4 can start emitting a tiny statement subset against this runtime without re-deciding Promise completion, cancellation, yield, or async callback semantics.
+
+## Step 4 - minimal executable statement subset
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/compiled-events/event-async-basic.test.ts`.
+- Decision: `event-async` artifacts now emit an async IIFE instead of the unsupported skeleton for supported nodes.
+- Decision: the first supported statement subset is expression statement, return, block, simple `let`/`const`, if/else, identifier/member assignment, prefix/postfix, binary/unary expressions, member reads, and function invocation.
+- Decision: every emitted statement calls `runtime.beforeStatement(...)` and `runtime.afterStatement(...)`; return statements store the return value, run the completion hook, then return.
+- Observation: member writes and member calls need async IIFEs so receiver/member expressions can be completed before calling runtime helpers.
+- Observation: unsupported nodes now fail at compile time in compiled mode, matching the accepted no-fallback decision.
+- Future impact: the next expansion can add loops/try/switch/function declarations while preserving the same statement-boundary shape.

@@ -19,6 +19,7 @@ export {
   sourceRangeFromNode,
 } from "./source";
 export { bindingSyncRuntime } from "./runtime";
+export { eventAsyncRuntime } from "./event-runtime";
 export {
   compileBindingSyncExpression,
   compileBindingSyncExpressionSource,
@@ -36,7 +37,6 @@ export {
 } from "./targets/binding-sync-executor";
 export {
   clearEventAsyncCompilerCache,
-  eventAsyncRuntime,
   executeCompiledEventAsyncArtifact,
   executeCompiledEventAsyncStatements,
 } from "./targets/event-async-executor";

@@ -3,17 +3,11 @@ import type { BindingTreeEvaluationContext } from "../../script-runner/BindingTr
 import type { Statement } from "../../script-runner/ScriptingSourceTree";
 import { instantiateCompiledScriptArtifact } from "../artifact";
 import { createCompiledScriptCache, createCompiledScriptCacheKey } from "../cache";
-import { UnsupportedCompiledScriptNodeError } from "../errors";
+import { eventAsyncRuntime } from "../event-runtime";
 import type { CompiledScriptArtifact } from "../types";
 import { compileEventAsyncStatements } from "./event-async";
 
 const eventAsyncCache = createCompiledScriptCache();
-
-export const eventAsyncRuntime = {
-  unsupported(target: string, sourceId: string, sourceRange?: any): never {
-    throw new UnsupportedCompiledScriptNodeError(target, sourceId, sourceRange);
-  },
-};
 
 export async function executeCompiledEventAsyncArtifact(
   artifact: CompiledScriptArtifact,
