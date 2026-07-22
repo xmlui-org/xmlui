@@ -104,13 +104,15 @@ export const Tooltip = memo(forwardRef(function Tooltip({
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
 
-  // The tooltip text doubles as the trigger's accessible name when the
-  // trigger doesn't bring its own — icon-only buttons (Icon tooltip="...")
-  // are otherwise nameless for assistive tech, and this matches the
-  // pre-behavior Icon semantics (aria-label={tooltip}).
+  // Pass the plain tooltip text to the trigger as an inert data attribute.
+  // Components that are nameless without it (Icon) use it as their
+  // accessible name; text-bearing triggers keep name-from-content, and
+  // Radix supplies aria-describedby when the tooltip opens. Setting
+  // aria-label here directly would override the accessible name of
+  // labeled triggers (buttons, links), which breaks name-from-content.
   const trigger =
-    text && isValidElement(children) && !(children.props as any)?.["aria-label"]
-      ? cloneElement(children as any, { "aria-label": text })
+    text && isValidElement(children)
+      ? cloneElement(children as any, { "data-tooltip-text": text })
       : children;
 
   return (
