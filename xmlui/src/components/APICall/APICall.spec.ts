@@ -1255,6 +1255,39 @@ test.describe("Basic Functionality", () => {
       expect(await testStateDriver.testState()).toBeLessThan(1000);
     });
 
+    test("flushes onSuccess UI updates after form submit under strict determinism", async ({
+      initTestBed,
+      page,
+      createTextBoxDriver,
+    }) => {
+      await initTestBed(
+        `
+        <Fragment var.savedId="{null}">
+          <APICall
+            id="savePick"
+            url="/api/test/1"
+            method="post"
+            body="{$param}"
+            onSuccess="result => savedId = result.id" />
+          <Form onSubmit="data => savePick.execute(data)" submitFeedbackDelay="0">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+          </Form>
+          <Text when="{savedId}" testId="success">Saved {savedId}</Text>
+        </Fragment>
+      `,
+        {
+          apiInterceptor: basicApiInterceptor,
+          appGlobals: { strictDeterminism: true, defaultHandlerTimeoutMs: 5000 },
+        },
+      );
+
+      const input = await createTextBoxDriver(page.getByTestId("nameField"));
+      await input.field.fill("Calendar Pick");
+      await page.getByRole("button", { name: "Save" }).click();
+
+      await expect(page.getByTestId("success")).toHaveText("Saved 2", { timeout: 1000 });
+    });
+
     test("accepts parameters", async ({ initTestBed, createButtonDriver }) => {
       const { testStateDriver } = await initTestBed(
         `
