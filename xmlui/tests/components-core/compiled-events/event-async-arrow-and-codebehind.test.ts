@@ -5,6 +5,7 @@ import {
   compileEventAsyncStatements,
   executeCompiledEventAsyncArtifact,
 } from "../../../src/components-core/script-compiler";
+import { createCoWStateProxy } from "../../../src/components-core/container/cow-state-proxy";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
@@ -152,6 +153,125 @@ describe("compiled event-async arrow and callback calls", () => {
       items: [1, 2, 3],
       result: [],
     });
+  });
+
+  it("initializes a main thread for deferred host callbacks", async () => {
+    let callback: ((event: { payload: string }) => Promise<void>) | undefined;
+    const cancelToken = {
+      aborted: false,
+      throwIfAborted() {
+        if (this.aborted) {
+          throw new Error("cancelled");
+        }
+      },
+    };
+    const state = {
+      $cancel: cancelToken,
+      value: "none",
+      subscribe: (handler: (event: { payload: string }) => Promise<void>) => {
+        callback = handler;
+      },
+    };
+    let changes: any[] = [];
+    const createLocalContext = () =>
+      createCoWStateProxy({ ...state }, (changeInfo) => {
+        changes.push(changeInfo);
+      });
+    const evalContext = {
+      localContext: createLocalContext(),
+      onStatementCompleted: () => {
+        for (const change of changes) {
+          state[change.pathArray[0] as keyof typeof state] = change.newValue;
+        }
+        changes = [];
+        evalContext.localContext = createLocalContext();
+      },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+    const artifact = compileEventAsyncStatementSource(
+      "subscribe((event) => { value = event.payload; });",
+      "test:event:deferred-host-callback",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+    cancelToken.aborted = true;
+    await callback?.({ payload: "hammer" });
+
+    expect(state.value).toBe("hammer");
+  });
+
+  it("passes implicit context to component API member calls", async () => {
+    const calls: any[] = [];
+    const localContext = {
+      api: {
+        _SUPPORT_IMPLICIT_CONTEXT: true,
+        execute: async (executionContext: any, body: any) => {
+          calls.push({ executionContext, body });
+        },
+      },
+    };
+    const evalContext = {
+      localContext,
+      implicitContextGetter: (hostObject: any) => ({
+        hostObject,
+        appContext: { marker: "ctx" },
+      }),
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+    const artifact = compileEventAsyncStatementSource(
+      "api.execute({ name: 'John' });",
+      "test:event:implicit-context-member-call",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(calls).toEqual([
+      {
+        executionContext: {
+          hostObject: localContext.api,
+          appContext: { marker: "ctx" },
+        },
+        body: { name: "John" },
+      },
+    ]);
+  });
+
+  it("passes implicit context to bare component API function references", async () => {
+    const calls: any[] = [];
+    const localContext = {
+      api: {
+        _SUPPORT_IMPLICIT_CONTEXT: true,
+        execute: async (executionContext: any, body: any, options: any) => {
+          calls.push({ executionContext, body, options });
+        },
+      },
+    };
+    const evalContext = {
+      localContext,
+      eventArgs: [{ name: "John" }, { passAsDefaultBody: true }],
+      implicitContextGetter: (hostObject: any) => ({
+        hostObject,
+        appContext: { marker: "ctx" },
+      }),
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+    const artifact = compileEventAsyncStatementSource(
+      "api.execute",
+      "test:event:implicit-context-function-reference",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(calls).toEqual([
+      {
+        executionContext: {
+          hostObject: localContext.api,
+          appContext: { marker: "ctx" },
+        },
+        body: { name: "John" },
+        options: { passAsDefaultBody: true },
+      },
+    ]);
   });
 
   it("awaits async work from inline arrow callbacks", async () => {

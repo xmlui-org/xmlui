@@ -4,6 +4,7 @@ import {
   compileEventAsyncStatementSource,
   compileEventAsyncStatements,
   executeCompiledEventAsyncArtifact,
+  executeCompiledEventAsyncHandler,
   serializeCompiledScriptArtifact,
   UnsupportedCompiledScriptNodeError,
 } from "../../../src/components-core/script-compiler";
@@ -60,5 +61,44 @@ describe("event-async compiled script target", () => {
     expect(() =>
       compileEventAsyncStatementSource("count = enabled ? 1 : 2;", "Main.xmlui#event-4"),
     ).toThrow(UnsupportedCompiledScriptNodeError);
+  });
+
+  it("prefers a parse-time artifact over runtime AST compilation", async () => {
+    const artifact = compileEventAsyncStatementSource("count = count + 1;", "Main.xmlui#event-5");
+    const unsupportedStatements = new Parser("count = enabled ? 1 : 2;").parseStatements();
+    const evalContext = {
+      localContext: { count: 1, enabled: true },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+
+    await executeCompiledEventAsyncHandler(
+      unsupportedStatements,
+      evalContext,
+      undefined,
+      artifact,
+      "Main.xmlui#event-unsupported",
+      "count = enabled ? 1 : 2;",
+    );
+
+    expect(evalContext.localContext.count).toBe(2);
+  });
+
+  it("runtime-compiles and cache keys statement handlers when no artifact exists", async () => {
+    const unsupportedStatements = new Parser("count = enabled ? 1 : 2;").parseStatements();
+    const evalContext = {
+      localContext: { count: 1, enabled: true },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+
+    await expect(
+      executeCompiledEventAsyncHandler(
+        unsupportedStatements,
+        evalContext,
+        undefined,
+        undefined,
+        "Main.xmlui#event-runtime",
+        "count = enabled ? 1 : 2;",
+      ),
+    ).rejects.toBeInstanceOf(UnsupportedCompiledScriptNodeError);
   });
 });

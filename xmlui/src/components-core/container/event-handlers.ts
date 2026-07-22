@@ -32,8 +32,8 @@ import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { createEventEvalOptions } from "../script-runner/eval-options";
 import {
-  executeCompiledEventAsyncArtifact,
-  executeCompiledEventAsyncStatements,
+  executeCompiledEventAsyncHandler,
+  UnsupportedCompiledScriptNodeError,
 } from "../script-compiler";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import {
@@ -575,22 +575,27 @@ export function createEventHandlers(config: EventHandlerConfig) {
         );
         const effectiveTimeoutMs =
           options?.handlerTimeoutMs !== undefined ? options.handlerTimeoutMs : ambientTimeout;
+        const preparedStatements = prepareHandlerStatements(statements, evalContext);
+        const preparedUsesOriginalStatements = preparedStatements === statements;
+        const interpretedHandler = () =>
+          processStatementQueueAsync(preparedStatements, evalContext);
         const handlerPromise = evalContext.options?.compileEventHandlers
-          ? compiledEventArtifact
-            ? executeCompiledEventAsyncArtifact(compiledEventArtifact, evalContext)
-            : executeCompiledEventAsyncStatements(
-                statements,
-                evalContext,
-                undefined,
-                typeof source === "string"
-                  ? `event:string:${source}`
-                  : `event:ast:${statements[0]?.nodeId ?? "empty"}`,
-                rawEventSource,
-              )
-          : processStatementQueueAsync(
-              prepareHandlerStatements(statements, evalContext),
+          ? executeCompiledEventAsyncHandler(
+              preparedStatements,
               evalContext,
-            );
+              undefined,
+              preparedUsesOriginalStatements ? compiledEventArtifact : undefined,
+              typeof source === "string"
+                ? `event:string:${source}`
+                : `event:ast:${preparedStatements[0]?.nodeId ?? statements[0]?.nodeId ?? "empty"}`,
+              rawEventSource,
+            ).catch((error) => {
+              if (error instanceof UnsupportedCompiledScriptNodeError) {
+                return interpretedHandler();
+              }
+              throw error;
+            })
+          : interpretedHandler();
         const compiledReturnValue = await runWithTimeout(handlerPromise, {
           timeoutMs: effectiveTimeoutMs,
           abort: (reason) => abortCancelToken(reason),

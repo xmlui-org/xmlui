@@ -144,6 +144,11 @@
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
     },
+    "//#_e2e:compiled-events": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER", "XMLUI_COMPILE_EVENT_HANDLERS"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
+      "outputs": ["playwright-report/**"]
+    },
     "//#_e2e:smoke": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],

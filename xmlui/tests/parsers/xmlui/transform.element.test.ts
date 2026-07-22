@@ -429,6 +429,7 @@ describe("Xmlui transform - child elements", () => {
       expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
       const id = (stmts[0] as ExpressionStatement).expr as Identifier;
       expect(id.name).equal("doIt");
+      expect(event.compiled).toBeUndefined();
     });
 
     it("implicit events get parse-time compiled artifacts when enabled", () => {
@@ -443,6 +444,25 @@ describe("Xmlui transform - child elements", () => {
         sourceText: "doIt",
       });
       expect(event.compiled.sourceId).toMatch(/^0#event-\d+$/);
+    });
+
+    it("parse-time event artifacts are JSON serializable", () => {
+      const cd = transformSource("<Stack onClick='count = count + 1' />", 0, false, undefined, {
+        compileEventHandlers: true,
+      }) as ComponentDef;
+      const event = (cd.events! as any).click;
+
+      const serialized = JSON.stringify(event.compiled);
+      const parsed = JSON.parse(serialized);
+
+      expect(serialized).not.toContain("nativeFn");
+      expect(parsed).toMatchObject({
+        target: "event-async",
+        sourceText: "count = count + 1",
+      });
+      expect(parsed.sourceId).toMatch(/^0#event-\d+$/);
+      expect(parsed.js).toContain("return (async () =>");
+      expect(parsed.mappings.length).toBeGreaterThan(0);
     });
 
     it("event with name/value attr works #1", () => {

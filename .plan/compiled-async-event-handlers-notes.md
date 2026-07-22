@@ -221,3 +221,35 @@ Implementation note: the interpreter now clears pending `errorToThrow` values fo
 - Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 107 tests.
 - Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
 - Step 8 status: the planned arrow/callback/code-behind slice is complete for inline callback arguments, local arrow declarations, direct inline arrow calls, destructured/rest arrow parameters, `ArrowExpressionStatement` event-argument invocation, and code-behind/imported lazy arrow calls. The full E2E suite remains intentionally unrun by the agent; it should be exercised through the root `test-compiled-bindings` flow after the user enables the new switch.
+
+## Step 9 - parse-time event artifacts and runtime cache decision
+
+- Affected modules: `xmlui/src/parsers/xmlui-parser/transform.ts`, `xmlui/src/components-core/container/event-handlers.ts`, `xmlui/src/components-core/script-compiler/targets/event-async-executor.ts`, `xmlui/tests/parsers/xmlui/transform.element.test.ts`, `xmlui/tests/components-core/script-compiler/event-async.test.ts`.
+- Decision: event attributes keep their parsed AST and, when `compileEventHandlers` is enabled at parse time, an optional serializable `event-async` artifact on `ParsedEventValue.compiled`.
+- Decision: compiled event execution now routes through `executeCompiledEventAsyncHandler(...)`. That helper always prefers the parse-time artifact when present; only artifact-less handlers use runtime AST compilation and the compiler cache.
+- Decision: runtime cache keys remain based on target, source id, source text, first AST node id, compiler version, and event compile options. Parse-time artifacts bypass this artifact cache and only go through artifact instantiation.
+- Observation: default parser mode still leaves `event.compiled` undefined, so unsupported compiled nodes do not become parse-time errors unless the feature flag explicitly asks for event compilation.
+- Observation: parse-time event artifacts round-trip through `JSON.stringify`/`JSON.parse` without `nativeFn`, preserving the build-time/Vite/source-map direction.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/event-async.test.ts` passed with 6 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/parsers/xmlui/transform.element.test.ts` passed with 109 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 109 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- Step 9 status: complete for parse-time compiled event artifact storage, JSON serializability, runtime artifact preference, and runtime compile/cache fallback.
+
+## Step 10 - E2E switch and targeted compiled-event subset
+
+- Affected modules: `package.json`, `xmlui/package.json`, `xmlui/src/testing/fixtures.ts`, `xmlui/src/testing/compile-event-handlers-env.ts`, `xmlui/tests/components-core/script-compiler/e2e-compile-event-handlers-env.test.ts`.
+- Decision: the E2E feature flag remains `XMLUI_COMPILE_EVENT_HANDLERS=true`, mapped by the shared test fixture to `xmluiConfig.compileEventHandlers = true`.
+- Decision: individual testbed descriptions can still explicitly override `xmluiConfig.compileEventHandlers`; the helper merges the env default first and the per-test config second.
+- Decision: root-level manual target: `npm run test-compiled-events`. Workspace target: `npm --workspace xmlui run test:e2e:compiled-events`.
+- Decision: the initial targeted subset covers `scripting.spec.ts`, `event-handler-assignment-regression.spec.ts`, `init-cleanup-events.spec.ts`, `datasource-onLoaded-regression.spec.ts`, `api-bound-component-regression.spec.ts`, and `api-call-as-extracted-component.spec.ts`.
+- Observation: `npm --workspace xmlui run test:e2e:compiled-events -- --list` resolves to 26 tests in 6 files without running browser execution.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/e2e-compile-event-handlers-env.test.ts` passed with 14 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- Step 10 status: complete for the E2E env switch, per-spec override behavior, package scripts, and a targeted compiled-event E2E subset. The targeted and full E2E suites remain manual run gates.
+
+### Step 10 follow-up - Turbo root task registration
+
+- Observation: the root `test-compiled-events` script initially failed with `Could not find task //#_e2e:compiled-events in project` because the package script existed but `turbo.json` did not define the root task.
+- Fix: added `//#_e2e:compiled-events` to `turbo.json`, mirroring the compiled-bindings task with `PLAYWRIGHT_USE_DEV_SERVER` and `XMLUI_COMPILE_EVENT_HANDLERS` in the task env and the same test-bed/unit dependencies.
+- Validation: `npm run test-compiled-events -- --dry-run` now resolves the task and shows the expected Playwright command without running E2E.

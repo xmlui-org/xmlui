@@ -214,6 +214,24 @@ function emitEventExpressionStatementExpression(
   expr: Expression,
   context: CompilerContext,
 ): void {
+  if (expr.type === T_MEMBER_ACCESS_EXPRESSION) {
+    const receiverName = context.nextTemp();
+    const updateRootName = getNonLocalRootIdentifier(expr.obj, context);
+    writer.write("(async () => { const ");
+    writer.write(receiverName);
+    writer.write(" = await runtime.complete(");
+    emitExpression(writer, expr.obj, context);
+    writer.write("); return await runtime.call(runtime.member(");
+    writer.write(receiverName);
+    writer.write(`, ${JSON.stringify(expr.member)}, evalContext), `);
+    writer.write(receiverName);
+    writer.write(", evalContext.eventArgs ?? [], evalContext, thread");
+    if (updateRootName) {
+      writer.write(`, ${JSON.stringify(updateRootName)}`);
+    }
+    writer.write("); })()", expr);
+    return;
+  }
   if (expr.type === T_IDENTIFIER || isMemberExpressionChain(expr)) {
     const updateRootName = getNonLocalRootIdentifier(expr, context);
     writer.write("await runtime.call(await runtime.complete(");
@@ -1082,7 +1100,11 @@ function emitArgumentArray(
       throwUnsupportedCompiledScriptNode(arg, context.sourceId);
     }
     if (arg.type === T_ARROW_EXPRESSION) {
-      emitNativeArrowExpression(writer, arg, context);
+      if (arrowReferencesCompilerLocals(arg, context)) {
+        emitNativeArrowExpression(writer, arg, context);
+      } else {
+        emitArrowExpression(writer, arg, context);
+      }
       return;
     }
     writer.write("await runtime.complete(");
@@ -1090,6 +1112,59 @@ function emitArgumentArray(
     writer.write(")");
   });
   writer.write("]");
+}
+
+function arrowReferencesCompilerLocals(expr: ArrowExpression, context: CompilerContext): boolean {
+  if (context.locals.size === 0) {
+    return false;
+  }
+
+  const arrowLocals = new Set(getNativeArrowArgs(expr, context).flatMap((arg) => arg.localNames));
+  return nodeReferencesCompilerLocals(expr.statement, context.locals, arrowLocals);
+}
+
+function nodeReferencesCompilerLocals(
+  node: any,
+  compilerLocals: Set<string>,
+  shadowed: Set<string>,
+): boolean {
+  if (!node || typeof node !== "object") {
+    return false;
+  }
+
+  if (node.type === T_IDENTIFIER && compilerLocals.has(node.name) && !shadowed.has(node.name)) {
+    return true;
+  }
+
+  if (node.type === T_ARROW_EXPRESSION) {
+    const nestedShadowed = new Set(shadowed);
+    for (const arg of getNativeArrowArgs(node, { sourceId: "event:arrow-scan" } as CompilerContext)) {
+      for (const name of arg.localNames) {
+        nestedShadowed.add(name);
+      }
+    }
+    return nodeReferencesCompilerLocals(node.statement, compilerLocals, nestedShadowed);
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    if (
+      key === "startToken" ||
+      key === "endToken" ||
+      key === "source" ||
+      key === "parenthesized"
+    ) {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      if (value.some((item) => nodeReferencesCompilerLocals(item, compilerLocals, shadowed))) {
+        return true;
+      }
+    } else if (nodeReferencesCompilerLocals(value, compilerLocals, shadowed)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function emitNativeArrowExpression(

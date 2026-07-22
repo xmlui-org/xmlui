@@ -38,6 +38,7 @@ export {
 export {
   clearEventAsyncCompilerCache,
   executeCompiledEventAsyncArtifact,
+  executeCompiledEventAsyncHandler,
   executeCompiledEventAsyncStatements,
 } from "./targets/event-async-executor";
 export type {

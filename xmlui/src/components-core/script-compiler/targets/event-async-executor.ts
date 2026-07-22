@@ -20,6 +20,26 @@ export async function executeCompiledEventAsyncArtifact(
   });
 }
 
+export async function executeCompiledEventAsyncHandler(
+  statements: Statement[],
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThread,
+  artifact?: CompiledScriptArtifact,
+  sourceId = `event:ast:${statements[0]?.nodeId ?? "empty"}`,
+  sourceText?: string,
+): Promise<any> {
+  if (artifact) {
+    return await executeCompiledEventAsyncArtifact(artifact, evalContext, thread);
+  }
+  return await executeCompiledEventAsyncStatements(
+    statements,
+    evalContext,
+    thread,
+    sourceId,
+    sourceText,
+  );
+}
+
 export async function executeCompiledEventAsyncStatements(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,

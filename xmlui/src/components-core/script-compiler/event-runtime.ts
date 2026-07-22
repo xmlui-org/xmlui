@@ -33,6 +33,12 @@ export const eventAsyncRuntime = {
   },
 
   async start(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    evalContext.mainThread ??= {
+      childThreads: [],
+      blocks: [{ vars: {} }],
+      loops: [],
+      breakLabelValue: -1,
+    };
     await this.checkCancel(evalContext);
   },
 
@@ -153,6 +159,13 @@ export const eventAsyncRuntime = {
               )
           : arg,
       );
+
+      if (thisArg?._SUPPORT_IMPLICIT_CONTEXT) {
+        if (!evalContext.implicitContextGetter) {
+          throw new Error("Cannot use implicitContextGetter, it is undefined");
+        }
+        callArgs.unshift(evalContext.implicitContextGetter(thisArg));
+      }
 
       assertEventFunctionAllowed(functionObj);
       const proxiedFunction = getAsyncProxy(functionObj as Function, callArgs, thisArg);
