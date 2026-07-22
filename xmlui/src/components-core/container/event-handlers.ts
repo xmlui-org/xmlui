@@ -524,10 +524,15 @@ export function createEventHandlers(config: EventHandlerConfig) {
             statementPromises.current.set(key, resolve!);
 
             try {
-              // We use this to tell react that this update is not high-priority.
-              startTransition(() => {
+              const bumpVersion = () => {
                 setVersion((prev) => prev + 1);
-              });
+              };
+              if (options?.schedulerBypass) {
+                bumpVersion();
+              } else {
+                // We use this to tell react that this update is not high-priority.
+                startTransition(bumpVersion);
+              }
 
               // Wait for state update to complete
               if (mountedRef.current) {
