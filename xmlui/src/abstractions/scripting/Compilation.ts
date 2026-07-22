@@ -44,6 +44,7 @@ export type ParsedEventValue = {
   parseId: number;
   statements: Statement[];
   source?: string;
+  compiled?: CompiledScriptArtifact;
 }
 
 // --- The parsed property value (if defined by an attribute value)

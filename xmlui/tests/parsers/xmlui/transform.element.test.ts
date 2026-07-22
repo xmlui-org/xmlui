@@ -431,6 +431,20 @@ describe("Xmlui transform - child elements", () => {
       expect(id.name).equal("doIt");
     });
 
+    it("implicit events get parse-time compiled artifacts when enabled", () => {
+      const cd = transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
+        compileEventHandlers: true,
+      }) as ComponentDef;
+      const event = (cd.events! as any).click;
+
+      expect(event.__PARSED).toBe(true);
+      expect(event.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: "doIt",
+      });
+      expect(event.compiled.sourceId).toMatch(/^0#event-\d+$/);
+    });
+
     it("event with name/value attr works #1", () => {
       const cd = transformSource(
         "<Stack><event name='myEvent' value='doIt'/></Stack>",

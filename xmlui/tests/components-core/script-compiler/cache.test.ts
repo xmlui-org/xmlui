@@ -48,7 +48,7 @@ describe("compiled script cache", () => {
     };
 
     expect(createCompiledScriptCacheKey(base)).not.toBe(
-      createCompiledScriptCacheKey({ ...base, target: "event-handler" }),
+      createCompiledScriptCacheKey({ ...base, target: "event-async" }),
     );
     expect(createCompiledScriptCacheKey(base)).not.toBe(
       createCompiledScriptCacheKey({ ...base, sourceText: "{other}" }),
@@ -85,4 +85,3 @@ describe("compiled script cache", () => {
     expect(cache.size).toBe(1);
   });
 });
-

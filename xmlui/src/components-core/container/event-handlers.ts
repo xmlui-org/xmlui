@@ -30,6 +30,7 @@ import { processStatementQueueAsync } from "../script-runner/process-statement-a
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
+import { createEventEvalOptions } from "../script-runner/eval-options";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import {
   createCancellationToken,
@@ -373,19 +374,10 @@ export function createEventHandlers(config: EventHandlerConfig) {
             },
           };
         },
-        options: {
-          defaultToOptionalMemberAccess:
-            typeof appContext.xmluiConfig?.defaultToOptionalMemberAccess === "boolean"
-              ? appContext.xmluiConfig.defaultToOptionalMemberAccess
-              : true,
-          strictDomSandbox: Array.isArray(appContext.xmluiConfig?.strictDomSandbox)
-            ? appContext.xmluiConfig.strictDomSandbox
-            : appContext.xmluiConfig?.strictDomSandbox === true,
-          allowConsole: appContext.xmluiConfig?.allowConsole !== false,
+        options: createEventEvalOptions(appContext, {
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
-          ...(appContext as any).__udcEvalOptions,
-        },
+        }),
       };
 
       // Initialize trace and extract metadata for logging

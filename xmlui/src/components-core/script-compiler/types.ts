@@ -1,7 +1,7 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 
-export type CompiledScriptTarget = "binding-sync" | "event-handler" | "code-behind";
+export type CompiledScriptTarget = "binding-sync" | "event-async";
 
 export type CompiledScriptSourceRange = {
   start: number;
@@ -51,4 +51,3 @@ export type CompiledScriptInstance<TValue = unknown> = {
   nativeFn: Function;
   execute(args: CompiledScriptExecuteArgs): TValue;
 };
-
