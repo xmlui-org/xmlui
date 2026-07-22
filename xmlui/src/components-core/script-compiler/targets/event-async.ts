@@ -1,6 +1,8 @@
 import { Parser } from "../../../parsers/scripting/Parser";
 import {
   T_ASSIGNMENT_EXPRESSION,
+  T_ARROW_EXPRESSION,
+  T_ARROW_EXPRESSION_STATEMENT,
   T_ARRAY_LITERAL,
   T_BINARY_EXPRESSION,
   T_BLOCK_STATEMENT,
@@ -26,6 +28,7 @@ import {
   T_PREFIX_OP_EXPRESSION,
   T_RETURN_STATEMENT,
   T_SPREAD_EXPRESSION,
+  T_DESTRUCTURE,
   T_SWITCH_STATEMENT,
   T_THROW_STATEMENT,
   T_TRY_STATEMENT,
@@ -33,6 +36,8 @@ import {
   T_VAR_STATEMENT,
   T_WHILE_STATEMENT,
   type AssignmentExpression,
+  type ArrowExpression,
+  type ArrowExpressionStatement,
   type ArrayDestructure,
   type ArrayLiteral,
   type BinaryExpression,
@@ -66,6 +71,8 @@ import {
   type UnaryExpression,
   type VarStatement,
   type VarDeclaration,
+  type Destructure,
+  type SpreadExpression,
   type WhileStatement,
 } from "../../script-runner/ScriptingSourceTree";
 import { createCompiledScriptArtifact } from "../artifact";
@@ -138,6 +145,9 @@ function emitStatement(
       return;
     case T_EXPRESSION_STATEMENT:
       emitExpressionStatement(writer, statement, context, emitEventExpressionStatementExpression);
+      return;
+    case T_ARROW_EXPRESSION_STATEMENT:
+      emitArrowExpressionStatement(writer, statement, context);
       return;
     case T_RETURN_STATEMENT:
       emitReturnStatement(writer, statement, context);
@@ -216,6 +226,23 @@ function emitEventExpressionStatementExpression(
     return;
   }
   emitExpression(writer, expr, context);
+}
+
+function emitArrowExpressionStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: ArrowExpressionStatement,
+  context: CompilerContext,
+): void {
+  emitBeforeStatement(writer, statement);
+  const returnName = context.nextTemp();
+  writer.write(`const ${returnName} = await runtime.call(runtime.arrow(`, statement);
+  writer.write(JSON.stringify(statement.expr), statement.expr);
+  writer.write(
+    ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread);",
+    statement,
+  );
+  emitAfterStatement(writer, statement);
+  writer.write(`return ${returnName};`, statement);
 }
 
 function emitExpressionStatement(
@@ -309,9 +336,14 @@ function emitVarDeclaration(
     assertJsIdentifier({ name: decl.id }, context.sourceId);
     writer.write(decl.id, decl);
     if (decl.expr) {
-      writer.write(" = await runtime.complete(");
-      emitExpression(writer, decl.expr, context);
-      writer.write(")");
+      writer.write(" = ");
+      if (decl.expr.type === T_ARROW_EXPRESSION) {
+        emitNativeArrowExpression(writer, decl.expr, context);
+      } else {
+        writer.write("await runtime.complete(");
+        emitExpression(writer, decl.expr, context);
+        writer.write(")");
+      }
     }
   }
 }
@@ -346,7 +378,7 @@ function emitDestructureDeclaration(
 type DestructureSpec = [name: string, path: Array<string | number>];
 
 function collectDestructureSpecs(
-  decl: VarDeclaration,
+  decl: Pick<VarDeclaration | Destructure, "aDestr" | "oDestr">,
   context: CompilerContext,
 ): DestructureSpec[] {
   if (decl.aDestr) {
@@ -823,6 +855,9 @@ function emitExpression(
     case T_FUNCTION_INVOCATION_EXPRESSION:
       emitFunctionInvocation(writer, expr, context);
       return;
+    case T_ARROW_EXPRESSION:
+      emitArrowExpression(writer, expr, context);
+      return;
     case T_ASSIGNMENT_EXPRESSION:
       emitAssignmentExpression(writer, expr, context);
       return;
@@ -967,6 +1002,15 @@ function emitFunctionInvocation(
   expr: FunctionInvocationExpression,
   context: CompilerContext,
 ): void {
+  if (expr.obj.type === T_ARROW_EXPRESSION) {
+    writer.write("await ");
+    emitNativeArrowExpression(writer, expr.obj, context);
+    writer.write("(");
+    emitCompletedArgumentList(writer, expr.arguments, context);
+    writer.write(")", expr);
+    return;
+  }
+
   if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
     const receiverName = context.nextTemp();
     const updateRootName = getNonLocalRootIdentifier(expr.obj.obj, context);
@@ -1000,6 +1044,32 @@ function emitFunctionInvocation(
   writer.write(")", expr);
 }
 
+function emitCompletedArgumentList(
+  writer: CompiledScriptCodeWriter,
+  args: Expression[],
+  context: CompilerContext,
+): void {
+  args.forEach((arg, index) => {
+    if (index > 0) writer.write(", ");
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+    }
+    writer.write("await runtime.complete(");
+    emitExpression(writer, arg, context);
+    writer.write(")");
+  });
+}
+
+function emitArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
+  writer.write("runtime.arrow(");
+  writer.write(JSON.stringify(expr), expr);
+  writer.write(", evalContext, thread)", expr);
+}
+
 function emitArgumentArray(
   writer: CompiledScriptCodeWriter,
   args: Expression[],
@@ -1008,11 +1078,137 @@ function emitArgumentArray(
   writer.write("[");
   args.forEach((arg, index) => {
     if (index > 0) writer.write(", ");
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+    }
+    if (arg.type === T_ARROW_EXPRESSION) {
+      emitNativeArrowExpression(writer, arg, context);
+      return;
+    }
     writer.write("await runtime.complete(");
     emitExpression(writer, arg, context);
     writer.write(")");
   });
   writer.write("]");
+}
+
+function emitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
+  if (expr.async) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  const args = getNativeArrowArgs(expr, context);
+  const argNames = args.flatMap((arg) => arg.localNames);
+  const arrowContext = {
+    ...extendCompilerContext(context, argNames),
+    inFunction: true,
+  };
+
+  writer.write("(async (");
+  writer.write(args.map((arg) => arg.jsParam).join(", "));
+  writer.write(") => ");
+  emitNativeArrowBody(writer, expr, arrowContext, args);
+  writer.write(")", expr);
+}
+
+type NativeArrowArg = {
+  jsParam: string;
+  localNames: string[];
+  emitBinding(writer: CompiledScriptCodeWriter): void;
+};
+
+function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): NativeArrowArg[] {
+  let restSeen = false;
+  return expr.args.map((arg) => {
+    if (restSeen) {
+      throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+    }
+    if (arg.type === T_IDENTIFIER) {
+      assertJsIdentifier(arg, context.sourceId);
+      return {
+        jsParam: arg.name,
+        localNames: [arg.name],
+        emitBinding: () => {},
+      };
+    }
+    if (arg.type === T_DESTRUCTURE) {
+      const paramName = context.nextTemp();
+      const specs = collectDestructureSpecs(arg as Destructure, context);
+      return {
+        jsParam: paramName,
+        localNames: specs.map(([name]) => name),
+        emitBinding: (writer) => emitNativeArrowDestructureBinding(writer, specs, paramName),
+      };
+    }
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      restSeen = true;
+      const spread = arg as SpreadExpression;
+      if (spread.expr.type !== T_IDENTIFIER) {
+        throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+      }
+      assertJsIdentifier(spread.expr, context.sourceId);
+      return {
+        jsParam: `...${spread.expr.name}`,
+        localNames: [spread.expr.name],
+        emitBinding: () => {},
+      };
+    }
+    throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+  });
+}
+
+function emitNativeArrowDestructureBinding(
+  writer: CompiledScriptCodeWriter,
+  specs: DestructureSpec[],
+  sourceName: string,
+): void {
+  writer.write("const { ");
+  specs.forEach(([name], index) => {
+    if (index > 0) writer.write(", ");
+    writer.write(name);
+  });
+  writer.write(` } = runtime.destructure(${sourceName}, ${JSON.stringify(specs)});`);
+}
+
+function emitNativeArrowBody(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+  args: NativeArrowArg[],
+): void {
+  switch (expr.statement.type) {
+    case T_EMPTY_STATEMENT:
+      writer.write("{", expr.statement);
+      args.forEach((arg) => arg.emitBinding(writer));
+      writer.write("return undefined; }", expr.statement);
+      return;
+    case T_EXPRESSION_STATEMENT: {
+      const returnName = context.nextTemp();
+      writer.write("{", expr.statement);
+      args.forEach((arg) => arg.emitBinding(writer));
+      emitBeforeStatement(writer, expr.statement);
+      writer.write(`const ${returnName} = await runtime.complete(`, expr.statement);
+      emitExpression(writer, expr.statement.expr, context);
+      writer.write(");", expr.statement);
+      emitAfterStatement(writer, expr.statement);
+      writer.write(`return ${returnName};`, expr.statement);
+      writer.write("}", expr.statement);
+      return;
+    }
+    case T_BLOCK_STATEMENT: {
+      const blockContext = extendCompilerContext(context, collectLocalNames(expr.statement.stmts));
+      writer.write("{", expr.statement);
+      args.forEach((arg) => arg.emitBinding(writer));
+      expr.statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
+      writer.write("}", expr.statement);
+      return;
+    }
+    default:
+      throwUnsupportedCompiledScriptNode(expr.statement, context.sourceId);
+  }
 }
 
 function emitAssignmentExpression(

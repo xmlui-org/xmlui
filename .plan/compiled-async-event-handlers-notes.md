@@ -176,3 +176,48 @@ Implementation note: the interpreter now clears pending `errorToThrow` values fo
 - Observation: a later repeated one-shot `tests/components-core/compiled-events` invocation again did not terminate promptly and was interrupted; the individually run Step 7 files passed immediately.
 - Step 7 status: the planned Step 7 statement coverage is now complete for while, do/while, for, for/of, for/in, break, continue, switch, throw, try/catch/finally, function declaration hoisting, destructuring `let`/`const`, and the `var` main-thread rule.
 - Future impact: expression-level language gaps such as conditional expressions, sequence expressions, template literals, and arrow/callback/code-behind semantics belong to the next planned phases rather than Step 7 statement-control coverage.
+
+## Step 8a - inline arrow callbacks for async array proxies
+
+- Affected modules: `xmlui/src/components-core/script-compiler/event-runtime.ts`, `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts`.
+- Decision: event expressions now support `T_ARROW_EXPRESSION` values through `runtime.arrow(...)`, which creates the same lazy XMLUI arrow object shape as the interpreter and captures the current logical-thread closures.
+- Decision: `eventAsyncRuntime.complete(...)` returns XMLUI arrow objects unchanged. This avoids recursively walking and mutating arrow AST/closure objects while completing ordinary arrays and objects as before.
+- Decision: inline arrow expressions passed directly as function arguments compile to native `async` JavaScript callbacks instead of lazy arrow objects. This is required for callbacks such as `items.forEach((item) => { sum += item; })` to close over compiled JS locals like `sum`.
+- Observation: the generated native callback still emits XMLUI statement boundaries inside expression and block bodies, so callback body statements keep the event-loop yield contract.
+- Observation: async array proxy coverage now includes `map`, `filter`, `forEach`, `find`, `findIndex`, `some`, `every`, and `flatMap` with inline callbacks.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts` passed with 5 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 107 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- Future impact: lazy arrows stored in compiled locals or state, direct arrow invocation, destructured/rest arrow parameters, and code-behind/import function compilation still need separate Step 8 slices.
+
+## Step 8b - local arrow declarations and direct invocation
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts`.
+- Decision: simple `let`/`const` arrow initializers now compile to native `async` JavaScript function values instead of lazy XMLUI arrow objects. This lets local arrow declarations close over compiled JS locals.
+- Decision: direct inline arrow invocations such as `((value) => value * base)(3)` compile through the same native arrow path, so they can capture compiled locals and still await XMLUI expression completion for arguments and return values.
+- Observation: expression-bodied and block-bodied native arrows reuse the event statement emitter inside the arrow body, so body statements keep boundary/yield behavior and `var` remains forbidden inside arrow bodies.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts` passed with 8 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 107 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- Future impact: assignments of arrows into `localContext`/state and destructured/rest arrow parameters still need dedicated parity handling; native JS arrows cannot be serialized into future build-time artifacts the same way lazy XMLUI arrows can, so source-map/debug work should keep this distinction visible.
+
+## Step 8c - native arrow parameters
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts`.
+- Decision: native compiled arrow callbacks now accept identifier parameters, destructured object/array parameters, and a trailing rest parameter.
+- Decision: destructured arrow parameters bind through `runtime.destructure(...)`, the same helper used for destructured `let`/`const` declarations. This preserves XMLUI optional-member behavior for missing or nullish nested values instead of using native JavaScript destructuring throws.
+- Decision: rest parameters are supported only as the final parameter and only with an identifier target, matching the parser shapes currently exercised by XMLUI arrow functions.
+- Observation: destructured parameter names are registered as compiled locals for the arrow body, so reads resolve to native callback-scope values rather than falling through to `evalContext.localContext`.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts` passed with 11 tests.
+
+## Step 8d - code-behind/lazy arrows and Step 8 closure
+
+- Affected modules: `xmlui/src/components-core/script-compiler/event-runtime.ts`, `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts`.
+- Decision: `runtime.arrow(...)` now constructs lazy XMLUI arrow objects with the current logical-thread closures and preserves the non-enumerable `closureEvalContext`, so compiled event code can call code-behind style functions through the existing async arrow executor.
+- Decision: `ArrowExpressionStatement` sources compile to a direct lazy-arrow call with `evalContext.eventArgs`, matching handler expressions whose source is a bare arrow expression.
+- Decision: code-behind functions and imported/aliased code-behind functions remain represented as XMLUI lazy arrows in `localContext`; the compiled event runtime invokes them through `runtime.call(...)` and `executeArrowExpression(...)`, so implicit async completion stays in the interpreter-compatible path.
+- Observation: native arrows are used where compiled JavaScript locals must be captured (`let`/`const` arrow declarations, direct inline arrow invocation, and inline callback arguments). Lazy XMLUI arrows are used where the value must behave like a runtime XMLUI arrow object, especially code-behind/imported functions and general arrow expression values.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events/event-async-arrow-and-codebehind.test.ts` passed with 14 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 107 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.
+- Step 8 status: the planned arrow/callback/code-behind slice is complete for inline callback arguments, local arrow declarations, direct inline arrow calls, destructured/rest arrow parameters, `ArrowExpressionStatement` event-argument invocation, and code-behind/imported lazy arrow calls. The full E2E suite remains intentionally unrun by the agent; it should be exercised through the root `test-compiled-bindings` flow after the user enables the new switch.

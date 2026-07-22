@@ -7,6 +7,7 @@ import { getAsyncProxy } from "../script-runner/asyncProxy";
 import { isBannedFunction } from "../script-runner/bannedFunctions";
 import {
   completePromise,
+  obtainClosures,
   getAllowedNewConstructor,
 } from "../script-runner/eval-tree-common";
 import { executeArrowExpression } from "../script-runner/eval-tree-async";
@@ -75,7 +76,31 @@ export const eventAsyncRuntime = {
   },
 
   async complete(value: any): Promise<any> {
+    if (isArrowExpressionObject(value)) {
+      return value;
+    }
     return await completePromise(value);
+  },
+
+  arrow(
+    expr: ArrowExpression,
+    evalContext: BindingTreeEvaluationContext,
+    thread?: LogicalThread,
+  ): ArrowExpression {
+    if (expr.async) {
+      throw new Error("XMLUI does not support async arrow functions.");
+    }
+    const lazyArrow = {
+      ...expr,
+      _ARROW_EXPR_: true,
+      closureContext: obtainClosures(thread ?? evalContext.mainThread),
+    } as ArrowExpression;
+    Object.defineProperty(lazyArrow, "closureEvalContext", {
+      value: evalContext,
+      enumerable: false,
+      configurable: true,
+    });
+    return lazyArrow;
   },
 
   throwStatement(value: any): never {
