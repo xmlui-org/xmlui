@@ -268,6 +268,32 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("heading", { name: "Default Header" })).not.toBeVisible();
   });
 
+  test("delivers compound component event without trailing state write", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <TestEmitter onPing="testState = 'pinged'" />
+    `,
+      {
+        components: [
+          `
+          <Component name="TestEmitter">
+            <event name="ping" />
+            <Button label="Ping" onClick="emitEvent('ping')" />
+          </Component>
+        `,
+        ],
+        appGlobals: { strictDeterminism: true, defaultHandlerTimeoutMs: 2000 },
+      },
+    );
+
+    await page.getByRole("button", { name: "Ping" }).click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 500 }).toEqual("pinged");
+  });
+
   test("maintains proper rendering order with multiple slots", async ({ initTestBed, page }) => {
     await initTestBed(`
       <MultiSlotComponent>
