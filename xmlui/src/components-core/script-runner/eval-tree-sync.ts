@@ -45,7 +45,6 @@ import {
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import { isBannedFunction } from "./bannedFunctions";
 import {
   createArrowArgDeclaration,
   createClosureEvalContext,
@@ -63,13 +62,14 @@ import {
   getAllowedNewConstructor,
   getExprValue,
   getStateUpdateScope,
-  isPromise,
   notifyStateUpdate,
   removeArrowWorkingThread,
   setExprValue,
 } from "./eval-tree-common";
 import { ensureMainThread } from "./process-statement-common";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
+import { assertSyncResult, callSyncFunction } from "./sync-runtime";
+import { evaluateCompiledBinding } from "../script-compiler";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -92,6 +92,7 @@ export function evalBindingExpression(
   thread?: LogicalThread,
 ): any {
   // --- Use the main thread by default
+  ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
 
   // --- Parse the source code
@@ -125,6 +126,21 @@ export function evalBinding(
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
+  if (evalContext.options?.compileBindings && expr.type !== T_ARROW_EXPRESSION) {
+    const previousArrowInvoker = evalContext.compiledArrowInvoker;
+    evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
+      executeArrowExpressionSync(
+        arrowExpr,
+        arrowEvalContext,
+        arrowThread ?? arrowEvalContext.mainThread,
+        ...args,
+      );
+    try {
+      return evaluateCompiledBinding(expr, evalContext, thread ?? evalContext.mainThread!);
+    } finally {
+      evalContext.compiledArrowInvoker = previousArrowInvoker;
+    }
+  }
   return evalBindingExpressionTree(thisStack, expr, evalContext, thread ?? evalContext.mainThread!);
 }
 
@@ -227,9 +243,7 @@ function evalBindingExpressionTree(
     case T_FUNCTION_INVOCATION_EXPRESSION:
       // --- Special sync handling
       const funcResult = evalFunctionInvocation(evaluator, thisStack, expr, evalContext, thread);
-      if (isPromise(funcResult)) {
-        throw new Error("Promises (async function calls) are not allowed in binding expressions.");
-      }
+      assertSyncResult(funcResult);
       return funcResult;
 
     case T_ARROW_EXPRESSION:
@@ -606,14 +620,6 @@ function evalFunctionInvocation(
     }
   }
 
-  // --- Check if the function is banned from running
-  const bannedInfo = isBannedFunction(functionObj);
-  if (bannedInfo.banned) {
-    throw new Error(
-      `Function ${bannedInfo.func?.name ?? "unknown"} is not allowed to call. ${bannedInfo?.help ?? ""}`,
-    );
-  }
-
   // --- We use context for "this"
   const currentContext = thisStack.length > 0 ? thisStack.pop() : evalContext.localContext;
 
@@ -621,9 +627,13 @@ function evalFunctionInvocation(
   const rootScope = getStateUpdateScope(expr.obj, evalContext, thread);
   notifyStateUpdate("will", evalContext, rootScope, "function-call");
 
-  const value = evalContext.options?.defaultToOptionalMemberAccess
-    ? (functionObj as Function)?.call(currentContext, ...functionArgs)
-    : (functionObj as Function).call(currentContext, ...functionArgs);
+  const value = callSyncFunction({
+    functionObj,
+    thisArg: currentContext,
+    args: functionArgs,
+    evalContext,
+    optional: evalContext.options?.defaultToOptionalMemberAccess,
+  });
 
   notifyStateUpdate("did", evalContext, rootScope, "function-call");
 

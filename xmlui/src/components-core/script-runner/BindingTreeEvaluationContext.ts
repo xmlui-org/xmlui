@@ -41,6 +41,14 @@ export type BindingTreeEvaluationContext = {
   // --- Cached closure contexts for arrow expressions
   closureContexts?: Map<ArrowExpression, BlockScope[]>;
 
+  // --- Invokes an XMLUI arrow object from compiled binding code
+  compiledArrowInvoker?: (
+    expr: ArrowExpression,
+    args: any[],
+    evalContext: BindingTreeEvaluationContext,
+    thread?: LogicalThread,
+  ) => any;
+
   // --- Use this context wrapper with function that support implicit context
   implicitContextGetter?: ImplicitContextGetter;
 
@@ -98,6 +106,17 @@ class CancellationToken {
 // Evaluation options to use with binding tree evaluation
 export type EvalTreeOptions = {
   defaultToOptionalMemberAccess?: boolean;
+  /**
+   * Experimental switch for compiled synchronous binding expressions.
+   *
+   * Default: `false`. Step 1 only propagates the option through the binding
+   * evaluation call chain; the existing AST interpreter remains the only
+   * evaluator until the compiler target is implemented.
+   *
+   * Set via `App.xmluiConfig.compileBindings` in config.json or the App
+   * component.
+   */
+  compileBindings?: boolean;
   /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access

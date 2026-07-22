@@ -55,7 +55,7 @@ import {
  * Call this immediately after `isBannedMember()` returns `{ banned: true }`.
  * When `result.banned` is `false`, this function is a no-op.
  */
-function handleMemberBan(result: BannedMemberResult, options?: EvalTreeOptions): void {
+export function handleMemberBan(result: BannedMemberResult, options?: EvalTreeOptions): void {
   if (!result.banned) return;
   // console access is allowed unless the caller explicitly opts out.
   if (result.api === "window.console" && options?.allowConsole !== false) return;
@@ -180,7 +180,7 @@ export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThre
 
 type IdentifierScope = "global" | "app" | "localContext" | "block";
 
-function checkUdcCapability(
+export function checkUdcCapability(
   evalContext: BindingTreeEvaluationContext,
   root: string,
   member?: string,

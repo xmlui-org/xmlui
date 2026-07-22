@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseParameterString } from "../../src/components-core/script-runner/ParameterParser";
 import type { Expression } from "../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_BINARY_EXPRESSION, T_LITERAL } from "../../src/parsers/scripting/ScriptingNodeTypes";
+import { UnsupportedCompiledScriptNodeError } from "../../src/components-core/script-compiler";
 
 describe("parseParameterString", () => {
   it("Empty string works", () => {
@@ -30,6 +31,41 @@ describe("parseParameterString", () => {
     expect(result.length).toBe(1);
     expect(result[0].type).toBe("expression");
     expect((result[0].value as Expression).type).toBe(T_BINARY_EXPRESSION);
+    if (result[0].type === "expression") {
+      expect(result[0].compiled).toBeUndefined();
+    }
+  });
+
+  it("can attach compiled binding artifacts when requested", () => {
+    // --- Act
+    const result = parseParameterString("hello{a+b}world", {
+      compileBindings: true,
+      sourceId: "Main.xmlui:title",
+    });
+
+    // --- Assert
+    expect(result.length).toBe(3);
+    expect(result[1].type).toBe("expression");
+    if (result[1].type === "expression") {
+      expect(result[1].compiled).toMatchObject({
+        target: "binding-sync",
+        sourceId: "Main.xmlui:title#expr-1",
+        sourceText: "a+b",
+        dependencies: ["a", "b"],
+      });
+      expect(result[1].compiled?.js).toContain("runtime.start(evalContext);");
+      expect(result[1].compiled?.mappings.length).toBeGreaterThan(0);
+      expect(JSON.stringify(result[1].compiled)).not.toContain("nativeFn");
+    }
+  });
+
+  it("throws unsupported node errors while compiling requested parse artifacts", () => {
+    expect(() =>
+      parseParameterString("{(async () => 1)}", {
+        compileBindings: true,
+        sourceId: "Main.xmlui:bad",
+      }),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 
   it("Combination works #1", () => {

@@ -18,6 +18,7 @@ import { createValueExtractor } from "./rendering/valueExtractor";
 import { useFnDeps } from "./FnDepsContext";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import type { AppContextObject } from "../abstractions/AppContextDefs";
+import { createBindingEvalOptions } from "./script-runner/eval-options";
 
 interface LoaderRendererContext {
   node: ComponentDef;
@@ -75,13 +76,17 @@ export function LoaderComponent({
 
   // --- Memoizes the value extractor object
   const valueExtractor = useMemo(() => {
+    const bindingEvalOptions = createBindingEvalOptions(
+      appContext,
+      (appContext as any)?.__udcEvalOptions,
+    );
     return createValueExtractor(
       state,
       appContext,
       referenceTrackedApi,
       memoedVarsRef,
       fnDeps,
-      (appContext as any)?.__udcEvalOptions,
+      bindingEvalOptions,
     );
   }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 

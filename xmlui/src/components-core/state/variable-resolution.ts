@@ -45,6 +45,7 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
 import { extractParam } from "../utils/extractParam";
 import { ParseVarError } from "../rendering/ContainerUtils";
 import { pickFromObject, shallowCompare } from "../utils/misc";
@@ -80,6 +81,10 @@ export function useVars(
 ): ContainerState {
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
+  const bindingEvalOptions = useMemo(
+    () => createBindingEvalOptions(appContext, evalOptions),
+    [appContext, evalOptions],
+  );
 
   const resolvedVars = useMemo(() => {
     const ret: any = {};
@@ -120,10 +125,10 @@ export function useVars(
                           appContext,
                           options: {
                             defaultToOptionalMemberAccess: true,
-                            ...evalOptions,
+                            ...bindingEvalOptions,
                           },
                         })
-                      : extractParam(state, value, appContext, strict, undefined, evalOptions);
+                      : extractParam(state, value, appContext, strict, undefined, bindingEvalOptions);
                   } catch (e) {
                     console.log(state);
                     throw new ParseVarError(value, e);
@@ -208,7 +213,7 @@ export function useVars(
       }
     });
     return ret;
-  }, [appContext, componentState, evalOptions, fnDeps, memoedVars, referenceTrackedApi, vars]);
+  }, [appContext, bindingEvalOptions, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
   return useShallowCompareMemoize(resolvedVars);
 }

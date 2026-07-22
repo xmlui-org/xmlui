@@ -40,6 +40,9 @@ export type StandaloneAppDescription = {
    * - `xsVerboseLogBucket` (string) — optional bucket label for trace entries.
    * - `defaultToOptionalMemberAccess` (boolean) — treat all member accesses as optional
    *   (default `true`).
+   * - `compileBindings` (boolean, default `false`) — experimental switch that
+   *   carries compiled synchronous binding evaluation through the runtime
+   *   configuration. The current implementation still uses the AST interpreter.
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
    * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
    *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.
@@ -247,7 +250,7 @@ export type StandaloneAppDescription = {
    * govern the engine's behaviour rather than application data (which lives
    * in `appGlobals`). Examples: `disableInlineStyle`, `useHashBasedRouting`,
    * `withXSRFToken`, `logRestApiErrors`, `xsVerbose`, `xsVerboseLogMax`,
-   * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`,
+   * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`, `compileBindings`,
    * `applyLayoutProperties`, `lintSeverity`, `searchIndexEnabled`, and the
    * `strict*` family.
    *

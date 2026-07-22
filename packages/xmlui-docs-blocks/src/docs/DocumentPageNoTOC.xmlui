@@ -5,8 +5,7 @@
     <Breadcrumbs defaultItems="{$props.defaultItems}" />
     <Markdown
       when="{$props.content || $props.url}"
-      content="{$props.content}"
-      data="{$props.url}" />
+      content="{$props.content}" />
     <Slot when="{!$props.content && !$props.url}" />
     <DocumentLinks />
   </Stack>

@@ -68,7 +68,7 @@
                                 {$props.sortedPosts[1].description}
                             </Text>
                             <Text variant="blurb" maxLines="4" ellipses>
-                                {item.description}
+                                {$props.sortedPosts[1].description}
                             </Text>
                             <HStack horizontalAlignment="end" width="100%">
                                 <Link to="/blog/{$props.sortedPosts[1].slug}">
@@ -105,7 +105,7 @@
                                 {$props.sortedPosts[2].description}
                             </Text>
                             <Text variant="blurb" maxLines="4" ellipses>
-                                {item.description}
+                                {$props.sortedPosts[2].description}
                             </Text>
                             <HStack horizontalAlignment="end" width="100%">
                                 <Link to="/blog/{$props.sortedPosts[2].slug}">

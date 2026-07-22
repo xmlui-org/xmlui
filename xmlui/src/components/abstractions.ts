@@ -340,10 +340,13 @@ const TextVariantKeys = [
   "cite", // use <cite>
   "code", // use <code>
   "deleted", // use <del>
+  "description", // Descriptive supporting text
   "inherit",
+  "info", // Compact informational metadata text
   "inserted", // use <ins>
   "keyboard", // use <kbd>,
   "marked", // use <mark>
+  "blurb", // Short summary or teaser text
   "sample", // use <samp>
   "sub", // use <sub>
   "sup", // use <sup>
@@ -413,10 +416,13 @@ export const TextVariantElement: Record<TextVariant, TextVariantMappingType> = {
   cite: "cite",
   code: "code",
   deleted: "del",
+  description: "span",
   inherit: "span",
+  info: "span",
   inserted: "ins",
   keyboard: "kbd",
   marked: "mark",
+  blurb: "span",
   sample: "samp",
   sub: "sub",
   sup: "sup",
@@ -441,6 +447,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "cite", description: "Is used to mark up the title of a cited work" },
   { value: "code", description: "Represents a line of code" },
   { value: "deleted", description: "Represents text that has been deleted" },
+  { value: "description", description: "Represents descriptive supporting text" },
   { value: "em", description: "Marks text to stress emphasis" },
   {
     value: "inherit",
@@ -450,6 +457,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
     value: "inserted",
     description: "Represents a range of text that has been added to a document",
   },
+  { value: "info", description: "Represents compact informational metadata text" },
   {
     value: "keyboard",
     description:
@@ -459,6 +467,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
     value: "marked",
     description: "Represents text which is marked or highlighted for reference or notation",
   },
+  { value: "blurb", description: "Represents a short summary or teaser text" },
   { value: "mono", description: "Text using a mono style font family" },
   { value: "paragraph", description: "Represents a paragraph" },
   {

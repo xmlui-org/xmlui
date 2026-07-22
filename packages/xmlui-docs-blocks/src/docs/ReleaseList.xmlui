@@ -11,7 +11,7 @@
                     </VStack>
                     <Fragment when="{$isFirst && $props.showLatestBadge !== false}">
                         <SpaceFiller />
-                        <Badge variant="pill">Latest</Badge>
+                        <Badge variant="pill" value="Latest" />
                     </Fragment>
                 </HStack>
                 <VStack paddingLeft="$padding-normal">
@@ -40,7 +40,12 @@
                             {$item.assets[0].name}
                         </Link>
                         <SpaceFiller />
-                        <Button variant="ghost" themeColor="primary" icon="download" padding="$space-2">
+                        <Button
+                            variant="ghost"
+                            themeColor="primary"
+                            icon="download"
+                            padding="$space-2"
+                            label="{$props.downloadLabel || 'Download'}">
                             <Link active="true" to="{$item.assets[0].browser_download_url}">
                                 {$props.downloadLabel || 'Download'}
                             </Link>

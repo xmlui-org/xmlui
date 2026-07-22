@@ -4,9 +4,26 @@ import type { Plugin } from "vite";
 import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite";
 // @ts-ignore
 import path from "path";
+import { readFile } from "fs/promises";
 import react from "@vitejs/plugin-react";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
+import type { PluginOptions } from "../vite-xmlui-plugin";
+
+async function loadXmluiPluginOptions(): Promise<PluginOptions> {
+  try {
+    const rawConfig = await readFile(path.join(process.cwd(), "xmlui.config.json"), "utf-8");
+    const config = JSON.parse(rawConfig);
+    return {
+      analyze: config.analyze,
+      reactiveCycles: config.reactiveCycles,
+      accessibility: config.accessibility,
+      typeContracts: config.typeContracts,
+    };
+  } catch {
+    return {};
+  }
+}
 
 export const buildLib = async ({
   watchMode,
@@ -27,6 +44,7 @@ export const buildLib = async ({
   } catch (e) {
     // console.error(e);
   }
+  const xmluiPluginOptions = await loadXmluiPluginOptions();
 
   const config: UserConfig = {
     customLogger: overrides.customLogger,
@@ -59,6 +77,7 @@ export const buildLib = async ({
         treeshake: mode === "metadata" ? true : undefined,
         external: mode === "metadata" ? [] : ["react", "react-dom", "xmlui", "react/jsx-runtime"],
         output: {
+          exports: "named",
           footer: (chunk) => {
             if (chunk.name === "index" && chunk.fileName === umdFileName) {
               return `if(typeof window.xmlui !== "undefined"){window.xmlui.standalone.registerExtension(window['${env.npm_package_name}'].default || window['${env.npm_package_name}']);}`;
@@ -68,14 +87,15 @@ export const buildLib = async ({
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
+            xmlui: "xmlui",
             "react/jsx-runtime": "jsxRuntime",
           },
         },
       },
     },
     plugins: (mode === "metadata"
-      ? [ViteXmlui({})]
-      : [react(), ViteXmlui({}), libInjectCss(), ...(overrides.plugins || [])]) as Plugin[],
+      ? [ViteXmlui(xmluiPluginOptions)]
+      : [react(), ViteXmlui(xmluiPluginOptions), libInjectCss(), ...(overrides.plugins || [])]) as Plugin[],
   };
 
   await viteBuild(defineConfig(config));

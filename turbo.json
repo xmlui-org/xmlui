@@ -139,6 +139,11 @@
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
     },
+    "//#_e2e:compiled-bindings": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER", "XMLUI_COMPILE_BINDINGS"],
+      "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
+      "outputs": ["playwright-report/**"]
+    },
     "//#_e2e:smoke": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
@@ -151,10 +156,7 @@
     },
     "xmlui-integration-test-app#setup:standalone": {
       "dependsOn": ["xmlui#build:xmlui-standalone", "xmlui-test-extension#build:extension"],
-      "outputs": [
-        "public/js/xmlui-standalone.umd.js",
-        "public/js/xmlui-test-extension.js"
-      ]
+      "outputs": ["public/js/xmlui-standalone.umd.js", "public/js/xmlui-test-extension.js"]
     },
     "xmlui-integration-test-app#build": {
       "dependsOn": ["^prepublishOnly", "xmlui-test-extension#build:extension"],

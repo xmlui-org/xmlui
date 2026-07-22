@@ -4,6 +4,7 @@ import { parseAttributeValue } from "../../../src/components-core/script-runner/
 import type { Identifier, ObjectLiteral} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_IDENTIFIER } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_OBJECT_LITERAL } from "../../../src/parsers/scripting/ScriptingNodeTypes";
+import { UnsupportedCompiledScriptNodeError } from "../../../src/components-core/script-compiler";
 
 describe("Attribute value parsing", () => {
   it("Empty value", () => {
@@ -42,6 +43,36 @@ describe("Attribute value parsing", () => {
     expect(val.segments![0].literal).toBeUndefined();
     expect(val.segments![0].expr.type).toBe(T_IDENTIFIER);
     expect((val.segments![0].expr as Identifier).name).toBe("myId");
+    expect(val.segments![0].compiled).toBeUndefined();
+  });
+
+  it("can attach compiled binding artifacts when requested", () => {
+    // --- Act
+    const val = parseAttributeValue("hello{myId + 1}", {
+      compileBindings: true,
+      sourceId: "Main.xmlui:Text.value",
+    })!;
+
+    // --- Assert
+    expect(val.__PARSED).toBe(true);
+    expect(val.segments).toHaveLength(2);
+    expect(val.segments![1].compiled).toMatchObject({
+      target: "binding-sync",
+      sourceId: "Main.xmlui:Text.value#expr-1",
+      sourceText: "myId + 1",
+      dependencies: ["myId"],
+    });
+    expect(val.segments![1].compiled?.js).toContain("runtime.start(evalContext);");
+    expect(val.segments![1].compiled?.mappings.length).toBeGreaterThan(0);
+  });
+
+  it("throws unsupported node errors while compiling requested parse artifacts", () => {
+    expect(() =>
+      parseAttributeValue("{(async () => 1)}", {
+        compileBindings: true,
+        sourceId: "Main.xmlui:bad",
+      }),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 
   it("compound value #1", () => {
