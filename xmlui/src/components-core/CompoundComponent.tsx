@@ -213,7 +213,10 @@ export const CompoundComponent = forwardRef(
       }
 
       if (handler) {
-        return handler(...args);
+        const result = handler(...args);
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
+          void (result as Promise<unknown>).catch(() => undefined);
+        }
       }
     });
 
