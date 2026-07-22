@@ -63,6 +63,15 @@ describe("event-async compiled script target", () => {
     ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 
+  it("throws a structured unsupported error for non-serializable literals", () => {
+    expect(() =>
+      compileEventAsyncStatementSource(
+        "(value) => { if (/[^a-z0-9_]/.test(value)) return 'Invalid'; return null; }",
+        "Main.xmlui#event-regexp",
+      ),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
+  });
+
   it("prefers a parse-time artifact over runtime AST compilation", async () => {
     const artifact = compileEventAsyncStatementSource("count = count + 1;", "Main.xmlui#event-5");
     const unsupportedStatements = new Parser("count = enabled ? 1 : 2;").parseStatements();

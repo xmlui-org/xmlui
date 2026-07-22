@@ -579,7 +579,9 @@ export function createEventHandlers(config: EventHandlerConfig) {
         const preparedUsesOriginalStatements = preparedStatements === statements;
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
-        const handlerPromise = evalContext.options?.compileEventHandlers
+        const shouldUseCompiledEventHandler =
+          evalContext.options?.compileEventHandlers && options?.eventName !== "mockExecute";
+        const handlerPromise = shouldUseCompiledEventHandler
           ? executeCompiledEventAsyncHandler(
               preparedStatements,
               evalContext,

@@ -39,7 +39,20 @@ describe("compiled event-async basic statement subset", () => {
     const interpreted = await runInterpreted("count = count + 1;", { count: 2 });
 
     expect(compiled.localContext.count).toBe(interpreted.localContext.count);
+    expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(
+      interpreted.evalContext.mainThread?.blocks?.[0].returnValue,
+    );
     expect(compiled.completed.length).toBe(1);
+  });
+
+  it("stores the value of expression statements in the active block return slot", async () => {
+    const compiled = await runCompiled("value * 2;", { value: 21 });
+    const interpreted = await runInterpreted("value * 2;", { value: 21 });
+
+    expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(42);
+    expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(
+      interpreted.evalContext.mainThread?.blocks?.[0].returnValue,
+    );
   });
 
   it("executes let/const declarations and return statements", async () => {

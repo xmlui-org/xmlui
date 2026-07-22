@@ -251,6 +251,13 @@ function emitArrowExpressionStatement(
   statement: ArrowExpressionStatement,
   context: CompilerContext,
 ): void {
+  if (
+    statement.expr.async ||
+    containsNonSerializableLiteral(statement.expr) ||
+    isMultiStatementArrow(statement.expr)
+  ) {
+    throwUnsupportedCompiledScriptNode(statement.expr, context.sourceId);
+  }
   emitBeforeStatement(writer, statement);
   const returnName = context.nextTemp();
   writer.write(`const ${returnName} = await runtime.call(runtime.arrow(`, statement);
@@ -259,6 +266,7 @@ function emitArrowExpressionStatement(
     ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread);",
     statement,
   );
+  writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
   emitAfterStatement(writer, statement);
   writer.write(`return ${returnName};`, statement);
 }
@@ -274,9 +282,11 @@ function emitExpressionStatement(
   ) => void,
 ): void {
   emitBeforeStatement(writer, statement);
-  writer.write("await runtime.complete(", statement);
+  const returnName = context.nextTemp();
+  writer.write(`const ${returnName} = await runtime.complete(`, statement);
   emitStatementExpression(writer, statement.expr, context);
   writer.write(");", statement);
+  writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
   emitAfterStatement(writer, statement);
 }
 
@@ -853,6 +863,9 @@ function emitExpression(
 ): void {
   switch (expr.type) {
     case T_LITERAL:
+      if (!canSerializeLiteral(expr.value)) {
+        throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+      }
       writer.write(literalToJs(expr.value), expr);
       return;
     case T_IDENTIFIER:
@@ -1083,6 +1096,9 @@ function emitArrowExpression(
   expr: ArrowExpression,
   context: CompilerContext,
 ): void {
+  if (expr.async || containsNonSerializableLiteral(expr)) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
   writer.write("runtime.arrow(");
   writer.write(JSON.stringify(expr), expr);
   writer.write(", evalContext, thread)", expr);
@@ -1536,6 +1552,48 @@ function literalToJs(value: any): string {
       if (value === null) return "null";
       return JSON.stringify(value);
   }
+}
+
+function canSerializeLiteral(value: any): boolean {
+  return (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "bigint" ||
+    typeof value === "boolean" ||
+    typeof value === "undefined"
+  );
+}
+
+function containsNonSerializableLiteral(node: any): boolean {
+  if (!node || typeof node !== "object") {
+    return false;
+  }
+  if (node.type === T_LITERAL) {
+    return !canSerializeLiteral(node.value);
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (
+      key === "startToken" ||
+      key === "endToken" ||
+      key === "source" ||
+      key === "parenthesized"
+    ) {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      if (value.some((item) => containsNonSerializableLiteral(item))) {
+        return true;
+      }
+    } else if (containsNonSerializableLiteral(value)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isMultiStatementArrow(expr: ArrowExpression): boolean {
+  return expr.statement.type === T_BLOCK_STATEMENT && expr.statement.stmts.length > 1;
 }
 
 function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {

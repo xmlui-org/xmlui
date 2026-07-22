@@ -88,6 +88,19 @@ export const eventAsyncRuntime = {
     return await completePromise(value);
   },
 
+  setBlockReturnValue(
+    evalContext: BindingTreeEvaluationContext,
+    value: any,
+    thread?: LogicalThread,
+  ): any {
+    const activeThread = thread ?? evalContext.mainThread;
+    const blocks = activeThread?.blocks;
+    if (blocks?.length) {
+      blocks[blocks.length - 1].returnValue = value;
+    }
+    return value;
+  },
+
   arrow(
     expr: ArrowExpression,
     evalContext: BindingTreeEvaluationContext,

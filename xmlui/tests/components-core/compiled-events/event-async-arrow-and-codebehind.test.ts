@@ -4,6 +4,7 @@ import {
   compileEventAsyncStatementSource,
   compileEventAsyncStatements,
   executeCompiledEventAsyncArtifact,
+  UnsupportedCompiledScriptNodeError,
 } from "../../../src/components-core/script-compiler";
 import { createCoWStateProxy } from "../../../src/components-core/container/cow-state-proxy";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
@@ -64,6 +65,21 @@ describe("compiled event-async arrow and callback calls", () => {
     const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
     expect(returnValue).toBe("ALPHA");
+  });
+
+  it("falls back for top-level arrows with multiple body statements", () => {
+    const expr = new Parser("(item) => { first = item; second = item; }").parseExpr() as ArrowExpression;
+    const statement: ArrowExpressionStatement = {
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      nodeId: expr.nodeId,
+      expr,
+    };
+
+    expect(() =>
+      compileEventAsyncStatements([statement], {
+        sourceId: "test:event:multi-statement-arrow-expression-statement",
+      }),
+    ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 
   it("calls local arrow declarations", async () => {
