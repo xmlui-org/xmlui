@@ -7,8 +7,9 @@ import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
 import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
-import type { GetText } from "./parser";
+import type { GetText, XmluiParserOptions } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 import type { DocumentCursor } from "../../language-server/base/text-document";
 
@@ -130,6 +131,7 @@ export function nodeToComponentDef(
   preResolvedImports?: CollectedDeclarations,
   warnings?: string[],
   cursor?: DocumentCursor,
+  parserOptions: XmluiParserOptions = {},
 ): ComponentDef | CompoundComponentDef | null {
   return transformXmluiNode(
     node,
@@ -139,6 +141,7 @@ export function nodeToComponentDef(
     warnings,
     cursor,
     "component",
+    parserOptions,
   ).component;
 }
 
@@ -154,6 +157,7 @@ export function nodeToXmluiAppParts(
   preResolvedImports?: CollectedDeclarations,
   warnings?: string[],
   cursor?: DocumentCursor,
+  parserOptions: XmluiParserOptions = {},
 ): XmluiAppParts {
   const { component, inlineComponents } = transformXmluiNode(
     node,
@@ -163,6 +167,7 @@ export function nodeToXmluiAppParts(
     warnings,
     cursor,
     "entrypoint",
+    parserOptions,
   );
 
   return {
@@ -179,6 +184,7 @@ function transformXmluiNode(
   warnings: string[] | undefined,
   cursor: DocumentCursor | undefined,
   role: "component" | "entrypoint",
+  parserOptions: XmluiParserOptions,
 ): {
   component: ComponentDef | CompoundComponentDef | null;
   inlineComponents: CompoundComponentDef[];
@@ -1425,12 +1431,19 @@ function transformXmluiNode(
     const parser = new Parser(value);
     try {
       const statements = parser.parseStatements();
+      const parseId = ++lastParseId;
       return {
         __PARSED: true,
         statements,
-        parseId: ++lastParseId,
+        parseId,
         // TODO: retrieve the event source code only in dev mode
         source: value,
+        compiled: parserOptions.compileEventHandlers
+          ? compileEventAsyncStatements(statements, {
+              sourceId: `${fileId}#event-${parseId}`,
+              sourceText: value,
+            })
+          : undefined,
       } as ParsedEventValue;
     } catch {
       if (parser.errors.length > 0) {

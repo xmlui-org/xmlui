@@ -118,6 +118,18 @@ export type EvalTreeOptions = {
    */
   compileBindings?: boolean;
   /**
+   * Experimental switch for compiled asynchronous event handlers and
+   * code-behind functions.
+   *
+   * Default: `false`. Step 1 only propagates the option through the event
+   * handler evaluation call chain; the existing async AST interpreter remains
+   * the only evaluator until the compiler target is implemented.
+   *
+   * Set via `App.xmluiConfig.compileEventHandlers` in config.json or the App
+   * component.
+   */
+  compileEventHandlers?: boolean;
+  /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access
    * still proceeds but emits a `console.warn` and a `"sandbox:warn"` trace

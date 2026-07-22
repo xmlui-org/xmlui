@@ -18,8 +18,9 @@ export function transformSource(
   fileId?: number,
   printRes: boolean = false,
   warnings?: string[],
+  options: XmluiParserOptions = {},
 ): ComponentDef | CompoundComponentDef | undefined {
-  const { getText, parse } = createXmlUiParser(source);
+  const { getText, parse } = createXmlUiParser(source, options);
   const { node, errors } = parse();
   if (printRes) {
     console.log(toDbgString(node, getText));
@@ -32,7 +33,7 @@ export function transformSource(
     throw new Error(`${errors[0].code}: ${errors[0].message}`);
   }
   const cursor = new DocumentCursor(source);
-  return nodeToComponentDef(node, getText, fileId ?? 0, undefined, warnings, cursor);
+  return nodeToComponentDef(node, getText, fileId ?? 0, undefined, warnings, cursor, options);
 }
 
 export function transformEntryPointSource(

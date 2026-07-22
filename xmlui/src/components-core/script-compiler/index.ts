@@ -19,16 +19,28 @@ export {
   sourceRangeFromNode,
 } from "./source";
 export { bindingSyncRuntime } from "./runtime";
+export { eventAsyncRuntime } from "./event-runtime";
 export {
   compileBindingSyncExpression,
   compileBindingSyncExpressionSource,
   type CompileBindingSyncExpressionOptions,
 } from "./targets/binding-sync";
 export {
+  compileEventAsyncStatements,
+  compileEventAsyncStatementSource,
+  type CompileEventAsyncStatementsOptions,
+} from "./targets/event-async";
+export {
   clearBindingSyncCompilerCache,
   evaluateCompiledBinding,
   evaluateCompiledBindingExpressionSource,
 } from "./targets/binding-sync-executor";
+export {
+  clearEventAsyncCompilerCache,
+  executeCompiledEventAsyncArtifact,
+  executeCompiledEventAsyncHandler,
+  executeCompiledEventAsyncStatements,
+} from "./targets/event-async-executor";
 export type {
   CompiledScriptArtifact,
   CompiledScriptDiagnostic,

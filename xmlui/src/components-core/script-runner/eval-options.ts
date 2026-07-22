@@ -17,3 +17,31 @@ export function createBindingEvalOptions(
     ...overrides,
   };
 }
+
+/**
+ * Builds the evaluation options used by asynchronous event-handler execution.
+ *
+ * `compileEventHandlers` is an experimental app-level switch. This first step
+ * only carries the option through the existing async interpreter path; later
+ * compiler work will use it to select the compiled event/code-behind evaluator.
+ */
+export function createEventEvalOptions(
+  appContext?: AppContextObject,
+  overrides: EvalTreeOptions = {},
+): EvalTreeOptions {
+  return {
+    defaultToOptionalMemberAccess:
+      typeof appContext?.xmluiConfig?.defaultToOptionalMemberAccess === "boolean"
+        ? appContext.xmluiConfig.defaultToOptionalMemberAccess
+        : true,
+    strictDomSandbox: Array.isArray(appContext?.xmluiConfig?.strictDomSandbox)
+      ? appContext.xmluiConfig.strictDomSandbox
+      : appContext?.xmluiConfig?.strictDomSandbox === true,
+    allowConsole: appContext?.xmluiConfig?.allowConsole !== false,
+    ...(appContext?.xmluiConfig?.compileEventHandlers === true
+      ? { compileEventHandlers: true }
+      : {}),
+    ...((appContext as any)?.__udcEvalOptions ?? {}),
+    ...overrides,
+  };
+}

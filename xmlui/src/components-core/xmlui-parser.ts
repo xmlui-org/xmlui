@@ -73,11 +73,20 @@ export function xmlUiMarkupToComponent(
         preResolvedImports,
         warnings,
         cursor,
+        parserOptions,
       );
       component = appParts.entrypoint;
       inlineComponents = appParts.inlineComponents;
     } else {
-      component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
+      component = nodeToComponentDef(
+        node,
+        getText,
+        fileId,
+        preResolvedImports,
+        warnings,
+        cursor,
+        parserOptions,
+      );
     }
     if (component) {
       computeUsesForTree(component as ComponentDef, metadataLookup ?? getOptimizerMetadata);
