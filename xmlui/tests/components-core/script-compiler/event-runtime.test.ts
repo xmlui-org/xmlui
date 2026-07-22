@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createCancellationToken } from "../../../src/components-core/concurrency";
+import { ThrowStatementError } from "../../../src/components-core/EngineError";
 import { eventAsyncRuntime } from "../../../src/components-core/script-compiler";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
@@ -49,6 +50,26 @@ describe("event-async runtime helpers", () => {
     await expect(
       eventAsyncRuntime.checkCancel(createEvalContext({ localContext: { $cancel: token } })),
     ).rejects.toThrow(HandlerCancelledError);
+  });
+
+  it("wraps throw statement values in ThrowStatementError", () => {
+    const errorObject = { type: "Error" };
+
+    expect(() => eventAsyncRuntime.throwStatement(errorObject)).toThrow(ThrowStatementError);
+    try {
+      eventAsyncRuntime.throwStatement(errorObject);
+    } catch (err) {
+      expect((err as ThrowStatementError).errorObject).toBe(errorObject);
+    }
+  });
+
+  it("unwraps ThrowStatementError values for catch bindings", () => {
+    const errorObject = { type: "Error" };
+    const wrappedError = new ThrowStatementError(errorObject);
+    const nativeError = new Error("native");
+
+    expect(eventAsyncRuntime.catchValue(wrappedError)).toBe(errorObject);
+    expect(eventAsyncRuntime.catchValue(nativeError)).toBe(nativeError);
   });
 
   it("runs statement completion hooks and yields after a statement", async () => {

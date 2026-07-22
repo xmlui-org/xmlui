@@ -1,6 +1,7 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { HandlerCancelledError } from "../concurrency/token";
+import { ThrowStatementError } from "../EngineError";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import { getAsyncProxy } from "../script-runner/asyncProxy";
 import { isBannedFunction } from "../script-runner/bannedFunctions";
@@ -75,6 +76,26 @@ export const eventAsyncRuntime = {
 
   async complete(value: any): Promise<any> {
     return await completePromise(value);
+  },
+
+  throwStatement(value: any): never {
+    throw new ThrowStatementError(value);
+  },
+
+  catchValue(error: any): any {
+    return error instanceof ThrowStatementError ? error.errorObject : error;
+  },
+
+  destructure(value: any, specs: Array<[string, Array<string | number>]>): Record<string, any> {
+    const result: Record<string, any> = {};
+    for (const [name, path] of specs) {
+      let current = value;
+      for (const member of path) {
+        current = current?.[member];
+      }
+      result[name] = current;
+    }
+    return result;
   },
 
   async call(

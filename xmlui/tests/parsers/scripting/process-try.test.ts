@@ -649,17 +649,70 @@ describe("Process try statements", () => {
     const statements = parseStatements(source);
 
     // --- Act
-    try {
-      await processStatementQueueAsync(statements, evalContext);
-    } catch (err: any) {
-      // --- Assert
-      expect(evalContext.mainThread!.returnValue).equal(123);
-      expect(evalContext.mainThread!.blocks!.length).equal(1);
-      expect(evalContext.localContext.x).equal(1);
-      expect(err.errorObject.type).equal("Error");
-      return;
-    }
-    assert.fail("Exception expected");
+    await processStatementQueueAsync(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.returnValue).equal(123);
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+    expect(evalContext.localContext.x).equal(1);
+  });
+
+  it("try - finally with break suppresses pending throw", async () => {
+    // --- Arrange
+    const source = `
+      while (true) {
+        try {
+          throw { type: "Error" }
+        } finally {
+          x = 1;
+          break;
+        }
+        x = -1;
+      }
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    await processStatementQueueAsync(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+    expect(evalContext.localContext.x).equal(1);
+  });
+
+  it("try - finally with continue suppresses pending throw", async () => {
+    // --- Arrange
+    const source = `
+      while (x < 3) {
+        try {
+          throw { type: "Error" }
+        } finally {
+          x++;
+          continue;
+        }
+        z++;
+      }
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+        z: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    await processStatementQueueAsync(statements, evalContext);
+
+    // --- Assert
+    expect(evalContext.mainThread!.blocks!.length).equal(1);
+    expect(evalContext.localContext.x).equal(3);
+    expect(evalContext.localContext.z).equal(0);
   });
 
   it("try - finally with second return", async () => {

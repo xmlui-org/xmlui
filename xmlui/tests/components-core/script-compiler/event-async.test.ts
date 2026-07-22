@@ -58,7 +58,7 @@ describe("event-async compiled script target", () => {
 
   it("throws a structured unsupported error for unsupported nodes", () => {
     expect(() =>
-      compileEventAsyncStatementSource("while (true) { count++; }", "Main.xmlui#event-4"),
+      compileEventAsyncStatementSource("count = enabled ? 1 : 2;", "Main.xmlui#event-4"),
     ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 });

@@ -307,6 +307,8 @@ function processStatement(
 
       // --- Check for try blocks
       if ((thread.tryBlocks ?? []).length > 0) {
+        suppressPendingFinallyErrors(thread);
+
         // --- Mark ALL try scopes to exit with "return" to properly propagate through nested tries
         for (let i = 0; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![i].exitType = "return";
@@ -383,6 +385,8 @@ function processStatement(
         loopScope.tryBlockDepth >= 0 &&
         loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
       ) {
+        suppressPendingFinallyErrors(thread);
+
         // --- Mark the loop's try scope to exit with "continue"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "continue";
@@ -415,6 +419,8 @@ function processStatement(
         loopScope.tryBlockDepth >= 0 &&
         loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
       ) {
+        suppressPendingFinallyErrors(thread);
+
         // --- Mark the loop's try scope to exit with "break"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "break";
@@ -945,6 +951,14 @@ export function processDeclarations(
       } else {
         visitIdDeclaration(block, objDecl.alias ?? objDecl.id!, value, addConst);
       }
+    }
+  }
+}
+
+function suppressPendingFinallyErrors(thread: LogicalThread): void {
+  for (const tryScope of thread.tryBlocks ?? []) {
+    if (tryScope.processingPhase === "finally") {
+      delete tryScope.errorToThrow;
     }
   }
 }
