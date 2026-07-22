@@ -165,6 +165,42 @@ describe("binding-sync expression compiler", () => {
       {},
       8,
     ],
+    [
+      "switch with fallthrough",
+      "(() => { let value = ''; switch (kind) { case 'a': value += 'a'; case 'b': value += 'b'; break; default: value += 'd'; } return value; })()",
+      { kind: "a" },
+      "ab",
+    ],
+    [
+      "try catch finally",
+      "(() => { let value = ''; try { throw 'x'; } catch (err) { value += err; } finally { value += 'f'; } return value; })()",
+      {},
+      "xf",
+    ],
+    [
+      "try finally return",
+      "(() => { try { return 'try'; } finally { return 'finally'; } })()",
+      {},
+      "finally",
+    ],
+    [
+      "function declaration",
+      "(() => { function double(x) { return x * 2; } return double(3); })()",
+      {},
+      6,
+    ],
+    [
+      "array destructuring declaration",
+      "(() => { const [first, [second]] = values; return first + second; })()",
+      { values: [2, [3]] },
+      5,
+    ],
+    [
+      "object destructuring declaration",
+      "(() => { const { a, b: alias, c: { d } } = value; return a + alias + d; })()",
+      { value: { a: 1, b: 2, c: { d: 3 } } },
+      6,
+    ],
   ])("matches interpreter for %s", (_name, source, localContext, expected) => {
     expect(evalInterpreted(source, localContext)).toEqual(expected);
     expect(evalCompiled(source, localContext)).toEqual(expected);
@@ -333,12 +369,9 @@ describe("binding-sync expression compiler", () => {
     expect(() => compileBindingSyncExpressionSource("new Date()", "test:unsupported")).toThrow(
       UnsupportedCompiledScriptNodeError,
     );
-    expect(() =>
-      compileBindingSyncExpressionSource(
-        "(() => { try { return 1; } finally {} })()",
-        "test:unsupported",
-      ),
-    ).toThrow(UnsupportedCompiledScriptNodeError);
+    expect(() => compileBindingSyncExpressionSource("(async () => 1)", "test:unsupported")).toThrow(
+      UnsupportedCompiledScriptNodeError,
+    );
     expect(evalInterpreted("new Date(0)")).toBeInstanceOf(Date);
   });
 

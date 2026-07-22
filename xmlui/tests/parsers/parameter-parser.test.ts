@@ -61,7 +61,7 @@ describe("parseParameterString", () => {
 
   it("throws unsupported node errors while compiling requested parse artifacts", () => {
     expect(() =>
-      parseParameterString("{(() => { try { return 1; } finally {} })()}", {
+      parseParameterString("{(async () => 1)}", {
         compileBindings: true,
         sourceId: "Main.xmlui:bad",
       }),

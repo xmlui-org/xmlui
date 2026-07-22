@@ -86,3 +86,12 @@
 - Observation: `JSON.stringify(NaN)` and `JSON.stringify(Infinity)` return `null`, so using JSON serialization for all number literals silently changed `NaN`/`Infinity` binding values.
 - Decision: compiled literal emission now prints `NaN`, `Infinity`, and `-Infinity` as JavaScript numeric literals instead of passing them through `JSON.stringify(...)`.
 - Future impact: source-map/build-time artifact work should keep literal emission centralized so JavaScript's non-JSON numeric values are handled consistently across targets.
+
+## Step 10 - statement parity and change-detection coverage
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/binding-sync.ts`, `xmlui/tests/components-core/compiled-sync/*`, `xmlui/scripts/measure-compiled-bindings.ts`.
+- Decision: the binding-sync target now emits native JavaScript control flow for `switch`, `try/catch/finally`, function declarations, and local destructuring declarations. Binding-visible reads/writes still flow through runtime helpers.
+- Decision: dedicated compiled-sync unit tests cover dirty-root reporting, helper-level path/action descriptors, dependency invalidation, and read-only expressions that must not dirty any root.
+- Observation: `collectVariableDependencies()` currently does not expose `count` for a template literal such as `` `Count: ${count}` `` in the same way as plain binary/member expressions. The compiled work does not change that dependency model; it is a separate collector parity gap to revisit.
+- Observation: direct `tsx` execution may need non-sandboxed IPC pipe access in this environment. The measurement command is a developer harness, not a CI pass/fail benchmark.
+- Future impact: event/code-behind compilation can reuse the native statement-control-flow emitter shape, but its runtime helpers will need async/cancellation/transaction hooks. Dependency-model changes, especially computed members and template literals, should be handled centrally before Vite build-time compilation relies on serialized dependency metadata.

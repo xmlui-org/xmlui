@@ -68,7 +68,7 @@ describe("Attribute value parsing", () => {
 
   it("throws unsupported node errors while compiling requested parse artifacts", () => {
     expect(() =>
-      parseAttributeValue("{(() => { try { return 1; } finally {} })()}", {
+      parseAttributeValue("{(async () => 1)}", {
         compileBindings: true,
         sourceId: "Main.xmlui:bad",
       }),

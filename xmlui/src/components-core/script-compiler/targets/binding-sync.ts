@@ -15,6 +15,7 @@ import {
   T_FOR_IN_STATEMENT,
   T_FOR_OF_STATEMENT,
   T_FOR_STATEMENT,
+  T_FUNCTION_DECLARATION,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_ARROW_EXPRESSION,
   T_IDENTIFIER,
@@ -28,10 +29,14 @@ import {
   T_RETURN_STATEMENT,
   T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
+  T_SWITCH_STATEMENT,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
   T_UNARY_EXPRESSION,
+  T_VAR_STATEMENT,
   T_WHILE_STATEMENT,
+  type ArrayDestructure,
   type ArrayLiteral,
   type AssignmentExpression,
   type ArrowExpression,
@@ -47,6 +52,7 @@ import {
   type ForInStatement,
   type ForOfStatement,
   type ForStatement,
+  type FunctionDeclaration,
   type FunctionInvocationExpression,
   type Identifier,
   type IfStatement,
@@ -54,13 +60,16 @@ import {
   type MemberAccessExpression,
   type ObjectLiteral,
   type ObjectLiteralProp,
+  type ObjectDestructure,
   type PostfixOpExpression,
   type PrefixOpExpression,
   type ReturnStatement,
   type SequenceExpression,
   type Statement,
+  type SwitchStatement,
   type TemplateLiteralExpression,
   type ThrowStatement,
+  type TryStatement,
   type UnaryExpression,
   type VarDeclaration,
   type WhileStatement,
@@ -569,8 +578,14 @@ function emitStatement(
     case T_CONST_STATEMENT:
       emitDeclarationStatement(writer, "const", stmt, context);
       return;
+    case T_VAR_STATEMENT:
+      writer.write(`throw new Error("'var' declarations are not allowed within functions");`, stmt);
+      return;
     case T_BLOCK_STATEMENT:
       emitBlockStatement(writer, stmt, context);
+      return;
+    case T_FUNCTION_DECLARATION:
+      emitFunctionDeclaration(writer, stmt, context);
       return;
     case T_IF_STATEMENT:
       emitIfStatement(writer, stmt, context);
@@ -592,6 +607,12 @@ function emitStatement(
       return;
     case T_FOR_IN_STATEMENT:
       emitForInStatement(writer, stmt, context);
+      return;
+    case T_SWITCH_STATEMENT:
+      emitSwitchStatement(writer, stmt, context);
+      return;
+    case T_TRY_STATEMENT:
+      emitTryStatement(writer, stmt, context);
       return;
     case T_BREAK_STATEMENT:
       writer.write("break;", stmt as BreakStatement);
@@ -645,6 +666,28 @@ function emitIfStatement(
     writer.write(" else ");
     emitStatementAsBody(writer, stmt.elseB, context);
   }
+}
+
+function emitFunctionDeclaration(
+  writer: CompiledScriptCodeWriter,
+  stmt: FunctionDeclaration,
+  context: CompilerContext,
+): void {
+  if (stmt.async) {
+    throwUnsupportedCompiledScriptNode(stmt, context.sourceId);
+  }
+  assertJsIdentifier(stmt.id, context.sourceId);
+  const argNames = stmt.args.map((arg) => getArrowArgName(arg, context.sourceId));
+  const functionContext = extendCompilerContext(context, [stmt.id.name, ...argNames]);
+  writer.write("function ", stmt);
+  writer.write(stmt.id.name, stmt.id);
+  writer.write("(");
+  writer.write(argNames.join(", "));
+  writer.write(") ");
+  writer.write("{ runtime.checkTimeout(evalContext); ");
+  const blockContext = extendCompilerContext(functionContext, collectBlockLocalNames(stmt.stmt));
+  stmt.stmt.stmts.forEach((child) => emitStatement(writer, child, blockContext));
+  writer.write("}", stmt.stmt);
 }
 
 function emitThrowStatement(
@@ -770,6 +813,53 @@ function emitForInit(
   throwUnsupportedCompiledScriptNode(init, context.sourceId);
 }
 
+function emitSwitchStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: SwitchStatement,
+  context: CompilerContext,
+): void {
+  writer.write("switch (", stmt);
+  emitExpression(writer, stmt.expr, context);
+  writer.write(") {", stmt);
+  stmt.cases.forEach((switchCase) => {
+    if (switchCase.caseE) {
+      writer.write("case ", switchCase);
+      emitExpression(writer, switchCase.caseE, context);
+      writer.write(":", switchCase);
+    } else {
+      writer.write("default:", switchCase);
+    }
+    switchCase.stmts?.forEach((child) => emitStatement(writer, child, context));
+  });
+  writer.write("}", stmt);
+}
+
+function emitTryStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: TryStatement,
+  context: CompilerContext,
+): void {
+  writer.write("try ", stmt);
+  emitBlockStatement(writer, stmt.tryB, context);
+  if (stmt.catchB) {
+    writer.write(" catch");
+    if (stmt.catchV) {
+      assertJsIdentifier(stmt.catchV, context.sourceId);
+      writer.write(` (${stmt.catchV.name})`, stmt.catchV);
+    }
+    writer.write(" ");
+    emitBlockStatement(
+      writer,
+      stmt.catchB,
+      stmt.catchV ? extendCompilerContext(context, [stmt.catchV.name]) : context,
+    );
+  }
+  if (stmt.finallyB) {
+    writer.write(" finally ");
+    emitBlockStatement(writer, stmt.finallyB, context);
+  }
+}
+
 function emitStatementAsBody(
   writer: CompiledScriptCodeWriter,
   stmt: Statement,
@@ -790,13 +880,100 @@ function emitVarDeclaration(
   context: CompilerContext,
 ): void {
   if (!decl.id || decl.aDestr || decl.oDestr) {
-    throwUnsupportedCompiledScriptNode(decl, context.sourceId);
+    emitVarDeclarationPattern(writer, decl, context);
+  } else {
+    assertJsIdentifier(
+      { type: T_IDENTIFIER, nodeId: decl.nodeId, name: decl.id },
+      context.sourceId,
+    );
+    writer.write(decl.id, decl);
   }
-  assertJsIdentifier({ type: T_IDENTIFIER, nodeId: decl.nodeId, name: decl.id }, context.sourceId);
-  writer.write(decl.id, decl);
   if (decl.expr) {
     writer.write(" = ");
     emitExpression(writer, decl.expr, context);
+  }
+}
+
+function emitVarDeclarationPattern(
+  writer: CompiledScriptCodeWriter,
+  decl: VarDeclaration,
+  context: CompilerContext,
+): void {
+  if (decl.aDestr) {
+    emitArrayDestructurePattern(writer, decl.aDestr, context);
+    return;
+  }
+  if (decl.oDestr) {
+    emitObjectDestructurePattern(writer, decl.oDestr, context);
+    return;
+  }
+  throwUnsupportedCompiledScriptNode(decl, context.sourceId);
+}
+
+function emitArrayDestructurePattern(
+  writer: CompiledScriptCodeWriter,
+  destructure: ArrayDestructure[],
+  context: CompilerContext,
+): void {
+  writer.write("[");
+  destructure.forEach((item, index) => {
+    if (index > 0) writer.write(", ");
+    emitDestructureItemPattern(writer, item, context);
+  });
+  writer.write("]");
+}
+
+function emitObjectDestructurePattern(
+  writer: CompiledScriptCodeWriter,
+  destructure: ObjectDestructure[],
+  context: CompilerContext,
+): void {
+  writer.write("{");
+  destructure.forEach((item, index) => {
+    if (index > 0) writer.write(", ");
+    assertJsIdentifier(
+      { type: T_IDENTIFIER, nodeId: item.nodeId, name: item.id },
+      context.sourceId,
+    );
+    if (item.aDestr || item.oDestr || item.alias) {
+      writer.write(`${item.id}: `, item);
+      if (item.aDestr) {
+        emitArrayDestructurePattern(writer, item.aDestr, context);
+      } else if (item.oDestr) {
+        emitObjectDestructurePattern(writer, item.oDestr, context);
+      } else {
+        assertJsIdentifier(
+          { type: T_IDENTIFIER, nodeId: item.nodeId, name: item.alias! },
+          context.sourceId,
+        );
+        writer.write(item.alias!, item);
+      }
+    } else {
+      writer.write(item.id, item);
+    }
+  });
+  writer.write("}");
+}
+
+function emitDestructureItemPattern(
+  writer: CompiledScriptCodeWriter,
+  item: ArrayDestructure,
+  context: CompilerContext,
+): void {
+  if (item.id) {
+    assertJsIdentifier(
+      { type: T_IDENTIFIER, nodeId: item.nodeId, name: item.id },
+      context.sourceId,
+    );
+    writer.write(item.id, item);
+    return;
+  }
+  if (item.aDestr) {
+    emitArrayDestructurePattern(writer, item.aDestr, context);
+    return;
+  }
+  if (item.oDestr) {
+    emitObjectDestructurePattern(writer, item.oDestr, context);
   }
 }
 
@@ -805,13 +982,45 @@ function collectBlockLocalNames(stmt: BlockStatement): string[] {
   stmt.stmts.forEach((child) => {
     if (child.type === T_LET_STATEMENT || child.type === T_CONST_STATEMENT) {
       names.push(...collectDeclarationNames(child.decls));
+    } else if (child.type === T_FUNCTION_DECLARATION) {
+      names.push(child.id.name);
     }
   });
   return names;
 }
 
 function collectDeclarationNames(decls: VarDeclaration[]): string[] {
-  return decls.flatMap((decl) => (decl.id && !decl.aDestr && !decl.oDestr ? [decl.id] : []));
+  return decls.flatMap((decl) => collectVarDeclarationNames(decl));
+}
+
+function collectVarDeclarationNames(decl: VarDeclaration): string[] {
+  if (decl.id && !decl.aDestr && !decl.oDestr) {
+    return [decl.id];
+  }
+  if (decl.aDestr) {
+    return collectArrayDestructureNames(decl.aDestr);
+  }
+  if (decl.oDestr) {
+    return collectObjectDestructureNames(decl.oDestr);
+  }
+  return [];
+}
+
+function collectArrayDestructureNames(destructure: ArrayDestructure[]): string[] {
+  return destructure.flatMap((item) => {
+    if (item.id) return [item.id];
+    if (item.aDestr) return collectArrayDestructureNames(item.aDestr);
+    if (item.oDestr) return collectObjectDestructureNames(item.oDestr);
+    return [];
+  });
+}
+
+function collectObjectDestructureNames(destructure: ObjectDestructure[]): string[] {
+  return destructure.flatMap((item) => {
+    if (item.aDestr) return collectArrayDestructureNames(item.aDestr);
+    if (item.oDestr) return collectObjectDestructureNames(item.oDestr);
+    return [item.alias ?? item.id];
+  });
 }
 
 function getArrowArgName(expr: Expression, sourceId: string): string {

@@ -18638,6 +18638,10 @@ export default {
             "description": "Represents text that has been deleted"
           },
           {
+            "value": "description",
+            "description": "Represents descriptive supporting text"
+          },
+          {
             "value": "em",
             "description": "Marks text to stress emphasis"
           },
@@ -18650,12 +18654,20 @@ export default {
             "description": "Represents a range of text that has been added to a document"
           },
           {
+            "value": "info",
+            "description": "Represents compact informational metadata text"
+          },
+          {
             "value": "keyboard",
             "description": "Represents a span of text denoting textual user input from a keyboard or voice input"
           },
           {
             "value": "marked",
             "description": "Represents text which is marked or highlighted for reference or notation"
+          },
+          {
+            "value": "blurb",
+            "description": "Represents a short summary or teaser text"
           },
           {
             "value": "mono",

@@ -8,7 +8,6 @@
             </HStack>
             <Markdown
                 content="{$props.content}"
-                data="{$props.url}"
                 enablePlaygroundTracing="{$props.showInspector}" />
             <Slot />
             <DocumentLinks />
