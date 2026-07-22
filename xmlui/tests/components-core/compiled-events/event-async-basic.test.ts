@@ -4,6 +4,7 @@ import {
   compileEventAsyncStatementSource,
   executeCompiledEventAsyncArtifact,
 } from "../../../src/components-core/script-compiler";
+import { createCancellationToken, HandlerCancelledError } from "../../../src/components-core/concurrency";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { Parser } from "../../../src/parsers/scripting/Parser";
@@ -75,6 +76,24 @@ describe("compiled event-async basic statement subset", () => {
     expect(compiled.localContext.count).toBe(2);
   });
 
+  it("calls bare event handler references with event arguments", async () => {
+    const evalContext = createEvalContext({
+      localContext: {
+        selected: null,
+        selectItem: async function (this: any, item: string) {
+          this.selected = item.toUpperCase();
+        },
+      },
+      eventArgs: ["alpha"],
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    });
+    const artifact = compileEventAsyncStatementSource("selectItem", "test:event:bare");
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.selected).toBe("ALPHA");
+  });
+
   it("yields between completed statements", async () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
@@ -94,5 +113,95 @@ describe("compiled event-async basic statement subset", () => {
 
     expect(evalContext.localContext.count).toBe(2);
     expect(order).toEqual(["completed", "timer", "completed", "timer"]);
+  });
+
+  it("creates a statement boundary for each simple statement", async () => {
+    const boundaries: Array<Record<string, any>> = [];
+    const evalContext = createEvalContext({
+      localContext: { a: 0, b: 0 },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      onStatementStarted: (context) => {
+        boundaries.push({ phase: "start", a: context.localContext.a, b: context.localContext.b });
+      },
+      onStatementCompleted: (context) => {
+        boundaries.push({ phase: "complete", a: context.localContext.a, b: context.localContext.b });
+      },
+    });
+    const artifact = compileEventAsyncStatementSource("a = 1; b = 2;", "test:event:boundaries");
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(boundaries).toEqual([
+      { phase: "start", a: 0, b: 0 },
+      { phase: "complete", a: 1, b: 0 },
+      { phase: "start", a: 1, b: 0 },
+      { phase: "complete", a: 1, b: 2 },
+    ]);
+  });
+
+  it("lets the next statement observe the refreshed localContext snapshot", async () => {
+    const evalContext = createEvalContext({
+      localContext: { count: 0, observed: 0 },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      onStatementCompleted: (context) => {
+        context.localContext = { ...context.localContext, count: 41 };
+      },
+    });
+    const artifact = compileEventAsyncStatementSource(
+      "count = count + 1; observed = count;",
+      "test:event:refreshed-local-context",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext).toMatchObject({ count: 41, observed: 41 });
+  });
+
+  it("yields after every statement even when there is no state change", async () => {
+    const order: string[] = [];
+    const evalContext = createEvalContext({
+      localContext: { value: 1 },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      onStatementCompleted: () => {
+        const index = order.length / 2;
+        order.push(`completed:${index}`);
+        setTimeout(() => order.push(`timer:${index}`), 0);
+      },
+    });
+    const artifact = compileEventAsyncStatementSource(
+      "value + 0; value + 0; value + 0;",
+      "test:event:no-change-yield",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(order).toEqual([
+      "completed:0",
+      "timer:0",
+      "completed:1",
+      "timer:1",
+      "completed:2",
+      "timer:2",
+    ]);
+  });
+
+  it("stops execution when $cancel aborts between statements", async () => {
+    const { token, abort } = createCancellationToken();
+    const evalContext = createEvalContext({
+      localContext: { $cancel: token, count: 0 },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      onStatementCompleted: () => {
+        abort("user");
+      },
+    });
+    const artifact = compileEventAsyncStatementSource(
+      "count = count + 1; count = count + 1;",
+      "test:event:cancel-between-statements",
+    );
+
+    await expect(executeCompiledEventAsyncArtifact(artifact, evalContext)).rejects.toThrow(
+      HandlerCancelledError,
+    );
+    expect(evalContext.localContext.count).toBe(1);
   });
 });

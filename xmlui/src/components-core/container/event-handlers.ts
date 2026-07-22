@@ -31,6 +31,10 @@ import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { createEventEvalOptions } from "../script-runner/eval-options";
+import {
+  executeCompiledEventAsyncArtifact,
+  executeCompiledEventAsyncStatements,
+} from "../script-compiler";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import {
   createCancellationToken,
@@ -410,21 +414,22 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
         // --- Prepare the event handler to an arrow expression statement
         let statements: Statement[];
+        const compiledEventArtifact = isParsedEventValue(source) ? source.compiled : undefined;
+        const rawEventSource =
+          typeof source === "string"
+            ? source
+            : isParsedEventValue(source)
+              ? source.source
+              : undefined;
         if (typeof source === "string") {
           if (!parsedStatementsRef.current[source]) {
-            parsedStatementsRef.current[source] = prepareHandlerStatements(
-              parseHandlerCode(source),
-              evalContext,
-            );
+            parsedStatementsRef.current[source] = parseHandlerCode(source);
           }
           statements = parsedStatementsRef.current[source];
         } else if (isParsedEventValue(source)) {
           const parseId = source.parseId.toString();
           if (!parsedStatementsRef.current[parseId]) {
-            parsedStatementsRef.current[parseId] = prepareHandlerStatements(
-              source.statements,
-              evalContext,
-            );
+            parsedStatementsRef.current[parseId] = source.statements;
           }
           statements = parsedStatementsRef.current[parseId];
         } else {
@@ -436,7 +441,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           ];
         }
 
-        if (!statements?.length) {
+        if (!statements) {
           return;
         }
 
@@ -570,7 +575,23 @@ export function createEventHandlers(config: EventHandlerConfig) {
         );
         const effectiveTimeoutMs =
           options?.handlerTimeoutMs !== undefined ? options.handlerTimeoutMs : ambientTimeout;
-        await runWithTimeout(processStatementQueueAsync(statements, evalContext), {
+        const handlerPromise = evalContext.options?.compileEventHandlers
+          ? compiledEventArtifact
+            ? executeCompiledEventAsyncArtifact(compiledEventArtifact, evalContext)
+            : executeCompiledEventAsyncStatements(
+                statements,
+                evalContext,
+                undefined,
+                typeof source === "string"
+                  ? `event:string:${source}`
+                  : `event:ast:${statements[0]?.nodeId ?? "empty"}`,
+                rawEventSource,
+              )
+          : processStatementQueueAsync(
+              prepareHandlerStatements(statements, evalContext),
+              evalContext,
+            );
+        const compiledReturnValue = await runWithTimeout(handlerPromise, {
           timeoutMs: effectiveTimeoutMs,
           abort: (reason) => abortCancelToken(reason),
           onTimeout: () => {
@@ -604,6 +625,15 @@ export function createEventHandlers(config: EventHandlerConfig) {
             }
           },
         });
+        if (evalContext.options?.compileEventHandlers) {
+          evalContext.mainThread ??= {
+            childThreads: [],
+            blocks: [{ vars: {} }],
+            loops: [],
+            breakLabelValue: -1,
+          };
+          evalContext.mainThread.returnValue = compiledReturnValue;
+        }
 
         // --- Plan #6 W7-1 Phase 4: transactional commit. If the
         // --- handler is marked transactional, replay all buffered

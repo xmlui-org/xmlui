@@ -99,7 +99,7 @@ function emitStatement(
       return;
     case T_EXPRESSION_STATEMENT:
       writer.write("await runtime.complete(", statement);
-      emitExpression(writer, statement.expr, context);
+      emitEventExpressionStatementExpression(writer, statement.expr, context);
       writer.write(");", statement);
       emitAfterStatement(writer, statement);
       return;
@@ -123,6 +123,25 @@ function emitStatement(
     default:
       throwUnsupportedCompiledScriptNode(statement, context.sourceId);
   }
+}
+
+function emitEventExpressionStatementExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: Expression,
+  context: CompilerContext,
+): void {
+  if (expr.type === T_IDENTIFIER || isMemberExpressionChain(expr)) {
+    const updateRootName = getNonLocalRootIdentifier(expr, context);
+    writer.write("await runtime.call(await runtime.complete(");
+    emitExpression(writer, expr, context);
+    writer.write("), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread");
+    if (updateRootName) {
+      writer.write(`, ${JSON.stringify(updateRootName)}`);
+    }
+    writer.write(")", expr);
+    return;
+  }
+  emitExpression(writer, expr, context);
 }
 
 function emitAfterStatement(writer: CompiledScriptCodeWriter, statement: Statement): void {
@@ -506,6 +525,14 @@ function getNonLocalRootIdentifier(expr: Expression, context: CompilerContext): 
     default:
       return undefined;
   }
+}
+
+function isMemberExpressionChain(expr: Expression): boolean {
+  return (
+    (expr.type === T_MEMBER_ACCESS_EXPRESSION ||
+      (expr.type === T_CALCULATED_MEMBER_ACCESS_EXPRESSION && expr.member.type === T_LITERAL)) &&
+    (isMemberExpressionChain(expr.obj) || expr.obj.type === T_IDENTIFIER)
+  );
 }
 
 function createCompilerContext(sourceId: string): CompilerContext {

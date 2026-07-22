@@ -36,3 +36,21 @@
 - Observation: member writes and member calls need async IIFEs so receiver/member expressions can be completed before calling runtime helpers.
 - Observation: unsupported nodes now fail at compile time in compiled mode, matching the accepted no-fallback decision.
 - Future impact: the next expansion can add loops/try/switch/function declarations while preserving the same statement-boundary shape.
+
+## Step 5 - dispatcher switch behind compileEventHandlers
+
+- Affected modules: `xmlui/src/components-core/container/event-handlers.ts`, `xmlui/src/components-core/script-compiler/targets/event-async.ts`.
+- Decision: `runCodeAsync` now selects compiled execution when `evalContext.options.compileEventHandlers` is true; otherwise it keeps using `processStatementQueueAsync`.
+- Decision: parsed markup events use `ParsedEventValue.compiled` when present. Dynamic string handlers have no parse-time artifact, so the dispatcher compiles them through the same `event-async` executor/cache using the raw parsed statements.
+- Decision: the compiled path runs the same dispatcher lifecycle, timeout, cancellation, transaction buffer, state-change logging, and `onStatementCompleted` hook setup as the interpreter path.
+- Observation: bare event references such as `onClick="doIt"` need event-handler semantics, not plain identifier evaluation. The event expression-statement emitter now calls identifier/member chains with `evalContext.eventArgs`.
+- Observation: unsupported compiled nodes now surface when a compiled handler is executed if no parse-time artifact caught them earlier.
+- Future impact: once parser options are wired from app config in build/standalone loaders, markup handlers can rely entirely on parse-time artifacts; dynamic string handlers will remain a runtime-compile edge case unless those sources get their own parse-time owner.
+
+## Step 6 - statement boundary and event-loop parity
+
+- Affected modules: `xmlui/tests/components-core/compiled-events/event-async-basic.test.ts`.
+- Decision: the Step 6 test coverage is scoped to the statement kinds currently supported by the `event-async` code generator. Loop-body yield parity remains attached to the loop codegen expansion in Step 7.
+- Decision: boundary tests model the dispatcher contract directly through `onStatementStarted` and `onStatementCompleted`, including the local context refresh that normally happens after state commit.
+- Observation: compiled handlers now have regression coverage for per-statement boundaries, event-loop yield without state changes, refreshed `localContext` visibility in the next statement, and `$cancel` abort between statements.
+- Future impact: timeout and transactional parity should get dispatcher-level tests once more control-flow nodes are available, because their observable behavior depends on `runWithTimeout` and transaction buffer handling rather than only the code generator runtime hooks.
