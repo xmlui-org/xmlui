@@ -262,6 +262,22 @@ export const ListMd = createMetadata({
           "to within ~1.5px of the bottom).",
       },
     },
+    visibleRangeDidChange: {
+      description:
+        `This event fires when the range of visible (mounted) items changes — whatever ` +
+        `caused it: a user scroll, a programmatic scroll, or content growth. Unlike the ` +
+        `\`scroll\` event, it is not suppressed during the list's own programmatic and ` +
+        `auto-follow scrolls, because consumers of the visible range (e.g. prioritizing ` +
+        `work for on-screen items) care about what is visible, not why it became visible. ` +
+        `It fires only when the range actually shifts (deduplicated by value).`,
+      signature:
+        "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
+      parameters: {
+        range:
+          "The visible range: `startIndex` (first visible item index) and `endIndex` " +
+          "(last visible item index), inclusive, in the list's row order.",
+      },
+    },
     selectionDidChange: {
       description:
         `This event is triggered when the list's current selection changes. ` +
@@ -357,6 +373,14 @@ export const ListMd = createMetadata({
       parameters: {
         id: "The ID of the item to scroll to.",
       },
+    },
+    getVisibleRange: {
+      description:
+        "This method returns the currently visible item range as an object with " +
+        "`startIndex` and `endIndex` (inclusive, in the list's row order). Returns " +
+        "`{ startIndex: -1, endIndex: -1 }` when the list is empty or not yet measured. " +
+        "The pull-style counterpart of the `visibleRangeDidChange` event.",
+      signature: "getVisibleRange(): { startIndex: number, endIndex: number }",
     },
     clearSelection: {
       description: `This method clears the list of currently selected list rows.`,
@@ -697,6 +721,7 @@ const ListWithSelection = memo(function ListWithSelection({
       onDeleteAction={lookupEventHandler("deleteAction")}
       rowDoubleClick={lookupEventHandler("rowDoubleClick")}
       onScroll={lookupEventHandler("scroll")}
+      onVisibleRangeDidChange={lookupEventHandler("visibleRangeDidChange")}
       keyBindings={extractValue(node.props.keyBindings)}
       itemRenderer={stableItemRenderer}
       sectionRenderer={stableSectionRenderer}

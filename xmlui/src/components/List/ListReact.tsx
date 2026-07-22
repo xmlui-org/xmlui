@@ -269,6 +269,7 @@ type DynamicHeightListProps = {
     viewportSize: number;
     atEnd: boolean;
   }) => void;
+  onVisibleRangeDidChange?: (range: { startIndex: number; endIndex: number }) => void;
   keyBindings?: Record<string, string>;
 };
 
@@ -698,6 +699,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     onDeleteAction,
     rowDoubleClick,
     onScroll,
+    onVisibleRangeDidChange,
     keyBindings = defaultProps.keyBindings,
     ...rest
   }: DynamicHeightListProps,
@@ -1047,6 +1049,38 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
 
+  // --- Visible-range reporting. Unlike the `scroll` event (user-intent
+  // focused: suppressed during programmatic/auto-follow scrolls), the visible
+  // range reports whenever the set of mounted-visible items ACTUALLY changes,
+  // whatever caused it — user scroll, scrollToBottom(), content growth. A
+  // consumer prioritizing work for on-screen items (the motivating case) cares
+  // about what is visible, not why. Deduped by value so it fires only on a
+  // genuine range shift.
+  const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
+  const computeVisibleRange = useCallback(() => {
+    const v = virtualizerRef.current;
+    if (!v || !rows.length) return null;
+    const startIndex = v.findItemIndex(v.scrollOffset);
+    const endIndex = Math.min(v.findItemIndex(v.scrollOffset + v.viewportSize), rows.length - 1);
+    return { startIndex, endIndex };
+  }, [rows.length]);
+  const reportVisibleRange = useCallback(() => {
+    if (!onVisibleRangeDidChange) return;
+    const range = computeVisibleRange();
+    if (!range) return;
+    const last = lastVisibleRange.current;
+    if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
+    lastVisibleRange.current = range;
+    onVisibleRangeDidChange(range);
+  }, [onVisibleRangeDidChange, computeVisibleRange]);
+  useEffect(() => {
+    // Initial range and content-growth shifts (appends move the range even
+    // without a scroll). rAF lets virtua finish its measure/layout pass.
+    if (!onVisibleRangeDidChange) return;
+    const raf = requestAnimationFrame(reportVisibleRange);
+    return () => cancelAnimationFrame(raf);
+  }, [rows, onVisibleRangeDidChange, reportVisibleRange]);
+
   const lastScrollOffset = useRef(0);
   const handleVirtuaScroll = useCallback(
     (offset) => {
@@ -1083,10 +1117,11 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
           atEnd,
         });
       }
+      reportVisibleRange();
       tryToFetchPrevPage();
       tryToFetchNextPage();
     },
-    [scrollAnchor, onScroll, tryToFetchNextPage, tryToFetchPrevPage],
+    [scrollAnchor, onScroll, reportVisibleRange, tryToFetchNextPage, tryToFetchPrevPage],
   );
 
   const scrollToBottom = useEvent(() => {
@@ -1117,15 +1152,20 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   });
 
+  const getVisibleRange = useEvent(() => {
+    return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
+  });
+
   useIsomorphicLayoutEffect(() => {
     registerComponentApi?.({
       scrollToBottom,
       scrollToTop,
       scrollToIndex,
       scrollToId,
+      getVisibleRange,
       ...selectionApi,
     });
-  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, selectionApi]);
+  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, getVisibleRange, selectionApi]);
   // REVIEW: I changed this code line because in the build version rows[index] was undefined
   // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
   const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
