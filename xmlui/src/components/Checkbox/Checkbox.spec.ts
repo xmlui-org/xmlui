@@ -577,6 +577,26 @@ test.describe("Label", () => {
 // =============================================================================
 
 test.describe("Event Handling", () => {
+  test("labeled checkbox onClick fires once per input click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.on="{false}">
+        <Checkbox
+          label="Toggle me"
+          initialValue="{on}"
+          onClick="on = !on"
+        />
+        <Text testId="status">{on ? 'on' : 'off'}</Text>
+      </App>
+    `);
+
+    const checkbox = page.getByRole("checkbox", { name: "Toggle me" });
+    await expect(page.getByTestId("status")).toHaveText("off");
+
+    await checkbox.click();
+
+    await expect(page.getByTestId("status")).toHaveText("on");
+  });
+
   test("didChange event fires on state change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(
       `<Checkbox initialValue="false" onDidChange="testState = 'changed'" />`,

@@ -153,6 +153,14 @@ export const Toggle = memo(forwardRef(function Toggle(
     onBlur?.();
   }, [onBlur]);
 
+  const handleOnClick = useCallback(
+    (event: React.MouseEvent<HTMLInputElement>) => {
+      onClick(event);
+      event.stopPropagation();
+    },
+    [onClick],
+  );
+
   useEffect(() => {
     if (typeof indeterminate === "boolean" && innerRef.current) {
       innerRef.current.indeterminate = indeterminate;
@@ -201,7 +209,7 @@ export const Toggle = memo(forwardRef(function Toggle(
           aria-checked={indeterminate ? "mixed" : legitValue}
           aria-required={required}
           aria-disabled={!enabled}
-          onClick={onClick}
+          onClick={handleOnClick}
           onChange={onInputChange}
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
@@ -236,8 +244,8 @@ export const Toggle = memo(forwardRef(function Toggle(
     ariaLabel,
     handleOnBlur,
     handleOnFocus,
+    handleOnClick,
     onInputChange,
-    onClick,
     readOnly,
     required,
     validationStatus,
