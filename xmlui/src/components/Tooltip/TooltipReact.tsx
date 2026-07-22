@@ -1,4 +1,4 @@
-import { type ForwardedRef, forwardRef, memo } from "react";
+import { type ForwardedRef, cloneElement, forwardRef, isValidElement, memo } from "react";
 import type React from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
@@ -104,10 +104,21 @@ export const Tooltip = memo(forwardRef(function Tooltip({
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
 
+  // Pass the plain tooltip text to the trigger as an inert data attribute.
+  // Components that are nameless without it (Icon) use it as their
+  // accessible name; text-bearing triggers keep name-from-content, and
+  // Radix supplies aria-describedby when the tooltip opens. Setting
+  // aria-label here directly would override the accessible name of
+  // labeled triggers (buttons, links), which breaks name-from-content.
+  const trigger =
+    text && isValidElement(children)
+      ? cloneElement(children as any, { "data-tooltip-text": text })
+      : children;
+
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
       <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
-        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Trigger asChild>{trigger}</RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (
             <RadixTooltip.Content

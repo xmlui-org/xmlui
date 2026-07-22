@@ -68,7 +68,13 @@ export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(functio
 ) {
   const themeClass = useComponentThemeClass(IconMd);
   const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
-  return <Icon {...props} className={mergedClass} ref={ref} aria-label={tooltip} />;
+  // tooltip is stripped by wrapComponent (TooltipBehavior consumes it) and
+  // re-delivered by the Tooltip trigger as data-tooltip-text. Icons are
+  // nameless without it, so use it as the accessible name — after an
+  // explicit aria-label, and without clobbering either with undefined.
+  const p = props as Record<string, any>;
+  const ariaLabel = tooltip ?? p["aria-label"] ?? p["data-tooltip-text"];
+  return <Icon {...props} className={mergedClass} ref={ref} aria-label={ariaLabel} />;
 });
 
 export const iconComponentRenderer = wrapComponent(
