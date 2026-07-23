@@ -39,14 +39,16 @@ type EventStatementBoundaryOptions = {
 };
 
 export const eventAsyncRuntime = {
-  createInvocation(options?: { yieldIntervalMs?: number }) {
+  createInvocation(options?: { yieldIntervalMs?: number; suppressYield?: boolean }) {
     const invocation = Object.create(this) as typeof eventAsyncRuntime & {
       __yieldState?: EventYieldState;
+      __suppressYield?: boolean;
     };
     invocation.__yieldState = {
       lastYieldReferenceTs: this.now(),
       intervalMs: options?.yieldIntervalMs ?? DEFAULT_YIELD_INTERVAL_MS,
     };
+    invocation.__suppressYield = options?.suppressYield === true;
     return invocation;
   },
 
@@ -80,7 +82,7 @@ export const eventAsyncRuntime = {
   ): Promise<void> {
     await evalContext.onStatementCompleted?.(evalContext, statement as Statement);
     await this.checkCancel(evalContext);
-    if (options?.checkYield !== false) {
+    if (!this.isYieldSuppressed() && options?.checkYield !== false) {
       await this.maybeYield();
     }
     await this.checkCancel(evalContext);
@@ -111,6 +113,10 @@ export const eventAsyncRuntime = {
       intervalMs: DEFAULT_YIELD_INTERVAL_MS,
     };
     return runtime.__yieldState;
+  },
+
+  isYieldSuppressed(): boolean {
+    return (this as typeof eventAsyncRuntime & { __suppressYield?: boolean }).__suppressYield === true;
   },
 
   async checkCancel(evalContext: BindingTreeEvaluationContext): Promise<void> {

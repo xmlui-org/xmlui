@@ -279,3 +279,17 @@ Implementation note: the interpreter now clears pending `errorToThrow` values fo
 - Observation: the logging switch does not trigger runtime compilation and does not log artifact-less dynamic handler compilation.
 - Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/event-async.test.ts` passed with 115 tests.
 - Validation: `npm --workspace xmlui run test:unit -- tests/parsers/xmlui/transform.element.test.ts` passed with 112 tests.
+
+## Step 13 - event handler directive prologue
+
+- Affected modules: `xmlui/src/components-core/utils/event-handler-directives.ts`, `xmlui/src/components-core/container/event-handlers.ts`, `xmlui/src/components-core/script-compiler/event-runtime.ts`, `xmlui/src/components-core/script-compiler/targets/event-async-executor.ts`, `xmlui/src/parsers/xmlui-parser/transform.ts`, `xmlui/src/abstractions/scripting/Compilation.ts`, `xmlui/src/abstractions/ActionDefs.ts`, `xmlui/src/components-core/script-runner/BindingTreeEvaluationContext.ts`.
+- Decision: supported handler-prefix string directives are `"async"`, `"sync"`, `"queue"`, and `"block"`. They are extracted only from the initial string-literal prologue and removed from executable statements.
+- Decision: `"queue"` maps to the existing coordinator `queue` policy. `"block"` maps to `drop-while-running`. Source directives override component-level `handlerPolicy` props.
+- Decision: `"sync"` suppresses cooperative event-loop yield checkpoints only on the compiled event path. The interpreted async path intentionally ignores the sync yield-suppress semantics, though directive statements are still removed before execution.
+- Decision: parse-time event artifacts compile the directive-free executable statements while preserving the original handler `source` for debugging and inspector logging.
+- Observation: conflicting execution or scheduling directives are recorded as directive warnings, with the last directive winning. No runtime warning emission is implemented in this slice.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/utils/event-handler-directives.test.ts tests/components-core/compiled-events/event-async-basic.test.ts` passed with 19 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/parsers/xmlui/transform.element.test.ts` passed with 113 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events` passed with 90 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/event-async.test.ts tests/components-core/script-compiler/event-runtime.test.ts tests/components-core/utils/event-handler-directives.test.ts` passed with 131 tests.
+- Validation: `npx tsc --noEmit -p xmlui/tsconfig.json` passed.

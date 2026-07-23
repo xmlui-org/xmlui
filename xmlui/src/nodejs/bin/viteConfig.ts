@@ -4,9 +4,8 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
-import type { PluginOptions } from "../vite-xmlui-plugin";
+import { loadXmluiPluginOptions } from "./xmluiPluginOptions";
 import * as path from "path";
-import { readFile } from "fs/promises";
 import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
 
 type ViteConfigData = {
@@ -23,21 +22,6 @@ logger.warn = (msg, options) => {
   if (msg.includes('Failed to resolve "remix:manifest"')) return;
   loggerWarn(msg, options);
 };
-
-async function loadXmluiPluginOptions(): Promise<PluginOptions> {
-  try {
-    const rawConfig = await readFile(path.join(process.cwd(), "xmlui.config.json"), "utf-8");
-    const config = JSON.parse(rawConfig);
-    return {
-      analyze: config.analyze,
-      reactiveCycles: config.reactiveCycles,
-      accessibility: config.accessibility,
-      typeContracts: config.typeContracts,
-    };
-  } catch {
-    return {};
-  }
-}
 
 /**
  * Defence-in-depth: ensures the canonical CSS `@layer` cascade order is

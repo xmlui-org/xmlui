@@ -2,6 +2,7 @@ import type { ComponentDef, CompoundComponentDef } from "../ComponentDefs";
 import type { ThemeDefinition } from "../ThemingDefs";
 import type { Expression, Statement } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { CompiledScriptArtifact } from "../../components-core/script-compiler/types";
+import type { EventHandlerDirectiveInfo } from "../../components-core/utils/event-handler-directives";
 
 /** Contains the compilation result of a project */
 export type ProjectCompilation = {
@@ -45,6 +46,8 @@ export type ParsedEventValue = {
   statements: Statement[];
   source?: string;
   compiled?: CompiledScriptArtifact;
+  compiledUnsupported?: boolean;
+  directives?: EventHandlerDirectiveInfo;
 }
 
 // --- The parsed property value (if defined by an attribute value)

@@ -446,6 +446,31 @@ describe("Xmlui transform - child elements", () => {
       expect(event.compiled.sourceId).toMatch(/^0#event-\d+$/);
     });
 
+    it("extracts event directive prologues before creating parse-time compiled artifacts", () => {
+      const cd = transformSource(
+        `<Stack onClick='"sync"; "queue"; count = count + 1' />`,
+        0,
+        false,
+        undefined,
+        {
+          compileEventHandlers: true,
+        },
+      ) as ComponentDef;
+      const event = (cd.events! as any).click;
+
+      expect(event.directives).toMatchObject({
+        executionMode: "sync",
+        scheduling: "queue",
+        consumedCount: 2,
+      });
+      expect(event.source).toBe('"sync"; "queue"; count = count + 1');
+      expect(event.statements).toHaveLength(1);
+      expect(event.compiled.sourceText).toBe('"sync"; "queue"; count = count + 1');
+      expect(event.compiled.js).not.toContain('"sync"');
+      expect(event.compiled.js).not.toContain('"queue"');
+      expect(event.compiled.js).toContain("count");
+    });
+
     it("parse-time event artifacts are JSON serializable", () => {
       const cd = transformSource("<Stack onClick='count = count + 1' />", 0, false, undefined, {
         compileEventHandlers: true,
@@ -463,6 +488,38 @@ describe("Xmlui transform - child elements", () => {
       expect(parsed.sourceId).toMatch(/^0#event-\d+$/);
       expect(parsed.js).toContain("return (async () =>");
       expect(parsed.mappings.length).toBeGreaterThan(0);
+    });
+
+    it("creates parse-time artifacts for event handlers with template literals", () => {
+      const warnings: string[] = [];
+      const cd = transformSource(
+        `<Button onClick="
+          console.log('HERE');
+          const start = Date.now();
+          let sum = 0;
+          for (let i = 0; i < 10000; i++) {
+            sum += i;
+          }
+          toast.success(\`Sum: \${sum}, Time taken: \${Date.now() - start}ms\`);
+        ">Test</Button>`,
+        0,
+        false,
+        warnings,
+        {
+          compileEventHandlers: true,
+        },
+      ) as ComponentDef;
+      const event = (cd.events! as any).click;
+
+      expect(event.__PARSED).toBe(true);
+      expect(event.statements.length).toBeGreaterThan(0);
+      expect(event.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: expect.stringContaining("toast.success"),
+      });
+      expect(event.compiledUnsupported).toBe(false);
+      expect(event.compiled.js).toContain("join('')");
+      expect(warnings).toEqual([]);
     });
 
     it("does not log parse-time compiled event source by default", () => {
@@ -484,7 +541,7 @@ describe("Xmlui transform - child elements", () => {
       }
     });
 
-    it("logs parse-time compiled event source when enabled", () => {
+    it("does not log parse-time compiled event source while diagnostics are disabled", () => {
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
       const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
@@ -495,11 +552,9 @@ describe("Xmlui transform - child elements", () => {
           logCompiledEventHandlerSource: true,
         });
 
-        expect(groupSpy).toHaveBeenCalledWith(expect.stringMatching(/^\[xmlui\] compiled event handler 0#event-\d+$/));
-        expect(logSpy).toHaveBeenCalledWith("sourceId:", expect.stringMatching(/^0#event-\d+$/));
-        expect(logSpy).toHaveBeenCalledWith("source:", "count = count + 1");
-        expect(logSpy).toHaveBeenCalledWith("js:", expect.stringContaining("return (async () =>"));
-        expect(groupEndSpy).toHaveBeenCalled();
+        expect(logSpy).not.toHaveBeenCalled();
+        expect(groupSpy).not.toHaveBeenCalled();
+        expect(groupEndSpy).not.toHaveBeenCalled();
       } finally {
         logSpy.mockRestore();
         groupSpy.mockRestore();

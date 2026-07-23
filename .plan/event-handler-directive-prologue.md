@@ -87,11 +87,12 @@ Explicit alapértelmezés.
 
 ### `"sync"`
 
-A jelenlegi ágban első körben yield-policy direktíva, nem teljes dispatcher-szintű szinkron event futtatás.
+A jelenlegi ágban első körben compiled-only yield-policy direktíva, nem teljes dispatcher-szintű szinkron event futtatás.
 
 Szemantika:
 
-- cooperative event-loop yield checkpointok nem futnak;
+- compiled event handler útvonalon a cooperative event-loop yield checkpointok nem futnak;
+- interpreted útvonalon a `"sync"` direktívát ignoráljuk;
 - statement boundary hookok továbbra is futnak;
 - cancellation checkek továbbra is statement boundary-n futnak;
 - state commit, transactional, timeout és error handling továbbra is a meglévő async dispatcher szerződést használja;
@@ -101,11 +102,7 @@ Implementációs irány:
 
 - compiled útvonalon `eventAsyncRuntime.createInvocation({ suppressYield: true })` vagy ezzel ekvivalens invocation option;
 - `runtime.afterStatement(...)` ilyenkor kihagyja a `maybeYield(...)` hívást, függetlenül a codegen `checkYield` metaadatától;
-- interpreted útvonalon külön döntés szükséges:
-  - vagy az async interpreter kap `evalContext.options.suppressEventLoopYield` opciót, és kihagyja a no-change `delay(0)` yieldet;
-  - vagy első körben a direktíva csak compiled event handler módban hat a yieldre, és interpreter módban warningot kapunk.
-
-Javaslat: az opciót vezessük át az async interpreterbe is, hogy a direktíva compile flagtől függetlenül ugyanazt a szerződést jelentse.
+- interpreted útvonalon nem vezetünk be yield-suppress opciót; a meglévő interpreter no-change cooperative `delay(0)` viselkedése marad.
 
 Szinkron-biztonság:
 
@@ -273,7 +270,7 @@ vagy az `evalContext.options` részeként:
 evalContext.options.handlerExecutionMode = "sync";
 ```
 
-Javaslat: `evalContext.options.handlerExecutionMode` legyen a közös jel, és a compiled executor ebből hozza létre az invocation runtime-ot.
+Javaslat: `evalContext.options.handlerExecutionMode` legyen a közös jel, de csak a compiled executor használja yield-suppress döntésre. Az interpreted útvonal ezt az opciót első körben tudatosan figyelmen kívül hagyja.
 
 Runtime változás:
 
@@ -285,16 +282,16 @@ Runtime változás:
 
 ## Interpreted async útvonal integráció
 
-Az async interpreterben jelenleg no-change statementek után 100 futásenként `delay(0)` történik. A `"sync"` direktívának ezt is ki kell kapcsolnia, különben compile flagtől függne a szemantika.
+Az async interpreterben jelenleg no-change statementek után 100 futásenként `delay(0)` történik. A `"sync"` direktíva ezt az útvonalat nem módosítja.
 
-Javasolt változás:
+Javasolt döntés:
 
-- `BindingTreeEvaluationContext.options.handlerExecutionMode?: "async" | "sync"`;
-- `process-statement-async.ts` vagy a dispatcher `onStatementCompleted` callbackje ellenőrizze ezt;
-- ha `"sync"`, ne fusson a no-change cooperative `delay(0)`;
-- állapotváltozás utáni commit/await szerződés maradjon érintetlen.
+- interpreter módban a `"sync"` direktívát ignoráljuk;
+- a direktíva statementek ettől még ne fussanak normál user statementként;
+- `"queue"` és `"block"` scheduling direktívák interpreter módban is hatnak, mert a coordinator policyt módosítják;
+- ha compiled execution unsupported node miatt interpreter fallbackre vált, a `"sync"` yield-suppress hatása elveszik, és az interpreter meglévő cooperative yield viselkedése fut.
 
-Megjegyzés: a jelenlegi dispatcherben a no-change `delay(0)` nem közvetlenül az interpreterben, hanem az `evalContext.onStatementCompleted` callbackben történik. Ez jó hely a direktíva érvényesítésére.
+Megjegyzés: a fallback viselkedést dokumentálni kell, mert a `"sync"` első körben nem compile-flag független szerződés.
 
 ## Parse-time artifact integráció
 
@@ -369,7 +366,7 @@ Minimális első implementáció:
 
 - compiled `"sync"` handler nem hív `runtime.maybeYield(...)` akkor sem, ha a statement yield-checkre jogosult lenne;
 - compiled `"async"` vagy default handler megtartja a meglévő yield viselkedést;
-- interpreted `"sync"` handler no-change statementeknél nem futtat cooperative `delay(0)` yieldet;
+- interpreted `"sync"` handler ignorálja a sync yield-suppress hatást, de a direktíva statement nem fut normál statementként;
 - cancellation check `"sync"` módban is fut statement boundary-n;
 - state write/commit viselkedés `"sync"` módban is paritásban marad.
 
@@ -400,7 +397,7 @@ Frissítendő:
 
 - A négy direktíva felismerhető a handler elején és nem fut normál statementként.
 - `"async"` megőrzi a jelenlegi default viselkedést.
-- `"sync"` kikapcsolja a cooperative event-loop yieldet compiled és interpreted útvonalon is, de nem kapcsolja ki a statement boundary hookokat vagy cancellation checket.
+- `"sync"` kikapcsolja a cooperative event-loop yieldet compiled útvonalon, interpreted útvonalon ignorált, és nem kapcsolja ki a statement boundary hookokat vagy cancellation checket.
 - `"queue"` a meglévő coordinator queue policyjét használja.
 - `"block"` a meglévő coordinator drop-while-running policyjét használja.
 - Parse-time és runtime string handlerek azonos direktíva szemantikát kapnak.

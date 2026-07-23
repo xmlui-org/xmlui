@@ -40,6 +40,12 @@ calls, such as `Math.*`, selected `Number`/`String`/`Array` calls, and literal p
 methods, is also treated as non-yielding; user-defined, computed-member, callback-based, or
 argument-yielding calls still request the runtime yield check.
 
+Event handlers may start with directive string literals. `"async"` is the explicit default;
+`"sync"` suppresses compiled-event cooperative yield checkpoints but is ignored by the interpreted
+path; `"queue"` maps to the coordinator FIFO policy; and `"block"` maps to
+`drop-while-running`. Directive literals are removed before handler execution and parse-time
+compiled artifact generation.
+
 Effect: state changes from statement N are visible to statement N+1. Unlike raw React batching.
 
 ### Event categories

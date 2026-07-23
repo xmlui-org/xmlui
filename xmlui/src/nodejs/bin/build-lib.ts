@@ -4,26 +4,10 @@ import type { Plugin } from "vite";
 import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite";
 // @ts-ignore
 import path from "path";
-import { readFile } from "fs/promises";
 import react from "@vitejs/plugin-react";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
-import type { PluginOptions } from "../vite-xmlui-plugin";
-
-async function loadXmluiPluginOptions(): Promise<PluginOptions> {
-  try {
-    const rawConfig = await readFile(path.join(process.cwd(), "xmlui.config.json"), "utf-8");
-    const config = JSON.parse(rawConfig);
-    return {
-      analyze: config.analyze,
-      reactiveCycles: config.reactiveCycles,
-      accessibility: config.accessibility,
-      typeContracts: config.typeContracts,
-    };
-  } catch {
-    return {};
-  }
-}
+import { loadXmluiPluginOptions } from "./xmluiPluginOptions";
 
 export const buildLib = async ({
   watchMode,

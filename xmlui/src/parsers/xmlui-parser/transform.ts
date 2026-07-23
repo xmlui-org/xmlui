@@ -10,6 +10,7 @@ import { CharacterCodes } from "./CharacterCodes";
 import type { GetText, XmluiParserOptions } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
+import { extractEventHandlerDirectives } from "../../components-core/utils/event-handler-directives";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 import type { DocumentCursor } from "../../language-server/base/text-document";
 
@@ -25,6 +26,7 @@ const APP_NS_KEY = "app-ns";
 const APP_NS_VALUE = "#app-ns";
 const CORE_NS_KEY = "core-ns";
 export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
+const COMPILED_EVENT_HANDLER_SOURCE_LOGGING_ENABLED = false;
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -1446,22 +1448,42 @@ function transformXmluiNode(
     try {
       const statements = parser.parseStatements();
       const parseId = ++lastParseId;
-      const compiled = parserOptions.compileEventHandlers
-        ? compileEventAsyncStatements(statements, {
-            sourceId: `${fileId}#event-${parseId}`,
+      const { directives, executableStatements } = extractEventHandlerDirectives(statements);
+      const sourceId = `${fileId}#event-${parseId}`;
+      let compiled: ParsedEventValue["compiled"] | undefined;
+      let compiledUnsupported = false;
+      if (parserOptions.compileEventHandlers) {
+        try {
+          compiled = compileEventAsyncStatements(executableStatements, {
+            sourceId,
             sourceText: value,
-          })
-        : undefined;
-      if (compiled && parserOptions.logCompiledEventHandlerSource) {
+          });
+        } catch (error) {
+          compiledUnsupported = true;
+          const message =
+            `Could not compile event handler ${sourceId}; ` +
+            `falling back to interpreted execution. ${(error as Error).message}`;
+          if (warnings) {
+            warnings.push(message);
+          }
+        }
+      }
+      if (
+        COMPILED_EVENT_HANDLER_SOURCE_LOGGING_ENABLED &&
+        compiled &&
+        parserOptions.logCompiledEventHandlerSource
+      ) {
         logCompiledEventHandlerSource(compiled.sourceId, value, compiled.js);
       }
       return {
         __PARSED: true,
-        statements,
+        statements: executableStatements,
         parseId,
+        directives,
         // TODO: retrieve the event source code only in dev mode
         source: value,
         compiled,
+        compiledUnsupported,
       } as ParsedEventValue;
     } catch {
       if (parser.errors.length > 0) {

@@ -166,6 +166,43 @@ describe("compiled event-async basic statement subset", () => {
     }
   });
 
+  it("suppresses compiled event-loop yields in sync execution mode", async () => {
+    const originalNow = eventAsyncRuntime.now;
+    const originalYield = eventAsyncRuntime.yield;
+    let now = 0;
+    let yieldCount = 0;
+
+    eventAsyncRuntime.now = () => now;
+    eventAsyncRuntime.yield = async () => {
+      yieldCount++;
+    };
+
+    try {
+      const evalContext = createEvalContext({
+        localContext: { getValue: () => undefined },
+        options: {
+          compileEventHandlers: true,
+          defaultToOptionalMemberAccess: true,
+          handlerExecutionMode: "sync",
+        },
+        onStatementCompleted: () => {
+          now += 101;
+        },
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "getValue(); getValue();",
+        "test:event:sync-yield-suppressed",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(yieldCount).toBe(0);
+    } finally {
+      eventAsyncRuntime.now = originalNow;
+      eventAsyncRuntime.yield = originalYield;
+    }
+  });
+
   it("creates a statement boundary for each simple statement", async () => {
     const boundaries: Array<Record<string, any>> = [];
     const evalContext = createEvalContext({

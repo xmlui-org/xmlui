@@ -19,6 +19,7 @@ import {
   errReportComponent,
   xmlUiMarkupToComponent,
 } from "../components-core/xmlui-parser";
+import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
 import { getOptimizerMetadata } from "../components-core/optimization/metadataLookup";
 import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
@@ -124,6 +125,16 @@ export type PluginOptions = {
    * })
    */
   optimizerSourceDirs?: string[];
+  /**
+   * Compile event-handler source into JavaScript artifacts during the build-time
+   * XMLUI transform. When omitted, event handlers remain interpreted.
+   */
+  compileEventHandlers?: boolean;
+  /**
+   * Print generated event-handler JavaScript to the console while parsing.
+   * Only has an effect when `compileEventHandlers` is enabled.
+   */
+  logCompiledEventHandlerSource?: boolean;
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
@@ -324,7 +335,11 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           }
         }
 
-        const parserOptions = isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {};
+        const parserOptions: XmluiParserOptions = {
+          ...(isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {}),
+          compileEventHandlers: pluginOptions.compileEventHandlers,
+          logCompiledEventHandlerSource: pluginOptions.logCompiledEventHandlerSource,
+        };
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
           xmlUiMarkupToComponent(
             code,

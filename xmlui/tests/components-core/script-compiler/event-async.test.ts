@@ -184,6 +184,42 @@ describe("event-async compiled script target", () => {
     expect(evalContext.localContext.count).toBe(2);
   });
 
+  it("executes template literals", async () => {
+    const artifact = compileEventAsyncStatementSource(
+      "message = `Hello ${user.name}, count ${count}`;",
+      "Main.xmlui#event-template",
+    );
+    const evalContext = {
+      localContext: { count: 3, user: { name: "Ada" } },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.message).toBe("Hello Ada, count 3");
+  });
+
+  it("compiles the sample toast handler with a template literal", () => {
+    const source = `
+      const start = Date.now();
+      let sum = 0;
+      for (let i = 0; i < 10000; i++) {
+        sum += i;
+      }
+      toast.success(\`Sum: \${sum}, Time taken: \${Date.now() - start}ms\`);
+    `;
+    const parser = new Parser(source);
+    const statements = parser.parseStatements();
+
+    const artifact = compileEventAsyncStatements(statements, {
+      sourceId: "Main.xmlui#event-toast-template",
+      sourceText: source,
+    });
+
+    expect(artifact.js).toContain("runtime.call");
+    expect(artifact.js).toContain("join('')");
+  });
+
   it("skips yield checks for simple expression statements", () => {
     const artifact = compileEventAsyncStatementSource("value + 1;", "Main.xmlui#event-simple-expr");
 

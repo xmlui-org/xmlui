@@ -30,6 +30,7 @@ import {
   T_SPREAD_EXPRESSION,
   T_DESTRUCTURE,
   T_SWITCH_STATEMENT,
+  T_TEMPLATE_LITERAL_EXPRESSION,
   T_THROW_STATEMENT,
   T_TRY_STATEMENT,
   T_UNARY_EXPRESSION,
@@ -66,6 +67,7 @@ import {
   type ReturnStatement,
   type Statement,
   type SwitchStatement,
+  type TemplateLiteralExpression,
   type ThrowStatement,
   type TryStatement,
   type UnaryExpression,
@@ -1106,6 +1108,9 @@ function emitExpression(
     case T_OBJECT_LITERAL:
       emitObjectLiteral(writer, expr, context);
       return;
+    case T_TEMPLATE_LITERAL_EXPRESSION:
+      emitTemplateLiteral(writer, expr, context);
+      return;
     case T_PREFIX_OP_EXPRESSION:
     case T_POSTFIX_OP_EXPRESSION:
       emitPrePostExpression(writer, expr, context);
@@ -1234,6 +1239,25 @@ function emitObjectLiteralProp(
   writer.write("]: await runtime.complete(");
   emitExpression(writer, prop[1], context);
   writer.write(")");
+}
+
+function emitTemplateLiteral(
+  writer: CompiledScriptCodeWriter,
+  expr: TemplateLiteralExpression,
+  context: CompilerContext,
+): void {
+  writer.write("[");
+  expr.segments.forEach((segment, index) => {
+    if (index > 0) writer.write(", ");
+    if (segment.type === T_LITERAL) {
+      emitExpression(writer, segment, context);
+    } else {
+      writer.write("await runtime.complete(");
+      emitExpression(writer, segment, context);
+      writer.write(")");
+    }
+  });
+  writer.write("].map((value) => typeof value === 'string' ? value : `${value}`).join('')", expr);
 }
 
 function emitFunctionInvocation(
