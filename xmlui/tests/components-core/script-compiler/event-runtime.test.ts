@@ -72,25 +72,66 @@ describe("event-async runtime helpers", () => {
     expect(eventAsyncRuntime.catchValue(nativeError)).toBe(nativeError);
   });
 
-  it("runs statement completion hooks and yields after a statement", async () => {
-    const order: string[] = [];
-    const timeout = new Promise<void>((resolve) => {
-      setTimeout(() => {
-        order.push("timer");
-        resolve();
-      }, 0);
-    });
+  it("runs statement completion hooks without forcing a yield before the interval expires", async () => {
+    let yielded = false;
+    const runtime = eventAsyncRuntime.createInvocation({ yieldIntervalMs: 100 });
+    runtime.yield = async () => {
+      yielded = true;
+    };
 
-    await eventAsyncRuntime.afterStatement(
+    await runtime.afterStatement(
       createEvalContext({
-        onStatementCompleted: () => {
-          order.push("completed");
-        },
+        onStatementCompleted: () => undefined,
       }),
     );
-    await timeout;
 
-    expect(order).toEqual(["completed", "timer"]);
+    expect(yielded).toBe(false);
+  });
+
+  it("yields only after the configured interval and refreshes the reference time", async () => {
+    let now = 0;
+    const yieldedAt: number[] = [];
+    const runtime = eventAsyncRuntime.createInvocation({ yieldIntervalMs: 100 });
+    runtime.now = () => now;
+    runtime.yield = async () => {
+      yieldedAt.push(now);
+    };
+    (runtime as any).__yieldState = { lastYieldReferenceTs: 0, intervalMs: 100 };
+    const evalContext = createEvalContext({});
+
+    now = 99;
+    await runtime.afterStatement(evalContext);
+    now = 100;
+    await runtime.afterStatement(evalContext);
+    now = 150;
+    await runtime.afterStatement(evalContext);
+    now = 201;
+    await runtime.afterStatement(evalContext);
+
+    expect(yieldedAt).toEqual([100, 201]);
+  });
+
+  it("keeps yield timing isolated between handler invocations", async () => {
+    const first = eventAsyncRuntime.createInvocation({ yieldIntervalMs: 100 });
+    const second = eventAsyncRuntime.createInvocation({ yieldIntervalMs: 100 });
+    const yielded: string[] = [];
+    const evalContext = createEvalContext({});
+
+    first.now = () => 150;
+    second.now = () => 50;
+    first.yield = async () => {
+      yielded.push("first");
+    };
+    second.yield = async () => {
+      yielded.push("second");
+    };
+    (first as any).__yieldState = { lastYieldReferenceTs: 0, intervalMs: 100 };
+    (second as any).__yieldState = { lastYieldReferenceTs: 0, intervalMs: 100 };
+
+    await first.afterStatement(evalContext);
+    await second.afterStatement(evalContext);
+
+    expect(yielded).toEqual(["first"]);
   });
 
   it("invokes lazy XMLUI arrow objects asynchronously", async () => {

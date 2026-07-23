@@ -57,6 +57,51 @@ describe("event-async compiled script target", () => {
     expect(evalContext.localContext.count).toBe(2);
   });
 
+  it("skips yield checks for simple expression statements", () => {
+    const artifact = compileEventAsyncStatementSource("value + 1;", "Main.xmlui#event-simple-expr");
+
+    expect(artifact.js).toContain(
+      "runtime.afterStatement(evalContext, undefined, { checkYield: false })",
+    );
+  });
+
+  it("keeps yield checks for expression statements with calls", () => {
+    const artifact = compileEventAsyncStatementSource("getValue();", "Main.xmlui#event-call-expr");
+
+    expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
+    expect(artifact.js).not.toContain(
+      "runtime.afterStatement(evalContext, undefined, { checkYield: false })",
+    );
+  });
+
+  it("keeps yield checks for bare event handler references", () => {
+    const artifact = compileEventAsyncStatementSource("selectItem", "Main.xmlui#event-bare-ref");
+
+    expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
+    expect(artifact.js).not.toContain(
+      "runtime.afterStatement(evalContext, undefined, { checkYield: false })",
+    );
+  });
+
+  it("skips yield checks for simple declarations but keeps them for call initializers", () => {
+    const simpleArtifact = compileEventAsyncStatementSource(
+      "let value = count + 1;",
+      "Main.xmlui#event-simple-decl",
+    );
+    const callArtifact = compileEventAsyncStatementSource(
+      "let value = getValue();",
+      "Main.xmlui#event-call-decl",
+    );
+
+    expect(simpleArtifact.js).toContain(
+      "runtime.afterStatement(evalContext, undefined, { checkYield: false })",
+    );
+    expect(callArtifact.js).toContain("runtime.afterStatement(evalContext);");
+    expect(callArtifact.js).not.toContain(
+      "runtime.afterStatement(evalContext, undefined, { checkYield: false })",
+    );
+  });
+
   it("throws a structured unsupported error for unsupported nodes", () => {
     expect(() =>
       compileEventAsyncStatementSource("count = enabled ? 1 : 2;", "Main.xmlui#event-4"),

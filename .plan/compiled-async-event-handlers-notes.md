@@ -253,3 +253,17 @@ Implementation note: the interpreter now clears pending `errorToThrow` values fo
 - Observation: the root `test-compiled-events` script initially failed with `Could not find task //#_e2e:compiled-events in project` because the package script existed but `turbo.json` did not define the root task.
 - Fix: added `//#_e2e:compiled-events` to `turbo.json`, mirroring the compiled-bindings task with `PLAYWRIGHT_USE_DEV_SERVER` and `XMLUI_COMPILE_EVENT_HANDLERS` in the task env and the same test-bed/unit dependencies.
 - Validation: `npm run test-compiled-events -- --dry-run` now resolves the task and shows the expected Playwright command without running E2E.
+
+## Step 11 - compiled event yield optimization
+
+- Affected modules: `xmlui/src/components-core/script-compiler/event-runtime.ts`, `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/tests/components-core/script-compiler/event-runtime.test.ts`, `xmlui/tests/components-core/script-compiler/event-async.test.ts`, `xmlui/tests/components-core/compiled-events/event-async-basic.test.ts`, `xmlui/tests/components-core/compiled-events/event-async-control-flow.test.ts`.
+- Decision: compiled event artifacts now execute against `eventAsyncRuntime.createInvocation()`. The generated handlers still share one runtime method implementation through the prototype, but every handler invocation receives isolated yield timing state.
+- Decision: `runtime.afterStatement(...)` keeps completion hooks and cancellation checks on every statement boundary. Event-loop yielding is now delegated to `runtime.maybeYield(...)`, which yields only when the invocation's 100ms interval has elapsed.
+- Decision: codegen can pass `{ checkYield: false }` for statement boundaries that are known not to need an event-loop yield check. Empty statements, block wrapper boundaries, top-level `var`, function declarations, simple `let`/`const`, and expression statements without yield-producing calls use that fast path.
+- Decision: bare event references such as `onClick="selectItem"` still request yield checks even though the AST is only an identifier, because event expression-statement semantics compile them into calls with `evalContext.eventArgs`.
+- Observation: the first static classifier is conservative. Any explicit `T_FUNCTION_INVOCATION_EXPRESSION` is treated as yield-producing; future work can whitelist known fast functions such as `Math.*`.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/event-runtime.test.ts tests/components-core/script-compiler/event-async.test.ts` passed with 21 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events/event-async-basic.test.ts tests/components-core/compiled-events/event-async-control-flow.test.ts` passed with 53 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events` passed with 89 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 116 tests.
+- Manual gate: the root `test-compiled-bindings` regression command remains user-run; it was not run by the agent.

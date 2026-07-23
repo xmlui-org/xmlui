@@ -141,7 +141,7 @@ function emitStatement(
     case T_EMPTY_STATEMENT:
       emitBeforeStatement(writer, statement);
       writer.write(";", statement);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: false });
       return;
     case T_EXPRESSION_STATEMENT:
       emitExpressionStatement(writer, statement, context, emitEventExpressionStatementExpression);
@@ -155,12 +155,12 @@ function emitStatement(
     case T_LET_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "let", statement, context);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement) });
       return;
     case T_CONST_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "const", statement, context);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement) });
       return;
     case T_VAR_STATEMENT:
       emitVarStatement(writer, statement, context);
@@ -287,7 +287,9 @@ function emitExpressionStatement(
   emitStatementExpression(writer, statement.expr, context);
   writer.write(");", statement);
   writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, {
+    checkYield: eventExpressionStatementMayYield(statement.expr),
+  });
 }
 
 function emitPlainExpressionStatementExpression(
@@ -298,7 +300,63 @@ function emitPlainExpressionStatementExpression(
   emitExpression(writer, expr, context);
 }
 
-function emitAfterStatement(writer: CompiledScriptCodeWriter, statement: Statement): void {
+function eventExpressionStatementMayYield(expr: Expression): boolean {
+  return expr.type === T_IDENTIFIER || isMemberExpressionChain(expr) || expressionMayYield(expr);
+}
+
+function declarationStatementMayYield(statement: LetStatement | ConstStatement): boolean {
+  return statement.decls.some((decl) => (decl.expr ? expressionMayYield(decl.expr) : false));
+}
+
+function expressionMayYield(expr: Expression): boolean {
+  switch (expr.type) {
+    case T_FUNCTION_INVOCATION_EXPRESSION:
+      return true;
+    case T_MEMBER_ACCESS_EXPRESSION:
+      return expressionMayYield(expr.obj);
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+      return expressionMayYield(expr.obj) || expressionMayYield(expr.member);
+    case T_UNARY_EXPRESSION:
+      return expressionMayYield(expr.expr);
+    case T_BINARY_EXPRESSION:
+      return expressionMayYield(expr.left) || expressionMayYield(expr.right);
+    case T_ASSIGNMENT_EXPRESSION:
+      return expressionMayYield(expr.leftValue) || expressionMayYield(expr.expr);
+    case T_ARRAY_LITERAL:
+      return expr.items.some((item) => expressionMayYield(item));
+    case T_OBJECT_LITERAL:
+      return expr.props.some((prop) => {
+        if (!Array.isArray(prop)) {
+          return true;
+        }
+        return expressionMayYield(prop[0]) || expressionMayYield(prop[1]);
+      });
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
+      return expressionMayYield(expr.expr);
+    case T_SPREAD_EXPRESSION:
+      return expressionMayYield(expr.expr);
+    case T_ARROW_EXPRESSION:
+    case T_LITERAL:
+    case T_IDENTIFIER:
+      return false;
+    default:
+      return true;
+  }
+}
+
+function emitAfterStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: Statement,
+  options?: { checkYield?: boolean },
+): void {
+  if (options?.checkYield === false) {
+    writer.write(
+      "await runtime.afterStatement(evalContext, undefined, { checkYield: false });",
+      statement,
+    );
+    return;
+  }
   writer.write("await runtime.afterStatement(evalContext);", statement);
 }
 
@@ -350,7 +408,7 @@ function emitVarStatement(
     writer.write(`throw new Error("'var' declarations are not allowed within functions");`, statement);
     return;
   }
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
 }
 
 function emitVarDeclaration(
@@ -457,7 +515,7 @@ function emitBlockStatement(
 ): void {
   const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
   emitBeforeStatement(writer, statement);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
   writer.write("{", statement);
   statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", statement);
@@ -696,7 +754,7 @@ function emitFunctionDeclarationStatement(
   }
   emitBeforeStatement(writer, statement);
   emitFunctionDeclaration(writer, statement, context);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
 }
 
 function emitFunctionDeclaration(

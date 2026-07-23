@@ -27,7 +27,29 @@ import type {
 } from "../script-runner/ScriptingSourceTree";
 import { UnsupportedCompiledScriptNodeError } from "./errors";
 
+const DEFAULT_YIELD_INTERVAL_MS = 100;
+
+type EventYieldState = {
+  lastYieldReferenceTs: number;
+  intervalMs: number;
+};
+
+type EventStatementBoundaryOptions = {
+  checkYield?: boolean;
+};
+
 export const eventAsyncRuntime = {
+  createInvocation(options?: { yieldIntervalMs?: number }) {
+    const invocation = Object.create(this) as typeof eventAsyncRuntime & {
+      __yieldState?: EventYieldState;
+    };
+    invocation.__yieldState = {
+      lastYieldReferenceTs: this.now(),
+      intervalMs: options?.yieldIntervalMs ?? DEFAULT_YIELD_INTERVAL_MS,
+    };
+    return invocation;
+  },
+
   unsupported(target: string, sourceId: string, sourceRange?: any): never {
     throw new UnsupportedCompiledScriptNodeError(target, sourceId, sourceRange);
   },
@@ -39,6 +61,7 @@ export const eventAsyncRuntime = {
       loops: [],
       breakLabelValue: -1,
     };
+    this.ensureYieldState();
     await this.checkCancel(evalContext);
   },
 
@@ -53,14 +76,41 @@ export const eventAsyncRuntime = {
   async afterStatement(
     evalContext: BindingTreeEvaluationContext,
     statement?: Statement,
+    options?: EventStatementBoundaryOptions,
   ): Promise<void> {
     await evalContext.onStatementCompleted?.(evalContext, statement as Statement);
     await this.checkCancel(evalContext);
+    if (options?.checkYield !== false) {
+      await this.maybeYield();
+    }
+    await this.checkCancel(evalContext);
+  },
+
+  async maybeYield(): Promise<void> {
+    const state = this.ensureYieldState();
+    const now = this.now();
+    if (now - state.lastYieldReferenceTs < state.intervalMs) {
+      return;
+    }
+    state.lastYieldReferenceTs = now;
     await this.yield();
   },
 
   async yield(): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  },
+
+  now(): number {
+    return typeof performance !== "undefined" ? performance.now() : Date.now();
+  },
+
+  ensureYieldState(): EventYieldState {
+    const runtime = this as typeof eventAsyncRuntime & { __yieldState?: EventYieldState };
+    runtime.__yieldState ??= {
+      lastYieldReferenceTs: this.now(),
+      intervalMs: DEFAULT_YIELD_INTERVAL_MS,
+    };
+    return runtime.__yieldState;
   },
 
   async checkCancel(evalContext: BindingTreeEvaluationContext): Promise<void> {
@@ -161,7 +211,7 @@ export const eventAsyncRuntime = {
         );
       }
 
-      const callArgs = args.map((arg) =>
+      const callArgs: any[] = args.map((arg) =>
         isArrowExpressionObject(arg)
           ? async (...arrowArgs: any[]) =>
               await executeArrowExpression(

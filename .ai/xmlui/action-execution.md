@@ -31,6 +31,12 @@ After each statement:
 2. Fresh state snapshot cloned for next statement
 3. After 100 no-change statements → `await delay(0)` to yield main thread
 
+Compiled event handlers keep the same statement boundary and state-refresh contract, but their
+event-loop yield is optimized: eligible statement boundaries perform a shared runtime check and
+yield at most once every 100ms per handler invocation. Simple declarations and expression
+statements that do not contain a yield-producing function call can skip the yield check while still
+running completion hooks and cancellation checks.
+
 Effect: state changes from statement N are visible to statement N+1. Unlike raw React batching.
 
 ### Event categories

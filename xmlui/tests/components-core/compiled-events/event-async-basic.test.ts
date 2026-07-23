@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   compileEventAsyncStatementSource,
+  eventAsyncRuntime,
   executeCompiledEventAsyncArtifact,
 } from "../../../src/components-core/script-compiler";
 import { createCancellationToken, HandlerCancelledError } from "../../../src/components-core/concurrency";
@@ -107,7 +108,7 @@ describe("compiled event-async basic statement subset", () => {
     expect(evalContext.localContext.selected).toBe("ALPHA");
   });
 
-  it("yields between completed statements", async () => {
+  it("does not force event-loop yields between simple expression statements", async () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { count: 0 },
@@ -119,13 +120,50 @@ describe("compiled event-async basic statement subset", () => {
     });
     const artifact = compileEventAsyncStatementSource(
       "count = count + 1; count = count + 1;",
-      "test:event:yield",
+      "test:event:simple-no-yield",
     );
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
     expect(evalContext.localContext.count).toBe(2);
-    expect(order).toEqual(["completed", "timer", "completed", "timer"]);
+    expect(order).toEqual(["completed", "completed"]);
+
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    expect(order).toEqual(["completed", "completed", "timer", "timer"]);
+  });
+
+  it("uses the shared runtime yield check for call expression statements", async () => {
+    const originalNow = eventAsyncRuntime.now;
+    const originalYield = eventAsyncRuntime.yield;
+    let now = 0;
+    let yieldCount = 0;
+
+    eventAsyncRuntime.now = () => now;
+    eventAsyncRuntime.yield = async () => {
+      yieldCount++;
+    };
+
+    try {
+      const evalContext = createEvalContext({
+        localContext: { getValue: () => undefined },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: () => {
+          now += 101;
+        },
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "getValue(); getValue();",
+        "test:event:call-yield-check",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(yieldCount).toBe(2);
+    } finally {
+      eventAsyncRuntime.now = originalNow;
+      eventAsyncRuntime.yield = originalYield;
+    }
   });
 
   it("creates a statement boundary for each simple statement", async () => {
@@ -170,13 +208,13 @@ describe("compiled event-async basic statement subset", () => {
     expect(evalContext.localContext).toMatchObject({ count: 41, observed: 41 });
   });
 
-  it("yields after every statement even when there is no state change", async () => {
+  it("does not yield after every simple statement when there is no state change", async () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { value: 1 },
       options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
-        const index = order.length / 2;
+        const index = order.length;
         order.push(`completed:${index}`);
         setTimeout(() => order.push(`timer:${index}`), 0);
       },
@@ -188,12 +226,16 @@ describe("compiled event-async basic statement subset", () => {
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
+    expect(order).toEqual(["completed:0", "completed:1", "completed:2"]);
+
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
     expect(order).toEqual([
       "completed:0",
-      "timer:0",
       "completed:1",
-      "timer:1",
       "completed:2",
+      "timer:0",
+      "timer:1",
       "timer:2",
     ]);
   });

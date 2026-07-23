@@ -14,7 +14,10 @@ export async function executeCompiledEventAsyncArtifact(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): Promise<any> {
-  return await instantiateCompiledScriptArtifact<Promise<any>>(artifact, eventAsyncRuntime).execute({
+  return await instantiateCompiledScriptArtifact<Promise<any>>(
+    artifact,
+    eventAsyncRuntime.createInvocation(),
+  ).execute({
     evalContext,
     thread,
   });
