@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import {
   createCompiledScriptArtifact,
+  createCompiledScriptFunctionBody,
   createCompiledScriptMapping,
   deserializeCompiledScriptArtifact,
   instantiateCompiledScriptArtifact,
@@ -85,6 +86,60 @@ describe("compiled script artifacts", () => {
     );
   });
 
+  it("adds inline source map comments for runtime fallback debugging", () => {
+    const artifact = createCompiledScriptArtifact({
+      target: "binding-sync",
+      sourceId: "/src/Main.xmlui#expr-1",
+      sourceUrl: "/@xmlui-source/src/Main.xmlui",
+      sourceText: "count + 1",
+      js: "return 3;",
+      mappings: [
+        createCompiledScriptMapping(7, 8, "/src/Main.xmlui#expr-1", {
+          start: 10,
+          end: 15,
+          startLine: 2,
+          startColumn: 4,
+          endLine: 2,
+          endColumn: 9,
+        }),
+      ],
+      sources: [
+        {
+          id: "/src/Main.xmlui#expr-1",
+          url: "/@xmlui-source/src/Main.xmlui",
+          sourceText: '<Text value="{count + 1}" />',
+        },
+      ],
+    });
+
+    const body = createCompiledScriptFunctionBody(artifact, { sourceMapMode: "inline" });
+
+    expect(body).toContain(
+      "//# sourceURL=/@xmlui-source/__compiled/%2Fsrc%2FMain.xmlui%23expr-1.js",
+    );
+    expect(body).toContain("//# sourceMappingURL=data:application/json;charset=utf-8;base64,");
+  });
+
+  it("prefers external source map URLs when requested", () => {
+    const artifact = createCompiledScriptArtifact({
+      target: "event-async",
+      sourceId: "/src/Main.xmlui#event-1",
+      sourceUrl: "/@xmlui-source/src/Main.xmlui",
+      js: "return undefined;",
+    });
+
+    const body = createCompiledScriptFunctionBody(artifact, {
+      sourceMapMode: "external",
+      sourceMapUrl: "/@xmlui-source/src/Main.xmlui.map",
+    });
+
+    expect(body).toContain(
+      "//# sourceURL=/@xmlui-source/__compiled/%2Fsrc%2FMain.xmlui%23event-1.js",
+    );
+    expect(body).toContain("//# sourceMappingURL=/@xmlui-source/src/Main.xmlui.map");
+    expect(body).not.toContain("base64");
+  });
+
   it("throws a structured error for unsupported nodes", () => {
     expect(() =>
       throwUnsupportedCompiledScriptNode(
@@ -116,4 +171,3 @@ describe("compiled script artifacts", () => {
     ).toThrow(UnsupportedCompiledScriptNodeError);
   });
 });
-

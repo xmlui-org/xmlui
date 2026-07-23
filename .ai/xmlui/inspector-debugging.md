@@ -5,6 +5,7 @@
 XMLUI ships a built-in trace/log system under the `_xs*` namespace on `window`. It is **zero-overhead when disabled** and captures a full timeline of interactions, API calls, state changes, and handler executions when enabled. The system has two entry points: the `Inspector` component (UI viewer) and `window._xsLogs` (raw data for DevTools/automation).
 
 **Key directories:**
+
 ```
 xmlui/src/components-core/inspector/
 ├── inspectorUtils.ts      ← Core: pushXsLog, createLogEntry, pushTrace, popTrace
@@ -21,14 +22,14 @@ xmlui/src/components/Inspector/
 
 ## Core Functions (`inspectorUtils.ts`)
 
-| Function | Signature | Purpose |
-|----------|-----------|---------|
-| `pushXsLog` | `(entry: XsLogEntry, xsLogMax?: number) => void` | Append entry to `window._xsLogs`; noop if tracing off |
-| `createLogEntry` | `(kind: string, extras?: Partial<XsLogEntry>) => XsLogEntry` | Factory; pre-fills `ts`, `perfTs`, `traceId` |
-| `pushTrace` | `(preferredId?: string) => string` | Push new trace ID onto stack; returns the new ID |
-| `popTrace` | `() => void` | Pop current trace ID; restore parent |
-| `getCurrentTrace` | `() => string \| undefined` | Current trace ID (excludes startup trace after first interaction) |
-| `generateTraceId` | `() => string` | `"t-${timestamp}-${random}"` |
+| Function          | Signature                                                    | Purpose                                                           |
+| ----------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `pushXsLog`       | `(entry: XsLogEntry, xsLogMax?: number) => void`             | Append entry to `window._xsLogs`; noop if tracing off             |
+| `createLogEntry`  | `(kind: string, extras?: Partial<XsLogEntry>) => XsLogEntry` | Factory; pre-fills `ts`, `perfTs`, `traceId`                      |
+| `pushTrace`       | `(preferredId?: string) => string`                           | Push new trace ID onto stack; returns the new ID                  |
+| `popTrace`        | `() => void`                                                 | Pop current trace ID; restore parent                              |
+| `getCurrentTrace` | `() => string \| undefined`                                  | Current trace ID (excludes startup trace after first interaction) |
+| `generateTraceId` | `() => string`                                               | `"t-${timestamp}-${random}"`                                      |
 
 ---
 
@@ -36,20 +37,20 @@ xmlui/src/components/Inspector/
 
 ```typescript
 interface XsLogEntry {
-  ts: number;               // Date.now() when created
-  perfTs?: number;          // performance.now()
-  startPerfTs?: number;     // For duration calculation
-  traceId?: string;         // Groups events in one interaction
-  kind?: string;            // See: Event Kinds table
-  eventName?: string;       // "click", "change", "submit", etc.
-  componentType?: string;   // XMLUI component name
-  componentLabel?: string;  // Human-readable ID
-  uid?: string;             // Component UID or DataSource ID
-  text?: string;            // Stringified details
-  diffPretty?: string;      // Human-readable state diff
-  diffJson?: DiffEntry[];   // Structured diff
+  ts: number; // Date.now() when created
+  perfTs?: number; // performance.now()
+  startPerfTs?: number; // For duration calculation
+  traceId?: string; // Groups events in one interaction
+  kind?: string; // See: Event Kinds table
+  eventName?: string; // "click", "change", "submit", etc.
+  componentType?: string; // XMLUI component name
+  componentLabel?: string; // Human-readable ID
+  uid?: string; // Component UID or DataSource ID
+  text?: string; // Stringified details
+  diffPretty?: string; // Human-readable state diff
+  diffJson?: DiffEntry[]; // Structured diff
   error?: { message: string; stack?: string };
-  [key: string]: any;       // Custom fields allowed
+  [key: string]: any; // Custom fields allowed
 }
 ```
 
@@ -57,39 +58,40 @@ interface XsLogEntry {
 
 ## Event Kinds Reference
 
-| Kind | Pushed By | Meaning |
-|------|-----------|---------|
-| `"interaction"` | AppContent (document capture) | User click/keypress (trusted events only) |
-| `"navigate"` | NavigateAction | `navigate()` called |
-| `"api:start"` | DataLoader, APICall | Fetch begins |
-| `"api:complete"` | DataLoader, APICall | Fetch succeeded |
-| `"api:error"` | DataLoader, APICall | Fetch failed |
-| `"handler:start"` | handler-logging | Event handler begins |
-| `"handler:complete"` | handler-logging | Handler finished (with duration) |
-| `"handler:error"` | handler-logging | Handler threw; payload includes component/event context, `handlerCode`, and optional `diagnosticCode` / `diagnosticHint` |
-| `"state:changes"` | handler-logging, AppContent | Container state diff |
-| `"error:boundary"` | ErrorBoundary | React render error caught |
-| `"toast"` | AppContent | Toast notification shown |
-| `"modal:show"` | ConfirmationModalContextProvider | Confirm dialog opened |
-| `"modal:confirm"` | ConfirmationModalContextProvider | User confirmed |
-| `"modal:cancel"` | ConfirmationModalContextProvider | User cancelled |
-| `"method:call"` | state-layers | Component API method invoked |
-| `"value:change"` | variable-logging | User var changed |
-| `"native:*"` | Any | Native DOM events (prefix preserved) |
-| `"sandbox:warn"` | bannedMembers `sandboxWarnLogger` | Banned DOM API access in non-strict mode (default) |
-| `"log:debug"` / `"log:info"` / `"log:warn"` / `"log:error"` | `Log.*` global | User-emitted log via sanctioned `Log` API (replaces `console.*`) |
-| `"app:fetch"` | `App.fetch` global | HTTP request via the gated fetch wrapper (origin allowlist applied) |
-| `"app:randomBytes"` | `App.randomBytes` global | Entropy use via the gated `crypto.getRandomValues` wrapper |
-| `"app:mark"` / `"app:measure"` | `App.mark` / `App.measure` globals | User performance marks/measures |
-| `"clipboard:copy"` | `Clipboard.copy` global | Clipboard write via sanctioned wrapper |
-| `"storage"` | local-storage-functions | Managed localStorage operation degraded; payload includes `code`, `operation`, `key`, and `error` |
-| `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | `<WebSocket>` component | Managed WebSocket lifecycle |
-| `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component | Managed SSE lifecycle |
-| `"reactive-cycle"` | reactive graph analyzer | Static/runtime reactive dependency cycle; payload includes cycle hash, severity, and formatted nodes |
-| `"build"` | analyzer pipeline (plan #13) | Build-time validation diagnostic echoed at runtime; payload `code, severity, file, line, column, message`, optional `data`, `suggestions` |
-| `"errors"` | structured error pipeline (plan #07) | Structured error event; payload `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` |
-| `"audit"` | audit subsystem (plan #15) | Audit-pipeline self-diagnostic (redaction gap, sink failure, buffer overflow); payload `code: AuditDiagCode`, `severity`, `message`, optional `data` |
-| `"a11y"` | accessibility linter (plan #05) | Linter finding when `App.appGlobals.strictAccessibility` is truthy; payload `code: A11yCode`, `severity`, `componentName`, `message`, optional `fix` |
+| Kind                                                                                              | Pushed By                            | Meaning                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `"interaction"`                                                                                   | AppContent (document capture)        | User click/keypress (trusted events only)                                                                                                                                                                                                                 |
+| `"navigate"`                                                                                      | NavigateAction                       | `navigate()` called                                                                                                                                                                                                                                       |
+| `"api:start"`                                                                                     | DataLoader, APICall                  | Fetch begins                                                                                                                                                                                                                                              |
+| `"api:complete"`                                                                                  | DataLoader, APICall                  | Fetch succeeded                                                                                                                                                                                                                                           |
+| `"api:error"`                                                                                     | DataLoader, APICall                  | Fetch failed                                                                                                                                                                                                                                              |
+| `"handler:start"`                                                                                 | handler-logging                      | Event handler begins                                                                                                                                                                                                                                      |
+| `"handler:complete"`                                                                              | handler-logging                      | Handler finished (with duration)                                                                                                                                                                                                                          |
+| `"handler:error"`                                                                                 | handler-logging                      | Handler threw; payload includes component/event context, `handlerCode`, and optional `diagnosticCode` / `diagnosticHint`                                                                                                                                  |
+| `"state:changes"`                                                                                 | handler-logging, AppContent          | Container state diff                                                                                                                                                                                                                                      |
+| `"error:boundary"`                                                                                | ErrorBoundary                        | React render error caught                                                                                                                                                                                                                                 |
+| `"toast"`                                                                                         | AppContent                           | Toast notification shown                                                                                                                                                                                                                                  |
+| `"modal:show"`                                                                                    | ConfirmationModalContextProvider     | Confirm dialog opened                                                                                                                                                                                                                                     |
+| `"modal:confirm"`                                                                                 | ConfirmationModalContextProvider     | User confirmed                                                                                                                                                                                                                                            |
+| `"modal:cancel"`                                                                                  | ConfirmationModalContextProvider     | User cancelled                                                                                                                                                                                                                                            |
+| `"method:call"`                                                                                   | state-layers                         | Component API method invoked                                                                                                                                                                                                                              |
+| `"value:change"`                                                                                  | variable-logging                     | User var changed                                                                                                                                                                                                                                          |
+| `"native:*"`                                                                                      | Any                                  | Native DOM events (prefix preserved)                                                                                                                                                                                                                      |
+| `"sandbox:warn"`                                                                                  | bannedMembers `sandboxWarnLogger`    | Banned DOM API access in non-strict mode (default)                                                                                                                                                                                                        |
+| `"log:debug"` / `"log:info"` / `"log:warn"` / `"log:error"`                                       | `Log.*` global                       | User-emitted log via sanctioned `Log` API (replaces `console.*`)                                                                                                                                                                                          |
+| `"app:fetch"`                                                                                     | `App.fetch` global                   | HTTP request via the gated fetch wrapper (origin allowlist applied)                                                                                                                                                                                       |
+| `"app:randomBytes"`                                                                               | `App.randomBytes` global             | Entropy use via the gated `crypto.getRandomValues` wrapper                                                                                                                                                                                                |
+| `"app:mark"` / `"app:measure"`                                                                    | `App.mark` / `App.measure` globals   | User performance marks/measures                                                                                                                                                                                                                           |
+| `"clipboard:copy"`                                                                                | `Clipboard.copy` global              | Clipboard write via sanctioned wrapper                                                                                                                                                                                                                    |
+| `"storage"`                                                                                       | local-storage-functions              | Managed localStorage operation degraded; payload includes `code`, `operation`, `key`, and `error`                                                                                                                                                         |
+| `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"`                                     | `<WebSocket>` component              | Managed WebSocket lifecycle                                                                                                                                                                                                                               |
+| `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component            | Managed SSE lifecycle                                                                                                                                                                                                                                     |
+| `"reactive-cycle"`                                                                                | reactive graph analyzer              | Static/runtime reactive dependency cycle; payload includes cycle hash, severity, and formatted nodes                                                                                                                                                      |
+| `"build"`                                                                                         | analyzer pipeline (plan #13)         | Build-time validation diagnostic echoed at runtime; payload `code, severity, file, line, column, message`, optional `data`, `suggestions`                                                                                                                 |
+| `"errors"`                                                                                        | structured error pipeline (plan #07) | Structured error event; payload `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId`                                                                                                                    |
+| `"audit"`                                                                                         | audit subsystem (plan #15)           | Audit-pipeline self-diagnostic (redaction gap, sink failure, buffer overflow); payload `code: AuditDiagCode`, `severity`, `message`, optional `data`                                                                                                      |
+| `"a11y"`                                                                                          | accessibility linter (plan #05)      | Linter finding when `App.appGlobals.strictAccessibility` is truthy; payload `code: A11yCode`, `severity`, `componentName`, `message`, optional `fix`                                                                                                      |
+| `"debug-source"`                                                                                  | compiled script executors            | Deduplicated metadata for compiled binding/event artifacts when `xsVerbose` and `compiledScriptSourceMaps` are enabled; payload includes `target`, `sourceUrl`, `originalFile`, `sourceRange`, `artifactId`, and `sourcemapMode` without full source text |
 
 ---
 
@@ -97,28 +99,29 @@ interface XsLogEntry {
 
 All are initialized only when `xsVerbose=true` in app config/globals. Checking `window._xsLogs` being an array is the canonical gate.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `_xsLogs` | `XsLogEntry[]` | Circular buffer (default max 200) |
-| `_xsCurrentTrace` | `string` | Active trace ID |
-| `_xsStartupTrace` | `string` | Startup-phase trace ID |
-| `_xsStartupComplete` | `boolean` | True after first user interaction |
-| `_xsLastInteraction` | `object` | `{ id, ts, type, target }` of last event |
-| `_xsInspectMap` | `Map` | `data-inspectid` → component metadata |
-| `_xsTestIdMap` | `Map` | `data-testid` → component metadata |
-| `_xsSources` | `Map` | File ID → source code |
-| `_xsSourceFiles` | `string[]` | Source file paths |
-| `_xsHandlerSourceInfo` | `SourceLocation` | Active handler's source location |
-| `_xsPendingConfirmTrace` | `string` | Trace ID awaiting confirmation |
-| `_xsLastApiStatus` | `Map` | Transaction ID → HTTP status code |
-| `__xsVerbose` | `boolean` | Verbose mode flag |
-| `__xsTraceHelpers` | `object` | `{ pushTrace, popTrace, pushXsLog, createLogEntry }` (for `method:call` instrumentation) |
+| Property                 | Type             | Description                                                                              |
+| ------------------------ | ---------------- | ---------------------------------------------------------------------------------------- |
+| `_xsLogs`                | `XsLogEntry[]`   | Circular buffer (default max 200)                                                        |
+| `_xsCurrentTrace`        | `string`         | Active trace ID                                                                          |
+| `_xsStartupTrace`        | `string`         | Startup-phase trace ID                                                                   |
+| `_xsStartupComplete`     | `boolean`        | True after first user interaction                                                        |
+| `_xsLastInteraction`     | `object`         | `{ id, ts, type, target }` of last event                                                 |
+| `_xsInspectMap`          | `Map`            | `data-inspectid` → component metadata                                                    |
+| `_xsTestIdMap`           | `Map`            | `data-testid` → component metadata                                                       |
+| `_xsSources`             | `Map`            | File ID → source code                                                                    |
+| `_xsSourceFiles`         | `string[]`       | Source file paths                                                                        |
+| `_xsHandlerSourceInfo`   | `SourceLocation` | Active handler's source location                                                         |
+| `_xsPendingConfirmTrace` | `string`         | Trace ID awaiting confirmation                                                           |
+| `_xsLastApiStatus`       | `Map`            | Transaction ID → HTTP status code                                                        |
+| `__xsVerbose`            | `boolean`        | Verbose mode flag                                                                        |
+| `__xsTraceHelpers`       | `object`         | `{ pushTrace, popTrace, pushXsLog, createLogEntry }` (for `method:call` instrumentation) |
 
 ---
 
 ## Enabling Tracing
 
 In `config.json` or app globals:
+
 ```json
 {
   "globals": {
@@ -129,6 +132,7 @@ In `config.json` or app globals:
 ```
 
 **In code, check the flag uniformly:**
+
 ```typescript
 const xsVerbose = appContext.appGlobals?.xsVerbose === true;
 if (!xsVerbose) return;
@@ -156,7 +160,10 @@ Used by `event-handlers.ts` to wrap every `on*` event handler.
 ```typescript
 const logger = createHandlerLogger({ appContext, nodeDebugSource });
 const traceId = logger.logHandlerStart({
-  uid, eventName, componentType, handlerCode
+  uid,
+  eventName,
+  componentType,
+  handlerCode,
 });
 try {
   // ... execute handler ...
@@ -176,12 +183,12 @@ When a handler fails, XMLUI always writes a contextual console error. With
 `xsVerbose: true`, it also records a `"handler:error"` entry in `window._xsLogs`
 with these observability fields:
 
-| Field | Meaning |
-|-------|---------|
-| `componentType` / `componentLabel` / `eventName` | Component and event that ran |
-| `handlerCode` | Source snippet for the handler when available |
-| `diagnosticCode` | Stable machine-readable category, such as `handler-assignment-target`, `handler-await-syntax`, or `handler-unresolved-identifier` |
-| `diagnosticHint` | Human-readable recovery hint for the category |
+| Field                                            | Meaning                                                                                                                           |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `componentType` / `componentLabel` / `eventName` | Component and event that ran                                                                                                      |
+| `handlerCode`                                    | Source snippet for the handler when available                                                                                     |
+| `diagnosticCode`                                 | Stable machine-readable category, such as `handler-assignment-target`, `handler-await-syntax`, or `handler-unresolved-identifier` |
+| `diagnosticHint`                                 | Human-readable recovery hint for the category                                                                                     |
 
 ### State Logging (`state-logging.ts`)
 
@@ -190,12 +197,13 @@ Used by DataLoader and StateContainer for mutations outside event handlers.
 ```typescript
 const logger = createStateLogger({ appContext });
 logger.logStatePartChange({ uid, key, oldValue, newValue });
-logger.logStateBatch(changes);  // Multiple changes atomically
+logger.logStateBatch(changes); // Multiple changes atomically
 ```
 
 ### Variable Logging (`variable-logging.ts`)
 
 Tracks `<Var>` element values and script variable changes. Filters internal framework vars:
+
 ```
 "$props", "emitEvent", "hasEventHandler", "updateState",
 "$item", "$itemIndex", "$this", "$parent"
@@ -207,13 +215,13 @@ Tracks `<Var>` element values and script variable changes. Filters internal fram
 
 **Props:**
 
-| Prop | Default | Description |
-|------|---------|-------------|
-| `src` | `"xmlui/xs-diff.html"` | Inspector viewer URL |
-| `tooltip` | `"Inspector"` | Icon hover text |
-| `dialogTitle` | `"XMLUI Inspector"` | Modal header |
-| `dialogWidth` | `"95vw"` | Modal CSS min-width |
-| `dialogHeight` | `"95vh"` | Modal CSS min-height |
+| Prop           | Default                | Description          |
+| -------------- | ---------------------- | -------------------- |
+| `src`          | `"xmlui/xs-diff.html"` | Inspector viewer URL |
+| `tooltip`      | `"Inspector"`          | Icon hover text      |
+| `dialogTitle`  | `"XMLUI Inspector"`    | Modal header         |
+| `dialogWidth`  | `"95vw"`               | Modal CSS min-width  |
+| `dialogHeight` | `"95vh"`               | Modal CSS min-height |
 
 **APIs:** `open()`, `close()`
 
@@ -228,10 +236,12 @@ The iframe reads `window._xsLogs` via postMessage to display the trace timeline.
 **Keyboard shortcut:** Alt + Ctrl + Shift + S (toggles state view)
 
 When `displayStateView=true`:
+
 - Components are outlined with bounding boxes
 - State change transitions optionally highlighted (blink)
 
 Debug view configuration interface:
+
 ```typescript
 interface IDebugViewContext {
   displayStateView?: boolean;
@@ -251,21 +261,25 @@ interface IDebugViewContext {
 ## Adding Custom Trace Entries
 
 **Minimal pattern:**
+
 ```typescript
 import { pushXsLog, createLogEntry } from "../inspector/inspectorUtils";
 
 // In a function that has access to appContext:
 const xsVerbose = appContext.appGlobals?.xsVerbose === true;
 if (xsVerbose) {
-  pushXsLog(createLogEntry("custom:myEvent", {
-    uid: componentId,
-    eventName: "myAction",
-    text: JSON.stringify(details),
-  }));
+  pushXsLog(
+    createLogEntry("custom:myEvent", {
+      uid: componentId,
+      eventName: "myAction",
+      text: JSON.stringify(details),
+    }),
+  );
 }
 ```
 
 **With trace lifecycle (for multi-step operations):**
+
 ```typescript
 import { pushTrace, popTrace, createLogEntry, pushXsLog } from "../inspector/inspectorUtils";
 
@@ -283,16 +297,16 @@ try {
 
 ## Integration Map
 
-| Component | What It Logs | Kind(s) |
-|-----------|-------------|---------|
-| `AppContent` | User interactions (trusted DOM events), app state changes, toasts | `interaction`, `state:changes`, `toast` |
-| `event-handlers.ts` | Every on* handler execution | `handler:start`, `handler:complete`, `handler:error`, `state:changes` |
-| `DataLoader` | API fetch lifecycle | `api:start`, `api:complete`, `api:error` |
-| `APICall` | Action-triggered API calls | `api:start`, `api:complete`, `api:error` |
-| `NavigateAction` | Route changes | `navigate` |
-| `ErrorBoundary` | Render errors | `error:boundary` |
-| `ConfirmationModalContextProvider` | Confirm dialogs | `modal:show`, `modal:confirm`, `modal:cancel` |
-| `state-layers.ts` | Component API method calls | `method:call` |
+| Component                          | What It Logs                                                      | Kind(s)                                                               |
+| ---------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `AppContent`                       | User interactions (trusted DOM events), app state changes, toasts | `interaction`, `state:changes`, `toast`                               |
+| `event-handlers.ts`                | Every on\* handler execution                                      | `handler:start`, `handler:complete`, `handler:error`, `state:changes` |
+| `DataLoader`                       | API fetch lifecycle                                               | `api:start`, `api:complete`, `api:error`                              |
+| `APICall`                          | Action-triggered API calls                                        | `api:start`, `api:complete`, `api:error`                              |
+| `NavigateAction`                   | Route changes                                                     | `navigate`                                                            |
+| `ErrorBoundary`                    | Render errors                                                     | `error:boundary`                                                      |
+| `ConfirmationModalContextProvider` | Confirm dialogs                                                   | `modal:show`, `modal:confirm`, `modal:cancel`                         |
+| `state-layers.ts`                  | Component API method calls                                        | `method:call`                                                         |
 
 ---
 
@@ -315,12 +329,12 @@ try {
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `xmlui/src/components-core/inspector/inspectorUtils.ts` | Core trace API |
-| `xmlui/src/components-core/inspector/handler-logging.ts` | Handler lifecycle logging |
-| `xmlui/src/components-core/inspector/state-logging.ts` | State mutation logging |
-| `xmlui/src/components-core/inspector/variable-logging.ts` | Variable change logging |
-| `xmlui/src/components-core/rendering/AppContent.tsx` | Interaction capture + system initialization |
-| `xmlui/src/components-core/DebugViewProvider.tsx` | State visualizer context |
-| `xmlui/src/components/Inspector/InspectorNative.tsx` | Inspector UI component |
+| File                                                      | Purpose                                     |
+| --------------------------------------------------------- | ------------------------------------------- |
+| `xmlui/src/components-core/inspector/inspectorUtils.ts`   | Core trace API                              |
+| `xmlui/src/components-core/inspector/handler-logging.ts`  | Handler lifecycle logging                   |
+| `xmlui/src/components-core/inspector/state-logging.ts`    | State mutation logging                      |
+| `xmlui/src/components-core/inspector/variable-logging.ts` | Variable change logging                     |
+| `xmlui/src/components-core/rendering/AppContent.tsx`      | Interaction capture + system initialization |
+| `xmlui/src/components-core/DebugViewProvider.tsx`         | State visualizer context                    |
+| `xmlui/src/components/Inspector/InspectorNative.tsx`      | Inspector UI component                      |

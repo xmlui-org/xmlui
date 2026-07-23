@@ -113,24 +113,16 @@ export type EvalTreeOptions = {
   /**
    * Experimental switch for compiled synchronous binding expressions.
    *
-   * Default: `false`. Step 1 only propagates the option through the binding
-   * evaluation call chain; the existing AST interpreter remains the only
-   * evaluator until the compiler target is implemented.
-   *
-   * Set via `App.xmluiConfig.compileBindings` in config.json or the App
-   * component.
+   * Default: `false`. Set via `App.xmluiConfig.compileScripts`; the legacy
+   * `compileBindings` key is kept as a compatibility alias.
    */
   compileBindings?: boolean;
   /**
    * Experimental switch for compiled asynchronous event handlers and
    * code-behind functions.
    *
-   * Default: `false`. Step 1 only propagates the option through the event
-   * handler evaluation call chain; the existing async AST interpreter remains
-   * the only evaluator until the compiler target is implemented.
-   *
-   * Set via `App.xmluiConfig.compileEventHandlers` in config.json or the App
-   * component.
+   * Default: `false`. Set via `App.xmluiConfig.compileScripts`; the legacy
+   * `compileEventHandlers` key is kept as a compatibility alias.
    */
   compileEventHandlers?: boolean;
   /**
@@ -139,6 +131,13 @@ export type EvalTreeOptions = {
    * yield checkpoints; the interpreted async path intentionally ignores it.
    */
   handlerExecutionMode?: EventHandlerExecutionMode;
+  /**
+   * Enables source map comments for JavaScript-compiled XMLUI scripts.
+   *
+   * `external` is the preferred dev-server mode; `inline` is a runtime fallback
+   * for environments without a Vite source-map endpoint.
+   */
+  compiledScriptSourceMaps?: boolean | "inline" | "external";
   /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access

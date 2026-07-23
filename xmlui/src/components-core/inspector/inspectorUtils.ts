@@ -125,9 +125,7 @@ export function formatDiff(path: string, before: any, after: any): DiffEntry {
   const beforeJson = simpleStringify(before);
   const afterJson = simpleStringify(after);
   const diffPretty =
-    `path: ${path}\n` +
-    `${prefixLines(beforeJson, "- ")}\n` +
-    `${prefixLines(afterJson, "+ ")}`;
+    `path: ${path}\n` + `${prefixLines(beforeJson, "- ")}\n` + `${prefixLines(afterJson, "+ ")}`;
   return {
     path,
     type: "update",
@@ -333,8 +331,7 @@ export function pushXsLog(
   // If it doesn't exist, tracing is off — noop.
   if (!Array.isArray(w._xsLogs)) return false;
 
-  const atCapacity =
-    Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length >= xsLogMax;
+  const atCapacity = Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length >= xsLogMax;
 
   if (atCapacity) {
     if (onOverflow === "drop-newest") {
@@ -380,7 +377,24 @@ export function pushXsLog(
  * modals, toasts) is preserved.
  */
 export function splicePreservingInteractions(logs: any[], maxSize: number): void {
-  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error", "handler:start", "handler:complete", "modal:show", "modal:confirm", "modal:cancel", "toast", "submenu:open", "selection:change", "focus:change", "method:call", "value:change"]);
+  const preserved = new Set([
+    "interaction",
+    "navigate",
+    "api:start",
+    "api:complete",
+    "api:error",
+    "handler:start",
+    "handler:complete",
+    "modal:show",
+    "modal:confirm",
+    "modal:cancel",
+    "toast",
+    "submenu:open",
+    "selection:change",
+    "focus:change",
+    "method:call",
+    "value:change",
+  ]);
   const keep: any[] = [];
   const evictable: any[] = [];
   for (const entry of logs) {
@@ -407,10 +421,7 @@ export function splicePreservingInteractions(logs: any[], maxSize: number): void
  * Entries produced outside any span use the boot-trace ID as fallback and
  * emit an `audit-correlation-missing` info diagnostic.
  */
-export function createLogEntry(
-  kind: string,
-  extras: Partial<XsLogEntry> = {},
-): XsLogEntry {
+export function createLogEntry(kind: string, extras: Partial<XsLogEntry> = {}): XsLogEntry {
   const w = typeof window !== "undefined" ? (window as any) : {};
   const ctx = currentContext();
   const traceId = ctx ? ctx.traceId : (w._xsCurrentTrace ?? BOOT_TRACE_ID);
@@ -431,6 +442,7 @@ export function createLogEntry(
     "log:warn",
     "log:error",
     "i18n",
+    "debug-source",
   ]);
   if (!ctx && !INTERNAL_KINDS.has(kind) && Array.isArray(w._xsLogs)) {
     // Per-session dedup by kind to bound the diagnostic volume.

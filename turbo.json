@@ -139,13 +139,8 @@
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
     },
-    "//#_e2e:compiled-bindings": {
-      "env": ["PLAYWRIGHT_USE_DEV_SERVER", "XMLUI_COMPILE_BINDINGS"],
-      "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
-      "outputs": ["playwright-report/**"]
-    },
-    "//#_e2e:compiled-events": {
-      "env": ["PLAYWRIGHT_USE_DEV_SERVER", "XMLUI_COMPILE_EVENT_HANDLERS"],
+    "//#_e2e:compiled-scripts": {
+      "env": ["PLAYWRIGHT_USE_DEV_SERVER", "XMLUI_COMPILE_SCRIPTS"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
     },

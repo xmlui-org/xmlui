@@ -15,10 +15,7 @@ import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
 import path from "node:path";
-import {
-  errReportComponent,
-  xmlUiMarkupToComponent,
-} from "../components-core/xmlui-parser";
+import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
 import { getOptimizerMetadata } from "../components-core/optimization/metadataLookup";
 import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
@@ -42,6 +39,18 @@ import type {
 } from "../abstractions/ComponentDefs";
 import { metadataRegistry } from "../language-server/metadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
+import { createDebugSourceUrl } from "../components-core/script-compiler/source";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSource,
+  CompiledScriptSourceMapMode,
+} from "../components-core/script-compiler/types";
+import {
+  createCompiledScriptGeneratedSourceUrl,
+  createCompiledScriptSourceMap,
+} from "../components-core/script-compiler/source-map";
+import { createFunctionBodySourceMapArtifact } from "../components-core/script-compiler/artifact";
+import { XmluiVirtualSourceRegistry, normalizePath } from "./virtual-sources";
 
 export type AnalyzeMode = "off" | "warn" | "strict";
 
@@ -126,16 +135,91 @@ export type PluginOptions = {
    */
   optimizerSourceDirs?: string[];
   /**
+   * Compile XMLUI binding expressions and event handlers into JavaScript where
+   * the corresponding compiler target supports it. This is the preferred public
+   * switch; `compileBindings` and `compileEventHandlers` remain as
+   * compatibility aliases.
+   */
+  compileScripts?: boolean;
+  /**
+   * Legacy compatibility alias for binding compilation. The Vite plugin does
+   * not compile bindings during transform, but uses this to enable dev-server
+   * source registration when runtime binding compilation is active.
+   *
+   * @deprecated Use `compileScripts` instead.
+   */
+  compileBindings?: boolean;
+  /**
    * Compile event-handler source into JavaScript artifacts during the build-time
    * XMLUI transform. When omitted, event handlers remain interpreted.
+   *
+   * @deprecated Use `compileScripts` instead.
    */
   compileEventHandlers?: boolean;
   /**
    * Print generated event-handler JavaScript to the console while parsing.
-   * Only has an effect when `compileEventHandlers` is enabled.
+   * Only has an effect when event-handler compilation is enabled.
    */
   logCompiledEventHandlerSource?: boolean;
+  /**
+   * Emit source-map/debug-source metadata for JavaScript-compiled XMLUI scripts.
+   * `"external"` is the preferred dev-server mode; `"inline"` is reserved for
+   * runtime fallback paths.
+   */
+  compiledScriptSourceMaps?: CompiledScriptSourceMapMode;
 };
+
+function createTransformSourceMap(
+  code: string,
+  file: string,
+  sources: CompiledScriptSource[],
+): {
+  version: 3;
+  file: string;
+  sources: string[];
+  sourcesContent: string[];
+  names: string[];
+  mappings: string;
+} {
+  const uniqueSources = new Map<string, CompiledScriptSource>();
+  for (const source of sources) {
+    const key = source.url ?? source.id;
+    if (!uniqueSources.has(key)) {
+      uniqueSources.set(key, source);
+    }
+  }
+  const entries = Array.from(uniqueSources.values());
+  return {
+    version: 3,
+    file,
+    sources: entries.map((source) => source.url ?? source.id),
+    sourcesContent: entries.map((source) => source.sourceText ?? ""),
+    names: [],
+    mappings: code.length > 0 && entries.length > 0 ? "AAAA" : "",
+  };
+}
+
+function collectCompiledArtifacts(value: unknown, artifacts: CompiledScriptArtifact[] = []) {
+  if (!value || typeof value !== "object") {
+    return artifacts;
+  }
+  const maybeArtifact = value as Partial<CompiledScriptArtifact>;
+  if (
+    typeof maybeArtifact.sourceId === "string" &&
+    typeof maybeArtifact.js === "string" &&
+    typeof maybeArtifact.target === "string" &&
+    Array.isArray(maybeArtifact.mappings)
+  ) {
+    artifacts.push(maybeArtifact as CompiledScriptArtifact);
+    return artifacts;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectCompiledArtifacts(item, artifacts));
+    return artifacts;
+  }
+  Object.values(value).forEach((item) => collectCompiledArtifacts(item, artifacts));
+  return artifacts;
+}
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
 const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
@@ -146,6 +230,8 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let projectRoot = "";
+  let virtualSources: XmluiVirtualSourceRegistry | undefined;
+  let devServerMode = false;
   const analyzeMode: AnalyzeMode = pluginOptions.analyze ?? "warn";
   const cyclesMode: AnalyzeMode =
     pluginOptions.reactiveCycles ?? (analyzeMode === "strict" ? "strict" : "warn");
@@ -166,8 +252,6 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   let typeContractWarnCount = 0;
   let typeContractErrorCount = 0;
 
-  // Helper to normalize Windows paths to use forward slashes
-  const normalizePath = (p: string) => p.replace(/\\/g, "/");
   const isComponentsPath = (p: string) => p.includes("/components/");
   const isEntrypointPath = (p: string) => !isComponentsPath(p) && /\/Main\.xmlui$/.test(p);
   const rootForAnalysis = (component: ComponentDef | CompoundComponentDef): ComponentDef =>
@@ -182,10 +266,51 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       return "";
     }
     return (
-      warnings
-        .map((msg) => `console.warn("[xmlui] " + ${JSON.stringify(msg)});`)
-        .join("\n") + "\n"
+      warnings.map((msg) => `console.warn("[xmlui] " + ${JSON.stringify(msg)});`).join("\n") + "\n"
     );
+  };
+  const compileEventHandlers =
+    pluginOptions.compileEventHandlers ?? pluginOptions.compileScripts ?? false;
+  const compileScripts =
+    pluginOptions.compileScripts === true ||
+    pluginOptions.compileBindings === true ||
+    compileEventHandlers;
+  const sourceMapsEnabled = () =>
+    pluginOptions.compiledScriptSourceMaps === true ||
+    pluginOptions.compiledScriptSourceMaps === "inline" ||
+    pluginOptions.compiledScriptSourceMaps === "external" ||
+    (pluginOptions.compiledScriptSourceMaps !== false && devServerMode && compileScripts);
+  const createDebugSource = (
+    id: string,
+    sourceText: string,
+    displayName = id,
+  ): CompiledScriptSource => ({
+    id,
+    url: virtualSources?.createUrl(id) ?? createDebugSourceUrl(id),
+    displayName,
+    sourceText,
+  });
+  const registerCompiledArtifacts = (value: unknown) => {
+    if (!sourceMapsEnabled()) return;
+    for (const artifact of collectCompiledArtifacts(value)) {
+      const generatedUrl = createCompiledScriptGeneratedSourceUrl(artifact);
+      const generatedPrefix = `"use strict";\n`;
+      const generatedBody = `${generatedPrefix}${artifact.js}`;
+      const sourceMapArtifact = createFunctionBodySourceMapArtifact(
+        artifact,
+        generatedBody,
+        generatedPrefix.length,
+      );
+      virtualSources?.register(
+        {
+          id: artifact.sourceId,
+          url: generatedUrl,
+          displayName: artifact.displayName ?? artifact.sourceId,
+          sourceText: generatedBody,
+        },
+        createCompiledScriptSourceMap(sourceMapArtifact, generatedUrl),
+      );
+    }
   };
 
   // Build optimizer metadata lookup for extension packages.
@@ -337,17 +462,11 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         const parserOptions: XmluiParserOptions = {
           ...(isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {}),
-          compileEventHandlers: pluginOptions.compileEventHandlers,
+          compileEventHandlers,
           logCompiledEventHandlerSource: pluginOptions.logCompiledEventHandlerSource,
         };
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
-          xmlUiMarkupToComponent(
-            code,
-            fileId,
-            codeBehind,
-            extensionMetadataLookup,
-            parserOptions,
-          );
+          xmlUiMarkupToComponent(code, fileId, codeBehind, extensionMetadataLookup, parserOptions);
         if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
           await resolveInlineComponentCodeBehind(inlineComponents, normalizedId);
         }
@@ -502,6 +621,8 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           }
         }
 
+        const debugSources = [createDebugSource(fileId, code)];
+        virtualSources?.registerAll(debugSources);
         const file = {
           component,
           inlineComponents,
@@ -509,11 +630,20 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           ...codeBehind,
           file: fileId,
           warnings,
+          ...(sourceMapsEnabled() ? { debugSources } : {}),
         };
+        const outputCode = browserWarningLogCode(warnings) + dataToEsm(file);
+        const map = sourceMapsEnabled()
+          ? createTransformSourceMap(outputCode, fileId, debugSources)
+          : { mappings: "" };
+        if (sourceMapsEnabled()) {
+          virtualSources?.register(debugSources[0], map);
+          registerCompiledArtifacts(file);
+        }
 
         return {
-          code: browserWarningLogCode(warnings) + dataToEsm(file),
-          map: { mappings: "" },
+          code: outputCode,
+          map,
           moduleType: "js",
         };
       }
@@ -533,11 +663,15 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           : id.substring(0, id.length - (moduleFileExtension.length + 1));
 
         // --- Create a module fetcher for import support
+        const debugSourcesById = new Map<string, CompiledScriptSource>();
+        debugSourcesById.set(normalizedId, createDebugSource(normalizedId, code));
         const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
           // The modulePath parameter is the RESOLVED absolute path, not the original import path
           // So we can just read it directly
           try {
-            return await fs.readFile(modulePath, "utf-8");
+            const moduleSource = await fs.readFile(modulePath, "utf-8");
+            debugSourcesById.set(modulePath, createDebugSource(modulePath, moduleSource));
+            return moduleSource;
           } catch (e) {
             throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
           }
@@ -583,9 +717,26 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           }
         }
 
+        const debugSources = Array.from(debugSourcesById.values());
+        virtualSources?.registerAll(debugSources);
+        const outputCode = dataToEsm({
+          ...codeBehind,
+          src: code,
+          sourceUrl: debugSources[0]?.url ?? createDebugSourceUrl(normalizedId),
+          ...(sourceMapsEnabled() ? { debugSources } : {}),
+        });
+
+        const map = sourceMapsEnabled()
+          ? createTransformSourceMap(outputCode, normalizedId, debugSources)
+          : { mappings: "" };
+        if (sourceMapsEnabled()) {
+          virtualSources?.register(debugSources[0], map);
+          registerCompiledArtifacts(codeBehind);
+        }
+
         return {
-          code: dataToEsm({ ...codeBehind, src: code }),
-          map: { mappings: "" },
+          code: outputCode,
+          map,
           moduleType: "js",
         };
       }
@@ -594,6 +745,39 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
     configResolved(config) {
       projectRoot = normalizePath(config.root);
+      virtualSources = new XmluiVirtualSourceRegistry(projectRoot);
+    },
+
+    configureServer(server) {
+      devServerMode = true;
+      virtualSources ??= new XmluiVirtualSourceRegistry(projectRoot);
+      server.middlewares.use((req, res, next) => {
+        if (!sourceMapsEnabled() || !req.url?.startsWith("/@xmlui-source/")) {
+          next();
+          return;
+        }
+        try {
+          const url = req.url.split("?")[0];
+          const isMap = url.endsWith(".map");
+          const sourceUrl = isMap ? url.slice(0, -4) : url;
+          const content = isMap
+            ? virtualSources?.getMap(sourceUrl)
+            : virtualSources?.getContent(sourceUrl);
+          if (content === undefined) {
+            next();
+            return;
+          }
+          res.statusCode = 200;
+          res.setHeader(
+            "Content-Type",
+            isMap ? "application/json; charset=utf-8" : "text/plain; charset=utf-8",
+          );
+          res.end(typeof content === "string" ? content : JSON.stringify(content));
+        } catch (error) {
+          res.statusCode = 400;
+          res.end((error as Error).message);
+        }
+      });
     },
 
     buildEnd() {
@@ -642,10 +826,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         this.warn(summary);
       }
 
-      if (
-        typeContractMode !== "off" &&
-        (typeContractWarnCount > 0 || typeContractErrorCount > 0)
-      ) {
+      if (typeContractMode !== "off" && (typeContractWarnCount > 0 || typeContractErrorCount > 0)) {
         const byCode = Array.from(typeContractCounts.entries())
           .sort(([a], [b]) => a.localeCompare(b))
           .map(([code, count]) => `  ${code}: ${count}`)
@@ -707,5 +888,4 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       return undefined;
     },
   };
-
 }
