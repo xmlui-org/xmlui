@@ -31,6 +31,21 @@ After each statement:
 2. Fresh state snapshot cloned for next statement
 3. After 100 no-change statements → `await delay(0)` to yield main thread
 
+Compiled event handlers keep the same statement boundary and state-refresh contract, but their
+event-loop yield is optimized: eligible statement boundaries perform a shared runtime check and
+yield at most once every 100ms per handler invocation. Simple declarations and expression
+statements that do not contain a yield-producing function call can skip the yield check while still
+running completion hooks and cancellation checks. A narrow allowlist of known synchronous built-in
+calls, such as `Math.*`, selected `Number`/`String`/`Array` calls, and literal primitive prototype
+methods, is also treated as non-yielding; user-defined, computed-member, callback-based, or
+argument-yielding calls still request the runtime yield check.
+
+Event handlers may start with directive string literals. `"async"` is the explicit default;
+`"sync"` suppresses compiled-event cooperative yield checkpoints but is ignored by the interpreted
+path; `"queue"` maps to the coordinator FIFO policy; and `"block"` maps to
+`drop-while-running`. Directive literals are removed before handler execution and parse-time
+compiled artifact generation.
+
 Effect: state changes from statement N are visible to statement N+1. Unlike raw React batching.
 
 ### Event categories

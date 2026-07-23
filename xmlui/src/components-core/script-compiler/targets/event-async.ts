@@ -30,6 +30,7 @@ import {
   T_SPREAD_EXPRESSION,
   T_DESTRUCTURE,
   T_SWITCH_STATEMENT,
+  T_TEMPLATE_LITERAL_EXPRESSION,
   T_THROW_STATEMENT,
   T_TRY_STATEMENT,
   T_UNARY_EXPRESSION,
@@ -66,6 +67,7 @@ import {
   type ReturnStatement,
   type Statement,
   type SwitchStatement,
+  type TemplateLiteralExpression,
   type ThrowStatement,
   type TryStatement,
   type UnaryExpression,
@@ -96,6 +98,7 @@ type CompilerContext = {
   >;
   nextTemp(): string;
   nextLabel(prefix: string): string;
+  nextLoopCounter(): string;
 };
 
 export function compileEventAsyncStatements(
@@ -107,8 +110,8 @@ export function compileEventAsyncStatements(
   const context = extendCompilerContext(createCompilerContext(sourceId), collectLocalNames(statements));
 
   writer.write("return (async () => {");
-  writer.write("await runtime.start(evalContext, thread);");
   statements.forEach((statement) => emitStatement(writer, statement, context));
+  writer.write("await runtime.flushPendingState(evalContext);");
   writer.write("return undefined;");
   writer.write("})();");
 
@@ -141,9 +144,13 @@ function emitStatement(
     case T_EMPTY_STATEMENT:
       emitBeforeStatement(writer, statement);
       writer.write(";", statement);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: false });
       return;
     case T_EXPRESSION_STATEMENT:
+      if (isNativeExpressionSafe(statement.expr, context)) {
+        emitNativeExpressionStatement(writer, statement, context);
+        return;
+      }
       emitExpressionStatement(writer, statement, context, emitEventExpressionStatementExpression);
       return;
     case T_ARROW_EXPRESSION_STATEMENT:
@@ -155,12 +162,12 @@ function emitStatement(
     case T_LET_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "let", statement, context);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
       return;
     case T_CONST_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "const", statement, context);
-      emitAfterStatement(writer, statement);
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
       return;
     case T_VAR_STATEMENT:
       emitVarStatement(writer, statement, context);
@@ -287,7 +294,24 @@ function emitExpressionStatement(
   emitStatementExpression(writer, statement.expr, context);
   writer.write(");", statement);
   writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, {
+    checkYield: eventExpressionStatementMayYield(statement.expr, context),
+  });
+}
+
+function emitNativeExpressionStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: ExpressionStatement,
+  context: CompilerContext,
+): void {
+  const returnName = context.nextTemp();
+  writer.write(`const ${returnName} = (`, statement);
+  emitNativeExpression(writer, statement.expr, context);
+  writer.write(");", statement);
+  writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
+  emitAfterStatement(writer, statement, {
+    checkYield: eventExpressionStatementMayYield(statement.expr, context),
+  });
 }
 
 function emitPlainExpressionStatementExpression(
@@ -298,12 +322,427 @@ function emitPlainExpressionStatementExpression(
   emitExpression(writer, expr, context);
 }
 
-function emitAfterStatement(writer: CompiledScriptCodeWriter, statement: Statement): void {
-  writer.write("await runtime.afterStatement(evalContext);", statement);
+function eventExpressionStatementMayYield(expr: Expression, context: CompilerContext): boolean {
+  return (
+    expr.type === T_IDENTIFIER ||
+    isMemberExpressionChain(expr) ||
+    expressionMayYield(expr, context)
+  );
+}
+
+function declarationStatementMayYield(
+  statement: LetStatement | ConstStatement,
+  context: CompilerContext,
+): boolean {
+  return statement.decls.some((decl) =>
+    decl.expr ? expressionMayYield(decl.expr, context) : false,
+  );
+}
+
+function expressionMayYield(expr: Expression, context: CompilerContext): boolean {
+  switch (expr.type) {
+    case T_FUNCTION_INVOCATION_EXPRESSION:
+      return (
+        expr.arguments.some((arg) => expressionMayYield(arg, context)) ||
+        !isKnownNonYieldingCall(expr, context)
+      );
+    case T_MEMBER_ACCESS_EXPRESSION:
+      return expressionMayYield(expr.obj, context);
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+      return expressionMayYield(expr.obj, context) || expressionMayYield(expr.member, context);
+    case T_UNARY_EXPRESSION:
+      return expressionMayYield(expr.expr, context);
+    case T_BINARY_EXPRESSION:
+      return expressionMayYield(expr.left, context) || expressionMayYield(expr.right, context);
+    case T_ASSIGNMENT_EXPRESSION:
+      return expressionMayYield(expr.leftValue, context) || expressionMayYield(expr.expr, context);
+    case T_ARRAY_LITERAL:
+      return expr.items.some((item) => expressionMayYield(item, context));
+    case T_OBJECT_LITERAL:
+      return expr.props.some((prop) => {
+        if (!Array.isArray(prop)) {
+          return true;
+        }
+        return expressionMayYield(prop[0], context) || expressionMayYield(prop[1], context);
+      });
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
+      return expressionMayYield(expr.expr, context);
+    case T_SPREAD_EXPRESSION:
+      return expressionMayYield(expr.expr, context);
+    case T_ARROW_EXPRESSION:
+    case T_LITERAL:
+    case T_IDENTIFIER:
+      return false;
+    default:
+      return true;
+  }
+}
+
+const SAFE_STATIC_CALLS: Record<string, ReadonlySet<string>> = {
+  Date: new Set(["now"]),
+  Math: new Set([
+    "abs",
+    "acos",
+    "acosh",
+    "asin",
+    "asinh",
+    "atan",
+    "atan2",
+    "atanh",
+    "cbrt",
+    "ceil",
+    "clz32",
+    "cos",
+    "cosh",
+    "exp",
+    "expm1",
+    "floor",
+    "fround",
+    "hypot",
+    "imul",
+    "log",
+    "log10",
+    "log1p",
+    "log2",
+    "max",
+    "min",
+    "pow",
+    "random",
+    "round",
+    "sign",
+    "sin",
+    "sinh",
+    "sqrt",
+    "tan",
+    "tanh",
+    "trunc",
+  ]),
+  Number: new Set(["isFinite", "isInteger", "isNaN", "isSafeInteger", "parseFloat", "parseInt"]),
+  String: new Set(["fromCharCode", "fromCodePoint", "raw"]),
+  Array: new Set(["isArray"]),
+};
+
+const SAFE_STRING_PROTOTYPE_CALLS = new Set([
+  "at",
+  "charAt",
+  "charCodeAt",
+  "codePointAt",
+  "concat",
+  "endsWith",
+  "includes",
+  "indexOf",
+  "lastIndexOf",
+  "localeCompare",
+  "match",
+  "matchAll",
+  "normalize",
+  "padEnd",
+  "padStart",
+  "repeat",
+  "replace",
+  "replaceAll",
+  "search",
+  "slice",
+  "split",
+  "startsWith",
+  "substring",
+  "toLocaleLowerCase",
+  "toLocaleUpperCase",
+  "toLowerCase",
+  "toString",
+  "toUpperCase",
+  "trim",
+  "trimEnd",
+  "trimStart",
+  "valueOf",
+]);
+
+const SAFE_NUMBER_PROTOTYPE_CALLS = new Set([
+  "toExponential",
+  "toFixed",
+  "toLocaleString",
+  "toPrecision",
+  "toString",
+  "valueOf",
+]);
+
+const SAFE_BOOLEAN_PROTOTYPE_CALLS = new Set(["toString", "valueOf"]);
+
+const SAFE_ARRAY_PROTOTYPE_CALLS = new Set([
+  "at",
+  "includes",
+  "indexOf",
+  "join",
+  "lastIndexOf",
+  "slice",
+  "toLocaleString",
+  "toString",
+]);
+
+function isKnownNonYieldingCall(
+  expr: FunctionInvocationExpression,
+  context: CompilerContext,
+): boolean {
+  if (expr.obj.type !== T_MEMBER_ACCESS_EXPRESSION) {
+    return false;
+  }
+
+  const member = expr.obj.member;
+  const receiver = expr.obj.obj;
+  if (receiver.type === T_IDENTIFIER) {
+    if (context.locals.has(receiver.name)) {
+      return false;
+    }
+    return SAFE_STATIC_CALLS[receiver.name]?.has(member) === true;
+  }
+
+  if (receiver.type === T_LITERAL) {
+    switch (typeof receiver.value) {
+      case "string":
+        return SAFE_STRING_PROTOTYPE_CALLS.has(member);
+      case "number":
+      case "bigint":
+        return SAFE_NUMBER_PROTOTYPE_CALLS.has(member);
+      case "boolean":
+        return SAFE_BOOLEAN_PROTOTYPE_CALLS.has(member);
+      default:
+        return false;
+    }
+  }
+
+  if (receiver.type === T_ARRAY_LITERAL) {
+    return SAFE_ARRAY_PROTOTYPE_CALLS.has(member);
+  }
+
+  return false;
+}
+
+function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boolean {
+  switch (expr.type) {
+    case T_LITERAL:
+      return canSerializeLiteral(expr.value);
+    case T_IDENTIFIER:
+      return isNativeIdentifier(expr, context);
+    case T_UNARY_EXPRESSION:
+      return isNativeExpressionSafe(expr.expr, context);
+    case T_BINARY_EXPRESSION:
+      return isNativeExpressionSafe(expr.left, context) && isNativeExpressionSafe(expr.right, context);
+    case T_ARRAY_LITERAL:
+      return expr.items.every((item) => item.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(item, context));
+    case T_OBJECT_LITERAL:
+      return expr.props.every((prop) => {
+        if (!Array.isArray(prop)) {
+          return false;
+        }
+        return isNativeObjectKeySafe(prop[0], context) && isNativeExpressionSafe(prop[1], context);
+      });
+    case T_TEMPLATE_LITERAL_EXPRESSION:
+      return expr.segments.every((segment) => isNativeExpressionSafe(segment, context));
+    case T_ASSIGNMENT_EXPRESSION:
+      return (
+        expr.leftValue.type === T_IDENTIFIER &&
+        context.locals.has(expr.leftValue.name) &&
+        isNativeExpressionSafe(expr.expr, context)
+      );
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
+      return expr.expr.type === T_IDENTIFIER && context.locals.has(expr.expr.name);
+    case T_FUNCTION_INVOCATION_EXPRESSION:
+      return isNativeSafeCall(expr, context);
+    case T_MEMBER_ACCESS_EXPRESSION:
+      return isNativeMemberExpressionSafe(expr, context);
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+      return isNativeExpressionSafe(expr.obj, context) && isNativeExpressionSafe(expr.member, context);
+    default:
+      return false;
+  }
+}
+
+function isNativeIdentifier(expr: Identifier, context: CompilerContext): boolean {
+  if (context.locals.has(expr.name)) {
+    return true;
+  }
+  return expr.name === "NaN" || expr.name === "Infinity" || expr.name === "undefined";
+}
+
+function isNativeObjectKeySafe(expr: Expression, context: CompilerContext): boolean {
+  return expr.type === T_IDENTIFIER || isNativeExpressionSafe(expr, context);
+}
+
+function isNativeMemberExpressionSafe(
+  expr: MemberAccessExpression,
+  context: CompilerContext,
+): boolean {
+  if (expr.obj.type === T_IDENTIFIER) {
+    return (
+      !context.locals.has(expr.obj.name) &&
+      SAFE_STATIC_CALLS[expr.obj.name]?.has(expr.member) === true
+    );
+  }
+  return isNativeExpressionSafe(expr.obj, context);
+}
+
+function isNativeSafeCall(expr: FunctionInvocationExpression, context: CompilerContext): boolean {
+  return (
+    isKnownNonYieldingCall(expr, context) &&
+    expr.arguments.every((arg) => arg.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(arg, context))
+  );
+}
+
+function emitNativeExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: Expression,
+  context: CompilerContext,
+): void {
+  if (!isNativeExpressionSafe(expr, context)) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+
+  switch (expr.type) {
+    case T_LITERAL:
+      writer.write(literalToJs(expr.value), expr);
+      return;
+    case T_IDENTIFIER:
+      assertJsIdentifier(expr, context.sourceId);
+      writer.write(expr.name, expr);
+      return;
+    case T_UNARY_EXPRESSION:
+      writer.write(`(${expr.op} `, expr);
+      emitNativeExpression(writer, expr.expr, context);
+      writer.write(")");
+      return;
+    case T_BINARY_EXPRESSION:
+      writer.write("(", expr);
+      emitNativeExpression(writer, expr.left, context);
+      writer.write(` ${expr.op} `);
+      emitNativeExpression(writer, expr.right, context);
+      writer.write(")");
+      return;
+    case T_ARRAY_LITERAL:
+      writer.write("[", expr);
+      expr.items.forEach((item, index) => {
+        if (index > 0) writer.write(", ");
+        emitNativeExpression(writer, item, context);
+      });
+      writer.write("]");
+      return;
+    case T_OBJECT_LITERAL:
+      writer.write("({", expr);
+      expr.props.forEach((prop, index) => {
+        if (index > 0) writer.write(", ");
+        if (!Array.isArray(prop)) {
+          throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+        }
+        emitNativeObjectKey(writer, prop[0], context);
+        writer.write(": ");
+        emitNativeExpression(writer, prop[1], context);
+      });
+      writer.write("})");
+      return;
+    case T_TEMPLATE_LITERAL_EXPRESSION:
+      emitNativeTemplateLiteral(writer, expr, context);
+      return;
+    case T_ASSIGNMENT_EXPRESSION:
+      writer.write("(", expr);
+      emitNativeExpression(writer, expr.leftValue, context);
+      writer.write(` ${expr.op} `);
+      emitNativeExpression(writer, expr.expr, context);
+      writer.write(")");
+      return;
+    case T_PREFIX_OP_EXPRESSION:
+      writer.write(`(${expr.op}`, expr);
+      emitNativeExpression(writer, expr.expr, context);
+      writer.write(")");
+      return;
+    case T_POSTFIX_OP_EXPRESSION:
+      writer.write("(", expr);
+      emitNativeExpression(writer, expr.expr, context);
+      writer.write(`${expr.op})`);
+      return;
+    case T_MEMBER_ACCESS_EXPRESSION:
+      if (
+        expr.obj.type === T_IDENTIFIER &&
+        !context.locals.has(expr.obj.name) &&
+        SAFE_STATIC_CALLS[expr.obj.name]?.has(expr.member) === true
+      ) {
+        writer.write(expr.obj.name, expr.obj);
+      } else {
+        emitNativeExpression(writer, expr.obj, context);
+      }
+      writer.write(".");
+      writer.write(expr.member, expr);
+      return;
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+      emitNativeExpression(writer, expr.obj, context);
+      writer.write("[");
+      emitNativeExpression(writer, expr.member, context);
+      writer.write("]");
+      return;
+    case T_FUNCTION_INVOCATION_EXPRESSION:
+      emitNativeExpression(writer, expr.obj, context);
+      writer.write("(");
+      expr.arguments.forEach((arg, index) => {
+        if (index > 0) writer.write(", ");
+        emitNativeExpression(writer, arg, context);
+      });
+      writer.write(")", expr);
+      return;
+    default:
+      throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+}
+
+function emitNativeObjectKey(
+  writer: CompiledScriptCodeWriter,
+  expr: Expression,
+  context: CompilerContext,
+): void {
+  if (expr.type === T_IDENTIFIER) {
+    writer.write(expr.name, expr);
+    return;
+  }
+  writer.write("[");
+  emitNativeExpression(writer, expr, context);
+  writer.write("]");
+}
+
+function emitNativeTemplateLiteral(
+  writer: CompiledScriptCodeWriter,
+  expr: TemplateLiteralExpression,
+  context: CompilerContext,
+): void {
+  writer.write("`", expr);
+  expr.segments.forEach((segment) => {
+    if (segment.type === T_LITERAL && typeof segment.value === "string") {
+      writer.write(escapeTemplateLiteralText(segment.value), segment);
+      return;
+    }
+    writer.write("${");
+    emitNativeExpression(writer, segment, context);
+    writer.write("}");
+  });
+  writer.write("`");
+}
+
+function escapeTemplateLiteralText(value: string): string {
+  return value.replace(/[`\\$]/g, (char) => (char === "$" ? "\\$" : `\\${char}`));
+}
+
+function emitAfterStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: Statement,
+  options?: { checkYield?: boolean },
+): void {
+  if (options?.checkYield === false) {
+    return;
+  }
+  writer.write("await runtime.checkpointIfDue(evalContext);", statement);
 }
 
 function emitBeforeStatement(writer: CompiledScriptCodeWriter, statement: Statement): void {
-  writer.write("await runtime.beforeStatement(evalContext);", statement);
+  void writer;
+  void statement;
 }
 
 function emitReturnStatement(
@@ -322,7 +761,10 @@ function emitReturnStatement(
     writer.write("undefined");
   }
   writer.write(";", statement);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, {
+    checkYield: statement.expr ? expressionMayYield(statement.expr, context) : false,
+  });
+  writer.write("await runtime.flushPendingState(evalContext);", statement);
   writer.write(`return ${returnName};`, statement);
 }
 
@@ -350,7 +792,7 @@ function emitVarStatement(
     writer.write(`throw new Error("'var' declarations are not allowed within functions");`, statement);
     return;
   }
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
 }
 
 function emitVarDeclaration(
@@ -367,6 +809,8 @@ function emitVarDeclaration(
       writer.write(" = ");
       if (decl.expr.type === T_ARROW_EXPRESSION) {
         emitNativeArrowExpression(writer, decl.expr, context);
+      } else if (isNativeExpressionSafe(decl.expr, context)) {
+        emitNativeExpression(writer, decl.expr, context);
       } else {
         writer.write("await runtime.complete(");
         emitExpression(writer, decl.expr, context);
@@ -457,7 +901,7 @@ function emitBlockStatement(
 ): void {
   const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
   emitBeforeStatement(writer, statement);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
   writer.write("{", statement);
   statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", statement);
@@ -536,6 +980,10 @@ function emitForStatement(
   context: CompilerContext,
 ): void {
   const scopedContext = extendCompilerContext(context, collectForLocalNames(statement));
+  if (canEmitNativeForStatement(statement, scopedContext)) {
+    emitNativeForStatement(writer, statement, scopedContext);
+    return;
+  }
   const breakLabel = context.nextLabel("break");
   const continueLabel = context.nextLabel("continue");
   const loopContext = extendLoopContext(scopedContext, breakLabel, continueLabel);
@@ -576,6 +1024,160 @@ function emitForStatement(
   }
   writer.write("}", statement);
   writer.write("}", statement);
+}
+
+function canEmitNativeForStatement(statement: ForStatement, context: CompilerContext): boolean {
+  return (
+    isNativeForInitSafe(statement.init, context) &&
+    (!statement.cond || isNativeExpressionSafe(statement.cond, context)) &&
+    (!statement.upd || isNativeExpressionSafe(statement.upd, context)) &&
+    canEmitNativeLoopBody(statement.body, context)
+  );
+}
+
+function isNativeForInitSafe(init: ForStatement["init"], context: CompilerContext): boolean {
+  if (!init) {
+    return true;
+  }
+  if (init.type === T_EXPRESSION_STATEMENT) {
+    return isNativeExpressionSafe(init.expr, context);
+  }
+  if (init.type === T_LET_STATEMENT) {
+    return init.decls.every(
+      (decl) => decl.id && !decl.aDestr && !decl.oDestr && (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
+    );
+  }
+  return false;
+}
+
+function canEmitNativeLoopBody(statement: Statement, context: CompilerContext): boolean {
+  switch (statement.type) {
+    case T_EMPTY_STATEMENT:
+      return true;
+    case T_EXPRESSION_STATEMENT:
+      return isNativeExpressionSafe(statement.expr, context);
+    case T_LET_STATEMENT:
+    case T_CONST_STATEMENT:
+      return statement.decls.every(
+        (decl) => decl.id && !decl.aDestr && !decl.oDestr && (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
+      );
+    case T_BLOCK_STATEMENT: {
+      const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
+      return statement.stmts.every((child) => canEmitNativeLoopBody(child, blockContext));
+    }
+    default:
+      return false;
+  }
+}
+
+function emitNativeForStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: ForStatement,
+  context: CompilerContext,
+): void {
+  const loopCounter = context.nextLoopCounter();
+  writer.write("{", statement);
+  writer.write(`let ${loopCounter} = 0;`, statement);
+  writer.write("for (", statement);
+  emitNativeForInit(writer, statement.init, context);
+  writer.write("; ");
+  if (statement.cond) {
+    emitNativeExpression(writer, statement.cond, context);
+  }
+  writer.write("; ");
+  if (statement.upd) {
+    emitNativeExpression(writer, statement.upd, context);
+  }
+  writer.write(") ", statement);
+  emitNativeForBody(writer, statement.body, context, loopCounter);
+  writer.write("}", statement);
+}
+
+function emitNativeForInit(
+  writer: CompiledScriptCodeWriter,
+  init: ForStatement["init"],
+  context: CompilerContext,
+): void {
+  if (!init) {
+    return;
+  }
+  if (init.type === T_EXPRESSION_STATEMENT) {
+    emitNativeExpression(writer, init.expr, context);
+    return;
+  }
+  if (init.type === T_LET_STATEMENT) {
+    writer.write("let ", init);
+    init.decls.forEach((decl, index) => {
+      if (index > 0) writer.write(", ");
+      assertJsIdentifier({ name: decl.id! }, context.sourceId);
+      writer.write(decl.id!, decl);
+      if (decl.expr) {
+        writer.write(" = ");
+        emitNativeExpression(writer, decl.expr, context);
+      }
+    });
+    return;
+  }
+  throwUnsupportedCompiledScriptNode(init, context.sourceId);
+}
+
+function emitNativeForBody(
+  writer: CompiledScriptCodeWriter,
+  body: Statement,
+  context: CompilerContext,
+  loopCounter: string,
+): void {
+  writer.write("{", body);
+  if (body.type === T_BLOCK_STATEMENT) {
+    const blockContext = extendCompilerContext(context, collectLocalNames(body.stmts));
+    body.stmts.forEach((child) => emitNativeLoopBodyStatement(writer, child, blockContext));
+  } else {
+    emitNativeLoopBodyStatement(writer, body, context);
+  }
+  writer.write(`if ((++${loopCounter} % 1000) === 0) { await runtime.checkpointIfDue(evalContext); }`, body);
+  writer.write("}", body);
+}
+
+function emitNativeLoopBodyStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: Statement,
+  context: CompilerContext,
+): void {
+  switch (statement.type) {
+    case T_EMPTY_STATEMENT:
+      writer.write(";", statement);
+      return;
+    case T_EXPRESSION_STATEMENT:
+      emitNativeBareExpressionStatement(writer, statement, context);
+      return;
+    case T_LET_STATEMENT:
+      emitDeclarationStatement(writer, "let", statement, context);
+      return;
+    case T_CONST_STATEMENT:
+      emitDeclarationStatement(writer, "const", statement, context);
+      return;
+    case T_BLOCK_STATEMENT: {
+      const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
+      writer.write("{", statement);
+      statement.stmts.forEach((child) => emitNativeLoopBodyStatement(writer, child, blockContext));
+      writer.write("}", statement);
+      return;
+    }
+    default:
+      throwUnsupportedCompiledScriptNode(statement, context.sourceId);
+  }
+}
+
+function emitNativeBareExpressionStatement(
+  writer: CompiledScriptCodeWriter,
+  statement: ExpressionStatement,
+  context: CompilerContext,
+): void {
+  emitNativeExpression(writer, statement.expr, context);
+  writer.write(";", statement);
+  emitAfterStatement(writer, statement, {
+    checkYield: eventExpressionStatementMayYield(statement.expr, context),
+  });
 }
 
 function emitForInStatement(
@@ -696,7 +1298,7 @@ function emitFunctionDeclarationStatement(
   }
   emitBeforeStatement(writer, statement);
   emitFunctionDeclaration(writer, statement, context);
-  emitAfterStatement(writer, statement);
+  emitAfterStatement(writer, statement, { checkYield: false });
 }
 
 function emitFunctionDeclaration(
@@ -898,6 +1500,9 @@ function emitExpression(
     case T_OBJECT_LITERAL:
       emitObjectLiteral(writer, expr, context);
       return;
+    case T_TEMPLATE_LITERAL_EXPRESSION:
+      emitTemplateLiteral(writer, expr, context);
+      return;
     case T_PREFIX_OP_EXPRESSION:
     case T_POSTFIX_OP_EXPRESSION:
       emitPrePostExpression(writer, expr, context);
@@ -1028,6 +1633,25 @@ function emitObjectLiteralProp(
   writer.write(")");
 }
 
+function emitTemplateLiteral(
+  writer: CompiledScriptCodeWriter,
+  expr: TemplateLiteralExpression,
+  context: CompilerContext,
+): void {
+  writer.write("[");
+  expr.segments.forEach((segment, index) => {
+    if (index > 0) writer.write(", ");
+    if (segment.type === T_LITERAL) {
+      emitExpression(writer, segment, context);
+    } else {
+      writer.write("await runtime.complete(");
+      emitExpression(writer, segment, context);
+      writer.write(")");
+    }
+  });
+  writer.write("].map((value) => typeof value === 'string' ? value : `${value}`).join('')", expr);
+}
+
 function emitFunctionInvocation(
   writer: CompiledScriptCodeWriter,
   expr: FunctionInvocationExpression,
@@ -1121,6 +1745,10 @@ function emitArgumentArray(
       } else {
         emitArrowExpression(writer, arg, context);
       }
+      return;
+    }
+    if (isNativeExpressionSafe(arg, context)) {
+      emitNativeExpression(writer, arg, context);
       return;
     }
     writer.write("await runtime.complete(");
@@ -1498,6 +2126,7 @@ function isMemberExpressionChain(expr: Expression): boolean {
 function createCompilerContext(sourceId: string): CompilerContext {
   let tempIndex = 0;
   let labelIndex = 0;
+  let loopCounterIndex = 0;
   return {
     sourceId,
     locals: new Set(),
@@ -1505,6 +2134,7 @@ function createCompilerContext(sourceId: string): CompilerContext {
     controlLabels: [],
     nextTemp: () => `__xmlui_evt_${tempIndex++}`,
     nextLabel: (prefix: string) => `__xmlui_evt_${prefix}_${labelIndex++}`,
+    nextLoopCounter: () => `__xmlui_evt_loop_${loopCounterIndex++}`,
   };
 }
 

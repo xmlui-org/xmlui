@@ -3,6 +3,7 @@ import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import type { ArrowExpression, Statement } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { UdcCapability, UdcContract, UdcDiagnostic } from "../udc-sandbox";
+import type { EventHandlerExecutionMode } from "../utils/event-handler-directives";
 
 /**
  * A function that resolves a module name to the text of the module
@@ -83,6 +84,9 @@ export type BindingTreeEvaluationContext = {
     evalContext: BindingTreeEvaluationContext,
     stmt: Statement,
   ): void | Promise<void>;
+
+  // --- True when the event-handler working state has pending writes to flush
+  hasPendingStateChanges?: () => boolean;
 };
 
 // --- The type of non-local variable update
@@ -129,6 +133,12 @@ export type EvalTreeOptions = {
    * component.
    */
   compileEventHandlers?: boolean;
+  /**
+   * Event-handler directive prologue execution mode. The compiled event
+   * executor currently uses `"sync"` to suppress cooperative event-loop
+   * yield checkpoints; the interpreted async path intentionally ignores it.
+   */
+  handlerExecutionMode?: EventHandlerExecutionMode;
   /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access

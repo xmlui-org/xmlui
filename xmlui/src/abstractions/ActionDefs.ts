@@ -3,6 +3,10 @@ import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ArrowExpression } from "../components-core/script-runner/ScriptingSourceTree";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
+import type {
+  EventHandlerDirectiveWarning,
+  EventHandlerExecutionMode,
+} from "../components-core/utils/event-handler-directives";
 
 // This type represents the options to use for looking up actions.
 export type LookupActionOptions = {
@@ -54,6 +58,8 @@ export type LookupActionOptions = {
   handlerPolicy?: "parallel" | "single-flight" | "queue" | "drop-while-running";
   handlerTimeoutMs?: number;
   transactional?: boolean;
+  handlerExecutionMode?: EventHandlerExecutionMode;
+  handlerDirectiveWarnings?: EventHandlerDirectiveWarning[];
 };
 
 // This function resolves an action by its name (within the component node that

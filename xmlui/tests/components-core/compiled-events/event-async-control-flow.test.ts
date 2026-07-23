@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   compileEventAsyncStatementSource,
+  eventAsyncRuntime,
   executeCompiledEventAsyncArtifact,
 } from "../../../src/components-core/script-compiler";
 import { ThrowStatementError } from "../../../src/components-core/EngineError";
@@ -37,6 +38,34 @@ async function expectCompiledParity(source: string, localContext: Record<string,
   expect(compiled.localContext).toEqual(interpreted.localContext);
 }
 
+async function withYieldProbe(
+  run: (probe: { recordCompletion(): void; yieldedAtCompletion: number[] }) => Promise<void>,
+) {
+  const originalNow = eventAsyncRuntime.now;
+  const originalYield = eventAsyncRuntime.yield;
+  let now = 0;
+  let completions = 0;
+  const yieldedAtCompletion: number[] = [];
+
+  eventAsyncRuntime.now = () => (now += 101);
+  eventAsyncRuntime.yield = async () => {
+    yieldedAtCompletion.push(completions);
+  };
+
+  try {
+    await run({
+      recordCompletion: () => {
+        completions++;
+        now += 101;
+      },
+      yieldedAtCompletion,
+    });
+  } finally {
+    eventAsyncRuntime.now = originalNow;
+    eventAsyncRuntime.yield = originalYield;
+  }
+}
+
 describe("compiled event-async control flow", () => {
   it("executes while loops", async () => {
     await expectCompiledParity("let x = 0; while (x < 3) { x++; } return x;");
@@ -70,30 +99,23 @@ describe("compiled event-async control flow", () => {
     );
   });
 
-  it("yields for loop body statements on each iteration", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: { count: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        const index = order.length / 2;
-        order.push(`completed:${index}`);
-        setTimeout(() => order.push(`timer:${index}`), 0);
-      },
+  it("checks yields for loop guard statements on each iteration", async () => {
+    await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
+      const evalContext = createEvalContext({
+        localContext: { count: 0 },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: recordCompletion,
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "while (count < 3) { count = count + 1; }",
+        "test:event:loop-yield",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(evalContext.localContext.count).toBe(3);
+      expect(yieldedAtCompletion.length).toBeGreaterThanOrEqual(4);
     });
-    const artifact = compileEventAsyncStatementSource(
-      "while (count < 3) { count = count + 1; }",
-      "test:event:loop-yield",
-    );
-
-    await executeCompiledEventAsyncArtifact(artifact, evalContext);
-
-    expect(evalContext.localContext.count).toBe(3);
-    expect(order.length).toBeGreaterThanOrEqual(12);
-    for (let i = 0; i < order.length; i += 2) {
-      expect(order[i]).toBe(`completed:${i / 2}`);
-      expect(order[i + 1]).toBe(`timer:${i / 2}`);
-    }
   });
 
   it("executes for loops with let initializers", async () => {
@@ -120,30 +142,23 @@ describe("compiled event-async control flow", () => {
     );
   });
 
-  it("yields for for-loop guard, body, and update statements", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: { count: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        const index = order.length / 2;
-        order.push(`completed:${index}`);
-        setTimeout(() => order.push(`timer:${index}`), 0);
-      },
+  it("checks yields for for-loop guard and update statements", async () => {
+    await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
+      const evalContext = createEvalContext({
+        localContext: { count: 0 },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: recordCompletion,
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "for (let i = 0; i < 3; i++) { count = count + 1; }",
+        "test:event:for-loop-yield",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(evalContext.localContext.count).toBe(3);
+      expect(yieldedAtCompletion.length).toBeGreaterThanOrEqual(7);
     });
-    const artifact = compileEventAsyncStatementSource(
-      "for (let i = 0; i < 3; i++) { count = count + 1; }",
-      "test:event:for-loop-yield",
-    );
-
-    await executeCompiledEventAsyncArtifact(artifact, evalContext);
-
-    expect(evalContext.localContext.count).toBe(3);
-    expect(order.length).toBeGreaterThanOrEqual(18);
-    for (let i = 0; i < order.length; i += 2) {
-      expect(order[i]).toBe(`completed:${i / 2}`);
-      expect(order[i + 1]).toBe(`timer:${i / 2}`);
-    }
   });
 
   it("executes for-in loops with none, let, and const bindings", async () => {
@@ -206,30 +221,23 @@ describe("compiled event-async control flow", () => {
     );
   });
 
-  it("yields for for-of guard and body statements", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: { obj: [1, 2, 3], sum: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        const index = order.length / 2;
-        order.push(`completed:${index}`);
-        setTimeout(() => order.push(`timer:${index}`), 0);
-      },
+  it("checks yields for for-of guard statements", async () => {
+    await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
+      const evalContext = createEvalContext({
+        localContext: { obj: [1, 2, 3], sum: 0 },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: recordCompletion,
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "for (let item of obj) { sum += item; }",
+        "test:event:for-of-yield",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(evalContext.localContext.sum).toBe(6);
+      expect(yieldedAtCompletion.length).toBeGreaterThanOrEqual(4);
     });
-    const artifact = compileEventAsyncStatementSource(
-      "for (let item of obj) { sum += item; }",
-      "test:event:for-of-yield",
-    );
-
-    await executeCompiledEventAsyncArtifact(artifact, evalContext);
-
-    expect(evalContext.localContext.sum).toBe(6);
-    expect(order.length).toBeGreaterThanOrEqual(14);
-    for (let i = 0; i < order.length; i += 2) {
-      expect(order[i]).toBe(`completed:${i / 2}`);
-      expect(order[i + 1]).toBe(`timer:${i / 2}`);
-    }
   });
 
   it("throws ThrowStatementError for throw statements", async () => {
@@ -258,22 +266,20 @@ describe("compiled event-async control flow", () => {
   });
 
   it("runs the statement boundary before throwing", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: {},
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        order.push("completed");
-        setTimeout(() => order.push("timer"), 0);
-      },
+    await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
+      const evalContext = createEvalContext({
+        localContext: {},
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: recordCompletion,
+      });
+      const artifact = compileEventAsyncStatementSource("throw 'boom'", "test:event:throw-yield");
+
+      await expect(executeCompiledEventAsyncArtifact(artifact, evalContext)).rejects.toThrow(
+        ThrowStatementError,
+      );
+
+      expect(yieldedAtCompletion).toEqual([0]);
     });
-    const artifact = compileEventAsyncStatementSource("throw 'boom'", "test:event:throw-yield");
-
-    await expect(executeCompiledEventAsyncArtifact(artifact, evalContext)).rejects.toThrow(
-      ThrowStatementError,
-    );
-
-    expect(order).toEqual(["completed", "timer"]);
   });
 
   it("executes switch statements with no matching case", async () => {
@@ -311,25 +317,38 @@ describe("compiled event-async control flow", () => {
   });
 
   it("yields around switch dispatch before running matching case statements", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: { x: 1, y: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        const index = order.length / 2;
-        order.push(`completed:${index}`);
-        setTimeout(() => order.push(`timer:${index}`), 0);
-      },
-    });
-    const artifact = compileEventAsyncStatementSource(
-      "switch (x) { case 1: y++; break; }",
-      "test:event:switch-yield",
-    );
+    const originalNow = eventAsyncRuntime.now;
+    const originalYield = eventAsyncRuntime.yield;
+    let now = 0;
+    let completions = 0;
+    const yieldedAtCompletion: number[] = [];
 
-    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+    eventAsyncRuntime.now = () => (now += 101);
+    eventAsyncRuntime.yield = async () => {
+      yieldedAtCompletion.push(completions);
+    };
 
-    expect(evalContext.localContext.y).toBe(1);
-    expect(order.slice(0, 2)).toEqual(["completed:0", "timer:0"]);
+    try {
+      const evalContext = createEvalContext({
+        localContext: { x: 1, y: 0 },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: () => {
+          completions++;
+        },
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "switch (x) { case 1: y++; break; }",
+        "test:event:switch-yield",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(evalContext.localContext.y).toBe(1);
+      expect(yieldedAtCompletion[0]).toBe(0);
+    } finally {
+      eventAsyncRuntime.now = originalNow;
+      eventAsyncRuntime.yield = originalYield;
+    }
   });
 
   it("executes try/finally for normal completion", async () => {
@@ -399,24 +418,37 @@ describe("compiled event-async control flow", () => {
   });
 
   it("yields before entering try body statements", async () => {
-    const order: string[] = [];
-    const evalContext = createEvalContext({
-      localContext: { x: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        const index = order.length / 2;
-        order.push(`completed:${index}`);
-        setTimeout(() => order.push(`timer:${index}`), 0);
-      },
-    });
-    const artifact = compileEventAsyncStatementSource(
-      "try { x = 1; } finally { x = 2; }",
-      "test:event:try-yield",
-    );
+    const originalNow = eventAsyncRuntime.now;
+    const originalYield = eventAsyncRuntime.yield;
+    let now = 0;
+    let completions = 0;
+    const yieldedAtCompletion: number[] = [];
 
-    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+    eventAsyncRuntime.now = () => (now += 101);
+    eventAsyncRuntime.yield = async () => {
+      yieldedAtCompletion.push(completions);
+    };
 
-    expect(evalContext.localContext.x).toBe(2);
-    expect(order.slice(0, 2)).toEqual(["completed:0", "timer:0"]);
+    try {
+      const evalContext = createEvalContext({
+        localContext: { x: 0 },
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        onStatementCompleted: () => {
+          completions++;
+        },
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "try { x = 1; } finally { x = 2; }",
+        "test:event:try-yield",
+      );
+
+      await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(evalContext.localContext.x).toBe(2);
+      expect(yieldedAtCompletion[0]).toBe(0);
+    } finally {
+      eventAsyncRuntime.now = originalNow;
+      eventAsyncRuntime.yield = originalYield;
+    }
   });
 });

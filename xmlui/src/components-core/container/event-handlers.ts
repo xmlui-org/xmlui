@@ -26,6 +26,10 @@ import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { buildProxy, type ProxyAction } from "../rendering/buildProxy";
 import { createCoWStateProxy } from "./cow-state-proxy";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
+import {
+  extractEventHandlerDirectives,
+  type EventHandlerDirectiveInfo,
+} from "../utils/event-handler-directives";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
@@ -65,8 +69,27 @@ type StatePartChangedFn = (
   action: ProxyAction,
 ) => void;
 
+function isCompiledEventDiagnosticEnabled(appContext: AppContextObject | undefined): boolean {
+  void appContext;
+  return false;
+}
+
+function logCompiledEventDiagnostic(message: string, details: Record<string, any>): void {
+  if (typeof console !== "undefined" && console.warn) {
+    console.warn(`[xmlui:event-compiler] ${message}`, details);
+  }
+}
+
 // Type for statement promise resolver
 type StatementPromiseResolver = () => void;
+
+function mapSchedulingDirectiveToPolicy(
+  scheduling: EventHandlerDirectiveInfo["scheduling"],
+): HandlerPolicy | undefined {
+  if (scheduling === "queue") return "queue";
+  if (scheduling === "block") return "drop-while-running";
+  return undefined;
+}
 
 /**
  * Configuration for creating event handler executors
@@ -232,9 +255,57 @@ export function createEventHandlers(config: EventHandlerConfig) {
         return returnValue;
       }
 
+      let rawStatements: Statement[];
+      let compiledEventArtifact: ParsedEventValue["compiled"] | undefined;
+      let rawEventSource: string | undefined;
+      let parseCacheKey: string | undefined;
+      let parseTimeDirectives: EventHandlerDirectiveInfo | undefined;
+      let parseTimeCompilationUnsupported = false;
+
+      if (typeof source === "string") {
+        rawEventSource = source;
+        parseCacheKey = source;
+        if (!parsedStatementsRef.current[parseCacheKey]) {
+          parsedStatementsRef.current[parseCacheKey] = parseHandlerCode(source);
+        }
+        rawStatements = parsedStatementsRef.current[parseCacheKey];
+      } else if (isParsedEventValue(source)) {
+        compiledEventArtifact = source.compiled;
+        parseTimeCompilationUnsupported = source.compiledUnsupported === true;
+        rawEventSource = source.source;
+        parseTimeDirectives = source.directives;
+        parseCacheKey = source.parseId.toString();
+        if (!parsedStatementsRef.current[parseCacheKey]) {
+          parsedStatementsRef.current[parseCacheKey] = source.statements;
+        }
+        rawStatements = parsedStatementsRef.current[parseCacheKey];
+      } else {
+        rawStatements = [
+          {
+            type: T_ARROW_EXPRESSION_STATEMENT,
+            expr: source,
+          } as ArrowExpressionStatement,
+        ];
+      }
+
+      const directiveResult = parseTimeDirectives
+        ? { directives: parseTimeDirectives, executableStatements: rawStatements }
+        : extractEventHandlerDirectives(rawStatements);
+      const directivePolicy = mapSchedulingDirectiveToPolicy(directiveResult.directives.scheduling);
+      const effectiveOptions: LookupActionOptions = {
+        ...(options ?? {}),
+        ...(directivePolicy ? { handlerPolicy: directivePolicy } : {}),
+        ...(directiveResult.directives.executionMode
+          ? { handlerExecutionMode: directiveResult.directives.executionMode }
+          : {}),
+        ...(directiveResult.directives.warnings.length > 0
+          ? { handlerDirectiveWarnings: directiveResult.directives.warnings }
+          : {}),
+      };
+
       // --- Check if the event handler can sign its lifecycle state
       const canSignEventLifecycle = () => {
-        return uid.description !== undefined && options?.eventName !== undefined;
+        return uid.description !== undefined && effectiveOptions?.eventName !== undefined;
       };
 
       // Ensure stateRef reflects the latest parent state before reading it.
@@ -257,15 +328,15 @@ export function createEventHandlers(config: EventHandlerConfig) {
       // invocation's token with reason `"supersede"`, letting any
       // in-flight fetches tear down cleanly via `$cancel.onAbort`.
       // ---------------------------------------------------------------
-      const handlerPolicy = (options?.handlerPolicy ?? "parallel") as HandlerPolicy;
-      const eventNameForCoord = options?.eventName?.toString() ?? "handler";
+      const handlerPolicy = (effectiveOptions?.handlerPolicy ?? "parallel") as HandlerPolicy;
+      const eventNameForCoord = effectiveOptions?.eventName?.toString() ?? "handler";
       const componentUidForCoord = uid.description ?? "anonymous";
       const coordinator = getDefaultHandlerCoordinator();
       const invocation: HandlerInvocation = {
         componentUid: componentUidForCoord,
         eventName: eventNameForCoord,
         policy: handlerPolicy,
-        timeoutMs: options?.handlerTimeoutMs,
+        timeoutMs: effectiveOptions?.handlerTimeoutMs,
       };
 
       const decision = await coordinator.enter(invocation);
@@ -291,7 +362,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
       // handler is declared `transactional`, every accumulated change
       // is replayed in a single dispatch after the handler resolves.
       // On cancellation / timeout / error the buffer is discarded.
-      const isTransactional = options?.transactional === true;
+      const isTransactional = effectiveOptions?.transactional === true;
       const txBuffer = isTransactional ? createTransactionalBuffer() : null;
 
       const getComponentStateClone = () => {
@@ -302,8 +373,8 @@ export function createEventHandlers(config: EventHandlerConfig) {
         // Nested objects are isolated lazily by the CoW proxy on first write.
         const poj: Record<string, any> = { ...originalState };
 
-        if (options?.context) {
-          Object.assign(poj, options.context);
+        if (effectiveOptions?.context) {
+          Object.assign(poj, effectiveOptions.context);
         }
         poj["$this"] = originalState[uid];
         poj["$cancel"] = cancelToken;
@@ -379,19 +450,23 @@ export function createEventHandlers(config: EventHandlerConfig) {
           };
         },
         options: createEventEvalOptions(appContext, {
+          ...(effectiveOptions.handlerExecutionMode
+            ? { handlerExecutionMode: effectiveOptions.handlerExecutionMode }
+            : {}),
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
         }),
+        hasPendingStateChanges: () => changes.length > 0,
       };
 
       // Initialize trace and extract metadata for logging
       const traceId = handlerLogger.initializeTrace();
       const { uidName, componentType, componentLabel } = handlerLogger.extractComponentMetadata(
         uid,
-        options,
+        effectiveOptions,
       );
       const handlerCode = handlerLogger.extractHandlerCode(source);
-      const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(options);
+      const { handlerFileId, handlerSourceRange } = handlerLogger.lookupSourceInfo(effectiveOptions);
 
       // Track handler start time for duration calculation
       const handlerStartPerfTs = typeof performance !== "undefined" ? performance.now() : undefined;
@@ -403,7 +478,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         // Log handler start
         handlerLogger.logHandlerStart({
           uid: uidName,
-          eventName: options?.eventName,
+          eventName: effectiveOptions?.eventName,
           componentType,
           componentLabel,
           eventArgs,
@@ -413,34 +488,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         });
 
         // --- Prepare the event handler to an arrow expression statement
-        let statements: Statement[];
-        const compiledEventArtifact = isParsedEventValue(source) ? source.compiled : undefined;
-        const rawEventSource =
-          typeof source === "string"
-            ? source
-            : isParsedEventValue(source)
-              ? source.source
-              : undefined;
-        if (typeof source === "string") {
-          if (!parsedStatementsRef.current[source]) {
-            parsedStatementsRef.current[source] = parseHandlerCode(source);
-          }
-          statements = parsedStatementsRef.current[source];
-        } else if (isParsedEventValue(source)) {
-          const parseId = source.parseId.toString();
-          if (!parsedStatementsRef.current[parseId]) {
-            parsedStatementsRef.current[parseId] = source.statements;
-          }
-          statements = parsedStatementsRef.current[parseId];
-        } else {
-          statements = [
-            {
-              type: T_ARROW_EXPRESSION_STATEMENT,
-              expr: source,
-            } as ArrowExpressionStatement,
-          ];
-        }
-
+        const statements = directiveResult.executableStatements;
         if (!statements) {
           return;
         }
@@ -451,7 +499,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             type: ContainerActionKind.EVENT_HANDLER_STARTED,
             payload: {
               uid,
-              eventName: options.eventName,
+              eventName: effectiveOptions.eventName,
             },
           });
         }
@@ -462,7 +510,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             // Log state changes
             handlerLogger.logStateChanges({
               uid: uidName,
-              eventName: options.eventName,
+              eventName: effectiveOptions.eventName,
               componentType,
               componentLabel,
               changes,
@@ -524,7 +572,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
               const bumpVersion = () => {
                 setVersion((prev) => prev + 1);
               };
-              if (options?.schedulerBypass) {
+              if (effectiveOptions?.schedulerBypass) {
                 bumpVersion();
               } else {
                 // We use this to tell react that this update is not high-priority.
@@ -574,25 +622,60 @@ export function createEventHandlers(config: EventHandlerConfig) {
           (appContext as any)?.xmluiConfig?.defaultHandlerTimeoutMs ?? 30000,
         );
         const effectiveTimeoutMs =
-          options?.handlerTimeoutMs !== undefined ? options.handlerTimeoutMs : ambientTimeout;
+          effectiveOptions?.handlerTimeoutMs !== undefined
+            ? effectiveOptions.handlerTimeoutMs
+            : ambientTimeout;
         const preparedStatements = prepareHandlerStatements(statements, evalContext);
         const preparedUsesOriginalStatements = preparedStatements === statements;
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
         const shouldUseCompiledEventHandler =
-          evalContext.options?.compileEventHandlers && options?.eventName !== "mockExecute";
+          evalContext.options?.compileEventHandlers &&
+          effectiveOptions?.eventName !== "mockExecute" &&
+          !parseTimeCompilationUnsupported;
+        const compiledEventDiagnosticEnabled = isCompiledEventDiagnosticEnabled(appContext);
+        if (compiledEventDiagnosticEnabled) {
+          logCompiledEventDiagnostic("dispatch decision", {
+            componentUid: componentUidForCoord,
+            eventName: eventNameForCoord,
+            runtimeCompileEventHandlers: evalContext.options?.compileEventHandlers === true,
+            ignoredMockExecute: effectiveOptions?.eventName === "mockExecute",
+            willUseCompiledPath: shouldUseCompiledEventHandler === true,
+            sourceKind:
+              typeof source === "string"
+                ? "string"
+                : isParsedEventValue(source)
+                  ? "parsed-event"
+                  : "arrow-expression",
+            hasParseTimeArtifact: compiledEventArtifact !== undefined,
+            parseTimeCompilationUnsupported,
+            parseTimeArtifactSourceId: compiledEventArtifact?.sourceId,
+            preparedUsesOriginalStatements,
+            statementCount: preparedStatements.length,
+            handlerExecutionMode: effectiveOptions.handlerExecutionMode,
+            handlerPolicy,
+          });
+        }
         const handlerPromise = shouldUseCompiledEventHandler
           ? executeCompiledEventAsyncHandler(
-              preparedStatements,
+              compiledEventArtifact ? statements : preparedStatements,
               evalContext,
               undefined,
-              preparedUsesOriginalStatements ? compiledEventArtifact : undefined,
+              compiledEventArtifact,
               typeof source === "string"
                 ? `event:string:${source}`
                 : `event:ast:${preparedStatements[0]?.nodeId ?? statements[0]?.nodeId ?? "empty"}`,
               rawEventSource,
             ).catch((error) => {
               if (error instanceof UnsupportedCompiledScriptNodeError) {
+                if (compiledEventDiagnosticEnabled) {
+                  logCompiledEventDiagnostic("compiled path unsupported; falling back", {
+                    componentUid: componentUidForCoord,
+                    eventName: eventNameForCoord,
+                    message: error.message,
+                    parseTimeArtifactSourceId: compiledEventArtifact?.sourceId,
+                  });
+                }
                 return interpretedHandler();
               }
               throw error;
@@ -660,7 +743,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             type: ContainerActionKind.EVENT_HANDLER_COMPLETED,
             payload: {
               uid,
-              eventName: options.eventName,
+              eventName: effectiveOptions.eventName,
             },
           });
         }
@@ -677,7 +760,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
         handlerLogger.logHandlerComplete({
           uid: uidName,
-          eventName: options?.eventName,
+          eventName: effectiveOptions?.eventName,
           componentType,
           componentLabel,
           returnValue,
@@ -712,18 +795,18 @@ export function createEventHandlers(config: EventHandlerConfig) {
         // Log handler error
         handlerLogger.logHandlerError({
           uid: uidName,
-          eventName: options?.eventName,
+          eventName: effectiveOptions?.eventName,
           componentType,
           componentLabel,
           error: e,
-          ownerFileId: options?.sourceFileId ?? handlerFileId,
-          ownerSource: options?.sourceRange ?? handlerSourceRange,
+          ownerFileId: effectiveOptions?.sourceFileId ?? handlerFileId,
+          ownerSource: effectiveOptions?.sourceRange ?? handlerSourceRange,
           handlerCode,
           traceId: handlerTraceId,
         });
 
         // Sign error if not suppressed
-        if (options?.signError !== false) {
+        if (effectiveOptions?.signError !== false) {
           appContext.signError(e as Error);
         }
 
@@ -732,7 +815,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             type: ContainerActionKind.EVENT_HANDLER_ERROR,
             payload: {
               uid,
-              eventName: options.eventName,
+              eventName: effectiveOptions.eventName,
               error: e,
             },
           });

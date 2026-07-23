@@ -3,19 +3,25 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { ModuleResolver } from "../../src/parsers/scripting/ModuleResolver";
-import viteXmluiPlugin from "../../src/nodejs/vite-xmlui-plugin";
+import viteXmluiPlugin, { type PluginOptions } from "../../src/nodejs/vite-xmlui-plugin";
 
 async function importGeneratedModule(code: string) {
   const encoded = Buffer.from(code).toString("base64");
   return import(`data:text/javascript;base64,${encoded}#${Math.random()}`);
 }
 
-async function transformXmlui(code: string, id: string, root = "/project") {
+async function transformXmlui(
+  code: string,
+  id: string,
+  root = "/project",
+  options: Partial<PluginOptions> = {},
+) {
   const plugin = viteXmluiPlugin({
     analyze: "off",
     reactiveCycles: "off",
     accessibility: "off",
     typeContracts: "off",
+    ...options,
   });
   (plugin.configResolved as any)?.({ root });
   const ctx = {
@@ -156,6 +162,37 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       expect(mod.default.warnings).toEqual([
         "/src/Main.xmlui contains only inline component definitions; rendering an empty Fragment.",
       ]);
+    });
+  });
+
+  describe("Compiled Event Handlers", () => {
+    it("does not compile event handlers by default", async () => {
+      const { result } = await transformXmlui(
+        `<Button onClick="count = count + 1" />`,
+        "/project/src/Main.xmlui",
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const event = mod.default.component.events.click;
+      expect(event.compiled).toBeUndefined();
+    });
+
+    it("serializes parse-time compiled event artifacts when enabled", async () => {
+      const { result } = await transformXmlui(
+        `<Button onClick="count = count + 1" />`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileEventHandlers: true },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const event = mod.default.component.events.click;
+      expect(event.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: "count = count + 1",
+      });
+      expect(event.compiled.sourceId).toMatch(/^\/src\/Main\.xmlui#event-\d+$/);
+      expect(event.compiled.js).toContain("return (async () =>");
     });
   });
 

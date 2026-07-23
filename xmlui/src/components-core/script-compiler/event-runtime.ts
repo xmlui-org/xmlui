@@ -27,18 +27,47 @@ import type {
 } from "../script-runner/ScriptingSourceTree";
 import { UnsupportedCompiledScriptNodeError } from "./errors";
 
+const DEFAULT_YIELD_INTERVAL_MS = 100;
+
+type EventYieldState = {
+  lastYieldReferenceTs: number;
+  intervalMs: number;
+};
+
+type EventStatementBoundaryOptions = {
+  checkYield?: boolean;
+};
+
 export const eventAsyncRuntime = {
+  createInvocation(options?: { yieldIntervalMs?: number; suppressYield?: boolean }) {
+    const invocation = Object.create(this) as typeof eventAsyncRuntime & {
+      __yieldState?: EventYieldState;
+      __suppressYield?: boolean;
+    };
+    invocation.__yieldState = {
+      lastYieldReferenceTs: this.now(),
+      intervalMs: options?.yieldIntervalMs ?? DEFAULT_YIELD_INTERVAL_MS,
+    };
+    invocation.__suppressYield = options?.suppressYield === true;
+    return invocation;
+  },
+
   unsupported(target: string, sourceId: string, sourceRange?: any): never {
     throw new UnsupportedCompiledScriptNodeError(target, sourceId, sourceRange);
   },
 
   async start(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    await this.initialize(evalContext);
+  },
+
+  async initialize(evalContext: BindingTreeEvaluationContext): Promise<void> {
     evalContext.mainThread ??= {
       childThreads: [],
       blocks: [{ vars: {} }],
       loops: [],
       breakLabelValue: -1,
     };
+    this.ensureYieldState();
     await this.checkCancel(evalContext);
   },
 
@@ -53,14 +82,61 @@ export const eventAsyncRuntime = {
   async afterStatement(
     evalContext: BindingTreeEvaluationContext,
     statement?: Statement,
+    options?: EventStatementBoundaryOptions,
   ): Promise<void> {
     await evalContext.onStatementCompleted?.(evalContext, statement as Statement);
     await this.checkCancel(evalContext);
+    if (!this.isYieldSuppressed() && options?.checkYield !== false) {
+      await this.maybeYield();
+    }
+    await this.checkCancel(evalContext);
+  },
+
+  async maybeYield(): Promise<void> {
+    const state = this.ensureYieldState();
+    const now = this.now();
+    if (now - state.lastYieldReferenceTs < state.intervalMs) {
+      return;
+    }
+    state.lastYieldReferenceTs = now;
     await this.yield();
+  },
+
+  async checkpointIfDue(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    await this.checkCancel(evalContext);
+    if (!this.isYieldSuppressed()) {
+      await this.maybeYield();
+    }
+    await this.checkCancel(evalContext);
+  },
+
+  async flushPendingState(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    if (evalContext.hasPendingStateChanges?.() !== true) {
+      return;
+    }
+    await evalContext.onStatementCompleted?.(evalContext, undefined as any);
+    await this.checkCancel(evalContext);
   },
 
   async yield(): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  },
+
+  now(): number {
+    return typeof performance !== "undefined" ? performance.now() : Date.now();
+  },
+
+  ensureYieldState(): EventYieldState {
+    const runtime = this as typeof eventAsyncRuntime & { __yieldState?: EventYieldState };
+    runtime.__yieldState ??= {
+      lastYieldReferenceTs: this.now(),
+      intervalMs: DEFAULT_YIELD_INTERVAL_MS,
+    };
+    return runtime.__yieldState;
+  },
+
+  isYieldSuppressed(): boolean {
+    return (this as typeof eventAsyncRuntime & { __suppressYield?: boolean }).__suppressYield === true;
   },
 
   async checkCancel(evalContext: BindingTreeEvaluationContext): Promise<void> {
@@ -150,6 +226,7 @@ export const eventAsyncRuntime = {
     thread?: LogicalThread,
     updateRootName?: string,
   ): Promise<any> {
+    await this.flushPendingState(evalContext);
     await notifyEventStateUpdate(updateRootName, "will", evalContext, "function-call");
     try {
       if (isArrowExpressionObject(functionObj)) {
@@ -161,7 +238,7 @@ export const eventAsyncRuntime = {
         );
       }
 
-      const callArgs = args.map((arg) =>
+      const callArgs: any[] = args.map((arg) =>
         isArrowExpressionObject(arg)
           ? async (...arrowArgs: any[]) =>
               await executeArrowExpression(
@@ -188,6 +265,7 @@ export const eventAsyncRuntime = {
           : (proxiedFunction as Function).call(thisArg, ...callArgs);
       return await completePromise(value);
     } finally {
+      await this.flushPendingState(evalContext);
       await notifyEventStateUpdate(updateRootName, "did", evalContext, "function-call");
     }
   },
