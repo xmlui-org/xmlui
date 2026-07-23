@@ -87,6 +87,7 @@ function formatDisplayLabel(event: unknown, eventName: string): string | undefin
 
 type Props = {
   option?: unknown;
+  maps?: Record<string, unknown>;
   className?: string;
   width?: string;
   height?: string;
@@ -97,6 +98,7 @@ type Props = {
 
 export const EChartRender = memo(function EChartRender({
   option,
+  maps,
   className,
   width,
   height,
@@ -107,6 +109,32 @@ export const EChartRender = memo(function EChartRender({
   const chartRef = useRef<InstanceType<typeof ReactECharts> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { getThemeVar, root } = useTheme();
+
+  // Register GeoJSON maps BEFORE the chart applies an option that references
+  // them (a `map` series naming an unregistered map fails to render).
+  // Change detection is per-name by value identity: XMLUI binding expressions
+  // produce a fresh outer object every evaluation, but the inner GeoJSON refs
+  // (e.g. a DataSource value) are stable until the data actually changes — so
+  // this registers each map once, and again only when its GeoJSON is replaced
+  // (the async-arrival case: undefined → loaded). registerMap parses the
+  // GeoJSON, so avoiding per-render re-registration matters for large files.
+  // mapsRevision feeds ReactECharts' key: echarts-for-react deep-equals the
+  // option to decide whether to re-apply it, so a map registered AFTER first
+  // mount would never take effect without forcing a remount.
+  const registeredMaps = useRef<Record<string, unknown>>({});
+  const mapsRevision = useRef(0);
+  if (maps) {
+    let changed = false;
+    for (const [name, geojson] of Object.entries(maps)) {
+      if (!name || !geojson) continue;
+      if (registeredMaps.current[name] !== geojson) {
+        echarts.registerMap(name, geojson as Parameters<typeof echarts.registerMap>[1]);
+        registeredMaps.current[name] = geojson;
+        changed = true;
+      }
+    }
+    if (changed) mapsRevision.current++;
+  }
 
   const onEvents = useMemo(() => {
     if (!onNativeEvent) return undefined;
@@ -249,6 +277,7 @@ export const EChartRender = memo(function EChartRender({
       style={{ width: width || "100%", height: height || "400px" }}
     >
       <ReactECharts
+        key={mapsRevision.current}
         ref={chartRef}
         echarts={echarts}
         option={themedOption}
