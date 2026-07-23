@@ -1125,11 +1125,15 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   );
 
   const scrollToBottom = useEvent(() => {
-    if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(rows.length + 1, {
-        align: "end",
-        offset: startMargin,
-      });
+    const v = virtualizerRef.current;
+    if (v && rows.length) {
+      // Absolute bottom, not align-end of the last item: aligning to the last
+      // item's currently measured end lands short while late-measuring content
+      // (async Markdown, images) is still growing, and repeated calls keep
+      // landing short of the settled bottom. scrollTo(scrollSize) clamps to
+      // the true bottom regardless of item boundaries — the same call the
+      // scrollAnchor="bottom" internals use for exactly this reason.
+      v.scrollTo(v.scrollSize + startMargin);
     }
   });
 
