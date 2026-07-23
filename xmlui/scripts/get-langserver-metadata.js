@@ -1,5 +1,13 @@
+import { writeFile, rename } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { collectedComponentMetadata } from "../dist/metadata/xmlui-metadata.cjs";
-generateLangServerMetadata(collectedComponentMetadata);
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const outputPath = resolve(scriptDir, "../src/language-server/xmlui-metadata-generated.js");
+const writesToStdout = process.argv.includes("--stdout");
+
+await generateLangServerMetadata(collectedComponentMetadata);
 
 /**
  * @typedef {import('../src/abstractions/ComponentDefs.js').ComponentMetadata} ComponentMetadata
@@ -9,7 +17,7 @@ generateLangServerMetadata(collectedComponentMetadata);
  *
  * @param {Record<string, ComponentMetadata>} metaByComp
  */
-function generateLangServerMetadata(metaByComp) {
+async function generateLangServerMetadata(metaByComp) {
   // The snapshot is a faithful FULL serialization of collectedComponentMetadata.
   // It MUST preserve the optimizer fields that `createMetadata` hoists to top
   // level — `childInjectedVars`, `unstableChildInjectedVars`,
@@ -21,9 +29,15 @@ function generateLangServerMetadata(metaByComp) {
 export default ${JSON.stringify(metaByComp, null, 2)};
 `;
 
-  process.stdout.write(fileContent, (err) => {
-    if (err) {
-      console.error(`Could not write generated metadata to stdout:\n ${err.message}`);
-    }
-  });
+  if (writesToStdout) {
+    process.stdout.write(fileContent);
+    return;
+  }
+
+  const tempPath = `${outputPath}.${process.pid}.tmp`;
+  await writeFile(tempPath, fileContent);
+  await rename(tempPath, outputPath);
+  console.error(
+    `Wrote ${Object.keys(metaByComp).length} component metadata entries to ${outputPath}`,
+  );
 }
