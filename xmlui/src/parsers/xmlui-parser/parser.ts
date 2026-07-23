@@ -206,6 +206,7 @@ export type XmluiFileRole = "component" | "entrypoint";
 export type XmluiParserOptions = {
   role?: XmluiFileRole;
   compileEventHandlers?: boolean;
+  logCompiledEventHandlerSource?: boolean;
 };
 
 export type ParseResult = { node: Node; errors: ParserDiag[] };

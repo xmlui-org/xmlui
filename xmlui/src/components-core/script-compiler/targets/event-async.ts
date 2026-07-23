@@ -155,12 +155,12 @@ function emitStatement(
     case T_LET_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "let", statement, context);
-      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement) });
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
       return;
     case T_CONST_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "const", statement, context);
-      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement) });
+      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
       return;
     case T_VAR_STATEMENT:
       emitVarStatement(writer, statement, context);
@@ -288,7 +288,7 @@ function emitExpressionStatement(
   writer.write(");", statement);
   writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
   emitAfterStatement(writer, statement, {
-    checkYield: eventExpressionStatementMayYield(statement.expr),
+    checkYield: eventExpressionStatementMayYield(statement.expr, context),
   });
 }
 
@@ -300,42 +300,54 @@ function emitPlainExpressionStatementExpression(
   emitExpression(writer, expr, context);
 }
 
-function eventExpressionStatementMayYield(expr: Expression): boolean {
-  return expr.type === T_IDENTIFIER || isMemberExpressionChain(expr) || expressionMayYield(expr);
+function eventExpressionStatementMayYield(expr: Expression, context: CompilerContext): boolean {
+  return (
+    expr.type === T_IDENTIFIER ||
+    isMemberExpressionChain(expr) ||
+    expressionMayYield(expr, context)
+  );
 }
 
-function declarationStatementMayYield(statement: LetStatement | ConstStatement): boolean {
-  return statement.decls.some((decl) => (decl.expr ? expressionMayYield(decl.expr) : false));
+function declarationStatementMayYield(
+  statement: LetStatement | ConstStatement,
+  context: CompilerContext,
+): boolean {
+  return statement.decls.some((decl) =>
+    decl.expr ? expressionMayYield(decl.expr, context) : false,
+  );
 }
 
-function expressionMayYield(expr: Expression): boolean {
+function expressionMayYield(expr: Expression, context: CompilerContext): boolean {
   switch (expr.type) {
     case T_FUNCTION_INVOCATION_EXPRESSION:
-      return true;
+      return (
+        expr.arguments.some((arg) => expressionMayYield(arg, context)) ||
+        !isKnownNonYieldingCall(expr, context)
+      );
     case T_MEMBER_ACCESS_EXPRESSION:
-      return expressionMayYield(expr.obj);
+      return expressionMayYield(expr.obj, context);
     case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
-      return expressionMayYield(expr.obj) || expressionMayYield(expr.member);
+      return expressionMayYield(expr.obj, context) || expressionMayYield(expr.member, context);
     case T_UNARY_EXPRESSION:
-      return expressionMayYield(expr.expr);
+      return expressionMayYield(expr.expr, context);
     case T_BINARY_EXPRESSION:
-      return expressionMayYield(expr.left) || expressionMayYield(expr.right);
+      return expressionMayYield(expr.left, context) || expressionMayYield(expr.right, context);
     case T_ASSIGNMENT_EXPRESSION:
-      return expressionMayYield(expr.leftValue) || expressionMayYield(expr.expr);
+      return expressionMayYield(expr.leftValue, context) || expressionMayYield(expr.expr, context);
     case T_ARRAY_LITERAL:
-      return expr.items.some((item) => expressionMayYield(item));
+      return expr.items.some((item) => expressionMayYield(item, context));
     case T_OBJECT_LITERAL:
       return expr.props.some((prop) => {
         if (!Array.isArray(prop)) {
           return true;
         }
-        return expressionMayYield(prop[0]) || expressionMayYield(prop[1]);
+        return expressionMayYield(prop[0], context) || expressionMayYield(prop[1], context);
       });
     case T_PREFIX_OP_EXPRESSION:
     case T_POSTFIX_OP_EXPRESSION:
-      return expressionMayYield(expr.expr);
+      return expressionMayYield(expr.expr, context);
     case T_SPREAD_EXPRESSION:
-      return expressionMayYield(expr.expr);
+      return expressionMayYield(expr.expr, context);
     case T_ARROW_EXPRESSION:
     case T_LITERAL:
     case T_IDENTIFIER:
@@ -343,6 +355,144 @@ function expressionMayYield(expr: Expression): boolean {
     default:
       return true;
   }
+}
+
+const SAFE_STATIC_CALLS: Record<string, ReadonlySet<string>> = {
+  Math: new Set([
+    "abs",
+    "acos",
+    "acosh",
+    "asin",
+    "asinh",
+    "atan",
+    "atan2",
+    "atanh",
+    "cbrt",
+    "ceil",
+    "clz32",
+    "cos",
+    "cosh",
+    "exp",
+    "expm1",
+    "floor",
+    "fround",
+    "hypot",
+    "imul",
+    "log",
+    "log10",
+    "log1p",
+    "log2",
+    "max",
+    "min",
+    "pow",
+    "random",
+    "round",
+    "sign",
+    "sin",
+    "sinh",
+    "sqrt",
+    "tan",
+    "tanh",
+    "trunc",
+  ]),
+  Number: new Set(["isFinite", "isInteger", "isNaN", "isSafeInteger", "parseFloat", "parseInt"]),
+  String: new Set(["fromCharCode", "fromCodePoint", "raw"]),
+  Array: new Set(["isArray"]),
+};
+
+const SAFE_STRING_PROTOTYPE_CALLS = new Set([
+  "at",
+  "charAt",
+  "charCodeAt",
+  "codePointAt",
+  "concat",
+  "endsWith",
+  "includes",
+  "indexOf",
+  "lastIndexOf",
+  "localeCompare",
+  "match",
+  "matchAll",
+  "normalize",
+  "padEnd",
+  "padStart",
+  "repeat",
+  "replace",
+  "replaceAll",
+  "search",
+  "slice",
+  "split",
+  "startsWith",
+  "substring",
+  "toLocaleLowerCase",
+  "toLocaleUpperCase",
+  "toLowerCase",
+  "toString",
+  "toUpperCase",
+  "trim",
+  "trimEnd",
+  "trimStart",
+  "valueOf",
+]);
+
+const SAFE_NUMBER_PROTOTYPE_CALLS = new Set([
+  "toExponential",
+  "toFixed",
+  "toLocaleString",
+  "toPrecision",
+  "toString",
+  "valueOf",
+]);
+
+const SAFE_BOOLEAN_PROTOTYPE_CALLS = new Set(["toString", "valueOf"]);
+
+const SAFE_ARRAY_PROTOTYPE_CALLS = new Set([
+  "at",
+  "includes",
+  "indexOf",
+  "join",
+  "lastIndexOf",
+  "slice",
+  "toLocaleString",
+  "toString",
+]);
+
+function isKnownNonYieldingCall(
+  expr: FunctionInvocationExpression,
+  context: CompilerContext,
+): boolean {
+  if (expr.obj.type !== T_MEMBER_ACCESS_EXPRESSION) {
+    return false;
+  }
+
+  const member = expr.obj.member;
+  const receiver = expr.obj.obj;
+  if (receiver.type === T_IDENTIFIER) {
+    if (context.locals.has(receiver.name)) {
+      return false;
+    }
+    return SAFE_STATIC_CALLS[receiver.name]?.has(member) === true;
+  }
+
+  if (receiver.type === T_LITERAL) {
+    switch (typeof receiver.value) {
+      case "string":
+        return SAFE_STRING_PROTOTYPE_CALLS.has(member);
+      case "number":
+      case "bigint":
+        return SAFE_NUMBER_PROTOTYPE_CALLS.has(member);
+      case "boolean":
+        return SAFE_BOOLEAN_PROTOTYPE_CALLS.has(member);
+      default:
+        return false;
+    }
+  }
+
+  if (receiver.type === T_ARRAY_LITERAL) {
+    return SAFE_ARRAY_PROTOTYPE_CALLS.has(member);
+  }
+
+  return false;
 }
 
 function emitAfterStatement(

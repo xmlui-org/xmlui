@@ -267,3 +267,15 @@ Implementation note: the interpreter now clears pending `errorToThrow` values fo
 - Validation: `npm --workspace xmlui run test:unit -- tests/components-core/compiled-events` passed with 89 tests.
 - Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler` passed with 116 tests.
 - Manual gate: the root `test-compiled-bindings` regression command remains user-run; it was not run by the agent.
+
+## Step 12 - safe built-in calls and parse-time source logging
+
+- Affected modules: `xmlui/src/components-core/script-compiler/targets/event-async.ts`, `xmlui/src/parsers/xmlui-parser/parser.ts`, `xmlui/src/parsers/xmlui-parser/transform.ts`, `xmlui/src/components-core/abstractions/standalone.ts`, `xmlui/tests/components-core/script-compiler/event-async.test.ts`, `xmlui/tests/parsers/xmlui/transform.element.test.ts`.
+- Decision: `expressionMayYield(...)` now treats a narrow static allowlist of known synchronous JavaScript built-ins as non-yielding. Every allowlisted method has an explicit unit test case.
+- Decision: safe static calls are recognized only when their root global name is not shadowed by a compiled local. Computed member calls such as `Math[name](value)` remain yield-producing.
+- Decision: safe prototype calls are recognized only on literal/string/number/boolean/array receivers that the code generator can identify statically. Calls on arbitrary variables such as `value.trim()` remain yield-producing.
+- Decision: callback-based array methods, user-defined functions, code-behind/imported functions, `JSON.*`, `Date.*`, `Object.*`, and argument-yielding calls remain yield-producing.
+- Decision: parser option `logCompiledEventHandlerSource` logs parse-time compiled event artifacts only when `compileEventHandlers` actually creates an artifact. The log includes `sourceId`, original handler source, and generated JavaScript.
+- Observation: the logging switch does not trigger runtime compilation and does not log artifact-less dynamic handler compilation.
+- Validation: `npm --workspace xmlui run test:unit -- tests/components-core/script-compiler/event-async.test.ts` passed with 115 tests.
+- Validation: `npm --workspace xmlui run test:unit -- tests/parsers/xmlui/transform.element.test.ts` passed with 112 tests.

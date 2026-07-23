@@ -35,7 +35,10 @@ Compiled event handlers keep the same statement boundary and state-refresh contr
 event-loop yield is optimized: eligible statement boundaries perform a shared runtime check and
 yield at most once every 100ms per handler invocation. Simple declarations and expression
 statements that do not contain a yield-producing function call can skip the yield check while still
-running completion hooks and cancellation checks.
+running completion hooks and cancellation checks. A narrow allowlist of known synchronous built-in
+calls, such as `Math.*`, selected `Number`/`String`/`Array` calls, and literal primitive prototype
+methods, is also treated as non-yielding; user-defined, computed-member, callback-based, or
+argument-yielding calls still request the runtime yield check.
 
 Effect: state changes from statement N are visible to statement N+1. Unlike raw React batching.
 

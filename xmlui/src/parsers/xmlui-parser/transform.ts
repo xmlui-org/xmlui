@@ -33,6 +33,20 @@ interface TransformNode extends Node {
   originalKind?: SyntaxKind;
 }
 
+function logCompiledEventHandlerSource(sourceId: string, sourceText: string, js: string): void {
+  if (typeof console === "undefined") return;
+  const title = `[xmlui] compiled event handler ${sourceId}`;
+  if (typeof console.groupCollapsed === "function") {
+    console.groupCollapsed(title);
+    console.log("sourceId:", sourceId);
+    console.log("source:", sourceText);
+    console.log("js:", js);
+    console.groupEnd?.();
+    return;
+  }
+  console.log(title, { sourceId, source: sourceText, js });
+}
+
 const HelperNode = {
   property: "property",
   template: "template",
@@ -1432,18 +1446,22 @@ function transformXmluiNode(
     try {
       const statements = parser.parseStatements();
       const parseId = ++lastParseId;
+      const compiled = parserOptions.compileEventHandlers
+        ? compileEventAsyncStatements(statements, {
+            sourceId: `${fileId}#event-${parseId}`,
+            sourceText: value,
+          })
+        : undefined;
+      if (compiled && parserOptions.logCompiledEventHandlerSource) {
+        logCompiledEventHandlerSource(compiled.sourceId, value, compiled.js);
+      }
       return {
         __PARSED: true,
         statements,
         parseId,
         // TODO: retrieve the event source code only in dev mode
         source: value,
-        compiled: parserOptions.compileEventHandlers
-          ? compileEventAsyncStatements(statements, {
-              sourceId: `${fileId}#event-${parseId}`,
-              sourceText: value,
-            })
-          : undefined,
+        compiled,
       } as ParsedEventValue;
     } catch {
       if (parser.errors.length > 0) {

@@ -47,6 +47,9 @@ export type StandaloneAppDescription = {
    *   that carries compiled asynchronous event-handler and code-behind
    *   evaluation through the runtime configuration. The current implementation
    *   still uses the async AST interpreter.
+   * - `logCompiledEventHandlerSource` (boolean, default `false`) — when
+   *   `compileEventHandlers` creates parse-time event artifacts, log the
+   *   original handler source and generated JavaScript to the console.
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
    * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
    *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.
@@ -255,7 +258,7 @@ export type StandaloneAppDescription = {
    * in `appGlobals`). Examples: `disableInlineStyle`, `useHashBasedRouting`,
    * `withXSRFToken`, `logRestApiErrors`, `xsVerbose`, `xsVerboseLogMax`,
    * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`, `compileBindings`,
-   * `compileEventHandlers`,
+   * `compileEventHandlers`, `logCompiledEventHandlerSource`,
    * `applyLayoutProperties`, `lintSeverity`, `searchIndexEnabled`, and the
    * `strict*` family.
    *

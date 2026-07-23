@@ -1,4 +1,4 @@
-import { describe, expect, it, assert } from "vitest";
+import { describe, expect, it, assert, vi } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformEntryPointSource, transformSource } from "./xmlui";
 import type {
@@ -463,6 +463,69 @@ describe("Xmlui transform - child elements", () => {
       expect(parsed.sourceId).toMatch(/^0#event-\d+$/);
       expect(parsed.js).toContain("return (async () =>");
       expect(parsed.mappings.length).toBeGreaterThan(0);
+    });
+
+    it("does not log parse-time compiled event source by default", () => {
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
+      const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
+
+      try {
+        transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
+          compileEventHandlers: true,
+        });
+
+        expect(logSpy).not.toHaveBeenCalled();
+        expect(groupSpy).not.toHaveBeenCalled();
+      } finally {
+        logSpy.mockRestore();
+        groupSpy.mockRestore();
+        groupEndSpy.mockRestore();
+      }
+    });
+
+    it("logs parse-time compiled event source when enabled", () => {
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
+      const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
+
+      try {
+        transformSource("<Stack onClick='count = count + 1' />", 0, false, undefined, {
+          compileEventHandlers: true,
+          logCompiledEventHandlerSource: true,
+        });
+
+        expect(groupSpy).toHaveBeenCalledWith(expect.stringMatching(/^\[xmlui\] compiled event handler 0#event-\d+$/));
+        expect(logSpy).toHaveBeenCalledWith("sourceId:", expect.stringMatching(/^0#event-\d+$/));
+        expect(logSpy).toHaveBeenCalledWith("source:", "count = count + 1");
+        expect(logSpy).toHaveBeenCalledWith("js:", expect.stringContaining("return (async () =>"));
+        expect(groupEndSpy).toHaveBeenCalled();
+      } finally {
+        logSpy.mockRestore();
+        groupSpy.mockRestore();
+        groupEndSpy.mockRestore();
+      }
+    });
+
+    it("does not compile or log event source when only logging is enabled", () => {
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+      const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
+      const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
+
+      try {
+        const cd = transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
+          logCompiledEventHandlerSource: true,
+        }) as ComponentDef;
+        const event = (cd.events! as any).click;
+
+        expect(event.compiled).toBeUndefined();
+        expect(logSpy).not.toHaveBeenCalled();
+        expect(groupSpy).not.toHaveBeenCalled();
+      } finally {
+        logSpy.mockRestore();
+        groupSpy.mockRestore();
+        groupEndSpy.mockRestore();
+      }
     });
 
     it("event with name/value attr works #1", () => {
