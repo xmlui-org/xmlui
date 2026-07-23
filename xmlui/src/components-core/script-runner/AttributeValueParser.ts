@@ -2,7 +2,11 @@ import type { ParsedPropertyValue } from "../../abstractions/scripting/Compilati
 import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
 import { compileBindingSyncExpression } from "../script-compiler/targets/binding-sync";
-import type { ParseBindingOptions } from "./ParameterParser";
+import {
+  createCompiledSources,
+  createSegmentSourceOrigin,
+  type ParseBindingOptions,
+} from "./ParameterParser";
 
 let lastParseId = 0;
 
@@ -80,13 +84,18 @@ export function parseAttributeValue(
         } else {
           const segmentIndex = result.segments?.length ?? 0;
           const exprText = exprSource.substring(0, exprSource.length - tail.length);
+          const sourceId = `${options.sourceId ?? `attribute:${result.parseId}`}#expr-${segmentIndex}`;
           // --- Successfully parsed expression, get dependencies
           result.segments.push({
             expr,
             compiled: options.compileBindings
               ? compileBindingSyncExpression(expr!, {
-                  sourceId: `${options.sourceId ?? `attribute:${result.parseId}`}#expr-${segmentIndex}`,
+                  sourceId,
                   sourceText: exprText,
+                  sourceUrl: options.sourceUrl,
+                  displayName: options.displayName,
+                  sources: createCompiledSources(sourceId, options, exprText),
+                  sourceOrigin: createSegmentSourceOrigin(options.sourceOrigin, i),
                 })
               : undefined,
           });

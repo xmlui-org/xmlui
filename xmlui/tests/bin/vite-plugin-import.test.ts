@@ -37,6 +37,65 @@ async function transformXmlui(
   };
 }
 
+async function createPluginHarness(root = "/project", options: Partial<PluginOptions> = {}) {
+  const plugin = viteXmluiPlugin({
+    analyze: "off",
+    reactiveCycles: "off",
+    accessibility: "off",
+    typeContracts: "off",
+    ...options,
+  });
+  (plugin.configResolved as any)?.({ root });
+  let middleware: any;
+  (plugin.configureServer as any)?.({
+    middlewares: {
+      use(handler: any) {
+        middleware = handler;
+      },
+    },
+  });
+  const ctx = {
+    warn: vi.fn(),
+    error: (message: string) => {
+      throw new Error(String(message));
+    },
+  };
+
+  return {
+    plugin,
+    async transform(code: string, id: string) {
+      return await (plugin.transform as any).call(ctx, code, id, {});
+    },
+    async request(url: string) {
+      let body = "";
+      const headers: Record<string, string> = {};
+      let statusCode = 200;
+      let nextCalled = false;
+      await middleware(
+        { url },
+        {
+          set statusCode(value: number) {
+            statusCode = value;
+          },
+          get statusCode() {
+            return statusCode;
+          },
+          setHeader(name: string, value: string) {
+            headers[name] = value;
+          },
+          end(value: string) {
+            body = value;
+          },
+        },
+        () => {
+          nextCalled = true;
+        },
+      );
+      return { body, headers, statusCode, nextCalled };
+    },
+  };
+}
+
 describe("Vite Plugin Import Integration (Built Mode)", () => {
   beforeEach(() => {
     ModuleResolver.clearCache();
@@ -194,6 +253,139 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       expect(event.compiled.sourceId).toMatch(/^\/src\/Main\.xmlui#event-\d+$/);
       expect(event.compiled.js).toContain("return (async () =>");
     });
+
+    it("serializes parse-time compiled event artifacts with the common compileScripts switch", async () => {
+      const { result } = await transformXmlui(
+        `<Button onClick="count = count + 1" />`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const event = mod.default.component.events.click;
+      expect(event.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: "count = count + 1",
+      });
+    });
+
+    it("lets legacy compileEventHandlers disable event compilation under compileScripts", async () => {
+      const { result } = await transformXmlui(
+        `<Button onClick="count = count + 1" />`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true, compileEventHandlers: false },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.events.click.compiled).toBeUndefined();
+    });
+
+    it("emits XMLUI transform source maps and debug sources when enabled", async () => {
+      const source = `<Button onClick="count = count + 1" />`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
+        compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      expect(result.map).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/Main.xmlui"],
+        sourcesContent: [source],
+        names: [],
+        mappings: "AAAA",
+      });
+      expect(mod.default.debugSources).toEqual([
+        {
+          id: "/src/Main.xmlui",
+          url: "/@xmlui-source/src/Main.xmlui",
+          displayName: "/src/Main.xmlui",
+          sourceText: source,
+        },
+      ]);
+      expect(mod.default.component.events.click.compiled.sources[0]).toMatchObject({
+        url: "/@xmlui-source/src/Main.xmlui",
+        sourceText: source,
+      });
+    });
+
+    it("serves virtual XMLUI sources and source maps from the dev middleware", async () => {
+      const source = `<Button onClick="count = count + 1" />`;
+      const harness = await createPluginHarness("/project", {
+        compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const result = await harness.transform(source, "/project/src/Main.xmlui");
+      const mod = await importGeneratedModule(result.code);
+
+      const sourceResponse = await harness.request("/@xmlui-source/src/Main.xmlui");
+      expect(sourceResponse.nextCalled).toBe(false);
+      expect(sourceResponse.headers["Content-Type"]).toContain("text/plain");
+      expect(sourceResponse.body).toBe(source);
+
+      const mapResponse = await harness.request("/@xmlui-source/src/Main.xmlui.map");
+      expect(mapResponse.nextCalled).toBe(false);
+      expect(mapResponse.headers["Content-Type"]).toContain("application/json");
+      expect(JSON.parse(mapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/Main.xmlui"],
+        mappings: "AAAA",
+      });
+
+      const compiledSourceId = mod.default.component.events.click.compiled.sourceId;
+      const compiledMapResponse = await harness.request(
+        `/@xmlui-source/__compiled/${encodeURIComponent(compiledSourceId)}.js.map`,
+      );
+      expect(compiledMapResponse.nextCalled).toBe(false);
+      expect(JSON.parse(compiledMapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/Main.xmlui"],
+        sourcesContent: [source],
+      });
+    });
+
+    it("defaults dev middleware source maps on when compileScripts is enabled", async () => {
+      const source = `<Button onClick="count = count + 1" />`;
+      const harness = await createPluginHarness("/project", {
+        compileScripts: true,
+      });
+
+      const result = await harness.transform(source, "/project/src/Main.xmlui");
+      const mod = await importGeneratedModule(result.code);
+
+      expect(mod.default.debugSources).toEqual([
+        {
+          id: "/src/Main.xmlui",
+          url: "/@xmlui-source/src/Main.xmlui",
+          displayName: "/src/Main.xmlui",
+          sourceText: source,
+        },
+      ]);
+      const sourceResponse = await harness.request("/@xmlui-source/src/Main.xmlui");
+      expect(sourceResponse.body).toBe(source);
+      expect(result.map.sources).toEqual(["/@xmlui-source/src/Main.xmlui"]);
+    });
+
+    it("defaults dev middleware source maps on when legacy compileBindings is enabled", async () => {
+      const source = `<Text value="{count + 1}" />`;
+      const harness = await createPluginHarness("/project", {
+        compileBindings: true,
+      });
+
+      const result = await harness.transform(source, "/project/src/Main.xmlui");
+      const mod = await importGeneratedModule(result.code);
+
+      expect(mod.default.debugSources[0]).toMatchObject({
+        url: "/@xmlui-source/src/Main.xmlui",
+        sourceText: source,
+      });
+      expect(mod.default.component.props.value.compiled).toBeUndefined();
+      const sourceResponse = await harness.request("/@xmlui-source/src/Main.xmlui");
+      expect(sourceResponse.body).toBe(source);
+    });
   });
 
   describe("Vite Plugin File Structure", () => {
@@ -214,6 +406,32 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const resolved = ModuleResolver.resolvePath(importPath, moduleFile);
 
       expect(resolved).toBe("/src/utils/validators.xs");
+    });
+
+    it("emits code-behind debug sources for .xmlui.xs files and imports", async () => {
+      const dir = await mkdtemp(join(tmpdir(), "xmlui-vite-xs-debug-"));
+      const srcDir = join(dir, "src");
+      await mkdir(srcDir);
+      const mainPath = join(srcDir, "Main.xmlui.xs").replace(/\\/g, "/");
+      const helperPath = join(srcDir, "helpers.xs").replace(/\\/g, "/");
+      await writeFile(helperPath, `function double(x) { return x * 2; }`);
+      const source = `import { double } from "./helpers.xs";
+function run(value) { return double(value); }`;
+
+      const { result } = await transformXmlui(source, mainPath, dir, {
+        compiledScriptSourceMaps: "external",
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      expect(result.map.sources).toEqual([
+        "/@xmlui-source/src/Main.xmlui.xs",
+        "/@xmlui-source/src/helpers.xs",
+      ]);
+      expect(mod.default.debugSources.map((source: any) => source.displayName)).toEqual([
+        mainPath,
+        helperPath,
+      ]);
+      expect(mod.default.sourceUrl).toBe("/@xmlui-source/src/Main.xmlui.xs");
     });
 
     it("should resolve from vite project root", () => {
@@ -447,11 +665,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const paths = components.map((comp) => ModuleResolver.resolvePath(commonImport, comp));
 
       // All should resolve to same shared module
-      expect(paths).toEqual([
-        "/shared/theme.xs",
-        "/shared/theme.xs",
-        "/shared/theme.xs",
-      ]);
+      expect(paths).toEqual(["/shared/theme.xs", "/shared/theme.xs", "/shared/theme.xs"]);
     });
   });
 
@@ -481,11 +695,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
 
   describe("File Name Extraction for Bundling", () => {
     it("should extract consistent file names", () => {
-      const files = [
-        "/src/Button.xs",
-        "/src/components/Button.xs",
-        "/src/components/ui/Button.xs",
-      ];
+      const files = ["/src/Button.xs", "/src/components/Button.xs", "/src/components/ui/Button.xs"];
 
       const names = files.map((f) => ModuleResolver.getFileName(f));
 

@@ -3,11 +3,10 @@ import type { BindingTreeEvaluationContext } from "../../script-runner/BindingTr
 import type { Expression } from "../../script-runner/ScriptingSourceTree";
 import { createCompiledScriptCache, createCompiledScriptCacheKey } from "../cache";
 import { instantiateCompiledScriptArtifact } from "../artifact";
+import { createCompiledScriptGeneratedSourceUrl } from "../source-map";
 import { bindingSyncRuntime } from "../runtime";
-import {
-  compileBindingSyncExpression,
-  compileBindingSyncExpressionSource,
-} from "./binding-sync";
+import { compileBindingSyncExpression, compileBindingSyncExpressionSource } from "./binding-sync";
+import { emitCompiledScriptDebugSourceTrace } from "../debug-source-trace";
 
 const bindingSyncCache = createCompiledScriptCache();
 
@@ -26,10 +25,12 @@ export function evaluateCompiledBindingExpressionSource(
   const artifact = bindingSyncCache.getOrCreate(key, () =>
     compileBindingSyncExpressionSource(source, sourceId),
   );
-  return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime).execute({
-    evalContext,
-    thread,
-  });
+  emitCompiledScriptDebugSourceTrace(artifact, evalContext);
+  return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime, {
+    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+    generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
+    sourceMapUrl: getExternalSourceMapUrl(artifact),
+  }).execute({ evalContext, thread });
 }
 
 export function evaluateCompiledBinding(
@@ -51,10 +52,12 @@ export function evaluateCompiledBinding(
       sourceText: expr.source,
     }),
   );
-  return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime).execute({
-    evalContext,
-    thread,
-  });
+  emitCompiledScriptDebugSourceTrace(artifact, evalContext);
+  return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime, {
+    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+    generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
+    sourceMapUrl: getExternalSourceMapUrl(artifact),
+  }).execute({ evalContext, thread });
 }
 
 export function clearBindingSyncCompilerCache(): void {
@@ -70,3 +73,14 @@ function createBindingSyncOptionsKey(evalContext: BindingTreeEvaluationContext):
   });
 }
 
+function getExternalGeneratedSourceUrl(
+  artifact: Parameters<typeof createCompiledScriptGeneratedSourceUrl>[0],
+): string {
+  return createCompiledScriptGeneratedSourceUrl(artifact);
+}
+
+function getExternalSourceMapUrl(
+  artifact: Parameters<typeof createCompiledScriptGeneratedSourceUrl>[0],
+): string {
+  return `${createCompiledScriptGeneratedSourceUrl(artifact)}.map`;
+}

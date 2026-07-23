@@ -10,6 +10,7 @@ import { CharacterCodes } from "./CharacterCodes";
 import type { GetText, XmluiParserOptions } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
+import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
 import { extractEventHandlerDirectives } from "../../components-core/utils/event-handler-directives";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 import type { DocumentCursor } from "../../language-server/base/text-document";
@@ -1457,6 +1458,20 @@ function transformXmluiNode(
           compiled = compileEventAsyncStatements(executableStatements, {
             sourceId,
             sourceText: value,
+            sourceUrl: createDebugSourceUrl(String(fileId)),
+            displayName: String(fileId),
+            sources: [
+              {
+                id: sourceId,
+                url: createDebugSourceUrl(String(fileId)),
+                displayName: String(fileId),
+                sourceText: originalGetText(node),
+              },
+            ],
+            sourceOrigin: {
+              offset: (nodeContainingValue?.pos ?? 0) + 1,
+              sourceText: originalGetText(node),
+            },
           });
         } catch (error) {
           compiledUnsupported = true;

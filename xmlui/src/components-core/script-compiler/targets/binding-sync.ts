@@ -79,11 +79,19 @@ import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
 import { throwUnsupportedCompiledScriptNode } from "../errors";
 import { sourceRangeFromNode } from "../source";
-import type { CompiledScriptArtifact } from "../types";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSource,
+  CompiledScriptSourceOrigin,
+} from "../types";
 
 export type CompileBindingSyncExpressionOptions = {
   sourceId: string;
   sourceText?: string;
+  sourceUrl?: string;
+  displayName?: string;
+  sources?: CompiledScriptSource[];
+  sourceOrigin?: CompiledScriptSourceOrigin;
 };
 
 type CompilerContext = {
@@ -95,11 +103,19 @@ type CompilerContext = {
 
 export function compileBindingSyncExpression(
   expr: Expression,
-  { sourceId, sourceText }: CompileBindingSyncExpressionOptions,
+  {
+    sourceId,
+    sourceText,
+    sourceUrl,
+    displayName,
+    sources,
+    sourceOrigin,
+  }: CompileBindingSyncExpressionOptions,
 ): CompiledScriptArtifact {
-  const writer = new CompiledScriptCodeWriter(sourceId);
+  const writer = new CompiledScriptCodeWriter(sourceId, sourceOrigin);
   const context = createCompilerContext(sourceId);
   writer.write("runtime.start(evalContext);");
+  writer.newline();
   writer.write("return ");
   emitExpression(writer, expr, context);
   writer.write(";");
@@ -107,8 +123,11 @@ export function compileBindingSyncExpression(
   return createCompiledScriptArtifact({
     target: "binding-sync",
     sourceId,
+    sourceUrl,
+    displayName,
     sourceText,
-    sourceRange: sourceRangeFromNode(expr),
+    sources,
+    sourceRange: sourceRangeFromNode(expr, sourceOrigin),
     astNodeId: expr.nodeId,
     dependencies: collectVariableDependencies(expr),
     js: writer.toString(),
@@ -119,6 +138,7 @@ export function compileBindingSyncExpression(
 export function compileBindingSyncExpressionSource(
   sourceText: string,
   sourceId: string,
+  options: Omit<CompileBindingSyncExpressionOptions, "sourceId" | "sourceText"> = {},
 ): CompiledScriptArtifact {
   const parser = new Parser(sourceText);
   const expr = parser.parseExpr();
@@ -133,7 +153,7 @@ export function compileBindingSyncExpressionSource(
   if (!parser.isEof) {
     throw new Error("Expression is not terminated properly");
   }
-  return compileBindingSyncExpression(expr, { sourceId, sourceText });
+  return compileBindingSyncExpression(expr, { ...options, sourceId, sourceText });
 }
 
 function emitExpression(

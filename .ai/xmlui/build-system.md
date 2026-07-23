@@ -221,6 +221,23 @@ Used when one doesn't utilize the xmlui commands, like `xmlui start`, `xmlui bui
   → JavaScript ESM module
 ```
 
+### Compiled Script Source Maps
+
+When `compiledScriptSourceMaps` is enabled on the Vite XMLUI plugin, transformed `.xmlui`,
+`.xmlui.xs`, and `.xs` files include Source Map v3 metadata with `sources` pointing at
+`/@xmlui-source/...` URLs and `sourcesContent` carrying the original source text. `compileScripts`
+is the preferred public switch for script compilation; the older `compileBindings` and
+`compileEventHandlers` keys remain compatibility aliases.
+
+`xmlui start` defaults source maps to `"external"` in dev server mode whenever script compilation is
+enabled, unless config explicitly sets `compiledScriptSourceMaps: false`. The dev server registers
+those sources in a virtual source registry and serves both source text and `.map` JSON via the same
+`/@xmlui-source/...` namespace.
+
+This is the preferred debug path for JavaScript-compiled binding expressions and event handlers. The
+runtime `new Function(...)` path can still fall back to inline source maps, but Vite dev server mode
+should prefer external sourcemap URLs.
+
 ### Configuration
 
 ```typescript

@@ -28,7 +28,6 @@ export type StandaloneAppDescription = {
   // Resource definitions for the app
   resources?: Record<string, string>;
 
-  
   // Resource map for the app
   resourceMap?: Record<string, string>;
   /**
@@ -40,16 +39,21 @@ export type StandaloneAppDescription = {
    * - `xsVerboseLogBucket` (string) — optional bucket label for trace entries.
    * - `defaultToOptionalMemberAccess` (boolean) — treat all member accesses as optional
    *   (default `true`).
-   * - `compileBindings` (boolean, default `false`) — experimental switch that
-   *   carries compiled synchronous binding evaluation through the runtime
-   *   configuration. The current implementation still uses the AST interpreter.
-   * - `compileEventHandlers` (boolean, default `false`) — experimental switch
-   *   that carries compiled asynchronous event-handler and code-behind
-   *   evaluation through the runtime configuration. The current implementation
-   *   still uses the async AST interpreter.
+   * - `compileScripts` (boolean, default `false`) — compile supported XMLUI
+   *   binding expressions and event handlers to JavaScript.
+   * - `compileBindings` (boolean, default `undefined`) — legacy compatibility
+   *   alias for enabling/disabling binding compilation independently.
+   * - `compileEventHandlers` (boolean, default `undefined`) — legacy
+   *   compatibility alias for enabling/disabling event-handler compilation
+   *   independently.
    * - `logCompiledEventHandlerSource` (boolean, default `false`) — when
    *   `compileEventHandlers` creates parse-time event artifacts, log the
    *   original handler source and generated JavaScript to the console.
+   * - `compiledScriptSourceMaps` (boolean | "inline" | "external", default `false`;
+   *   `xmlui start` defaults to `"external"` when script compilation is enabled)
+   *   — when enabled, JavaScript-compiled XMLUI scripts carry source-map/debug
+   *   metadata. `"external"` is the preferred dev-server mode; `"inline"` is a
+   *   runtime fallback for environments without a Vite source-map endpoint.
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
    * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
    *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.
@@ -94,7 +98,7 @@ export type StandaloneAppDescription = {
    * - `errorCorrelationIdHeader` (string, default `"X-Correlation-Id"`) — the HTTP
    *   response header from which `AppError.correlationId` is read when a fetch fails.
    *   See `dev-docs/plans/07-structured-exception-model.md`.
- * - `strictAuditLogging` (boolean, default `true`) — when `true` (default), the
+   * - `strictAuditLogging` (boolean, default `true`) — when `true` (default), the
    *   redaction policy blocks on un-redacted PII fields; entry is dropped and
    *   `audit-pii-leaked` is emitted. Set to `false` to downgrade to warn-only mode.
    *   See `dev-docs/plans/15-audit-grade-observability.md`.
@@ -257,8 +261,8 @@ export type StandaloneAppDescription = {
    * govern the engine's behaviour rather than application data (which lives
    * in `appGlobals`). Examples: `disableInlineStyle`, `useHashBasedRouting`,
    * `withXSRFToken`, `logRestApiErrors`, `xsVerbose`, `xsVerboseLogMax`,
-   * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`, `compileBindings`,
-   * `compileEventHandlers`, `logCompiledEventHandlerSource`,
+   * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`, `compileScripts`,
+   * `compiledScriptSourceMaps`, `logCompiledEventHandlerSource`,
    * `applyLayoutProperties`, `lintSeverity`, `searchIndexEnabled`, and the
    * `strict*` family.
    *
@@ -275,7 +279,6 @@ export type StandaloneAppDescription = {
 
   icons?: Record<string, string>;
 };
-
 
 export type StandaloneJsonConfig = {
   name?: string;

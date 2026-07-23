@@ -4,16 +4,16 @@ import type { EvalTreeOptions } from "./BindingTreeEvaluationContext";
 /**
  * Builds the evaluation options used by synchronous binding evaluation.
  *
- * `compileBindings` is an experimental app-level switch. Step 1 only carries
- * the option through the existing interpreter path; later compiler work will
- * use it to select the compiled binding evaluator.
+ * `compileScripts` is the preferred app-level switch. `compileBindings` remains
+ * a compatibility alias for opting the binding compiler in or out separately.
  */
 export function createBindingEvalOptions(
   appContext?: AppContextObject,
   overrides: EvalTreeOptions = {},
 ): EvalTreeOptions {
   return {
-    ...(appContext?.xmluiConfig?.compileBindings === true ? { compileBindings: true } : {}),
+    ...(shouldCompileBindings(appContext) ? { compileBindings: true } : {}),
+    ...normalizeCompiledScriptSourceMaps(appContext),
     ...overrides,
   };
 }
@@ -21,9 +21,9 @@ export function createBindingEvalOptions(
 /**
  * Builds the evaluation options used by asynchronous event-handler execution.
  *
- * `compileEventHandlers` is an experimental app-level switch. This first step
- * only carries the option through the existing async interpreter path; later
- * compiler work will use it to select the compiled event/code-behind evaluator.
+ * `compileScripts` is the preferred app-level switch. `compileEventHandlers`
+ * remains a compatibility alias for opting event compilation in or out
+ * separately.
  */
 export function createEventEvalOptions(
   appContext?: AppContextObject,
@@ -38,10 +38,34 @@ export function createEventEvalOptions(
       ? appContext.xmluiConfig.strictDomSandbox
       : appContext?.xmluiConfig?.strictDomSandbox === true,
     allowConsole: appContext?.xmluiConfig?.allowConsole !== false,
-    ...(appContext?.xmluiConfig?.compileEventHandlers === true
-      ? { compileEventHandlers: true }
-      : {}),
+    ...(shouldCompileEventHandlers(appContext) ? { compileEventHandlers: true } : {}),
+    ...normalizeCompiledScriptSourceMaps(appContext),
     ...((appContext as any)?.__udcEvalOptions ?? {}),
     ...overrides,
   };
+}
+
+function shouldCompileBindings(appContext?: AppContextObject): boolean {
+  const config = appContext?.xmluiConfig;
+  return config?.compileBindings ?? config?.compileScripts ?? false;
+}
+
+function shouldCompileEventHandlers(appContext?: AppContextObject): boolean {
+  const config = appContext?.xmluiConfig;
+  return config?.compileEventHandlers ?? config?.compileScripts ?? false;
+}
+
+function normalizeCompiledScriptSourceMaps(appContext?: AppContextObject): EvalTreeOptions {
+  const mode = appContext?.xmluiConfig?.compiledScriptSourceMaps;
+  if (mode === true || mode === "inline" || mode === "external") {
+    return { compiledScriptSourceMaps: mode };
+  }
+  if (
+    mode !== false &&
+    import.meta.env.DEV &&
+    (shouldCompileBindings(appContext) || shouldCompileEventHandlers(appContext))
+  ) {
+    return { compiledScriptSourceMaps: "external" };
+  }
+  return {};
 }

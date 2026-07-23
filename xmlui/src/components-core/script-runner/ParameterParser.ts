@@ -1,11 +1,18 @@
 import type { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
-import type { CompiledScriptArtifact } from "../script-compiler/types";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSource,
+  CompiledScriptSourceOrigin,
+} from "../script-compiler/types";
 import { compileBindingSyncExpression } from "../script-compiler/targets/binding-sync";
 
 export type ParseBindingOptions = {
   compileBindings?: boolean;
   sourceId?: string;
+  sourceUrl?: string;
+  displayName?: string;
+  sourceOrigin?: CompiledScriptSourceOrigin;
 };
 
 /**
@@ -13,7 +20,7 @@ export type ParseBindingOptions = {
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseParameterString (
+export function parseParameterString(
   source: string,
   options: ParseBindingOptions = {},
 ): (StringLiteralSection | ExpressionSection)[] {
@@ -35,7 +42,7 @@ export function parseParameterString (
           if (section !== "") {
             result.push({
               type: "literal",
-              value: section
+              value: section,
             });
           }
           // --- Start a new section
@@ -83,7 +90,7 @@ export function parseParameterString (
           result.push({
             type: "expression",
             value: expr!,
-            compiled: createCompiledBindingArtifact(expr!, exprText, options, segmentIndex),
+            compiled: createCompiledBindingArtifact(expr!, exprText, options, segmentIndex, i),
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
@@ -101,20 +108,20 @@ export function parseParameterString (
       if (section !== "") {
         result.push({
           type: "literal",
-          value: section
+          value: section,
         });
       }
       break;
     case ParsePhase.Escape:
       result.push({
         type: "literal",
-        value: section + escape
+        value: section + escape,
       });
       break;
     case ParsePhase.ExprStart:
       result.push({
         type: "literal",
-        value: section + "{"
+        value: section + "{",
       });
       break;
   }
@@ -128,20 +135,54 @@ function createCompiledBindingArtifact(
   sourceText: string,
   options: ParseBindingOptions,
   segmentIndex: number,
+  expressionStart: number,
 ): CompiledScriptArtifact | undefined {
   if (!options.compileBindings) {
     return undefined;
   }
+  const sourceId = `${options.sourceId ?? "inline"}#expr-${segmentIndex}`;
   return compileBindingSyncExpression(expr, {
-    sourceId: `${options.sourceId ?? "inline"}#expr-${segmentIndex}`,
+    sourceId,
     sourceText,
+    sourceUrl: options.sourceUrl,
+    displayName: options.displayName,
+    sources: createCompiledSources(sourceId, options, sourceText),
+    sourceOrigin: createSegmentSourceOrigin(options.sourceOrigin, expressionStart),
   });
+}
+
+export function createSegmentSourceOrigin(
+  sourceOrigin: CompiledScriptSourceOrigin | undefined,
+  segmentStart: number,
+): CompiledScriptSourceOrigin | undefined {
+  if (!sourceOrigin) {
+    return undefined;
+  }
+  return {
+    ...sourceOrigin,
+    offset: (sourceOrigin.offset ?? 0) + segmentStart,
+  };
+}
+
+export function createCompiledSources(
+  sourceId: string,
+  options: Pick<ParseBindingOptions, "sourceOrigin" | "sourceUrl" | "displayName">,
+  fallbackSourceText: string,
+): CompiledScriptSource[] {
+  return [
+    {
+      id: sourceId,
+      ...(options.sourceUrl ? { url: options.sourceUrl } : {}),
+      ...(options.displayName ? { displayName: options.displayName } : {}),
+      sourceText: options.sourceOrigin?.sourceText ?? fallbackSourceText,
+    },
+  ];
 }
 
 enum ParsePhase {
   StringLiteral,
   Escape,
-  ExprStart
+  ExprStart,
 }
 /**
  * Represents a literal segment

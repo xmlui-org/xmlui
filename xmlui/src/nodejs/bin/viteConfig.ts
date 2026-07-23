@@ -87,7 +87,7 @@ export async function getViteConfig({
     // console.error(e);
   }
 
-  const xmluiPluginOptions = await loadXmluiPluginOptions();
+  const xmluiPluginOptions = await loadXmluiPluginOptions({ devServer: true });
 
   // Single instance shared by the main pipeline and the dep-scanner pipeline.
   // The dep scanner runs a separate Rolldown build that only sees plugins

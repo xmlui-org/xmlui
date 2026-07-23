@@ -81,11 +81,20 @@ import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
 import { throwUnsupportedCompiledScriptNode } from "../errors";
 import { sourceRangeFromNode } from "../source";
-import type { CompiledScriptArtifact, CompiledScriptSourceRange } from "../types";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSource,
+  CompiledScriptSourceOrigin,
+  CompiledScriptSourceRange,
+} from "../types";
 
 export type CompileEventAsyncStatementsOptions = {
   sourceId: string;
   sourceText?: string;
+  sourceUrl?: string;
+  displayName?: string;
+  sources?: CompiledScriptSource[];
+  sourceOrigin?: CompiledScriptSourceOrigin;
 };
 
 type CompilerContext = {
@@ -103,22 +112,41 @@ type CompilerContext = {
 
 export function compileEventAsyncStatements(
   statements: Statement[],
-  { sourceId, sourceText }: CompileEventAsyncStatementsOptions,
+  {
+    sourceId,
+    sourceText,
+    sourceUrl,
+    displayName,
+    sources,
+    sourceOrigin,
+  }: CompileEventAsyncStatementsOptions,
 ): CompiledScriptArtifact {
-  const writer = new CompiledScriptCodeWriter(sourceId);
-  const sourceRange = sourceRangeFromStatements(statements);
-  const context = extendCompilerContext(createCompilerContext(sourceId), collectLocalNames(statements));
+  const writer = new CompiledScriptCodeWriter(sourceId, sourceOrigin);
+  const sourceRange = sourceRangeFromStatements(statements, sourceOrigin);
+  const context = extendCompilerContext(
+    createCompilerContext(sourceId),
+    collectLocalNames(statements),
+  );
 
   writer.write("return (async () => {");
-  statements.forEach((statement) => emitStatement(writer, statement, context));
+  writer.newline();
+  statements.forEach((statement) => {
+    emitStatement(writer, statement, context);
+    writer.newline();
+  });
   writer.write("await runtime.flushPendingState(evalContext);");
+  writer.newline();
   writer.write("return undefined;");
+  writer.newline();
   writer.write("})();");
 
   return createCompiledScriptArtifact({
     target: "event-async",
     sourceId,
+    sourceUrl,
+    displayName,
     sourceText,
+    sources,
     sourceRange,
     astNodeId: statements[0]?.nodeId,
     js: writer.toString(),
@@ -129,10 +157,11 @@ export function compileEventAsyncStatements(
 export function compileEventAsyncStatementSource(
   sourceText: string,
   sourceId: string,
+  options: Omit<CompileEventAsyncStatementsOptions, "sourceId" | "sourceText"> = {},
 ): CompiledScriptArtifact {
   const parser = new Parser(sourceText);
   const statements = parser.parseStatements();
-  return compileEventAsyncStatements(statements, { sourceId, sourceText });
+  return compileEventAsyncStatements(statements, { ...options, sourceId, sourceText });
 }
 
 function emitStatement(
@@ -162,12 +191,16 @@ function emitStatement(
     case T_LET_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "let", statement, context);
-      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
+      emitAfterStatement(writer, statement, {
+        checkYield: declarationStatementMayYield(statement, context),
+      });
       return;
     case T_CONST_STATEMENT:
       emitBeforeStatement(writer, statement);
       emitDeclarationStatement(writer, "const", statement, context);
-      emitAfterStatement(writer, statement, { checkYield: declarationStatementMayYield(statement, context) });
+      emitAfterStatement(writer, statement, {
+        checkYield: declarationStatementMayYield(statement, context),
+      });
       return;
     case T_VAR_STATEMENT:
       emitVarStatement(writer, statement, context);
@@ -304,6 +337,7 @@ function emitNativeExpressionStatement(
   statement: ExpressionStatement,
   context: CompilerContext,
 ): void {
+  emitBeforeStatement(writer, statement);
   const returnName = context.nextTemp();
   writer.write(`const ${returnName} = (`, statement);
   emitNativeExpression(writer, statement.expr, context);
@@ -324,9 +358,7 @@ function emitPlainExpressionStatementExpression(
 
 function eventExpressionStatementMayYield(expr: Expression, context: CompilerContext): boolean {
   return (
-    expr.type === T_IDENTIFIER ||
-    isMemberExpressionChain(expr) ||
-    expressionMayYield(expr, context)
+    expr.type === T_IDENTIFIER || isMemberExpressionChain(expr) || expressionMayYield(expr, context)
   );
 }
 
@@ -527,9 +559,13 @@ function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boo
     case T_UNARY_EXPRESSION:
       return isNativeExpressionSafe(expr.expr, context);
     case T_BINARY_EXPRESSION:
-      return isNativeExpressionSafe(expr.left, context) && isNativeExpressionSafe(expr.right, context);
+      return (
+        isNativeExpressionSafe(expr.left, context) && isNativeExpressionSafe(expr.right, context)
+      );
     case T_ARRAY_LITERAL:
-      return expr.items.every((item) => item.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(item, context));
+      return expr.items.every(
+        (item) => item.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(item, context),
+      );
     case T_OBJECT_LITERAL:
       return expr.props.every((prop) => {
         if (!Array.isArray(prop)) {
@@ -553,7 +589,9 @@ function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boo
     case T_MEMBER_ACCESS_EXPRESSION:
       return isNativeMemberExpressionSafe(expr, context);
     case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
-      return isNativeExpressionSafe(expr.obj, context) && isNativeExpressionSafe(expr.member, context);
+      return (
+        isNativeExpressionSafe(expr.obj, context) && isNativeExpressionSafe(expr.member, context)
+      );
     default:
       return false;
   }
@@ -586,7 +624,9 @@ function isNativeMemberExpressionSafe(
 function isNativeSafeCall(expr: FunctionInvocationExpression, context: CompilerContext): boolean {
   return (
     isKnownNonYieldingCall(expr, context) &&
-    expr.arguments.every((arg) => arg.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(arg, context))
+    expr.arguments.every(
+      (arg) => arg.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(arg, context),
+    )
   );
 }
 
@@ -789,7 +829,10 @@ function emitVarStatement(
 ): void {
   emitBeforeStatement(writer, statement);
   if (context.inFunction) {
-    writer.write(`throw new Error("'var' declarations are not allowed within functions");`, statement);
+    writer.write(
+      `throw new Error("'var' declarations are not allowed within functions");`,
+      statement,
+    );
     return;
   }
   emitAfterStatement(writer, statement, { checkYield: false });
@@ -1044,7 +1087,11 @@ function isNativeForInitSafe(init: ForStatement["init"], context: CompilerContex
   }
   if (init.type === T_LET_STATEMENT) {
     return init.decls.every(
-      (decl) => decl.id && !decl.aDestr && !decl.oDestr && (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
+      (decl) =>
+        decl.id &&
+        !decl.aDestr &&
+        !decl.oDestr &&
+        (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
     );
   }
   return false;
@@ -1059,7 +1106,11 @@ function canEmitNativeLoopBody(statement: Statement, context: CompilerContext): 
     case T_LET_STATEMENT:
     case T_CONST_STATEMENT:
       return statement.decls.every(
-        (decl) => decl.id && !decl.aDestr && !decl.oDestr && (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
+        (decl) =>
+          decl.id &&
+          !decl.aDestr &&
+          !decl.oDestr &&
+          (!decl.expr || isNativeExpressionSafe(decl.expr, context)),
       );
     case T_BLOCK_STATEMENT: {
       const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
@@ -1076,21 +1127,36 @@ function emitNativeForStatement(
   context: CompilerContext,
 ): void {
   const loopCounter = context.nextLoopCounter();
-  writer.write("{", statement);
-  writer.write(`let ${loopCounter} = 0;`, statement);
-  writer.write("for (", statement);
+  writer.write(";", statement);
+  writer.newline();
+  writer.withoutMappings(() => {
+    writer.write("{");
+    writer.newline();
+    writer.write(`let ${loopCounter} = 0;`);
+    writer.newline();
+    writer.write("for (");
+  });
   emitNativeForInit(writer, statement.init, context);
-  writer.write("; ");
+  writer.withoutMappings(() => {
+    writer.write("; ");
+  });
   if (statement.cond) {
     emitNativeExpression(writer, statement.cond, context);
   }
-  writer.write("; ");
+  writer.withoutMappings(() => {
+    writer.write("; ");
+  });
   if (statement.upd) {
     emitNativeExpression(writer, statement.upd, context);
   }
-  writer.write(") ", statement);
+  writer.withoutMappings(() => {
+    writer.write(") ");
+  });
   emitNativeForBody(writer, statement.body, context, loopCounter);
-  writer.write("}", statement);
+  writer.newline();
+  writer.withoutMappings(() => {
+    writer.write("}");
+  });
 }
 
 function emitNativeForInit(
@@ -1127,15 +1193,27 @@ function emitNativeForBody(
   context: CompilerContext,
   loopCounter: string,
 ): void {
-  writer.write("{", body);
+  writer.withoutMappings(() => {
+    writer.write("{");
+    writer.newline();
+  });
   if (body.type === T_BLOCK_STATEMENT) {
     const blockContext = extendCompilerContext(context, collectLocalNames(body.stmts));
-    body.stmts.forEach((child) => emitNativeLoopBodyStatement(writer, child, blockContext));
+    body.stmts.forEach((child) => {
+      emitNativeLoopBodyStatement(writer, child, blockContext);
+      writer.newline();
+    });
   } else {
     emitNativeLoopBodyStatement(writer, body, context);
+    writer.newline();
   }
-  writer.write(`if ((++${loopCounter} % 1000) === 0) { await runtime.checkpointIfDue(evalContext); }`, body);
-  writer.write("}", body);
+  writer.withoutMappings(() => {
+    writer.write(
+      `if ((++${loopCounter} % 1000) === 0) { await runtime.checkpointIfDue(evalContext); }`,
+    );
+    writer.newline();
+    writer.write("}");
+  });
 }
 
 function emitNativeLoopBodyStatement(
@@ -1159,7 +1237,11 @@ function emitNativeLoopBodyStatement(
     case T_BLOCK_STATEMENT: {
       const blockContext = extendCompilerContext(context, collectLocalNames(statement.stmts));
       writer.write("{", statement);
-      statement.stmts.forEach((child) => emitNativeLoopBodyStatement(writer, child, blockContext));
+      writer.newline();
+      statement.stmts.forEach((child) => {
+        emitNativeLoopBodyStatement(writer, child, blockContext);
+        writer.newline();
+      });
       writer.write("}", statement);
       return;
     }
@@ -1380,7 +1462,10 @@ function emitSwitchStatement(
       writer.write(`const ${caseValueName} = await runtime.complete(`, switchCase);
       emitExpression(writer, switchCase.caseE, context);
       writer.write(");", switchCase);
-      writer.write(`if (${caseValueName} === ${switchValueName}) { ${matchIndexName} = ${index}; }`, switchCase);
+      writer.write(
+        `if (${caseValueName} === ${switchValueName}) { ${matchIndexName} = ${index}; }`,
+        switchCase,
+      );
     }
     writer.write("}", statement);
   });
@@ -1410,13 +1495,12 @@ function emitTryStatement(
     writer.write("{", statement.catchB);
     if (statement.catchV) {
       assertJsIdentifier(statement.catchV, context.sourceId);
-      writer.write(`let ${statement.catchV.name} = runtime.catchValue(${errorName});`, statement.catchV);
+      writer.write(
+        `let ${statement.catchV.name} = runtime.catchValue(${errorName});`,
+        statement.catchV,
+      );
     }
-    emitStatementBlockBody(
-      writer,
-      statement.catchB,
-      extendCompilerContext(context, catchLocals),
-    );
+    emitStatementBlockBody(writer, statement.catchB, extendCompilerContext(context, catchLocals));
     writer.write("}", statement.catchB);
   }
   if (statement.finallyB) {
@@ -1782,7 +1866,9 @@ function nodeReferencesCompilerLocals(
 
   if (node.type === T_ARROW_EXPRESSION) {
     const nestedShadowed = new Set(shadowed);
-    for (const arg of getNativeArrowArgs(node, { sourceId: "event:arrow-scan" } as CompilerContext)) {
+    for (const arg of getNativeArrowArgs(node, {
+      sourceId: "event:arrow-scan",
+    } as CompilerContext)) {
       for (const name of arg.localNames) {
         nestedShadowed.add(name);
       }
@@ -1791,12 +1877,7 @@ function nodeReferencesCompilerLocals(
   }
 
   for (const [key, value] of Object.entries(node)) {
-    if (
-      key === "startToken" ||
-      key === "endToken" ||
-      key === "source" ||
-      key === "parenthesized"
-    ) {
+    if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
       continue;
     }
     if (Array.isArray(value)) {
@@ -1970,7 +2051,10 @@ function emitPrePostExpression(
   const prefix = expr.type === T_PREFIX_OP_EXPRESSION;
   emitWriteExpression(writer, expr.expr, context, (writeTarget) => {
     if (writeTarget.kind === "local-id") {
-      writer.write(prefix ? `${expr.op}${writeTarget.name}` : `${writeTarget.name}${expr.op}`, expr);
+      writer.write(
+        prefix ? `${expr.op}${writeTarget.name}` : `${writeTarget.name}${expr.op}`,
+        expr,
+      );
       return;
     }
     writer.write(
@@ -2203,12 +2287,7 @@ function containsNonSerializableLiteral(node: any): boolean {
     return !canSerializeLiteral(node.value);
   }
   for (const [key, value] of Object.entries(node)) {
-    if (
-      key === "startToken" ||
-      key === "endToken" ||
-      key === "source" ||
-      key === "parenthesized"
-    ) {
+    if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
       continue;
     }
     if (Array.isArray(value)) {
@@ -2234,14 +2313,18 @@ function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): v
 
 function sourceRangeFromStatements(
   statements: Statement[],
+  sourceOrigin?: CompiledScriptSourceOrigin,
 ): CompiledScriptSourceRange | undefined {
   if (statements.length === 0) {
     return undefined;
   }
   const first = statements[0];
   const last = statements[statements.length - 1];
-  return sourceRangeFromNode({
-    startToken: first.startToken,
-    endToken: last.endToken,
-  });
+  return sourceRangeFromNode(
+    {
+      startToken: first.startToken,
+      endToken: last.endToken,
+    },
+    sourceOrigin,
+  );
 }

@@ -69,8 +69,7 @@ import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
 import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
 import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
-import { applyE2eCompileBindingsConfig } from "./compile-bindings-env";
-import { applyE2eCompileEventHandlersConfig } from "./compile-event-handlers-env";
+import { applyE2eCompileScriptsConfig } from "./compile-scripts-env";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -430,9 +429,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           sourceBaseComponent.children[0].testId = baseComponentTestId;
         }
       }
-      const themedDescription = applyE2eCompileEventHandlersConfig(
-        applyE2eCompileBindingsConfig(mapThemeRelatedVars(description)),
-      );
+      const themedDescription = applyE2eCompileScriptsConfig(mapThemeRelatedVars(description));
 
       // Merge default test resources with any provided resources
       const mergedResources = {

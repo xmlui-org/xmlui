@@ -3,7 +3,9 @@ import type { BindingTreeEvaluationContext } from "../../script-runner/BindingTr
 import type { Statement } from "../../script-runner/ScriptingSourceTree";
 import { instantiateCompiledScriptArtifact } from "../artifact";
 import { createCompiledScriptCache, createCompiledScriptCacheKey } from "../cache";
+import { emitCompiledScriptDebugSourceTrace } from "../debug-source-trace";
 import { eventAsyncRuntime } from "../event-runtime";
+import { createCompiledScriptGeneratedSourceUrl } from "../source-map";
 import type { CompiledScriptArtifact } from "../types";
 import { compileEventAsyncStatements } from "./event-async";
 
@@ -19,7 +21,11 @@ function logCompiledEventDiagnostic(
   message: string,
   details: Record<string, any>,
 ): void {
-  if (isCompiledEventDiagnosticEnabled(evalContext) && typeof console !== "undefined" && console.warn) {
+  if (
+    isCompiledEventDiagnosticEnabled(evalContext) &&
+    typeof console !== "undefined" &&
+    console.warn
+  ) {
     console.warn(`[xmlui:event-compiler] ${message}`, details);
   }
 }
@@ -39,10 +45,12 @@ export async function executeCompiledEventAsyncArtifact(
     suppressYield: evalContext.options?.handlerExecutionMode === "sync",
   });
   await invocation.initialize(evalContext);
-  return await instantiateCompiledScriptArtifact<Promise<any>>(
-    artifact,
-    invocation,
-  ).execute({
+  emitCompiledScriptDebugSourceTrace(artifact, evalContext);
+  return await instantiateCompiledScriptArtifact<Promise<any>>(artifact, invocation, {
+    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+    generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
+    sourceMapUrl: getExternalSourceMapUrl(artifact),
+  }).execute({
     evalContext,
     thread,
   });
@@ -113,4 +121,16 @@ function createEventAsyncOptionsKey(evalContext: BindingTreeEvaluationContext): 
     allowConsole: evalContext.options?.allowConsole,
     strictUdcSandbox: evalContext.options?.strictUdcSandbox,
   });
+}
+
+function getExternalGeneratedSourceUrl(
+  artifact: Parameters<typeof createCompiledScriptGeneratedSourceUrl>[0],
+): string {
+  return createCompiledScriptGeneratedSourceUrl(artifact);
+}
+
+function getExternalSourceMapUrl(
+  artifact: Parameters<typeof createCompiledScriptGeneratedSourceUrl>[0],
+): string {
+  return `${createCompiledScriptGeneratedSourceUrl(artifact)}.map`;
 }

@@ -229,6 +229,72 @@ describe("event-async compiled script target", () => {
     expect(artifact.js).not.toContain("runtime.afterStatement");
   });
 
+  it("emits breakpoint-friendly mapping anchors for native statement lines", () => {
+    const source = [
+      "const start = Date.now();",
+      "let sum = 0;",
+      "for (let i = 0; i < 10000; i++) {",
+      "  sum += i;",
+      "}",
+      "toast.success(`Sum: ${sum}`);",
+    ].join("\n");
+
+    const artifact = compileEventAsyncStatementSource(source, "Main.xmlui#event-breakpoints");
+    const forAnchorOffset = artifact.js.indexOf(";\n{\nlet __xmlui_evt_loop_");
+    const forHeaderOffset = artifact.js.indexOf("for (");
+    const forInitOffset = artifact.js.indexOf("let i = 0", forHeaderOffset);
+    const forCondOffset = artifact.js.indexOf("(i < 10000)", forHeaderOffset);
+    const forUpdateOffset = artifact.js.indexOf("(i++)", forHeaderOffset);
+    const startOffset = artifact.js.indexOf("const start = Date.now();");
+    const sumOffset = artifact.js.indexOf("(sum += i);");
+
+    expect(forAnchorOffset).toBeGreaterThanOrEqual(0);
+    expect(forHeaderOffset).toBeGreaterThanOrEqual(0);
+    expect(forInitOffset).toBeGreaterThanOrEqual(0);
+    expect(forCondOffset).toBeGreaterThanOrEqual(0);
+    expect(forUpdateOffset).toBeGreaterThanOrEqual(0);
+    expect(startOffset).toBeGreaterThanOrEqual(0);
+    expect(sumOffset).toBeGreaterThanOrEqual(0);
+    expect(artifact.js.slice(startOffset - 1, startOffset)).toBe("\n");
+    expect(artifact.js.slice(sumOffset - 1, sumOffset)).toBe("\n");
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: forAnchorOffset,
+        sourceRange: expect.objectContaining({ startLine: 3 }),
+      }),
+    );
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: forInitOffset,
+        sourceRange: expect.objectContaining({ startLine: 3 }),
+      }),
+    );
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: forCondOffset,
+        sourceRange: expect.objectContaining({ startLine: 3 }),
+      }),
+    );
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: forUpdateOffset,
+        sourceRange: expect.objectContaining({ startLine: 3 }),
+      }),
+    );
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: startOffset,
+        sourceRange: expect.objectContaining({ startLine: 1 }),
+      }),
+    );
+    expect(artifact.mappings).toContainEqual(
+      expect.objectContaining({
+        generatedStart: sumOffset,
+        sourceRange: expect.objectContaining({ startLine: 4 }),
+      }),
+    );
+  });
+
   it("skips yield checks for simple expression statements", () => {
     const artifact = compileEventAsyncStatementSource("value + 1;", "Main.xmlui#event-simple-expr");
 

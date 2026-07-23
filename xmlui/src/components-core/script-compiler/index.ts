@@ -1,5 +1,7 @@
 export {
   COMPILED_SCRIPT_ARTIFACT_VERSION,
+  createCompiledScriptFunctionBody,
+  createFunctionBodySourceMapArtifact,
   createCompiledScriptArtifact,
   deserializeCompiledScriptArtifact,
   instantiateCompiledScriptArtifact,
@@ -10,14 +12,15 @@ export {
   createCompiledScriptCache,
   createCompiledScriptCacheKey,
 } from "./cache";
+export { UnsupportedCompiledScriptNodeError, throwUnsupportedCompiledScriptNode } from "./errors";
+export { createCompiledScriptMapping, createDebugSourceUrl, sourceRangeFromNode } from "./source";
 export {
-  UnsupportedCompiledScriptNodeError,
-  throwUnsupportedCompiledScriptNode,
-} from "./errors";
-export {
-  createCompiledScriptMapping,
-  sourceRangeFromNode,
-} from "./source";
+  createCompiledScriptGeneratedSourceUrl,
+  createCompiledScriptSourceMap,
+  createInlineSourceMapComment,
+  createSourceUrlComment,
+  type CompiledScriptSourceMap,
+} from "./source-map";
 export { bindingSyncRuntime } from "./runtime";
 export { eventAsyncRuntime } from "./event-runtime";
 export {
@@ -45,8 +48,12 @@ export type {
   CompiledScriptArtifact,
   CompiledScriptDiagnostic,
   CompiledScriptExecuteArgs,
+  CompiledScriptInstantiateOptions,
   CompiledScriptInstance,
   CompiledScriptMapping,
+  CompiledScriptSource,
+  CompiledScriptSourceOrigin,
+  CompiledScriptSourceMapMode,
   CompiledScriptRuntime,
   CompiledScriptSourceRange,
   CompiledScriptTarget,
