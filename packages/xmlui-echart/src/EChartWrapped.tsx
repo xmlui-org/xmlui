@@ -15,6 +15,16 @@ export const EChartMd: ComponentMetadata = createMetadata({
         "XMLUI theme colors are automatically injected for palette, text, axes, " +
         "and tooltip unless explicitly overridden in the option.",
     },
+    maps: {
+      description:
+        "An object of `name → GeoJSON` map definitions. Each entry is passed to " +
+        "`echarts.registerMap(name, geojson)` before the option is applied, so a " +
+        "`map`-type series can reference the name (e.g. " +
+        "`series: [{ type: 'map', map: 'my-region', ... }]`). Entries whose value " +
+        "is empty are skipped, so binding a not-yet-loaded DataSource value is safe: " +
+        "the map registers (and the chart re-renders) when the data arrives. " +
+        "Omitting the property leaves current behavior unchanged.",
+    },
     width: {
       description: "Width of the chart container.",
       valueType: "string",
@@ -43,6 +53,10 @@ export const EChartMd: ComponentMetadata = createMetadata({
 export const echartComponentRenderer = wrapComponent(COMP, EChartRender, EChartMd, {
   exposeRegisterApi: true,
   strings: ["width", "height", "renderer"],
+  // Function-valued option members (tooltip.formatter, label.formatter, ...)
+  // arrive from the engine as arrow-expression marker objects; deep-convert
+  // them to callables so ECharts receives real functions (judell/bram#226).
+  deepSyncCallbacks: ["option"],
   captureNativeEvents: true,
   deriveAriaLabel: (props) => {
     const option = props.option;
