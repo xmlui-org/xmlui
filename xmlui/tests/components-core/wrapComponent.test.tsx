@@ -477,3 +477,110 @@ describe("wrapComponent — mixed config", () => {
     expect(element.props.registerComponentApi).toBeDefined();
   });
 });
+
+describe("wrapComponent — deepSyncCallbacks", () => {
+  const arrowExpr = (tag: string) => ({ _ARROW_EXPR_: true, args: [], statement: { tag } });
+
+  describe("deepConvertSyncCallbacks helper", () => {
+    it("converts arrow-expression objects at arbitrary depth", async () => {
+      const { deepConvertSyncCallbacks } = await import("../../src/components-core/wrapComponent");
+      const lookup = vi.fn((v: any) => () => v.statement.tag);
+      const input = {
+        tooltip: { trigger: "item", formatter: arrowExpr("tip") },
+        series: [{ type: "map", label: { formatter: arrowExpr("lbl") } }],
+      };
+      const out = deepConvertSyncCallbacks(input, lookup);
+      expect(typeof out.tooltip.formatter).toBe("function");
+      expect(out.tooltip.formatter()).toBe("tip");
+      expect(typeof out.series[0].label.formatter).toBe("function");
+      expect(out.series[0].label.formatter()).toBe("lbl");
+      expect(lookup).toHaveBeenCalledTimes(2);
+    });
+
+    it("preserves identity of subtrees without arrow expressions", async () => {
+      const { deepConvertSyncCallbacks } = await import("../../src/components-core/wrapComponent");
+      const lookup = vi.fn((v: any) => () => v);
+      const untouched = { visualMap: { min: 0, max: 100 }, data: [1, 2, 3] };
+      const input = { untouched, tooltip: { formatter: arrowExpr("t") } };
+      const out = deepConvertSyncCallbacks(input, lookup);
+      // Converted branch is a new object; untouched branch is the SAME reference
+      expect(out).not.toBe(input);
+      expect(out.untouched).toBe(untouched);
+      expect(out.untouched.data).toBe(untouched.data);
+    });
+
+    it("returns the identical value when nothing converts", async () => {
+      const { deepConvertSyncCallbacks } = await import("../../src/components-core/wrapComponent");
+      const lookup = vi.fn();
+      const input = { a: [1, { b: "x" }], c: null, d: undefined };
+      expect(deepConvertSyncCallbacks(input, lookup)).toBe(input);
+      expect(lookup).not.toHaveBeenCalled();
+    });
+
+    it("does not recurse into non-plain objects (class instances, dates)", async () => {
+      const { deepConvertSyncCallbacks } = await import("../../src/components-core/wrapComponent");
+      const lookup = vi.fn();
+      class Thing { formatter = arrowExpr("hidden"); }
+      const date = new Date(0);
+      const input = { thing: new Thing(), date };
+      const out = deepConvertSyncCallbacks(input, lookup);
+      expect(out).toBe(input);
+      expect(out.date).toBe(date);
+      expect(lookup).not.toHaveBeenCalled();
+    });
+
+    it("passes primitives and functions through untouched", async () => {
+      const { deepConvertSyncCallbacks } = await import("../../src/components-core/wrapComponent");
+      const lookup = vi.fn();
+      const fn = () => 1;
+      expect(deepConvertSyncCallbacks(42, lookup)).toBe(42);
+      expect(deepConvertSyncCallbacks("s", lookup)).toBe("s");
+      expect(deepConvertSyncCallbacks(fn, lookup)).toBe(fn);
+      expect(deepConvertSyncCallbacks(null, lookup)).toBe(null);
+    });
+  });
+
+  describe("renderer integration", () => {
+    const metadata: any = {
+      props: { option: { description: "Config object" } },
+    };
+
+    it("deep-converts listed props via lookupSyncCallback", () => {
+      const lookupSyncCallback = vi.fn((v: any) => () => v.statement.tag);
+      const result = wrapComponent("Test", DummyNative, metadata, {
+        deepSyncCallbacks: ["option"],
+      });
+      const rawOption = {
+        tooltip: { formatter: arrowExpr("tip") },
+        visualMap: { min: 0 },
+      };
+      const context = createMockContext({
+        node: { type: "Test", props: { option: rawOption, other: rawOption }, children: [] },
+        lookupSyncCallback,
+      });
+      const element = asElement(result.renderer(context as any));
+      // Listed prop: nested arrow expression became a callable
+      expect(typeof element.props.option.tooltip.formatter).toBe("function");
+      expect(element.props.option.tooltip.formatter()).toBe("tip");
+      // Untouched sibling subtree keeps identity
+      expect(element.props.option.visualMap).toBe(rawOption.visualMap);
+      // Unlisted prop with the same content is NOT walked
+      expect(element.props.other).toBe(rawOption);
+      expect(element.props.other.tooltip.formatter).toBe(rawOption.tooltip.formatter);
+    });
+
+    it("is inert for components that do not opt in", () => {
+      const lookupSyncCallback = vi.fn();
+      const result = wrapComponent("Test", DummyNative, metadata, {});
+      const rawOption = { tooltip: { formatter: arrowExpr("tip") } };
+      const context = createMockContext({
+        node: { type: "Test", props: { option: rawOption }, children: [] },
+        lookupSyncCallback,
+      });
+      const element = asElement(result.renderer(context as any));
+      // Exact same reference forwarded — no walk, no conversion, no clone
+      expect(element.props.option).toBe(rawOption);
+      expect(lookupSyncCallback).not.toHaveBeenCalled();
+    });
+  });
+});

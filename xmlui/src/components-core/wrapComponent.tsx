@@ -18,7 +18,7 @@ import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
  * as the same reference, so downstream deep-equal/memoization on the prop
  * behaves as if no walk happened.
  */
-function deepConvertSyncCallbacks(
+export function deepConvertSyncCallbacks(
   value: any,
   lookupSyncCallback: (v: any) => any,
 ): any {
