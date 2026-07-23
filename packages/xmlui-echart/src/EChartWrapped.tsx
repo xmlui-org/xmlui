@@ -53,6 +53,10 @@ export const EChartMd: ComponentMetadata = createMetadata({
 export const echartComponentRenderer = wrapComponent(COMP, EChartRender, EChartMd, {
   exposeRegisterApi: true,
   strings: ["width", "height", "renderer"],
+  // Function-valued option members (tooltip.formatter, label.formatter, ...)
+  // arrive from the engine as arrow-expression marker objects; deep-convert
+  // them to callables so ECharts receives real functions (judell/bram#226).
+  deepSyncCallbacks: ["option"],
   captureNativeEvents: true,
   deriveAriaLabel: (props) => {
     const option = props.option;

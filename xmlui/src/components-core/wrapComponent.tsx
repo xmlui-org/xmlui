@@ -9,6 +9,47 @@ import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 import { MemoizedItem } from "../components/container-helpers";
 import { COMPONENT_PART_KEY } from "./theming/responsive-layout";
+import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
+
+/**
+ * Deep-walk a value, replacing every nested arrow-expression object with a
+ * callable produced by lookupSyncCallback (see config.deepSyncCallbacks).
+ * Identity-preserving: subtrees containing no arrow expressions are returned
+ * as the same reference, so downstream deep-equal/memoization on the prop
+ * behaves as if no walk happened.
+ */
+function deepConvertSyncCallbacks(
+  value: any,
+  lookupSyncCallback: (v: any) => any,
+): any {
+  if (isArrowExpressionObject(value)) {
+    return lookupSyncCallback(value);
+  }
+  if (Array.isArray(value)) {
+    let changed = false;
+    const out = value.map((v) => {
+      const converted = deepConvertSyncCallbacks(v, lookupSyncCallback);
+      if (converted !== v) changed = true;
+      return converted;
+    });
+    return changed ? out : value;
+  }
+  if (
+    value !== null &&
+    typeof value === "object" &&
+    (value.constructor === Object || value.constructor === undefined)
+  ) {
+    let changed = false;
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(value)) {
+      const converted = deepConvertSyncCallbacks(v, lookupSyncCallback);
+      if (converted !== v) changed = true;
+      out[k] = converted;
+    }
+    return changed ? out : value;
+  }
+  return value;
+}
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -110,6 +151,17 @@ export type WrapComponentConfig = {
    * Maps XMLUI prop name to React prop name (or same name if identical).
    */
   callbacks?: string[] | Record<string, string>;
+
+  /**
+   * Props whose extracted value is deep-walked, converting every nested
+   * arrow-expression object into a callable via lookupSyncCallback. Use for
+   * config-object props of wrapped JS libraries that accept function-valued
+   * members at arbitrary depth (e.g. an ECharts option's tooltip.formatter).
+   * Without this, a function written inside such an object reaches the
+   * library as an inert `_ARROW_EXPR_` marker object. Unchanged subtrees
+   * keep their identity, so memoization on the prop still works.
+   */
+  deepSyncCallbacks?: string[];
 
   /**
    * Rename XMLUI prop names to different React prop names.
@@ -891,6 +943,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         } else if (specialProps.has(key)) {
           // Not an explicitly-typed component prop and in the blocked set → skip.
           continue;
+        } else if (config.deepSyncCallbacks?.includes(key)) {
+          props[reactKey] = deepConvertSyncCallbacks(extractValue(rawValue), lookupSyncCallback);
         } else {
           props[reactKey] = extractValue(rawValue);
         }
@@ -1549,6 +1603,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           props[reactKey] = extractValue.asOptionalString(rawValue);
         } else if (specialProps.has(key)) {
           continue;
+        } else if (config.deepSyncCallbacks?.includes(key)) {
+          props[reactKey] = deepConvertSyncCallbacks(extractValue(rawValue), lookupSyncCallback);
         } else {
           props[reactKey] = extractValue(rawValue);
         }
