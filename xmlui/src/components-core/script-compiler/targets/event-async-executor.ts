@@ -29,17 +29,19 @@ export async function executeCompiledEventAsyncArtifact(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): Promise<any> {
+  const invocation = eventAsyncRuntime.createInvocation({
+    suppressYield: evalContext.options?.handlerExecutionMode === "sync",
+  });
   logCompiledEventDiagnostic(evalContext, "executing compiled artifact", {
     sourceId: artifact.sourceId,
     target: artifact.target,
     handlerExecutionMode: evalContext.options?.handlerExecutionMode,
     suppressYield: evalContext.options?.handlerExecutionMode === "sync",
   });
+  await invocation.initialize(evalContext);
   return await instantiateCompiledScriptArtifact<Promise<any>>(
     artifact,
-    eventAsyncRuntime.createInvocation({
-      suppressYield: evalContext.options?.handlerExecutionMode === "sync",
-    }),
+    invocation,
   ).execute({
     evalContext,
     thread,

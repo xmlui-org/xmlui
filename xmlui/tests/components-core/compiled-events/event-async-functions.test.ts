@@ -73,7 +73,7 @@ describe("compiled event-async function declarations", () => {
     );
   });
 
-  it("creates statement boundaries inside declared function bodies", async () => {
+  it("executes declared function bodies without statement boundary hooks", async () => {
     const completed: string[] = [];
     const evalContext = createEvalContext({
       localContext: { result: 0 },
@@ -90,7 +90,7 @@ describe("compiled event-async function declarations", () => {
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
     expect(evalContext.localContext.result).toBe(3);
-    expect(completed.length).toBeGreaterThanOrEqual(4);
+    expect(completed).toEqual([]);
   });
 
   it("rejects unsupported function declaration parameter patterns", () => {

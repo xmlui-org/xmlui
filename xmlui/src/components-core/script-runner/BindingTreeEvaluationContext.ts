@@ -84,6 +84,9 @@ export type BindingTreeEvaluationContext = {
     evalContext: BindingTreeEvaluationContext,
     stmt: Statement,
   ): void | Promise<void>;
+
+  // --- True when the event-handler working state has pending writes to flush
+  hasPendingStateChanges?: () => boolean;
 };
 
 // --- The type of non-local variable update

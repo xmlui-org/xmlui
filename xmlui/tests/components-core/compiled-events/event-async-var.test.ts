@@ -37,7 +37,7 @@ async function expectCompiledParity(source: string, localContext: Record<string,
 }
 
 describe("compiled event-async var statements", () => {
-  it("keeps top-level var statements as statement-boundary no-ops", async () => {
+  it("keeps top-level var statements as no-ops", async () => {
     const completed: string[] = [];
     const evalContext = createEvalContext({
       localContext: { result: 0 },
@@ -54,7 +54,7 @@ describe("compiled event-async var statements", () => {
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
     expect(evalContext.localContext.result).toBe(1);
-    expect(completed).toEqual(["statement", "statement"]);
+    expect(completed).toEqual([]);
   });
 
   it("matches interpreter behavior for top-level var statements", async () => {
@@ -76,7 +76,7 @@ describe("compiled event-async var statements", () => {
     );
   });
 
-  it("does not complete a rejected var statement inside a function", async () => {
+  it("does not emit statement completion hooks for rejected var statements inside functions", async () => {
     const completed: string[] = [];
     const evalContext = createEvalContext({
       localContext: {},
@@ -93,6 +93,6 @@ describe("compiled event-async var statements", () => {
     await expect(executeCompiledEventAsyncArtifact(artifact, evalContext)).rejects.toThrow(
       "'var' declarations are not allowed within functions",
     );
-    expect(completed).toEqual(["statement"]);
+    expect(completed).toEqual([]);
   });
 });

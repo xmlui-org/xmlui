@@ -518,7 +518,8 @@ describe("Xmlui transform - child elements", () => {
         sourceText: expect.stringContaining("toast.success"),
       });
       expect(event.compiledUnsupported).toBe(false);
-      expect(event.compiled.js).toContain("join('')");
+      expect(event.compiled.js).toContain("`Sum: ${sum}, Time taken: ${(Date.now() - start)}ms`");
+      expect(event.compiled.js).toContain("runtime.checkpointIfDue(evalContext)");
       expect(warnings).toEqual([]);
     });
 

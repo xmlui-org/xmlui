@@ -47,7 +47,7 @@ async function withYieldProbe(
   let completions = 0;
   const yieldedAtCompletion: number[] = [];
 
-  eventAsyncRuntime.now = () => now;
+  eventAsyncRuntime.now = () => (now += 101);
   eventAsyncRuntime.yield = async () => {
     yieldedAtCompletion.push(completions);
   };
@@ -278,7 +278,7 @@ describe("compiled event-async control flow", () => {
         ThrowStatementError,
       );
 
-      expect(yieldedAtCompletion).toEqual([1]);
+      expect(yieldedAtCompletion).toEqual([0]);
     });
   });
 
@@ -323,7 +323,7 @@ describe("compiled event-async control flow", () => {
     let completions = 0;
     const yieldedAtCompletion: number[] = [];
 
-    eventAsyncRuntime.now = () => now;
+    eventAsyncRuntime.now = () => (now += 101);
     eventAsyncRuntime.yield = async () => {
       yieldedAtCompletion.push(completions);
     };
@@ -334,7 +334,6 @@ describe("compiled event-async control flow", () => {
         options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: () => {
           completions++;
-          now += 101;
         },
       });
       const artifact = compileEventAsyncStatementSource(
@@ -345,7 +344,7 @@ describe("compiled event-async control flow", () => {
       await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
       expect(evalContext.localContext.y).toBe(1);
-      expect(yieldedAtCompletion[0]).toBe(1);
+      expect(yieldedAtCompletion[0]).toBe(0);
     } finally {
       eventAsyncRuntime.now = originalNow;
       eventAsyncRuntime.yield = originalYield;
@@ -425,7 +424,7 @@ describe("compiled event-async control flow", () => {
     let completions = 0;
     const yieldedAtCompletion: number[] = [];
 
-    eventAsyncRuntime.now = () => now;
+    eventAsyncRuntime.now = () => (now += 101);
     eventAsyncRuntime.yield = async () => {
       yieldedAtCompletion.push(completions);
     };
@@ -436,7 +435,6 @@ describe("compiled event-async control flow", () => {
         options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: () => {
           completions++;
-          now += 101;
         },
       });
       const artifact = compileEventAsyncStatementSource(
@@ -447,7 +445,7 @@ describe("compiled event-async control flow", () => {
       await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
       expect(evalContext.localContext.x).toBe(2);
-      expect(yieldedAtCompletion[0]).toBe(1);
+      expect(yieldedAtCompletion[0]).toBe(0);
     } finally {
       eventAsyncRuntime.now = originalNow;
       eventAsyncRuntime.yield = originalYield;

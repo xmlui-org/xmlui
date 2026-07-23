@@ -57,6 +57,10 @@ export const eventAsyncRuntime = {
   },
 
   async start(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    await this.initialize(evalContext);
+  },
+
+  async initialize(evalContext: BindingTreeEvaluationContext): Promise<void> {
     evalContext.mainThread ??= {
       childThreads: [],
       blocks: [{ vars: {} }],
@@ -96,6 +100,22 @@ export const eventAsyncRuntime = {
     }
     state.lastYieldReferenceTs = now;
     await this.yield();
+  },
+
+  async checkpointIfDue(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    await this.checkCancel(evalContext);
+    if (!this.isYieldSuppressed()) {
+      await this.maybeYield();
+    }
+    await this.checkCancel(evalContext);
+  },
+
+  async flushPendingState(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    if (evalContext.hasPendingStateChanges?.() !== true) {
+      return;
+    }
+    await evalContext.onStatementCompleted?.(evalContext, undefined as any);
+    await this.checkCancel(evalContext);
   },
 
   async yield(): Promise<void> {
@@ -206,6 +226,7 @@ export const eventAsyncRuntime = {
     thread?: LogicalThread,
     updateRootName?: string,
   ): Promise<any> {
+    await this.flushPendingState(evalContext);
     await notifyEventStateUpdate(updateRootName, "will", evalContext, "function-call");
     try {
       if (isArrowExpressionObject(functionObj)) {
@@ -244,6 +265,7 @@ export const eventAsyncRuntime = {
           : (proxiedFunction as Function).call(thisArg, ...callArgs);
       return await completePromise(value);
     } finally {
+      await this.flushPendingState(evalContext);
       await notifyEventStateUpdate(updateRootName, "did", evalContext, "function-call");
     }
   },

@@ -17,7 +17,7 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test -c ..",
     "test:e2e:compiled-bindings": "cross-env XMLUI_COMPILE_BINDINGS=true playwright test -c .. tests-e2e/binding-regression.spec.ts tests-e2e/scripting.spec.ts",
-    "test:e2e:compiled-events": "cross-env XMLUI_COMPILE_EVENT_HANDLERS=true playwright test -c ..",
+    "test:e2e:compiled-events": "cross-env XMLUI_COMPILE_EVENT_HANDLERS=true playwright test -c .. --max-failures=25",
     "measure:compiled-bindings": "tsx scripts/measure-compiled-bindings.ts",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "test:e2e-website-examples": "playwright test -c .. --grep \"@website\"",

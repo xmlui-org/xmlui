@@ -10,19 +10,18 @@ import {
 } from "../../../src/components-core/script-compiler";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 
-const NO_YIELD_CHECK = "runtime.afterStatement(evalContext, undefined, { checkYield: false })";
+const YIELD_CHECK = "runtime.checkpointIfDue(evalContext)";
 
 function expectSkipsYieldCheck(source: string): void {
   const artifact = compileEventAsyncStatementSource(source, `Main.xmlui#event-safe:${source}`);
 
-  expect(artifact.js).toContain(NO_YIELD_CHECK);
+  expect(artifact.js).not.toContain(YIELD_CHECK);
 }
 
 function expectKeepsYieldCheck(source: string): void {
   const artifact = compileEventAsyncStatementSource(source, `Main.xmlui#event-yield:${source}`);
 
-  expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
-  expect(artifact.js).not.toContain(NO_YIELD_CHECK);
+  expect(artifact.js).toContain(YIELD_CHECK);
 }
 
 const SAFE_MATH_CALLS = [
@@ -79,6 +78,7 @@ const SAFE_STRING_STATIC_CALLS = [
 ];
 
 const SAFE_ARRAY_STATIC_CALLS = ["Array.isArray([]);"];
+const SAFE_DATE_STATIC_CALLS = ["Date.now();"];
 
 const SAFE_STRING_PROTOTYPE_CALLS = [
   "'alpha'.at(0);",
@@ -217,27 +217,34 @@ describe("event-async compiled script target", () => {
     });
 
     expect(artifact.js).toContain("runtime.call");
-    expect(artifact.js).toContain("join('')");
+    expect(artifact.js).toContain("`Sum: ${sum}, Time taken: ${(Date.now() - start)}ms`");
+    expect(artifact.js).toContain("for (let i = 0; (i < 10000); (i++))");
+    expect(artifact.js).toContain("(sum += i);");
+    expect(artifact.js).toContain("runtime.checkpointIfDue(evalContext)");
+    expect(artifact.js).not.toContain("runtime.complete(i)");
+    expect(artifact.js).not.toContain("runtime.complete(10000)");
+    expect(artifact.js).not.toContain("runtime.id(\"i\"");
+    expect(artifact.js).not.toContain("runtime.assignId(\"sum\"");
+    expect(artifact.js).not.toContain("runtime.beforeStatement");
+    expect(artifact.js).not.toContain("runtime.afterStatement");
   });
 
   it("skips yield checks for simple expression statements", () => {
     const artifact = compileEventAsyncStatementSource("value + 1;", "Main.xmlui#event-simple-expr");
 
-    expect(artifact.js).toContain(NO_YIELD_CHECK);
+    expect(artifact.js).not.toContain(YIELD_CHECK);
   });
 
   it("keeps yield checks for expression statements with calls", () => {
     const artifact = compileEventAsyncStatementSource("getValue();", "Main.xmlui#event-call-expr");
 
-    expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
-    expect(artifact.js).not.toContain(NO_YIELD_CHECK);
+    expect(artifact.js).toContain(YIELD_CHECK);
   });
 
   it("keeps yield checks for bare event handler references", () => {
     const artifact = compileEventAsyncStatementSource("selectItem", "Main.xmlui#event-bare-ref");
 
-    expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
-    expect(artifact.js).not.toContain(NO_YIELD_CHECK);
+    expect(artifact.js).toContain(YIELD_CHECK);
   });
 
   it("skips yield checks for simple declarations but keeps them for call initializers", () => {
@@ -250,9 +257,8 @@ describe("event-async compiled script target", () => {
       "Main.xmlui#event-call-decl",
     );
 
-    expect(simpleArtifact.js).toContain(NO_YIELD_CHECK);
-    expect(callArtifact.js).toContain("runtime.afterStatement(evalContext);");
-    expect(callArtifact.js).not.toContain(NO_YIELD_CHECK);
+    expect(simpleArtifact.js).not.toContain(YIELD_CHECK);
+    expect(callArtifact.js).toContain(YIELD_CHECK);
   });
 
   it.each(SAFE_MATH_CALLS)("skips yield checks for safe Math call %s", (source) => {
@@ -268,6 +274,10 @@ describe("event-async compiled script target", () => {
   });
 
   it.each(SAFE_ARRAY_STATIC_CALLS)("skips yield checks for safe Array call %s", (source) => {
+    expectSkipsYieldCheck(source);
+  });
+
+  it.each(SAFE_DATE_STATIC_CALLS)("skips yield checks for safe Date call %s", (source) => {
     expectSkipsYieldCheck(source);
   });
 
@@ -304,7 +314,6 @@ describe("event-async compiled script target", () => {
     "Math[name](value);",
     "value.trim();",
     "JSON.stringify(value);",
-    "Date.now();",
     "items.map(item => item + 1);",
     "items.forEach(item => item);",
     "items.reduce((sum, item) => sum + item, 0);",
@@ -320,7 +329,7 @@ describe("event-async compiled script target", () => {
       "Main.xmlui#event-shadowed-math",
     );
 
-    expect(artifact.js).toContain("runtime.afterStatement(evalContext);");
+    expect(artifact.js).toContain(YIELD_CHECK);
   });
 
   it("throws a structured unsupported error for unsupported nodes", () => {

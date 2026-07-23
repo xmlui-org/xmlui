@@ -456,6 +456,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
         }),
+        hasPendingStateChanges: () => changes.length > 0,
       };
 
       // Initialize trace and extract metadata for logging

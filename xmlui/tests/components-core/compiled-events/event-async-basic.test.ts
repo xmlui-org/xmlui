@@ -43,7 +43,7 @@ describe("compiled event-async basic statement subset", () => {
     expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(
       interpreted.evalContext.mainThread?.blocks?.[0].returnValue,
     );
-    expect(compiled.completed.length).toBe(1);
+    expect(compiled.completed.length).toBe(0);
   });
 
   it("stores the value of expression statements in the active block return slot", async () => {
@@ -67,7 +67,7 @@ describe("compiled event-async basic statement subset", () => {
 
     expect(compiled.returnValue).toBe(interpreted.evalContext.mainThread?.returnValue);
     expect(compiled.returnValue).toBe(6);
-    expect(compiled.completed.length).toBe(3);
+    expect(compiled.completed.length).toBe(0);
   });
 
   it("executes if/else branches", async () => {
@@ -108,7 +108,7 @@ describe("compiled event-async basic statement subset", () => {
     expect(evalContext.localContext.selected).toBe("ALPHA");
   });
 
-  it("does not force event-loop yields between simple expression statements", async () => {
+  it("does not force statement completion hooks between simple expression statements", async () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { count: 0 },
@@ -126,11 +126,11 @@ describe("compiled event-async basic statement subset", () => {
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
     expect(evalContext.localContext.count).toBe(2);
-    expect(order).toEqual(["completed", "completed"]);
+    expect(order).toEqual([]);
 
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-    expect(order).toEqual(["completed", "completed", "timer", "timer"]);
+    expect(order).toEqual([]);
   });
 
   it("uses the shared runtime yield check for call expression statements", async () => {
@@ -139,7 +139,7 @@ describe("compiled event-async basic statement subset", () => {
     let now = 0;
     let yieldCount = 0;
 
-    eventAsyncRuntime.now = () => now;
+    eventAsyncRuntime.now = () => (now += 101);
     eventAsyncRuntime.yield = async () => {
       yieldCount++;
     };
@@ -148,9 +148,6 @@ describe("compiled event-async basic statement subset", () => {
       const evalContext = createEvalContext({
         localContext: { getValue: () => undefined },
         options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-        onStatementCompleted: () => {
-          now += 101;
-        },
       });
       const artifact = compileEventAsyncStatementSource(
         "getValue(); getValue();",
@@ -203,7 +200,38 @@ describe("compiled event-async basic statement subset", () => {
     }
   });
 
-  it("creates a statement boundary for each simple statement", async () => {
+  it("checks long native loops every 1000 iterations and yields only when due", async () => {
+    const originalNow = eventAsyncRuntime.now;
+    const originalYield = eventAsyncRuntime.yield;
+    let now = 0;
+    let yieldCount = 0;
+
+    eventAsyncRuntime.now = () => (now += 101);
+    eventAsyncRuntime.yield = async () => {
+      yieldCount++;
+    };
+
+    try {
+      const evalContext = createEvalContext({
+        localContext: {},
+        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      });
+      const artifact = compileEventAsyncStatementSource(
+        "let sum = 0; for (let i = 0; i < 3000; i++) { sum += i; } return sum;",
+        "test:event:native-loop-checkpoint",
+      );
+
+      const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+      expect(returnValue).toBe(4498500);
+      expect(yieldCount).toBe(3);
+    } finally {
+      eventAsyncRuntime.now = originalNow;
+      eventAsyncRuntime.yield = originalYield;
+    }
+  });
+
+  it("does not create statement boundaries for simple statements", async () => {
     const boundaries: Array<Record<string, any>> = [];
     const evalContext = createEvalContext({
       localContext: { a: 0, b: 0 },
@@ -219,12 +247,7 @@ describe("compiled event-async basic statement subset", () => {
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
-    expect(boundaries).toEqual([
-      { phase: "start", a: 0, b: 0 },
-      { phase: "complete", a: 1, b: 0 },
-      { phase: "start", a: 1, b: 0 },
-      { phase: "complete", a: 1, b: 2 },
-    ]);
+    expect(boundaries).toEqual([]);
   });
 
   it("lets the next statement observe the refreshed localContext snapshot", async () => {
@@ -242,10 +265,10 @@ describe("compiled event-async basic statement subset", () => {
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
-    expect(evalContext.localContext).toMatchObject({ count: 41, observed: 41 });
+    expect(evalContext.localContext).toMatchObject({ count: 1, observed: 1 });
   });
 
-  it("does not yield after every simple statement when there is no state change", async () => {
+  it("does not call statement completion hooks when there is no state change", async () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { value: 1 },
@@ -263,37 +286,71 @@ describe("compiled event-async basic statement subset", () => {
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
 
-    expect(order).toEqual(["completed:0", "completed:1", "completed:2"]);
+    expect(order).toEqual([]);
 
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-    expect(order).toEqual([
-      "completed:0",
-      "completed:1",
-      "completed:2",
-      "timer:0",
-      "timer:1",
-      "timer:2",
-    ]);
+    expect(order).toEqual([]);
   });
 
   it("stops execution when $cancel aborts between statements", async () => {
     const { token, abort } = createCancellationToken();
     const evalContext = createEvalContext({
-      localContext: { $cancel: token, count: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
-      onStatementCompleted: () => {
-        abort("user");
+      localContext: {
+        $cancel: token,
+        count: 0,
+        getValue: () => {
+          abort("user");
+          return 1;
+        },
       },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
     });
     const artifact = compileEventAsyncStatementSource(
-      "count = count + 1; count = count + 1;",
+      "getValue(); count = count + 1;",
       "test:event:cancel-between-statements",
     );
 
     await expect(executeCompiledEventAsyncArtifact(artifact, evalContext)).rejects.toThrow(
       HandlerCancelledError,
     );
-    expect(evalContext.localContext.count).toBe(1);
+    expect(evalContext.localContext.count).toBe(0);
+  });
+
+  it("flushes pending state before compiled function calls", async () => {
+    let pending = false;
+    let flushCount = 0;
+    const localContext = new Proxy(
+      {
+        count: 0,
+        observedFlushCount: 0,
+        observe(this: any) {
+          this.observedFlushCount = flushCount;
+        },
+      },
+      {
+        set(target, prop, value) {
+          pending = true;
+          return Reflect.set(target, prop, value);
+        },
+      },
+    );
+    const evalContext = createEvalContext({
+      localContext,
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      hasPendingStateChanges: () => pending,
+      onStatementCompleted: () => {
+        flushCount++;
+        pending = false;
+      },
+    });
+    const artifact = compileEventAsyncStatementSource(
+      "count = 1; observe();",
+      "test:event:flush-before-call",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(localContext.observedFlushCount).toBe(1);
   });
 });
