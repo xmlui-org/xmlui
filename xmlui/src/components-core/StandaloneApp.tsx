@@ -1993,6 +1993,23 @@ function useStandalone(
           extensionManager,
         );
       }
+      warnBuiltInComponentNameCollisions(componentsWithCodeBehinds, extensionManager);
+      await warnShadowedLocalComponentFiles(
+        entryPointWithCodeBehind,
+        componentsWithCodeBehinds,
+        async (componentName) => {
+          try {
+            const response = await fetchWithoutCache(
+              prefixPath(`components/${componentName}.${componentFileExtension}`),
+            );
+            await validateResponseIsNotHtml(response);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        extensionManager,
+      );
       // --- Let's check for errors to display
 
       let defaultTheme = config?.defaultTheme;
@@ -2126,11 +2143,12 @@ export function collectMissingComponents(
       .map((r) => r.args[0].replace("#app-ns.", ""))
       .filter((comp) => !componentsFailedToLoad.has(comp) && !comp.includes(".")),
   );
+
   const visitor = (
     compDef: ComponentDef,
-    parent: ComponentDef | null | undefined,
+    _parent: ComponentDef | null | undefined,
     before: boolean,
-    continuation: { cancel?: boolean; abort?: boolean },
+    _continuation: { cancel?: boolean; abort?: boolean },
   ) => {
     if (!compDef.props) return;
     Object.entries(compDef.props).forEach(([propKey, propValue]) => {
@@ -2145,6 +2163,93 @@ export function collectMissingComponents(
   };
   visitComponent(entryPoint as ComponentDef, null, visitor, {}, metadataHandler);
   return baseSet;
+}
+
+export function warnBuiltInComponentNameCollisions(
+  components: CompoundComponentDef[],
+  extensionManager?: StandaloneExtensionManager,
+  warn: (message: string) => void = console.warn,
+) {
+  const componentRegistry = new ComponentRegistry({}, extensionManager);
+  try {
+    const warnedNames = new Set<string>();
+    for (const component of components) {
+      if (
+        component?.name &&
+        !warnedNames.has(component.name) &&
+        componentRegistry.hasCoreComponent(component.name)
+      ) {
+        warnedNames.add(component.name);
+        warn(
+          `[xmlui] Custom component "${component.name}" has the same name as a built-in component. ` +
+            `Unqualified <${component.name}> tags resolve to the built-in component; ` +
+            `use an app namespace or rename the custom component to render it.`,
+        );
+      }
+    }
+  } finally {
+    componentRegistry.destroy();
+  }
+}
+
+export async function warnShadowedLocalComponentFiles(
+  entryPoint: ComponentDef | CompoundComponentDef,
+  components: CompoundComponentDef[],
+  componentFileExists: (componentName: string) => Promise<boolean>,
+  extensionManager?: StandaloneExtensionManager,
+  warn: (message: string) => void = console.warn,
+) {
+  const componentRegistry = new ComponentRegistry(
+    { compoundComponents: components },
+    extensionManager,
+  );
+  try {
+    const metadataHandler = createMetadataHandler(componentRegistry);
+    const loadedComponentNames = new Set(components.map((component) => component.name));
+    const candidates = new Set<string>();
+
+    const visitor = (
+      compDef: ComponentDef,
+      _parent: ComponentDef | null | undefined,
+      before: boolean,
+      _continuation: { cancel?: boolean; abort?: boolean },
+    ) => {
+      if (!before) return;
+      const componentName = compDef.type;
+      if (
+        componentName &&
+        !componentName.includes(".") &&
+        !loadedComponentNames.has(componentName) &&
+        componentRegistry.hasCoreComponent(componentName)
+      ) {
+        candidates.add(componentName);
+      }
+    };
+
+    visitComponent(entryPoint as ComponentDef, null, visitor, {}, metadataHandler);
+    for (const component of components) {
+      visitComponent(component.component as ComponentDef, null, visitor, {}, metadataHandler);
+    }
+
+    for (const componentName of candidates) {
+      let exists = false;
+      try {
+        exists = await componentFileExists(componentName);
+      } catch {
+        exists = false;
+      }
+      if (exists) {
+        warn(
+          `[xmlui] Local component file "components/${componentName}.${componentFileExtension}" ` +
+            `was not loaded because <${componentName}> already resolves to the built-in ` +
+            `"${componentName}" component. Rename the custom component or reference it with ` +
+            `an app namespace to avoid the collision.`,
+        );
+      }
+    }
+  } finally {
+    componentRegistry.destroy();
+  }
 }
 
 // --- This React hook logs the app's version number to the browser's console at startup

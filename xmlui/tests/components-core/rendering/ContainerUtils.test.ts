@@ -107,6 +107,7 @@ describe("ContainerUtils", () => {
       UNSTABLE_GLOBAL_VARS.add("$pathname");
       UNSTABLE_GLOBAL_VARS.add("$routeParams");
       UNSTABLE_GLOBAL_VARS.add("$queryParams");
+      UNSTABLE_GLOBAL_VARS.add("$queryString");
       UNSTABLE_GLOBAL_VARS.add("$linkInfo");
     });
 
@@ -189,6 +190,7 @@ describe("ContainerUtils", () => {
         $pathname: "/some/path",
         $routeParams: { id: "123" },
         $queryParams: { search: "test" },
+        $queryString: "?search=test",
         $linkInfo: { href: "/" },
       };
       const result = extractScopedState(parentState, ["user"]) as any;
@@ -197,6 +199,7 @@ describe("ContainerUtils", () => {
       expect(result).not.toHaveProperty("$pathname");
       expect(result).not.toHaveProperty("$routeParams");
       expect(result).not.toHaveProperty("$queryParams");
+      expect(result).not.toHaveProperty("$queryString");
       expect(result).not.toHaveProperty("$linkInfo");
     });
 

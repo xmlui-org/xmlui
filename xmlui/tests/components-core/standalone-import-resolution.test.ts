@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   collectImportsFromStandaloneSources,
   collectMissingComponents,
+  warnBuiltInComponentNameCollisions,
+  warnShadowedLocalComponentFiles,
 } from "../../src/components-core/StandaloneApp";
 import type { CompoundComponentDef } from "../../src/abstractions/ComponentDefs";
 import type { StandaloneAppDescription } from "../../src/components-core/abstractions/standalone";
@@ -240,5 +242,45 @@ describe("standalone inline components", () => {
 
     expect(missing.has("FileBacked")).toBe(false);
     expect(missing.has("StillMissing")).toBe(true);
+  });
+});
+
+describe("standalone component name collision diagnostics", () => {
+  it("warns when a custom component has the same name as a built-in", () => {
+    const parsed = xmlUiMarkupToComponent(
+      `
+        <Component name="Queue">
+          <Text value="file-backed Queue" />
+        </Component>
+      `,
+      "/app/components/Queue.xmlui",
+    );
+    const warnings: string[] = [];
+
+    warnBuiltInComponentNameCollisions(
+      [parsed.component as CompoundComponentDef],
+      undefined,
+      (message) => warnings.push(message),
+    );
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('Custom component "Queue"');
+    expect(warnings[0]).toContain("built-in component");
+  });
+
+  it("warns when a convention component file is shadowed by a built-in", async () => {
+    const warnings: string[] = [];
+
+    await warnShadowedLocalComponentFiles(
+      { type: "App", children: [{ type: "Queue" }, { type: "Button" }] },
+      [],
+      async (componentName) => componentName === "Queue",
+      undefined,
+      (message) => warnings.push(message),
+    );
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('components/Queue.xmlui');
+    expect(warnings[0]).toContain("was not loaded");
   });
 });

@@ -202,7 +202,7 @@ export function extractScopedState<T extends Record<string, any>>(
   // metadata (e.g. List's `$item`/`$itemIndex`, Form's `$data`, Table's `$row`).
   const FRAMEWORK_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast", "$context", "$props", "$cell", "$row", "$rowIndex", "$isSelected", "$value", "$setValue", "$data", "$completedItems", "$queuedItems"];
   for (const key of FRAMEWORK_VARS) {
-    if (key in parentState && !(key in picked)) {
+    if (key in parentState && !UNSTABLE_GLOBAL_VARS.has(key) && !(key in picked)) {
       picked[key] = (parentState as any)[key];
     }
   }
