@@ -39,7 +39,8 @@ const App: StandaloneAppDescription = {
   appGlobals: {
     useHashBasedRouting: false,
     showHeadingAnchors: true,
-    searchIndexEnabled: true,
+    // Search uses the prebuilt staticSearchData below; avoid runtime hidden page indexing.
+    searchIndexEnabled: false,
     navSections: {
       components: componentsSection,
       extensions: extensionsSection,

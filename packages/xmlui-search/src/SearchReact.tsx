@@ -82,6 +82,51 @@ const searchOptions: IFuseOptions<SearchItemData> = {
 };
 
 const MIN_MATCH_LENGTH = 2;
+const EMPTY_STATIC_SEARCH_DATA: SearchItemData[] = [];
+const EMPTY_SEARCH_CONTEXT_CONTENT: Record<string, SearchItemData> = {};
+
+type SearchIndexCacheEntry = {
+  fuse: Fuse<SearchItemData>;
+};
+
+const searchIndexCache = new WeakMap<
+  SearchItemData[],
+  WeakMap<Record<string, SearchItemData>, SearchIndexCacheEntry>
+>();
+
+function getSharedSearchIndex(
+  staticData: SearchItemData[],
+  content: Record<string, SearchItemData> | null | undefined,
+): SearchIndexCacheEntry {
+  const contextContent = content ?? EMPTY_SEARCH_CONTEXT_CONTENT;
+  let byContent = searchIndexCache.get(staticData);
+  if (!byContent) {
+    byContent = new WeakMap();
+    searchIndexCache.set(staticData, byContent);
+  }
+
+  const cached = byContent.get(contextContent);
+  if (cached) return cached;
+
+  // Does very basic deduplication of search data based on path and title,
+  // preferring entries with longer content.
+  const combined = [...staticData, ...Object.values(contextContent)];
+  const deduped = new Map<string, SearchItemData>();
+  for (const item of combined) {
+    const key = `${item.path}::${item.title}`;
+    const existing = deduped.get(key);
+    if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
+      deduped.set(key, item);
+    }
+  }
+
+  const mergedData = Array.from(deduped.values());
+  const entry = {
+    fuse: new Fuse<SearchItemData>(mergedData, searchOptions),
+  };
+  byContent.set(contextContent, entry);
+  return entry;
+}
 
 export const Search = memo(function Search({
   id,
@@ -99,7 +144,6 @@ export const Search = memo(function Search({
   mode = "overlay",
   ...rest
 }: Props) {
-  const fuse = useMemo(() => new Fuse<SearchItemData>([], searchOptions), []);
   const useOverlay = mode === "overlay";
   const _id = useId();
   const inputId = id || _id;
@@ -157,37 +201,24 @@ export const Search = memo(function Search({
   const content = useSearchContextContent();
 
   const staticData = useMemo(() => {
-    if (!data) return [];
+    if (!data) return EMPTY_STATIC_SEARCH_DATA;
     if (typeof data !== "object") {
       console.warn("Search data should be an object with path keys and string content values");
-      return [];
+      return EMPTY_STATIC_SEARCH_DATA;
     }
     if (!isSearchItemDataArray(data)) {
       console.warn(
         "Search data should be an array of objects with 'path', 'title' and 'content' string properties",
       );
-      return [];
+      return EMPTY_STATIC_SEARCH_DATA;
     }
     return data;
   }, [data]);
 
-  // Does very basic deduplication of search data based on path and title, preferring entries with longer content
-  const mergedData = useMemo(() => {
-    const combined = [...staticData, ...Object.values(content ?? {})];
-    const deduped = new Map<string, SearchItemData>();
-    for (const item of combined) {
-      const key = `${item.path}::${item.title}`;
-      const existing = deduped.get(key);
-      if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
-        deduped.set(key, item);
-      }
-    }
-    return Array.from(deduped.values());
-  }, [content, staticData]);
-
-  useEffect(() => {
-    fuse.setCollection(mergedData);
-  }, [fuse, mergedData]);
+  const { fuse } = useMemo(
+    () => getSharedSearchIndex(staticData, content),
+    [content, staticData],
+  );
 
   // --- Search execution (v1 style — inline useMemo)
 
@@ -200,7 +231,7 @@ export const Search = memo(function Search({
     });
     const mapped = postProcessSearch(limited, debouncedValue);
     return groupAndSortByCategory(mapped);
-  }, [debouncedValue, limit]);
+  }, [debouncedValue, fuse, limit]);
 
   const totalCount = allResults.length;
 
