@@ -22,7 +22,13 @@ export const AppMd = createMetadata({
     "header, footer, and content areas that work together seamlessly.",
   excludeBehaviors: ["tooltip", "animation", "label"],
   optimization: {
-    unstableChildInjectedVars: ["$pathname", "$routeParams", "$queryParams", "$linkInfo"],
+    unstableChildInjectedVars: [
+      "$pathname",
+      "$routeParams",
+      "$queryParams",
+      "$queryString",
+      "$linkInfo",
+    ],
   },
   props: {
     layout: {

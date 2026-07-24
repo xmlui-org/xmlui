@@ -2626,6 +2626,7 @@ export default {
       "$pathname",
       "$routeParams",
       "$queryParams",
+      "$queryString",
       "$linkInfo"
     ]
   },

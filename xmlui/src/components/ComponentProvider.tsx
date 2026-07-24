@@ -1001,6 +1001,10 @@ export class ComponentRegistry {
     );
   }
 
+  hasCoreComponent(componentName: string) {
+    return this.pool.get(CORE_NS)?.has(componentName) === true;
+  }
+
   // --- Registers a loader renderer using its definition
   registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
