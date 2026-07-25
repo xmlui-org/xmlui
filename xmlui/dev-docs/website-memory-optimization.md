@@ -425,6 +425,8 @@ npm run measure:memory -w website -- --url http://localhost:3000/docs/guides/lay
 
 The full E2E suite was run by the user between accepted implementation steps.
 
-During SSG builds, a known existing `RangeError: Invalid time value` was observed
-for the `supabase-and-xmlui` blog route. It did not fail the build and was not
-introduced by this memory work.
+During the original memory work, SSG builds exposed a pre-existing
+`RangeError: Invalid time value` on the `supabase-and-xmlui` draft blog route.
+That issue was handled separately afterward: the blog page now avoids formatting
+invalid post dates, and RSS generation skips draft posts and posts with invalid
+or missing dates.

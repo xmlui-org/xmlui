@@ -9,6 +9,12 @@
     function markdownContent() {
         return appGlobals.prefetchedContent[`/blog/${$props.post.slug}.md`];
     }
+    function formattedPostDate() {
+        const date = $props.post.date;
+        return Number.isFinite(Date.parse(date))
+            ? formatDate(date, "d MMM yyyy")
+            : "";
+    }
     </script>
     <CHStack>
         <VStack
@@ -45,8 +51,7 @@
                     <HStack verticalAlignment="center" gap="$space-3">
                         <Text variant="info">
                             {$props.post.author}
-                        •
-                        {formatDate($props.post.date, "d MMM yyyy")}
+                            {formattedPostDate() ? " • " + formattedPostDate() : ""}
                         </Text>
                         <ReadingTime content="{markdownContent()}" />
                     </HStack>

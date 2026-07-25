@@ -5,7 +5,7 @@
     <link>https://docs.xmlui.org</link>
     <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
     <language>en</language>
-    <lastBuildDate>Sat, 25 Jul 2026 04:51:09 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 25 Jul 2026 05:21:41 GMT</lastBuildDate>
 
     <item>
       <title>A safer target language for LLMs</title>
@@ -70,14 +70,6 @@
       <pubDate>Fri, 18 Jul 2025 00:00:00 GMT</pubDate>
       <author>support@xmlui.org (Jon Udell)</author>
       <guid>https://docs.xmlui.org/introducing-xmlui</guid>
-    </item>
-    <item>
-      <title>Supabase + XMLUI</title>
-      <link>https://docs.xmlui.org/supabase-and-xmlui</link>
-      <description>Supabase provides a powerful backend: Postgres database, authentication, real-time subscriptions, storage, and edge functions. But building a frontend typically means setting up a build system, managing dependencies, and writing lots of boilerplate....</description>
-      <pubDate>Invalid Date</pubDate>
-      <author>support@xmlui.org (Jon Udell)</author>
-      <guid>https://docs.xmlui.org/supabase-and-xmlui</guid>
     </item>
   </channel>
 </rss>
