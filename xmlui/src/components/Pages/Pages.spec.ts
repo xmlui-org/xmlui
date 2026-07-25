@@ -196,3 +196,65 @@ test.describe("Scroll Restoration", () => {
     expect(restoredScroll).toBe(0);
   });
 });
+
+test.describe("Programmatic navigation", () => {
+  const messageComposerComponent = (navigationCall: string) => `
+    <Component name="MessageComposer">
+      <script>
+        function submit() {
+          emitEvent('submitted');
+        }
+      </script>
+      <Button
+        testId="send"
+        onClick="submit(); ${navigationCall}">
+        Send
+      </Button>
+    </Component>
+  `;
+
+  const appWithMessageComposer = `
+    <App>
+      <Pages>
+        <Page url="/">
+          <MessageComposer onSubmitted="testState = 'submitted'" />
+        </Page>
+        <Page url="/sent">
+          <Text testId="sent">Sent</Text>
+        </Page>
+      </Pages>
+    </App>
+  `;
+
+  test("navigate() works inside a user-defined component handler", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(appWithMessageComposer, {
+      components: [messageComposerComponent("navigate('/sent')")],
+    });
+
+    const sendButton = page.getByTestId("send");
+    await expect(sendButton).toBeVisible();
+    await sendButton.click();
+
+    await expect(page.getByTestId("sent")).toBeVisible();
+    await expect.poll(testStateDriver.testState).toBe("submitted");
+  });
+
+  test("Actions.navigate() works inside a user-defined component handler", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(appWithMessageComposer, {
+      components: [messageComposerComponent("Actions.navigate('/sent')")],
+    });
+
+    const sendButton = page.getByTestId("send");
+    await expect(sendButton).toBeVisible();
+    await sendButton.click();
+
+    await expect(page.getByTestId("sent")).toBeVisible();
+    await expect.poll(testStateDriver.testState).toBe("submitted");
+  });
+});

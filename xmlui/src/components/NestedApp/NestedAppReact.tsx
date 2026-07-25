@@ -41,6 +41,8 @@ type NestedAppProps = {
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
 const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
+const LAZY_NESTED_APP_ROOT_MARGIN = "800px 0px";
+const MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT = 1;
 
 type NestedAppStyleSheetSource = {
   rules: CSSRule[];
@@ -478,9 +480,15 @@ export const LazyNestedApp = memo(function LazyNestedApp({
   const shouldMountImmediately = immediate !== false;
   const [shouldRender, setShouldRender] = useState(shouldMountImmediately);
   const placeholderRef = useRef<HTMLDivElement>(null);
+  const hasInteractedRef = useRef(false);
+  const shouldRenderRef = useRef(shouldRender);
 
   useEffect(() => {
-    if (shouldMountImmediately || shouldRender) {
+    shouldRenderRef.current = shouldRender;
+  }, [shouldRender]);
+
+  useEffect(() => {
+    if (shouldMountImmediately) {
       return;
     }
 
@@ -492,22 +500,29 @@ export const LazyNestedApp = memo(function LazyNestedApp({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
+        if (entry.isIntersecting) {
+          if (!shouldRenderRef.current) {
+            startTransition(() => {
+              setShouldRender(true);
+            });
+          }
           return;
         }
-        observer.disconnect();
-        startTransition(() => {
-          setShouldRender(true);
-        });
+
+        if (shouldRenderRef.current && !hasInteractedRef.current) {
+          startTransition(() => {
+            setShouldRender(false);
+          });
+        }
       },
-      { rootMargin: "800px 0px" },
+      { rootMargin: LAZY_NESTED_APP_ROOT_MARGIN },
     );
 
     observer.observe(placeholder);
     return () => {
       observer.disconnect();
     };
-  }, [shouldMountImmediately, shouldRender]);
+  }, [shouldMountImmediately]);
 
   useEffect(() => {
     if (shouldMountImmediately && !shouldRender) {
@@ -517,10 +532,22 @@ export const LazyNestedApp = memo(function LazyNestedApp({
     }
   }, [shouldMountImmediately, shouldRender]);
 
-  if (!shouldRender) {
-    return <div ref={placeholderRef} style={{ minHeight: restProps.height ?? 1 }} />;
-  }
-  return <NestedApp {...restProps} />;
+  const markInteracted = useCallback(() => {
+    hasInteractedRef.current = true;
+  }, []);
+
+  return (
+    <div
+      ref={placeholderRef}
+      onFocusCapture={markInteracted}
+      onKeyDownCapture={markInteracted}
+      onPointerDownCapture={markInteracted}
+      data-nested-app-lazy-state={shouldRender ? "mounted" : "hibernated"}
+      style={{ minHeight: restProps.height ?? MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT, width: "100%" }}
+    >
+      {shouldRender && <NestedApp {...restProps} />}
+    </div>
+  );
 });
 
 export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(

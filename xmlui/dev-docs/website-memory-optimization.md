@@ -399,17 +399,37 @@ Useful checks:
 - initial active playground count should remain low on pages with many examples.
 - scroll height should remain stable before and after activation.
 
-### Treat Hibernation As A Separate Design
+### Offscreen Hibernation For Never-Interacted Playgrounds
 
-If further large memory reductions are required, design offscreen hibernation as
-a separate feature. Recommended constraints:
+After the initial optimization, a reload-specific memory pattern remained on
+`/docs/guides/layout`: after scrolling to the bottom and then reloading, Chromium
+renderer RSS could climb toward the browser task-manager footprint reported by
+users, even though forced-GC JS heap, React fiber counts, and ComponentDef counts
+remained stable.
+
+The key measurement was that this was not primarily retained JS object graph:
+
+| Scenario | JS + embedder heap | Chromium process RSS | Active shadow roots |
+| --- | ---: | ---: | ---: |
+| Before hibernation, after full scroll | ~306 MB | ~980 MB | 35 |
+| Before hibernation, after 5 reloads | ~305 MB | ~1.12 GB | 35 |
+| No-scroll control, after 5 reloads | ~115 MB | ~758 MB | 1 |
+| With hibernation, after full scroll | ~135 MB | ~802 MB | 3 |
+| With hibernation, after 5 reloads | ~142 MB | ~937 MB | 3-4 |
+| With hibernation, 1 reload + 60s wait | ~137 MB | ~903 MB | 3 |
+
+This points to native renderer memory associated with many simultaneously live
+embedded app/shadow-root instances. The mitigation is to hibernate lazy
+playgrounds that have never received user interaction when they move far outside
+the viewport.
+
+The implemented constraints are:
 
 - keep the reserved frame height stable,
-- do not hibernate a playground after user interaction unless state persistence
-  is solved,
-- measure reverse-scroll behavior,
-- measure remount latency,
-- keep the feature scoped to docs playgrounds first.
+- keep immediate playgrounds mounted,
+- do not hibernate a playground after focus, keyboard, or pointer interaction,
+- remount automatically when the placeholder approaches the viewport again,
+- keep the feature scoped to the lazy `NestedApp` path used by docs playgrounds.
 
 ## Validation Performed During The Optimization
 

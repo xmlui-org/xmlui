@@ -758,6 +758,35 @@ test.describe("xmlui-pg inline components", () => {
     await expect(page.getByRole("button", { name: "Plain playground" })).toBeVisible();
   });
 
+  test("keeps an interacted lazy playground mounted after it scrolls away", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 800, height: 420 });
+    const SOURCE = [
+      "```xmlui-pg height=\"240px\" name=\"First lazy playground\"",
+      '<Button label="First lazy playground" />',
+      "```",
+      '<div style="height: 1400px"></div>',
+      "```xmlui-pg height=\"240px\" name=\"Second lazy playground\"",
+      '<Button label="Second lazy playground" />',
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const firstButton = page.getByRole("button", { name: "First lazy playground" });
+    await expect(firstButton).toBeVisible();
+    await firstButton.click();
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(1000);
+
+    await expect(firstButton).toBeAttached();
+    await expect(page.getByRole("button", { name: "Second lazy playground" })).toBeVisible();
+    await expect(page.locator('[data-nested-app-lazy-state="mounted"]')).toHaveCount(2);
+  });
+
   test("renders an empty app and warns when the app segment has only inline components", async ({
     initTestBed,
     page,
