@@ -1,4 +1,6 @@
 import { chromium } from "playwright";
+import { execFileSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 
 const DEFAULT_URL = "http://localhost:3000/docs/guides/layout";
 
@@ -7,6 +9,12 @@ function parseArgs(argv) {
     url: DEFAULT_URL,
     scroll: true,
     checkpoints: 0,
+    reloads: 0,
+    reloadMode: "direct",
+    reloadWaitMs: 5000,
+    lifetimeDiagnostics: false,
+    pagehideCleanup: false,
+    chromeTrace: "",
     searchQueries: ["layout", "stack", "grid"],
     json: false,
   };
@@ -23,6 +31,26 @@ function parseArgs(argv) {
       args.checkpoints = Number.parseInt(argv[++i] || "0", 10) || 0;
     } else if (arg.startsWith("--checkpoints=")) {
       args.checkpoints = Number.parseInt(arg.slice("--checkpoints=".length), 10) || 0;
+    } else if (arg === "--reloads") {
+      args.reloads = Number.parseInt(argv[++i] || "0", 10) || 0;
+    } else if (arg.startsWith("--reloads=")) {
+      args.reloads = Number.parseInt(arg.slice("--reloads=".length), 10) || 0;
+    } else if (arg === "--reload-mode") {
+      args.reloadMode = argv[++i] || args.reloadMode;
+    } else if (arg.startsWith("--reload-mode=")) {
+      args.reloadMode = arg.slice("--reload-mode=".length);
+    } else if (arg === "--reload-wait-ms") {
+      args.reloadWaitMs = Number.parseInt(argv[++i] || "5000", 10) || 5000;
+    } else if (arg.startsWith("--reload-wait-ms=")) {
+      args.reloadWaitMs = Number.parseInt(arg.slice("--reload-wait-ms=".length), 10) || 5000;
+    } else if (arg === "--lifetime-diagnostics") {
+      args.lifetimeDiagnostics = true;
+    } else if (arg === "--pagehide-cleanup") {
+      args.pagehideCleanup = true;
+    } else if (arg === "--chrome-trace") {
+      args.chromeTrace = argv[++i] || "";
+    } else if (arg.startsWith("--chrome-trace=")) {
+      args.chromeTrace = arg.slice("--chrome-trace=".length);
     } else if (arg === "--search") {
       args.searchQueries = (argv[++i] || "").split(",").map((item) => item.trim()).filter(Boolean);
     } else if (arg.startsWith("--search=")) {
@@ -45,6 +73,12 @@ Options:
   --url <url>             Page URL to measure. Default: ${DEFAULT_URL}
   --no-scroll             Skip the after-scroll activation measurement.
   --checkpoints <count>   Record samples at evenly spaced scroll positions.
+  --reloads <count>       Reload the page and remeasure after each reload.
+  --reload-mode <mode>    direct, about-blank, or new-page. Default: direct
+  --reload-wait-ms <ms>   Wait time after each reload before measuring. Default: 5000
+  --lifetime-diagnostics  Measure same-tab about:blank, page close, and new page behavior.
+  --pagehide-cleanup      Diagnostic: clear shadow roots and adopted styles on pagehide.
+  --chrome-trace <path>   Record a Chromium memory-infra trace to this JSON file.
   --search <a,b,c>        Search smoke queries. Default: layout,stack,grid
   --json                  Print only the JSON payload.
   --help                  Show this help.
@@ -58,18 +92,172 @@ function formatBytes(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
+function getProcessTreeMemory(rootPid) {
+  if (!rootPid) return null;
+  try {
+    const output = execFileSync("ps", ["-axo", "pid=,ppid=,rss=,command="], {
+      encoding: "utf8",
+    });
+    const processes = output
+      .trim()
+      .split("\n")
+      .map((line) => {
+        const match = line.trim().match(/^(\d+)\s+(\d+)\s+(\d+)\s+(.*)$/);
+        if (!match) return null;
+        return {
+          pid: Number(match[1]),
+          ppid: Number(match[2]),
+          rssBytes: Number(match[3]) * 1024,
+          command: match[4],
+        };
+      })
+      .filter(Boolean);
+
+    const byParent = new Map();
+    for (const process of processes) {
+      const children = byParent.get(process.ppid) || [];
+      children.push(process);
+      byParent.set(process.ppid, children);
+    }
+
+    const tree = [];
+    const stack = [rootPid];
+    const seen = new Set();
+    while (stack.length > 0) {
+      const pid = stack.pop();
+      if (seen.has(pid)) continue;
+      seen.add(pid);
+      const process = processes.find((item) => item.pid === pid);
+      if (process) {
+        tree.push(process);
+      }
+      for (const child of byParent.get(pid) || []) {
+        stack.push(child.pid);
+      }
+    }
+
+    return {
+      rootPid,
+      processCount: tree.length,
+      rssBytes: tree.reduce((sum, process) => sum + process.rssBytes, 0),
+      topProcesses: tree
+        .toSorted((a, b) => b.rssBytes - a.rssBytes)
+        .slice(0, 8)
+        .map((process) => ({
+          pid: process.pid,
+          ppid: process.ppid,
+          rssBytes: process.rssBytes,
+          command: process.command.slice(0, 160),
+        })),
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const browser = await chromium.launch({
+  const browserServer = await chromium.launchServer({
     headless: true,
     args: ["--js-flags=--expose-gc"],
   });
+  const browser = await chromium.connect(browserServer.wsEndpoint());
+  const browserCdp = await browser.newBrowserCDPSession();
 
   try {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-    const cdp = await page.context().newCDPSession(page);
-    await cdp.send("Runtime.enable");
-    await cdp.send("HeapProfiler.enable");
+    let page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    const browserPid = browserServer.process()?.pid;
+    let cdp;
+
+    async function attachCdpSession() {
+      cdp = await page.context().newCDPSession(page);
+      await cdp.send("Runtime.enable");
+      await cdp.send("HeapProfiler.enable");
+    }
+
+    async function installPagehideCleanup() {
+      if (!args.pagehideCleanup) return;
+      await page.addInitScript(() => {
+        window.addEventListener(
+          "pagehide",
+          () => {
+            document.querySelectorAll("*").forEach((element) => {
+              const shadowRoot = element.shadowRoot;
+              if (!shadowRoot) return;
+              try {
+                shadowRoot.adoptedStyleSheets = [];
+              } catch {}
+              shadowRoot.textContent = "";
+            });
+          },
+          { capture: true },
+        );
+      });
+    }
+
+    await installPagehideCleanup();
+    await attachCdpSession();
+
+    async function startChromeTrace() {
+      if (!args.chromeTrace) return;
+      await browserCdp.send("Tracing.start", {
+        transferMode: "ReturnAsStream",
+        traceConfig: {
+          includedCategories: [
+            "blink",
+            "devtools.timeline",
+            "disabled-by-default-memory-infra",
+            "disabled-by-default-memory-infra.v8.code_stats",
+            "disabled-by-default-v8.gc",
+            "v8",
+          ],
+          memoryDumpConfig: {
+            triggers: [
+              { mode: "detailed", periodic_interval_ms: 5000 },
+            ],
+          },
+        },
+      });
+    }
+
+    async function requestChromeMemoryDump(label) {
+      if (!args.chromeTrace) return;
+      await browserCdp.send("Tracing.requestMemoryDump", {
+        deterministic: false,
+        levelOfDetail: "detailed",
+      }).catch(() => {});
+      await page.evaluate((dumpLabel) => {
+        performance.mark(`xmlui-memory-dump:${dumpLabel}`);
+      }, label).catch(() => {});
+    }
+
+    async function stopChromeTrace() {
+      if (!args.chromeTrace) return;
+      const tracingComplete = new Promise((resolve) => {
+        browserCdp.once("Tracing.tracingComplete", resolve);
+      });
+      await browserCdp.send("Tracing.end");
+      const event = await tracingComplete;
+      const stream = event.stream;
+      let traceJson = "";
+      while (stream) {
+        const chunk = await browserCdp.send("IO.read", { handle: stream });
+        traceJson += chunk.data || "";
+        if (chunk.eof) break;
+      }
+      if (stream) {
+        await browserCdp.send("IO.close", { handle: stream }).catch(() => {});
+      }
+      writeFileSync(args.chromeTrace, traceJson);
+    }
+
+    async function openMeasuredPage() {
+      page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+      await installPagehideCleanup();
+      await attachCdpSession();
+      await page.goto(args.url, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await waitForSettled();
+    }
 
     async function forceGc() {
       await cdp.send("HeapProfiler.collectGarbage");
@@ -155,12 +343,38 @@ async function main() {
         });
 
         const playgroundContainers = document.querySelectorAll('[class*="nestedAppContainer"]').length;
+        const lazyMountedWrappers = document.querySelectorAll(
+          '[data-nested-app-lazy-state="mounted"]',
+        ).length;
+        const lazyHibernatedWrappers = document.querySelectorAll(
+          '[data-nested-app-lazy-state="hibernated"]',
+        ).length;
         const shadowHosts = allElements.filter((element) => element.shadowRoot).length;
         const visibleShadowHosts = allElements.filter((element) => {
           if (!element.shadowRoot) return false;
           const rect = element.getBoundingClientRect();
           return rect.width > 0 && rect.height > 0;
         }).length;
+        const styleElements = allElements.filter((element) => element.tagName === "STYLE");
+        const styleBlocks = styleElements
+          .map((element) => {
+            const root = element.getRootNode();
+            const text = element.textContent || "";
+            return {
+              root: root instanceof ShadowRoot ? "shadow" : "document",
+              bytes: text.length,
+              xmluiCssVarOccurrences: (text.match(/--xmlui-/g) || []).length,
+              dataStyleHash: element.getAttribute("data-style-hash"),
+              dataStyleRegistry: element.hasAttribute("data-style-registry"),
+              preview: text.slice(0, 180).replace(/\s+/g, " "),
+            };
+          })
+          .sort((a, b) => b.bytes - a.bytes);
+        const styleTextBytesIncludingShadow = styleBlocks.reduce((sum, block) => sum + block.bytes, 0);
+        const xmluiCssVarOccurrencesInStyles = styleBlocks.reduce(
+          (sum, block) => sum + block.xmluiCssVarOccurrences,
+          0,
+        );
         const state = {
           reactFibers: 0,
           componentDefs: 0,
@@ -169,6 +383,8 @@ async function main() {
           objectsWithStartToken: 0,
           objectsWithEndToken: 0,
           playgroundContainers,
+          lazyMountedWrappers,
+          lazyHibernatedWrappers,
           shadowHosts,
           visibleShadowHosts,
           inactivePlaygrounds: Math.max(0, playgroundContainers - visibleShadowHosts),
@@ -180,6 +396,10 @@ async function main() {
           codeBlocks: document.querySelectorAll(".global-codeBlock, [class*='codeBlock']").length,
           dataComponentType: document.querySelectorAll("[data-component-type]").length,
           domElementsIncludingShadow: allElements.length,
+          styleTagsIncludingShadow: styleElements.length,
+          styleTextBytesIncludingShadow,
+          xmluiCssVarOccurrencesInStyles,
+          largestStyleBlocks: styleBlocks.slice(0, 8),
         };
 
         const seenFibers = new Set();
@@ -210,7 +430,8 @@ async function main() {
         };
       });
 
-      return { label, heap, metrics };
+      await requestChromeMemoryDump(label);
+      return { label, heap, processMemory: getProcessTreeMemory(browserPid), metrics };
     }
 
     async function scrollThroughPage() {
@@ -264,6 +485,36 @@ async function main() {
       return samples;
     }
 
+    async function measureReloads(count) {
+      if (!count || count < 1) return [];
+      const samples = [];
+      for (let index = 1; index <= count; index++) {
+        if (args.reloadMode === "direct") {
+          await page.reload({ waitUntil: "domcontentloaded", timeout: 60000 });
+          await waitForSettled();
+        } else if (args.reloadMode === "about-blank") {
+          await page.goto("about:blank", { waitUntil: "domcontentloaded", timeout: 60000 });
+          await waitForSettled();
+          await page.goto(args.url, { waitUntil: "domcontentloaded", timeout: 60000 });
+          await waitForSettled();
+        } else if (args.reloadMode === "new-page") {
+          await page.close();
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await openMeasuredPage();
+        } else {
+          throw new Error(`Unknown --reload-mode "${args.reloadMode}"`);
+        }
+        if (args.scroll) {
+          await scrollThroughPage();
+        }
+        if (args.reloadWaitMs > 0) {
+          await page.waitForTimeout(args.reloadWaitMs);
+        }
+        samples.push(await measure(`after-reload-${index}`));
+      }
+      return samples;
+    }
+
     async function searchSmoke(queries) {
       const results = [];
       if (queries.length === 0) return results;
@@ -291,30 +542,74 @@ async function main() {
       return results;
     }
 
-    await page.goto(args.url, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await waitForSettled();
-    const initial = await measure("initial");
-    const search = await searchSmoke(args.searchQueries);
-    const checkpoints = args.scroll ? await measureCheckpoints(args.checkpoints) : [];
-    const afterScroll = args.scroll ? (await scrollThroughPage(), await measure("after-scroll")) : null;
+    async function processOnlySample(label) {
+      return {
+        label,
+        processMemory: getProcessTreeMemory(browserPid),
+      };
+    }
 
-    const output = {
-      url: args.url,
-      measuredAt: new Date().toISOString(),
-      initial,
-      checkpoints,
-      afterScroll,
-      search,
-    };
+    async function measureLifetimeDiagnostics() {
+      const samples = [];
+
+      await page.goto("about:blank", { waitUntil: "domcontentloaded", timeout: 60000 });
+      await waitForSettled();
+      samples.push(await measure("after-about-blank"));
+
+      await page.close();
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      samples.push(await processOnlySample("after-page-close"));
+
+      await openMeasuredPage();
+      samples.push(await measure("new-page-in-same-browser-initial"));
+      if (args.scroll) {
+        await scrollThroughPage();
+        samples.push(await measure("new-page-in-same-browser-after-scroll"));
+      }
+
+      return samples;
+    }
+
+    await startChromeTrace();
+    let output;
+    try {
+      await page.goto(args.url, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await waitForSettled();
+      const initial = await measure("initial");
+      const search = await searchSmoke(args.searchQueries);
+      const checkpoints = args.scroll ? await measureCheckpoints(args.checkpoints) : [];
+      const afterScroll = args.scroll ? (await scrollThroughPage(), await measure("after-scroll")) : null;
+      const reloads = await measureReloads(args.reloads);
+      const lifetimeDiagnostics = args.lifetimeDiagnostics
+        ? await measureLifetimeDiagnostics()
+        : [];
+
+      output = {
+        url: args.url,
+        measuredAt: new Date().toISOString(),
+        initial,
+        checkpoints,
+        afterScroll,
+        reloads,
+        lifetimeDiagnostics,
+        search,
+        chromeTrace: args.chromeTrace || undefined,
+      };
+    } finally {
+      await stopChromeTrace();
+    }
 
     if (args.json) {
       console.log(JSON.stringify(output, null, 2));
     } else {
+      const { initial, checkpoints, afterScroll, reloads, lifetimeDiagnostics, search } = output;
       console.log(`Memory measurement for ${args.url}`);
       console.log("");
       printSample(initial);
       if (checkpoints.length > 0) printCheckpointSummary(initial, checkpoints);
       if (afterScroll) printSample(afterScroll);
+      reloads.forEach((sample) => printSample(sample));
+      lifetimeDiagnostics.forEach((sample) => printSample(sample));
       if (search.length > 0) {
         console.log("");
         console.log("Search smoke:");
@@ -327,10 +622,19 @@ async function main() {
     }
   } finally {
     await browser.close();
+    await browserServer.close();
   }
 }
 
 function printSample(sample) {
+  if (!sample.heap) {
+    console.log(`${sample.label}:`);
+    if (sample.processMemory) {
+      console.log(`- Process RSS: ${formatBytes(sample.processMemory.rssBytes)}`);
+      console.log(`- Process count: ${sample.processMemory.processCount}`);
+    }
+    return;
+  }
   const combined = sample.heap.usedSize + sample.heap.embedderHeapUsedSize;
   console.log(`${sample.label}:`);
   console.log(`- JS heap: ${formatBytes(sample.heap.usedSize)}`);
@@ -339,7 +643,12 @@ function printSample(sample) {
   console.log(`- React fibers: ${sample.metrics.reactFibers}`);
   console.log(`- ComponentDefs: ${sample.metrics.componentDefs}`);
   console.log(`- Shadow hosts: ${sample.metrics.visibleShadowHosts}/${sample.metrics.shadowHosts}`);
+  console.log(`- Style text: ${formatBytes(sample.metrics.styleTextBytesIncludingShadow)} across ${sample.metrics.styleTagsIncludingShadow} style tags`);
+  console.log(`- XMLUI CSS var refs: ${sample.metrics.xmluiCssVarOccurrencesInStyles}`);
   console.log(`- Scroll height: ${sample.metrics.mainScroller?.scrollHeight ?? "n/a"}`);
+  if (sample.processMemory) {
+    console.log(`- Process RSS: ${formatBytes(sample.processMemory.rssBytes)}`);
+  }
 }
 
 function printCheckpointSummary(initial, checkpoints) {

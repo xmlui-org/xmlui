@@ -37,10 +37,13 @@ type NestedAppProps = {
   refreshVersion?: number;
   withSplashScreen?: boolean;
   className?: string;
+  inheritsHostTheme?: boolean;
 };
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
 const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
+const LAZY_NESTED_APP_ROOT_MARGIN = "800px 0px";
+const MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT = 1;
 
 type NestedAppStyleSheetSource = {
   rules: CSSRule[];
@@ -156,6 +159,7 @@ export const NestedApp = memo(function NestedApp({
   refreshVersion,
   withSplashScreen = false,
   className,
+  inheritsHostTheme = false,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -357,10 +361,11 @@ export const NestedApp = memo(function NestedApp({
               interceptor={mock}
               waitForApiInterceptor={true}
             >
-              <NestedAppRoot themeStylesToReset={theme.themeStyles}>
+              <NestedAppRoot themeStylesToReset={inheritsHostTheme ? undefined : theme.themeStyles}>
                 <AppRoot
                   onInit={onInit}
                   isNested={true}
+                  suppressRootThemeCssVars={inheritsHostTheme}
                   previewMode={true}
                   standalone={true}
                   trackContainerHeight={height ? "fixed" : "auto"}
@@ -396,6 +401,7 @@ export const NestedApp = memo(function NestedApp({
     config?.resources,
     config?.themes,
     height,
+    inheritsHostTheme,
     mock,
     parentInterceptorContext,
     style,
@@ -456,7 +462,7 @@ function NestedAppRoot({
   // css variables are leaking into to shadow dom, so we reset them here
   const themeVarReset = useMemo(() => {
     const vars = {};
-    Object.keys(themeStylesToReset).forEach((key) => {
+    Object.keys(themeStylesToReset || {}).forEach((key) => {
       vars[key] = "initial";
     });
     return vars;
@@ -478,9 +484,15 @@ export const LazyNestedApp = memo(function LazyNestedApp({
   const shouldMountImmediately = immediate !== false;
   const [shouldRender, setShouldRender] = useState(shouldMountImmediately);
   const placeholderRef = useRef<HTMLDivElement>(null);
+  const hasInteractedRef = useRef(false);
+  const shouldRenderRef = useRef(shouldRender);
 
   useEffect(() => {
-    if (shouldMountImmediately || shouldRender) {
+    shouldRenderRef.current = shouldRender;
+  }, [shouldRender]);
+
+  useEffect(() => {
+    if (shouldMountImmediately) {
       return;
     }
 
@@ -492,22 +504,29 @@ export const LazyNestedApp = memo(function LazyNestedApp({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
+        if (entry.isIntersecting) {
+          if (!shouldRenderRef.current) {
+            startTransition(() => {
+              setShouldRender(true);
+            });
+          }
           return;
         }
-        observer.disconnect();
-        startTransition(() => {
-          setShouldRender(true);
-        });
+
+        if (shouldRenderRef.current && !hasInteractedRef.current) {
+          startTransition(() => {
+            setShouldRender(false);
+          });
+        }
       },
-      { rootMargin: "800px 0px" },
+      { rootMargin: LAZY_NESTED_APP_ROOT_MARGIN },
     );
 
     observer.observe(placeholder);
     return () => {
       observer.disconnect();
     };
-  }, [shouldMountImmediately, shouldRender]);
+  }, [shouldMountImmediately]);
 
   useEffect(() => {
     if (shouldMountImmediately && !shouldRender) {
@@ -517,10 +536,26 @@ export const LazyNestedApp = memo(function LazyNestedApp({
     }
   }, [shouldMountImmediately, shouldRender]);
 
-  if (!shouldRender) {
-    return <div ref={placeholderRef} style={{ minHeight: restProps.height ?? 1 }} />;
-  }
-  return <NestedApp {...restProps} />;
+  const markInteracted = useCallback(() => {
+    hasInteractedRef.current = true;
+  }, []);
+
+  const placeholderStyle = restProps.height
+    ? { height: restProps.height, minHeight: restProps.height, width: "100%" }
+    : { minHeight: MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT, width: "100%" };
+
+  return (
+    <div
+      ref={placeholderRef}
+      onFocusCapture={markInteracted}
+      onKeyDownCapture={markInteracted}
+      onPointerDownCapture={markInteracted}
+      data-nested-app-lazy-state={shouldRender ? "mounted" : "hibernated"}
+      style={placeholderStyle}
+    >
+      {shouldRender && <NestedApp {...restProps} />}
+    </div>
+  );
 });
 
 export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(

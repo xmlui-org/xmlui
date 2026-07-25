@@ -41,6 +41,17 @@ type AppWithCodeViewReactProps = {
 };
 
 export const DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT = "320px";
+const LOCAL_TONE_CONTROLLER_PATTERN = /<\s*(ToneSwitch|ToneChangerButton)(?=[\s/>])/;
+
+function hasLocalToneController(app: string, components: any[] = []) {
+  return (
+    LOCAL_TONE_CONTROLLER_PATTERN.test(app) ||
+    components.some(
+      (component) =>
+        typeof component === "string" && LOCAL_TONE_CONTROLLER_PATTERN.test(component),
+    )
+  );
+}
 
 /**
  * A component that displays markdown content on the left and a NestedApp on the right
@@ -84,6 +95,15 @@ export function AppWithCodeViewReact({
     themes: [...((config?.themes as any[]) || []), ...(allThemes || [])],
   };
   const effectiveActiveTheme = activeTheme || config?.defaultTheme || activeThemeId;
+  const hasLocalThemes = Array.isArray(config?.themes) && config.themes.length > 0;
+  const hasLocalToneSwitcher = hasLocalToneController(app, components);
+  const inheritsHostTheme =
+    activeTheme === undefined &&
+    config?.defaultTheme === undefined &&
+    activeTone === undefined &&
+    config?.defaultTone === undefined &&
+    !hasLocalThemes &&
+    !hasLocalToneSwitcher;
   const effectiveHeight = height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT;
   const shouldMountImmediately = immediate ?? false;
 
@@ -203,6 +223,7 @@ export function AppWithCodeViewReact({
               config={effectiveConfig}
               activeTone={activeTone}
               activeTheme={effectiveActiveTheme}
+              inheritsHostTheme={inheritsHostTheme}
               refreshVersion={refreshVersion}
               withSplashScreen={withSplashScreen}
               immediate={shouldMountImmediately}
@@ -223,6 +244,7 @@ export function AppWithCodeViewReact({
         config={effectiveConfig}
         activeTone={activeTone}
         activeTheme={effectiveActiveTheme}
+        inheritsHostTheme={inheritsHostTheme}
         refreshVersion={refreshVersion}
         withSplashScreen={withSplashScreen}
         immediate={shouldMountImmediately}

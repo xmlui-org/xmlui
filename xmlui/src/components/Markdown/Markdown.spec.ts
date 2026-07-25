@@ -758,6 +758,139 @@ test.describe("xmlui-pg inline components", () => {
     await expect(page.getByRole("button", { name: "Plain playground" })).toBeVisible();
   });
 
+  test("keeps an interacted lazy playground mounted after it scrolls away", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 800, height: 420 });
+    const SOURCE = [
+      "```xmlui-pg height=\"240px\" name=\"First lazy playground\"",
+      '<Button label="First lazy playground" />',
+      "```",
+      '<div style="height: 1400px"></div>',
+      "```xmlui-pg height=\"240px\" name=\"Second lazy playground\"",
+      '<Button label="Second lazy playground" />',
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const firstButton = page.getByRole("button", { name: "First lazy playground" });
+    await expect(firstButton).toBeVisible();
+    await firstButton.click();
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(1000);
+
+    await expect(firstButton).toBeAttached();
+    await expect(page.getByRole("button", { name: "Second lazy playground" })).toBeVisible();
+    await expect(page.locator('[data-nested-app-lazy-state="mounted"]')).toHaveCount(2);
+  });
+
+  test("skips bulk theme CSS for host-theme inherited playgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Inherited theme playground"',
+      '<Button label="Inherited theme playground" />',
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Inherited theme playground" })).toBeVisible();
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeLessThan(10);
+    expect(themeCssCounts.rootThemeVarCount).toBe(0);
+  });
+
+  test("keeps root theme CSS for inherited playgrounds with local tone switchers", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Inherited tone switcher playground"',
+      "<App>",
+      '  <Footer testId="footer">',
+      "    Built with XMLUI",
+      "    <SpaceFiller />",
+      "    <ToneSwitch />",
+      "  </Footer>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const toneSwitch = page.getByRole("switch");
+    await expect(toneSwitch).toBeVisible();
+    await toneSwitch.click({ force: true });
+    await expect(toneSwitch).toBeChecked();
+
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      const footer = host?.shadowRoot?.querySelector('[class*="footerWrapper"]');
+      const hostRect = host?.getBoundingClientRect();
+      const footerRect = footer?.getBoundingClientRect();
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+        hostHeight: hostRect?.height,
+        footerBottomGap:
+          hostRect && footerRect ? Math.round(hostRect.bottom - footerRect.bottom) : undefined,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeGreaterThan(100);
+    expect(themeCssCounts.rootThemeVarCount).toBeGreaterThan(0);
+    expect(themeCssCounts.hostHeight).toBeGreaterThan(180);
+    expect(themeCssCounts.footerBottomGap).toBeLessThan(4);
+  });
+
+  test("keeps parent theme reset for explicitly themed playgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Explicit theme playground"',
+      '<App defaultTheme="test">',
+      '  <Button label="Explicit theme playground" />',
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Explicit theme playground" })).toBeVisible();
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeGreaterThan(100);
+    expect(themeCssCounts.rootThemeVarCount).toBeGreaterThan(0);
+  });
+
   test("renders an empty app and warns when the app segment has only inline components", async ({
     initTestBed,
     page,
