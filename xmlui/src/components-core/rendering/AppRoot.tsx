@@ -57,12 +57,14 @@ export function AppRoot({
   children,
   projectCompilation,
   isNested = false,
+  suppressRootThemeCssVars = false,
   onInit,
   icons,
   helmetContext,
 }: AppWrapperProps & {
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
+  suppressRootThemeCssVars?: boolean;
 }) {
   // --- Make sure, the root node is wrapped in a `Theme` component. Also,
   // --- the root node must be wrapped in a `Container` component managing
@@ -72,6 +74,7 @@ export function AppRoot({
       type: "Theme",
       props: {
         root: true,
+        suppressRootThemeCssVars,
       },
       children: [node],
     };
@@ -82,7 +85,7 @@ export function AppRoot({
       uses: [],
       globalVars: globalVars || {},
     };
-  }, [node, globalVars]);
+  }, [node, globalVars, suppressRootThemeCssVars]);
 
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;

@@ -135,6 +135,46 @@ test("Themed H1 regression", async ({ page, initTestBed }) => {
   expect(h2Color).toBe("rgb(0, 255, 0)");
 });
 
+test("Theme control props are not emitted as CSS theme variables", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <App>
+      <Theme themeId="test" applyIf="true" disableInlineStyle="false">
+        <Text testId="content">Theme content</Text>
+      </Theme>
+    </App>
+  `);
+
+  await expect(page.getByTestId("content")).toBeVisible();
+  const leakedControlVars = await page.evaluate(() => {
+    const styleText = Array.from(document.querySelectorAll("style"))
+      .map((style) => style.textContent || "")
+      .join("\n");
+    return [...styleText.matchAll(/--xmlui-(root|themeId|applyIf|disableInlineStyle)\s*:/g)].map(
+      (match) => match[0],
+    );
+  });
+
+  expect(leakedControlVars).toEqual([]);
+});
+
+test("root Theme still emits app-level CSS theme variables", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <App>
+      <Text testId="content">Root theme content</Text>
+    </App>
+  `);
+
+  await expect(page.getByTestId("content")).toBeVisible();
+  const rootSpaceBase = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--xmlui-space-base").trim(),
+  );
+
+  expect(rootSpaceBase).not.toBe("");
+});
+
 // =============================================================================
 // APPLYIF PROPERTY TESTS
 // =============================================================================

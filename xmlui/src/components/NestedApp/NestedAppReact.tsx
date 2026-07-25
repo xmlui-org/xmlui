@@ -37,6 +37,7 @@ type NestedAppProps = {
   refreshVersion?: number;
   withSplashScreen?: boolean;
   className?: string;
+  inheritsHostTheme?: boolean;
 };
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
@@ -158,6 +159,7 @@ export const NestedApp = memo(function NestedApp({
   refreshVersion,
   withSplashScreen = false,
   className,
+  inheritsHostTheme = false,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -359,10 +361,11 @@ export const NestedApp = memo(function NestedApp({
               interceptor={mock}
               waitForApiInterceptor={true}
             >
-              <NestedAppRoot themeStylesToReset={theme.themeStyles}>
+              <NestedAppRoot themeStylesToReset={inheritsHostTheme ? undefined : theme.themeStyles}>
                 <AppRoot
                   onInit={onInit}
                   isNested={true}
+                  suppressRootThemeCssVars={inheritsHostTheme}
                   previewMode={true}
                   standalone={true}
                   trackContainerHeight={height ? "fixed" : "auto"}
@@ -398,6 +401,7 @@ export const NestedApp = memo(function NestedApp({
     config?.resources,
     config?.themes,
     height,
+    inheritsHostTheme,
     mock,
     parentInterceptorContext,
     style,
@@ -458,7 +462,7 @@ function NestedAppRoot({
   // css variables are leaking into to shadow dom, so we reset them here
   const themeVarReset = useMemo(() => {
     const vars = {};
-    Object.keys(themeStylesToReset).forEach((key) => {
+    Object.keys(themeStylesToReset || {}).forEach((key) => {
       vars[key] = "initial";
     });
     return vars;

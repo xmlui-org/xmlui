@@ -43,9 +43,17 @@ export const ThemeMd = createMetadata({
 });
 
 export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
-  exclude: ["tone", "themeId", "root", "applyIf", "disableInlineStyle"],
+  exclude: ["tone", "themeId", "root", "applyIf", "disableInlineStyle", "suppressRootThemeCssVars"],
   customRender(_props, { node, extractValue, renderChild, layoutContext, appContext }) {
-    const { tone, ...restProps } = node.props;
+    const {
+      tone,
+      themeId,
+      root,
+      applyIf: applyIfProp,
+      disableInlineStyle: disableInlineStyleProp,
+      suppressRootThemeCssVars,
+      ...themeVarProps
+    } = node.props;
     const notifications =
       appContext?.xmluiConfig?.notifications ?? appContext?.appGlobals?.notifications;
     const toastDuration = notifications?.duration;
@@ -55,30 +63,32 @@ export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
       themeTone = "light";
     }
 
-    const themeId = extractValue.asOptionalString(node.props.themeId);
-    const isRoot = extractValue.asOptionalBoolean(node.props.root);
-    const disableInlineStyle = extractValue.asOptionalBoolean(node.props.disableInlineStyle);
-    const themeVars = extractValue(restProps);
+    const themeIdValue = extractValue.asOptionalString(themeId);
+    const isRoot = extractValue.asOptionalBoolean(root);
+    const disableInlineStyle = extractValue.asOptionalBoolean(disableInlineStyleProp);
+    const shouldSuppressRootThemeCssVars =
+      extractValue.asOptionalBoolean(suppressRootThemeCssVars) === true;
+    const themeVars = extractValue(themeVarProps);
 
     // Determine if Theme actually does anything meaningful
     // If no theme properties are set and applyIf is not explicitly set, default to false
-    const hasThemeId = !!themeId;
+    const hasThemeId = !!themeIdValue;
     const hasTone = !!themeTone;
     const hasThemeVars = themeVars && Object.keys(themeVars).length > 0;
     const hasDisableInlineStyle = disableInlineStyle !== undefined;
-    const hasExplicitApplyIf = node.props.applyIf !== undefined;
+    const hasExplicitApplyIf = applyIfProp !== undefined;
 
     const isMeaningfulTheme =
       isRoot || hasThemeId || hasTone || hasThemeVars || hasDisableInlineStyle;
 
     // If applyIf is explicitly set, use that value; otherwise, only apply if theme is meaningful
     const applyIf = hasExplicitApplyIf
-      ? extractValue.asOptionalBoolean(node.props.applyIf)
+      ? extractValue.asOptionalBoolean(applyIfProp)
       : isMeaningfulTheme;
 
     return (
       <Theme
-        id={themeId}
+        id={themeIdValue}
         isRoot={isRoot}
         applyIf={applyIf}
         disableInlineStyle={disableInlineStyle}
@@ -88,6 +98,7 @@ export const themeComponentRenderer = wrapComponent(COMP, Theme, ThemeMd, {
         toastDuration={toastDuration}
         notificationPosition={notificationPosition}
         themeVars={themeVars}
+        suppressRootThemeCssVars={shouldSuppressRootThemeCssVars}
         node={node}
       />
     );

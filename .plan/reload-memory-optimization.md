@@ -30,6 +30,8 @@ Measured on local SSG preview for `http://localhost:3000/docs/guides/layout`.
 | With offscreen hibernation prototype, after full scroll | ~135-146 MB | ~802-807 MB | 3-4 | Significant reduction. |
 | With offscreen hibernation prototype, after 5 reloads | ~142 MB | ~937 MB | 3-4 | Improved but RSS not eliminated. |
 | With offscreen hibernation prototype, 1 reload + 60s wait | ~137 MB | ~903 MB | 3 | No return to ~1.1 GB in this run. |
+| With inherited-theme CSS suppression, after full scroll | ~128 MB | ~733 MB | 2 | Style text down to ~0.43 MB. |
+| With inherited-theme CSS suppression, after 5 reloads | ~129 MB | ~770 MB | 2 | Structural CSS metrics stable across reloads. |
 
 The hibernation prototype also kept scroll height stable at `25365` during a
 12-checkpoint sweep.
@@ -1077,3 +1079,266 @@ Reasoning:
   theme, while leaving nested root theme emission intact.
 - Phase C is likely higher impact, but it should wait for Phase B measurements
   because it changes root Theme emission semantics inside nested apps.
+
+## Phase A+B Prototype Results
+
+Implemented after approval.
+
+Scope:
+
+- Phase A: Theme control-prop hygiene.
+- Phase B: Skip the parent theme reset class for docs playgrounds that purely
+  inherit the host theme/tone.
+- Phase C was not implemented.
+
+Code changes:
+
+- `xmlui/src/components/Theme/Theme.tsx`
+  - Destructures `tone`, `themeId`, `root`, `applyIf`, and
+    `disableInlineStyle` before extracting arbitrary `themeVars`.
+  - This prevents Theme control props from being treated as CSS theme variable
+    candidates.
+- `xmlui/src/components/Theme/ThemeReact.tsx`
+  - Makes full compiled CSS-var emission explicit for root Themes by including
+    `isRoot` in `needsCompiledVars`.
+  - This preserves normal root app theming after removing accidental `root`
+    leakage from `themeVars`.
+- `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx`
+  - Computes a conservative `inheritsHostTheme` flag.
+  - The flag is true only when the playground has no explicit `activeTheme`,
+    `config.defaultTheme`, `activeTone`, `config.defaultTone`, or local
+    `config.themes`.
+- `xmlui/src/components/NestedApp/NestedAppReact.tsx`
+  - Passes no parent theme reset styles to `NestedAppRoot` when
+    `inheritsHostTheme` is true.
+  - Keeps the existing reset behavior for every explicit theme/tone/config case.
+- `website/scripts/measure-memory.mjs`
+  - Fixed the non-JSON summary output path after adding CSSOM diagnostics.
+
+Targeted tests:
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npx playwright test xmlui/src/components/Theme/Theme.spec.ts --reporter=line` | Passed, `24/24` | Includes new checks for control-prop leakage and root Theme CSS vars. |
+| `npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts -g "xmlui-pg" --reporter=line` | Passed, `16/16` | Includes inherited playground no-bulk-reset and explicit themed playground keeps-reset checks. |
+| `node --check website/scripts/measure-memory.mjs` | Passed | Syntax check for the measurement harness. |
+| `npm run measure:memory -w website -- --help` | Passed | CLI smoke check for the measurement harness. |
+
+TypeScript check:
+
+```sh
+npx tsc --noEmit -p xmlui/tsconfig.json
+```
+
+Result:
+
+- Failed in existing `xmlui/src/components-core/wrapComponent.tsx` type
+  inference errors:
+  - `Property 'map' does not exist on type 'never'.`
+  - `Property 'constructor' does not exist on type 'never'.`
+- These errors were not in files changed by this prototype and were not pursued
+  as part of the memory optimization.
+
+SSG build:
+
+```sh
+npm run build-ssg -w website
+```
+
+Result:
+
+- Passed.
+- Known warnings remained:
+  - lightningcss `:export` warnings,
+  - direct `eval` warning from `smart.gauge`,
+  - existing theme value warnings for `fontSize-Text` and `fontSize-Badge`.
+
+Local SSG preview measurement:
+
+```sh
+npm run preview-ssg -w website
+npm run measure:memory -w website -- \
+  --url http://localhost:3000/docs/guides/layout \
+  --search= \
+  --checkpoints=12 \
+  --json
+npm run measure:memory -w website -- \
+  --url http://localhost:3000/docs/guides/layout \
+  --search= \
+  --reloads=5 \
+  --reload-mode=direct \
+  --reload-wait-ms=5000
+```
+
+Checkpoint results:
+
+| Scenario | Combined heap | Process RSS | Active shadow roots | Style text | XMLUI CSS var refs | Scroll height |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Initial | ~`112 MB` | ~`663 MB` | `1` | ~`0.57 MB` | `17,038` | `25,365` |
+| After checkpoint sweep / after scroll | ~`135 MB` | ~`750 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+
+5 direct reload results:
+
+| Scenario | Combined heap | Process RSS | Active shadow roots | Style text | XMLUI CSS var refs | Scroll height |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Initial | ~`112 MB` | ~`668 MB` | `1` | ~`0.57 MB` | `17,038` | `25,365` |
+| After scroll | ~`128 MB` | ~`739 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+| Reload 1 | ~`130 MB` | ~`809 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+| Reload 2 | ~`130 MB` | ~`826 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+| Reload 3 | ~`129 MB` | ~`796 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+| Reload 4 | ~`130 MB` | ~`840 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+| Reload 5 | ~`129 MB` | ~`816 MB` | `2` | ~`0.70 MB` | `20,904` | `25,365` |
+
+Interpretation:
+
+- Phase A behaved as intended: Theme control props are no longer emitted as CSS
+  variables, while root Theme CSS vars remain available.
+- Phase B behaved as intended: inherited playgrounds no longer generate the
+  bulk parent reset; explicit themed playgrounds still do.
+- The 5-reload result stayed far below the original ~`1.1 GB` symptom and below
+  the earlier direct-reload deep-dive result of ~`912 MB`.
+- The result is close to, and slightly better than, the earlier formalized
+  hibernation 5-reload result of ~`856 MB`, though those runs used different
+  reload wait durations (`5000 ms` here vs `8000 ms` in the earlier run).
+- The largest remaining shadow-root style blocks are still full nested root
+  Theme CSS blocks of about `140 KB` and about `4,033` `--xmlui-*`
+  occurrences each.
+
+Conclusion:
+
+- Phase A+B is a valid prototype and should be handed to the user's full E2E
+  suite.
+- The next meaningful memory experiment, if full E2E passes and more reduction
+  is needed, is Phase C: suppress full nested root Theme CSS for the same
+  conservative inherited-theme case.
+- Do not proceed to Phase C before review, because it changes nested root Theme
+  CSS emission semantics more deeply than Phase B.
+
+## Phase C Prototype Results
+
+Implemented after approval and after the user's full E2E suite reported no
+regression for Phase A+B.
+
+Scope:
+
+- Phase C: suppress the full implicit nested root Theme CSS variable block for
+  docs playgrounds that purely inherit the host theme/tone.
+- Kept Phase A+B unchanged.
+- Did not start Phase D shared/deduplicated style registry work.
+
+Code changes:
+
+- `xmlui/src/components-core/rendering/AppRoot.tsx`
+  - Added an internal `suppressRootThemeCssVars` prop.
+  - Passes this flag to the implicit root `Theme` component created by
+    `AppRoot`.
+- `xmlui/src/components/Theme/Theme.tsx`
+  - Treats `suppressRootThemeCssVars` as a control prop, not as a theme var.
+  - Converts the value to a boolean and passes it to `ThemeReact`.
+- `xmlui/src/components/Theme/ThemeReact.tsx`
+  - Skips full compiled root CSS-var emission only when both conditions are
+    true:
+    - the Theme is a root Theme,
+    - `suppressRootThemeCssVars` is true.
+  - Still emits explicit `themeVars`, `colorScheme`, and root screen-size
+    variables.
+- `xmlui/src/components/NestedApp/NestedAppReact.tsx`
+  - Enables `suppressRootThemeCssVars` only for nested apps whose
+    `inheritsHostTheme` flag is true.
+  - Explicit theme/tone/config cases keep full nested root Theme CSS.
+- `xmlui/src/components/Markdown/Markdown.spec.ts`
+  - Strengthened the inherited playground test to assert that no root-level
+    `--xmlui-space-base:` Theme block is emitted inside the shadow root.
+  - Strengthened the explicit theme test to assert that explicitly themed
+    playgrounds still keep both the parent reset and root Theme vars.
+
+Targeted tests:
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npx playwright test xmlui/src/components/Theme/Theme.spec.ts --reporter=line` | Passed, `24/24` | Root Theme behavior and control-prop hygiene still pass. |
+| `npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts -g "xmlui-pg" --reporter=line` | Passed, `16/16` | Includes inherited no-root-theme-css and explicit-theme isolation checks. |
+| `node --check website/scripts/measure-memory.mjs` | Passed | Measurement harness syntax check. |
+
+SSG build:
+
+```sh
+npm run build-ssg -w website
+```
+
+Result:
+
+- Passed.
+- Known warnings remained:
+  - lightningcss `:export` warnings,
+  - direct `eval` warning from `smart.gauge`,
+  - existing theme value warnings for `fontSize-Text` and `fontSize-Badge`.
+
+Local SSG preview measurement:
+
+```sh
+npm run preview-ssg -w website
+npm run measure:memory -w website -- \
+  --url http://localhost:3000/docs/guides/layout \
+  --search= \
+  --checkpoints=12 \
+  --json
+npm run measure:memory -w website -- \
+  --url http://localhost:3000/docs/guides/layout \
+  --search= \
+  --reloads=5 \
+  --reload-mode=direct \
+  --reload-wait-ms=5000
+```
+
+Checkpoint results:
+
+| Scenario | Combined heap | Process RSS | Active shadow roots | Style text | XMLUI CSS var refs | Scroll height |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Initial | ~`112 MB` | ~`659 MB` | `1` | ~`0.44 MB` | `13,005` | `25,365` |
+| After checkpoint sweep / after scroll | ~`140 MB` | ~`740 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+
+5 direct reload results:
+
+| Scenario | Combined heap | Process RSS | Active shadow roots | Style text | XMLUI CSS var refs | Scroll height |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Initial | ~`112 MB` | ~`661 MB` | `1` | ~`0.44 MB` | `13,005` | `25,365` |
+| After scroll | ~`128 MB` | ~`733 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+| Reload 1 | ~`129 MB` | ~`783 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+| Reload 2 | ~`130 MB` | ~`789 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+| Reload 3 | ~`129 MB` | ~`768 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+| Reload 4 | ~`130 MB` | ~`806 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+| Reload 5 | ~`129 MB` | ~`770 MB` | `2` | ~`0.43 MB` | `12,838` | `25,365` |
+
+Comparison to Phase A+B:
+
+| Metric after scroll | Phase A+B | Phase C | Change |
+| --- | ---: | ---: | ---: |
+| Style text | ~`0.70 MB` | ~`0.43 MB` | ~`39%` lower |
+| XMLUI CSS var refs | `20,904` | `12,838` | ~`39%` lower |
+| 5-reload final RSS | ~`816 MB` | ~`770 MB` | ~`46 MB` lower in this run |
+| Scroll height | `25,365` | `25,365` | Stable |
+| Active shadow roots | `2` | `2` | Unchanged |
+
+Interpretation:
+
+- The Phase C hypothesis is supported.
+- The remaining large duplicated nested root Theme block was removed for
+  inherited docs playgrounds: after-scroll style text dropped from ~`0.70 MB`
+  to ~`0.43 MB`, and XMLUI CSS variable references dropped from `20,904` to
+  `12,838`.
+- The RSS signal also improved in this run: the 5th direct reload ended around
+  ~`770 MB`, compared with ~`816 MB` for Phase A+B under the same
+  `5000 ms` reload wait.
+- Chromium RSS remains noisy and still rises after the first reload, but the
+  live XMLUI/DOM/style shape stays stable across reloads.
+- This optimization is narrower and lower risk than Phase D because it does
+  not share style registries across isolation boundaries; it only avoids
+  re-emitting a root variable set when the nested playground intentionally
+  inherits the host theme.
+
+Stop decision:
+
+- Stop after Phase C implementation and measurements.
+- Hand this prototype to the user's full E2E suite before considering any
+  broader style-registry work.

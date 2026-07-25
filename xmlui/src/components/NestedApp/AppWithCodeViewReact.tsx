@@ -84,6 +84,13 @@ export function AppWithCodeViewReact({
     themes: [...((config?.themes as any[]) || []), ...(allThemes || [])],
   };
   const effectiveActiveTheme = activeTheme || config?.defaultTheme || activeThemeId;
+  const hasLocalThemes = Array.isArray(config?.themes) && config.themes.length > 0;
+  const inheritsHostTheme =
+    activeTheme === undefined &&
+    config?.defaultTheme === undefined &&
+    activeTone === undefined &&
+    config?.defaultTone === undefined &&
+    !hasLocalThemes;
   const effectiveHeight = height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT;
   const shouldMountImmediately = immediate ?? false;
 
@@ -203,6 +210,7 @@ export function AppWithCodeViewReact({
               config={effectiveConfig}
               activeTone={activeTone}
               activeTheme={effectiveActiveTheme}
+              inheritsHostTheme={inheritsHostTheme}
               refreshVersion={refreshVersion}
               withSplashScreen={withSplashScreen}
               immediate={shouldMountImmediately}
@@ -223,6 +231,7 @@ export function AppWithCodeViewReact({
         config={effectiveConfig}
         activeTone={activeTone}
         activeTheme={effectiveActiveTheme}
+        inheritsHostTheme={inheritsHostTheme}
         refreshVersion={refreshVersion}
         withSplashScreen={withSplashScreen}
         immediate={shouldMountImmediately}

@@ -602,6 +602,7 @@ async function main() {
     if (args.json) {
       console.log(JSON.stringify(output, null, 2));
     } else {
+      const { initial, checkpoints, afterScroll, reloads, lifetimeDiagnostics, search } = output;
       console.log(`Memory measurement for ${args.url}`);
       console.log("");
       printSample(initial);

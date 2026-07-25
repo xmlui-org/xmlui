@@ -45,6 +45,7 @@ type Props = {
   toastDuration?: number;
   notificationPosition?: NotificationPosition;
   themeVars?: Record<string, string>;
+  suppressRootThemeCssVars?: boolean;
   children?: ReactNode;
 };
 
@@ -59,6 +60,7 @@ export function Theme({
   toastDuration = defaultProps.toastDuration,
   notificationPosition = defaultProps.notificationPosition,
   themeVars = defaultProps.themeVars,
+  suppressRootThemeCssVars = false,
   layoutContext,
   children,
 }: Props) {
@@ -114,9 +116,11 @@ export function Theme({
     const filteredThemeCssVars = {};
 
     // Only populate the full compiled theme CSS vars on the wrapper div when:
-    //   1. An explicit `tone` is set — the wrapper must lock in a different tone's colors, OR
-    //   2. An explicit `id` is set — the wrapper switches to a different theme definition, OR
-    //   3. `themeVars` contains base vars (no component suffix, e.g. "color-primary") that
+    //   1. This is the root theme and root theme CSS vars are not suppressed —
+    //      it owns the app-level CSS variable scope, OR
+    //   2. An explicit `tone` is set — the wrapper must lock in a different tone's colors, OR
+    //   3. An explicit `id` is set — the wrapper switches to a different theme definition, OR
+    //   4. `themeVars` contains base vars (no component suffix, e.g. "color-primary") that
     //      influence derived vars computed at compile time.
     //
     // When none of these apply (e.g. layout-only overrides like "width-navPanel-App"),
@@ -124,6 +128,7 @@ export function Theme({
     // Shadowing causes tone-switching to break: <html> updates correctly but children
     // inherit the stale tone values from the closer ancestor div instead.
     const needsCompiledVars =
+      (isRoot && !suppressRootThemeCssVars) ||
       tone !== undefined ||
       id !== undefined ||
       Object.keys(themeVars).some((key) => !parseHVar(key)?.component);
@@ -229,6 +234,7 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     invalidThemeVarNames,
     getThemeVar,
+    suppressRootThemeCssVars,
   ]);
 
   const className = useStyles(transformedStyles, { layer: "themes" });

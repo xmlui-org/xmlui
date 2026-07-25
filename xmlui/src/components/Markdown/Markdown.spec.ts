@@ -787,6 +787,64 @@ test.describe("xmlui-pg inline components", () => {
     await expect(page.locator('[data-nested-app-lazy-state="mounted"]')).toHaveCount(2);
   });
 
+  test("skips bulk theme CSS for host-theme inherited playgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Inherited theme playground"',
+      '<Button label="Inherited theme playground" />',
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Inherited theme playground" })).toBeVisible();
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeLessThan(10);
+    expect(themeCssCounts.rootThemeVarCount).toBe(0);
+  });
+
+  test("keeps parent theme reset for explicitly themed playgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Explicit theme playground"',
+      '<App defaultTheme="test">',
+      '  <Button label="Explicit theme playground" />',
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Explicit theme playground" })).toBeVisible();
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeGreaterThan(100);
+    expect(themeCssCounts.rootThemeVarCount).toBeGreaterThan(0);
+  });
+
   test("renders an empty app and warns when the app segment has only inline components", async ({
     initTestBed,
     page,
