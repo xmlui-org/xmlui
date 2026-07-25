@@ -540,6 +540,10 @@ export const LazyNestedApp = memo(function LazyNestedApp({
     hasInteractedRef.current = true;
   }, []);
 
+  const placeholderStyle = restProps.height
+    ? { height: restProps.height, minHeight: restProps.height, width: "100%" }
+    : { minHeight: MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT, width: "100%" };
+
   return (
     <div
       ref={placeholderRef}
@@ -547,7 +551,7 @@ export const LazyNestedApp = memo(function LazyNestedApp({
       onKeyDownCapture={markInteracted}
       onPointerDownCapture={markInteracted}
       data-nested-app-lazy-state={shouldRender ? "mounted" : "hibernated"}
-      style={{ minHeight: restProps.height ?? MIN_LAZY_NESTED_APP_PLACEHOLDER_HEIGHT, width: "100%" }}
+      style={placeholderStyle}
     >
       {shouldRender && <NestedApp {...restProps} />}
     </div>

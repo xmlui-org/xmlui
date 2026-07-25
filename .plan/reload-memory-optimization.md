@@ -1342,3 +1342,74 @@ Stop decision:
 - Stop after Phase C implementation and measurements.
 - Hand this prototype to the user's full E2E suite before considering any
   broader style-registry work.
+
+### Phase C Visual Regression Follow-Up
+
+Trigger:
+
+- The user reported a visual regression on `/docs/tutorial-02`, in the `Footer`
+  section's `Try clicking the ToneSwitch` playground.
+- In the new local SSG preview, clicking the embedded `ToneSwitch` no longer
+  changed the playground tone to dark.
+- The same example also showed footer layout regression: the playground frame
+  kept its reserved height, but the embedded app's shadow host collapsed to
+  content height, so the `Footer` appeared directly under the playground header
+  and a blank area remained below it.
+
+Root cause:
+
+- The playground had no explicit `activeTheme`, `defaultTheme`, `activeTone`,
+  `defaultTone`, or local `themes`, so Phase C classified it as an inherited
+  host-theme playground.
+- That classification is correct for static examples, but not for examples
+  containing a local tone controller.
+- `ToneSwitch` updates the nested app's own theme tone context. If the nested
+  root Theme CSS variables are suppressed, the shadow tree continues to rely on
+  the host's inherited CSS variables and the visual tone cannot change.
+- The footer-position problem had a separate root cause. `LazyNestedApp`
+  reserved space with `minHeight`, but did not set a definite `height` when the
+  playground supplied an explicit or implicit height. The nested `NestedApp`
+  child uses `height: 100%`; without a definite parent height that percentage
+  collapses to content height, so the footer is at the bottom of a short app
+  host rather than at the bottom of the reserved playground content area.
+
+Fix:
+
+- Narrowed the Phase C eligibility rule in
+  `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx`.
+- A playground is no longer considered safely static-inherited when its app
+  markup or component segments contain:
+  - `<ToneSwitch ...>`,
+  - `<ToneChangerButton ...>`.
+- Those playgrounds keep the pre-Phase-C behavior:
+  - parent reset remains enabled,
+  - nested root Theme CSS variables are emitted,
+  - local tone switching can update the playground visually.
+- Fixed the separate footer layout issue in
+  `xmlui/src/components/NestedApp/NestedAppReact.tsx` by giving the lazy wrapper
+  both `height` and `minHeight` when `restProps.height` exists. Direct lazy
+  nested apps without a supplied height keep the previous min-height-only
+  behavior.
+
+Validation:
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts -g "xmlui-pg" --reporter=line` | Passed, `17/17` | Added a regression test for inherited playgrounds that contain `ToneSwitch`. |
+| `npm run build-ssg -w website` | Passed | Same known build warnings as before. |
+| Local SSG preview `/docs/tutorial-02` check | Passed | On the fresh preview at an OS-assigned port, the Footer example switch changed from unchecked to checked after click. |
+| Tutorial Footer shadow-root CSS check | Passed | `rootThemeVarCount=2`, `resetVarCount=3915`, confirming Phase C suppression is no longer active for this tone-switching playground. |
+| Local SSG preview `/docs/tutorial-02` footer geometry check | Passed | For the `Try clicking the ToneSwitch` example: shadow host height `277px`, app height `277px`, pages bottom `923`, footer top `923`, footer bottom gap `0px`. |
+
+Interpretation:
+
+- The regression confirms that the Phase C optimization must distinguish
+  "statically inherits the host theme" from "starts from the host theme but can
+  mutate local tone at runtime".
+- The memory optimization remains active for passive inherited examples, but
+  is intentionally disabled for tone-mutating examples because correctness is
+  more important and such examples are rare.
+- The screenshots represented two failures in the same docs example, not one
+  failure: local tone mutation required full nested root Theme CSS, while footer
+  placement required the lazy wrapper to expose a definite height to the
+  `height: 100%` nested app.

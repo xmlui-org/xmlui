@@ -815,6 +815,52 @@ test.describe("xmlui-pg inline components", () => {
     expect(themeCssCounts.rootThemeVarCount).toBe(0);
   });
 
+  test("keeps root theme CSS for inherited playgrounds with local tone switchers", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      '```xmlui-pg immediate height="240px" name="Inherited tone switcher playground"',
+      "<App>",
+      '  <Footer testId="footer">',
+      "    Built with XMLUI",
+      "    <SpaceFiller />",
+      "    <ToneSwitch />",
+      "  </Footer>",
+      "</App>",
+      "```",
+    ].join("\n");
+
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+
+    const toneSwitch = page.getByRole("switch");
+    await expect(toneSwitch).toBeVisible();
+    await toneSwitch.click({ force: true });
+    await expect(toneSwitch).toBeChecked();
+
+    const themeCssCounts = await page.evaluate(() => {
+      const host = Array.from(document.querySelectorAll("*")).find((element) => element.shadowRoot);
+      const styleText = Array.from(host?.shadowRoot?.querySelectorAll("style") || [])
+        .map((style) => style.textContent || "")
+        .join("\n");
+      const footer = host?.shadowRoot?.querySelector('[class*="footerWrapper"]');
+      const hostRect = host?.getBoundingClientRect();
+      const footerRect = footer?.getBoundingClientRect();
+      return {
+        resetVarCount: (styleText.match(/--xmlui-[^:]+:\s*initial/g) || []).length,
+        rootThemeVarCount: (styleText.match(/--xmlui-space-base\s*:/g) || []).length,
+        hostHeight: hostRect?.height,
+        footerBottomGap:
+          hostRect && footerRect ? Math.round(hostRect.bottom - footerRect.bottom) : undefined,
+      };
+    });
+
+    expect(themeCssCounts.resetVarCount).toBeGreaterThan(100);
+    expect(themeCssCounts.rootThemeVarCount).toBeGreaterThan(0);
+    expect(themeCssCounts.hostHeight).toBeGreaterThan(180);
+    expect(themeCssCounts.footerBottomGap).toBeLessThan(4);
+  });
+
   test("keeps parent theme reset for explicitly themed playgrounds", async ({
     initTestBed,
     page,
