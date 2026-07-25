@@ -40,6 +40,8 @@ type AppWithCodeViewReactProps = {
   controlsWidth?: string | number;
 };
 
+export const DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT = "320px";
+
 /**
  * A component that displays markdown content on the left and a NestedApp on the right
  */
@@ -82,6 +84,8 @@ export function AppWithCodeViewReact({
     themes: [...((config?.themes as any[]) || []), ...(allThemes || [])],
   };
   const effectiveActiveTheme = activeTheme || config?.defaultTheme || activeThemeId;
+  const effectiveHeight = height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT;
+  const shouldMountImmediately = immediate ?? false;
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
@@ -117,7 +121,7 @@ export function AppWithCodeViewReact({
     return (
       <>
         {!!markdown && !splitView && <Markdown>{markdown}</Markdown>}
-        <div className={styles.nestedAppContainer} style={{ height }}>
+        <div className={styles.nestedAppContainer} style={{ height: effectiveHeight }}>
           {!noHeader && (
             <div className={styles.header}>
               {!splitView && <span className={styles.headerText}>{title}</span>}
@@ -201,7 +205,7 @@ export function AppWithCodeViewReact({
               activeTheme={effectiveActiveTheme}
               refreshVersion={refreshVersion}
               withSplashScreen={withSplashScreen}
-              immediate={immediate}
+              immediate={shouldMountImmediately}
             />
           </div>
         </div>
@@ -212,7 +216,7 @@ export function AppWithCodeViewReact({
     <>
       {!!markdown && <Markdown>{markdown}</Markdown>}
       <IndexAwareNestedApp
-        height={height}
+        height={effectiveHeight}
         app={app}
         api={api}
         components={components}
@@ -221,7 +225,7 @@ export function AppWithCodeViewReact({
         activeTheme={effectiveActiveTheme}
         refreshVersion={refreshVersion}
         withSplashScreen={withSplashScreen}
-        immediate={immediate}
+        immediate={shouldMountImmediately}
       />
     </>
   );

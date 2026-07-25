@@ -167,7 +167,157 @@ export type PluginOptions = {
    * runtime fallback paths.
    */
   compiledScriptSourceMaps?: CompiledScriptSourceMapMode;
+  /**
+   * Strip parser source-location metadata from ComponentDef graphs emitted to
+   * browser/runtime modules. Build-time analyzers still run before this step.
+   * Defaults to production builds only; dev server output keeps debug metadata.
+   */
+  stripComponentDebug?: boolean;
+  /**
+   * Remove empty optional collection fields from ComponentDef graphs emitted to
+   * browser/runtime modules. Defaults to production builds only; dev server
+   * output keeps the parser's fuller object shape for diagnostics.
+   */
+  normalizeComponentDefCollections?: boolean;
+  /**
+   * Remove parser/source-position metadata from ComponentDef graphs emitted to
+   * browser/runtime modules. Defaults to production builds only; dev server
+   * output keeps token/source locations for diagnostics and source maps.
+   */
+  stripComponentSourceMetadata?: boolean;
 };
+
+function isRecord(value: unknown): value is Record<string, any> {
+  return !!value && typeof value === "object";
+}
+
+function isComponentDefLike(value: unknown): value is ComponentDef {
+  return isRecord(value) && typeof value.type === "string";
+}
+
+function isCompoundComponentDefLike(value: unknown): value is CompoundComponentDef {
+  return isRecord(value) && typeof value.name === "string" && isComponentDefLike(value.component);
+}
+
+const emptyCollectionKeys = new Set([
+  "api",
+  "children",
+  "computedGlobalUses",
+  "computedUses",
+  "contextVars",
+  "events",
+  "functions",
+  "globalVars",
+  "loaders",
+  "namespaces",
+  "props",
+  "slots",
+  "uses",
+  "vars",
+  "_savedFunctionDefs",
+  "_savedVarDefs",
+]);
+
+const sourceTokenKeys = new Set(["startToken", "endToken"]);
+
+function isEmptyCollection(value: unknown): boolean {
+  return (
+    (Array.isArray(value) && value.length === 0) ||
+    (isRecord(value) &&
+      Object.getPrototypeOf(value) === Object.prototype &&
+      Object.keys(value).length === 0)
+  );
+}
+
+function stripComponentSourceMetadata(value: unknown, seen = new WeakSet<object>()) {
+  if (!isRecord(value)) {
+    return;
+  }
+  if (seen.has(value)) {
+    return;
+  }
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      stripComponentSourceMetadata(item, seen);
+    }
+    return;
+  }
+
+  for (const key of sourceTokenKeys) {
+    delete (value as any)[key];
+  }
+
+  for (const item of Object.values(value)) {
+    stripComponentSourceMetadata(item, seen);
+  }
+}
+
+function stripComponentDebug(value: unknown, seen = new WeakSet<object>()) {
+  if (!isRecord(value)) {
+    return;
+  }
+  if (seen.has(value)) {
+    return;
+  }
+  seen.add(value);
+
+  if (isComponentDefLike(value) || isCompoundComponentDefLike(value)) {
+    delete (value as any).debug;
+  }
+
+  if (isCompoundComponentDefLike(value)) {
+    stripComponentDebug(value.component, seen);
+  }
+
+  if (isComponentDefLike(value)) {
+    stripComponentDebug(value.children, seen);
+    stripComponentDebug(value.loaders, seen);
+    stripComponentDebug(value.slots, seen);
+    stripComponentDebug(value.props, seen);
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      stripComponentDebug(item, seen);
+    }
+    return;
+  }
+
+  for (const item of Object.values(value)) {
+    stripComponentDebug(item, seen);
+  }
+}
+
+function normalizeComponentDefCollections(value: unknown, seen = new WeakSet<object>()) {
+  if (!isRecord(value)) {
+    return;
+  }
+  if (seen.has(value)) {
+    return;
+  }
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      normalizeComponentDefCollections(item, seen);
+    }
+    return;
+  }
+
+  for (const item of Object.values(value)) {
+    normalizeComponentDefCollections(item, seen);
+  }
+
+  if (isComponentDefLike(value) || isCompoundComponentDefLike(value)) {
+    for (const key of emptyCollectionKeys) {
+      if (isEmptyCollection((value as any)[key])) {
+        delete (value as any)[key];
+      }
+    }
+  }
+}
 
 function createTransformSourceMap(
   code: string,
@@ -619,6 +769,24 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
               this.warn(message);
             }
           }
+        }
+
+        const shouldStripComponentDebug = pluginOptions.stripComponentDebug ?? !devServerMode;
+        if (shouldStripComponentDebug) {
+          stripComponentDebug(component);
+          stripComponentDebug(inlineComponents);
+        }
+        const shouldNormalizeComponentDefCollections =
+          pluginOptions.normalizeComponentDefCollections ?? !devServerMode;
+        if (shouldNormalizeComponentDefCollections) {
+          normalizeComponentDefCollections(component);
+          normalizeComponentDefCollections(inlineComponents);
+        }
+        const shouldStripComponentSourceMetadata =
+          pluginOptions.stripComponentSourceMetadata ?? !devServerMode;
+        if (shouldStripComponentSourceMetadata) {
+          stripComponentSourceMetadata(component);
+          stripComponentSourceMetadata(inlineComponents);
         }
 
         const debugSources = [createDebugSource(fileId, code)];

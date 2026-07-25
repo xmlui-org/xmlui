@@ -1,0 +1,432 @@
+# Website Memory Optimization Notes
+
+This document summarizes the memory investigation and optimization work done for
+the XMLUI documentation website, with special attention to pages that contain
+many `xmlui-pg` embedded playgrounds.
+
+The main investigated route was:
+
+```text
+/docs/guides/layout
+```
+
+That page is a useful stress case because it contains 35 live `xmlui-pg`
+examples. Each example can behave as a small independent XMLUI application with
+its own React root, shadow root, providers, parsed ComponentDefs, state
+containers, code view, and styling infrastructure.
+
+## Problem Summary
+
+Users reported that the docs website consumed too much memory, especially around
+search and pages with many embedded examples.
+
+The investigation found two separate classes of issues:
+
+1. The earlier search issue was caused by runtime indexing of hidden docs pages
+   even though static search data was already available. That was fixed before
+   the `xmlui-pg` memory work described here.
+2. The production docs route `/docs/guides/layout` retained a large amount of
+   memory because it mounted many embedded XMLUI playgrounds and duplicated
+   runtime/style infrastructure for each one.
+
+The important conclusion is that the largest wins did not come from one leak.
+They came from removing repeated per-playground costs and avoiding unnecessary
+initial mounting.
+
+## How We Measured
+
+The production-like local workflow is:
+
+```sh
+npm run build-ssg -w website
+npm run preview-ssg -w website
+```
+
+The preview server serves `website/dist-ssg`, which matches the deployment
+workflow closely enough for local no-deployment validation.
+
+A reusable local measurement script was added:
+
+```sh
+npm run measure:memory -w website -- --url http://localhost:3000/docs/guides/layout
+```
+
+For scroll checkpoint measurements:
+
+```sh
+npm run measure:memory -w website -- --url http://localhost:3000/docs/guides/layout --checkpoints 12
+```
+
+The script uses Playwright and Chrome DevTools Protocol to:
+
+- force garbage collection,
+- read `Runtime.getHeapUsage`,
+- count React fibers reachable from DOM roots,
+- count ComponentDef-like objects,
+- count production-only debug/token metadata,
+- count nested playground containers and active shadow roots,
+- count DOM/code block structures,
+- smoke-test docs search with `layout`, `stack`, and `grid`.
+
+The heap numbers should be treated as comparative measurements, not absolute
+budgets. They vary across machines and Chrome versions. The useful signal is
+before/after movement under the same script and route.
+
+## Baseline
+
+The first production-shaped SSG preview baseline for
+`/docs/guides/layout` showed:
+
+| Metric | Baseline |
+| --- | ---: |
+| JS heap after forced GC | about `195 MB` |
+| React fibers | `15,272` |
+| ComponentDef-like objects in React props | `3,562` |
+| ComponentDefs with `debug` | `819` |
+| `debug.source` | `819` |
+| `debug.attributes` | `739` |
+| DOM elements | `8,134` |
+| `data-component-type` elements | `173` |
+
+The same shape was observed on the public production site, so local SSG preview
+was accepted as the validation target.
+
+## Change 1: Strip ComponentDef Debug Metadata In Production
+
+Affected file:
+
+- `xmlui/src/nodejs/vite-xmlui-plugin.ts`
+
+Production/SSG builds were retaining `ComponentDef.debug` metadata. This is
+useful in development for diagnostics and source mapping, but it is unnecessary
+for normal production rendering.
+
+The Vite XMLUI plugin now strips `debug` from emitted ComponentDef graphs by
+default outside dev-server mode. Dev builds keep the metadata.
+
+Result:
+
+| Metric | Before | After |
+| --- | ---: | ---: |
+| `debug` / `debug.source` / `debug.attributes` / `debug.reactiveNodes` | non-zero | `0` |
+| SSR bundle | about `12.32 MB` / gzip `2.04 MB` | about `10.28 MB` / gzip `1.88 MB` |
+| Browser JS heap | about `195 MB` | about `195 MB` |
+
+This was a good production payload cleanup, but it was not a major browser heap
+win. The main heap problem was elsewhere.
+
+## Change 2: Share Constructed Stylesheets Across Nested Apps
+
+Affected file:
+
+- `xmlui/src/components/NestedApp/NestedAppReact.tsx`
+
+This was the largest confirmed memory win.
+
+Each embedded playground renders into its own shadow root. Before the change,
+each shadow root received fresh constructed `CSSStyleSheet` objects copied from
+the same document-level stylesheets.
+
+On `/docs/guides/layout` this meant:
+
+| Metric | Before |
+| --- | ---: |
+| Nested app shadow roots | `35` |
+| Adopted stylesheet slots | `175` |
+| Unique constructed `CSSStyleSheet` objects | `175` |
+| Repeated CSS rules across slots | `603,785` |
+| Estimated repeated CSS text | about `157 MB` |
+| CDP embedder heap sample | about `419 MB` |
+
+The fix introduced a module-level cache for constructed stylesheets derived from
+document stylesheets. The cache is keyed by a stylesheet signature. Shadow roots
+still get the same set of adopted stylesheets, but the immutable constructed
+stylesheet objects are reused.
+
+After the change:
+
+| Metric | After |
+| --- | ---: |
+| Nested app shadow roots | `35` |
+| Adopted stylesheet slots | `175` |
+| Unique constructed `CSSStyleSheet` objects | `5` |
+| CDP embedder heap sample | about `50-51 MB` |
+
+The important design point: this shares immutable style infrastructure only. It
+does not share React roots, app state, dynamic style registries, provider trees,
+or playground state.
+
+## Change 3: Lazy-Mount Embedded Playground Apps
+
+Affected files:
+
+- `xmlui/src/components/NestedApp/NestedAppReact.tsx`
+- `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx`
+
+The page originally mounted every embedded playground during initial render.
+That is expensive because each playground is a real XMLUI application.
+
+`LazyNestedApp` now supports deferred mounting using `IntersectionObserver`.
+It mounts when the placeholder approaches the viewport, with:
+
+```text
+rootMargin: 800px 0px
+```
+
+Once mounted, the app remains mounted. This preserves playground state after the
+first activation.
+
+The first conservative prototype deferred only examples with explicit `height`.
+That was safe but had almost no effect on `/docs/guides/layout`, because only
+one playground on that page had an explicit outer height.
+
+The broader solution required stable height reservation.
+
+## Change 4: Default Implicit Playground Height
+
+Affected files:
+
+- `xmlui/src/components/NestedApp/AppWithCodeViewReact.tsx`
+- `xmlui/src/components/Markdown/MarkdownReact.tsx`
+- `xmlui/src/components/NestedApp/AppWithCodeView.tsx`
+- `website/content/docs/pages/playground-and-codefence.md`
+
+Lazy mounting is only safe if the placeholder and the eventual mounted
+playground occupy the same height. Otherwise, the page changes height as
+playgrounds activate, which can break scroll position, anchors, and table of
+contents navigation.
+
+We tested a broad lazy-mount prototype with a guessed `160px` placeholder. It
+confirmed the memory benefit but also confirmed the scroll risk:
+
+| Metric | Result |
+| --- | ---: |
+| Initial combined heap | about `118 MB` |
+| After-scroll combined heap | about `302 MB` |
+| Scroll height | `21315 -> 19739` |
+| Scroll drift | `-1576 px` |
+
+The final accepted approach defines a documented default implicit playground
+height:
+
+```ts
+export const DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT = "320px";
+```
+
+When an `xmlui-pg` fence does not specify `height`, the docs renderer uses
+`320px` both for the initial placeholder and for the mounted playground frame.
+Explicit `height` still wins.
+
+Measured sweep:
+
+| Default height | Initial combined heap | After-scroll combined heap | Scroll drift | Page length impact |
+| --- | ---: | ---: | ---: | ---: |
+| `400px` | about `118 MB` | about `305 MB` | `0 px` | Too much page growth |
+| `320px` | about `119 MB` | about `302 MB` | `0 px` | Best compromise |
+| `240px` | about `119 MB` | about `303 MB` | `0 px` | More clipping risk |
+
+Final accepted implementation on `/docs/guides/layout`:
+
+| Metric | Initial | After scroll |
+| --- | ---: | ---: |
+| Nested containers | `35` | `35` |
+| Mounted apps | `1` | `35` |
+| Deferred apps | `34` | `0` |
+| Combined heap | about `113 MB` | about `289-293 MB` |
+| Scroll height | `25365` | `25365` |
+| Scroll drift | `0 px` | `0 px` |
+
+The tradeoff is that implicit examples can become taller than their previous
+auto-height rendering. The best long-term authoring pattern is to give important
+docs examples explicit, example-specific heights. The `320px` default remains a
+safe fallback.
+
+## Change 5: Normalize Empty Optional ComponentDef Collections
+
+Affected files:
+
+- `xmlui/src/nodejs/vite-xmlui-plugin.ts`
+- `xmlui/src/components-core/StandaloneApp.tsx`
+
+The ComponentDef type has many optional collection fields, such as `props`,
+`events`, `vars`, `children`, `functions`, `uses`, and internal saved
+definitions. Empty arrays/objects add object overhead and can also alter runtime
+shape checks.
+
+The production/SSG plugin now has a `normalizeComponentDefCollections` path that
+removes empty optional collections from emitted ComponentDef graphs. Dev-server
+output keeps the fuller parser shape.
+
+`StandaloneApp` was also adjusted so code-behind merge paths avoid synthesizing
+empty `vars: {}` or `functions: {}` when both sides are empty.
+
+Measured impact on the website route was small. This should be understood as
+runtime-shape hygiene, not a headline memory win.
+
+## Change 6: Strip Production Script Token Metadata
+
+Affected file:
+
+- `xmlui/src/nodejs/vite-xmlui-plugin.ts`
+
+The compact ComponentDef serialization experiment showed that compact keys or
+tuple-shaped ComponentDefs would not help much after gzip/brotli. The better
+signal was parser/source metadata still retained in production-shaped graphs.
+
+The safe final change strips only script AST token references:
+
+```text
+startToken
+endToken
+```
+
+It intentionally preserves `nodeId`, because runtime script execution and
+compiled-event cache/source IDs use it. It also does not blindly delete generic
+position-like keys such as `startLine` or `startPosition`, because those keys can
+exist in user data and should not be removed by a production serializer.
+
+Measured impact:
+
+| Metric | Before | After |
+| --- | ---: | ---: |
+| SSR render bundle | `10,281.98 kB` / gzip `1,884.25 kB` | `10,186.60 kB` / gzip `1,875.40 kB` |
+| Initial JS heap | `74.39 MB` | `74.33 MB` |
+| After-scroll JS heap | `235.64 MB` | `235.85 MB` |
+
+This is a useful production payload cleanup. It is not a major browser heap win.
+
+## What We Did Not Implement
+
+### Compact Tuple ComponentDefs
+
+A measurement-only serializer estimated:
+
+| Representation | Raw JSON delta | Gzip delta | Brotli delta |
+| --- | ---: | ---: | ---: |
+| Compact object keys | `-13.0%` | `-2.5%` | about `0%` |
+| Tuple-shaped ComponentDefs | `-16.1%` | `-2.9%` | `-0.5%` |
+
+Because compression already handles repeated property names well, tuple-shaped
+runtime ComponentDefs would add complexity for little compressed-size benefit.
+We did not implement it.
+
+### Lazy Rendering Of The XML/Code Source Pane
+
+Measurement showed that hidden source panes are rendered up front:
+
+| Metric | Initial | After scroll |
+| --- | ---: | ---: |
+| Hidden split-code Markdown blocks | `41` | `41` |
+| Code block nodes | `218` | `218` |
+| Highlighted HTML strings | about `295 KB` | about `295 KB` |
+
+This is a real source of initial DOM/React work, but the raw measured string
+surface is small compared with the embedded app runtime costs. The prototype was
+intentionally skipped after confirming that the XML/code view is rarely used in
+current docs content.
+
+### Offscreen Playground Hibernation
+
+After the accepted optimizations, after-scroll memory is still much higher than
+initial memory because all 35 playground apps eventually mount and stay mounted.
+
+Checkpoint measurement showed a roughly linear retained cost:
+
+| State | Active playgrounds | Combined heap |
+| --- | ---: | ---: |
+| Initial | `1` | about `113 MB` |
+| Full scroll | `35` | about `284-293 MB` |
+
+That is about `5 MB` combined heap per additionally activated playground on the
+measured route.
+
+The only likely way to reduce this significantly is to hibernate or unmount
+offscreen playgrounds. That is a product/UX-sensitive change because it can
+affect playground state, remount cost, and reverse-scroll behavior. We did not
+implement it in this optimization round.
+
+## Current Mental Model
+
+The current memory behavior of `xmlui-pg` docs pages is:
+
+1. Initial page load keeps the host docs app, markdown structures, source/code
+   panes, and only viewport-near playground apps mounted.
+2. As the user scrolls, more playgrounds mount through `IntersectionObserver`.
+3. Mounted playgrounds remain mounted to preserve state.
+4. The shared constructed stylesheet cache prevents each playground shadow root
+   from duplicating the same large CSSOM structures.
+5. Production builds strip debug and token metadata, but those are not the
+   dominant heap cost.
+
+In other words:
+
+- initial memory was significantly reduced,
+- production payload shape is cleaner,
+- after-scroll memory is now mostly the expected cost of many live embedded
+  applications.
+
+## Recommended Follow-Up Work
+
+### Prefer Explicit Heights In Docs Authoring
+
+The best layout/memory authoring pattern is to give `xmlui-pg` examples explicit
+heights when practical.
+
+Explicit heights allow:
+
+- stable lazy placeholders,
+- lower initial memory,
+- no scroll drift,
+- better control than the generic `320px` fallback.
+
+The `320px` default should remain a safety fallback, not the ideal for every
+example.
+
+### Keep The Memory Harness Manual For Now
+
+Do not add hard CI thresholds yet. Heap measurements are noisy. The script is
+best used as a local comparative profiler:
+
+```sh
+npm run preview-ssg -w website
+npm run measure:memory -w website -- --url http://localhost:3000/docs/guides/layout --checkpoints 12
+```
+
+Useful checks:
+
+- `debug` and `debug.source` should stay at `0` in SSG preview.
+- `startToken` and `endToken` should stay at `0` in SSG preview.
+- initial active playground count should remain low on pages with many examples.
+- scroll height should remain stable before and after activation.
+
+### Treat Hibernation As A Separate Design
+
+If further large memory reductions are required, design offscreen hibernation as
+a separate feature. Recommended constraints:
+
+- keep the reserved frame height stable,
+- do not hibernate a playground after user interaction unless state persistence
+  is solved,
+- measure reverse-scroll behavior,
+- measure remount latency,
+- keep the feature scoped to docs playgrounds first.
+
+## Validation Performed During The Optimization
+
+Targeted checks used during the work included:
+
+```sh
+npx vitest run xmlui/tests/bin/vite-plugin-import.test.ts
+npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts -g "xmlui-pg"
+npx playwright test xmlui/src/components/Markdown/Markdown.spec.ts xmlui/src/components/App/App.spec.ts
+node --check website/scripts/measure-memory.mjs
+npm run measure:memory -w website -- --url http://localhost:3000/docs/guides/layout
+```
+
+The full E2E suite was run by the user between accepted implementation steps.
+
+During the original memory work, SSG builds exposed a pre-existing
+`RangeError: Invalid time value` on the `supabase-and-xmlui` draft blog route.
+That issue was handled separately afterward: the blog page now avoids formatting
+invalid post dates, and RSS generation skips draft posts and posts with invalid
+or missing dates.

@@ -149,6 +149,106 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
   });
 
   describe("Inline components in entrypoint files", () => {
+    it("strips ComponentDef debug metadata from production transform output by default", async () => {
+      const { result } = await transformXmlui(
+        `
+          <Component name='CardTitle'>
+            <Text value="inline" />
+          </Component>
+          <App>
+            <Card titleTemplate="{CardTitle}" />
+          </App>
+        `,
+        "/project/src/Main.xmlui",
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.debug).toBeUndefined();
+      expect(mod.default.component.children[0].debug).toBeUndefined();
+      expect(mod.default.inlineComponents[0].debug).toBeUndefined();
+      expect(mod.default.inlineComponents[0].component.debug).toBeUndefined();
+      expect(JSON.stringify(mod.default.component)).not.toContain('"debug"');
+      expect(JSON.stringify(mod.default.inlineComponents)).not.toContain('"debug"');
+    });
+
+    it("keeps ComponentDef debug metadata in dev server transform output", async () => {
+      const harness = await createPluginHarness("/project");
+
+      const result = await harness.transform(`<App><Text value="hello" /></App>`, "/project/src/Main.xmlui");
+      const mod = await importGeneratedModule(result.code);
+
+      expect(mod.default.component.debug?.source).toBeDefined();
+      expect(mod.default.component.children[0].debug?.source).toBeDefined();
+    });
+
+    it("can keep ComponentDef debug metadata when explicitly configured", async () => {
+      const { result } = await transformXmlui(
+        `<App><Text value="hello" /></App>`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { stripComponentDebug: false },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.debug?.source).toBeDefined();
+      expect(mod.default.component.children[0].debug?.source).toBeDefined();
+    });
+
+    it("strips parser source metadata from production transform output by default", async () => {
+      const { result } = await transformXmlui(
+        `<App var.count="{1}"><Button onClick="count = count + 1" label="{count}" /></App>`,
+        "/project/src/Main.xmlui",
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const output = JSON.stringify(mod.default);
+
+      expect(output).not.toContain('"startToken"');
+      expect(output).not.toContain('"endToken"');
+      expect(output).not.toContain('"startPosition"');
+      expect(output).not.toContain('"endPosition"');
+      expect(output).not.toContain('"startLine"');
+      expect(output).not.toContain('"endLine"');
+      expect(output).not.toContain('"startColumn"');
+      expect(output).not.toContain('"endColumn"');
+      expect(output).toContain('"nodeId"');
+    });
+
+    it("keeps parser source metadata in dev server transform output", async () => {
+      const harness = await createPluginHarness("/project");
+
+      const result = await harness.transform(
+        `<App var.count="{1}"><Button onClick="count = count + 1" label="{count}" /></App>`,
+        "/project/src/Main.xmlui",
+      );
+      const mod = await importGeneratedModule(result.code);
+      const output = JSON.stringify(mod.default);
+
+      expect(output).toContain('"startToken"');
+      expect(output).toContain('"endToken"');
+      expect(output).toContain('"startPosition"');
+      expect(output).toContain('"endPosition"');
+      expect(output).toContain('"nodeId"');
+    });
+
+    it("can keep parser source metadata when explicitly configured", async () => {
+      const { result } = await transformXmlui(
+        `<App var.count="{1}"><Button onClick="count = count + 1" label="{count}" /></App>`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { stripComponentSourceMetadata: false },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const output = JSON.stringify(mod.default);
+
+      expect(output).toContain('"startToken"');
+      expect(output).toContain('"endToken"');
+      expect(output).toContain('"startPosition"');
+      expect(output).toContain('"endPosition"');
+      expect(output).toContain('"nodeId"');
+    });
+
     it("emits inlineComponents for Main.xmlui", async () => {
       const { result } = await transformXmlui(
         `

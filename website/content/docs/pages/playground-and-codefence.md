@@ -583,6 +583,8 @@ Modifiers can be combined in various ways.
 - `copy display name="..." height="..."` - Full-featured playground with custom height
 - `copy display name="..." /pattern/` - Named example with pattern highlighting
 
+If an `xmlui-pg` fence does not specify `height`, the rendered playground uses a default height of `320px`. Add an explicit `height="..."` when an example needs a shorter or taller preview.
+
 ## Quick reference
 
 ### Fence Types

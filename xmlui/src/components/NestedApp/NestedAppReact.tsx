@@ -42,6 +42,72 @@ type NestedAppProps = {
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
 const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
 
+type NestedAppStyleSheetSource = {
+  rules: CSSRule[];
+  signaturePart: string;
+};
+
+let sharedNestedAppStyleSheets:
+  | {
+      signature: string;
+      promise: Promise<CSSStyleSheet[]>;
+    }
+  | undefined;
+
+function getNestedAppStyleSheetSources(): NestedAppStyleSheetSource[] {
+  return Array.from(document.styleSheets).flatMap((sheet, index) => {
+    if (
+      sheet.ownerNode &&
+      sheet.ownerNode instanceof Element &&
+      sheet.ownerNode.hasAttribute("data-style-hash")
+    ) {
+      return [];
+    }
+
+    if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
+      return [];
+    }
+
+    try {
+      const rules = Array.from(sheet.cssRules);
+      return [
+        {
+          rules,
+          signaturePart: [
+            index,
+            sheet.href || "inline",
+            rules.length,
+            rules[0]?.cssText.length || 0,
+            rules[rules.length - 1]?.cssText.length || 0,
+          ].join(":"),
+        },
+      ];
+    } catch (e) {
+      return [];
+    }
+  });
+}
+
+function getSharedNestedAppStyleSheets(): Promise<CSSStyleSheet[]> {
+  const sources = getNestedAppStyleSheetSources();
+  const signature = sources.map((source) => source.signaturePart).join("|");
+  if (sharedNestedAppStyleSheets?.signature === signature) {
+    return sharedNestedAppStyleSheets.promise;
+  }
+
+  const promise = Promise.all(
+    sources.map(async ({ rules }) => {
+      const newSheet = new CSSStyleSheet();
+      const cssText = rules.map((rule) => rule.cssText).join(" \n");
+      await newSheet.replace(cssText);
+      return newSheet;
+    }),
+  );
+
+  sharedNestedAppStyleSheets = { signature, promise };
+  return promise;
+}
+
 function toSafeFileStem(value: string | undefined, fallback: string): string {
   if (!value) return fallback;
   const normalized = value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
@@ -93,7 +159,7 @@ export const NestedApp = memo(function NestedApp({
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const shadowRef = useRef(null);
+  const shadowRef = useRef<ShadowRoot | null>(null);
   const contentRootRef = useRef<Root | null>(null);
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
@@ -159,44 +225,10 @@ export const NestedApp = memo(function NestedApp({
       style.innerHTML = CSS_LAYER_ORDER;
       shadowRef.current.appendChild(style);
 
-      // This should run once to prepare the stylesheets
-      const sheetPromises = Array.from(document.styleSheets).map(async (sheet) => {
-        // Check if the owner element has the attribute you want to skip
-        if (
-          sheet.ownerNode &&
-          sheet.ownerNode instanceof Element &&
-          sheet.ownerNode.hasAttribute("data-style-hash")
-        ) {
-          return null; // Skip this stylesheet
+      void getSharedNestedAppStyleSheets().then((sheets) => {
+        if (shadowRef.current) {
+          shadowRef.current.adoptedStyleSheets = sheets;
         }
-        // Can't access cross-origin sheets, so skip them
-        if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
-          try {
-            // Create a new CSSStyleSheet object
-            const newSheet = new CSSStyleSheet();
-            // Get the CSS rules as text
-            const cssText = Array.from(sheet.cssRules)
-              .map((rule) => rule.cssText)
-              .join(" \n");
-            // Apply the text to the new sheet object
-            await newSheet.replace(cssText);
-            return newSheet;
-          } catch (e) {
-            // console.error('Could not process stylesheet:', sheet.href, e);
-            return null;
-          }
-        }
-        return null;
-      });
-
-      // When your component mounts and the shadow root is available...
-      void Promise.all(sheetPromises).then((sheets) => {
-        // Filter out any sheets that failed to load
-        const validSheets = sheets.filter(Boolean);
-
-        // Apply the array of constructed stylesheets to the shadow root
-        // This is synchronous and does not trigger new network requests
-        shadowRef.current.adoptedStyleSheets = validSheets;
       });
     }
     if (!contentRootRef.current && shadowRef.current) {
@@ -443,16 +475,50 @@ export const LazyNestedApp = memo(function LazyNestedApp({
   immediate,
   ...restProps
 }: NestedAppProps & { immediate?: boolean }) {
-  const [shouldRender, setShouldRender] = useState(immediate || false);
+  const shouldMountImmediately = immediate !== false;
+  const [shouldRender, setShouldRender] = useState(shouldMountImmediately);
+  const placeholderRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!immediate) {
+    if (shouldMountImmediately || shouldRender) {
+      return;
+    }
+
+    const placeholder = placeholderRef.current;
+    if (!placeholder || typeof IntersectionObserver === "undefined") {
+      startTransition(() => setShouldRender(true));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+        observer.disconnect();
+        startTransition(() => {
+          setShouldRender(true);
+        });
+      },
+      { rootMargin: "800px 0px" },
+    );
+
+    observer.observe(placeholder);
+    return () => {
+      observer.disconnect();
+    };
+  }, [shouldMountImmediately, shouldRender]);
+
+  useEffect(() => {
+    if (shouldMountImmediately && !shouldRender) {
       startTransition(() => {
         setShouldRender(true);
       });
     }
-  }, [immediate]);
+  }, [shouldMountImmediately, shouldRender]);
+
   if (!shouldRender) {
-    return null;
+    return <div ref={placeholderRef} style={{ minHeight: restProps.height ?? 1 }} />;
   }
   return <NestedApp {...restProps} />;
 });

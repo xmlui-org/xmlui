@@ -5,6 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { AppWithCodeViewReact } from "./AppWithCodeViewReact";
 import { defaultProps } from "./NestedApp.defaults";
 import { createMetadata } from "../metadata-helpers";
+import { DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT } from "./AppWithCodeViewReact";
 
 const COMP = "AppWithCodeView";
 
@@ -56,8 +57,9 @@ It supports both side-by-side and stacked layouts.`,
     },
     height: {
       description:
-        "The height of the nested app. If not set, the height is determined automatically.",
+        `The height of the nested app. If not set, the default height is ${DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT}.`,
       valueType: "length",
+      defaultValue: DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT,
     },
     allowPlaygroundPopup: {
       description:

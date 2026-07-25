@@ -12,6 +12,14 @@ interface BlogPost {
   date: string;
 }
 
+function isDraft(frontmatter: Record<string, string>): boolean {
+  return frontmatter.draft?.toLowerCase() === 'true';
+}
+
+function hasValidDate(date: string | undefined): date is string {
+  return !!date && Number.isFinite(new Date(date).getTime());
+}
+
 function extractFrontmatter(content: string): Record<string, string> {
   const frontmatter: Record<string, string> = {};
   const lines = content.split('\n');
@@ -55,7 +63,16 @@ function extractBlogPosts(): BlogPost[] {
     const content = fs.readFileSync(filePath, 'utf8');
     const frontmatter = extractFrontmatter(content);
 
-    if (frontmatter.title && frontmatter.slug && frontmatter.author && frontmatter.date) {
+    if (isDraft(frontmatter)) {
+      continue;
+    }
+
+    if (!hasValidDate(frontmatter.date)) {
+      console.warn(`Skipping blog post with invalid or missing date: ${file}`);
+      continue;
+    }
+
+    if (frontmatter.title && frontmatter.slug && frontmatter.author) {
       blogPosts.push({
         key: frontmatter.slug,
         title: frontmatter.title,

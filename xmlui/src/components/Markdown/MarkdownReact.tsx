@@ -33,7 +33,9 @@ import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
-import NestedAppAndCodeViewReact from "../NestedApp/AppWithCodeViewReact";
+import NestedAppAndCodeViewReact, {
+  DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT,
+} from "../NestedApp/AppWithCodeViewReact";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
@@ -153,7 +155,9 @@ function PlaygroundSampRenderer(props: any) {
     />
   );
   if (appProps.noFrame === true) {
-    return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
+    return (
+      <div style={{ height: appProps.height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT }}>{content}</div>
+    );
   }
   return content;
 }
