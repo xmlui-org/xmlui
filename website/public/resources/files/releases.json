@@ -1,5 +1,89 @@
 [
   {
+    "tag_name": "xmlui@0.12.31",
+    "published_at": "2026-07-12T04:50:08Z",
+    "changes": [
+      {
+        "description": "Expose SkipLink, FocusScope, and LiveRegion in component metadata and generated documentation.",
+        "commit_sha": "2005039"
+      },
+      {
+        "description": "Expose `autoComplete`, `autoCorrect`, `spellCheck`, and `autoCapitalize` on `TextArea` and `TextBox`.",
+        "commit_sha": "69b3eda"
+      },
+      {
+        "description": "Reuse a single API interceptor worker instance and serialize its start/stop",
+        "commit_sha": "eeb554e"
+      },
+      {
+        "description": "Fix analyzer false positives around reusable Component definitions and parsed event-handler arrows.",
+        "commit_sha": "03fcaba"
+      },
+      {
+        "description": "Prevent TextArea layout props from leaking to the native textarea element.",
+        "commit_sha": "9ff4236"
+      },
+      {
+        "description": "Fix stored arrow callbacks so they retain the evaluation context where they were defined.",
+        "commit_sha": "91416bb"
+      },
+      {
+        "description": "Reduce analyzer false positives for local script declarations, function parameters, and arrow parameters in expression-scope and component-reference rules.",
+        "commit_sha": "658f704"
+      },
+      {
+        "description": "Improve parser diagnostics for quoted text that appears where an attribute name is expected, helping users identify attributes closed early by an unescaped quote.",
+        "commit_sha": "e4e85c6"
+      },
+      {
+        "description": "Add app-bound layout spacing theme variables and wire non-breaking default spacing hooks for App content, Stack, FlowLayout, and Pages.",
+        "commit_sha": "144d6e3"
+      },
+      {
+        "description": "Add `listenToSources` to `ChangeListener` for watching named independent values with source-level change details.",
+        "commit_sha": "89737e4"
+      },
+      {
+        "description": "Prevent textarea-backed FormItem layout props from leaking to the native textarea DOM element.",
+        "commit_sha": "c71bd1e"
+      },
+      {
+        "description": "Update Remix runtime dependencies to avoid vulnerable transitive versions of `@remix-run/server-runtime` and `turbo-stream`.",
+        "commit_sha": "14bb9c4"
+      },
+      {
+        "description": "Improve runtime event handler and managed localStorage failure diagnostics with component/event context, handler source snippets, stable diagnostic codes, targeted hints, and Inspector trace metadata.",
+        "commit_sha": "e4e85c6"
+      },
+      {
+        "description": "Improve unbound-identifier analysis for nested arrow handlers so callback parameters stay scoped to their callback body and unresolved names inside callbacks are reported more precisely.",
+        "commit_sha": "e4e85c6"
+      },
+      {
+        "description": "Add a Splitter resizeMode prop for controlling how panels adjust when the splitter container resizes.",
+        "commit_sha": "795d4a8"
+      },
+      {
+        "description": "Use XMLUI's date helper functions in how-to examples so `onInit` and API mock handlers run reliably in the expression sandbox.",
+        "commit_sha": "eeb554e"
+      },
+      {
+        "description": "Preserve `TextArea` caret and selection while editing bound form values.",
+        "commit_sha": "fa60d52"
+      },
+      {
+        "description": "Add `xmluiConfig` as a dedicated setting group for framework / runtime configuration.",
+        "commit_sha": "c825246"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.31.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.31/xmlui-0.12.31.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.30",
     "published_at": "2026-06-09T10:55:58Z",
     "changes": [
@@ -428,58 +512,6 @@
       {
         "name": "xmlui-0.12.25.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.25/xmlui-0.12.25.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.24",
-    "published_at": "2026-04-28T14:58:42Z",
-    "changes": [
-      {
-        "description": "Refactor Button component styles and tests",
-        "commit_sha": "cfa46e7"
-      },
-      {
-        "description": "fix: vite builds failing to detect they are in vite mode, not in standalone mode, breaking the `xmlui start` and other commands for websites using vite.",
-        "commit_sha": "ba102d8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.24.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.24/xmlui-0.12.24.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.23",
-    "published_at": "2026-04-28T06:20:34Z",
-    "changes": [
-      {
-        "description": "Fix: Default Ctrl+F search finds hidden NavLinks in NavPanel",
-        "commit_sha": "7acf59e"
-      },
-      {
-        "description": "Fix dev-server dep scanner failing on `.xmlui` files. The scanner runs in its own Rolldown pipeline that does not inherit Vite's main `plugins` array, so the xmlui transform never ran and the scan crashed with `[PARSE_ERROR] Unexpected token` / `Unexpected JSX expression` for every `.xmlui` source picked up via `import.meta.glob('/src/**')`. The xmlui plugin is now also registered under `optimizeDeps.rolldownOptions.plugins`, so the scanner can transform XML markup before parsing.",
-        "commit_sha": "826e360"
-      },
-      {
-        "description": "NavGroup: hide collapsed children from browser find-in-page (Ctrl+F) and assistive tech by toggling `visibility: hidden` on the collapsed content (with a delayed transition so the collapse animation still plays). Previously, NavLink labels inside a collapsed NavGroup remained discoverable via Ctrl+F because they were only faded out (`opacity: 0`).",
-        "commit_sha": "7acf59e"
-      },
-      {
-        "description": "Fix standalone bundle regression where loading `Main.xmlui` without a `config.json` file crashed with \"Cannot read properties of undefined (reading 'defaultTheme')\". The standalone bootstrap now tolerates a missing config file, restoring the script-tag drop-in pattern (`<script src=\"xmlui-standalone.umd.js\"></script>` + `Main.xmlui`) that worked in 0.12.15.",
-        "commit_sha": "ed53f00"
-      },
-      {
-        "description": "fix: improve theme fallback logic in ThemeProvider",
-        "commit_sha": "0e3b85f"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.23.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.23/xmlui-0.12.23.js"
       }
     ]
   }

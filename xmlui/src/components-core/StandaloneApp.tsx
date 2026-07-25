@@ -79,6 +79,26 @@ function resolveOptimizerMetadata(type: string) {
   return getOptimizerMetadata(type);
 }
 
+function mergeRecordsOrUndefined<T extends Record<string, any>>(
+  ...records: Array<T | undefined | null>
+): T | undefined {
+  const merged = Object.assign({}, ...records.filter(Boolean));
+  return Object.keys(merged).length > 0 ? (merged as T) : undefined;
+}
+
+function firstNonEmptyRecord<T extends Record<string, any>>(
+  ...records: Array<T | undefined | null>
+): T | undefined {
+  return records.find((record) => !!record && Object.keys(record).length > 0);
+}
+
+function optionalRecordField<K extends string, T extends Record<string, any>>(
+  key: K,
+  record: T | undefined,
+): Partial<Record<K, T>> {
+  return record ? ({ [key]: record } as Record<K, T>) : {};
+}
+
 /**
  * Creates a MetadataHandler that delegates component lookups to either a
  * MetadataProvider or a ComponentRegistry. Memoizes lookups to avoid
@@ -575,11 +595,14 @@ async function resolveInlineComponentCodeBehindFromFetch(
       removeCodeBehindTokensFromTree(codeBehind);
       inlineComponent.component = {
         ...inlineComponent.component,
-        vars: {
-          ...inlineComponent.component.vars,
-          ...codeBehind.vars,
-        },
-        functions: codeBehind.functions || inlineComponent.component.functions,
+        ...optionalRecordField(
+          "vars",
+          mergeRecordsOrUndefined(inlineComponent.component.vars, codeBehind.vars),
+        ),
+        ...optionalRecordField(
+          "functions",
+          firstNonEmptyRecord(codeBehind.functions, inlineComponent.component.functions),
+        ),
         scriptError: codeBehind.moduleErrors,
       };
       (inlineComponent as any).codeBehindSource = code;
@@ -932,11 +955,11 @@ function resolveRuntime(runtime: Record<string, any>): {
   // --- Its declarations are LOCAL to the Main component.
   let entryPointWithCodeBehind = {
     ...safeEntryPoint,
-    vars: {
-      ...entryPointCodeBehind?.vars,
-      ...safeEntryPoint?.vars,
-    },
-    functions: entryPointCodeBehind?.functions,
+    ...optionalRecordField(
+      "vars",
+      mergeRecordsOrUndefined(entryPointCodeBehind?.vars, safeEntryPoint?.vars),
+    ),
+    ...optionalRecordField("functions", firstNonEmptyRecord(entryPointCodeBehind?.functions)),
     scriptError: entryPointCodeBehind?.moduleErrors,
   } as ComponentDef;
 
@@ -972,11 +995,11 @@ function resolveRuntime(runtime: Record<string, any>): {
         ...compound,
         component: {
           ...compound.component,
-          vars: {
-            ...compound.component?.vars,
-            ...componentCodeBehind?.vars,
-          },
-          functions: componentCodeBehind?.functions,
+          ...optionalRecordField(
+            "vars",
+            mergeRecordsOrUndefined(compound.component?.vars, componentCodeBehind?.vars),
+          ),
+          ...optionalRecordField("functions", firstNonEmptyRecord(componentCodeBehind?.functions)),
           scriptError: componentCodeBehind?.moduleErrors,
         },
       };
@@ -1698,12 +1721,21 @@ function useStandalone(
       // --- Assemble the runtime for the main app file
       let entryPointWithCodeBehind: ComponentDef = {
         ...loadedEntryPoint.component,
-        vars: {
-          ...loadedEntryPointCodeBehind?.vars,
-          ...loadedEntryPoint.component.vars,
-          ...loadedEntryPoint.codeBehind?.vars,
-        },
-        functions: loadedEntryPoint.codeBehind?.functions || loadedEntryPointCodeBehind?.functions,
+        ...optionalRecordField(
+          "vars",
+          mergeRecordsOrUndefined(
+            loadedEntryPointCodeBehind?.vars,
+            loadedEntryPoint.component.vars,
+            loadedEntryPoint.codeBehind?.vars,
+          ),
+        ),
+        ...optionalRecordField(
+          "functions",
+          firstNonEmptyRecord(
+            loadedEntryPoint.codeBehind?.functions,
+            loadedEntryPointCodeBehind?.functions,
+          ),
+        ),
         scriptError:
           loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
@@ -1749,12 +1781,18 @@ function useStandalone(
             ...compWrapper.component,
             component: {
               ...(compWrapper.component as any).component,
-              vars: {
-                ...(compWrapper.component as any).component.vars,
-                ...compWrapper.codeBehind?.vars,
-                ...componentCodeBehind?.vars,
-              },
-              functions: compWrapper.codeBehind?.functions || componentCodeBehind?.functions,
+              ...optionalRecordField(
+                "vars",
+                mergeRecordsOrUndefined(
+                  (compWrapper.component as any).component.vars,
+                  compWrapper.codeBehind?.vars,
+                  componentCodeBehind?.vars,
+                ),
+              ),
+              ...optionalRecordField(
+                "functions",
+                firstNonEmptyRecord(compWrapper.codeBehind?.functions, componentCodeBehind?.functions),
+              ),
               scriptError:
                 compWrapper.codeBehind?.moduleErrors || componentCodeBehind?.moduleErrors,
             },
@@ -1839,15 +1877,21 @@ function useStandalone(
             ...compWrapper.component,
             component: {
               ...(compWrapper.component as any).component,
-              vars: {
-                ...(compWrapper.component as any).component.vars,
-                ...componentCodeBehind?.codeBehind?.vars,
-              },
+              ...optionalRecordField(
+                "vars",
+                mergeRecordsOrUndefined(
+                  (compWrapper.component as any).component.vars,
+                  componentCodeBehind?.codeBehind?.vars,
+                ),
+              ),
             },
           } as CompoundComponentDef;
 
           if (componentCodeBehind && "codeBehind" in componentCodeBehind) {
-            fileBackedComponent.component.functions = componentCodeBehind.codeBehind.functions;
+            const functions = firstNonEmptyRecord(componentCodeBehind.codeBehind.functions);
+            if (functions) {
+              fileBackedComponent.component.functions = functions;
+            }
             fileBackedComponent.component.scriptError =
               componentCodeBehind.codeBehind.moduleErrors;
           }
@@ -1964,15 +2008,21 @@ function useStandalone(
               ...compWrapper.component,
               component: {
                 ...(compWrapper.component as any).component,
-                vars: {
-                  ...(compWrapper.component as any).component.vars,
-                  ...componentCodeBehind?.codeBehind?.vars,
-                },
+                ...optionalRecordField(
+                  "vars",
+                  mergeRecordsOrUndefined(
+                    (compWrapper.component as any).component.vars,
+                    componentCodeBehind?.codeBehind?.vars,
+                  ),
+                ),
               },
             };
 
             if (componentCodeBehind && "codeBehind" in componentCodeBehind) {
-              compoundComp.component.functions = componentCodeBehind.codeBehind.functions;
+              const functions = firstNonEmptyRecord(componentCodeBehind.codeBehind.functions);
+              if (functions) {
+                compoundComp.component.functions = functions;
+              }
               compoundComp.component.scriptError = componentCodeBehind.codeBehind.moduleErrors;
             }
 
