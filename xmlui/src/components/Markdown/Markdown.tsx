@@ -114,6 +114,13 @@ export const MarkdownMd = createMetadata({
         "`highlightText` occurrence is emphasized and scrolled into view.",
       valueType: "boolean",
     },
+    highlightActiveIndex: {
+      description:
+        "Which occurrence (0-based, counted across the whole block) of `highlightText` is " +
+        "the active match: it is emphasized and scrolled into view. -1 or unset means none. " +
+        "Generalizes `highlightActive`.",
+      valueType: "number",
+    },
     enablePlaygroundTracing: {
       description: "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
       valueType: "boolean",
@@ -284,6 +291,7 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
     "enablePlaygroundTracing",
     "highlightText",
     "highlightActive",
+    "highlightActiveIndex",
   ],
   customRender(_props, { node, extractValue, renderChild, classes }) {
     let renderedChildren = "";
@@ -324,6 +332,7 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
         enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
         highlightText={extractValue.asOptionalString(node.props.highlightText)}
         highlightActive={extractValue.asOptionalBoolean(node.props.highlightActive)}
+        highlightActiveIndex={extractValue.asOptionalNumber(node.props.highlightActiveIndex)}
         anchorRenderer={
           node.props.anchorTemplate
             ? (anchorId: string, anchorHref: string) => (
@@ -360,6 +369,7 @@ type TransformedMarkdownProps = {
   anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
   highlightText?: string;
   highlightActive?: boolean;
+  highlightActiveIndex?: number;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -382,6 +392,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       anchorRenderer,
       highlightText,
       highlightActive,
+      highlightActiveIndex,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -436,6 +447,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         anchorRenderer={anchorRenderer}
         highlightText={highlightText}
         highlightActive={highlightActive}
+        highlightActiveIndex={highlightActiveIndex}
       >
         {markdownContent}
       </Markdown>

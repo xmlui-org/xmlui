@@ -117,15 +117,16 @@ const preventPlaygroundParagraphWrap = () => {
 
 /** Rehype plugin factory: wrap case-insensitive occurrences of `needle` in
  *  <mark> nodes. Operates on the parsed hast tree, so matches inside code,
- *  inline code, and links are handled correctly with no escaping. The first
- *  match gets data-active="true" when `active` is set (the caller marks exactly
- *  one active block). */
-function makeHighlightPlugin(needle: string, active: boolean) {
+ *  inline code, and links are handled correctly with no escaping. The match
+ *  whose ordinal (0-based, counted across all text nodes in this block) equals
+ *  `activeIndex` gets data-active="true" (the caller marks exactly one active
+ *  block); -1 means no match in this block is active. */
+function makeHighlightPlugin(needle: string, activeIndex: number) {
   return function () {
     return function transformer(tree: Node) {
       const q = (needle || "").toLowerCase();
       if (q.length < 2) return;
-      let firstDone = false;
+      let matchOrdinal = 0;
       visit(tree, "text", (node: any, index: number | undefined, parent: any) => {
         if (!parent || typeof index !== "number") return;
         if (parent.tagName === "script" || parent.tagName === "style") return;
@@ -139,8 +140,8 @@ function makeHighlightPlugin(needle: string, active: boolean) {
         while (idx !== -1) {
           if (idx > last) out.push({ type: "text", value: value.slice(last, idx) });
           const matched = value.slice(idx, idx + q.length);
-          const isActive = active && !firstDone;
-          if (isActive) firstDone = true;
+          const isActive = matchOrdinal === activeIndex;
+          matchOrdinal++;
           out.push({
             type: "element",
             tagName: "mark",
@@ -226,6 +227,7 @@ type MarkdownProps = {
   anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
   highlightText?: string;
   highlightActive?: boolean;
+  highlightActiveIndex?: number;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -285,6 +287,7 @@ export const Markdown = memo(
       anchorRenderer,
       highlightText,
       highlightActive,
+      highlightActiveIndex,
       ...rest
     }: MarkdownProps,
     ref,
@@ -353,20 +356,31 @@ export const Markdown = memo(
       },
       [ref],
     );
+    const activeIndex =
+      typeof highlightActiveIndex === "number" && highlightActiveIndex >= 0
+        ? highlightActiveIndex
+        : highlightActive
+          ? 0
+          : -1;
     const rehypePlugins = useMemo(
       () =>
         highlightText && highlightText.trim().length >= 2
-          ? [...stableRehypePlugins, makeHighlightPlugin(highlightText.trim(), !!highlightActive)]
+          ? [...stableRehypePlugins, makeHighlightPlugin(highlightText.trim(), activeIndex)]
           : stableRehypePlugins,
-      [highlightText, highlightActive],
+      [highlightText, highlightActive, highlightActiveIndex],
     );
     useEffect(() => {
-      if (!highlightActive || !highlightText || highlightText.trim().length < 2) return;
+      if (
+        (!highlightActive && !(typeof highlightActiveIndex === "number" && highlightActiveIndex >= 0)) ||
+        !highlightText ||
+        highlightText.trim().length < 2
+      )
+        return;
       const el = containerRef.current?.querySelector(
         'mark[data-active="true"]',
       ) as HTMLElement | null;
       if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
-    }, [highlightActive, highlightText]);
+    }, [highlightActive, highlightActiveIndex, highlightText]);
 
     const imageInfo = useRef(new Map<string, boolean>());
     if (typeof children !== "string") {
