@@ -30,7 +30,7 @@ import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockReact";
 import classnames from "classnames";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
-import { visit } from "unist-util-visit";
+import { visit, SKIP } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
 import NestedAppAndCodeViewReact, {
@@ -115,6 +115,49 @@ const preventPlaygroundParagraphWrap = () => {
   };
 };
 
+/** Rehype plugin factory: wrap case-insensitive occurrences of `needle` in
+ *  <mark> nodes. Operates on the parsed hast tree, so matches inside code,
+ *  inline code, and links are handled correctly with no escaping. The first
+ *  match gets data-active="true" when `active` is set (the caller marks exactly
+ *  one active block). */
+function makeHighlightPlugin(needle: string, active: boolean) {
+  return function () {
+    return function transformer(tree: Node) {
+      const q = (needle || "").toLowerCase();
+      if (q.length < 2) return;
+      let firstDone = false;
+      visit(tree, "text", (node: any, index: number | undefined, parent: any) => {
+        if (!parent || typeof index !== "number") return;
+        if (parent.tagName === "script" || parent.tagName === "style") return;
+        if (parent.tagName === "mark") return; // already highlighted
+        const value: string = node.value || "";
+        const hay = value.toLowerCase();
+        let idx = hay.indexOf(q);
+        if (idx === -1) return;
+        const out: any[] = [];
+        let last = 0;
+        while (idx !== -1) {
+          if (idx > last) out.push({ type: "text", value: value.slice(last, idx) });
+          const matched = value.slice(idx, idx + q.length);
+          const isActive = active && !firstDone;
+          if (isActive) firstDone = true;
+          out.push({
+            type: "element",
+            tagName: "mark",
+            properties: isActive ? { "data-active": "true" } : {},
+            children: [{ type: "text", value: matched }],
+          });
+          last = idx + q.length;
+          idx = hay.indexOf(q, last);
+        }
+        if (last < value.length) out.push({ type: "text", value: value.slice(last) });
+        parent.children.splice(index, 1, ...out);
+        return [SKIP, index + out.length]; // don't re-descend into the inserted <mark> nodes
+      });
+    };
+  };
+}
+
 /** Stable rehype plugin array — same reference across all Markdown renders. */
 const stableRehypePlugins = [rehypeRaw, replaceUnknownElements, preventPlaygroundParagraphWrap];
 
@@ -181,6 +224,8 @@ type MarkdownProps = {
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
   anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
+  highlightText?: string;
+  highlightActive?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -238,6 +283,8 @@ export const Markdown = memo(
       overflowMode = defaultProps.overflowMode,
       breakMode = defaultProps.breakMode,
       anchorRenderer,
+      highlightText,
+      highlightActive,
       ...rest
     }: MarkdownProps,
     ref,
@@ -297,6 +344,30 @@ export const Markdown = memo(
       return classes;
     }, [breakMode]);
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    const setRefs = useCallback(
+      (el: HTMLDivElement | null) => {
+        containerRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) (ref as any).current = el;
+      },
+      [ref],
+    );
+    const rehypePlugins = useMemo(
+      () =>
+        highlightText && highlightText.trim().length >= 2
+          ? [...stableRehypePlugins, makeHighlightPlugin(highlightText.trim(), !!highlightActive)]
+          : stableRehypePlugins,
+      [highlightText, highlightActive],
+    );
+    useEffect(() => {
+      if (!highlightActive || !highlightText || highlightText.trim().length < 2) return;
+      const el = containerRef.current?.querySelector(
+        'mark[data-active="true"]',
+      ) as HTMLElement | null;
+      if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
+    }, [highlightActive, highlightText]);
+
     const imageInfo = useRef(new Map<string, boolean>());
     if (typeof children !== "string") {
       return null;
@@ -328,7 +399,7 @@ export const Markdown = memo(
     return (
       <div
         {...rest}
-        ref={ref}
+        ref={setRefs}
         className={classnames(
           styles.markdownContent,
           { [styles.grayscale]: grayscale },
@@ -342,7 +413,7 @@ export const Markdown = memo(
       >
         <ReactMarkdown
           remarkPlugins={remarkPlugins}
-          rehypePlugins={stableRehypePlugins}
+          rehypePlugins={rehypePlugins}
           components={{
             details({ children, node, ...props }) {
               return (
