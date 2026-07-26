@@ -1,0 +1,59 @@
+<App
+  var.cities="{[
+    { id: 'berkeley', name: 'Berkeley', country: 'US' },
+    { id: 'albany', name: 'Albany', country: 'US' },
+    { id: 'tokyo', name: 'Tokyo', country: 'JP' },
+    { id: 'vancouver', name: 'Vancouver', country: 'CA' },
+    { id: 'lisbon', name: 'Lisbon', country: 'PT' }
+  ]}"
+  var.reorderCount="{0}">
+  <VStack padding="$space-4" gap="$space-4" maxWidth="480px">
+    <Text variant="title">DndItems</Text>
+    <Text>Drag rows to reorder. Reorder count: <Text>{reorderCount}</Text></Text>
+
+    <Card padding="$space-2">
+      <DndItems data="{cities}"
+        onReorder="(newOrder) => {
+          cities = newOrder;
+          reorderCount = reorderCount + 1;
+        }">
+        <HStack
+          padding="$space-3"
+          backgroundColor="$color-surface-50"
+          border="1px solid $color-surface-200"
+          borderRadius="$borderRadius"
+          marginBottom="$space-1">
+          <Text>⋮⋮</Text>
+          <Text fontWeight="bold">{$item.name}</Text>
+          <Text color="$color-surface-500">({$item.country})</Text>
+          <SpaceFiller />
+          <Text fontSize="0.8em" color="$color-surface-400">
+            {$isFirst ? 'first' : ($isLast ? 'last' : '')}
+          </Text>
+        </HStack>
+      </DndItems>
+    </Card>
+
+    <Text variant="subtitle">dragHandle mode</Text>
+    <Text>The row stays interactive; only the ⋮⋮ grip drags.</Text>
+    <Card padding="$space-2">
+      <DndItems data="{cities}" dragHandle="true"
+        onReorder="(newOrder) => { cities = newOrder; }">
+        <HStack
+          padding="$space-3"
+          backgroundColor="$color-surface-50"
+          border="1px solid $color-surface-200"
+          borderRadius="$borderRadius"
+          marginBottom="$space-1"
+          verticalAlignment="center">
+          <TextBox initialValue="{$item.name}" width="*" />
+          <Text color="$color-surface-500">({$item.country})</Text>
+        </HStack>
+      </DndItems>
+    </Card>
+
+    <Text variant="small" color="$color-surface-500">
+      Order: {cities.map(c => c.name).join(', ')}
+    </Text>
+  </VStack>
+</App>
