@@ -12387,6 +12387,9 @@ export default {
       "paddingTop-Markdown": "var(--xmlui-paddingTop-Markdown)",
       "paddingBottom-Markdown": "var(--xmlui-paddingBottom-Markdown)",
       "backgroundColor-Markdown": "var(--xmlui-backgroundColor-Markdown)",
+      "backgroundColor-mark-markdown": "var(--xmlui-backgroundColor-mark-markdown)",
+      "textColor-mark-markdown": "var(--xmlui-textColor-mark-markdown)",
+      "backgroundColor-markActive-markdown": "var(--xmlui-backgroundColor-markActive-markdown)",
       "padding-Blockquote-markdown": "var(--xmlui-padding-Blockquote-markdown)",
       "paddingHorizontal-Blockquote-markdown": "var(--xmlui-paddingHorizontal-Blockquote-markdown, var(--xmlui-padding-Blockquote-markdown))",
       "paddingVertical-Blockquote-markdown": "var(--xmlui-paddingVertical-Blockquote-markdown, var(--xmlui-padding-Blockquote-markdown))",
@@ -12981,6 +12984,18 @@ export default {
         "description": "This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target=\"_blank\"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.",
         "valueType": "boolean"
       },
+      "highlightText": {
+        "description": "When set, every case-insensitive occurrence of this string in the rendered content is wrapped in a `<mark>` element (highlighted). Works across prose, code, and links. Empty or shorter than 2 characters is a no-op.",
+        "valueType": "string"
+      },
+      "highlightActive": {
+        "description": "When `true`, this Markdown block holds the active match: its first `highlightText` occurrence is emphasized and scrolled into view.",
+        "valueType": "boolean"
+      },
+      "highlightActiveIndex": {
+        "description": "Which occurrence (0-based, counted across the whole block) of `highlightText` is the active match: it is emphasized and scrolled into view. -1 or unset means none. Generalizes `highlightActive`.",
+        "valueType": "number"
+      },
       "enablePlaygroundTracing": {
         "description": "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
         "valueType": "boolean",
@@ -13078,6 +13093,9 @@ export default {
       "backgroundColor-Blockquote-markdown": "$color-surface-100",
       "width-accent-Blockquote-markdown": "3px",
       "color-accent-Blockquote-markdown": "$color-surface-500",
+      "backgroundColor-mark-markdown": "$color-warn-200",
+      "textColor-mark-markdown": "inherit",
+      "backgroundColor-markActive-markdown": "$color-warn-400",
       "borderRadius-Table-markdown": "$borderRadius",
       "textColor-Thead-markdown": "$color-surface-500",
       "backgroundColor-Thead-markdown": "$color-surface-100",
