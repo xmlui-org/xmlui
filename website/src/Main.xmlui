@@ -896,6 +896,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Highlight matching text inside Markdown"
+                            to="/docs/howto/highlight-inside-markdown"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Fill the viewport with one internal scroll region"
                             to="/docs/howto/build-a-full-height-scroll-layout"
                         />
@@ -2529,6 +2534,11 @@
             <Page url="/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/pin-a-toolbar-above-a-bounded-scroll-region.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/highlight-inside-markdown">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/highlight-inside-markdown.md']}"
                 />
             </Page>
             <Page url="/docs/howto/build-a-full-height-scroll-layout">
