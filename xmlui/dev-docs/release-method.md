@@ -29,6 +29,7 @@ Manual `workflow_dispatch`. Used **only** for `latest` and `support` releases. I
 | Input | Type   | Values              | Description                               |
 | ----- | ------ | ------------------- | ----------------------------------------- |
 | `tag` | choice | `latest`, `support` | The npm dist-tag this release will target |
+| `target_version` | string | optional exact semver | Overrides the calculated version for the fixed `xmlui` release group. Use only for intentional version skips, such as releasing `0.14.0` after `0.12.x`. |
 
 When dispatching on a `support/**` branch, an extra check enforces patch-only changesets (second layer of protection after `guard-branches.yml`).
 
@@ -64,7 +65,7 @@ The full test suite runs before every `latest` and `support` publish.
 
 ### Stable release (latest or support)
 
-1. Dispatch **`prepare-versions.yml`** on the target branch, choosing the `tag`.
+1. Dispatch **`prepare-versions.yml`** on the target branch, choosing the `tag`. For an intentional version skip, set `target_version` to the exact version to release.
 2. A Version PR is created (e.g. `"Version Packages for [latest] release"`). Review and merge it.
 3. Merging triggers **`release-packages.yml`**, which tests, publishes to npm under the correct dist-tag, and creates a GitHub release with the standalone JS file and VS Code extension.
 
@@ -166,5 +167,5 @@ main:  ...---(v0.12.0)---o---o------------------o(squashed into 1 commit)---(v0.
 
 1. `0.12.0` is latest. Branch `myname/new-feature` from `main`. Implement the feature.
 2. Open PR into `main` ← `myname/new-feature`. Squash & merge.
-3. Dispatch `prepare-versions.yml` on `main` with `tag: latest`. A minor changeset bumps the version to `0.13.0` and creates a Version PR.
-4. Review & merge the Version PR → triggers `release-packages.yml`. `0.13.0` is now latest on npm.
+3. Dispatch `prepare-versions.yml` on `main` with `tag: latest`. A minor changeset bumps the version to the next minor and creates a Version PR.
+4. Review & merge the Version PR → triggers `release-packages.yml`. The new minor is now latest on npm.
