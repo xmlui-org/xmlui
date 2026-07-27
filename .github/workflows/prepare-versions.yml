@@ -11,6 +11,10 @@ on:
         options:
           - latest
           - support
+      target_version:
+        description: "Optional exact version for the fixed xmlui release group, used only for intentional version skips such as 0.12.x -> 0.14.0."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -60,6 +64,7 @@ jobs:
           title: "Version Packages for [${{ inputs.tag }}] release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_VERSION: ${{ inputs.target_version }}
 
       - name: Output Changeset PR URL
         if: steps.changesets_pr.outputs.pullRequestUrl
