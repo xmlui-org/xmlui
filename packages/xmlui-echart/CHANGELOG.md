@@ -1,5 +1,11 @@
 # xmlui-echart
 
+## 0.1.5
+
+### Patch Changes
+
+- fc6536d: Publish consumer-facing extension packages so their built bundles are available from npm CDNs.
+
 ## 0.1.4
 
 ### Patch Changes

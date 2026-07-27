@@ -1,5 +1,30 @@
 # xmlui-vscode
 
+## 0.14.0
+
+### Patch Changes
+
+- Updated dependencies [b52a0dc]
+- Updated dependencies [7713dc6]
+- Updated dependencies [5e5b921]
+- Updated dependencies [3d3fdaf]
+- Updated dependencies [ccdf201]
+- Updated dependencies [b8f2593]
+- Updated dependencies [4af6204]
+- Updated dependencies [041ef2b]
+- Updated dependencies [0674d76]
+- Updated dependencies [0674d76]
+- Updated dependencies [0674d76]
+- Updated dependencies [0674d76]
+- Updated dependencies [59c397e]
+- Updated dependencies [b52a0dc]
+- Updated dependencies [5e5b921]
+- Updated dependencies [1c0a713]
+- Updated dependencies [3a25209]
+- Updated dependencies [b8f2593]
+- Updated dependencies [59c397e]
+  - xmlui@0.14.0
+
 ## 0.12.31
 
 ### Patch Changes
