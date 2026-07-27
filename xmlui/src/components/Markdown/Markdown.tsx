@@ -101,6 +101,26 @@ export const MarkdownMd = createMetadata({
         "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
     },
+    highlightText: {
+      description:
+        "When set, every case-insensitive occurrence of this string in the rendered " +
+        "content is wrapped in a `<mark>` element (highlighted). Works across prose, " +
+        "code, and links. Empty or shorter than 2 characters is a no-op.",
+      valueType: "string",
+    },
+    highlightActive: {
+      description:
+        "When `true`, this Markdown block holds the active match: its first " +
+        "`highlightText` occurrence is emphasized and scrolled into view.",
+      valueType: "boolean",
+    },
+    highlightActiveIndex: {
+      description:
+        "Which occurrence (0-based, counted across the whole block) of `highlightText` is " +
+        "the active match: it is emphasized and scrolled into view. -1 or unset means none. " +
+        "Generalizes `highlightActive`.",
+      valueType: "number",
+    },
     enablePlaygroundTracing: {
       description: "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
       valueType: "boolean",
@@ -193,6 +213,10 @@ export const MarkdownMd = createMetadata({
     "width-accent-Blockquote-markdown": "3px",
     "color-accent-Blockquote-markdown": "$color-surface-500",
 
+    "backgroundColor-mark-markdown": "$color-warn-200",
+    "textColor-mark-markdown": "inherit",
+    "backgroundColor-markActive-markdown": "$color-warn-400",
+
     "borderRadius-Table-markdown": "$borderRadius",
     "textColor-Thead-markdown": "$color-surface-500",
     "backgroundColor-Thead-markdown": "$color-surface-100",
@@ -265,6 +289,9 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
     "breakMode",
     "anchorTemplate",
     "enablePlaygroundTracing",
+    "highlightText",
+    "highlightActive",
+    "highlightActiveIndex",
   ],
   customRender(_props, { node, extractValue, renderChild, classes }) {
     let renderedChildren = "";
@@ -303,6 +330,9 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
         overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
         enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
+        highlightText={extractValue.asOptionalString(node.props.highlightText)}
+        highlightActive={extractValue.asOptionalBoolean(node.props.highlightActive)}
+        highlightActiveIndex={extractValue.asOptionalNumber(node.props.highlightActiveIndex)}
         anchorRenderer={
           node.props.anchorTemplate
             ? (anchorId: string, anchorHref: string) => (
@@ -337,6 +367,9 @@ type TransformedMarkdownProps = {
   breakMode?: BreakMode;
   enablePlaygroundTracing?: boolean;
   anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
+  highlightText?: string;
+  highlightActive?: boolean;
+  highlightActiveIndex?: number;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -357,6 +390,9 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       breakMode,
       enablePlaygroundTracing,
       anchorRenderer,
+      highlightText,
+      highlightActive,
+      highlightActiveIndex,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -409,6 +445,9 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         overflowMode={overflowMode}
         breakMode={breakMode}
         anchorRenderer={anchorRenderer}
+        highlightText={highlightText}
+        highlightActive={highlightActive}
+        highlightActiveIndex={highlightActiveIndex}
       >
         {markdownContent}
       </Markdown>
