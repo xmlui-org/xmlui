@@ -1,5 +1,32 @@
 # xmlui
 
+## 0.14.0
+
+### Minor Changes
+
+- 1c0a713: Prepare the next XMLUI minor release for the recent framework, scripting, playground, and user-defined component improvements.
+
+### Patch Changes
+
+- b52a0dc: Allow reusable component definitions without a nested component body.
+- 7713dc6: Fix labeled Checkbox click handlers firing twice for a single input click.
+- 5e5b921: Optimize compiled event handlers so event-loop yields are checked per handler invocation at 100ms intervals instead of after every statement. Known synchronous built-in calls can now skip yield checks, parse-time compiled event handler JavaScript can be logged for diagnostics, Vite builds can create parse-time compiled event artifacts, and handler-prefix directives (`"async"`, `"sync"`, `"queue"`, `"block"`) are supported.
+- 3d3fdaf: Add a shared `compileScripts` config switch for compiled XMLUI bindings and event handlers, and enable compiled script source maps automatically in dev server mode when script compilation is active.
+- ccdf201: Warn when standalone custom component files collide with built-in component names, and keep computedUses-scoped components from re-rendering on unrelated routing state object changes.
+- b8f2593: Set the default implicit XMLUI playground height to 320px so docs playgrounds can defer mounting without scroll drift.
+- 4af6204: Fix APICall success handlers so UI updates flush promptly under strict determinism.
+- 041ef2b: Fix compiled event handlers for deferred callbacks, prepared arrow handlers, unsupported-node fallback, and component API calls that require implicit execution context.
+- 0674d76: Fix DateInput and TimeInput so enabling `clearable` does not increase the component height.
+- 0674d76: Fix duplicate heading text in TableOfContents so each heading keeps a separate link with a unique anchor.
+- 0674d76: Fix NavPanel active-link syncing so it does not scroll the app page when bringing the active link into view.
+- 0674d76: Make the active TableOfContents item text use the same styling as hovered items.
+- 59c397e: Hibernate never-interacted lazy nested apps after they move offscreen to reduce memory retained by documentation pages with many embedded playgrounds.
+- b52a0dc: Allow `Main.xmlui` entrypoints, including Markdown `xmlui-pg` playground apps, to define reusable top-level components inline while preserving strict component-file parsing.
+- 5e5b921: Generate native JavaScript for safe local event-handler code paths, use time-gated compiled-event checkpoints, and preserve interpreter-compatible state flushing and fallback for unsupported event handlers.
+- 3a25209: Fix UDC `emitEvent` handlers so parent events are delivered promptly even when the emitting handler has no trailing state write.
+- b8f2593: Strip script parser token metadata from production XMLUI build output.
+- 59c397e: Reduce duplicated theme reset CSS for docs playgrounds that inherit the host theme.
+
 ## 0.12.31
 
 ### Patch Changes

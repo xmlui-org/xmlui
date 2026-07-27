@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.14
+
+### Patch Changes
+
+- 8b1fa4f: Improve docs search memory usage by reusing prepared Fuse indexes for identical search data.
+
 ## 0.1.13
 
 ### Patch Changes
