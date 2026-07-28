@@ -1,5 +1,11 @@
 # xmlui-echart
 
+## 0.1.6
+
+### Patch Changes
+
+- 9350f97: Pin React Router, @remix-run/router, DOMPurify, Babel, markdown-it, js-yaml, lodash, qs, and uuid to patched versions across nested lockfiles and upgrade xmlui-echart to ECharts 6.1.0 to address the latest Dependabot advisories.
+
 ## 0.1.5
 
 ### Patch Changes
