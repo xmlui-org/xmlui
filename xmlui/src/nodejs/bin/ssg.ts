@@ -253,7 +253,7 @@ export function applyRenderToShell(shellHtml: string, renderResult: RenderResult
   return html;
 }
 
-function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
+export function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
   const extensionLoaderLines = extensionImportSpecifiers
     .map((spec, index) => {
       const safeSpec = JSON.stringify(spec);
@@ -264,7 +264,7 @@ function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
   return `
 import React from "react";
 import { renderToString } from "react-dom/server";
-import { StaticRouter } from "react-router-dom/server";
+import { StaticRouter } from "react-router";
 import type { FilledContext } from "react-helmet-async";
 import {
   StandaloneApp,
