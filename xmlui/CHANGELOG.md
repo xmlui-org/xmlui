@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.14.1
+
+### Patch Changes
+
+- 659592b: Upgrade adm-zip to 0.6.0 and pin nested workspace lockfiles to the patched version to address CVE-2026-39244.
+- 947bec5: Upgrade transitive immutable lockfile entries to 5.1.9 to address the Immutable.js denial-of-service advisories.
+- 9350f97: Pin React Router, @remix-run/router, DOMPurify, Babel, markdown-it, js-yaml, lodash, qs, and uuid to patched versions across nested lockfiles and upgrade xmlui-echart to ECharts 6.1.0 to address the latest Dependabot advisories.
+- 37f40a9: Fix static site generation with the patched React Router package exports.
+- 06ee21a: Pin transitive tmp, minimatch, brace-expansion, js-yaml, Remix runtime, React Router, turbo-stream, fast-uri, postcss, and dompurify dependencies to patched or non-affected versions to address denial-of-service, path traversal, URL parsing, redirect, and XSS advisories.
+- 947bec5: Upgrade Vite to 8.0.16 to address the Windows server.fs.deny bypass advisory.
+
 ## 0.14.0
 
 ### Minor Changes
