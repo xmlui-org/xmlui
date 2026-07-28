@@ -1,11 +1,10 @@
 %-DESC-START
 
-**Key advantages over variables:**
-- **Global accessibility**: Any component can access the state by referencing the same `bucket`
-- **Automatic reactivity**: UI updates automatically when state changes, no manual prop passing required
-- **Cross-component coordination**: Perfect for user sessions, UI preferences, loading states, and shared data
+The modern equivalent is a **reactive global**: declare `global.state="{...}"` on the app root, and any component reads or writes it by name — the same prop-drilling-free sharing, without an `AppState` instance per consumer. See [Manage app-wide state with reactive globals](/docs/howto/manage-app-wide-state-with-reactive-globals) for the pattern and a one-to-one `AppState` → globals migration.
 
-## Using AppState
+The rest of this page documents `AppState` as it works today, for apps that still use it.
+
+## Using AppState (legacy)
 
 Variables in xmlui are a straightforward tool for managing states. However, a variable's scope is the app's main file or the particular component file in which it is declared. To access the variable's value (the stored state), you must pass its value to components wanting to leverage it.
 
