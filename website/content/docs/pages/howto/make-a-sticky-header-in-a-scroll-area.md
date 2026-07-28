@@ -1,6 +1,11 @@
 # Make a sticky header in a scroll area
 
-Use StickyBox or StickySection inside a scrollable container to keep a header visible while scrolling.
+Use `StickySection` inside a scrollable container to keep document-outline section headers visible while scrolling.
+
+> [!NOTE]
+> This how-to covers **stacking section headers** — a document outline where each `StickySection` yields the pinned slot to the next as you scroll one region. Two neighbouring cases are different patterns:
+> - A *single* toolbar or header pinned above a **bounded or nested** scrolling body (a search-result expander, a card, a dialog section) → [Pin a toolbar above a bounded scroll region](/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region).
+> - A persistent **app- or page-level** bar (a "Save changes" row over the whole page) → `StickyBox`, covered in the `StickySection` vs `StickyBox` note below.
 
 A project report has four long sections. As the user scrolls, the header for the current section should stay visible at the top so readers always know where they are. `StickySection` handles the stacking logic — when multiple sections compete for the sticky slot, only the most recently scrolled-to header wins.
 
@@ -72,7 +77,7 @@ A project report has four long sections. As the user scrolls, the header for the
 </App>
 ```
 
-**`StickySection` vs `StickyBox`**: Use `StickyBox` when you need a permanently visible element that should never yield its pinned position — for example a "Save changes" action bar:
+**`StickySection` vs `StickyBox`**: Use `StickyBox` for a persistent **app- or page-level** bar that should never yield its pinned position — for example a "Save changes" action bar over the whole page:
 
 ```xmlui
 <StickyBox to="top">
@@ -83,6 +88,8 @@ A project report has four long sections. As the user scrolls, the header for the
   </HStack>
 </StickyBox>
 ```
+
+`StickyBox` finds its scroll container by walking the DOM at runtime, so its correctness is non-local — reserve it for the whole-page case. For a bar pinned over a *bounded* region, use the [dock pattern](/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region) instead, whose correctness depends only on the local subtree.
 
 **`stickTo="bottom"`**: Pins content to the bottom of the scroll container — useful for a sticky totals row at the bottom of a scrollable data section:
 
@@ -101,3 +108,4 @@ A project report has four long sections. As the user scrolls, the header for the
 - [StickyBox component](/docs/reference/components/StickyBox) — simpler always-on sticky positioning
 - [ScrollViewer component](/docs/reference/components/ScrollViewer) — scroll container required for sticky content
 - [App component](/docs/reference/components/App) — `scrollWholePage` prop
+- [Pin a toolbar above a bounded scroll region](/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region) — a single toolbar/header pinned over a bounded, nested scrolling body
