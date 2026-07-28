@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, expect, it } from "vitest";
 import { getSsgEntrySource } from "../../src/nodejs/bin/ssg";
 
