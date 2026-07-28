@@ -24,6 +24,7 @@ import { setStorageChangeListener } from "../appContext/local-storage-functions"
 import { createLog } from "../appContext/log";
 import { buildAppContextValue, type AppContextDeps } from "../state/appContextFactory";
 import { AppUtilsNamespace, ClipboardNamespace, appCancel, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import { createUrlWithQueryParams } from "../../components/component-utils";
 import { announceLiveRegion, GlobalLiveRegion } from "../../components/LiveRegion/LiveRegionReact";
 import { SkipLink } from "../../components/SkipLink/SkipLinkReact";
 import {
@@ -296,16 +297,33 @@ export function AppContent({
     async (to: any, options?: any) => {
       const { onWillNavigate } = navigationHandlers;
 
-      // Extract queryParams if exists in options (for NavigateAction compatibility)
-      const queryParams = options?.queryParams;
-      const target = options?.target;
+      // Normalize the options argument. A markup `navigate(...)` resolves to THIS wrapper
+      // (not navigateAction), so the documented `{ queryParams, replace }` parsing and the
+      // query-string assembly must happen here too (#3694). Back-compat: a bare object with
+      // none of queryParams/replace/target is treated as the query-params record itself.
+      const opts = options && typeof options === "object" ? options : undefined;
+      const looksLikeOptions =
+        !!opts && ("queryParams" in opts || "replace" in opts || "target" in opts);
+      const queryParams = looksLikeOptions ? opts!.queryParams : opts;
+      const target = looksLikeOptions ? opts!.target : undefined;
 
-      // Remove queryParams + target from options before passing to navigateRouter
-      const { queryParams: _qp, target: _t, ...navigateOptions } = options || {};
+      // Router options: preserve recognized react-router options (replace, state, …) for the
+      // options form; for a bare query record, forward nothing (its own keys are query params).
+      const { queryParams: _qp, target: _t, ...restOptions } = opts || {};
+      const navigateOptions = looksLikeOptions ? restOptions : undefined;
+
+      // Fold query params into a string path when `to` is a plain path without a query yet.
+      // A string path's query survives every router; a To object's `search` is dropped under
+      // hash routing (#3694). navigateAction already builds the string, so a `to` that already
+      // carries "?" is left untouched to avoid a double query.
+      let finalTo = to;
+      if (queryParams && typeof to === "string" && !to.includes("?")) {
+        finalTo = createUrlWithQueryParams({ pathname: to, queryParams });
+      }
 
       // Call willNavigate handler if defined (only for programmatic navigation)
       if (onWillNavigate) {
-        const result = await onWillNavigate(to, queryParams);
+        const result = await onWillNavigate(finalTo, queryParams);
         // Cancel navigation if willNavigate returns false
         if (result === false) {
           return;
@@ -315,7 +333,7 @@ export function AppContent({
       // Step 2.3: target="_blank" opens an external tab via the audited helper.
       // Forces noopener,noreferrer so the new tab cannot reach back to window.opener.
       if (target === "_blank") {
-        const href = typeof to === "string" ? to : (to?.pathname ?? "") + (to?.search ?? "") + (to?.hash ?? "");
+        const href = typeof finalTo === "string" ? finalTo : (finalTo?.pathname ?? "") + (finalTo?.search ?? "") + (finalTo?.hash ?? "");
         pushXsLog({
           kind: "navigate",
           ts: Date.now(),
@@ -332,13 +350,13 @@ export function AppContent({
       pushXsLog({
         kind: "navigate",
         ts: Date.now(),
-        to: typeof to === "string" ? to : (to?.pathname ?? ""),
+        to: typeof finalTo === "string" ? finalTo : (finalTo?.pathname ?? ""),
         target: target ?? "_self",
       });
 
       // Perform the actual navigation
-      programmaticNavigationRef.current = typeof to === "string" ? to : (to?.pathname ?? "");
-      navigateRouter(to, navigateOptions);
+      programmaticNavigationRef.current = typeof finalTo === "string" ? finalTo : (finalTo?.pathname ?? "");
+      navigateRouter(finalTo, navigateOptions);
 
       // didNavigate will be fired by the useEffect that watches location changes
     },
