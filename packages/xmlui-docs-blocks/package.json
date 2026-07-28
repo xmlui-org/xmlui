@@ -19,7 +19,7 @@
   "dependencies": {
     "@shikijs/langs": "3.4.2",
     "js-yaml": "4.3.0",
-    "react-router-dom": "6.30.4",
+    "react-router-dom": "7.18.1",
     "remark-parse": "11.0.0",
     "remark-stringify": "11.0.0",
     "shiki": "^3.3.0",
