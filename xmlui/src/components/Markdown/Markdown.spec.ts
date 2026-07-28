@@ -1004,3 +1004,64 @@ test.describe("xmlui-pg inline components", () => {
     await expect(page.getByText("A reusable component must have a non-empty name.")).toBeVisible();
   });
 });
+
+test.describe("highlightText", () => {
+  // Text ordering of terms: pty(0) ticker(1) pty(2) ticker(3)
+  const MULTI = `The pty layer and the ticker both matter. Another pty here, and a ticker there.`;
+
+  test("string highlights only the literal phrase", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Markdown highlightText="pty ticker"><![CDATA[The pty layer, the ticker, and the phrase pty ticker once.]]></Markdown>`,
+    );
+    await expect(page.locator("mark")).toHaveCount(1);
+    await expect(page.locator("mark")).toHaveText("pty ticker");
+  });
+
+  test("array marks every occurrence of each term", async ({ initTestBed, page }) => {
+    await initTestBed(`<Markdown highlightText="{['pty', 'ticker']}"><![CDATA[${MULTI}]]></Markdown>`);
+    await expect(page.locator("mark")).toHaveCount(4);
+    await expect(page.locator("mark").filter({ hasText: "pty" })).toHaveCount(2);
+    await expect(page.locator("mark").filter({ hasText: "ticker" })).toHaveCount(2);
+  });
+
+  test("highlightActiveIndex walks marks in document order across terms", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Index 1 is the first ticker (document order), NOT the second pty (per-term order).
+    await initTestBed(
+      `<Markdown highlightText="{['pty', 'ticker']}" highlightActiveIndex="{1}"><![CDATA[${MULTI}]]></Markdown>`,
+    );
+    await expect(page.locator('mark[data-active="true"]')).toHaveCount(1);
+    await expect(page.locator('mark[data-active="true"]')).toHaveText("ticker");
+  });
+
+  test("active index 2 selects a pty, not a ticker — counting is interleaved, not per-term", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Per-term counting would put both ptys at indexes 0,1 and ticker at 2;
+    // interleaved document order puts pty at 0, ticker at 1, pty at 2.
+    await initTestBed(
+      `<Markdown highlightText="{['pty', 'ticker']}" highlightActiveIndex="{2}"><![CDATA[${MULTI}]]></Markdown>`,
+    );
+    await expect(page.locator('mark[data-active="true"]')).toHaveText("pty");
+  });
+
+  test("longest overlapping term wins (no nested marks)", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Markdown highlightText="{['cat', 'category']}"><![CDATA[Pick a category for the cat.]]></Markdown>`,
+    );
+    // "category" matched as one mark (longest-first), plus the standalone "cat" = 2 marks, none nested.
+    await expect(page.locator("mark")).toHaveCount(2);
+    await expect(page.locator("mark mark")).toHaveCount(0);
+    await expect(page.locator("mark").filter({ hasText: "category" })).toHaveCount(1);
+  });
+
+  test("terms shorter than 2 chars and empty array are no-ops", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Markdown highlightText="{['a', '']}"><![CDATA[a apple banana]]></Markdown>`,
+    );
+    await expect(page.locator("mark")).toHaveCount(0);
+  });
+});

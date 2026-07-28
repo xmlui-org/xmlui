@@ -12985,7 +12985,7 @@ export default {
         "valueType": "boolean"
       },
       "highlightText": {
-        "description": "When set, every case-insensitive occurrence of this string in the rendered content is wrapped in a `<mark>` element (highlighted). Works across prose, code, and links. Empty or shorter than 2 characters is a no-op.",
+        "description": "When set, wraps every case-insensitive occurrence in the rendered content in a `<mark>` element (highlighted). Accepts a **string** (a single phrase) or a **string array** (each term highlighted independently). Works across prose, code, and links. A term shorter than 2 characters, an empty string, or an empty array is a no-op.",
         "valueType": "string"
       },
       "highlightActive": {
@@ -12993,7 +12993,7 @@ export default {
         "valueType": "boolean"
       },
       "highlightActiveIndex": {
-        "description": "Which occurrence (0-based, counted across the whole block) of `highlightText` is the active match: it is emphasized and scrolled into view. -1 or unset means none. Generalizes `highlightActive`.",
+        "description": "Which occurrence (0-based) of `highlightText` is the active match: it is emphasized and scrolled into view. Occurrences are counted **across all terms in document order**, so stepping the index walks every `<mark>` top-to-bottom regardless of which term produced it. -1 or unset means none. Generalizes `highlightActive`.",
         "valueType": "number"
       },
       "enablePlaygroundTracing": {

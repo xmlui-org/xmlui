@@ -246,6 +246,18 @@ Use this property when the text you provide is not static but a result of calcul
 
 This boolean property specifies whether images should be displayed in grayscale. If set to `true`, all images within the markdown will be rendered in grayscale.
 
+### `highlightActive` [#highlightactive]
+
+When `true`, this Markdown block holds the active match: its first `highlightText` occurrence is emphasized and scrolled into view.
+
+### `highlightActiveIndex` [#highlightactiveindex]
+
+Which occurrence (0-based) of `highlightText` is the active match: it is emphasized and scrolled into view. Occurrences are counted **across all terms in document order**, so stepping the index walks every `<mark>` top-to-bottom regardless of which term produced it. -1 or unset means none. Generalizes `highlightActive`.
+
+### `highlightText` [#highlighttext]
+
+When set, wraps every case-insensitive occurrence in the rendered content in a `<mark>` element (highlighted). Accepts a **string** (a single phrase) or a **string array** (each term highlighted independently). Works across prose, code, and links. A term shorter than 2 characters, an empty string, or an empty array is a no-op.
+
 ### `openLinkInNewTab` [#openlinkinnewtab]
 
 This boolean property specifies whether links should open in a new tab. If set to `true`, all links within the markdown will open in a new tab with `target="_blank"`. Links that explicitly specify their own target using the `| target=...` syntax will override this setting.
@@ -410,6 +422,8 @@ The component itself cannot be styled, but the components that render the final 
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Admonition-markdown-warning | $color-warn-100 | $color-warn-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Blockquote-markdown | $color-surface-100 | $color-surface-50 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-even-Tr-markdown | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-mark-markdown | $color-warn-200 | $color-warn-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-markActive-markdown | $color-warn-400 | $color-warn-400 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Markdown | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Table-markdown | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tbody-markdown | *none* | *none* |
@@ -955,6 +969,7 @@ The component itself cannot be styled, but the components that render the final 
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-Td-markdown | *none* | *none* |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-mark-markdown | inherit | inherit |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Table-markdown | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Tbody-markdown | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text | *none* | *none* |

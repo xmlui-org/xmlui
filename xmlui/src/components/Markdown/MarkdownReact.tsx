@@ -115,17 +115,45 @@ const preventPlaygroundParagraphWrap = () => {
   };
 };
 
-/** Rehype plugin factory: wrap case-insensitive occurrences of `needle` in
- *  <mark> nodes. Operates on the parsed hast tree, so matches inside code,
- *  inline code, and links are handled correctly with no escaping. The match
- *  whose ordinal (0-based, counted across all text nodes in this block) equals
- *  `activeIndex` gets data-active="true" (the caller marks exactly one active
- *  block); -1 means no match in this block is active. */
-function makeHighlightPlugin(needle: string, activeIndex: number) {
+/** Normalize the `highlightText` prop (`string | string[]`) to a list of needles.
+ *  A string stays a single phrase (never whitespace-split — that would break an
+ *  intentional `"foo bar"` phrase highlight); an array is treated as independent
+ *  terms. Each needle is trimmed; those shorter than 2 characters are dropped, and
+ *  case-insensitive duplicates are removed. */
+function normalizeNeedles(highlightText?: string | string[]): string[] {
+  if (highlightText == null) return [];
+  const raw = Array.isArray(highlightText) ? highlightText : [highlightText];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const term of raw) {
+    const s = (term ?? "").trim();
+    const key = s.toLowerCase();
+    if (s.length >= 2 && !seen.has(key)) {
+      seen.add(key);
+      out.push(s);
+    }
+  }
+  return out;
+}
+
+/** Rehype plugin factory: wrap case-insensitive occurrences of any of `needles`
+ *  in <mark> nodes. Operates on the parsed hast tree, so matches inside code,
+ *  inline code, and links are handled correctly with no escaping. Matches are
+ *  numbered in a single 0-based ordinal sequence in **document order** across all
+ *  terms (text nodes are visited in document order, and each node is scanned
+ *  left-to-right); the match whose ordinal equals `activeIndex` gets
+ *  data-active="true" (-1 means no match in this block is active). At any position
+ *  the longest matching needle wins, so terms that overlap (`cat` vs `category`)
+ *  never produce nested or overlapping marks. */
+function makeHighlightPlugin(needles: string[], activeIndex: number) {
+  // Longest-first so an overlapping longer term is preferred at a given position.
+  const qs = needles
+    .map((n) => (n || "").toLowerCase())
+    .filter((q) => q.length >= 2)
+    .sort((a, b) => b.length - a.length);
   return function () {
     return function transformer(tree: Node) {
-      const q = (needle || "").toLowerCase();
-      if (q.length < 2) return;
+      if (qs.length === 0) return;
       let matchOrdinal = 0;
       visit(tree, "text", (node: any, index: number | undefined, parent: any) => {
         if (!parent || typeof index !== "number") return;
@@ -133,24 +161,37 @@ function makeHighlightPlugin(needle: string, activeIndex: number) {
         if (parent.tagName === "mark") return; // already highlighted
         const value: string = node.value || "";
         const hay = value.toLowerCase();
-        let idx = hay.indexOf(q);
-        if (idx === -1) return;
         const out: any[] = [];
-        let last = 0;
-        while (idx !== -1) {
-          if (idx > last) out.push({ type: "text", value: value.slice(last, idx) });
-          const matched = value.slice(idx, idx + q.length);
-          const isActive = matchOrdinal === activeIndex;
-          matchOrdinal++;
-          out.push({
-            type: "element",
-            tagName: "mark",
-            properties: isActive ? { "data-active": "true" } : {},
-            children: [{ type: "text", value: matched }],
-          });
-          last = idx + q.length;
-          idx = hay.indexOf(q, last);
+        let i = 0; // scan cursor
+        let last = 0; // start of pending unmarked text
+        let anyMatch = false;
+        while (i < value.length) {
+          let matchLen = 0;
+          for (const q of qs) {
+            if (hay.startsWith(q, i)) {
+              matchLen = q.length;
+              break;
+            }
+          }
+          if (matchLen > 0) {
+            anyMatch = true;
+            if (i > last) out.push({ type: "text", value: value.slice(last, i) });
+            const matched = value.slice(i, i + matchLen);
+            const isActive = matchOrdinal === activeIndex;
+            matchOrdinal++;
+            out.push({
+              type: "element",
+              tagName: "mark",
+              properties: isActive ? { "data-active": "true" } : {},
+              children: [{ type: "text", value: matched }],
+            });
+            i += matchLen;
+            last = i;
+          } else {
+            i++;
+          }
         }
+        if (!anyMatch) return;
         if (last < value.length) out.push({ type: "text", value: value.slice(last) });
         parent.children.splice(index, 1, ...out);
         return [SKIP, index + out.length]; // don't re-descend into the inserted <mark> nodes
@@ -225,7 +266,7 @@ type MarkdownProps = {
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
   anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
-  highlightText?: string;
+  highlightText?: string | string[];
   highlightActive?: boolean;
   highlightActiveIndex?: number;
 };
@@ -362,25 +403,30 @@ export const Markdown = memo(
         : highlightActive
           ? 0
           : -1;
+    // Stable dependency key: an inline array prop is a new reference every render,
+    // so memoize on the joined needle text rather than the array identity.
+    const needleKey = Array.isArray(highlightText)
+      ? highlightText.join(" ")
+      : highlightText ?? "";
+    const needles = useMemo(() => normalizeNeedles(highlightText), [needleKey]);
     const rehypePlugins = useMemo(
       () =>
-        highlightText && highlightText.trim().length >= 2
-          ? [...stableRehypePlugins, makeHighlightPlugin(highlightText.trim(), activeIndex)]
+        needles.length > 0
+          ? [...stableRehypePlugins, makeHighlightPlugin(needles, activeIndex)]
           : stableRehypePlugins,
-      [highlightText, highlightActive, highlightActiveIndex],
+      [needleKey, activeIndex],
     );
     useEffect(() => {
       if (
         (!highlightActive && !(typeof highlightActiveIndex === "number" && highlightActiveIndex >= 0)) ||
-        !highlightText ||
-        highlightText.trim().length < 2
+        needles.length === 0
       )
         return;
       const el = containerRef.current?.querySelector(
         'mark[data-active="true"]',
       ) as HTMLElement | null;
       if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
-    }, [highlightActive, highlightActiveIndex, highlightText]);
+    }, [highlightActive, highlightActiveIndex, needleKey]);
 
     const imageInfo = useRef(new Map<string, boolean>());
     if (typeof children !== "string") {
