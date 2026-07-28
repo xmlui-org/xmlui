@@ -14,7 +14,7 @@
     "postpublish": "clean-package restore"
   },
   "dependencies": {
-    "echarts": "^5.6.0",
+    "echarts": "6.1.0",
     "echarts-for-react": "^3.0.2",
     "classnames": "2.5.1"
   },
