@@ -8,13 +8,13 @@ const COMP = "AppState";
 export const AppStateMd = createMetadata({
   status: "stable",
   description:
-    "`AppState` is an invisible component that provides global state management " +
-    "across your entire application. Unlike component variables that are scoped " +
-    "locally, AppState allows any component to access and update shared state " +
-    "without prop drilling.",
+    "`AppState` is an invisible component that holds app-wide shared state any " +
+    "component can read and update without prop drilling. It is deprecated; new " +
+    "apps should use reactive globals instead.",
   deprecationMessage:
     "The AppState component is deprecated. We will remove it in a future release. " +
-    "Please use [global variables](/docs/guides/markup#global-variables) instead.",
+    "Use [reactive globals](/docs/howto/manage-app-wide-state-with-reactive-globals) " +
+    "for app-wide state instead.",
   events: {
     didUpdate: {
       description:

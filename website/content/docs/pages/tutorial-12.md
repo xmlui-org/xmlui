@@ -2,6 +2,9 @@
 
 The `Settings` component demonstrates how to manage application state that persists between sessions using [AppState](/docs/reference/components/AppState), [DataSource](/docs/reference/components/DataSource), and [APICall](/docs/reference/components/APICall) working together.
 
+> [!WARNING]
+> This tutorial reflects the XMLUI Invoice app, which uses the [`AppState`](/docs/reference/components/AppState) component. **`AppState` is deprecated.** For new apps, manage app-wide state with reactive globals instead — see [Manage app-wide state with reactive globals](/docs/howto/manage-app-wide-state-with-reactive-globals), which includes a one-to-one AppState → globals migration. The pattern below still works and is kept here because it matches the existing app; read it as a walkthrough of that app, not as the recommended approach for new code.
+
 ## State management pattern
 
 XMLUI Invoice uses a three-component pattern for persistent settings:

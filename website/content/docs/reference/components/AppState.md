@@ -1,16 +1,15 @@
 # AppState [#appstate]
 
 >[!WARNING]
-> The AppState component is deprecated. We will remove it in a future release. Please use [global variables](/docs/guides/markup#global-variables) instead.
+> The AppState component is deprecated. We will remove it in a future release. Use [reactive globals](/docs/howto/manage-app-wide-state-with-reactive-globals) for app-wide state instead.
 
-`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.
+`AppState` is an invisible component that holds app-wide shared state any component can read and update without prop drilling. It is deprecated; new apps should use reactive globals instead.
 
-**Key advantages over variables:**
-- **Global accessibility**: Any component can access the state by referencing the same `bucket`
-- **Automatic reactivity**: UI updates automatically when state changes, no manual prop passing required
-- **Cross-component coordination**: Perfect for user sessions, UI preferences, loading states, and shared data
+The modern equivalent is a **reactive global**: declare `global.state="{...}"` on the app root, and any component reads or writes it by name — the same prop-drilling-free sharing, without an `AppState` instance per consumer. See [Manage app-wide state with reactive globals](/docs/howto/manage-app-wide-state-with-reactive-globals) for the pattern and a one-to-one `AppState` → globals migration.
 
-## Using AppState [#using-appstate]
+The rest of this page documents `AppState` as it works today, for apps that still use it.
+
+## Using AppState (legacy) [#using-appstate-legacy]
 
 Variables in xmlui are a straightforward tool for managing states. However, a variable's scope is the app's main file or the particular component file in which it is declared. To access the variable's value (the stored state), you must pass its value to components wanting to leverage it.
 
@@ -57,7 +56,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```xmlui-pg name="Storing State in AppState" 
+```xmlui-pg name="Storing State in AppState"
 ---app copy display filename="Main.xmlui"
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
