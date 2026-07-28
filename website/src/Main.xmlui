@@ -1189,6 +1189,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Manage app-wide state with reactive globals"
+                            to="/docs/howto/manage-app-wide-state-with-reactive-globals"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Buffer a reactive edit"
                             to="/docs/howto/buffer-a-reactive-edit"
                         />
@@ -2687,6 +2692,11 @@
             <Page url="/docs/howto/communicate-between-sibling-components">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/communicate-between-sibling-components.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/manage-app-wide-state-with-reactive-globals">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/manage-app-wide-state-with-reactive-globals.md']}"
                 />
             </Page>
 
