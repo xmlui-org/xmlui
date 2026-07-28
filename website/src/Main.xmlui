@@ -911,6 +911,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Make a child fill the remaining vertical space"
+                            to="/docs/howto/fill-remaining-vertical-space"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Build a responsive card grid"
                             to="/docs/howto/build-a-responsive-card-grid"
                         />
@@ -2544,6 +2549,11 @@
             <Page url="/docs/howto/keep-a-star-sized-element-from-collapsing">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/keep-a-star-sized-element-from-collapsing.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/fill-remaining-vertical-space">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/fill-remaining-vertical-space.md']}"
                 />
             </Page>
             <Page url="/docs/howto/build-a-responsive-card-grid">
