@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "xmlui": "*"
+  },
+  "overrides": {
+    "adm-zip": "0.6.0"
   }
 }

@@ -93,6 +93,9 @@
     "vscode-languageclient": "^9.0.1",
     "xmlui": "*"
   },
+  "overrides": {
+    "adm-zip": "0.6.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@stylistic/eslint-plugin": "^2.9.0",
