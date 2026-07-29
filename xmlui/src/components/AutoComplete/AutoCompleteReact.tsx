@@ -91,6 +91,18 @@ function isOptionsExist(options: Option[], newOptions: Option[]) {
   );
 }
 
+function normalizeInitialValue(initialValue: any, multi: boolean) {
+  if (!multi) {
+    return initialValue ?? "";
+  }
+
+  if (Array.isArray(initialValue)) {
+    return initialValue;
+  }
+
+  return initialValue === "" || initialValue === null ? [] : [initialValue];
+}
+
 export const AutoComplete = memo(forwardRef(function AutoComplete(
   {
     id: idProp,
@@ -210,9 +222,9 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
   // Set initial state based on the initialValue prop
   useEffect(() => {
     if (initialValue !== undefined) {
-      updateState({ value: initialValue || [] }, { initial: true });
+      updateState({ value: normalizeInitialValue(initialValue, multi) }, { initial: true });
     }
-  }, [initialValue, updateState]);
+  }, [initialValue, multi, updateState]);
 
   // Observe the size of the reference element
   useEffect(() => {
