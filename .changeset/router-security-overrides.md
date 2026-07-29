@@ -2,4 +2,4 @@
 "xmlui": patch
 ---
 
-Pin React Router transitive dependencies to a non-vulnerable 7.18.1 release.
+Pin React Router transitive dependencies outside the vulnerable v7 advisory ranges.
