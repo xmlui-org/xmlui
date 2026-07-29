@@ -135,6 +135,20 @@ test("Themed H1 regression", async ({ page, initTestBed }) => {
   expect(h2Color).toBe("rgb(0, 255, 0)");
 });
 
+test("Themed H1 accepts MDN named colors", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <App>
+      <Theme textColor-H1="lightgreen">
+        <H1 testId="heading">Tube status</H1>
+      </Theme>
+    </App>
+  `);
+
+  const { color } = await getStyles(page.getByTestId("heading"), "color");
+
+  expect(color).toBe("rgb(144, 238, 144)");
+});
+
 test("Theme control props are not emitted as CSS theme variables", async ({
   page,
   initTestBed,

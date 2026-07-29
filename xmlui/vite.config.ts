@@ -1,6 +1,6 @@
 // @ts-ignore
 import path from "path";
-import { defineConfig, loadEnv, type Plugin } from "vite";
+import { createLogger, defineConfig, loadEnv, type Logger, type Plugin } from "vite";
 import type { PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
@@ -12,6 +12,104 @@ import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import copy from "rollup-plugin-copy";
 // @ts-ignore
 import * as packageJson from "./package.json";
+
+const stripCssModuleExports = (cssCode: string) => {
+  let stripped = "";
+  let index = 0;
+
+  while (index < cssCode.length) {
+    const exportIndex = cssCode.indexOf(":export", index);
+    if (exportIndex < 0) {
+      stripped += cssCode.slice(index);
+      break;
+    }
+
+    let cursor = exportIndex + ":export".length;
+    while (/\s/.test(cssCode[cursor] ?? "")) {
+      cursor++;
+    }
+    if (cssCode[cursor] !== "{") {
+      stripped += cssCode.slice(index, cursor);
+      index = cursor;
+      continue;
+    }
+
+    stripped += cssCode.slice(index, exportIndex);
+    cursor++;
+    let depth = 1;
+    let quote: string | undefined;
+    let escaped = false;
+    while (cursor < cssCode.length && depth > 0) {
+      const char = cssCode[cursor];
+      if (quote) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === quote) {
+          quote = undefined;
+        }
+      } else if (char === "'" || char === '"') {
+        quote = char;
+      } else if (char === "{") {
+        depth++;
+      } else if (char === "}") {
+        depth--;
+      }
+      cursor++;
+    }
+
+    if (depth > 0) {
+      stripped += cssCode.slice(exportIndex);
+      break;
+    }
+    index = cursor;
+  }
+
+  return stripped;
+};
+
+const createStandaloneLogger = (): Logger => {
+  const logger = createLogger();
+  const shouldSuppress = (msg: string) =>
+    (msg.includes("[INVALID_ANNOTATION]") &&
+      msg.includes("react-helmet-async/lib/index.module.js")) ||
+    msg.includes("[PLUGIN_TIMINGS]");
+
+  return {
+    ...logger,
+    info(msg, options) {
+      if (!shouldSuppress(msg)) logger.info(msg, options);
+    },
+    warn(msg, options) {
+      if (!shouldSuppress(msg)) logger.warn(msg, options);
+    },
+    warnOnce(msg, options) {
+      if (!shouldSuppress(msg)) logger.warnOnce(msg, options);
+    },
+    error(msg, options) {
+      if (!shouldSuppress(msg)) logger.error(msg, options);
+    },
+  };
+};
+
+const stripCssModuleExportsFromCssAssets = (): Plugin => ({
+  name: "xmlui-strip-css-module-exports-from-css-assets",
+  apply: "build",
+  enforce: "post",
+  generateBundle(_, bundle) {
+    for (const asset of Object.values(bundle)) {
+      if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) {
+        continue;
+      }
+      const source =
+        asset.source instanceof Uint8Array
+          ? new TextDecoder().decode(asset.source)
+          : `${asset.source}`;
+      asset.source = stripCssModuleExports(source);
+    }
+  },
+});
 
 export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -250,18 +348,14 @@ export default ({ mode = "lib" }) => {
       svgr(),
       ViteYaml(),
       ViteXmlui({}),
-      cssInjectedByJsPlugin(),
+      stripCssModuleExportsFromCssAssets(),
+      cssInjectedByJsPlugin({
+        preRenderCSSCode: stripCssModuleExports,
+      }),
       dtsPlugin(),
     ] as Plugin[];
   } else {
-    plugins = [
-      react(),
-      svgr(),
-      ViteYaml(),
-      ViteXmlui({}),
-      libInjectCss(),
-      dtsPlugin(),
-    ] as Plugin[];
+    plugins = [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dtsPlugin()] as Plugin[];
   }
 
   if (mode === "lib") {
@@ -289,6 +383,7 @@ export default ({ mode = "lib" }) => {
     );
   }
   return defineConfig({
+    customLogger: mode === "standalone" ? createStandaloneLogger() : undefined,
     resolve: {
       alias: {
         lodash: "lodash-es",
@@ -310,6 +405,7 @@ export default ({ mode = "lib" }) => {
     },
     build: {
       minify: true,
+      cssMinify: mode === "standalone" ? false : undefined,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,

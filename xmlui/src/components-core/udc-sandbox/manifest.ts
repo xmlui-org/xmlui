@@ -40,78 +40,7 @@ export interface SerializedUdcContract {
   trust?: "trusted" | "untrusted";
 }
 
-// ---------------------------------------------------------------------------
-// Loader
-// ---------------------------------------------------------------------------
-
-/**
- * Loads a `udc.manifest.json` for the given UDC.
- *
- * Looks for a sibling `udc.manifest.json` file next to the UDC source file
- * (when `sourceFile` is provided) or in `searchDirs` (when supplied).  When
- * the manifest is found, it is parsed, basic-validated, and returned.
- *
- * Designed to run in node-style environments (CLI, Vite plugin, LSP).
- * In browser bundles `fs`/`path` are unavailable; the function then returns
- * `null` rather than throwing, so callers can stay environment-agnostic.
- */
-export async function loadManifest(
-  udcName: string,
-  contract: UdcContract,
-  options?: {
-    sourceFile?: string;
-    searchDirs?: string[];
-  },
-): Promise<UdcManifest | null> {
-  void contract;
-  const sourceFile = options?.sourceFile;
-  const searchDirs = options?.searchDirs ?? [];
-
-  let fs: typeof import("fs") | undefined;
-  let path: typeof import("path") | undefined;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    fs = require("fs");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    path = require("path");
-  } catch {
-    return null;
-  }
-  if (!fs || !path) return null;
-
-  const candidatePaths: string[] = [];
-  if (sourceFile) {
-    candidatePaths.push(path.join(path.dirname(sourceFile), "udc.manifest.json"));
-    candidatePaths.push(
-      path.join(path.dirname(sourceFile), `${udcName}.udc.manifest.json`),
-    );
-  }
-  for (const dir of searchDirs) {
-    candidatePaths.push(path.join(dir, "udc.manifest.json"));
-    candidatePaths.push(path.join(dir, `${udcName}.udc.manifest.json`));
-  }
-
-  for (const p of candidatePaths) {
-    let raw: string;
-    try {
-      if (!fs.existsSync(p)) continue;
-      raw = fs.readFileSync(p, "utf-8");
-    } catch {
-      continue;
-    }
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      continue;
-    }
-    const manifest = validateManifestShape(parsed, udcName);
-    if (manifest) return manifest;
-  }
-  return null;
-}
-
-function validateManifestShape(value: unknown, expectedName: string): UdcManifest | null {
+export function validateManifestShape(value: unknown, expectedName: string): UdcManifest | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;
   if (typeof v.name !== "string" || typeof v.version !== "string") return null;

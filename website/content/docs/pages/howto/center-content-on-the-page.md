@@ -29,10 +29,22 @@ centered vertically only (left-aligned) inside a region that fills the height:
 ```xmlui-pg copy display name="Centered vertically in a filled region" height="340px"
 ---app display
 <App scrollWholePage="false">
-  <VStack height="100%" verticalAlignment="center" padding="$space-4" backgroundColor="$color-surface-100">
+  <VStack 
+    height="100%" 
+    verticalAlignment="center" 
+    padding="$space-4" 
+    backgroundColor="$color-surface-100"
+  >
     <H4>Vertically centered</H4>
-    <Text>This sits in the vertical middle because the VStack fills the height (height="100%" with scrollWholePage="false") and sets verticalAlignment="center".</Text>
-    <Text variant="secondary">Drop the height and it snaps to the top — vertical centering has nothing to center within.</Text>
+    <Text>
+      This sits in the vertical middle because the VStack fills the 
+      height (height="100%" with scrollWholePage="false") and sets 
+      verticalAlignment="center".
+    </Text>
+    <Text variant="secondary">
+      Drop the height and it snaps to the top — vertical centering 
+      has nothing to center within.
+    </Text>
   </VStack>
 </App>
 ```
@@ -41,6 +53,8 @@ If content you expected to be vertically centered is stuck at the top, the
 container collapsed to content height. Give it `height="100vh"`, `height="100%"`
 with `scrollWholePage="false"`, or make it a `height="*"` child of a bounded
 parent — see [Make a child fill the remaining vertical space](/docs/howto/fill-remaining-vertical-space).
+For a dedicated vertical-only walkthrough, see
+[Center content vertically in a filled container](/docs/howto/center-content-vertically-in-a-filled-container).
 
 ## Key points
 
@@ -61,7 +75,7 @@ parent — see [Make a child fill the remaining vertical space](/docs/howto/fill
 </CHStack>
 ```
 
-**Vertical centering needs a filled container — this is the usual bug**: `verticalAlignment="center"` (and `CVStack`) do nothing until the parent has a real height to center within. If content sticks to the top, the container collapsed to content height. Give it `height="100vh"`, `height="100%"` with `scrollWholePage="false"`, or make it a `height="*"` child of a bounded parent — see [Make a child fill the remaining vertical space](/docs/howto/fill-remaining-vertical-space).
+**Vertical centering needs a filled container — this is the usual bug**: `verticalAlignment="center"` (and `CVStack`) do nothing until the parent has a real height to center within. If content sticks to the top, the container collapsed to content height. Give it `height="100vh"`, `height="100%"` with `scrollWholePage="false"`, or make it a `height="*"` child of a bounded parent — see [Center content vertically in a filled container](/docs/howto/center-content-vertically-in-a-filled-container) and [Make a child fill the remaining vertical space](/docs/howto/fill-remaining-vertical-space).
 
 **Fixed width on the card**: A fixed width works well for login forms and other centred dialogs:
 
@@ -87,6 +101,7 @@ parent — see [Make a child fill the remaining vertical space](/docs/howto/fill
 
 **See also**
 - [Make a child fill the remaining vertical space](/docs/howto/fill-remaining-vertical-space) — the `height="*"` precondition that vertical centering depends on
+- [Center content vertically in a filled container](/docs/howto/center-content-vertically-in-a-filled-container) — vertical-only centering with a filled region
 - [Stack component](/docs/reference/components/Stack) — `horizontalAlignment`, `verticalAlignment`, and dock layout
 - [CVStack component](/docs/reference/components/CVStack) — centred vertical stack shorthand
 - [CHStack component](/docs/reference/components/CHStack) — centred horizontal stack shorthand
