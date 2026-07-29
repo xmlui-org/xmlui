@@ -1108,6 +1108,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Style looped rows without a per-row Theme"
+                            to="/docs/howto/scope-theme-outside-loops"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Adjust spacing globally"
                             to="/docs/howto/adjust-spacing-globally"
                         />
@@ -2658,6 +2663,11 @@
             <Page url="/docs/howto/scope-a-theme-to-a-card-or-section">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/scope-a-theme-to-a-card-or-section.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/scope-theme-outside-loops">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/scope-theme-outside-loops.md']}"
                 />
             </Page>
             <Page url="/docs/howto/adjust-spacing-globally">
