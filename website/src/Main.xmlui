@@ -1346,6 +1346,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Wrap long text in a Link"
+                            to="/docs/howto/wrap-long-text-in-a-link"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Theme DatePicker calendar items"
                             to="/docs/howto/theme-datepicker-calendar-items"
                         />
@@ -2861,6 +2866,11 @@
             <Page url="/docs/howto/customize-link-focus-and-decoration">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/customize-link-focus-and-decoration.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/wrap-long-text-in-a-link">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/wrap-long-text-in-a-link.md']}"
                 />
             </Page>
             <Page url="/docs/howto/theme-datepicker-calendar-items">
