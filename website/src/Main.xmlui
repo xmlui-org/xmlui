@@ -697,6 +697,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Measure performance with App.mark"
+                            to="/docs/howto/measure-performance-with-app-mark"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Handle action errors on a component"
                             to="/docs/howto/handle-action-errors-on-a-component"
                         />
@@ -2774,6 +2779,11 @@
             <Page url="/docs/howto/collect-global-errors-with-app-onerror">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/collect-global-errors-with-app-onerror.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/measure-performance-with-app-mark">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/measure-performance-with-app-mark.md']}"
                 />
             </Page>
             <Page url="/docs/howto/handle-action-errors-on-a-component">
