@@ -58,6 +58,24 @@ export interface BuildContentFromRuntimeOptions {
   contentPrefix?: string;
 }
 
+function toPlainTextContentKey(urlPrefix: string | undefined, urlFragment: string): string {
+  const prefix = urlPrefix ?? "";
+  if (!urlFragment) {
+    return prefix.endsWith("/") ? prefix.slice(0, -1) || "/" : prefix || "/";
+  }
+  return prefix + urlFragment;
+}
+
+function toPublicUrlFragment(contentFragment: string): string {
+  const withoutExtension = contentFragment.replace(/\.(md|mdx)$/, "");
+  if (!withoutExtension.startsWith("pages/")) {
+    return withoutExtension;
+  }
+
+  const pageFragment = withoutExtension.slice("pages/".length);
+  return pageFragment === "intro" ? "" : pageFragment;
+}
+
 export function buildContentFromRuntime(
   contentRuntime: Record<string, { default: string }>,
   options: BuildContentFromRuntimeOptions = {},
@@ -77,19 +95,26 @@ export function buildContentFromRuntime(
   Object.keys(contentRuntime).forEach((filePath) => {
     const raw = contentRuntime[filePath]?.default ?? "";
     const { data, content: body } = parseFrontmatter(raw);
-    let urlFragment: string;
+    const contentFragment = filePath.substring(contentPrefix.length);
+    const publicUrlFragment = toPublicUrlFragment(contentFragment);
+    let contentKey: string;
 
     if (filePath.startsWith(contentPrefix + "pages/")) {
-      urlFragment = filePath.substring(contentPrefix.length);
+      contentKey = contentFragment;
     } else {
-      urlFragment = filePath.substring(contentPrefix.length).replace(/\.(md|mdx)$/, "");
-      navPanelContent.push(urlFragment);
-      plainTextContent[(plainTextOptions.urlPrefix ?? "") + urlFragment] = markdownToPlainText(body);
+      contentKey = publicUrlFragment;
+      navPanelContent.push(contentKey);
     }
 
-    content[urlFragment] = body;
+    const plainTextContentKey = toPlainTextContentKey(
+      plainTextOptions.urlPrefix,
+      publicUrlFragment,
+    );
+    plainTextContent[plainTextContentKey] = markdownToPlainText(body);
+
+    content[contentKey] = body;
     if (Object.keys(data).length > 0) {
-      frontmatter[(plainTextOptions.urlPrefix ?? "") + urlFragment] = data;
+      frontmatter[plainTextContentKey] = data;
     }
   });
   return { content, plainTextContent, navPanelContent, frontmatter };
