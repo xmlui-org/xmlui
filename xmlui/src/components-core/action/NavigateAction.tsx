@@ -32,13 +32,26 @@ function resolveRelativePathname(pathname: string | number, currentPathname: str
 function navigate(
   { navigate, location, appContext }: ActionExecutionContext,
   pathname: string | number,
-  queryParams?: Record<string, any>,
+  options?: Record<string, any>,
 ) {
   // https://stackoverflow.com/questions/37385570/how-to-know-if-react-router-can-go-back-to-display-back-button-in-react-app
   if (pathname === -1 && location.key === "default") {
     navigate(".");
     return;
   }
+
+  // The second argument is an options object `{ queryParams?, replace? }`. For
+  // back-compat with the earlier `navigate(pathname, queryParams)` form, a bare
+  // object that carries neither `queryParams` nor `replace` is treated as the
+  // query-params Record itself.
+  const isOptionsObject =
+    !!options &&
+    typeof options === "object" &&
+    ("queryParams" in options || "replace" in options);
+  const queryParams: Record<string, any> | undefined = isOptionsObject
+    ? options!.queryParams
+    : options;
+  const replace = isOptionsObject ? !!options!.replace : false;
 
   // When routing through appContext.navigate, relative paths must be resolved to absolute
   // paths because appContext.navigate calls navigateRouter from AppContent's context, which
@@ -47,11 +60,11 @@ function navigate(
   // which always reflects the real current URL.
   const resolvedPathname = resolveRelativePathname(pathname, location.pathname);
 
+  // createUrlWithQueryParams returns a plain "pathname?search" string for the query-params
+  // case (a To object's `search` is dropped by the imperative router under hash routing —
+  // see #3694), so `to` is already router-safe here.
   const to = queryParams
-    ? createUrlWithQueryParams({
-        pathname: resolvedPathname,
-        queryParams,
-      })
+    ? createUrlWithQueryParams({ pathname: resolvedPathname, queryParams })
     : resolvedPathname;
 
   // Trace navigation event — pushXsLog is a noop when xsVerbose is off
@@ -63,6 +76,7 @@ function navigate(
     from: location.pathname,
     to: String(to),
     queryParams,
+    replace,
   });
 
   // Use appContext.navigate if available (which includes willNavigate/didNavigate handlers)
@@ -72,10 +86,11 @@ function navigate(
   // narrow on resolvedPathname to satisfy the type checker. When resolvedPathname is a
   // string the constructed `to` is a valid To value at runtime, cast is safe.
   if (appContext?.navigate && typeof resolvedPathname !== "number") {
-    // Pass queryParams in options for the wrapped navigate to access
-    appContext.navigate(to as To, { queryParams });
+    // Pass queryParams (for URL assembly) and replace (forwarded to the router,
+    // which honors it via AppContent's navigate options spread) to the wrapped navigate.
+    appContext.navigate(to as To, { queryParams, replace });
   } else {
-    navigate(to);
+    navigate(to, replace ? { replace: true } : undefined);
   }
 }
 

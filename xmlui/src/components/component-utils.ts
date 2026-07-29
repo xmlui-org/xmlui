@@ -12,10 +12,12 @@ export function createUrlWithQueryParams(
     return to;
   }
   if (to.queryParams !== undefined) {
-    return {
-      ...to,
-      search: new URLSearchParams(omitBy(to.queryParams, isUndefined)).toString(),
-    };
+    // Return a plain "pathname?search" string, not a To object. React Router's imperative
+    // navigate drops a To object's `search` under the hash router (only a string path
+    // survives — see #3694); this affects both `navigate()` and Link/NavLink clicks, which
+    // forward this value to the router. A string path routes correctly under every router.
+    const search = new URLSearchParams(omitBy(to.queryParams, isUndefined)).toString();
+    return search ? `${to.pathname}?${search}` : to.pathname;
   }
   return to;
 }

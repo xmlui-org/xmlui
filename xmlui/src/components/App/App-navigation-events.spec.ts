@@ -362,3 +362,103 @@ test.describe("Navigation Events", () => {
     expect(lastTwoEvents[1].to).toContain("/products/123");
   });
 });
+
+// =============================================================================
+// navigate() OPTIONS OBJECT — { queryParams, replace }  (#3694)
+// =============================================================================
+
+test.describe("navigate options object", () => {
+  // Markup's bare `navigate(...)` binds to the appContext wrapper, not navigateAction, so
+  // these use the bare form to exercise the surface real apps hit (#3694). One case below
+  // uses `Actions.navigate` to also cover the registered-action path.
+
+  test("bare navigate: options object queryParams builds the query string", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Button testId="navBtn" onClick="navigate('/about', { queryParams: { tab: 'profile' } })">Go</Button>
+          </Page>
+          <Page url="/about">About</Page>
+        </Pages>
+      </App>
+    `);
+    await page.getByTestId("navBtn").click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("About");
+    await expect(page).toHaveURL(/\/about\?tab=profile$/);
+  });
+
+  test("bare navigate: legacy bare object is accepted as query params (back-compat)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Button testId="navBtn" onClick="navigate('/about', { tab: 'profile' })">Go</Button>
+          </Page>
+          <Page url="/about">About</Page>
+        </Pages>
+      </App>
+    `);
+    await page.getByTestId("navBtn").click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("About");
+    await expect(page).toHaveURL(/\/about\?tab=profile$/);
+  });
+
+  test("Actions.navigate: options object queryParams builds the query string", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Button testId="navBtn" onClick="Actions.navigate('/about', { queryParams: { tab: 'profile' } })">Go</Button>
+          </Page>
+          <Page url="/about">About</Page>
+        </Pages>
+      </App>
+    `);
+    await page.getByTestId("navBtn").click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("About");
+    await expect(page).toHaveURL(/\/about\?tab=profile$/);
+  });
+
+  test("bare navigate: replace:true replaces the history entry so back skips it", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            HomeMarker
+            <Button testId="toOne" onClick="navigate('/one')">GoOne</Button>
+          </Page>
+          <Page url="/one">
+            OneMarker
+            <Button testId="toTwoReplace" onClick="navigate('/two', { replace: true })">GoTwo</Button>
+          </Page>
+          <Page url="/two">TwoMarker</Page>
+        </Pages>
+      </App>
+    `);
+    await page.getByTestId("toOne").click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("OneMarker");
+    await page.getByTestId("toTwoReplace").click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("TwoMarker");
+
+    // /one was replaced by /two, so history is [Home, /two]: back lands on Home, not /one.
+    await page.goBack();
+    await expect(page.locator(".xmlui-page-root")).toContainText("HomeMarker");
+    await expect(page.locator(".xmlui-page-root")).not.toContainText("OneMarker");
+  });
+});

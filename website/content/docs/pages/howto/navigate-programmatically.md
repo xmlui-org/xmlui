@@ -56,9 +56,13 @@ Sometimes a navigation must happen in response to logic — after a form submiss
 
 **`{ queryParams: { key: value } }` appends query parameters**: This merges parameters into the URL as a query string (e.g. `/settings?tab=profile`). It is more convenient and reliable than manually concatenating `?key=value` onto the URL string.
 
+**Back-compat — a bare object is treated as query params**: For compatibility with earlier code, `navigate('/settings', { tab: 'profile' })` (a second argument with no `queryParams` or `replace` key) is read as the query-params object — equivalent to `{ queryParams: { tab: 'profile' } }`. Prefer the explicit `{ queryParams: … }` form in new code so `replace` stays available.
+
 **Use `navigate` inside API callbacks for post-action routing**: A common pattern is `onSuccess="navigate('/dashboard')"` on an `APICall` — the user lands on the dashboard only after the server confirms the operation succeeded. Avoid navigating before the response arrives.
 
 **`Link` is still preferred for static navigation**: When the destination is known at render time and requires no conditional logic, use a `<Link to="/team">` or `<NavLink to="/team">` instead. Links are accessible by default (keyboard-focusable, right-click menu, middle-click to open in a new tab), while `navigate()` in a `Button`'s `onClick` loses those affordances.
+
+**Pass query params declaratively with a `Link`**: `Link` and `NavLink` take the same structured target as an object `to` — `<Link to="{{ pathname: '/settings', queryParams: { tab: 'profile' } }}">`. This is the declarative equivalent of `navigate('/settings', { queryParams: { tab: 'profile' } })`, producing `/settings?tab=profile`.
 
 ---
 
