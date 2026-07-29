@@ -1179,6 +1179,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Keep sync-callback attributes to one expression"
+                            to="/docs/howto/keep-sync-callbacks-to-one-expression"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Use accessors for complex expressions"
                             to="/docs/howto/use-accessors-to-simplify-complex-expressions"
                         />
@@ -2712,6 +2717,11 @@
             <Page url="/docs/howto/derive-a-value-from-multiple-sources">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/derive-a-value-from-multiple-sources.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/keep-sync-callbacks-to-one-expression">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-sync-callbacks-to-one-expression.md']}"
                 />
             </Page>
             <Page url="/docs/howto/run-a-one-time-action-on-page-load">
