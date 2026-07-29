@@ -13,7 +13,6 @@ type Props = {
   children: ReactNode;
   parentInterceptorContext?: IApiInterceptorContext;
   waitForApiInterceptor?: boolean;
-  useHashBasedRouting?: boolean;
 };
 
 // This React component injects the API interceptor into the application's context

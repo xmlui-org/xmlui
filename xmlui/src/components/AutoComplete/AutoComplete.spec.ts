@@ -37,6 +37,51 @@ test("initialValue sets the selected option", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 });
 
+test("empty initialValue stays empty in single mode", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <AutoComplete id="autoComplete" initialValue="">
+        <Option value="1" label="Bruce Wayne" />
+      </AutoComplete>
+      <Text testId="valueKind">{autoComplete.value === '' ? 'empty-string' : 'other'}</Text>
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("valueKind")).toHaveText("empty-string");
+  await expect(page.getByRole("combobox")).toHaveValue("");
+});
+
+test("zero initialValue stays selected in single mode", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <AutoComplete id="autoComplete" initialValue="{0}">
+        <Option value="{0}" label="Zero" />
+        <Option value="{1}" label="One" />
+      </AutoComplete>
+      <Text testId="text">Selected value: {autoComplete.value}</Text>
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
+  await expect(page.getByRole("combobox")).toHaveValue("Zero");
+});
+
+test("scalar initialValue becomes a selected badge in multi mode", async ({ initTestBed, page }) => {
+  await initTestBed(`
+    <Fragment>
+      <AutoComplete id="autoComplete" multi="true" initialValue="1">
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+      </AutoComplete>
+      <Text testId="text">Selected values: {autoComplete.value}</Text>
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("Selected values: 1");
+  await expect(page.getByText("Bruce Wayne").filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveValue("");
+});
+
 test("opens dropdown when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
   await initTestBed(`
     <AutoComplete>

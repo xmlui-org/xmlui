@@ -433,14 +433,9 @@ function StandaloneApp({
     // @ts-ignore
     (typeof globalThis.window !== "undefined" ? (globalThis as any).XMLUI_MOCK_TEST_ID : false);
 
-  // --- An app can turn off the default hash routing.
-  const useHashBasedRouting =
-    xmluiConfig?.useHashBasedRouting ?? appGlobals?.useHashBasedRouting ?? true;
-
   return (
     <ApiInterceptorProvider
       interceptor={mockedApi}
-      useHashBasedRouting={useHashBasedRouting}
       waitForApiInterceptor={waitForApiInterceptor}
     >
       <SsgEnvProvider>
