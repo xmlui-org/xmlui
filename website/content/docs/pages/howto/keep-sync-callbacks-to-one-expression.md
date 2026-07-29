@@ -61,7 +61,7 @@ itself a one-line expression.
 
 ## See also
 
-- [Scripting](/docs/scripting) — the `xs` language and its restrictions
+- [Scripting](/docs/guides/scripting) — the `xs` language and its restrictions
 - [Slider component](/docs/reference/components/Slider) — `valueFormat`
 - [List component](/docs/reference/components/List) — `groupBy`, `rowUnselectablePredicate`
 - [Table component](/docs/reference/components/Table) — `rowDisabledPredicate`, `rowUnselectablePredicate`
