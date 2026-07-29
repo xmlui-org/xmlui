@@ -110,7 +110,7 @@ For tiny helpers used only by one app, you can start with an inline component in
 
 Prefer props when the same component is rendered with different data in different places. Prefer globals when every consumer reads the same singleton value and prop-threading would only create boilerplate. See [Scoping › Global variables](/docs/guides/scoping#global-variables) and [Scripting › Code-Behind files](/docs/guides/scripting#code-behind-files) for details on globals and `Globals.xs`.
 
-**`id` is reserved — never use it as a prop name**: The `id` attribute is special in XMLUI: it registers a named reference that parent built-in components can use to call the component's API. If you pass `id="{$item.id}"` to a user-defined component, XMLUI captures it as the component reference, not as `$props.id`. Use a descriptive name instead:
+**`id` is reserved — never use it as a prop name**: The `id` attribute is special in XMLUI: it registers a named reference that parent built-in components can use to call the component's API. If you pass `id="{$item.id}"` to a user-defined component, XMLUI captures it as the component reference, not as `$props.id` — which stays silently `undefined`. The tell is a guard like `when="{!!$props.id}"` (or a `DataSource` gated on it) that never fires, while other props on the same component work fine. Use a descriptive name instead:
 
 ```xmlui
 <!-- ❌ wrong: id is captured by the framework, $props.id is undefined -->
