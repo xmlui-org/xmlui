@@ -41,6 +41,20 @@ test.describe("Centred login card", { tag: "@website" }, () => {
   });
 });
 
+test.describe("Centered vertically in a filled region", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(
+    markdown,
+    "Centered vertically in a filled region",
+  );
+
+  test("initial state renders the vertically centered content", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.getByRole("heading", { name: "Vertically centered" })).toBeVisible();
+    await expect(page.getByText("This sits in the vertical middle")).toBeVisible();
+    await expect(page.getByText("Drop the height and it snaps to the top")).toBeVisible();
+  });
+});
+
 test.describe("Centred with marginHorizontal", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,

@@ -24,11 +24,28 @@ buttons and watch the fill disappear:
   <VStack padding="$space-3" gap="$space-3">
     <HStack verticalAlignment="center" gap="$space-2">
       <Text variant="strong">Body height:</Text>
-      <Button label="*" variant="{bh === '*' ? 'solid' : 'outlined'}" onClick="bh = '*'" />
-      <Button label="auto" variant="{bh === 'auto' ? 'solid' : 'outlined'}" onClick="bh = 'auto'" />
-      <Button label="160px" variant="{bh === '160px' ? 'solid' : 'outlined'}" onClick="bh = '160px'" />
+      <Button 
+        label="*" 
+        variant="{bh === '*' ? 'solid' : 'outlined'}" 
+        onClick="bh = '*'" 
+      />
+      <Button 
+        label="auto" 
+        variant="{bh === 'auto' ? 'solid' : 'outlined'}" 
+        onClick="bh = 'auto'" 
+      />
+      <Button 
+        label="160px" 
+        variant="{bh === '160px' ? 'solid' : 'outlined'}" 
+        onClick="bh = '160px'" 
+      />
     </HStack>
-    <VStack height="380px" gap="0" borderWidth="1px" borderColor="$color-surface-300">
+    <VStack 
+      height="380px" 
+      gap="0" 
+      borderWidth="1px" 
+      borderColor="$color-surface-300"
+    >
       <HStack padding="$space-3" backgroundColor="$color-primary-100">
         <Text variant="strong">Header — natural height</Text>
       </HStack>
@@ -40,7 +57,11 @@ buttons and watch the fill disappear:
         backgroundColor="$color-surface-100"
         borderVertical="2px dashed $color-primary-300">
         <Text variant="strong">Body — height="{bh}"</Text>
-        <Text>Only "*" pushes the footer to the bottom. "auto" shrinks to this text and "160px" is a fixed slab — either way the rows bunch at the top and the leftover height falls below.</Text>
+        <Text>
+          Only "*" pushes the footer to the bottom. "auto" shrinks to 
+          this text and "160px" is a fixed slab — either way the rows 
+          bunch at the top and the leftover height falls below.
+        </Text>
       </VStack>
       <HStack padding="$space-3" backgroundColor="$color-primary-100">
         <Text variant="strong">Footer — natural height</Text>
@@ -83,18 +104,45 @@ even split, a weighted split, and a fixed value against the always-starred botto
   <VStack padding="$space-3" gap="$space-3">
     <HStack verticalAlignment="center" gap="$space-2">
       <Text variant="strong">Top region height:</Text>
-      <Button label="*" variant="{top === '*' ? 'solid' : 'outlined'}" onClick="top = '*'" />
-      <Button label="2*" variant="{top === '2*' ? 'solid' : 'outlined'}" onClick="top = '2*'" />
-      <Button label="120px" variant="{top === '120px' ? 'solid' : 'outlined'}" onClick="top = '120px'" />
+      <Button 
+        label="*" 
+        variant="{top === '*' ? 'solid' : 'outlined'}" 
+        onClick="top = '*'" 
+      />
+      <Button 
+        label="2*" 
+        variant="{top === '2*' ? 'solid' : 'outlined'}" 
+        onClick="top = '2*'" 
+      />
+      <Button 
+        label="80px" 
+        variant="{top === '80px' ? 'solid' : 'outlined'}" 
+        onClick="top = '80px'" 
+      />
     </HStack>
-    <VStack height="320px" gap="0" borderWidth="1px" borderColor="$color-surface-300">
+    <VStack 
+      height="320px" 
+      gap="0" 
+      borderWidth="1px" 
+      borderColor="$color-surface-300"
+    >
       <HStack padding="$space-3" backgroundColor="$color-primary-100">
         <Text variant="strong">Header — natural height</Text>
       </HStack>
-      <VStack height="{top}" backgroundColor="$color-primary-50" verticalAlignment="center" horizontalAlignment="center">
+      <VStack 
+        height="{top}" 
+        backgroundColor="$color-primary-50" 
+        verticalAlignment="center" 
+        horizontalAlignment="center"
+      >
         <Text variant="strong">Top — height="{top}"</Text>
       </VStack>
-      <VStack height="*" backgroundColor="$color-surface-200" verticalAlignment="center" horizontalAlignment="center">
+      <VStack 
+        height="*" 
+        backgroundColor="$color-surface-200" 
+        verticalAlignment="center" 
+        horizontalAlignment="center"
+      >
         <Text variant="strong">Bottom — height="*"</Text>
       </VStack>
     </VStack>
@@ -103,7 +151,7 @@ even split, a weighted split, and a fixed value against the always-starred botto
 ```
 
 `*` vs `*` splits evenly; `2*` makes the top twice the bottom (weights, like star
-widths); `120px` drops the top out of the star math entirely — it takes a fixed
+widths); `80px` drops the top out of the star math entirely — it takes a fixed
 slab and the bottom `*` absorbs the rest.
 
 **It is the vertical mirror of `width="*"`.** The star rule is identical on both
@@ -116,6 +164,7 @@ a `width="*"` how-to already solves your row, the same shape solves your column.
 
 - [Stop a `width="*"` element from collapsing next to a flexible sibling](/docs/howto/keep-a-star-sized-element-from-collapsing) — the horizontal mirror and the "starred child squeezed to a sliver" trap
 - [Fill the viewport with one internal scroll region](/docs/howto/build-a-full-height-scroll-layout) — when the filled region should scroll internally
-- [Center content on the page](/docs/howto/center-content-on-the-page) — centering *within* a container that fills the height
+- [Center content vertically in a filled container](/docs/howto/center-content-vertically-in-a-filled-container) — why vertical centering depends on a filled region
+- [Center content on the page](/docs/howto/center-content-on-the-page) — centering a full-page card or panel
 - [Stack component](/docs/reference/components/Stack) — `height`, star sizing, and alignment
 - [Layout Properties](/docs/styles-and-themes/layout-props) — sizing units including `*`

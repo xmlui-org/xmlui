@@ -48,6 +48,13 @@ describe("theming validator — rule table", () => {
 });
 
 describe("theming validator — color", () => {
+  it.each(["lightgreen", "rebeccapurple", "ALICEBLUE"])(
+    "accepts CSS named color %s",
+    (value) => {
+      expect(verifyThemeValue("color", value)).toBeNull();
+    },
+  );
+
   it("accepts component-shaped theme variable references", () => {
     expect(verifyThemeValue("color", "textColor-Link--hover")).toBeNull();
   });

@@ -39,7 +39,11 @@ describe("colorRule", () => {
     "var(--xmlui-Button-color)",
     "$primary",
     "red",
+    "lightgreen",
+    "rebeccapurple",
     "TRANSPARENT",
+    "currentColor",
+    "revert-layer",
   ])("accepts %p", (raw) => {
     expect(colorRule.verify(raw)).toBeNull();
   });

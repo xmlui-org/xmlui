@@ -881,6 +881,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Center content vertically in a filled container"
+                            to="/docs/howto/center-content-vertically-in-a-filled-container"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Create a resizable split view"
                             to="/docs/howto/create-a-resizable-split-view"
                         />
@@ -2529,6 +2534,11 @@
             <Page url="/docs/howto/center-content-on-the-page">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/center-content-on-the-page.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/center-content-vertically-in-a-filled-container">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/center-content-vertically-in-a-filled-container.md']}"
                 />
             </Page>
             <Page url="/docs/howto/create-a-resizable-split-view">

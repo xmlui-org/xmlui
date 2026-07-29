@@ -4,7 +4,13 @@ import type { ComponentRendererDef, LayoutContext } from "../abstractions/Render
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { validateInjectedVars } from "./optimization/validateInjectedVars";
-import { pushXsLog, createLogEntry, pushTrace, popTrace, getCurrentTrace } from "./inspector/inspectorUtils";
+import {
+  pushXsLog,
+  createLogEntry,
+  pushTrace,
+  popTrace,
+  getCurrentTrace,
+} from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 import { MemoizedItem } from "../components/container-helpers";
@@ -18,10 +24,7 @@ import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
  * as the same reference, so downstream deep-equal/memoization on the prop
  * behaves as if no walk happened.
  */
-export function deepConvertSyncCallbacks(
-  value: any,
-  lookupSyncCallback: (v: any) => any,
-): any {
+export function deepConvertSyncCallbacks(value: unknown, lookupSyncCallback: (v: any) => any): any {
   if (isArrowExpressionObject(value)) {
     return lookupSyncCallback(value);
   }
@@ -37,7 +40,7 @@ export function deepConvertSyncCallbacks(
   if (
     value !== null &&
     typeof value === "object" &&
-    (value.constructor === Object || value.constructor === undefined)
+    (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null)
   ) {
     let changed = false;
     const out: Record<string, any> = {};
@@ -777,7 +780,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           if (traceKind) {
             // For ChangeListener didChange, include prevValue/newValue for diff rendering
             const changeListenerDiff: Record<string, any> = {};
-            if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+            if (
+              traceKind === "value:change" &&
+              args[0] &&
+              typeof args[0] === "object" &&
+              "prevValue" in args[0] &&
+              "newValue" in args[0]
+            ) {
               changeListenerDiff.prevValue = args[0].prevValue;
               changeListenerDiff.newValue = args[0].newValue;
             }
@@ -809,8 +818,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     // --- Dynamic native event capture ---
     // Only enabled per-component via config.captureNativeEvents (not appGlobals).
-    const nativeEventsEnabled =
-      xsVerbose && config.captureNativeEvents;
+    const nativeEventsEnabled = xsVerbose && config.captureNativeEvents;
 
     if (nativeEventsEnabled) {
       const xmluiId = node.uid || node.testId;
@@ -1434,9 +1442,11 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           };
         }
         // __onDidChange still needed for the StateWrapper onChange path
-        props.__onDidChange = props.onDidChange || ((...args: any[]) => {
-          updateState({ value: args[0] });
-        });
+        props.__onDidChange =
+          props.onDidChange ||
+          ((...args: any[]) => {
+            updateState({ value: args[0] });
+          });
       } else {
         // Non-didChange events (gotFocus, lostFocus, ChangeListener didChange) pass through as native props
         props[reactPropName] = (...args: any[]) => {
@@ -1449,7 +1459,13 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             if (traceKind) {
               // For ChangeListener didChange, include prevValue/newValue for diff rendering
               const changeListenerDiff: Record<string, any> = {};
-              if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+              if (
+                traceKind === "value:change" &&
+                args[0] &&
+                typeof args[0] === "object" &&
+                "prevValue" in args[0] &&
+                "newValue" in args[0]
+              ) {
                 changeListenerDiff.prevValue = args[0].prevValue;
                 changeListenerDiff.newValue = args[0].newValue;
               }
@@ -1481,8 +1497,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture (same as wrapComponent) ---
-    const nativeEventsEnabled =
-      xsVerbose && config.captureNativeEvents;
+    const nativeEventsEnabled = xsVerbose && config.captureNativeEvents;
 
     if (nativeEventsEnabled) {
       const xmluiId = node.uid || node.testId;
