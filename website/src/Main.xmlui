@@ -697,6 +697,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Measure performance with App.mark"
+                            to="/docs/howto/measure-performance-with-app-mark"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Handle action errors on a component"
                             to="/docs/howto/handle-action-errors-on-a-component"
                         />
@@ -1108,6 +1113,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Style looped rows without a per-row Theme"
+                            to="/docs/howto/scope-theme-outside-loops"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Adjust spacing globally"
                             to="/docs/howto/adjust-spacing-globally"
                         />
@@ -1171,6 +1181,11 @@
                             icon="article"
                             label="Derive a value from multiple sources"
                             to="/docs/howto/derive-a-value-from-multiple-sources"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Keep sync-callback attributes to one expression"
+                            to="/docs/howto/keep-sync-callbacks-to-one-expression"
                         />
                         <NavLink
                             icon="article"
@@ -2660,6 +2675,11 @@
                     content="{appGlobals.docsContent['pages/howto/scope-a-theme-to-a-card-or-section.md']}"
                 />
             </Page>
+            <Page url="/docs/howto/scope-theme-outside-loops">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/scope-theme-outside-loops.md']}"
+                />
+            </Page>
             <Page url="/docs/howto/adjust-spacing-globally">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/adjust-spacing-globally.md']}"
@@ -2702,6 +2722,11 @@
             <Page url="/docs/howto/derive-a-value-from-multiple-sources">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/derive-a-value-from-multiple-sources.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/keep-sync-callbacks-to-one-expression">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-sync-callbacks-to-one-expression.md']}"
                 />
             </Page>
             <Page url="/docs/howto/run-a-one-time-action-on-page-load">
@@ -2754,6 +2779,11 @@
             <Page url="/docs/howto/collect-global-errors-with-app-onerror">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/collect-global-errors-with-app-onerror.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/measure-performance-with-app-mark">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/measure-performance-with-app-mark.md']}"
                 />
             </Page>
             <Page url="/docs/howto/handle-action-errors-on-a-component">

@@ -367,6 +367,19 @@ The following JavaScript features are **not available** in the XMLUI scripting e
 | Destructuring assignment (`const { a, b } = obj`) | Not supported | Access properties directly: `obj.a`, `obj.b` |
 | Generator functions (`function*`) | Not supported | — |
 | `import` / `export` | Not available in inline code | Use code-behind files with top-level `function` declarations |
+| `var` inside a function body | Not supported | Use `let` or `const`. (Top-level `var` in a `.xmlui.xs` code-behind file is fine — see below.) It throws `'var' declarations are not allowed within functions`. |
+
+**Assigning through a non-script base fails silently.** An assignment whose target
+is reached through an identifier the engine doesn't track — for example
+`window.foo = x` — throws `Left value variable (foo) not found in the scope`. The
+engine resolves the assignment target as a bare name and can't find it. The
+failure is **silent at the call site**: the handler simply stops, and only a
+console error records it. Keep writable state in a component `var` or `global`,
+or perform the mutation in a real JavaScript function loaded from your
+`index.html` and call it from `xs`.
+
+For the same rule applied to *render-time* callbacks, see
+[Keep sync-callback attributes to one expression](/docs/howto/keep-sync-callbacks-to-one-expression).
 
 ### Unavailable globals
 
