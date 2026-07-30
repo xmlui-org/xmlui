@@ -901,6 +901,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Pin sticky content below the AppHeader"
+                            to="/docs/howto/pin-sticky-content-below-the-appheader"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pin a toolbar above a bounded scroll region"
                             to="/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region"
                         />
@@ -2569,6 +2574,11 @@
             <Page url="/docs/howto/make-a-sticky-header-in-a-scroll-area">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/make-a-sticky-header-in-a-scroll-area.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/pin-sticky-content-below-the-appheader">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/pin-sticky-content-below-the-appheader.md']}"
                 />
             </Page>
             <Page url="/docs/howto/pin-a-toolbar-above-a-bounded-scroll-region">
