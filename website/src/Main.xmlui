@@ -818,6 +818,11 @@
                             label="Paginate a list"
                             to="/docs/howto/paginate-a-list"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Implement infinite scroll pagination"
+                            to="/docs/howto/implement-infinite-scroll-pagination"
+                        />
                     </NavGroup>
 
                     <NavGroup label="Navigation & Routing">
@@ -2229,6 +2234,11 @@
             <Page url="/docs/howto/paginate-a-list">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/paginate-a-list.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/implement-infinite-scroll-pagination">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/implement-infinite-scroll-pagination.md']}"
                 />
             </Page>
             <Page url="/docs/howto/chain-a-refetch">
