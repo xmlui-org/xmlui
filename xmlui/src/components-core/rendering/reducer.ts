@@ -7,6 +7,7 @@ import { ContainerActionKind } from "./containers";
 import type { IDebugViewContext } from "../DebugViewProvider";
 import { pushXsLog } from "../inspector/inspectorUtils";
 import { isRenderInProgress } from "../scheduler";
+import { evalTrace } from "../script-runner/eval-trace";
 
 const MAX_STATE_TRANSITION_LENGTH = 100;
 
@@ -22,6 +23,9 @@ export function createContainerReducer(debugView: IDebugViewContext) {
 
   // --- The reducer function
   return produce((state: ContainerState, action: ContainerAction) => {
+    // --- Evaluation trace (see eval-trace.ts): names each container
+    // --- action while the host-armed window is open. No-op otherwise.
+    evalTrace("action", () => String(action.type ?? "") + " uid:" + String(action.payload?.uid ?? ""));
     if (isRenderInProgress()) {
       pushXsLog({
         kind: "scheduler",
