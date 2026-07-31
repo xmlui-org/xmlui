@@ -589,6 +589,11 @@
                             label="Set the initial value of a Select from fetched data"
                             to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Create a two-handle range slider"
+                            to="/docs/howto/create-a-two-handle-range-slider"
+                        />
                     </NavGroup>
 
                     <NavGroup label="Data Loading & APIs">
@@ -2188,6 +2193,11 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/create-a-two-handle-range-slider">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/create-a-two-handle-range-slider.md']}"
                 />
             </Page>
             <Page
