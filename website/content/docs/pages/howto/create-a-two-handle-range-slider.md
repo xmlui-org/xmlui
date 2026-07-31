@@ -51,6 +51,6 @@ A range slider is the natural control for "between X and Y" filters: price bands
 
 ## See also
 
-- [Slider component reference](/components/Slider) - all Slider properties, events, and theme variables
+- [Slider component reference](/docs/reference/components/Slider) - all Slider properties, events, and theme variables
 - [Filter and transform data from an API](/docs/howto/filter-and-transform-data-from-an-api) - apply the selected range to fetched data
 - [Debounce with ChangeListener](/docs/howto/debounce-with-changelistener) - avoid reacting to every intermediate drag value

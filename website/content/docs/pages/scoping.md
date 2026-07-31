@@ -59,7 +59,7 @@ The variable can be passed into a user-defined component.
 ```
 
 
-Or the variable can be transposed into the user-defined component by means of the [Slot](/components/Slot) mechanism. The `Slot` content evaluates in the parent's scope, so it can see parent vars and IDs, but renders inside the child’s layout.
+Or the variable can be transposed into the user-defined component by means of the [Slot](/docs/reference/components/Slot) mechanism. The `Slot` content evaluates in the parent's scope, so it can see parent vars and IDs, but renders inside the child’s layout.
 
 ```xmlui-pg name="Variables 4"
 ---app display filename="Main.xmlui"
@@ -263,7 +263,7 @@ The id can be passed into a user-defined component.
 </Component>
 ```
 
-Or the component ID can be transposed into the user-defined component by means of the [Slot](/components/Slot) mechanism.
+Or the component ID can be transposed into the user-defined component by means of the [Slot](/docs/reference/components/Slot) mechanism.
 
 ```xmlui-pg name="Component IDs 4"
 ---app display filename="Main.xmlui"
