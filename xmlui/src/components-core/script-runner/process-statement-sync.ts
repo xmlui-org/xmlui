@@ -54,6 +54,7 @@ import {
   closing,
   guard,
 } from "./process-statement-common";
+import { evalTrace } from "./eval-trace";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { evalBinding, executeArrowExpressionSync } from "./eval-tree-sync";
 import type {
@@ -118,6 +119,13 @@ export function processStatementQueue(
     try {
       // --- Sign that the statement is about to start
       void evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
+
+      // --- Evaluation trace (see eval-trace.ts): names the statement about
+      // --- to run. No-op outside the host-armed window.
+      evalTrace("stmt", () => {
+        const s: any = queueItem!.statement;
+        return String(s?.type ?? "") + " " + String(s?.source ?? "").slice(0, 80);
+      });
 
       // --- Execute the statement
       outcome = processStatement(
