@@ -551,6 +551,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Paste an image from the clipboard"
+                            to="/docs/howto/paste-an-image-from-the-clipboard"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Submit a form from a custom button or the Enter key"
                             to="/docs/howto/submit-a-form-from-a-custom-button"
                         />
@@ -2377,6 +2382,11 @@
             <Page url="/docs/howto/submit-a-form-with-file-uploads">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/paste-an-image-from-the-clipboard">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/paste-an-image-from-the-clipboard.md']}"
                 />
             </Page>
             <Page url="/docs/howto/submit-a-form-from-a-custom-button">
