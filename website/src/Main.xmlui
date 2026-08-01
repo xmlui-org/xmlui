@@ -551,6 +551,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Paste an image from the clipboard"
+                            to="/docs/howto/paste-an-image-from-the-clipboard"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Submit a form from a custom button or the Enter key"
                             to="/docs/howto/submit-a-form-from-a-custom-button"
                         />
@@ -588,6 +593,11 @@
                             icon="article"
                             label="Set the initial value of a Select from fetched data"
                             to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Create a two-handle range slider"
+                            to="/docs/howto/create-a-two-handle-range-slider"
                         />
                     </NavGroup>
 
@@ -807,6 +817,11 @@
                             icon="article"
                             label="Paginate a list"
                             to="/docs/howto/paginate-a-list"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Implement infinite scroll pagination"
+                            to="/docs/howto/implement-infinite-scroll-pagination"
                         />
                     </NavGroup>
 
@@ -2190,6 +2205,11 @@
                     content="{appGlobals.docsContent['pages/howto/set-the-initial-value-of-a-select-from-fetched-data.md']}"
                 />
             </Page>
+            <Page url="/docs/howto/create-a-two-handle-range-slider">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/create-a-two-handle-range-slider.md']}"
+                />
+            </Page>
             <Page
                 url="/docs/howto/pass-data-to-a-modal-dialog"
             >
@@ -2214,6 +2234,11 @@
             <Page url="/docs/howto/paginate-a-list">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/paginate-a-list.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/implement-infinite-scroll-pagination">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/implement-infinite-scroll-pagination.md']}"
                 />
             </Page>
             <Page url="/docs/howto/chain-a-refetch">
@@ -2367,6 +2392,11 @@
             <Page url="/docs/howto/submit-a-form-with-file-uploads">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/paste-an-image-from-the-clipboard">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/paste-an-image-from-the-clipboard.md']}"
                 />
             </Page>
             <Page url="/docs/howto/submit-a-form-from-a-custom-button">

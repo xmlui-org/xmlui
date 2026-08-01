@@ -1,6 +1,6 @@
 # Slider
 
-The `Dashboard` page continues with a chart of daily revenue that uses a [Slider](/components/Slider) to control both ends of a date range.
+The `Dashboard` page continues with a chart of daily revenue that uses a [Slider](/docs/reference/components/Slider) to control both ends of a date range.
 
 Here is a simplified version of that mechanism. Try using both slider handles to adjust the date range and corresponding total revenue.
 
