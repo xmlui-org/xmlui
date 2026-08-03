@@ -416,6 +416,13 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     display: inline-block;
   }
 
+  // Inline mode: render a true inline run so adjacent Text runs share one
+  // line-breaking context and flow as continuous text, breaking only at
+  // whitespace (not between runs). Overrides the base .text inline-block.
+  .inline {
+    display: inline;
+  }
+
   .noEllipsis {
     text-overflow: clip;
   }

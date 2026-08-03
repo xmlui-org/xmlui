@@ -58,6 +58,17 @@ export const TextMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.ellipses,
     },
+    inline: {
+      description:
+        "When \`true\`, the component renders \`display: inline\` so a sequence of adjacent " +
+        "\`Text\` runs joins one line-breaking context and wraps as continuous text, breaking " +
+        "only at whitespace rather than between runs. Use it to compose per-run-styled " +
+        "segments (syntax colors, highlights) into a single flowing line. Inline mode is " +
+        "mutually exclusive with \`maxLines\`, \`ellipses\`, and \`overflowMode\`, which require a " +
+        "block formatting context and are ignored when \`inline\` is set.",
+      valueType: "boolean",
+      defaultValue: defaultProps.inline,
+    },
     breakMode: {
       description:
         "This property controls how text breaks into multiple lines. " +
@@ -230,6 +241,7 @@ export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
     "maxLines",
     "preserveLinebreaks",
     "ellipses",
+    "inline",
     "overflowMode",
     "breakMode",
     "value",
@@ -244,6 +256,7 @@ export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
       maxLines,
       preserveLinebreaks,
       ellipses,
+      inline,
       overflowMode,
       breakMode,
       value,
@@ -266,6 +279,7 @@ export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
           defaultProps.preserveLinebreaks,
         )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
+        inline={extractValue.asOptionalBoolean(inline, defaultProps.inline)}
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(breakMode) as BreakMode | undefined}
         registerComponentApi={registerComponentApi}
