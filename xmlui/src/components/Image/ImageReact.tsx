@@ -56,25 +56,20 @@ export const Image = memo(forwardRef(function Img(
     return imageData;
   }, [imageData]);
 
-  // Handle Blob data when src is empty
+  // Handle Blob data when src is empty. The cleanup owns revocation, so the
+  // effect must not depend on blobUrl — reacting to its own output revokes
+  // and recreates the URL in a loop, flickering the rendered image.
   useEffect(() => {
     if (!src && blobToRender) {
       const url = URL.createObjectURL(blobToRender);
       setBlobUrl(url);
 
-      // Cleanup function to revoke the blob URL
       return () => {
         URL.revokeObjectURL(url);
         setBlobUrl(null);
       };
-    } else {
-      // Clean up any existing blob URL if src is provided or imageData is not a Blob
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-        setBlobUrl(null);
-      }
     }
-  }, [src, blobToRender, blobUrl]);
+  }, [src, blobToRender]);
 
   src = safeConvertPropToString(src);
   alt = safeConvertPropToString(alt);
