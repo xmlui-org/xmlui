@@ -103,6 +103,7 @@ type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   maxLines?: number;
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
+  inline?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
   classes?: Record<string, string>;
@@ -124,6 +125,7 @@ export const Text = memo(forwardRef(function Text(
     children,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
+    inline = defaultProps.inline,
     overflowMode = defaultProps.overflowMode,
     breakMode = defaultProps.breakMode,
     onContextMenu,
@@ -159,9 +161,13 @@ export const Text = memo(forwardRef(function Text(
   const { syntaxHighlightClasses, ...restVariantSpecificProps } = variantSpecificProps;
 
   const Element = useMemo(() => {
-    if (!variant || !TextVariantElement[variant]) return "div";
+    if (!variant || !TextVariantElement[variant]) {
+      // Inline mode wants phrasing content that can nest in a flowing line;
+      // fall back to a span instead of the default block-level div.
+      return inline ? "span" : "div";
+    }
     return TextVariantElement[variant];
-  }, [variant]);
+  }, [variant, inline]);
 
   // Custom variant CSS generation
   // Following React hook rules: hooks must be called unconditionally
@@ -317,7 +323,10 @@ export const Text = memo(forwardRef(function Text(
         isCustomVariant ? customVariantClassName : styles[variant || "default"],
         {
           [styles.preserveLinebreaks]: preserveLinebreaks,
-          ...overflowClasses,
+          [styles.inline]: inline,
+          // Inline mode has no block formatting context, so truncation/overflow
+          // classes don't apply; word-break behavior still does.
+          ...(inline ? {} : overflowClasses),
           ...breakClasses,
         },
         classes?.[COMPONENT_PART_KEY],
@@ -327,7 +336,8 @@ export const Text = memo(forwardRef(function Text(
         ...style,
         // Apply maxLines style for "ellipsis" mode and default behavior
         // "none", "scroll", and "flow" modes ignore maxLines for predictable, reliable behavior
-        ...(overflowMode === "ellipsis" || (!overflowMode && maxLines)
+        // Inline mode has no block context, so maxLines/line-clamping does not apply
+        ...(!inline && (overflowMode === "ellipsis" || (!overflowMode && maxLines))
           ? getMaxLinesStyle(maxLines)
           : {}),
       }}

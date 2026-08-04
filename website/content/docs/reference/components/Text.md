@@ -154,6 +154,33 @@ This property indicates whether ellipses should be displayed when the text is cr
 </App>
 ```
 
+### `inline` [#inline]
+
+> [!DEF]  default: **false**
+
+When `true`, the component renders `display: inline` so a sequence of adjacent `Text` runs joins one line-breaking context and wraps as continuous text, breaking only at whitespace rather than between runs. Use it to compose per-run-styled segments (syntax colors, highlights) into a single flowing line. Inline mode is mutually exclusive with `maxLines`, `ellipses`, and `overflowMode`, which require a block formatting context and are ignored when `inline` is set.
+
+By default a `Text` is `display: inline-block`, so a line built from several styled `Text` runs treats each run as an atomic box and may break *between* runs — splitting a word across a style boundary. Set `inline="true"` to render `display: inline` instead, so adjacent runs share one line-breaking context and wrap as continuous text, breaking only at whitespace.
+
+Both blocks render the **same sentence at the same width**, differing only in `inline`. The highlighted `Authentication` sits mid-identifier (`getUser` + `Authentication` + `Token`). With `inline="true"` the whole identifier flows as one word and the line breaks only at the surrounding spaces; with the default `inline-block` each segment is an atomic box, so the line breaks *inside* the identifier — dropping part of it onto its own line.
+
+```xmlui-pg copy display name="Example: inline keeps a styled word whole" height="360px"
+<App>
+  <VStack gap="$space-4" width="200px">
+    <VStack gap="$space-1">
+      <Text variant="strong" fontSize="$fontSize-sm">inline="true" — one flowing word</Text>
+      <Text>Call <Text inline="true">getUser</Text><Text inline="true" backgroundColor="yellow" color="black" borderRadius="0">Authentication</Text><Text inline="true">Token</Text> before the request.</Text>
+    </VStack>
+    <VStack gap="$space-1">
+      <Text variant="strong" fontSize="$fontSize-sm">default — inline-block splits the word</Text>
+      <Text>Call <Text>getUser</Text><Text backgroundColor="yellow" color="black" borderRadius="0">Authentication</Text><Text>Token</Text> before the request.</Text>
+    </VStack>
+  </VStack>
+</App>
+```
+
+Inline mode is for composing flowing rich text, so it is mutually exclusive with `maxLines`, `ellipses`, and `overflowMode` — those need a block formatting context and are ignored when `inline` is set.
+
 ### `maxLines` [#maxlines]
 
 This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
@@ -342,11 +369,14 @@ Available values:
 | `cite` | Is used to mark up the title of a cited work |
 | `code` | Represents a line of code |
 | `deleted` | Represents text that has been deleted |
+| `description` | Represents descriptive supporting text |
 | `em` | Marks text to stress emphasis |
 | `inherit` | Represents text that inherits the style from its parent element |
 | `inserted` | Represents a range of text that has been added to a document |
+| `info` | Represents compact informational metadata text |
 | `keyboard` | Represents a span of text denoting textual user input from a keyboard or voice input |
 | `marked` | Represents text which is marked or highlighted for reference or notation |
+| `blurb` | Represents a short summary or teaser text |
 | `mono` | Text using a mono style font family |
 | `paragraph` | Represents a paragraph |
 | `placeholder` | Text that is mostly used as the placeholder style in input controls |

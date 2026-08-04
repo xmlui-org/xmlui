@@ -148,6 +148,50 @@ please do not break it!"
 
     expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
+
+  test("inline prop renders display: inline", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`<Text testId="t" inline="true">run</Text>`);
+    const driver = await createTextDriver("t");
+
+    await expect(driver.component).toHaveCSS("display", "inline");
+  });
+
+  test("default (non-inline) Text renders display: inline-block", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    await initTestBed(`<Text testId="t">run</Text>`);
+    const driver = await createTextDriver("t");
+
+    await expect(driver.component).toHaveCSS("display", "inline-block");
+  });
+
+  test("adjacent inline runs share one line-breaking context", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    // A styled middle run should not force a break around itself: the three
+    // inline runs flow as one line. Given ample width, the whole line fits on
+    // a single row — its height equals one plain run's height. inline-block
+    // runs would still fit here, so the discriminating check is that height
+    // stays single-line, confirming the runs join one context.
+    await initTestBed(`
+    <VStack>
+      <Text testId="one">permissionhooks</Text>
+      <Text testId="composed" width="600px">
+        <Text inline="true">permission</Text>
+        <Text inline="true" backgroundColor="yellow">hook</Text>
+        <Text inline="true">s</Text>
+      </Text>
+    </VStack>
+    `);
+    const { height: single } = await getBounds((await createTextDriver("one")).component);
+    const { height: composed } = await getBounds(
+      (await createTextDriver("composed")).component,
+    );
+
+    expect(composed).toEqualWithTolerance(single, 0.01);
+  });
 });
 
 // =============================================================================

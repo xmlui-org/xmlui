@@ -18773,6 +18773,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": true
       },
+      "inline": {
+        "description": "When `true`, the component renders `display: inline` so a sequence of adjacent `Text` runs joins one line-breaking context and wraps as continuous text, breaking only at whitespace rather than between runs. Use it to compose per-run-styled segments (syntax colors, highlights) into a single flowing line. Inline mode is mutually exclusive with `maxLines`, `ellipses`, and `overflowMode`, which require a block formatting context and are ignored when `inline` is set.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "breakMode": {
         "description": "This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
         "valueType": "string",
