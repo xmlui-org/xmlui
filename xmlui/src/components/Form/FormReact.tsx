@@ -1311,8 +1311,9 @@ export const FormWithContextVar = forwardRef(function (
         })}
         onSubmit={lookupEventHandler("submit", {
           defaultHandler: submitUrl
-            ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}"${submitHeaders ? ", headers: $formHeaders" : ""} })`
+            ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}", throwOnError: true${submitHeaders ? ", headers: $formHeaders" : ""} })`
             : undefined,
+          signError: submitUrl && !node.events?.submit ? false : undefined,
           context: {
             $data,
             $formCancel,

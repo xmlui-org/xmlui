@@ -1070,6 +1070,80 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual("success");
     });
 
+    test("onSuccess does not fire when built-in submitUrl request fails with error notification", async ({
+      initTestBed,
+      page,
+      createFormDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Form
+          testId="form"
+          submitUrl="/test-failure"
+          submitMethod="post"
+          errorNotificationMessage="Save failed"
+          onSuccess="testState = 'success'"
+          data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `,
+        {
+          apiInterceptor: {
+            operations: {
+              testFailure: {
+                url: "/test-failure",
+                method: "post",
+                handler: `throw Errors.HttpError(401, { message: "Unauthorized" });`,
+              },
+            },
+          },
+        },
+      );
+
+      const driver = await createFormDriver("form");
+      await driver.submitForm();
+
+      await expect(page.getByText("Save failed")).toBeVisible();
+      await expect.poll(testStateDriver.testState).toEqual(null);
+    });
+
+    test("submitError fires when built-in submitUrl request fails with error notification", async ({
+      initTestBed,
+      page,
+      createFormDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Form
+          testId="form"
+          submitUrl="/test-failure"
+          submitMethod="post"
+          errorNotificationMessage="Save failed"
+          onSubmitError="error => testState = error.statusCode"
+          data="{{ name: 'Test' }}">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      `,
+        {
+          apiInterceptor: {
+            operations: {
+              testFailure: {
+                url: "/test-failure",
+                method: "post",
+                handler: `throw Errors.HttpError(401, { message: "Unauthorized" });`,
+              },
+            },
+          },
+        },
+      );
+
+      const driver = await createFormDriver("form");
+      await driver.submitForm();
+
+      await expect(page.getByText("Save failed")).toBeVisible();
+      await expect.poll(testStateDriver.testState).toEqual(401);
+    });
+
     test("onReset event fires when form is reset", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form
