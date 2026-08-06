@@ -632,7 +632,7 @@ Selecting a tile in either grid immediately reflects in the other:
 >[!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all TileGrids in the sync have that variable in scope.
 
-```xmlui-pg name="syncWithVar"
+```xmlui-pg name="TileGrid"
 ---app copy display /global.selState/ filename="Main.xmlui"
 <App global.selState="{{}}">
   <MyGrid />

@@ -61,6 +61,598 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
   });
 
+  test.describe("inferred columns", () => {
+    test("renders data without explicit Column children", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" />
+      `);
+
+      await expect(page.getByTestId("table")).toBeVisible();
+
+      const headers = page.locator("th");
+      await expect(headers).toHaveCount(4);
+      await expect(headers.nth(0)).toContainText("id");
+      await expect(headers.nth(1)).toContainText("name");
+      await expect(headers.nth(2)).toContainText("quantity");
+      await expect(headers.nth(3)).toContainText("category");
+
+      await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "5" }).first()).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
+    });
+
+    test("explicit Column children override inferred columns", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Product" />
+          <Column bindTo="quantity" header="Qty" />
+        </Table>
+      `);
+
+      const headers = page.locator("th");
+      await expect(headers).toHaveCount(2);
+      await expect(headers.nth(0)).toContainText("Product");
+      await expect(headers.nth(1)).toContainText("Qty");
+      await expect(headers.filter({ hasText: "category" })).toHaveCount(0);
+    });
+
+    test("columnInference controls sampled rows", async ({ initTestBed, page }) => {
+      const sparseData = [
+        { id: 1, name: "First" },
+        { id: 2, name: "Second", later: "Visible by default" },
+      ];
+
+      await initTestBed(`
+        <VStack>
+          <Table data='{${JSON.stringify(sparseData)}}' testId="default-table" />
+          <Table data='{${JSON.stringify(sparseData)}}' columnInference="first-only" testId="first-table" />
+        </VStack>
+      `);
+
+      const defaultHeaders = page.getByTestId("default-table").locator("th");
+      await expect(defaultHeaders.filter({ hasText: "later" })).toHaveCount(1);
+
+      const firstOnlyHeaders = page.getByTestId("first-table").locator("th");
+      await expect(firstOnlyHeaders.filter({ hasText: "later" })).toHaveCount(0);
+    });
+
+    test("inferred columns are sortable by default", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" />
+      `);
+
+      const quantityHeaderButton = page
+        .locator("th")
+        .filter({ hasText: "quantity" })
+        .locator("button");
+      await expect(quantityHeaderButton).toBeVisible();
+      await quantityHeaderButton.click();
+
+      const firstRowCells = page.locator("tbody tr").first().locator("td");
+      await expect(firstRowCells.nth(1)).toHaveText("Spinach");
+      await expect(firstRowCells.nth(2)).toHaveText("2");
+    });
+
+    test("inferred column types use typed rendering", async ({ initTestBed, page }) => {
+      const typedData = [
+        {
+          id: 1,
+          active: true,
+          published: "2026-08-06",
+          updated: "2026-08-06T12:00:00Z",
+          email: "ada@example.com",
+          website: "https://example.com",
+          tags: ["math", "logic"],
+          details: { level: "admin" },
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(typedData)}}' testId="table" />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText("1");
+      await expect(page.getByRole("link", { name: "ada@example.com" })).toHaveAttribute(
+        "href",
+        "mailto:ada@example.com",
+      );
+      await expect(page.getByRole("link", { name: "https://example.com" })).toHaveAttribute(
+        "href",
+        "https://example.com",
+      );
+      await expect(page.locator("td").filter({ hasText: "true" })).toBeVisible();
+      const inferredDateCells = page.locator('[data-column-cell-kind="date"]');
+      await expect(inferredDateCells).toHaveCount(2);
+      await expect(inferredDateCells.first()).not.toHaveText("2026-08-06");
+      await expect(inferredDateCells.nth(1)).not.toHaveText("2026-08-06T12:00:00Z");
+      await expect(page.locator("td").filter({ hasText: "math, logic" })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: '{"level":"admin"}' })).toBeVisible();
+    });
+
+    test("infers integer and number column rendering", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[
+          { id: 1, count: 12, amount: 1234.567 },
+          { id: 2, count: 7, amount: 45.5 }
+        ]}' testId="table" />
+      `);
+
+      const numberCells = page.locator('[data-column-cell-kind="number"]');
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText(["1", "2"]);
+      await expect(numberCells).toHaveCount(4);
+      await expect(numberCells.nth(0)).toHaveText("12");
+      await expect(numberCells.nth(1)).toHaveText("1,234.567");
+      await expect(numberCells.nth(2)).toHaveText("7");
+      await expect(numberCells.nth(3)).toHaveText("45.5");
+    });
+
+    test("uses idKey and UUID values for inferred id-like display types", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          idKey="customerId"
+          data='{[
+            {
+              customerId: "C-001",
+              quantity: 12,
+              traceId: "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f"
+            }
+          ]}'
+          testId="table"
+        />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText("C-001");
+      await expect(page.locator('[data-column-cell-kind="uuid"]')).toHaveText(
+        "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
+      );
+      await expect(page.locator('[data-column-cell-kind="number"]')).toHaveText("12");
+    });
+
+    test("uses balanced type-aware sizing for inferred columns by default", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{[
+            { id: 1, customer: "Ada" },
+            { id: 2, customer: "Grace" }
+          ]}'
+          testId="table"
+        />
+      `);
+
+      const idCellBox = await page.locator("tbody tr").first().locator("td").nth(0).boundingBox();
+      const customerCellBox = await page
+        .locator("tbody tr")
+        .first()
+        .locator("td")
+        .nth(1)
+        .boundingBox();
+
+      expect(idCellBox?.width).toBeLessThan(140);
+      expect(customerCellBox?.width).toBeGreaterThan((idCellBox?.width ?? 0) * 2);
+    });
+
+    test("infers date, datetime, email, url, phone, and boolean rendering", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table data='{[
+          {
+            active: true,
+            published: "2026-08-06",
+            updated: "2026-08-06T12:00:00Z",
+            email: "ada@example.com",
+            website: "https://example.com/profile",
+            phone: "+1 555 123 4567"
+          }
+        ]}' testId="table" />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="boolean"]')).toHaveText("true");
+      const dateCells = page.locator('[data-column-cell-kind="date"]');
+      await expect(dateCells).toHaveCount(2);
+      await expect(dateCells.first()).not.toHaveText("2026-08-06");
+      await expect(dateCells.nth(1)).not.toHaveText("2026-08-06T12:00:00Z");
+      await expect(page.getByRole("link", { name: "ada@example.com" })).toHaveAttribute(
+        "href",
+        "mailto:ada@example.com",
+      );
+      await expect(page.getByRole("link", { name: "https://example.com/profile" })).toHaveAttribute(
+        "href",
+        "https://example.com/profile",
+      );
+      await expect(page.getByRole("link", { name: "+1 555 123 4567" })).toHaveAttribute(
+        "href",
+        "tel:+1 555 123 4567",
+      );
+    });
+
+    test("infers enum and long-text rendering", async ({ initTestBed, page }) => {
+      const rows = [
+        {
+          status: "sent",
+          notes:
+            "This note is intentionally long enough to cross the deterministic long text threshold used by column inference.",
+        },
+        {
+          status: "draft",
+          notes:
+            "This second long note keeps the column homogeneous while making the inferred type visible.",
+        },
+        {
+          status: "sent",
+          notes:
+            "This third long note keeps the sample broad enough for enum inference to remain stable.",
+        },
+        {
+          status: "draft",
+          notes:
+            "This fourth long note keeps status low-cardinality and notes above the wrapping threshold.",
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(rows)}}' testId="table" />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="enum"]').first()).toHaveText("sent");
+      const longText = page.locator('[data-column-cell-kind="long-text"]').first();
+      await expect(longText).toContainText("intentionally long enough");
+      await expect(longText).toHaveCSS("white-space", "normal");
+    });
+
+    test("infers tags, object, and array rendering", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[
+          {
+            tags: ["math", "logic"],
+            details: { level: "admin" },
+            scores: [1, 2]
+          }
+        ]}' testId="table" />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="tags"]')).toHaveText("math, logic");
+      const jsonCells = page.locator('[data-column-cell-kind="json"]');
+      await expect(jsonCells.nth(0)).toHaveText('{"level":"admin"}');
+      await expect(jsonCells.nth(1)).toHaveText("[1,2]");
+    });
+  });
+
+  test.describe("Column type rendering", () => {
+    test("renders explicit text, number, date, boolean, link, enum, and json types", async ({
+      initTestBed,
+      page,
+    }) => {
+      const typedData = [
+        {
+          name: "Ada",
+          amount: 1234.5678,
+          count: 12.7,
+          ratio: 0.12,
+          published: "2026-08-06",
+          updated: "2026-08-06T12:00:00Z",
+          active: true,
+          email: "ada@example.com",
+          website: "https://example.com/profile",
+          state: "sent",
+          details: { level: "admin" },
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(typedData)}}' testId="table">
+          <Column bindTo="name" type="text" />
+          <Column bindTo="amount" type="currency(USD)" />
+          <Column bindTo="count" type="integer" />
+          <Column bindTo="ratio" type="percent" />
+          <Column bindTo="published" type="date" />
+          <Column bindTo="updated" type="datetime" />
+          <Column bindTo="active" type="boolean" />
+          <Column bindTo="email" type="email" />
+          <Column bindTo="website" type="url(label:domain)" />
+          <Column bindTo="state" type="enum" typeOptions="{{sent:{label:'Sent to customer'}}}" />
+          <Column bindTo="details" type="json" />
+        </Table>
+      `);
+
+      await expect(page.getByRole("cell", { name: "Ada", exact: true })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "$1,234.57" })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "13" })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "12%" })).toBeVisible();
+      const dateCells = page.locator('[data-column-cell-kind="date"]');
+      await expect(dateCells).toHaveCount(2);
+      await expect(dateCells.first()).not.toHaveText("2026-08-06");
+      await expect(dateCells.nth(1)).not.toHaveText("2026-08-06T12:00:00Z");
+      await expect(page.locator("td").filter({ hasText: "true" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "ada@example.com" })).toHaveAttribute(
+        "href",
+        "mailto:ada@example.com",
+      );
+      await expect(page.getByRole("link", { name: "example.com", exact: true })).toHaveAttribute(
+        "href",
+        "https://example.com/profile",
+      );
+      await expect(page.locator("td").filter({ hasText: "Sent to customer" })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: '{"level":"admin"}' })).toBeVisible();
+    });
+
+    test("renders decimal-aligned numeric structure", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{amount: 1234.5678}]}' testId="table">
+          <Column bindTo="amount" type="number(8,3)" />
+        </Table>
+      `);
+
+      const numberCell = page.locator('[data-column-cell-kind="number"]').first();
+      await expect(numberCell).toHaveText("1,234.568");
+      await expect(numberCell.locator('[data-number-part="integer"]')).toHaveText("1,234");
+      await expect(numberCell.locator('[data-number-part="decimal"]')).toHaveText(".");
+      await expect(numberCell.locator('[data-number-part="fraction"]')).toHaveText("568");
+    });
+
+    test("clamps long-text typed columns with max line options", async ({ initTestBed, page }) => {
+      const note =
+        "This is a long note that should wrap across multiple visual lines when the column is narrow enough to require clamping.";
+
+      await initTestBed(`
+        <Table data='{[{note: "${note}"}]}' testId="table" columnSizing="balanced">
+          <Column bindTo="note" type="long-text(lines:2)" />
+        </Table>
+      `);
+
+      const longText = page.locator('[data-column-cell-kind="long-text"]');
+      await expect(longText).toHaveAttribute("title", note);
+      await expect(longText).toHaveCSS("overflow", "hidden");
+      expect(await longText.evaluate((element) => getComputedStyle(element).webkitLineClamp)).toBe(
+        "2",
+      );
+    });
+
+    test("aligns numeric typed columns to the end by default", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{name: "Ada", amount: 1234.5, total: 9876.5, override: 42}]}' testId="table">
+          <Column bindTo="name" type="text" />
+          <Column bindTo="amount" type="number(8,3)" />
+          <Column bindTo="total" type="currency(USD)" />
+          <Column bindTo="override" type="integer" horizontalAlignment="start" />
+        </Table>
+      `);
+
+      const textCell = page.locator("td").nth(0);
+      const numberCell = page.locator("td").nth(1);
+      const currencyCell = page.locator("td").nth(2);
+      const overriddenNumericCell = page.locator("td").nth(3);
+
+      await expect(textCell).not.toHaveCSS("text-align", "end");
+      await expect(numberCell).toHaveCSS("justify-content", "flex-end");
+      await expect(numberCell).toHaveCSS("text-align", "end");
+      await expect(currencyCell).toHaveCSS("justify-content", "flex-end");
+      await expect(currencyCell).toHaveCSS("text-align", "end");
+      await expect(overriddenNumericCell).toHaveCSS("justify-content", "flex-start");
+      await expect(overriddenNumericCell).toHaveCSS("text-align", "start");
+    });
+
+    test("renders text-like explicit column types", async ({ initTestBed, page }) => {
+      const typedData = [
+        {
+          shortText: "Compact value",
+          longText:
+            "This is a deliberately longer value that should use the long text wrapping hook.",
+          markdown: "Hello **bold** and *soft* text",
+          code: "const answer = 42;",
+          uuid: "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
+          id: "customer-00000042",
+          fullId: "customer-00000042",
+          name: "Ada Lovelace",
+          address: "42 Long Street, Budapest",
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(typedData)}}' testId="table">
+          <Column bindTo="shortText" type="short-text" />
+          <Column bindTo="longText" type="long-text" />
+          <Column bindTo="markdown" type="markdown" />
+          <Column bindTo="code" type="code" />
+          <Column bindTo="uuid" type="uuid" />
+          <Column bindTo="id" type="id(short)" />
+          <Column bindTo="fullId" type="id(full)" />
+          <Column bindTo="name" type="name" />
+          <Column bindTo="address" type="address" />
+        </Table>
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="short-text"]')).toHaveText(
+        "Compact value",
+      );
+      const longText = page.locator('[data-column-cell-kind="long-text"]');
+      await expect(longText).toContainText("deliberately longer value");
+      await expect(longText).toHaveCSS("white-space", "normal");
+      await expect(page.locator('[data-column-cell-kind="markdown"] strong')).toHaveText("bold");
+      await expect(page.locator('[data-column-cell-kind="markdown"] em')).toHaveText("soft");
+      const codeCell = page.locator('[data-column-cell-kind="code"]');
+      await expect(codeCell).toHaveText("const answer = 42;");
+      expect(await codeCell.evaluate((el) => getComputedStyle(el).fontFamily)).toContain(
+        "monospace",
+      );
+      await expect(page.locator('[data-column-cell-kind="uuid"]')).toHaveText(
+        "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
+      );
+      await expect(page.locator('[data-column-cell-kind="id"]').first()).toHaveText(
+        "customer...",
+      );
+      await expect(page.locator('[data-column-cell-kind="id"]').nth(1)).toHaveText(
+        "customer-00000042",
+      );
+      await expect(page.locator('[data-column-cell-kind="name"]')).toHaveText("Ada Lovelace");
+      await expect(page.locator('[data-column-cell-kind="address"]')).toHaveText(
+        "42 Long Street, Budapest",
+      );
+    });
+
+    test("renders numeric and time-oriented explicit column types", async ({
+      initTestBed,
+      page,
+    }) => {
+      const typedData = [
+        {
+          number: 1234.5,
+          decimal: 12.7,
+          accounting: -12.5,
+          scientific: 1200,
+          bytes: 1536,
+          duration: 3661,
+          rating: 4,
+          time: "2026-08-06T12:34:00Z",
+          relative: "2999-01-01T00:00:00Z",
+          timestamp: "2026-08-06T12:00:00Z",
+          isoDate: "2026-08-06T12:00:00Z",
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(typedData)}}' testId="table">
+          <Column bindTo="number" type="number" />
+          <Column bindTo="decimal" type="decimal(2)" />
+          <Column bindTo="accounting" type="accounting(USD)" />
+          <Column bindTo="scientific" type="scientific" />
+          <Column bindTo="bytes" type="bytes" />
+          <Column bindTo="duration" type="duration" />
+          <Column bindTo="rating" type="rating(5)" />
+          <Column bindTo="time" type="time" />
+          <Column bindTo="relative" type="relative-time" />
+          <Column bindTo="timestamp" type="timestamp" />
+          <Column bindTo="isoDate" type="iso-date" />
+        </Table>
+      `);
+
+      const numberCells = page.locator('[data-column-cell-kind="number"]');
+      await expect(numberCells.nth(0)).toHaveText("1,234.5");
+      await expect(numberCells.nth(1)).toHaveText("12.70");
+      await expect(numberCells.nth(2)).toHaveText("($12.50)");
+      await expect(numberCells.nth(3)).toHaveText("1.2E3");
+      await expect(numberCells.nth(4)).toHaveText("1.5 KB");
+      await expect(page.locator('[data-column-cell-kind="duration"]')).toHaveText("1h 1m 1s");
+      await expect(page.locator('[data-column-cell-kind="rating"]')).toHaveText("4 / 5");
+      const dateCells = page.locator('[data-column-cell-kind="date"]');
+      await expect(dateCells).toHaveCount(4);
+      await expect(dateCells.nth(1)).toContainText(/in \d+ years/);
+      await expect(dateCells.nth(2)).toHaveText("1786017600000");
+      await expect(dateCells.nth(3)).toHaveText("2026-08-06");
+    });
+
+    test("renders boolean, enum, and status explicit column types", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table data='{[{active: true, checked: true, available: false, state: "pending", kind: "sent"}]}' testId="table">
+          <Column bindTo="active" type="boolean" />
+          <Column bindTo="checked" type="checkbox" />
+          <Column bindTo="available" type="yes-no" />
+          <Column bindTo="state" type="status" />
+          <Column bindTo="kind" type="enum" typeOptions="{{sent:{label:'Sent to customer'}}}" />
+        </Table>
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="boolean"]').first()).toHaveText("true");
+      await expect(page.locator('[data-column-cell-kind="checkbox"]')).toHaveAttribute(
+        "aria-checked",
+        "true",
+      );
+      await expect(page.locator('[data-column-cell-kind="yes-no"]')).toHaveText("No");
+      await expect(page.locator('[data-column-cell-kind="status"]')).toHaveText("pending");
+      await expect(page.locator('[data-column-cell-kind="enum"]')).toHaveText("Sent to customer");
+    });
+
+    test("renders visual and structured explicit column types", async ({ initTestBed, page }) => {
+      const imageUrl =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+      const typedData = [
+        {
+          color: "#336699",
+          phone: "+1 555 123 4567",
+          tag: "alpha",
+          tags: ["math", "logic"],
+          image: imageUrl,
+          avatar: imageUrl,
+          icon: "check",
+          link: "https://example.com/profile",
+          object: { level: "admin" },
+          array: [1, 2],
+          list: ["red", "blue"],
+        },
+      ];
+
+      await initTestBed(`
+        <Table data='{${JSON.stringify(typedData)}}' testId="table">
+          <Column bindTo="color" type="color" />
+          <Column bindTo="phone" type="phone" />
+          <Column bindTo="tag" type="tag" />
+          <Column bindTo="tags" type="tags" />
+          <Column bindTo="image" type="image" typeOptions="{{alt:'Sample thumbnail'}}" />
+          <Column bindTo="avatar" type="avatar" typeOptions="{{label:'Ada avatar'}}" />
+          <Column bindTo="icon" type="icon" />
+          <Column bindTo="link" type="link(label:domain)" />
+          <Column bindTo="object" type="object" />
+          <Column bindTo="array" type="array" />
+          <Column bindTo="list" type="list" />
+        </Table>
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="color"]')).toHaveText("#336699");
+      await expect(page.locator("[data-color-swatch]")).toHaveCSS(
+        "background-color",
+        "rgb(51, 102, 153)",
+      );
+      await expect(page.getByRole("link", { name: "+1 555 123 4567" })).toHaveAttribute(
+        "href",
+        "tel:+1 555 123 4567",
+      );
+      await expect(page.locator('[data-column-cell-kind="tag"]')).toHaveText("alpha");
+      await expect(page.locator('[data-column-cell-kind="tags"]')).toHaveText("math, logic");
+      await expect(page.getByRole("img", { name: "Sample thumbnail" })).toHaveAttribute(
+        "src",
+        imageUrl,
+      );
+      await expect(page.getByRole("img", { name: "Ada avatar" })).toHaveAttribute("src", imageUrl);
+      await expect(page.locator('[data-column-cell-kind="avatar"]')).toHaveCSS(
+        "border-radius",
+        "50%",
+      );
+      await expect(page.locator('[data-column-cell-kind="icon"]')).toBeVisible();
+      await expect(page.getByRole("link", { name: "example.com", exact: true })).toHaveAttribute(
+        "href",
+        "https://example.com/profile",
+      );
+      await expect(page.locator('[data-column-cell-kind="json"]').nth(0)).toHaveText(
+        '{"level":"admin"}',
+      );
+      await expect(page.locator('[data-column-cell-kind="json"]').nth(1)).toHaveText("[1,2]");
+      await expect(page.locator('[data-column-cell-kind="list"]')).toHaveText("red, blue");
+    });
+
+    test("custom Column children override typed rendering", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{amount: 1234.5}]}' testId="table">
+          <Column bindTo="amount" type="currency(USD)">
+            <Text>Custom {$cell}</Text>
+          </Column>
+        </Table>
+      `);
+
+      await expect(page.locator("td").filter({ hasText: "Custom 1234.5" })).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "$1,234.50" })).toHaveCount(0);
+    });
+  });
+
   test("invokes onRowDoubleClick when row is double-clicked", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table" onRowDoubleClick="(item) => testState = item.name">

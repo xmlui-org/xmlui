@@ -4592,6 +4592,14 @@ export default {
         "description": "This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "type": {
+        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate, convert, or mutate the underlying data. Custom child markup inside the `Column` overrides type rendering.",
+        "valueType": "string"
+      },
+      "typeOptions": {
+        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum/status label maps, link labels, or image/avatar alt text, and long-text options such as `maxLines`. Values in `typeOptions` override compact options specified in the `type` string.",
+        "valueType": "any"
       }
     },
     "contextVars": {
@@ -17382,6 +17390,23 @@ export default {
       "data": {
         "description": "The component receives data via this property. The `data` property is a list of items that the `Table` can display.",
         "valueType": "any"
+      },
+      "columnInference": {
+        "description": "Controls how the `Table` samples the resolved `data` array when it has no explicit `Column` children and needs to infer columns and display types. The default is `first-n(25)`. Use `first-only` for the fastest inference, `first-n(n)` for a bounded prefix, `sample(n)` for deterministic spread sampling, `all` for small datasets, or `off` to disable inferred columns. This setting inspects row objects only; unwrap API response envelopes before passing data to the table.",
+        "valueType": "string",
+        "defaultValue": "first-n(25)"
+      },
+      "columnSizing": {
+        "description": "Controls how automatically sized columns consume horizontal space. `stretch` keeps the traditional equal-fill behavior, `balanced` uses type-aware defaults so compact types such as IDs and numbers stay narrow while text-like columns use star sizing, `content` prefers compact fixed widths, and `auto` uses `balanced` for inferred columns while preserving `stretch` for explicit columns.",
+        "valueType": "string",
+        "availableValues": [
+          "auto",
+          "stretch",
+          "balanced",
+          "content"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "auto"
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",
