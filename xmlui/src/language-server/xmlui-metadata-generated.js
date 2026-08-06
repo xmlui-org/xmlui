@@ -3433,6 +3433,7 @@ export default {
       "fontSize-Badge-pill": "0.8em",
       "backgroundColor-Badge": "rgb(from $color-secondary-500 r g b / 0.6)",
       "textColor-Badge": "$const-color-surface-0",
+      "textTransform-Badge": "uppercase",
       "textAlign-Badge": "center"
     }
   },

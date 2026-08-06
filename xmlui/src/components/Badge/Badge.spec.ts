@@ -182,6 +182,21 @@ function registerConsolidatedThemeVarTests(
         });
         await expect(page.getByTestId("badge")).toHaveCSS("color", expected);
       });
+
+      test("textTransform", async ({ initTestBed, page }) => {
+        const expected = "none";
+        await initTestBed(`<Badge variant="${variant}" testId="badge" value="test content"/>`, {
+          testThemeVars: {
+            [key("textTransform")]: expected,
+          },
+        });
+        await expect(page.getByTestId("badge")).toHaveCSS("text-transform", expected);
+      });
+
+      test("textTransform defaults to uppercase", async ({ initTestBed, page }) => {
+        await initTestBed(`<Badge variant="${variant}" testId="badge" value="test content"/>`);
+        await expect(page.getByTestId("badge")).toHaveCSS("text-transform", "uppercase");
+      });
     }
 
     test("applies border-side theme variables", async ({ initTestBed, createBadgeDriver }) => {

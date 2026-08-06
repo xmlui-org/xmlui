@@ -31,7 +31,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
     @include t.paddingVars($themeVars, $component);
     @include t.borderVars($themeVars, $component);
     @include t.textVars($themeVars, $component);
-    text-transform: uppercase;
   }
 
   .pill {
