@@ -1,5 +1,11 @@
 # xmlui-docs-blocks
 
+## 0.0.13
+
+### Patch Changes
+
+- 6e539e0: Fix docs search data generation so markdown pages under `pages/`, including how-to articles, are indexed with their public routes.
+
 ## 0.0.12
 
 ### Patch Changes
