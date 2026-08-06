@@ -161,7 +161,7 @@ This event is triggered when value of RadioGroup has changed.
 
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
-```xmlui-pg name="didChange"
+```xmlui-pg name="RadioGroup"
 ---app copy display name="Example: didChange"
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">

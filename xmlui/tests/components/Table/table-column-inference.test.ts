@@ -143,9 +143,23 @@ describe("Table inferred field discovery", () => {
 describe("Table inferred column metadata", () => {
   it("builds sortable column metadata from discovered fields", () => {
     expect(buildInferredColumns([{ id: 1, name: "Ada" }], "all")).toEqual([
-      { header: "id", accessorKey: "id", canSort: true, type: "integer" },
-      { header: "name", accessorKey: "name", canSort: true, type: "text" },
+      { header: "id", accessorKey: "id", canSort: true, type: "id" },
+      { header: "name", accessorKey: "name", canSort: true, type: "name" },
     ]);
+  });
+
+  it("uses idKey to infer the id display type", () => {
+    expect(buildInferredColumns([{ customerId: "C-001", quantity: 1 }], "all", {
+      idKey: "customerId",
+    })).toEqual([
+      { header: "customerId", accessorKey: "customerId", canSort: true, type: "id" },
+      { header: "quantity", accessorKey: "quantity", canSort: true, type: "integer" },
+    ]);
+  });
+
+  it("does not infer id for unique-looking values unless the field matches idKey", () => {
+    expect(buildInferredColumns([{ orderNo: "O-001" }, { orderNo: "O-002" }], "all")[0].type).not
+      .toBe("id");
   });
 
   it("does not mutate input rows", () => {
@@ -164,6 +178,14 @@ describe("Table inferred column types", () => {
   it("infers integer and number values", () => {
     expect(inferColumnType([1, 2, 3])).toBe("integer");
     expect(inferColumnType([1, 2.5, 3])).toBe("number");
+  });
+
+  it("infers id only when the field matches idKey", () => {
+    expect(inferColumnType([1, 2, 3], { field: "id", idKey: "id" })).toBe("id");
+    expect(inferColumnType(["C-001", "C-002"], { field: "customerId", idKey: "customerId" })).toBe(
+      "id",
+    );
+    expect(inferColumnType([1, 2, 3], { field: "quantity", idKey: "id" })).toBe("integer");
   });
 
   it("falls back to text for non-finite or mixed numeric values", () => {
@@ -185,6 +207,21 @@ describe("Table inferred column types", () => {
     expect(inferColumnType(["2026-08-06T10:15:00Z", "2026-08-07T12:00:00Z"])).toBe("datetime");
   });
 
+  it("infers uuid from UUID-shaped string values", () => {
+    expect(
+      inferColumnType([
+        "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
+        "550e8400-e29b-41d4-a716-446655440000",
+      ]),
+    ).toBe("uuid");
+    expect(
+      inferColumnType(["47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f"], {
+        field: "id",
+        idKey: "id",
+      }),
+    ).toBe("uuid");
+  });
+
   it("infers email, url, and phone strings using a conservative threshold", () => {
     expect(inferColumnType(["a@example.com", "b@example.com", "not email"])).toBe("text");
     expect(
@@ -192,6 +229,11 @@ describe("Table inferred column types", () => {
     ).toBe("email");
     expect(inferColumnType(["https://example.com", "http://xmlui.org"])).toBe("url");
     expect(inferColumnType(["+1 555 123 4567", "(555) 234-5678"])).toBe("phone");
+  });
+
+  it("uses name-like field names before enum inference", () => {
+    expect(inferColumnType(["Ada", "Grace"], { field: "customer" })).toBe("name");
+    expect(inferColumnType(["Ada", "Grace"], { field: "customerName" })).toBe("name");
   });
 
   it("infers long text above the length threshold", () => {

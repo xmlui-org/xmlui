@@ -720,6 +720,16 @@
                     <NavGroup label="Tables & Data Display">
                         <NavLink
                             icon="article"
+                            label="Use smart Table columns"
+                            to="/docs/howto/use-smart-table-columns"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Format table columns by type"
+                            to="/docs/howto/format-table-columns-by-type"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pin columns in a wide table"
                             to="/docs/howto/pin-columns-in-a-wide-table"
                         />
@@ -2458,6 +2468,16 @@
             </Page>
 
             <!-- New how-to articles: Tables & Data Display -->
+            <Page url="/docs/howto/use-smart-table-columns">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/use-smart-table-columns.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/format-table-columns-by-type">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/format-table-columns-by-type.md']}"
+                />
+            </Page>
             <Page url="/docs/howto/pin-columns-in-a-wide-table">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/pin-columns-in-a-wide-table.md']}"

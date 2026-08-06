@@ -30,6 +30,7 @@ import {
   Table,
   TablePaginationControlsLocationValues,
   CheckboxToleranceValues,
+  TableColumnSizingValues,
 } from "./TableReact";
 import { defaultProps } from "./Table.defaults";
 import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
@@ -99,6 +100,18 @@ export const TableMd = createMetadata({
         `only; unwrap API response envelopes before passing data to the table.`,
       valueType: "string",
       defaultValue: defaultProps.columnInference,
+    },
+    columnSizing: {
+      description:
+        `Controls how automatically sized columns consume horizontal space. \`stretch\` keeps ` +
+        `the traditional equal-fill behavior, \`balanced\` uses type-aware defaults so compact ` +
+        `types such as IDs and numbers stay narrow while text-like columns use star sizing, ` +
+        `\`content\` prefers compact fixed widths, and \`auto\` uses \`balanced\` for inferred ` +
+        `columns while preserving \`stretch\` for explicit columns.`,
+      valueType: "string",
+      availableValues: TableColumnSizingValues,
+      isStrictEnum: true,
+      defaultValue: defaultProps.columnSizing,
     },
     idKey: {
       description:
@@ -910,6 +923,8 @@ const TableWithColumns = memo(
             data={data}
             columns={columns}
             columnInference={extractValue.asOptionalString(node.props.columnInference)}
+            columnSizing={extractValue.asOptionalString(node.props.columnSizing)}
+            idKey={idKey}
             hasExplicitColumns={hasExplicitColumns}
             pageSizeOptions={extractValue(node.props.pageSizeOptions)}
             pageSize={extractValue.asOptionalNumber(node.props.pageSize)}

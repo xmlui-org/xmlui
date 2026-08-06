@@ -5,6 +5,7 @@ export const defaultProps = {
   data: EMPTY_ARRAY,
   columns: EMPTY_ARRAY,
   columnInference: "first-n(25)",
+  columnSizing: "auto" as "auto" | "stretch" | "balanced" | "content",
   isPaginated: false,
   loading: false,
   rowsSelectable: false,

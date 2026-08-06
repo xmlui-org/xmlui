@@ -220,7 +220,7 @@ This component does not expose any methods.
 | [textIndent](/docs/styles-and-themes/common-units/#text-indent)-Badge-pill | *none* | *none* |
 | [textShadow](/docs/styles-and-themes/common-units/#text-shadow)-Badge | *none* | *none* |
 | [textShadow](/docs/styles-and-themes/common-units/#text-shadow)-Badge-pill | *none* | *none* |
-| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-Badge | *none* | *none* |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-Badge | uppercase | uppercase |
 | [textTransform](/docs/styles-and-themes/common-units/#textTransform)-Badge-pill | *none* | *none* |
 | [textUnderlineOffset](/docs/styles-and-themes/common-units/#size-values)-Badge | *none* | *none* |
 | [textUnderlineOffset](/docs/styles-and-themes/common-units/#size-values)-Badge-pill | *none* | *none* |

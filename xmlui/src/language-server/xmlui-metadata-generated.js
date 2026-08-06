@@ -4598,7 +4598,7 @@ export default {
         "valueType": "string"
       },
       "typeOptions": {
-        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum/status label maps, link labels, or image/avatar alt text. Values in `typeOptions` override compact options specified in the `type` string.",
+        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum/status label maps, link labels, or image/avatar alt text, and long-text options such as `maxLines`. Values in `typeOptions` override compact options specified in the `type` string.",
         "valueType": "any"
       }
     },
@@ -17395,6 +17395,18 @@ export default {
         "description": "Controls how the `Table` samples the resolved `data` array when it has no explicit `Column` children and needs to infer columns and display types. The default is `first-n(25)`. Use `first-only` for the fastest inference, `first-n(n)` for a bounded prefix, `sample(n)` for deterministic spread sampling, `all` for small datasets, or `off` to disable inferred columns. This setting inspects row objects only; unwrap API response envelopes before passing data to the table.",
         "valueType": "string",
         "defaultValue": "first-n(25)"
+      },
+      "columnSizing": {
+        "description": "Controls how automatically sized columns consume horizontal space. `stretch` keeps the traditional equal-fill behavior, `balanced` uses type-aware defaults so compact types such as IDs and numbers stay narrow while text-like columns use star sizing, `content` prefers compact fixed widths, and `auto` uses `balanced` for inferred columns while preserving `stretch` for explicit columns.",
+        "valueType": "string",
+        "availableValues": [
+          "auto",
+          "stretch",
+          "balanced",
+          "content"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "auto"
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",

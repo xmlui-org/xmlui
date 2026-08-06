@@ -10,6 +10,8 @@
 Use `Column` to define headers, data binding, sorting behavior, display types, and custom cell content.
 If you omit `Column` children, `Table` inspects the data records and creates inferred columns automatically.
 Explicit `Column` children always win over inferred columns.
+Inferred columns use [`idKey`](#idkey) to identify the row identifier column, so the default `idKey="id"` infers an `id` display type for an `id` field.
+UUID-shaped string values infer the more specific `uuid` display type.
 
 **Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
 
@@ -185,15 +187,142 @@ Useful values:
 - `all`: inspect every row; use this only for small datasets
 - `off`: do not infer columns
 
+The `25` in `first-n(25)` and `sample(25)` is only an example.
+Use any positive integer that fits the data size and cost you want, such as `first-n(5)`, `first-n(100)`, or `sample(50)`.
+
 `columnInference` expects the table's `data` value to be the row array itself.
 If an API returns an envelope such as `{ items: [...] }`, unwrap that envelope before passing the value to `Table`.
 
-```xmlui-pg name="Example: columnInference"
+### How Inference Works
+
+Column inference runs only when the `Table` has no explicit `Column` children.
+If you add any `Column` children, those columns define the table instead of the inferred columns.
+
+The table expects `data` to resolve to an array of row objects.
+Only plain object rows participate in field discovery; primitive values, arrays, dates, inherited properties, and non-enumerable properties are ignored.
+The internal `order` field is also skipped.
+
+| Step | Rule |
+| --- | --- |
+| 1. Sample rows | `first-only`, `first-n(n)`, `sample(n)`, `all`, or `off` decides which rows are inspected. `sample(n)` uses a deterministic spread across the supplied array. |
+| 2. Discover fields | The table reads enumerable own keys from sampled row objects. Field order follows first discovery: keys from earlier sampled rows come first, and newly discovered keys from later sampled rows are appended. |
+| 3. Create columns | Each discovered field becomes a sortable inferred column with `header` and `accessorKey` set to the field name. |
+| 4. Infer type | The sampled values for each field are inspected and mapped to a `Column` `type`. |
+| 5. Apply layout | The inferred type participates in `columnSizing`; numeric-like types align to the end, compact types get compact default widths in balanced sizing, and text-like types can use star sizing. |
+
+Type inference ignores `null`, `undefined`, and empty string values when deciding the type.
+If no present values remain, or if the sampled values are mixed in a way the table cannot classify, the type falls back to `text`.
+
+| Sampled values | Inferred type |
+| --- | --- |
+| UUID-shaped strings | `uuid` |
+| Scalar values in the field named by `idKey` | `id` |
+| Finite numbers | `integer` when all numbers are integers; otherwise `number` |
+| Booleans | `boolean` |
+| Arrays of short strings | `tags` |
+| Other arrays | `array` |
+| Plain objects | `object` |
+| ISO date strings | `date` |
+| ISO datetime strings | `datetime` |
+| Mostly email, URL, or phone strings | `email`, `url`, or `phone` |
+| Name-like fields such as `name`, `customer`, `customerName`, `displayName`, `fullName`, or fields ending in `Name` | `name` |
+| Any string longer than 80 characters | `long-text` |
+| Low-cardinality short string sets | `enum` |
+| Other strings or unknown mixed values | `text` |
+
+Inference is display-oriented.
+It does not validate data, mutate rows, unwrap API response envelopes, or inspect server-side pages that are not present in the supplied `data` array.
+Use explicit `Column` children when you need guaranteed columns, labels, ordering, types, sizing, or custom cell content.
+
+```xmlui-pg display name="Example: columnInference first-only"
 <App>
   <Table
     columnInference="first-only"
     data='{[
       { id: 1, customer: "Ada" },
+      { id: 2, customer: "Grace", total: 87.5 }
+    ]}'
+  />
+</App>
+```
+
+Use `first-n(n)` when the first record may be sparse, but the useful fields appear near the beginning of the data:
+
+```xmlui-pg display name="Example: columnInference first-n"
+<App>
+  <Table
+    columnInference="first-n(3)"
+    data='{[
+      { id: 1, customer: "Ada" },
+      { id: 2, customer: "Grace", total: 87.5 },
+      { id: 3, customer: "Linus", paid: true },
+      { id: 4, customer: "Margaret", internalNote: "Not sampled" }
+    ]}'
+  />
+</App>
+```
+
+Use `sample(n)` when fields may appear later in a larger local array and you want a deterministic spread instead of only the first records:
+
+```xmlui-pg display name="Example: columnInference sample"
+<App>
+  <Table
+    columnInference="sample(3)"
+    data='{[
+      { id: 1, customer: "Ada" },
+      { id: 2, customer: "Grace" },
+      { id: 3, customer: "Linus", total: 87.5 },
+      { id: 4, customer: "Margaret" },
+      { id: 5, customer: "Katherine", status: "paid" }
+    ]}'
+  />
+</App>
+```
+
+`idKey` also guides inferred display types.
+The field named by `idKey` is inferred as `id`; UUID-shaped string values are inferred as `uuid`.
+
+```xmlui-pg display name="Example: columnInference with idKey"
+<App>
+  <Table
+    idKey="customerId"
+    data='{[
+      {
+        customerId: "C-001",
+        name: "Ada",
+        traceId: "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f"
+      },
+      {
+        customerId: "C-002",
+        name: "Grace",
+        traceId: "550e8400-e29b-41d4-a716-446655440000"
+      }
+    ]}'
+  />
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START columnSizing
+
+`columnSizing` controls how automatically sized columns consume horizontal space.
+
+Available values:
+
+- `auto`: use type-aware balanced sizing for inferred columns, and preserve the traditional stretch behavior for explicit columns
+- `stretch`: distribute available width among columns that do not specify `width`
+- `balanced`: keep compact types such as `id`, numbers, booleans, and dates narrow, while text-like types use star sizing
+- `content`: prefer compact fixed widths for typed columns
+
+Explicit `Column` values such as `width`, `minWidth`, `maxWidth`, and `horizontalAlignment` override type-aware defaults.
+
+```xmlui-pg display name="Example: columnSizing"
+<App>
+  <Table
+    columnSizing="balanced"
+    data='{[
+      { id: 1, customer: "Ada", total: 123.45 },
       { id: 2, customer: "Grace", total: 87.5 }
     ]}'
   />

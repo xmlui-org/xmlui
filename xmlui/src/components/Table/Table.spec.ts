@@ -151,6 +151,7 @@ test.describe("Basic Functionality", () => {
         <Table data='{${JSON.stringify(typedData)}}' testId="table" />
       `);
 
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText("1");
       await expect(page.getByRole("link", { name: "ada@example.com" })).toHaveAttribute(
         "href",
         "mailto:ada@example.com",
@@ -177,13 +178,63 @@ test.describe("Basic Functionality", () => {
       `);
 
       const numberCells = page.locator('[data-column-cell-kind="number"]');
-      await expect(numberCells).toHaveCount(6);
-      await expect(numberCells.nth(0)).toHaveText("1");
-      await expect(numberCells.nth(1)).toHaveText("12");
-      await expect(numberCells.nth(2)).toHaveText("1,234.567");
-      await expect(numberCells.nth(3)).toHaveText("2");
-      await expect(numberCells.nth(4)).toHaveText("7");
-      await expect(numberCells.nth(5)).toHaveText("45.5");
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText(["1", "2"]);
+      await expect(numberCells).toHaveCount(4);
+      await expect(numberCells.nth(0)).toHaveText("12");
+      await expect(numberCells.nth(1)).toHaveText("1,234.567");
+      await expect(numberCells.nth(2)).toHaveText("7");
+      await expect(numberCells.nth(3)).toHaveText("45.5");
+    });
+
+    test("uses idKey and UUID values for inferred id-like display types", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          idKey="customerId"
+          data='{[
+            {
+              customerId: "C-001",
+              quantity: 12,
+              traceId: "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f"
+            }
+          ]}'
+          testId="table"
+        />
+      `);
+
+      await expect(page.locator('[data-column-cell-kind="id"]')).toHaveText("C-001");
+      await expect(page.locator('[data-column-cell-kind="uuid"]')).toHaveText(
+        "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
+      );
+      await expect(page.locator('[data-column-cell-kind="number"]')).toHaveText("12");
+    });
+
+    test("uses balanced type-aware sizing for inferred columns by default", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{[
+            { id: 1, customer: "Ada" },
+            { id: 2, customer: "Grace" }
+          ]}'
+          testId="table"
+        />
+      `);
+
+      const idCellBox = await page.locator("tbody tr").first().locator("td").nth(0).boundingBox();
+      const customerCellBox = await page
+        .locator("tbody tr")
+        .first()
+        .locator("td")
+        .nth(1)
+        .boundingBox();
+
+      expect(idCellBox?.width).toBeLessThan(140);
+      expect(customerCellBox?.width).toBeGreaterThan((idCellBox?.width ?? 0) * 2);
     });
 
     test("infers date, datetime, email, url, phone, and boolean rendering", async ({
@@ -344,6 +395,48 @@ test.describe("Basic Functionality", () => {
       await expect(numberCell.locator('[data-number-part="integer"]')).toHaveText("1,234");
       await expect(numberCell.locator('[data-number-part="decimal"]')).toHaveText(".");
       await expect(numberCell.locator('[data-number-part="fraction"]')).toHaveText("568");
+    });
+
+    test("clamps long-text typed columns with max line options", async ({ initTestBed, page }) => {
+      const note =
+        "This is a long note that should wrap across multiple visual lines when the column is narrow enough to require clamping.";
+
+      await initTestBed(`
+        <Table data='{[{note: "${note}"}]}' testId="table" columnSizing="balanced">
+          <Column bindTo="note" type="long-text(lines:2)" />
+        </Table>
+      `);
+
+      const longText = page.locator('[data-column-cell-kind="long-text"]');
+      await expect(longText).toHaveAttribute("title", note);
+      await expect(longText).toHaveCSS("overflow", "hidden");
+      expect(await longText.evaluate((element) => getComputedStyle(element).webkitLineClamp)).toBe(
+        "2",
+      );
+    });
+
+    test("aligns numeric typed columns to the end by default", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{name: "Ada", amount: 1234.5, total: 9876.5, override: 42}]}' testId="table">
+          <Column bindTo="name" type="text" />
+          <Column bindTo="amount" type="number(8,3)" />
+          <Column bindTo="total" type="currency(USD)" />
+          <Column bindTo="override" type="integer" horizontalAlignment="start" />
+        </Table>
+      `);
+
+      const textCell = page.locator("td").nth(0);
+      const numberCell = page.locator("td").nth(1);
+      const currencyCell = page.locator("td").nth(2);
+      const overriddenNumericCell = page.locator("td").nth(3);
+
+      await expect(textCell).not.toHaveCSS("text-align", "end");
+      await expect(numberCell).toHaveCSS("justify-content", "flex-end");
+      await expect(numberCell).toHaveCSS("text-align", "end");
+      await expect(currencyCell).toHaveCSS("justify-content", "flex-end");
+      await expect(currencyCell).toHaveCSS("text-align", "end");
+      await expect(overriddenNumericCell).toHaveCSS("justify-content", "flex-start");
+      await expect(overriddenNumericCell).toHaveCSS("text-align", "start");
     });
 
     test("renders text-like explicit column types", async ({ initTestBed, page }) => {

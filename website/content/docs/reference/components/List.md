@@ -1835,7 +1835,7 @@ through a global variable. Selecting a row in either list immediately reflects i
 >[!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all Lists in the sync have that variable in their scope.
 
-```xmlui-pg name="syncWithVar"
+```xmlui-pg name="List"
 ---app copy display /global.selState/ filename="Main.xmlui"
 <App global.selState="{{}}">
   <MyList />
@@ -2091,6 +2091,14 @@ the array will contain zero or one item.
 </App>
 ```
 
+### `visibleRangeDidChange` [#visiblerangedidchange]
+
+This event fires when the range of visible (mounted) items changes — whatever caused it: a user scroll, a programmatic scroll, or content growth. Unlike the `scroll` event, it is not suppressed during the list's own programmatic and auto-follow scrolls, because consumers of the visible range (e.g. prioritizing work for on-screen items) care about what is visible, not why it became visible. It fires only when the range actually shifts (deduplicated by value).
+
+**Signature**: `visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void`
+
+- `range`: The visible range: `startIndex` (first visible item index) and `endIndex` (last visible item index), inclusive, in the list's row order.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `clearSelection` [#clearselection]
@@ -2157,6 +2165,12 @@ This method returns the list of currently selected list row items.
 **Signature**: `getSelectedItems(): Array<any>`
 
 (See the [example](#clearselection) at the `clearSelection` method)
+
+### `getVisibleRange` [#getvisiblerange]
+
+This method returns the currently visible item range as an object with `startIndex` and `endIndex` (inclusive, in the list's row order). Returns `{ startIndex: -1, endIndex: -1 }` when the list is empty or not yet measured. The pull-style counterpart of the `visibleRangeDidChange` event.
+
+**Signature**: `getVisibleRange(): { startIndex: number, endIndex: number }`
 
 ### `scrollToBottom` [#scrolltobottom]
 

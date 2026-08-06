@@ -147,15 +147,122 @@ You can pass layout properties to a Column:
 
 `type` tells the table how to display the column's bound values.
 Use it for common display semantics without writing custom cell markup.
+The type affects display only; it does not validate, convert, or mutate the underlying data.
+If a value cannot be formatted for the selected type, the table falls back to plain text for that cell.
 
-Common type families include:
+### Type Syntax
 
-- Text: `text`, `short-text`, `long-text`, `markdown`, `code`, `json`
-- Links and identifiers: `email`, `phone`, `url`, `link`, `uuid`, `id(short)`
-- Numbers: `number`, `number(8,3)`, `integer`, `decimal(2)`, `percent`, `currency(USD)`, `accounting(USD)`, `scientific`, `bytes`, `duration`, `rating(5)`
-- Dates: `date`, `date(short)`, `time`, `datetime`, `relative-time`, `timestamp`, `iso-date`
-- Choices and booleans: `boolean`, `checkbox`, `yes-no`, `status`, `enum`
-- Visual and structured values: `color`, `tag`, `tags`, `image`, `avatar`, `icon`, `object`, `array`, `list`
+Use a bare type name for the default behavior:
+
+```xmlui
+<Column bindTo="email" type="email" />
+```
+
+Some types accept positional arguments:
+
+```xmlui
+<Column bindTo="amount" type="number(8,3)" />
+<Column bindTo="total" type="currency(EUR)" />
+<Column bindTo="createdAt" type="datetime(short)" />
+```
+
+Some types accept named arguments:
+
+```xmlui
+<Column bindTo="site" type="url(label:domain)" />
+<Column bindTo="note" type="long-text(lines:2)" />
+```
+
+`typeOptions` can provide the same kind of options as an object.
+When both compact `type` arguments and `typeOptions` provide the same option, `typeOptions` wins.
+
+```xmlui
+<Column bindTo="note" type="long-text(lines:2)" typeOptions="{{maxLines:4}}" />
+```
+
+### Text and Identifier Types
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `text` | Plain text cell. | None. |
+| `short-text` | Plain text with compact text styling, useful for short labels and codes. | None. |
+| `long-text` | Wrapped text. Can be clamped to a fixed number of visual lines; clamped cells show the full text as a title tooltip by default. | `long-text(lines:2)`, `typeOptions="{{maxLines:2}}"`, `typeOptions="{{tooltip:false}}"`. |
+| `markdown` | Inline Markdown for `**bold**` and `*italic*`; also supports line clamping. | `markdown(lines:2)` or `typeOptions="{{maxLines:2}}"`. |
+| `code` | Monospace code-style text. | None. |
+| `id` | Compact identifier text. Long values are shortened to the first eight characters followed by `...` by default. | `id(short)` or `id(full)`. |
+| `uuid` | Compact text styling for UUID-shaped identifiers; the full value is displayed. | None. |
+| `name` | Plain name text with normal table-cell styling. | None. |
+| `address` | Wrapped address text. Can be clamped like `long-text`. | `address(lines:2)` or `typeOptions="{{maxLines:2}}"`. |
+
+### Link Types
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `email` | Renders an anchor with a `mailto:` URL and displays the email address. | None. |
+| `phone` | Renders an anchor with a `tel:` URL and displays the phone number. | None. |
+| `url` | Renders an anchor using the cell value as the `href`. | `url(label:domain)` displays the hostname. `url(label:'Open')` displays a fixed label. |
+| `link` | Same link renderer as `url`; use it when the value is a generic hyperlink. | `link(label:domain)` or `link(label:'Open')`. |
+
+### Numeric Types
+
+Numeric types are aligned to the end of the cell by default.
+The renderer separates integer, decimal, fraction, and suffix parts so decimals line up consistently across rows.
+For `number`, `integer`, `decimal`, `percent`, `currency`, `accounting`, `scientific`, `bytes`, and `rating`, invalid numeric values fall back to plain text.
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `number` | Locale-formatted number. | `number(8,3)` accepts precision and scale; the current formatter uses the scale as the maximum number of fractional digits. |
+| `integer` | Locale-formatted number rounded to zero fractional digits. | None. |
+| `decimal` | Locale-formatted decimal with a fixed number of fractional digits. | `decimal(2)`. |
+| `percent` | Locale-formatted percentage. For example, `0.12` displays as `12%`. | None. |
+| `currency` | Locale-formatted currency. | `currency(USD)`, `currency(EUR)`, or `typeOptions="{{currency:'USD'}}"`. Defaults to `USD`. |
+| `accounting` | Locale-formatted currency with accounting sign display where the locale supports it. | `accounting(USD)` or `typeOptions="{{currency:'USD'}}"`. Defaults to `USD`. |
+| `scientific` | Locale-formatted scientific notation. | None. |
+| `bytes` | Scales a byte count to `B`, `KB`, `MB`, `GB`, or `TB` with up to one fractional digit. | None. |
+| `duration` | Interprets the value as seconds and displays a compact duration such as `1h 1m 1s`. Negative values display as `0s`. | None. |
+| `rating` | Displays the value against a maximum, such as `4 / 5`. | `rating(5)` or `typeOptions="{{max:10}}"`. Defaults to `5`. |
+
+### Date and Time Types
+
+Date and time types accept `Date` values and date-compatible strings or numbers.
+Invalid date values fall back to plain text.
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `date` | Locale-formatted date. Defaults to medium date style. | `date(short)`, `date(medium)`, `date(long)`, or `date(full)`. |
+| `time` | Locale-formatted time. Defaults to short time style. | `time(short)`, `time(medium)`, `time(long)`, or `time(full)`. |
+| `datetime` | Locale-formatted date and time. Defaults to short date and short time style. | `datetime(short)`, `datetime(medium)`, `datetime(long)`, or `datetime(full)`. |
+| `relative-time` | Displays a relative value such as `1 hour ago` or `tomorrow`, based on the current time. | None. |
+| `timestamp` | Displays the JavaScript timestamp in milliseconds. | None. |
+| `iso-date` | Displays the ISO calendar date portion, such as `2026-08-06`. | None. |
+
+### Choice and Boolean Types
+
+`enum` and `status` render as plain text by default.
+Use `typeOptions` to map raw values to readable labels; visual badges require custom `Column` child content.
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `boolean` | Displays `true` or `false`. | None. |
+| `checkbox` | Displays a checkmark for truthy values and an empty cell for falsy values. The cell has checkbox semantics. | None. |
+| `yes-no` | Displays `Yes` or `No`. | None. |
+| `enum` | Displays the raw value or a mapped label as plain text. | `typeOptions="{{sent:{label:'Sent'}, draft:'Draft'}}"` or `typeOptions="{{values:{sent:'Sent'}}}"`. |
+| `status` | Displays the raw value or a mapped label as plain text. | Same mapping options as `enum`. |
+
+### Visual and Structured Types
+
+| Type | Visual traits | Useful options |
+| --- | --- | --- |
+| `color` | Displays a color swatch followed by the color text. | None. |
+| `tag` | Displays a single value with tag-like styling. | None. |
+| `tags` | Displays arrays as comma-separated values with tag-like styling. Non-array values display as text. | None. |
+| `image` | Displays the cell value as an image URL. | `typeOptions="{{alt:'Thumbnail'}}"` for accessible alt text. |
+| `avatar` | Displays the cell value as a rounded avatar image URL. | `typeOptions="{{label:'Ada avatar'}}"` or `typeOptions="{{alt:'Ada avatar'}}"`. |
+| `icon` | Displays an XMLUI icon and its icon name. | None. |
+| `json` | Displays `JSON.stringify(value)` in code styling. `null` displays as `null`. | None. |
+| `object` | Displays objects with `JSON.stringify(value)` in code styling. | None. |
+| `array` | Displays arrays with `JSON.stringify(value)` in code styling. | None. |
+| `list` | Displays arrays as comma-separated values. Non-array values display as text. | None. |
 
 ```xmlui-pg name="Example: Column type formatting"
 <App>
@@ -185,6 +292,24 @@ Common type families include:
 <App>
   <Table data='{[{ amount: 1234.5678 }, { amount: 9.5 }]}' >
     <Column bindTo="amount" type="number(8,3)" />
+  </Table>
+</App>
+```
+
+`long-text` can clamp wrapped content to a maximum number of visual lines.
+Use compact syntax or `typeOptions`; `typeOptions` wins when both are provided:
+
+```xmlui-pg name="Example: Long text line clamp"
+<App>
+  <Table
+    columnSizing="balanced"
+    data='{[
+      {
+        note: "This is a longer note that wraps across lines and is clamped for compact table display."
+      }
+    ]}'
+  >
+    <Column bindTo="note" type="long-text(lines:2)" />
   </Table>
 </App>
 ```

@@ -86,7 +86,7 @@ export const ColumnMd = createMetadata({
       description:
         `This property provides additional display options for the column type. Use it for ` +
         `object-shaped configuration, such as enum/status label maps, link labels, or image/avatar ` +
-        `alt text. Values in \`typeOptions\` override compact options specified in the \`type\` ` +
+        `alt text, and long-text options such as \`maxLines\`. Values in \`typeOptions\` override compact options specified in the \`type\` ` +
         `string.`,
       valueType: "any",
     },

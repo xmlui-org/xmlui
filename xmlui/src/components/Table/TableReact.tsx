@@ -103,6 +103,9 @@ export type TablePaginationControlsLocation =
 export const CheckboxToleranceValues = ["none", "compact", "comfortable", "spacious"] as const;
 export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 
+export const TableColumnSizingValues = ["auto", "stretch", "balanced", "content"] as const;
+export type TableColumnSizing = (typeof TableColumnSizingValues)[number];
+
 // =====================================================================================================================
 // Table Action Context Types
 
@@ -174,10 +177,25 @@ function buildActionContext(
 
 type CellVerticalAlign = "top" | "center" | "bottom";
 
+const END_ALIGNED_COLUMN_TYPES = new Set<NormalizedColumnType["name"]>([
+  "number",
+  "integer",
+  "decimal",
+  "percent",
+  "currency",
+  "accounting",
+  "scientific",
+  "bytes",
+  "duration",
+  "rating",
+]);
+
 type TableProps = {
   data: any[];
   columns?: OurColumnMetadata[];
   columnInference?: string;
+  columnSizing?: TableColumnSizing;
+  idKey?: string;
   hasExplicitColumns?: boolean;
   isPaginated?: boolean;
   loading?: boolean;
@@ -252,9 +270,136 @@ function defaultIsRowUnselectable(_: any) {
   return false;
 }
 
+function getDefaultTypeStyle(columnType?: NormalizedColumnType): CSSProperties | undefined {
+  if (!columnType || !END_ALIGNED_COLUMN_TYPES.has(columnType.name)) {
+    return undefined;
+  }
+
+  return {
+    display: "flex",
+    justifyContent: "flex-end",
+    textAlign: "end",
+  };
+}
+
+function resolveColumnSizingMode(
+  columnSizing: TableColumnSizing | undefined,
+  hasExplicitColumns: boolean | undefined,
+  columnCount: number,
+): Exclude<TableColumnSizing, "auto"> {
+  if (columnSizing && columnSizing !== "auto") {
+    return columnSizing;
+  }
+  return hasExplicitColumns || columnCount > 0 ? "stretch" : "balanced";
+}
+
+function getDefaultTypeWidth(
+  columnType: NormalizedColumnType | undefined,
+  columnSizing: Exclude<TableColumnSizing, "auto">,
+): string | number | undefined {
+  if (!columnType || columnSizing === "stretch") {
+    return undefined;
+  }
+  if (columnSizing === "balanced" && STAR_WIDTH_TYPES.has(columnType.name)) {
+    return columnType.name === "long-text" || columnType.name === "markdown" ? "2*" : "*";
+  }
+  return TYPE_WIDTHS[columnType.name] ?? CONTENT_WIDTHS[columnType.name];
+}
+
+function getDefaultTypeMinWidth(
+  columnType: NormalizedColumnType | undefined,
+  columnSizing: Exclude<TableColumnSizing, "auto">,
+): number | undefined {
+  if (!columnType || columnSizing === "stretch") {
+    return undefined;
+  }
+  return MIN_WIDTHS[columnType.name];
+}
+
 const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
+
+const TYPE_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
+  id: 96,
+  uuid: 260,
+  number: 120,
+  integer: 96,
+  decimal: 120,
+  percent: 96,
+  currency: 140,
+  accounting: 140,
+  scientific: 120,
+  bytes: 112,
+  duration: 112,
+  rating: 96,
+  boolean: 88,
+  checkbox: 64,
+  "yes-no": 88,
+  date: 128,
+  time: 112,
+  datetime: 176,
+  timestamp: 152,
+  "iso-date": 128,
+  "relative-time": 128,
+  enum: 128,
+  status: 128,
+  tag: 128,
+};
+
+const CONTENT_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
+  text: 180,
+  "short-text": 160,
+  name: 180,
+  email: 220,
+  phone: 160,
+  url: 240,
+  link: 220,
+  "long-text": 320,
+  markdown: 320,
+  address: 260,
+  json: 260,
+  object: 260,
+  array: 220,
+  list: 220,
+  tags: 220,
+};
+
+const STAR_WIDTH_TYPES = new Set<NormalizedColumnType["name"]>([
+  "text",
+  "short-text",
+  "name",
+  "email",
+  "phone",
+  "url",
+  "link",
+  "long-text",
+  "markdown",
+  "address",
+  "json",
+  "object",
+  "array",
+  "list",
+  "tags",
+]);
+
+const MIN_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
+  text: 120,
+  "short-text": 120,
+  name: 120,
+  email: 160,
+  phone: 120,
+  url: 160,
+  link: 160,
+  "long-text": 220,
+  markdown: 220,
+  address: 180,
+  json: 180,
+  object: 180,
+  array: 160,
+  list: 160,
+  tags: 160,
+};
 
 type SelectionToggleProps = {
   checkboxTolerance: CheckboxTolerance;
@@ -294,10 +439,15 @@ function SelectionToggle({
 }
 
 function renderTypedCellValue(value: unknown, columnType: NormalizedColumnType): ReactNode {
-  return renderCellModel(formatTableCellValue(value, columnType));
+  return renderCellModel(formatTableCellValue(value, columnType), columnType);
 }
 
-function renderCellModel(model: TableCellRenderModel): ReactNode {
+function renderCellModel(
+  model: TableCellRenderModel,
+  columnType?: NormalizedColumnType,
+): ReactNode {
+  const longTextClampStyle = getLongTextClampStyle(columnType);
+  const longTextTitle = longTextClampStyle && shouldShowClampedTitle(columnType) ? model.text : undefined;
   switch (model.kind) {
     case "empty":
       return null;
@@ -342,6 +492,8 @@ function renderCellModel(model: TableCellRenderModel): ReactNode {
         <span
           data-column-cell-kind="markdown"
           className={classnames(styles.typedCell, styles.typedCellLongText)}
+          style={longTextClampStyle}
+          title={longTextTitle}
         >
           {renderInlineMarkdown(model.text)}
         </span>
@@ -388,11 +540,45 @@ function renderCellModel(model: TableCellRenderModel): ReactNode {
         <span
           data-column-cell-kind={model.kind}
           className={classnames(styles.typedCell, getTypedCellClassName(model.kind))}
+          style={isLongTextLikeModel(model.kind) ? longTextClampStyle : undefined}
+          title={isLongTextLikeModel(model.kind) ? longTextTitle : undefined}
         >
           {model.text}
         </span>
       );
   }
+}
+
+function getLongTextClampStyle(columnType?: NormalizedColumnType): CSSProperties | undefined {
+  if (!columnType) {
+    return undefined;
+  }
+  const maxLines = positiveIntegerOption(columnType, "maxLines") ?? positiveIntegerOption(columnType, "lines");
+  if (maxLines === undefined) {
+    return undefined;
+  }
+  return {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: maxLines,
+    overflow: "hidden",
+  } as CSSProperties;
+}
+
+function shouldShowClampedTitle(columnType?: NormalizedColumnType): boolean {
+  return columnType?.options?.tooltip !== false;
+}
+
+function isLongTextLikeModel(kind: TableCellRenderModel["kind"]): boolean {
+  return kind === "long-text" || kind === "address";
+}
+
+function positiveIntegerOption(
+  columnType: NormalizedColumnType,
+  optionName: string,
+): number | undefined {
+  const value = columnType.options?.[optionName];
+  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : undefined;
 }
 
 function getTypedCellClassName(kind: TableCellRenderModel["kind"]): string | undefined {
@@ -674,6 +860,8 @@ export const Table = memo(
       data = defaultProps.data,
       columns = defaultProps.columns,
       columnInference = defaultProps.columnInference,
+      columnSizing: columnSizingMode = defaultProps.columnSizing,
+      idKey: inferenceIdKey = defaultProps.idKey,
       hasExplicitColumns = false,
       isPaginated,
       loading = defaultProps.loading,
@@ -784,8 +972,14 @@ export const Table = memo(
       if (!safeData.length) {
         return EMPTY_ARRAY;
       }
-      return buildInferredColumns(safeData, columnInference);
-    }, [columnInference, columns, hasExplicitColumns, safeData]);
+      return buildInferredColumns(safeData, columnInference, { idKey: inferenceIdKey });
+    }, [columnInference, columns, hasExplicitColumns, inferenceIdKey, safeData]);
+
+    const effectiveColumnSizingMode = resolveColumnSizingMode(
+      columnSizingMode,
+      hasExplicitColumns,
+      columns.length,
+    );
 
     useEffect(() => {
       if (autoFocus) {
@@ -920,10 +1114,16 @@ export const Table = memo(
     const columnsWithCustomCell: ColumnDef<any>[] = useMemo(() => {
       return safeColumns.map((col, idx) => {
         // --- Obtain column width information
-        const { width, starSizedWidth } = getColumnWidth(col.width, true, "width");
-        const { width: minWidth } = getColumnWidth(col.minWidth, false, "minWidth");
-        const { width: maxWidth } = getColumnWidth(col.maxWidth, false, "maxWidth");
         const columnType = col.type ? normalizeColumnType(col.type, col.typeOptions).type : undefined;
+        const effectiveColumnWidth =
+          col.width ?? getDefaultTypeWidth(columnType, effectiveColumnSizingMode);
+        const effectiveMinWidth =
+          col.minWidth ?? getDefaultTypeMinWidth(columnType, effectiveColumnSizingMode);
+        const { width, starSizedWidth } = getColumnWidth(effectiveColumnWidth, true, "width");
+        const { width: minWidth } = getColumnWidth(effectiveMinWidth, false, "minWidth");
+        const { width: maxWidth } = getColumnWidth(col.maxWidth, false, "maxWidth");
+        const typeStyle = getDefaultTypeStyle(columnType);
+        const columnStyle = typeStyle ? { ...typeStyle, ...col.style } : col.style;
 
         const customColumn = {
           ...col,
@@ -938,7 +1138,7 @@ export const Table = memo(
           meta: {
             starSizedWidth,
             pinTo: col.pinTo,
-            style: col.style,
+            style: columnStyle,
             className: col.className,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
@@ -991,7 +1191,7 @@ export const Table = memo(
           return { width, starSizedWidth };
         }
       });
-    }, [getThemeVar, safeColumns]);
+    }, [effectiveColumnSizingMode, getThemeVar, safeColumns]);
 
     // --- Prepare the selection column separately so hover-driven updates stay isolated to it
     const selectColumn: ColumnDef<any> = useMemo(() => {

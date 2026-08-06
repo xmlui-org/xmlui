@@ -105,7 +105,7 @@ This component supports the following behaviors:
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
-```xmlui-pg name="closeButtonVisible" height="220px"
+```xmlui-pg name="The ModalDialog as a Container 2" height="220px"
 ---app copy display name="Example: closeButtonVisible"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
@@ -121,7 +121,7 @@ Click outside the dialog to close it.
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 
-```xmlui-pg name="fullScreen" height="220px"
+```xmlui-pg name="The ModalDialog as a Container" height="220px"
 ---app copy display name="Example: fullScreen"
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
@@ -156,7 +156,7 @@ This event is fired when the close button is pressed or the user clicks outside 
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```xmlui-pg name="close" height="220px"
+```xmlui-pg name="The ModalDialog as a Container 3" height="220px"
 ---app copy {6-8} display name="Example: open/close events"
 <App>
   <Button label="Open Dialog" onClick="myDialog.open()" />
@@ -182,7 +182,7 @@ This event is fired when the `ModalDialog` is opened either via a `when` or an i
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```xmlui-pg name="open" height="220px"
+```xmlui-pg name="The ModalDialog as a Container 4" height="220px"
 ---app copy {6-8} display name="Example: open/close events"
 <App>
   <Button label="Open Dialog" onClick="myDialog.open()" />

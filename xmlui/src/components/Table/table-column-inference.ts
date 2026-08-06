@@ -36,6 +36,15 @@ export type ParseColumnInferenceResult = {
   diagnostics: ColumnInferenceDiagnostic[];
 };
 
+export type BuildInferredColumnsOptions = {
+  idKey?: string;
+};
+
+export type InferColumnTypeOptions = {
+  field?: string;
+  idKey?: string;
+};
+
 const DEFAULT_MODE: ColumnInferenceMode = {
   name: "first-n",
   count: 25,
@@ -52,6 +61,7 @@ const BARE_MODES = new Set<ColumnInferenceModeName>([
 
 const COUNTED_MODES = new Set<ColumnInferenceModeName>(["first-n", "sample", "until-stable"]);
 const EXCLUDED_INFERRED_FIELDS = new Set(["order"]);
+const DEFAULT_ID_KEY = "id";
 
 export function parseColumnInference(value: unknown): ParseColumnInferenceResult {
   const diagnostics: ColumnInferenceDiagnostic[] = [];
@@ -191,24 +201,43 @@ export function discoverColumnFields(
 export function buildInferredColumns(
   rows: readonly unknown[],
   modeOrValue?: ColumnInferenceMode | unknown,
+  options: BuildInferredColumnsOptions = {},
 ): OurColumnMetadata[] {
   const sampledRows = sampleRowsForColumnInference(rows, modeOrValue);
+  const idKey = options.idKey ?? DEFAULT_ID_KEY;
   return discoverColumnFields(rows, modeOrValue).map((field) => {
     return {
       header: field,
       accessorKey: field,
       canSort: true,
-      type: inferColumnType(getFieldValues(sampledRows, field)),
+      type: inferColumnType(getFieldValues(sampledRows, field), {
+        field,
+        idKey,
+      }),
     };
   });
 }
 
-export function inferColumnType(values: readonly unknown[]): ColumnTypeName {
+export function inferColumnType(
+  values: readonly unknown[],
+  options: InferColumnTypeOptions = {},
+): ColumnTypeName {
   const presentValues = values.filter(
     (value) => value !== null && value !== undefined && value !== "",
   );
   if (presentValues.length === 0) {
     return "text";
+  }
+
+  if (
+    presentValues.every((value) => typeof value === "string") &&
+    (presentValues as string[]).every(isUuidLikeString)
+  ) {
+    return "uuid";
+  }
+
+  if (isIdKeyField(options.field, options.idKey) && presentValues.every(isScalarIdValue)) {
+    return "id";
   }
 
   if (presentValues.every((value) => typeof value === "number" && Number.isFinite(value))) {
@@ -234,7 +263,7 @@ export function inferColumnType(values: readonly unknown[]): ColumnTypeName {
   }
 
   if (presentValues.every((value) => typeof value === "string")) {
-    return inferStringColumnType(presentValues as string[]);
+    return inferStringColumnType(presentValues as string[], options);
   }
 
   return "text";
@@ -272,7 +301,13 @@ function getFieldValues(rows: readonly unknown[], field: string): unknown[] {
   return rows.map((row) => (isPlainRecord(row) ? row[field] : undefined));
 }
 
-function inferStringColumnType(values: readonly string[]): ColumnTypeName {
+function inferStringColumnType(
+  values: readonly string[],
+  options: InferColumnTypeOptions = {},
+): ColumnTypeName {
+  if (values.every(isUuidLikeString)) {
+    return "uuid";
+  }
   if (values.every(isIsoDateOnlyString)) {
     return "date";
   }
@@ -287,6 +322,9 @@ function inferStringColumnType(values: readonly string[]): ColumnTypeName {
   }
   if (isMostly(values, isPhoneLikeString)) {
     return "phone";
+  }
+  if (isNameLikeField(options.field) && values.every(isShortDisplayString)) {
+    return "name";
   }
   if (values.some((value) => value.length > 80)) {
     return "long-text";
@@ -326,6 +364,35 @@ function isUrlLikeString(value: string): boolean {
 
 function isPhoneLikeString(value: string): boolean {
   return /^\+?[\d\s().-]{7,}$/.test(value) && /\d{7,}/.test(value.replace(/\D/g, ""));
+}
+
+function isUuidLikeString(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
+
+function isIdKeyField(field: string | undefined, idKey: string | undefined): boolean {
+  return !!field && !!idKey && field === idKey;
+}
+
+function isNameLikeField(field: string | undefined): boolean {
+  if (!field) {
+    return false;
+  }
+  return /^(name|customer|customerName|displayName|fullName)$/i.test(field) || /Name$/.test(field);
+}
+
+function isShortDisplayString(value: string): boolean {
+  return value.length > 0 && value.length <= 80;
+}
+
+function isScalarIdValue(value: unknown): boolean {
+  return (
+    (typeof value === "string" && value.trim().length > 0 && value.length <= 80) ||
+    (typeof value === "number" && Number.isFinite(value)) ||
+    typeof value === "bigint"
+  );
 }
 
 function isEnumLikeString(value: string): boolean {
