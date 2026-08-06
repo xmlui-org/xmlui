@@ -4,6 +4,7 @@ export const defaultProps = {
   idKey: "id",
   data: EMPTY_ARRAY,
   columns: EMPTY_ARRAY,
+  columnInference: "first-n(25)",
   isPaginated: false,
   loading: false,
   rowsSelectable: false,

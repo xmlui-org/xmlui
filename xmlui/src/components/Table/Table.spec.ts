@@ -61,6 +61,79 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
   });
 
+  test.describe("inferred columns", () => {
+    test("renders data without explicit Column children", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" />
+      `);
+
+      await expect(page.getByTestId("table")).toBeVisible();
+
+      const headers = page.locator("th");
+      await expect(headers).toHaveCount(4);
+      await expect(headers.nth(0)).toContainText("id");
+      await expect(headers.nth(1)).toContainText("name");
+      await expect(headers.nth(2)).toContainText("quantity");
+      await expect(headers.nth(3)).toContainText("category");
+
+      await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "5" }).first()).toBeVisible();
+      await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
+    });
+
+    test("explicit Column children override inferred columns", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+          <Column bindTo="name" header="Product" />
+          <Column bindTo="quantity" header="Qty" />
+        </Table>
+      `);
+
+      const headers = page.locator("th");
+      await expect(headers).toHaveCount(2);
+      await expect(headers.nth(0)).toContainText("Product");
+      await expect(headers.nth(1)).toContainText("Qty");
+      await expect(headers.filter({ hasText: "category" })).toHaveCount(0);
+    });
+
+    test("columnInference controls sampled rows", async ({ initTestBed, page }) => {
+      const sparseData = [
+        { id: 1, name: "First" },
+        { id: 2, name: "Second", later: "Visible by default" },
+      ];
+
+      await initTestBed(`
+        <VStack>
+          <Table data='{${JSON.stringify(sparseData)}}' testId="default-table" />
+          <Table data='{${JSON.stringify(sparseData)}}' columnInference="first-only" testId="first-table" />
+        </VStack>
+      `);
+
+      const defaultHeaders = page.getByTestId("default-table").locator("th");
+      await expect(defaultHeaders.filter({ hasText: "later" })).toHaveCount(1);
+
+      const firstOnlyHeaders = page.getByTestId("first-table").locator("th");
+      await expect(firstOnlyHeaders.filter({ hasText: "later" })).toHaveCount(0);
+    });
+
+    test("inferred columns are sortable by default", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' testId="table" />
+      `);
+
+      const quantityHeaderButton = page
+        .locator("th")
+        .filter({ hasText: "quantity" })
+        .locator("button");
+      await expect(quantityHeaderButton).toBeVisible();
+      await quantityHeaderButton.click();
+
+      const firstRowCells = page.locator("tbody tr").first().locator("td");
+      await expect(firstRowCells.nth(1)).toHaveText("Spinach");
+      await expect(firstRowCells.nth(2)).toHaveText("2");
+    });
+  });
+
   test("invokes onRowDoubleClick when row is double-clicked", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table" onRowDoubleClick="(item) => testState = item.name">

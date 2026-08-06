@@ -72,6 +72,23 @@ export const ColumnMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.canResize,
     },
+    type: {
+      description:
+        `This property provides a display hint for the column's cell values. ` +
+        `Use compact values such as \`text\`, \`email\`, \`number(8,3)\`, ` +
+        `\`currency(USD)\`, \`date\`, \`datetime\`, \`boolean\`, \`enum\`, ` +
+        `or \`json\` to select common table cell formatting behavior. ` +
+        `The type affects display only; it does not validate or mutate the underlying data.`,
+      valueType: "string",
+    },
+    typeOptions: {
+      description:
+        `This property provides additional display options for the column type. ` +
+        `Use it for object-shaped configuration, such as enum label maps, currency options, ` +
+        `or link/image field mappings. Values in \`typeOptions\` override compact options ` +
+        `specified in the \`type\` string.`,
+      valueType: "any",
+    },
   },
   contextVars: {
     $item: {
@@ -96,7 +113,10 @@ export const ColumnMd = createMetadata({
 });
 
 export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
-  customRender: (_props, { node, extractValue, renderChild, classes, appContext, layoutContext }) => {
+  customRender: (
+    _props,
+    { node, extractValue, renderChild, classes, appContext, layoutContext },
+  ) => {
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
     const canSortDefault = appContext?.xmluiConfig?.columnCanSortDefault ?? defaultProps.canSort;
 
@@ -113,23 +133,29 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
     }
     if (horizontalAlignment) {
       // Use flexbox to align block-level content
-      style.display = 'flex';
+      style.display = "flex";
       style.justifyContent =
-        horizontalAlignment === 'start' ? 'flex-start' :
-        horizontalAlignment === 'center' ? 'center' :
-        horizontalAlignment === 'end' ? 'flex-end' :
-        horizontalAlignment;
+        horizontalAlignment === "start"
+          ? "flex-start"
+          : horizontalAlignment === "center"
+            ? "center"
+            : horizontalAlignment === "end"
+              ? "flex-end"
+              : horizontalAlignment;
       style.textAlign = horizontalAlignment as React.CSSProperties["textAlign"]; // Also set textAlign for text content
     }
     if (verticalAlignment) {
       if (!style.display) {
-        style.display = 'flex';
+        style.display = "flex";
       }
       style.alignItems =
-        verticalAlignment === 'start' ? 'flex-start' :
-        verticalAlignment === 'center' ? 'center' :
-        verticalAlignment === 'end' ? 'flex-end' :
-        verticalAlignment;
+        verticalAlignment === "start"
+          ? "flex-start"
+          : verticalAlignment === "center"
+            ? "center"
+            : verticalAlignment === "end"
+              ? "flex-end"
+              : verticalAlignment;
       style.verticalAlign = verticalAlignment as React.CSSProperties["verticalAlign"]; // Also set verticalAlign for fallback
     }
 
@@ -141,6 +167,8 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
         pinTo={extractValue.asOptionalString(node.props.pinTo)}
+        type={extractValue.asOptionalString(node.props.type)}
+        typeOptions={extractValue(node.props.typeOptions)}
         width={extractValue(node.props.width)}
         minWidth={extractValue(node.props.minWidth)}
         maxWidth={extractValue(node.props.maxWidth)}

@@ -35,7 +35,7 @@ import { defaultProps } from "./Table.defaults";
 import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { PositionValues } from "../Pagination/Pagination";
-import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
 
@@ -46,6 +46,12 @@ const userSelectValues: PropertyValueDescription[] = [
   { value: "contain", description: "Selection is contained within this element" },
   { value: "all", description: "The entire element content is selected as one unit" },
 ];
+
+function hasColumnChild(children: ComponentDef[] | undefined): boolean {
+  return !!children?.some(
+    (child) => child.type === "Column" || hasColumnChild(child.children),
+  );
+}
 
 export const TableMd = createMetadata({
   status: "stable",
@@ -82,6 +88,17 @@ export const TableMd = createMetadata({
         `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
       valueType: "any",
+    },
+    columnInference: {
+      description:
+        `Controls how many records from the resolved \`data\` array the \`${COMP}\` inspects ` +
+        `when inferring columns and column display types. The default is \`first-n(25)\`. ` +
+        `Use \`first-only\` for the fastest inference, \`first-n(n)\` for a bounded prefix, ` +
+        `\`sample(n)\` for deterministic spread sampling, \`all\` for small datasets, ` +
+        `or \`off\` to disable inferred columns. This setting only applies when the \`${COMP}\` ` +
+        `has no explicit \`Column\` children.`,
+      valueType: "string",
+      defaultValue: defaultProps.columnInference,
     },
     idKey: {
       description:
@@ -764,6 +781,8 @@ const TableWithColumns = memo(
         return result;
       }, [columnIds, columnsByIds]);
 
+      const hasExplicitColumns = useMemo(() => hasColumnChild(node.children), [node.children]);
+
       const selectionContext = useSelectionContext();
 
       // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
@@ -890,6 +909,8 @@ const TableWithColumns = memo(
             ref={ref}
             data={data}
             columns={columns}
+            columnInference={extractValue.asOptionalString(node.props.columnInference)}
+            hasExplicitColumns={hasExplicitColumns}
             pageSizeOptions={extractValue(node.props.pageSizeOptions)}
             pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
             rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}

@@ -57,6 +57,7 @@ import {
   type ParsedKeyBinding,
 } from "../../parsers/keybinding-parser/keybinding-parser";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
+import { buildInferredColumns } from "./table-column-inference";
 
 // =====================================================================================================================
 // Helper types
@@ -173,6 +174,8 @@ type CellVerticalAlign = "top" | "center" | "bottom";
 type TableProps = {
   data: any[];
   columns?: OurColumnMetadata[];
+  columnInference?: string;
+  hasExplicitColumns?: boolean;
   isPaginated?: boolean;
   loading?: boolean;
   headerHeight?: string | number;
@@ -519,6 +522,8 @@ export const Table = memo(forwardRef(function Table(
   {
     data = defaultProps.data,
       columns = defaultProps.columns,
+      columnInference = defaultProps.columnInference,
+      hasExplicitColumns = false,
       isPaginated,
       loading = defaultProps.loading,
       headerHeight,
@@ -622,14 +627,14 @@ export const Table = memo(forwardRef(function Table(
     }, [isPaginated, pageSize, safeData.length, effectivePageSize]);
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
-      if (columns) {
+      if (hasExplicitColumns || columns.length > 0) {
         return columns;
       }
       if (!safeData.length) {
         return EMPTY_ARRAY;
       }
-      return Object.keys(safeData[0]).map((key: string) => ({ header: key, accessorKey: key }));
-    }, [columns, safeData]);
+      return buildInferredColumns(safeData, columnInference);
+    }, [columnInference, columns, hasExplicitColumns, safeData]);
 
     useEffect(() => {
       if (autoFocus) {

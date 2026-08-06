@@ -14,6 +14,8 @@ export type OurColumnMetadata = {
   canSort?: boolean;
   pinTo?: string;
   canResize?: boolean;
+  type?: string;
+  typeOptions?: any;
   cellRenderer?: (row: any, rowIndex: number, colIndex: number, value: any) => ReactNode;
 };
 

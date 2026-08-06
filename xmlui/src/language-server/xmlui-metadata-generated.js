@@ -4592,6 +4592,14 @@ export default {
         "description": "This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "type": {
+        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date`, `datetime`, `boolean`, `enum`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate or mutate the underlying data.",
+        "valueType": "string"
+      },
+      "typeOptions": {
+        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum label maps, currency options, or link/image field mappings. Values in `typeOptions` override compact options specified in the `type` string.",
+        "valueType": "any"
       }
     },
     "contextVars": {
@@ -17382,6 +17390,11 @@ export default {
       "data": {
         "description": "The component receives data via this property. The `data` property is a list of items that the `Table` can display.",
         "valueType": "any"
+      },
+      "columnInference": {
+        "description": "Controls how many records from the resolved `data` array the `Table` inspects when inferring columns and column display types. The default is `first-n(25)`. Use `first-only` for the fastest inference, `first-n(n)` for a bounded prefix, `sample(n)` for deterministic spread sampling, `all` for small datasets, or `off` to disable inferred columns. This setting only applies when the `Table` has no explicit `Column` children.",
+        "valueType": "string",
+        "defaultValue": "first-n(25)"
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",
