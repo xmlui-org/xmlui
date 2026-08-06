@@ -275,6 +275,7 @@ type APICall = {
   inProgressNotificationMessage?: string;
   completedNotificationMessage?: string;
   errorNotificationMessage?: string;
+  throwOnError?: boolean;
   credentials?: "omit" | "same-origin" | "include";
   omitTransactionId?: boolean;
 
@@ -309,6 +310,7 @@ export async function callApi(
     inProgressNotificationMessage,
     completedNotificationMessage,
     errorNotificationMessage,
+    throwOnError,
     uid: actionUid,
     onProgress,
     omitTransactionId,
@@ -593,6 +595,9 @@ export async function callApi(
       toast.error(errorMessage, {
         id: loadingToastId,
       });
+      if (result !== false && throwOnError) {
+        throw e;
+      }
     } else {
       if (loadingToastId) {
         toast.dismiss(loadingToastId);
