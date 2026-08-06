@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.14.2
+
+### Patch Changes
+
+- 7e23eca: Add a `textTransform-Badge` theme variable for customizing Badge text casing.
+- 6e539e0: Fix theme color validation to accept the complete MDN named color set.
+- 12dd992: Pin React Router transitive dependencies outside the vulnerable v7 advisory ranges.
+
 ## 0.14.1
 
 ### Patch Changes
