@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.14.3
+
+### Patch Changes
+
+- 5cb8db8: Fix Form built-in submitUrl handling so failed API submissions with error notifications do not run the success handler.
+- 1bdeb6f: Add smart Table column inference and typed Column display formatting.
+
 ## 0.14.2
 
 ### Patch Changes
