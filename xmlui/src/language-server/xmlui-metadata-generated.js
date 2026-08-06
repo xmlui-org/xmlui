@@ -4594,11 +4594,11 @@ export default {
         "defaultValue": true
       },
       "type": {
-        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date`, `datetime`, `boolean`, `enum`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate or mutate the underlying data.",
+        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate, convert, or mutate the underlying data. Custom child markup inside the `Column` overrides type rendering.",
         "valueType": "string"
       },
       "typeOptions": {
-        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum label maps, currency options, or link/image field mappings. Values in `typeOptions` override compact options specified in the `type` string.",
+        "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum/status label maps, link labels, or image/avatar alt text. Values in `typeOptions` override compact options specified in the `type` string.",
         "valueType": "any"
       }
     },
@@ -17392,7 +17392,7 @@ export default {
         "valueType": "any"
       },
       "columnInference": {
-        "description": "Controls how many records from the resolved `data` array the `Table` inspects when inferring columns and column display types. The default is `first-n(25)`. Use `first-only` for the fastest inference, `first-n(n)` for a bounded prefix, `sample(n)` for deterministic spread sampling, `all` for small datasets, or `off` to disable inferred columns. This setting only applies when the `Table` has no explicit `Column` children.",
+        "description": "Controls how the `Table` samples the resolved `data` array when it has no explicit `Column` children and needs to infer columns and display types. The default is `first-n(25)`. Use `first-only` for the fastest inference, `first-n(n)` for a bounded prefix, `sample(n)` for deterministic spread sampling, `all` for small datasets, or `off` to disable inferred columns. This setting inspects row objects only; unwrap API response envelopes before passing data to the table.",
         "valueType": "string",
         "defaultValue": "first-n(25)"
       },

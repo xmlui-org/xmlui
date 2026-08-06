@@ -1,4 +1,5 @@
 import type { OurColumnMetadata } from "../Column/TableContext";
+import type { ColumnTypeName } from "../Column/column-types";
 
 export const DEFAULT_COLUMN_INFERENCE = "first-n(25)";
 
@@ -191,11 +192,52 @@ export function buildInferredColumns(
   rows: readonly unknown[],
   modeOrValue?: ColumnInferenceMode | unknown,
 ): OurColumnMetadata[] {
-  return discoverColumnFields(rows, modeOrValue).map((field) => ({
-    header: field,
-    accessorKey: field,
-    canSort: true,
-  }));
+  const sampledRows = sampleRowsForColumnInference(rows, modeOrValue);
+  return discoverColumnFields(rows, modeOrValue).map((field) => {
+    return {
+      header: field,
+      accessorKey: field,
+      canSort: true,
+      type: inferColumnType(getFieldValues(sampledRows, field)),
+    };
+  });
+}
+
+export function inferColumnType(values: readonly unknown[]): ColumnTypeName {
+  const presentValues = values.filter(
+    (value) => value !== null && value !== undefined && value !== "",
+  );
+  if (presentValues.length === 0) {
+    return "text";
+  }
+
+  if (presentValues.every((value) => typeof value === "number" && Number.isFinite(value))) {
+    return presentValues.every((value) => Number.isInteger(value as number)) ? "integer" : "number";
+  }
+
+  if (presentValues.every((value) => typeof value === "boolean")) {
+    return "boolean";
+  }
+
+  if (presentValues.every((value) => Array.isArray(value))) {
+    return presentValues.every(
+      (value) =>
+        Array.isArray(value) &&
+        value.every((item) => typeof item === "string" && item.length <= 40),
+    )
+      ? "tags"
+      : "array";
+  }
+
+  if (presentValues.every((value) => isPlainRecord(value))) {
+    return "object";
+  }
+
+  if (presentValues.every((value) => typeof value === "string")) {
+    return inferStringColumnType(presentValues as string[]);
+  }
+
+  return "text";
 }
 
 function deterministicSample<T>(rows: readonly T[], count: number): T[] {
@@ -224,4 +266,68 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   }
   const prototype = Object.getPrototypeOf(value);
   return prototype === Object.prototype || prototype === null;
+}
+
+function getFieldValues(rows: readonly unknown[], field: string): unknown[] {
+  return rows.map((row) => (isPlainRecord(row) ? row[field] : undefined));
+}
+
+function inferStringColumnType(values: readonly string[]): ColumnTypeName {
+  if (values.every(isIsoDateOnlyString)) {
+    return "date";
+  }
+  if (values.every(isIsoDateTimeString)) {
+    return "datetime";
+  }
+  if (isMostly(values, isEmailLikeString)) {
+    return "email";
+  }
+  if (isMostly(values, isUrlLikeString)) {
+    return "url";
+  }
+  if (isMostly(values, isPhoneLikeString)) {
+    return "phone";
+  }
+  if (values.some((value) => value.length > 80)) {
+    return "long-text";
+  }
+
+  const uniqueValues = new Set(values);
+  if (
+    uniqueValues.size > 1 &&
+    uniqueValues.size <= Math.min(10, Math.max(3, Math.ceil(values.length / 2))) &&
+    values.every((value) => value.length <= 40 && isEnumLikeString(value))
+  ) {
+    return "enum";
+  }
+
+  return "text";
+}
+
+function isMostly(values: readonly string[], predicate: (value: string) => boolean): boolean {
+  return values.filter(predicate).length / values.length >= 0.8;
+}
+
+function isIsoDateOnlyString(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+}
+
+function isIsoDateTimeString(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}T/.test(value) && !Number.isNaN(Date.parse(value));
+}
+
+function isEmailLikeString(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isUrlLikeString(value: string): boolean {
+  return /^https?:\/\/\S+$/i.test(value);
+}
+
+function isPhoneLikeString(value: string): boolean {
+  return /^\+?[\d\s().-]{7,}$/.test(value) && /\d{7,}/.test(value.replace(/\D/g, ""));
+}
+
+function isEnumLikeString(value: string): boolean {
+  return /^[\p{L}\p{N}_ -]+$/u.test(value);
 }

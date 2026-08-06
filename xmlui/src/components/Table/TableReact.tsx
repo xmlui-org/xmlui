@@ -58,6 +58,8 @@ import {
 } from "../../parsers/keybinding-parser/keybinding-parser";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
 import { buildInferredColumns } from "./table-column-inference";
+import { formatTableCellValue, type TableCellRenderModel } from "./table-cell-formatting";
+import { normalizeColumnType, type NormalizedColumnType } from "../Column/column-types";
 
 // =====================================================================================================================
 // Helper types
@@ -77,6 +79,7 @@ declare module "@tanstack/table-core" {
     accessorKey?: string;
     pinTo?: string;
     cellRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
+    columnType?: NormalizedColumnType;
   }
 }
 
@@ -288,6 +291,153 @@ function SelectionToggle({
       />
     </div>
   );
+}
+
+function renderTypedCellValue(value: unknown, columnType: NormalizedColumnType): ReactNode {
+  return renderCellModel(formatTableCellValue(value, columnType));
+}
+
+function renderCellModel(model: TableCellRenderModel): ReactNode {
+  switch (model.kind) {
+    case "empty":
+      return null;
+    case "link":
+      return (
+        <a
+          href={model.href}
+          title={model.href}
+          data-column-cell-kind="link"
+          className={classnames(styles.typedCell, styles.typedCellLink)}
+        >
+          {model.text}
+        </a>
+      );
+    case "number":
+      return (
+        <span
+          data-column-cell-kind="number"
+          className={classnames(styles.typedCell, styles.typedCellNumber)}
+        >
+          <span data-number-part="integer">{model.integerPart}</span>
+          {model.decimalSeparator && (
+            <span data-number-part="decimal">{model.decimalSeparator}</span>
+          )}
+          {model.fractionPart && <span data-number-part="fraction">{model.fractionPart}</span>}
+          {model.suffixPart && <span data-number-part="suffix">{model.suffixPart}</span>}
+        </span>
+      );
+    case "checkbox":
+      return (
+        <span
+          data-column-cell-kind="checkbox"
+          className={classnames(styles.typedCell, styles.typedCellCheckbox)}
+          role="checkbox"
+          aria-checked={!!model.text}
+        >
+          {model.text}
+        </span>
+      );
+    case "markdown":
+      return (
+        <span
+          data-column-cell-kind="markdown"
+          className={classnames(styles.typedCell, styles.typedCellLongText)}
+        >
+          {renderInlineMarkdown(model.text)}
+        </span>
+      );
+    case "color":
+      return (
+        <span
+          data-column-cell-kind="color"
+          className={classnames(styles.typedCell, styles.typedCellColor)}
+        >
+          <span
+            data-color-swatch
+            className={styles.typedCellColorSwatch}
+            style={{ backgroundColor: model.color }}
+            aria-hidden
+          />
+          <span>{model.text}</span>
+        </span>
+      );
+    case "image":
+    case "avatar":
+      return (
+        <img
+          data-column-cell-kind={model.kind}
+          className={classnames(styles.typedCellImage, {
+            [styles.typedCellAvatar]: model.kind === "avatar",
+          })}
+          src={model.src}
+          alt={model.alt}
+        />
+      );
+    case "icon":
+      return (
+        <span
+          data-column-cell-kind="icon"
+          className={classnames(styles.typedCell, styles.typedCellIcon)}
+        >
+          <ThemedIcon name={model.iconName} fallback={model.iconName} aria-label={model.text} />
+          <span className={styles.typedCellIconLabel}>{model.text}</span>
+        </span>
+      );
+    default:
+      return (
+        <span
+          data-column-cell-kind={model.kind}
+          className={classnames(styles.typedCell, getTypedCellClassName(model.kind))}
+        >
+          {model.text}
+        </span>
+      );
+  }
+}
+
+function getTypedCellClassName(kind: TableCellRenderModel["kind"]): string | undefined {
+  switch (kind) {
+    case "long-text":
+    case "address":
+      return styles.typedCellLongText;
+    case "code":
+    case "json":
+      return styles.typedCellCode;
+    case "tag":
+    case "tags":
+      return styles.typedCellTag;
+    case "short-text":
+    case "id":
+    case "uuid":
+      return styles.typedCellCompactText;
+    default:
+      return undefined;
+  }
+}
+
+function renderInlineMarkdown(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const pattern = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text))) {
+    if (match.index > lastIndex) {
+      nodes.push(text.slice(lastIndex, match.index));
+    }
+    nodes.push(
+      match[2] ? (
+        <strong key={match.index}>{match[2]}</strong>
+      ) : (
+        <em key={match.index}>{match[3]}</em>
+      ),
+    );
+    lastIndex = pattern.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+  return nodes;
 }
 
 //These are the important styles to make sticky column pinning work!
@@ -518,9 +668,10 @@ function useTableKeyboardActions({
   return handleKeyboardActions;
 }
 
-export const Table = memo(forwardRef(function Table(
-  {
-    data = defaultProps.data,
+export const Table = memo(
+  forwardRef(function Table(
+    {
+      data = defaultProps.data,
       columns = defaultProps.columns,
       columnInference = defaultProps.columnInference,
       hasExplicitColumns = false,
@@ -772,6 +923,7 @@ export const Table = memo(forwardRef(function Table(
         const { width, starSizedWidth } = getColumnWidth(col.width, true, "width");
         const { width: minWidth } = getColumnWidth(col.minWidth, false, "minWidth");
         const { width: maxWidth } = getColumnWidth(col.maxWidth, false, "maxWidth");
+        const columnType = col.type ? normalizeColumnType(col.type, col.typeOptions).type : undefined;
 
         const customColumn = {
           ...col,
@@ -790,6 +942,7 @@ export const Table = memo(forwardRef(function Table(
             className: col.className,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
+            columnType,
           },
         };
         return customColumn;
@@ -960,8 +1113,6 @@ export const Table = memo(forwardRef(function Table(
       layoutVersionRef.current++;
     }
     const layoutVersion = layoutVersionRef.current;
-
-
 
     const columnPinning = useMemo(() => {
       const left: Array<string> = [];
@@ -1283,6 +1434,7 @@ export const Table = memo(forwardRef(function Table(
             <>
               {row.getVisibleCells().map((cell, i) => {
                 const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                const columnType = cell.column.columnDef?.meta?.columnType;
                 const size = cell.column.getSize();
                 const columnClassName = cell.column.columnDef?.meta?.className;
                 const columnStyle = cell.column.columnDef?.meta?.style;
@@ -1312,10 +1464,12 @@ export const Table = memo(forwardRef(function Table(
                     >
                       {cellRenderer
                         ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
-                        : (flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          ) as ReactNode)}
+                        : columnType
+                          ? renderTypedCellValue(cell?.getValue(), columnType)
+                          : (flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            ) as ReactNode)}
                     </div>
                   </td>
                 );
@@ -1862,8 +2016,8 @@ export const Table = memo(forwardRef(function Table(
           paginationControls}
       </div>
     );
-  }
-));
+  }),
+);
 
 type ClickableHeaderProps = {
   hasSorting?: boolean;

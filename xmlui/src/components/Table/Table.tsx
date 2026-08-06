@@ -91,12 +91,12 @@ export const TableMd = createMetadata({
     },
     columnInference: {
       description:
-        `Controls how many records from the resolved \`data\` array the \`${COMP}\` inspects ` +
-        `when inferring columns and column display types. The default is \`first-n(25)\`. ` +
-        `Use \`first-only\` for the fastest inference, \`first-n(n)\` for a bounded prefix, ` +
-        `\`sample(n)\` for deterministic spread sampling, \`all\` for small datasets, ` +
-        `or \`off\` to disable inferred columns. This setting only applies when the \`${COMP}\` ` +
-        `has no explicit \`Column\` children.`,
+        `Controls how the \`${COMP}\` samples the resolved \`data\` array when it has no explicit ` +
+        `\`Column\` children and needs to infer columns and display types. The default is ` +
+        `\`first-n(25)\`. Use \`first-only\` for the fastest inference, \`first-n(n)\` for a ` +
+        `bounded prefix, \`sample(n)\` for deterministic spread sampling, \`all\` for small ` +
+        `datasets, or \`off\` to disable inferred columns. This setting inspects row objects ` +
+        `only; unwrap API response envelopes before passing data to the table.`,
       valueType: "string",
       defaultValue: defaultProps.columnInference,
     },

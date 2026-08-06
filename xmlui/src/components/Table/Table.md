@@ -5,8 +5,11 @@
 - **Virtualization**: Only renders visible rows for smooth performance with large datasets
 - **Row selection**: Support single or multi-row selection for bulk operations
 - **Pagination**: Built-in pagination controls for managing large datasets
+- **Inferred columns**: Display object arrays even when no `Column` children are provided
 
-Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
+Use `Column` to define headers, data binding, sorting behavior, display types, and custom cell content.
+If you omit `Column` children, `Table` inspects the data records and creates inferred columns automatically.
+Explicit `Column` children always win over inferred columns.
 
 **Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
 
@@ -35,6 +38,49 @@ All samples use table columns with the following definition unless noted otherwi
 ```
 
 > **Note**: See [`Column`](../components/Column) to learn more about table columns.
+
+The simplest table can render directly from structured data:
+
+```xmlui-pg name="Example: Inferred columns"
+<App>
+  <Table
+    data='{[
+      { id: 1, customer: "Ada", total: 123.45, paid: true },
+      { id: 2, customer: "Grace", total: 87.5, paid: false }
+    ]}'
+  />
+</App>
+```
+
+When you provide explicit columns, the table renders only those columns:
+
+```xmlui-pg name="Example: Explicit columns override inference"
+<App>
+  <Table
+    data='{[
+      { id: 1, customer: "Ada", total: 123.45, paid: true },
+      { id: 2, customer: "Grace", total: 87.5, paid: false }
+    ]}'
+  >
+    <Column bindTo="customer" header="Customer" />
+    <Column bindTo="total" header="Total" type="currency(USD)" />
+  </Table>
+</App>
+```
+
+Inferred columns with bound fields are sortable by default:
+
+```xmlui-pg name="Example: Sort inferred columns"
+<App>
+  <Table
+    data='{[
+      { id: 1, product: "Notebook", quantity: 12 },
+      { id: 2, product: "Pencil", quantity: 48 },
+      { id: 3, product: "Folder", quantity: 7 }
+    ]}'
+  />
+</App>
+```
 
 %-DESC-END
 
@@ -121,6 +167,36 @@ Here, the component displays rocket information coming from the official SpaceX 
     <Column canSort="true" bindTo="country"/>
     <Column canSort="true" bindTo="company"/>
   </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START columnInference
+
+`columnInference` controls how `Table` samples data when no `Column` children are provided.
+The default is `first-n(25)`, which inspects the first 25 records and infers both field names and display types from those sampled values.
+
+Useful values:
+
+- `first-only`: infer from the first row only
+- `first-n(25)`: infer from the first 25 rows; this is the default
+- `sample(25)`: infer from a deterministic spread of rows
+- `all`: inspect every row; use this only for small datasets
+- `off`: do not infer columns
+
+`columnInference` expects the table's `data` value to be the row array itself.
+If an API returns an envelope such as `{ items: [...] }`, unwrap that envelope before passing the value to `Table`.
+
+```xmlui-pg name="Example: columnInference"
+<App>
+  <Table
+    columnInference="first-only"
+    data='{[
+      { id: 1, customer: "Ada" },
+      { id: 2, customer: "Grace", total: 87.5 }
+    ]}'
+  />
 </App>
 ```
 

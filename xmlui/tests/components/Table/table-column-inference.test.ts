@@ -3,6 +3,7 @@ import {
   buildInferredColumns,
   DEFAULT_COLUMN_INFERENCE,
   discoverColumnFields,
+  inferColumnType,
   parseColumnInference,
   sampleRowsForColumnInference,
 } from "../../../src/components/Table/table-column-inference";
@@ -120,10 +121,7 @@ describe("Table inferred field discovery", () => {
   });
 
   it("ignores runtime order fields", () => {
-    expect(discoverColumnFields([{ id: 1, order: 1, name: "Ada" }], "all")).toEqual([
-      "id",
-      "name",
-    ]);
+    expect(discoverColumnFields([{ id: 1, order: 1, name: "Ada" }], "all")).toEqual(["id", "name"]);
   });
 
   it("ignores prototype and non-enumerable fields", () => {
@@ -138,18 +136,15 @@ describe("Table inferred field discovery", () => {
   });
 
   it("discovers keys even when values are null", () => {
-    expect(discoverColumnFields([{ id: 1, nullable: null }], "all")).toEqual([
-      "id",
-      "nullable",
-    ]);
+    expect(discoverColumnFields([{ id: 1, nullable: null }], "all")).toEqual(["id", "nullable"]);
   });
 });
 
 describe("Table inferred column metadata", () => {
   it("builds sortable column metadata from discovered fields", () => {
     expect(buildInferredColumns([{ id: 1, name: "Ada" }], "all")).toEqual([
-      { header: "id", accessorKey: "id", canSort: true },
-      { header: "name", accessorKey: "name", canSort: true },
+      { header: "id", accessorKey: "id", canSort: true, type: "integer" },
+      { header: "name", accessorKey: "name", canSort: true, type: "text" },
     ]);
   });
 
@@ -162,6 +157,65 @@ describe("Table inferred column metadata", () => {
 
   it("returns no columns when inference is off", () => {
     expect(buildInferredColumns([{ id: 1, name: "Ada" }], "off")).toEqual([]);
+  });
+});
+
+describe("Table inferred column types", () => {
+  it("infers integer and number values", () => {
+    expect(inferColumnType([1, 2, 3])).toBe("integer");
+    expect(inferColumnType([1, 2.5, 3])).toBe("number");
+  });
+
+  it("falls back to text for non-finite or mixed numeric values", () => {
+    expect(inferColumnType([1, Number.NaN])).toBe("text");
+    expect(inferColumnType([1, "2"])).toBe("text");
+  });
+
+  it("infers boolean values", () => {
+    expect(inferColumnType([true, false, true])).toBe("boolean");
+  });
+
+  it("ignores nullish and empty string samples", () => {
+    expect(inferColumnType([null, undefined, "", 42])).toBe("integer");
+    expect(inferColumnType([null, undefined, ""])).toBe("text");
+  });
+
+  it("infers date and datetime strings", () => {
+    expect(inferColumnType(["2026-08-06", "2026-08-07"])).toBe("date");
+    expect(inferColumnType(["2026-08-06T10:15:00Z", "2026-08-07T12:00:00Z"])).toBe("datetime");
+  });
+
+  it("infers email, url, and phone strings using a conservative threshold", () => {
+    expect(inferColumnType(["a@example.com", "b@example.com", "not email"])).toBe("text");
+    expect(
+      inferColumnType(["a@example.com", "b@example.com", "c@example.com", "d@example.com"]),
+    ).toBe("email");
+    expect(inferColumnType(["https://example.com", "http://xmlui.org"])).toBe("url");
+    expect(inferColumnType(["+1 555 123 4567", "(555) 234-5678"])).toBe("phone");
+  });
+
+  it("infers long text above the length threshold", () => {
+    expect(inferColumnType(["short", "x".repeat(81)])).toBe("long-text");
+  });
+
+  it("infers enum for low-cardinality short strings", () => {
+    expect(inferColumnType(["draft", "sent", "draft", "failed", "sent", "draft"])).toBe("enum");
+  });
+
+  it("keeps high-cardinality strings as text", () => {
+    expect(inferColumnType(["a", "b", "c", "d", "e", "f"])).toBe("text");
+  });
+
+  it("infers tags for arrays of short strings", () => {
+    expect(inferColumnType([["red", "blue"], ["green"]])).toBe("tags");
+  });
+
+  it("infers array for other arrays", () => {
+    expect(inferColumnType([[1, 2], ["text"]])).toBe("array");
+  });
+
+  it("infers object for plain objects", () => {
+    expect(inferColumnType([{ a: 1 }, { b: 2 }])).toBe("object");
   });
 });
 

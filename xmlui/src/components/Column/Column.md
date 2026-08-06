@@ -2,10 +2,15 @@
 
 **Key features:**
 - **Data binding**: Use `bindTo` to automatically display object properties
+- **Typed display**: Use `type` for common table-cell formatting such as email links, dates, numbers, currency, enum labels, and JSON
 - **Component embedding**: Place any component inside `Column`: `Button`, `Text`, `Icon`, etc.
 - **Interactive behavior**: Enable/disable sorting and column resizing
 - **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
 - **Column pinning**: Pin columns to left or right edges for sticky behavior
+
+`Column` can bind a field, display that field with a type hint, or render completely custom child markup.
+The `type` property is display-oriented; it does not validate or convert the underlying data.
+When you place child components inside a `Column`, that custom content overrides `type` rendering.
 
 You can pass layout properties to a Column:
 
@@ -132,6 +137,126 @@ You can pass layout properties to a Column:
       },
     ]}'>
     <Column bindTo="name" />
+  </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START type
+
+`type` tells the table how to display the column's bound values.
+Use it for common display semantics without writing custom cell markup.
+
+Common type families include:
+
+- Text: `text`, `short-text`, `long-text`, `markdown`, `code`, `json`
+- Links and identifiers: `email`, `phone`, `url`, `link`, `uuid`, `id(short)`
+- Numbers: `number`, `number(8,3)`, `integer`, `decimal(2)`, `percent`, `currency(USD)`, `accounting(USD)`, `scientific`, `bytes`, `duration`, `rating(5)`
+- Dates: `date`, `date(short)`, `time`, `datetime`, `relative-time`, `timestamp`, `iso-date`
+- Choices and booleans: `boolean`, `checkbox`, `yes-no`, `status`, `enum`
+- Visual and structured values: `color`, `tag`, `tags`, `image`, `avatar`, `icon`, `object`, `array`, `list`
+
+```xmlui-pg name="Example: Column type formatting"
+<App>
+  <Table
+    data='{[
+      {
+        customer: "Ada",
+        email: "ada@example.com",
+        total: 1234.567,
+        paidAt: "2026-08-06T12:00:00Z",
+        active: true
+      }
+    ]}'
+  >
+    <Column bindTo="customer" type="text" />
+    <Column bindTo="email" type="email" />
+    <Column bindTo="total" type="currency(USD)" />
+    <Column bindTo="paidAt" type="datetime" />
+    <Column bindTo="active" type="yes-no" />
+  </Table>
+</App>
+```
+
+`number(8,3)` displays numeric values with up to three fractional digits and uses a decimal-aware cell structure:
+
+```xmlui-pg name="Example: Numeric column type"
+<App>
+  <Table data='{[{ amount: 1234.5678 }, { amount: 9.5 }]}' >
+    <Column bindTo="amount" type="number(8,3)" />
+  </Table>
+</App>
+```
+
+If a `Column` has child content, the child content is rendered instead of the typed default:
+
+```xmlui-pg name="Example: Column child content overrides type"
+<App>
+  <Table data='{[{ total: 1234.5 }]}' >
+    <Column bindTo="total" type="currency(USD)">
+      <Text>Custom total: {$cell}</Text>
+    </Column>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START typeOptions
+
+`typeOptions` provides object-shaped display options for the selected `type`.
+It is most useful when compact type syntax is not expressive enough.
+
+For `enum` and `status`, values render as plain text by default.
+Use `typeOptions` to map raw values to readable labels:
+
+```xmlui-pg name="Example: Enum labels with typeOptions"
+<App>
+  <Table
+    data='{[
+      { invoice: "INV-001", state: "sent" },
+      { invoice: "INV-002", state: "draft" }
+    ]}'
+  >
+    <Column bindTo="invoice" />
+    <Column
+      bindTo="state"
+      type="enum"
+      typeOptions="{{sent:{label:'Sent to customer'}, draft:{label:'Draft'}}}"
+    />
+  </Table>
+</App>
+```
+
+The same pattern works for `status`; it still renders plain text unless you provide custom child content:
+
+```xmlui-pg name="Example: Status labels stay plain text"
+<App>
+  <Table data='{[{ state: "blocked" }, { state: "ready" }]}' >
+    <Column
+      bindTo="state"
+      type="status"
+      typeOptions="{{blocked:'Blocked', ready:'Ready'}}"
+    />
+  </Table>
+</App>
+```
+
+For `image` and `avatar`, use `typeOptions` for accessible labels:
+
+```xmlui-pg name="Example: Image type options"
+<App>
+  <Table
+    data='{[
+      {
+        name: "Ada",
+        photo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+      }
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="photo" type="avatar" typeOptions="{{label:'Ada avatar'}}" />
   </Table>
 </App>
 ```
