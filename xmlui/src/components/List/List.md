@@ -440,9 +440,32 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 %-PROP-START loading
 
+This boolean property indicates whether the list is currently loading data. While loading is `true`
+and no list items are available, the list shows its loading UI after the configured
+[`loadingDelay`](#loadingdelay).
+
 ```xmlui-pg copy display name="Example: loading" height="120px"
 <App>
-  <List loading="true" />
+  <List loading="true" loadingDelay="0" />
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START loadingDelay
+
+The `loadingDelay` property controls how many milliseconds the list waits before showing its loading
+UI. The default is `400`, which prevents flicker when data loads quickly. Set it to `0` to show the
+loading UI immediately.
+
+```xmlui-pg copy display name="Example: loading delay" height="180px" /loadingDelay/
+<App var.isLoading="{false}" var.items="{[]}">
+  <Button
+    label="Load"
+    onClick="isLoading = true; delay(1000); items = [{ id: 1, name: 'Loaded item' }]; isLoading = false" />
+  <List loading="{isLoading}" loadingDelay="400" data="{items}">
+    <Text>{$item.name}</Text>
+  </List>
 </App>
 ```
 

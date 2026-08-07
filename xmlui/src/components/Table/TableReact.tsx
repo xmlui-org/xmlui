@@ -199,6 +199,7 @@ type TableProps = {
   hasExplicitColumns?: boolean;
   isPaginated?: boolean;
   loading?: boolean;
+  loadingDelay?: number;
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
@@ -865,6 +866,7 @@ export const Table = memo(
       hasExplicitColumns = false,
       isPaginated,
       loading = defaultProps.loading,
+      loadingDelay = defaultProps.loadingDelay,
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
@@ -2199,7 +2201,7 @@ export const Table = memo(
         </table>
         {loading && !hasData && (
           <div className={styles.loadingWrapper}>
-            <Spinner />
+            <Spinner delay={loadingDelay} />
           </div>
         )}
         {!hideNoDataView &&

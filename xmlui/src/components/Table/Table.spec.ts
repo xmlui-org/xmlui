@@ -61,6 +61,40 @@ test.describe("Basic Functionality", () => {
     await expect(page.locator("td").filter({ hasText: "Fruit" }).first()).toBeVisible();
   });
 
+  test("does not show loading indicator before loadingDelay expires", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<Table loading="true" loadingDelay="10000" data="{[]}" />`);
+
+    await expect(page.getByRole("status", { name: /loading/i })).toHaveCount(0, {
+      timeout: 0,
+    });
+  });
+
+  test("shows loading indicator after loadingDelay expires", async ({ initTestBed, page }) => {
+    await initTestBed(`<Table loading="true" loadingDelay="50" data="{[]}" />`);
+
+    await expect(page.getByRole("status", { name: /loading/i })).toBeVisible();
+  });
+
+  test("does not show loading indicator when loading finishes before loadingDelay", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.isLoading="{false}" var.items="{[]}">
+        <Button testId="load" onClick="isLoading = true; delay(50); items = [{ id: 1, name: 'Loaded' }]; isLoading = false" />
+        <Table loading="{isLoading}" loadingDelay="400" data="{items}" />
+      </Fragment>
+    `);
+
+    await page.getByTestId("load").click();
+
+    await expect(page.locator("td").filter({ hasText: "Loaded" }).first()).toBeVisible();
+    await expect(page.getByRole("status", { name: /loading/i })).toHaveCount(0);
+  });
+
   test.describe("inferred columns", () => {
     test("renders data without explicit Column children", async ({ initTestBed, page }) => {
       await initTestBed(`

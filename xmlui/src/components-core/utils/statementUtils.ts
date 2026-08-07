@@ -101,15 +101,8 @@ export function prepareHandlerStatements(
       // --- Handle single expression statements
       if (evalContext) {
         // --- We have a context in which the event handler is executed
-        if (stmt.expr.type === T_IDENTIFIER) {
-          // --- A single identifier, it is supposed to be an arrow function
-          // --- Use this arrow expression
-          return [convertExpressionToFunctionInvocation(stmt.expr)];
-        }
-
-        if (isMemberExpressionChain(stmt.expr)) {
-          // --- A single member expression chain, it is supposed to be an arrow function
-          // --- Use this arrow expression
+        if (isHandlerReferenceExpression(stmt.expr)) {
+          // --- A single identifier/member chain is supposed to be an event handler function.
           return [convertExpressionToFunctionInvocation(stmt.expr)];
         }
       }
@@ -203,14 +196,6 @@ export function prepareHandlerStatements(
   // --- Nothing to transform
   return stmts;
 
-  function isMemberExpressionChain(expr: Expression): boolean {
-    return (
-      (expr.type === T_MEMBER_ACCESS_EXPRESSION ||
-        (expr.type === T_CALCULATED_MEMBER_ACCESS_EXPRESSION && expr.member.type === T_LITERAL)) &&
-      (isMemberExpressionChain(expr.obj) || expr.obj.type === T_IDENTIFIER)
-    );
-  }
-
   function convertExpressionToFunctionInvocation(expr: Expression): ArrowExpressionStatement {
     // --- A single identifier, it is supposed to be an arrow function
     // --- Create formal arguments
@@ -251,6 +236,61 @@ export function prepareHandlerStatements(
       expr: arrowExpr,
     } as ArrowExpressionStatement;
   }
+}
+
+/**
+ * Transform event handler statements into the shape expected by the compiled event pipeline.
+ *
+ * This mirrors `prepareHandlerStatements`, but parse-time compilation has no event argument
+ * values yet. Bare handler references therefore stay as expressions because the compiler already
+ * knows how to call them with `evalContext.eventArgs` at execution time.
+ */
+export function prepareCompiledHandlerStatements(stmts: Statement[]): Statement[] {
+  const stmtLength = stmts?.length ?? 0;
+
+  if (stmtLength === 1) {
+    const stmt = stmts[0];
+
+    if (stmt.type === T_EXPRESSION_STATEMENT) {
+      if (isHandlerReferenceExpression(stmt.expr)) {
+        return stmts;
+      }
+
+      if (stmt.expr.type === T_ARROW_EXPRESSION) {
+        return [
+          {
+            type: T_ARROW_EXPRESSION_STATEMENT,
+            expr: stmt.expr,
+          } as ArrowExpressionStatement,
+        ];
+      }
+
+      return [
+        {
+          type: T_ARROW_EXPRESSION_STATEMENT,
+          expr: {
+            type: T_ARROW_EXPRESSION,
+            args: [],
+            statement: stmts[0],
+          } as ArrowExpression,
+        } as ArrowExpressionStatement,
+      ];
+    }
+  }
+
+  return stmts;
+}
+
+function isHandlerReferenceExpression(expr: Expression): boolean {
+  return expr.type === T_IDENTIFIER || isMemberExpressionChain(expr);
+}
+
+function isMemberExpressionChain(expr: Expression): boolean {
+  return (
+    (expr.type === T_MEMBER_ACCESS_EXPRESSION ||
+      (expr.type === T_CALCULATED_MEMBER_ACCESS_EXPRESSION && expr.member.type === T_LITERAL)) &&
+    (isMemberExpressionChain(expr.obj) || expr.obj.type === T_IDENTIFIER)
+  );
 }
 
 /**

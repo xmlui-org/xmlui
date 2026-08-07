@@ -446,6 +446,28 @@ describe("Xmlui transform - child elements", () => {
       expect(event.compiled.sourceId).toMatch(/^0#event-\d+$/);
     });
 
+    it("prepares single expression events before creating parse-time compiled artifacts", () => {
+      const warnings: string[] = [];
+      const cd = transformSource(
+        "<Button onClick='isFavorite ? removeFavorite.execute() : addFavorite.execute()' />",
+        0,
+        false,
+        warnings,
+        {
+          compileEventHandlers: true,
+        },
+      ) as ComponentDef;
+      const event = (cd.events! as any).click;
+
+      expect(event.__PARSED).toBe(true);
+      expect(event.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: "isFavorite ? removeFavorite.execute() : addFavorite.execute()",
+      });
+      expect(event.compiledUnsupported).toBe(false);
+      expect(warnings).toEqual([]);
+    });
+
     it("extracts event directive prologues before creating parse-time compiled artifacts", () => {
       const cd = transformSource(
         `<Stack onClick='"sync"; "queue"; count = count + 1' />`,

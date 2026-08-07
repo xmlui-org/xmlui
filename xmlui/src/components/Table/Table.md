@@ -680,11 +680,33 @@ The default value is `false`.
 %-PROP-START loading
 
 This boolean property indicates if the component is fetching (or processing) data.
-This property is useful when data is loaded conditionally or receiving it takes some time.
+This property is useful when data is loaded conditionally or receiving it takes some time. While
+loading is `true` and no rows are available, the table shows its loading UI after the configured
+[`loadingDelay`](#loadingdelay).
 
 ```xmlui-pg copy display name="Example: loading"
 <App>
-  <Table loading="true">
+  <Table loading="true" loadingDelay="0">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START loadingDelay
+
+The `loadingDelay` property controls how many milliseconds the table waits before showing its loading
+UI. The default is `400`, which prevents flicker when data loads quickly. Set it to `0` to show the
+loading UI immediately.
+
+```xmlui-pg copy display name="Example: loading delay" /loadingDelay/
+<App var.isLoading="{false}" var.items="{[]}">
+  <Button
+    label="Load"
+    onClick="isLoading = true; delay(1000); items = [{ id: 1, name: 'Loaded row', quantity: 1 }]; isLoading = false" />
+  <Table loading="{isLoading}" loadingDelay="400" data="{items}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
   </Table>

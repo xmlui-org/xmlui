@@ -8,6 +8,7 @@ export const defaultProps = {
   columnSizing: "auto" as "auto" | "stretch" | "balanced" | "content",
   isPaginated: false,
   loading: false,
+  loadingDelay: 400,
   rowsSelectable: false,
   enableMultiRowSelection: true,
   toggleSelectionOnClick: false,
