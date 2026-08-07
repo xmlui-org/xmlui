@@ -12,6 +12,7 @@ import type { ParsedEventValue } from "../../abstractions/scripting/Compilation"
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
 import { extractEventHandlerDirectives } from "../../components-core/utils/event-handler-directives";
+import { prepareCompiledHandlerStatements } from "../../components-core/utils/statementUtils";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 import type { DocumentCursor } from "../../language-server/base/text-document";
 
@@ -1455,7 +1456,7 @@ function transformXmluiNode(
       let compiledUnsupported = false;
       if (parserOptions.compileEventHandlers) {
         try {
-          compiled = compileEventAsyncStatements(executableStatements, {
+          const compileOptions = {
             sourceId,
             sourceText: value,
             sourceUrl: createDebugSourceUrl(String(fileId)),
@@ -1472,7 +1473,16 @@ function transformXmluiNode(
               offset: (nodeContainingValue?.pos ?? 0) + 1,
               sourceText: originalGetText(node),
             },
-          });
+          };
+          try {
+            compiled = compileEventAsyncStatements(executableStatements, compileOptions);
+          } catch (error) {
+            const preparedStatements = prepareCompiledHandlerStatements(executableStatements);
+            if (preparedStatements === executableStatements) {
+              throw error;
+            }
+            compiled = compileEventAsyncStatements(preparedStatements, compileOptions);
+          }
         } catch (error) {
           compiledUnsupported = true;
           const message =
