@@ -56,6 +56,42 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toBeVisible();
   });
 
+  test("does not show loading indicator before loadingDelay expires", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<List loading="true" loadingDelay="10000" data="{[]}" />`);
+
+    await expect(page.getByRole("status", { name: /loading/i })).toHaveCount(0, {
+      timeout: 0,
+    });
+  });
+
+  test("shows loading indicator after loadingDelay expires", async ({ initTestBed, page }) => {
+    await initTestBed(`<List loading="true" loadingDelay="50" data="{[]}" />`);
+
+    await expect(page.getByRole("status", { name: /loading/i })).toBeVisible();
+  });
+
+  test("does not show loading indicator when loading finishes before loadingDelay", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.isLoading="{false}" var.items="{[]}">
+        <Button testId="load" onClick="isLoading = true; delay(50); items = [{ id: 1, name: 'Loaded' }]; isLoading = false" />
+        <List loading="{isLoading}" loadingDelay="400" data="{items}">
+          <Text>{$item.name}</Text>
+        </List>
+      </Fragment>
+    `);
+
+    await page.getByTestId("load").click();
+
+    await expect(page.getByText("Loaded")).toBeVisible();
+    await expect(page.getByRole("status", { name: /loading/i })).toHaveCount(0);
+  });
+
   test("uses items property as alias for data", async ({ initTestBed, createListDriver }) => {
     await initTestBed(`
       <List items="{[{id: 1, name: 'Item 1'}]}">

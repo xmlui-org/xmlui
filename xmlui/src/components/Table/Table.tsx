@@ -136,6 +136,13 @@ export const TableMd = createMetadata({
         `property is useful when data is loaded conditionally or receiving it takes some time.`,
       valueType: "boolean",
     },
+    loadingDelay: {
+      description:
+        `The delay in milliseconds before showing the loading UI. Set to \`0\` to show ` +
+        `immediately, or a higher value to prevent flicker for fast-loading data.`,
+      valueType: "number",
+      defaultValue: defaultProps.loadingDelay,
+    },
     headerHeight: {
       description: `This optional property is used to specify the height of the table header.`,
       valueType: "length",
@@ -933,6 +940,7 @@ const TableWithColumns = memo(
             noDataRenderer={noDataRenderer}
             hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
             loading={extractValue.asOptionalBoolean(node.props.loading)}
+            loadingDelay={extractValue.asOptionalNumber(node.props.loadingDelay)}
             isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
             headerHeight={extractValue.asSize(node.props.headerHeight)}
             rowDisabledPredicate={stableRowDisabledPredicate}

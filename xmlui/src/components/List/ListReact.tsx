@@ -225,6 +225,7 @@ type DynamicHeightListProps = {
   sectionRenderer?: (group: any, id: any) => ReactNode;
   sectionFooterRenderer?: (group: any, id: any) => ReactNode;
   loading?: boolean;
+  loadingDelay?: number;
   limit?: number;
   groupBy?: string;
   orderBy?: OrderBy;
@@ -660,6 +661,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     sectionRenderer,
     sectionFooterRenderer,
     loading,
+    loadingDelay = defaultProps.loadingDelay,
     limit,
     groupBy,
     orderBy,
@@ -1200,7 +1202,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
           >
             {loading && rows.length === 0 && (
               <div className={styles.loadingWrapper}>
-                <Spinner />
+                <Spinner delay={loadingDelay} />
               </div>
             )}
             {!loading &&

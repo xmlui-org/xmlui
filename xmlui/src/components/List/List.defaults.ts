@@ -20,6 +20,7 @@ export const defaultProps = {
   hideEmptyGroups: true,
   borderCollapse: true,
   groupsInitiallyExpanded: true,
+  loadingDelay: 400,
   rowsSelectable: false,
   enableMultiRowSelection: true,
   initiallySelected: EMPTY_ARRAY as string[],

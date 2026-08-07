@@ -56,6 +56,13 @@ export const ListMd = createMetadata({
         `component receives usable list items via the [\`data\`](#data) property.`,
       valueType: "boolean",
     },
+    loadingDelay: {
+      description:
+        `The delay in milliseconds before showing the loading UI. Set to \`0\` to show ` +
+        `immediately, or a higher value to prevent flicker for fast-loading data.`,
+      valueType: "number",
+      defaultValue: defaultProps.loadingDelay,
+    },
     limit: {
       description: `This property limits the number of items displayed in the \`${COMP}\`. If not set, all items are displayed.`,
       valueType: "number",
@@ -678,6 +685,7 @@ const ListWithSelection = memo(function ListWithSelection({
       registerComponentApi={registerComponentApi}
       classes={classes}
       loading={extractValue.asOptionalBoolean(node.props.loading)}
+      loadingDelay={extractValue.asOptionalNumber(node.props.loadingDelay)}
       items={extractValue(node.props.items) || extractValue(node.props.data)}
       limit={extractValue(node.props.limit)}
       groupBy={groupByResolved as any}

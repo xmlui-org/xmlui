@@ -12013,6 +12013,11 @@ export default {
         "description": "This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.",
         "valueType": "boolean"
       },
+      "loadingDelay": {
+        "description": "The delay in milliseconds before showing the loading UI. Set to `0` to show immediately, or a higher value to prevent flicker for fast-loading data.",
+        "valueType": "number",
+        "defaultValue": 400
+      },
       "limit": {
         "description": "This property limits the number of items displayed in the `List`. If not set, all items are displayed.",
         "valueType": "number"
@@ -17421,6 +17426,11 @@ export default {
       "loading": {
         "description": "This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.",
         "valueType": "boolean"
+      },
+      "loadingDelay": {
+        "description": "The delay in milliseconds before showing the loading UI. Set to `0` to show immediately, or a higher value to prevent flicker for fast-loading data.",
+        "valueType": "number",
+        "defaultValue": 400
       },
       "headerHeight": {
         "description": "This optional property is used to specify the height of the table header.",
