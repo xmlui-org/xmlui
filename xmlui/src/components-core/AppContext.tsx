@@ -22,10 +22,13 @@ export const AppContext = createContext<AppContextObject | undefined>(undefined)
  * within any component logic using the hook.
  */
 export function useAppContext () {
-  const appContext = useContext(AppContext)!;
+  const appContext = useContext(AppContext);
   const localeProfile = useLocaleProfile();
   return useMemo(
-    () => composeAppContextWithLocaleProfile(appContext, localeProfile),
+    () =>
+      appContext?.App
+        ? composeAppContextWithLocaleProfile(appContext, localeProfile)
+        : appContext!,
     [appContext, localeProfile],
   );
 }
