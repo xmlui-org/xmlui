@@ -4,6 +4,7 @@
 
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/docs/reference/components/Pages) component
+- **Root locale**: Set `locale` to choose the app-level locale used by translations, direction, and locale-aware formatting
 
 %-DESC-END
 
@@ -13,6 +14,30 @@ When an `App` renders direct content without a `Pages` component, XMLUI applies
 default spacing to the content area. Use `paddingHorizontal-content-App`,
 `paddingVertical-content-App`, and `gap-content-App` to customize that spacing
 from the theme while preserving per-component layout props for local overrides.
+
+%-PROP-START locale
+
+`locale` declares the root locale for the app. It is used by `I18n`,
+`App.translate()`, locale-aware `App` formatting helpers, and automatic text
+direction detection.
+
+Use [Locale](/docs/reference/components/Locale) to override the locale or
+formatting traits for only part of the app.
+
+```xmlui-pg copy display name="Example: app root locale"
+<App
+  locale="hu-HU"
+  localeBundles="{{
+    'hu-HU': { greeting: 'Szia!' }
+  }}">
+  <VStack gap="$space-2">
+    <I18n key="greeting" />
+    <Text value="{App.formatNumber(12345.5)}" />
+  </VStack>
+</App>
+```
+
+%-PROP-END
 
 %-PROP-START layout
 

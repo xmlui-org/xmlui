@@ -1,6 +1,16 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
+import {
+  compare,
+  formatCurrency,
+  formatList,
+  formatNumber,
+  formatRelativeTime,
+  pluralRules,
+  type LocaleProfile,
+} from "./i18n";
+import { useLocaleProfile } from "./i18n/LocaleContext";
 
 /**
  * Stores the object that holds the global functions and methods of xmlui.
@@ -12,7 +22,61 @@ export const AppContext = createContext<AppContextObject | undefined>(undefined)
  * within any component logic using the hook.
  */
 export function useAppContext () {
-  return useContext(AppContext)!;
+  const appContext = useContext(AppContext)!;
+  const localeProfile = useLocaleProfile();
+  return useMemo(
+    () => composeAppContextWithLocaleProfile(appContext, localeProfile),
+    [appContext, localeProfile],
+  );
+}
+
+export function composeAppContextWithLocaleProfile(
+  appContext: AppContextObject,
+  localeProfile: LocaleProfile,
+): AppContextObject {
+  if (!hasScopedLocaleProfile(appContext, localeProfile)) {
+    return appContext;
+  }
+  const baseApp = appContext.App;
+  const translate = (key: string, vars?: Record<string, unknown>) =>
+    baseApp.translateForLocale(localeProfile.locale, key, vars);
+  return {
+    ...appContext,
+    App: {
+      ...baseApp,
+      translate,
+      t: translate,
+      formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+        formatNumber(value, localeProfile, options),
+      formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) =>
+        formatCurrency(value, currency, localeProfile, options),
+      formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
+        formatList(values, localeProfile.locale, options),
+      formatRelativeTime: (
+        value: number,
+        unit: Intl.RelativeTimeFormatUnit,
+        options?: Intl.RelativeTimeFormatOptions,
+      ) => formatRelativeTime(value, unit, localeProfile.locale, options),
+      compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
+        compare(a, b, localeProfile.locale, options),
+      pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
+        pluralRules(value, localeProfile.locale, options),
+    },
+  };
+}
+
+function hasScopedLocaleProfile(
+  appContext: AppContextObject,
+  localeProfile: LocaleProfile,
+): boolean {
+  return (
+    localeProfile.locale !== appContext.App.locale ||
+    localeProfile.decimalSeparator !== undefined ||
+    localeProfile.groupSeparator !== undefined ||
+    localeProfile.minusSign !== undefined ||
+    localeProfile.currency !== undefined ||
+    localeProfile.numberingSystem !== undefined
+  );
 }
 
 /**

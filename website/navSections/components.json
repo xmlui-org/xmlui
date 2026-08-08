@@ -272,6 +272,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/Locale",
+          "label": "Locale",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/Logo",
           "label": "Logo",
           "icon": "component"

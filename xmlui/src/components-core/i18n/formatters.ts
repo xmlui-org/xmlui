@@ -1,14 +1,29 @@
-export function formatNumber(value: number, locale = currentLocale(), options?: Intl.NumberFormatOptions): string {
-  return new Intl.NumberFormat(locale, options).format(value);
+import {
+  DEFAULT_LOCALE_PROFILE,
+  formatCurrencyWithLocaleProfile,
+  formatNumberWithLocaleProfile,
+  type LocaleProfile,
+} from "./locale-profile";
+
+type LocaleLike = string | LocaleProfile;
+
+export function formatNumber(
+  value: number,
+  locale: LocaleLike = currentLocale(),
+  options?: Intl.NumberFormatOptions,
+): string {
+  const profile = toLocaleProfile(locale);
+  return formatNumberWithLocaleProfile(value, profile, options);
 }
 
 export function formatCurrency(
   value: number,
-  currency: string,
-  locale = currentLocale(),
+  currency?: string,
+  locale: LocaleLike = currentLocale(),
   options?: Intl.NumberFormatOptions,
 ): string {
-  return new Intl.NumberFormat(locale, { style: "currency", currency, ...options }).format(value);
+  const profile = toLocaleProfile(locale);
+  return formatCurrencyWithLocaleProfile(value, currency, profile, options);
 }
 
 export function formatList(
@@ -32,10 +47,24 @@ export function compare(a: string, b: string, locale = currentLocale(), options?
   return new Intl.Collator(locale, options).compare(a, b);
 }
 
-export function pluralRules(value: number, locale = currentLocale(), options?: Intl.PluralRulesOptions): Intl.LDMLPluralRule {
+export function pluralRules(
+  value: number,
+  locale = currentLocale(),
+  options?: Intl.PluralRulesOptions,
+): Intl.LDMLPluralRule {
   return new Intl.PluralRules(locale, options).select(value);
 }
 
 function currentLocale(): string {
   return typeof navigator !== "undefined" ? navigator.language : "en";
+}
+
+function toLocaleProfile(locale: LocaleLike): LocaleProfile {
+  if (typeof locale === "string") {
+    return {
+      ...DEFAULT_LOCALE_PROFILE,
+      locale,
+    };
+  }
+  return locale;
 }

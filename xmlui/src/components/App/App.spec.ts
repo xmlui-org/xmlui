@@ -163,6 +163,27 @@ test.describe("Basic Functionality", () => {
     expect(await page.title()).toBe(APP_NAME);
   });
 
+  test("locale prop establishes the root app locale", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App
+        locale="hu-HU"
+        localeBundles="{{
+          'en': { 'greeting': 'Hello' },
+          'hu-HU': { 'greeting': 'Szia' }
+        }}">
+        <Text testId="locale" value="{App.locale}" />
+        <Text testId="number" value="{App.formatNumber(12345.5)}" />
+        <I18n key="greeting" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("locale")).toHaveText("hu-HU");
+    await expect(page.getByText("Szia")).toBeVisible();
+
+    const numberText = await page.getByTestId("number").textContent();
+    expect(numberText?.replace(/\s/g, " ")).toBe("12 345,5");
+  });
+
   test("handles different visual states with scrolling options", async ({ initTestBed, page }) => {
     // Test with scrollWholePage=true
     await initTestBed(`<App scrollWholePage="true" testId="app"/>`);

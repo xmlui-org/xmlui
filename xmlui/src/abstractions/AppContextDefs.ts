@@ -370,11 +370,13 @@ export type AppContextObject = {
     reloadLocale: (locale: string) => Promise<boolean>;
     translate: (key: string, vars?: Record<string, unknown>) => string;
     t: (key: string, vars?: Record<string, unknown>) => string;
+    /** Internal: resolves a translation key against an explicit locale. */
+    translateForLocale: (locale: string, key: string, vars?: Record<string, unknown>) => string;
     isRtlLocale: (locale?: string) => boolean;
     /** Resolved text direction for the active locale (`"ltr"` or `"rtl"`). */
     direction: "ltr" | "rtl";
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
-    formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
+    formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) => string;
     formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;
     formatRelativeTime: (
       value: number,

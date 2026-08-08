@@ -6,6 +6,7 @@ The `App` component is the root container that defines your application's overal
 
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/docs/reference/components/Pages) component
+- **Root locale**: Set `locale` to choose the app-level locale used by translations, direction, and locale-aware formatting
 
 ## Behaviors [#behaviors]
 
@@ -355,6 +356,26 @@ The `desktop` layout is designed for full-screen desktop applications. It stretc
 ### `locale` [#locale]
 
 BCP-47 locale override for the app. Use this to set the active locale from markup; user-driven locale changes through `App.setLocale()` can still update the active locale at runtime.
+
+`locale` declares the root locale for the app. It is used by `I18n`,
+`App.translate()`, locale-aware `App` formatting helpers, and automatic text
+direction detection.
+
+Use [Locale](/docs/reference/components/Locale) to override the locale or
+formatting traits for only part of the app.
+
+```xmlui-pg copy display name="Example: app root locale"
+<App
+  locale="hu-HU"
+  localeBundles="{{
+    'hu-HU': { greeting: 'Szia!' }
+  }}">
+  <VStack gap="$space-2">
+    <I18n key="greeting" />
+    <Text value="{App.formatNumber(12345.5)}" />
+  </VStack>
+</App>
+```
 
 ### `localeBundles` [#localebundles]
 

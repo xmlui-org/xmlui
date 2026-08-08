@@ -1,4 +1,5 @@
 import type { NormalizedColumnType } from "../Column/column-types";
+import type { LocaleProfile } from "../../components-core/i18n";
 
 export type TableCellRenderModel =
   | {
@@ -62,6 +63,7 @@ export type TableCellRenderModel =
 
 export type FormatTableCellOptions = {
   locale?: string;
+  localeProfile?: LocaleProfile;
   now?: Date;
 };
 
@@ -70,7 +72,9 @@ export function formatTableCellValue(
   columnType: NormalizedColumnType,
   options: FormatTableCellOptions = {},
 ): TableCellRenderModel {
-  const locale = stringOption(columnType, "locale") ?? options.locale;
+  const columnLocale = stringOption(columnType, "locale");
+  const localeProfile = columnLocale ? undefined : options.localeProfile;
+  const locale = columnLocale ?? localeProfile?.locale ?? options.locale;
   if (value === null || value === undefined) {
     return columnType.name === "json"
       ? { kind: "json", text: "null" }
@@ -98,10 +102,10 @@ export function formatTableCellValue(
     case "currency":
     case "accounting":
     case "scientific":
-      return formatNumericCell(value, columnType, locale);
+      return formatNumericCell(value, columnType, locale, localeProfile);
 
     case "rating":
-      return formatRatingCell(value, columnType, locale);
+      return formatRatingCell(value, columnType, locale, localeProfile);
 
     case "boolean":
       return { kind: "boolean", text: value ? "true" : "false" };
@@ -163,7 +167,7 @@ export function formatTableCellValue(
       };
 
     case "bytes":
-      return formatBytesCell(value, locale);
+      return formatBytesCell(value, locale, localeProfile);
 
     case "duration":
       return { kind: "duration", text: formatDurationCell(value) };
@@ -206,19 +210,24 @@ function formatRatingCell(
   value: unknown,
   columnType: NormalizedColumnType,
   locale: string | undefined,
+  localeProfile: LocaleProfile | undefined,
 ): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
     return { kind: "text", text: String(value) };
   }
   const max = numberOption(columnType, "max") ?? 5;
-  return { kind: "rating", text: `${new Intl.NumberFormat(locale).format(numericValue)} / ${max}` };
+  return {
+    kind: "rating",
+    text: `${formatNumberText(numericValue, locale, {}, localeProfile)} / ${max}`,
+  };
 }
 
 function formatNumericCell(
   value: unknown,
   columnType: NormalizedColumnType,
   locale: string | undefined,
+  localeProfile: LocaleProfile | undefined,
 ): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
@@ -247,7 +256,7 @@ function formatNumericCell(
   }
   if (columnType.name === "currency" || columnType.name === "accounting") {
     intlOptions.style = "currency";
-    intlOptions.currency = stringOption(columnType, "currency") ?? "USD";
+    intlOptions.currency = stringOption(columnType, "currency") ?? localeProfile?.currency ?? "USD";
     if (columnType.name === "accounting") {
       intlOptions.currencySign = "accounting";
     }
@@ -256,9 +265,13 @@ function formatNumericCell(
     intlOptions.notation = "scientific";
   }
 
-  const formatter = new Intl.NumberFormat(locale, intlOptions);
-  const text = formatter.format(numericValue);
-  return { kind: "number", text, ...splitNumberParts(formatter, numericValue) };
+  const formatter = new Intl.NumberFormat(locale, withNumberingSystem(intlOptions, localeProfile));
+  const parts = formatNumberParts(formatter, numericValue, localeProfile);
+  return {
+    kind: "number",
+    text: joinNumberParts(parts),
+    ...splitNumberParts(parts),
+  };
 }
 
 function formatDateCell(
@@ -318,7 +331,11 @@ function formatRelativeTimeCell(
   };
 }
 
-function formatBytesCell(value: unknown, locale: string | undefined): TableCellRenderModel {
+function formatBytesCell(
+  value: unknown,
+  locale: string | undefined,
+  localeProfile: LocaleProfile | undefined,
+): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
     return { kind: "text", text: String(value) };
@@ -330,10 +347,16 @@ function formatBytesCell(value: unknown, locale: string | undefined): TableCellR
     scaled /= 1024;
     unitIndex++;
   }
+  const parts = formatNumberParts(
+    new Intl.NumberFormat(locale, withNumberingSystem({ maximumFractionDigits: 1 }, localeProfile)),
+    scaled,
+    localeProfile,
+  );
+  const integerPart = joinNumberParts(parts);
   return {
     kind: "number",
-    text: `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(scaled)} ${units[unitIndex]}`,
-    integerPart: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(scaled),
+    text: `${integerPart} ${units[unitIndex]}`,
+    integerPart,
     suffixPart: ` ${units[unitIndex]}`,
   };
 }
@@ -355,8 +378,34 @@ function formatDurationCell(value: unknown): string {
   return parts.join(" ");
 }
 
-function splitNumberParts(formatter: Intl.NumberFormat, value: number) {
-  const parts = formatter.formatToParts(value);
+function formatNumberText(
+  value: number,
+  locale: string | undefined,
+  options: Intl.NumberFormatOptions,
+  localeProfile: LocaleProfile | undefined,
+): string {
+  return joinNumberParts(
+    formatNumberParts(
+      new Intl.NumberFormat(locale, withNumberingSystem(options, localeProfile)),
+      value,
+      localeProfile,
+    ),
+  );
+}
+
+function formatNumberParts(
+  formatter: Intl.NumberFormat,
+  value: number,
+  localeProfile: LocaleProfile | undefined,
+): Intl.NumberFormatPart[] {
+  return formatter.formatToParts(value).map((part) => replaceNumberPart(part, localeProfile));
+}
+
+function joinNumberParts(parts: Intl.NumberFormatPart[]): string {
+  return parts.map((part) => part.value).join("");
+}
+
+function splitNumberParts(parts: Intl.NumberFormatPart[]) {
   const decimalIndex = parts.findIndex((part) => part.type === "decimal");
   if (decimalIndex < 0) {
     return { integerPart: parts.map((part) => part.value).join("") };
@@ -378,6 +427,42 @@ function splitNumberParts(formatter: Intl.NumberFormat, value: number) {
       .map((part) => part.value)
       .join(""),
     ...(suffixPart ? { suffixPart } : {}),
+  };
+}
+
+function replaceNumberPart(
+  part: Intl.NumberFormatPart,
+  localeProfile: LocaleProfile | undefined,
+): Intl.NumberFormatPart {
+  if (!localeProfile) return part;
+  switch (part.type) {
+    case "decimal":
+      return localeProfile.decimalSeparator === undefined
+        ? part
+        : { ...part, value: localeProfile.decimalSeparator };
+    case "group":
+      return localeProfile.groupSeparator === undefined
+        ? part
+        : { ...part, value: localeProfile.groupSeparator };
+    case "minusSign":
+      return localeProfile.minusSign === undefined
+        ? part
+        : { ...part, value: localeProfile.minusSign };
+    default:
+      return part;
+  }
+}
+
+function withNumberingSystem(
+  options: Intl.NumberFormatOptions,
+  localeProfile: LocaleProfile | undefined,
+): Intl.NumberFormatOptions {
+  if (!localeProfile?.numberingSystem || options.numberingSystem) {
+    return options;
+  }
+  return {
+    ...options,
+    numberingSystem: localeProfile.numberingSystem,
   };
 }
 
