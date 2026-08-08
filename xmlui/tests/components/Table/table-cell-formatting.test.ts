@@ -28,6 +28,13 @@ describe("Table typed cell formatting", () => {
     expect(formatTableCellValue(12.7, type("decimal(2)"), { locale: "en-US" }).text).toBe("12.70");
   });
 
+  it("uses column locale options for numeric formatting", () => {
+    expect(formatTableCellValue(1976, type("number", { locale: "hu-HU" })).text).toBe("1976");
+    expect(formatTableCellValue(1234.5, type("decimal(1)", { locale: "hu-HU" })).text).toBe(
+      "1234,5",
+    );
+  });
+
   it("formats currency, accounting, percent, and scientific values", () => {
     expect(formatTableCellValue(12.5, type("currency(USD)"), { locale: "en-US" }).text).toBe(
       "$12.50",

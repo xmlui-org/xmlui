@@ -94,6 +94,24 @@ describe("binding-sync expression compiler", () => {
     ["NaN global constant", "NaN", {}, NaN],
     ["Infinity global constant", "Infinity", {}, Infinity],
     ["method call with this", "text.toUpperCase()", { text: "ada" }, "ADA"],
+    ["new Date member chain", "new Date(0).getUTCFullYear()", {}, 1970],
+    [
+      "new Date with spread arguments",
+      "new Date(...parts).getUTCMonth()",
+      { parts: [2024, 0, 2] },
+      0,
+    ],
+    ["new Error instance", "new Error('boom').message", {}, "boom"],
+    [
+      "Bram-style new Date formatting binding",
+      "formatDateTime(new Date(Number(date) * 1000), 'yyyy-MM-dd HH:mm')",
+      {
+        date: "0",
+        formatDateTime: (date: Date, format: string) =>
+          `${format}:${date.toISOString().slice(0, 16)}`,
+      },
+      "yyyy-MM-dd HH:mm:1970-01-01T00:00",
+    ],
     ["map arrow callback", "items.map(item => item.id)", { items: [{ id: 1 }, { id: 2 }] }, [1, 2]],
     [
       "filter/map arrow callback chain",
@@ -366,13 +384,27 @@ describe("binding-sync expression compiler", () => {
   });
 
   it("throws unsupported-node errors instead of falling back to the interpreter", () => {
-    expect(() => compileBindingSyncExpressionSource("new Date()", "test:unsupported")).toThrow(
-      UnsupportedCompiledScriptNodeError,
-    );
     expect(() => compileBindingSyncExpressionSource("(async () => 1)", "test:unsupported")).toThrow(
       UnsupportedCompiledScriptNodeError,
     );
+  });
+
+  it("constructs allowlisted objects in compiled bindings", () => {
     expect(evalInterpreted("new Date(0)")).toBeInstanceOf(Date);
+    expect(evalCompiled("new Date(0)")).toBeInstanceOf(Date);
+    expect(evalCompiled("new Date(0)").valueOf()).toBe(0);
+  });
+
+  it("rejects non-array spread operands in compiled new expressions", () => {
+    expect(() => evalCompiled("new Date(...parts)", { parts: "not-array" })).toThrow(
+      "Spread operator within a new expression expects an array operand.",
+    );
+  });
+
+  it("rejects constructors outside the XMLUI new allowlist in compiled bindings", () => {
+    expect(() => evalCompiled("new customCtor()", { customCtor: function CustomCtor() {} })).toThrow(
+      "XMLUI does not support the new operator with constructor 'CustomCtor'.",
+    );
   });
 
   it("uses the interpreter when compileBindings is disabled", () => {
@@ -475,13 +507,13 @@ describe("binding-sync expression compiler", () => {
   it("does not fall back to the interpreter for unsupported compiled nodes", () => {
     expect(() =>
       evalBindingExpression(
-        "new Date(0)",
+        "(async () => 1)",
         createEvalContext({
           localContext: {},
           options: { defaultToOptionalMemberAccess: true, compileBindings: true },
         }),
       ),
-    ).toThrow(UnsupportedCompiledScriptNodeError);
+    ).toThrow("XMLUI does not support async arrow functions.");
   });
 
   it("uses compileBindings from app config through extractParam", () => {

@@ -70,7 +70,7 @@ export function formatTableCellValue(
   columnType: NormalizedColumnType,
   options: FormatTableCellOptions = {},
 ): TableCellRenderModel {
-  const locale = options.locale || "en-US";
+  const locale = stringOption(columnType, "locale") ?? options.locale;
   if (value === null || value === undefined) {
     return columnType.name === "json"
       ? { kind: "json", text: "null" }
@@ -205,7 +205,7 @@ function formatIdCell(value: unknown, columnType: NormalizedColumnType): string 
 function formatRatingCell(
   value: unknown,
   columnType: NormalizedColumnType,
-  locale: string,
+  locale: string | undefined,
 ): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
@@ -218,7 +218,7 @@ function formatRatingCell(
 function formatNumericCell(
   value: unknown,
   columnType: NormalizedColumnType,
-  locale: string,
+  locale: string | undefined,
 ): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
@@ -264,7 +264,7 @@ function formatNumericCell(
 function formatDateCell(
   value: unknown,
   columnType: NormalizedColumnType,
-  locale: string,
+  locale: string | undefined,
 ): TableCellRenderModel {
   const date = toDate(value);
   if (!date) {
@@ -288,7 +288,11 @@ function formatDateCell(
   return { kind: "date", text: new Intl.DateTimeFormat(locale, intlOptions).format(date) };
 }
 
-function formatRelativeTimeCell(value: unknown, locale: string, now: Date): TableCellRenderModel {
+function formatRelativeTimeCell(
+  value: unknown,
+  locale: string | undefined,
+  now: Date,
+): TableCellRenderModel {
   const date = toDate(value);
   if (!date) {
     return { kind: "text", text: String(value) };
@@ -314,7 +318,7 @@ function formatRelativeTimeCell(value: unknown, locale: string, now: Date): Tabl
   };
 }
 
-function formatBytesCell(value: unknown, locale: string): TableCellRenderModel {
+function formatBytesCell(value: unknown, locale: string | undefined): TableCellRenderModel {
   const numericValue = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(numericValue)) {
     return { kind: "text", text: String(value) };

@@ -431,6 +431,21 @@ test.describe("Basic Functionality", () => {
       await expect(numberCell.locator('[data-number-part="fraction"]')).toHaveText("568");
     });
 
+    test("uses column locale options for typed formatting", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{[{year: 1976, amount: 1234.5, usAmount: 1234.5}]}' testId="table">
+          <Column bindTo="year" type="number" typeOptions="{{locale:'hu-HU'}}" />
+          <Column bindTo="amount" type="decimal(1)" typeOptions="{{locale:'hu-HU'}}" />
+          <Column bindTo="usAmount" type="decimal(1)" typeOptions="{{locale:'en-US'}}" />
+        </Table>
+      `);
+
+      const numberCells = page.locator('[data-column-cell-kind="number"]');
+      await expect(numberCells.nth(0)).toHaveText("1976");
+      await expect(numberCells.nth(1)).toHaveText("1234,5");
+      await expect(numberCells.nth(2)).toHaveText("1,234.5");
+    });
+
     test("clamps long-text typed columns with max line options", async ({ initTestBed, page }) => {
       const note =
         "This is a long note that should wrap across multiple visual lines when the column is narrow enough to require clamping.";
