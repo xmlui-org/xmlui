@@ -16,7 +16,11 @@ import {
   type AssignmentSymbols,
   type PrefixOpSymbol,
 } from "../script-runner/ScriptingSourceTree";
-import { getIdentifierScope, obtainClosures } from "../script-runner/eval-tree-common";
+import {
+  getAllowedNewConstructor,
+  getIdentifierScope,
+  obtainClosures,
+} from "../script-runner/eval-tree-common";
 
 const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
@@ -104,6 +108,20 @@ export const bindingSyncRuntime = {
     } finally {
       notifySyncFunctionCallUpdate(updateRootName, "did", evalContext, thread);
     }
+  },
+
+  construct(constructorObj: any, args: any[]): any {
+    const allowedConstructor = getAllowedNewConstructor(constructorObj);
+    const value = new allowedConstructor(...args);
+    assertSyncResult(value);
+    return value;
+  },
+
+  spreadNewArg(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within a new expression expects an array operand.");
+    }
+    return value;
   },
 
   assignId(

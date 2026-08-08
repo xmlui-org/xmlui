@@ -23,6 +23,7 @@ import {
   T_LET_STATEMENT,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
+  T_NEW_EXPRESSION,
   T_OBJECT_LITERAL,
   T_POSTFIX_OP_EXPRESSION,
   T_PREFIX_OP_EXPRESSION,
@@ -58,6 +59,7 @@ import {
   type IfStatement,
   type LetStatement,
   type MemberAccessExpression,
+  type NewExpression,
   type ObjectLiteral,
   type ObjectLiteralProp,
   type ObjectDestructure,
@@ -197,6 +199,9 @@ function emitExpression(
       return;
     case T_FUNCTION_INVOCATION_EXPRESSION:
       emitFunctionInvocation(writer, expr, context);
+      return;
+    case T_NEW_EXPRESSION:
+      emitNewExpression(writer, expr, context);
       return;
     case T_ARROW_EXPRESSION:
       emitArrowExpression(writer, expr, context);
@@ -495,6 +500,37 @@ function emitFunctionInvocation(
     writer.write(`, ${JSON.stringify(updateRootName)}`);
   }
   writer.write(")", expr);
+}
+
+function emitNewExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: NewExpression,
+  context: CompilerContext,
+): void {
+  writer.write("runtime.construct(");
+  emitExpression(writer, expr.callee, context);
+  writer.write(", ");
+  emitNewArgumentArray(writer, expr.arguments, context);
+  writer.write(")", expr);
+}
+
+function emitNewArgumentArray(
+  writer: CompiledScriptCodeWriter,
+  args: Expression[],
+  context: CompilerContext,
+): void {
+  writer.write("[");
+  args.forEach((arg, index) => {
+    if (index > 0) writer.write(", ");
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      writer.write("...runtime.spreadNewArg(");
+      emitExpression(writer, arg.expr, context);
+      writer.write(")");
+    } else {
+      emitExpression(writer, arg, withArrowMode(context, "native"));
+    }
+  });
+  writer.write("]");
 }
 
 function emitArgumentArray(
