@@ -30,6 +30,7 @@ import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
 import { IconMd } from "./Icon/Icon";
 import { I18nMd } from "./I18n/I18n";
+import { LocaleMd } from "./Locale/Locale";
 import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
@@ -361,6 +362,7 @@ Object.assign(metadataRegistry, {
   H6: H6Md,
   Icon: IconMd,
   I18n: I18nMd,
+  Locale: LocaleMd,
   IFrame: IFrameMd,
   Image: ImageMd,
   IncludeMarkup: IncludeMarkupMd,

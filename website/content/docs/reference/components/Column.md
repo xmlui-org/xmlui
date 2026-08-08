@@ -457,9 +457,13 @@ Some types accept named arguments:
 
 `typeOptions` can provide the same kind of options as an object.
 When both compact `type` arguments and `typeOptions` provide the same option, `typeOptions` wins.
+Locale-aware typed cells use the root `App locale` or the nearest `Locale`
+wrapper by default. Set `typeOptions.locale` to format an individual column
+with a specific BCP-47 locale; that explicit column locale wins over `Locale`.
 
 ```xmlui
 <Column bindTo="note" type="long-text(lines:2)" typeOptions="{{maxLines:4}}" />
+<Column bindTo="amount" type="currency(EUR)" typeOptions="{{locale:'hu-HU'}}" />
 ```
 
 ### Text and Identifier Types [#text-and-identifier-types]
@@ -493,7 +497,7 @@ For `number`, `integer`, `decimal`, `percent`, `currency`, `accounting`, `scient
 
 | Type | Visual traits | Useful options |
 | --- | --- | --- |
-| `number` | Locale-formatted number. | `number(8,3)` accepts precision and scale; the current formatter uses the scale as the maximum number of fractional digits. |
+| `number` | Locale-formatted number. | `number(8,3)` accepts precision and scale; the current formatter uses the scale as the maximum number of fractional digits. Use `typeOptions="{{locale:'hu-HU'}}"` to override the app or scoped locale for this column. |
 | `integer` | Locale-formatted number rounded to zero fractional digits. | None. |
 | `decimal` | Locale-formatted decimal with a fixed number of fractional digits. | `decimal(2)`. |
 | `percent` | Locale-formatted percentage. For example, `0.12` displays as `12%`. | None. |

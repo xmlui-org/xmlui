@@ -1044,6 +1044,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Scope locale formatting with Locale"
+                            to="/docs/howto/scope-locale-formatting-with-locale"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Switch layout direction from locale"
                             to="/docs/howto/switch-layout-direction-from-locale"
                         />
@@ -2169,6 +2174,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/format-values-for-the-active-locale.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/scope-locale-formatting-with-locale"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/scope-locale-formatting-with-locale.md']}"
                 />
             </Page>
             <Page

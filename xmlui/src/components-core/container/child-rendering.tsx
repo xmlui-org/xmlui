@@ -94,6 +94,27 @@ export function createChildRenderer(config: ChildRendererConfig) {
           return undefined;
         }
 
+        const childAppContext = rest?.appContext ?? appContext;
+        const childRenderChild: RenderChildFn =
+          childAppContext === appContext
+            ? stableRenderChild
+            : (
+                nestedChild,
+                nestedLayoutContext,
+                nestedParentRenderContext,
+                nestedUidInfoRef,
+                nestedRef,
+                nestedRest,
+              ) =>
+                stableRenderChild(
+                  nestedChild,
+                  nestedLayoutContext,
+                  nestedParentRenderContext,
+                  nestedUidInfoRef,
+                  nestedRef,
+                  { ...nestedRest, appContext: nestedRest?.appContext ?? childAppContext },
+                );
+
         // --- Invoke the renderChild function to render the child. Note that
         // --- in the context, we pass the `stableRenderChild` function, so the child can
         // --- render its children recursively.
@@ -102,11 +123,11 @@ export function createChildRenderer(config: ChildRendererConfig) {
           state: componentState,
           globalVars,
           dispatch,
-          appContext,
+          appContext: childAppContext,
           lookupAction,
           lookupSyncCallback,
           registerComponentApi,
-          renderChild: stableRenderChild,
+          renderChild: childRenderChild,
           statePartChanged: statePartChanged,
           layoutContext: lc,
           parentRenderContext: pRenderContext,

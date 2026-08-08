@@ -36,6 +36,7 @@ import {
   pluralRules,
   resolveLocale,
   isValidLocale,
+  normalizeLocaleProfile,
   createBundleStore,
   normalizeLocaleBundle,
   translateMessage,
@@ -45,6 +46,7 @@ import {
 import { createScheduler, type ScheduledTask, type Scheduler } from "../scheduler";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext, mergeXmluiConfig } from "../AppContext";
+import { LocaleProfileProvider } from "../i18n/LocaleContext";
 import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
@@ -948,6 +950,14 @@ export function AppContent({
       }),
     [xmluiConfig?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
   );
+  const rootLocaleProfile = useMemo(
+    () =>
+      normalizeLocaleProfile({
+        locale: activeLocale.locale,
+        source: activeLocale.source,
+      }),
+    [activeLocale.locale, activeLocale.source],
+  );
 
   const setLocale = useCallback(
     (locale: string, options?: { source?: "app" | "user" }) => {
@@ -1046,18 +1056,25 @@ export function AppContent({
     });
   }, [xmluiConfig?.localeBundles, xmluiConfig?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
 
-  const translate = useCallback(
-    (key: string, vars?: Record<string, unknown>) => {
+  const translateForLocale = useCallback(
+    (locale: string, key: string, vars?: Record<string, unknown>) => {
       return translateMessage(key, vars, {
         store: bundleStoreRef.current,
-        locale: activeLocale.locale,
+        locale,
         strict: xmluiConfig?.strictI18n === true,
         onDiagnostic: (diagnostic) => {
           reportI18nDiagnostic(diagnostic as any);
         },
       });
     },
-    [activeLocale.locale, xmluiConfig?.strictI18n, bundleVersion, reportI18nDiagnostic],
+    [xmluiConfig?.strictI18n, bundleVersion, reportI18nDiagnostic],
+  );
+
+  const translate = useCallback(
+    (key: string, vars?: Record<string, unknown>) => {
+      return translateForLocale(activeLocale.locale, key, vars);
+    },
+    [activeLocale.locale, translateForLocale],
   );
 
   const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
@@ -1651,23 +1668,24 @@ export function AppContent({
       reloadLocale,
       translate,
       t: translate,
+      translateForLocale,
       isRtlLocale,
       direction: resolvedDirection,
       formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
-        formatNumber(value, activeLocale.locale, options),
-      formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
-        formatCurrency(value, currency, activeLocale.locale, options),
+        formatNumber(value, rootLocaleProfile, options),
+      formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) =>
+        formatCurrency(value, currency, rootLocaleProfile, options),
       formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
-        formatList(values, activeLocale.locale, options),
+        formatList(values, rootLocaleProfile.locale, options),
       formatRelativeTime: (
         value: number,
         unit: Intl.RelativeTimeFormatUnit,
         options?: Intl.RelativeTimeFormatOptions,
-      ) => formatRelativeTime(value, unit, activeLocale.locale, options),
+      ) => formatRelativeTime(value, unit, rootLocaleProfile.locale, options),
       compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
-        compare(a, b, activeLocale.locale, options),
+        compare(a, b, rootLocaleProfile.locale, options),
       pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
-        pluralRules(value, activeLocale.locale, options),
+        pluralRules(value, rootLocaleProfile.locale, options),
       scheduler: schedulerMode,
       maxQueuedPerTrace,
       setScheduler,
@@ -1710,8 +1728,10 @@ export function AppContent({
       registerLocaleBundles,
       reloadLocale,
       translate,
+      translateForLocale,
       isRtlLocale,
       resolvedDirection,
+      rootLocaleProfile,
       schedulerMode,
       maxQueuedPerTrace,
       setScheduler,
@@ -1775,11 +1795,13 @@ export function AppContent({
 
   return (
     <AppContext.Provider value={appContextValue}>
-      <AppStateContext.Provider value={appStateContextValue}>
-        <GlobalLiveRegion />
-        {(xmluiConfig as any)?.autoSkipLink === true && <SkipLink />}
-        <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
-      </AppStateContext.Provider>
+      <LocaleProfileProvider profile={rootLocaleProfile}>
+        <AppStateContext.Provider value={appStateContextValue}>
+          <GlobalLiveRegion />
+          {(xmluiConfig as any)?.autoSkipLink === true && <SkipLink />}
+          <StandaloneComponent node={rootContainer}>{children}</StandaloneComponent>
+        </AppStateContext.Provider>
+      </LocaleProfileProvider>
     </AppContext.Provider>
   );
 }

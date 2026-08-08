@@ -35,6 +35,52 @@ describe("Table typed cell formatting", () => {
     );
   });
 
+  it("uses locale profile options when the column has no explicit locale", () => {
+    expect(
+      formatTableCellValue(12345.5, type("decimal(1)"), {
+        localeProfile: {
+          locale: "en-US",
+          decimalSeparator: ",",
+          groupSeparator: " ",
+        },
+      }).text,
+    ).toBe("12 345,5");
+  });
+
+  it("uses locale profile currency when the column has no explicit currency", () => {
+    expect(
+      formatTableCellValue(1299.95, type("currency"), {
+        localeProfile: {
+          locale: "fr-FR",
+          currency: "EUR",
+        },
+      }).text,
+    ).toBe("1 299,95 €");
+  });
+
+  it("lets column locale options override locale profile options", () => {
+    expect(
+      formatTableCellValue(12345.5, type("decimal(1)", { locale: "en-US" }), {
+        localeProfile: {
+          locale: "hu-HU",
+          decimalSeparator: "|",
+          groupSeparator: "_",
+        },
+      }).text,
+    ).toBe("12,345.5");
+  });
+
+  it("lets explicit column currency override locale profile currency", () => {
+    expect(
+      formatTableCellValue(1299.95, type("currency(USD)"), {
+        localeProfile: {
+          locale: "fr-FR",
+          currency: "EUR",
+        },
+      }).text,
+    ).toBe("1 299,95 $US");
+  });
+
   it("formats currency, accounting, percent, and scientific values", () => {
     expect(formatTableCellValue(12.5, type("currency(USD)"), { locale: "en-US" }).text).toBe(
       "$12.50",

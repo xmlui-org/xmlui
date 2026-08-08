@@ -331,12 +331,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Direct-child-only properties (ignoreLayoutProps, wrapChild) are stripped
   // --- from the fallback so they don't leak through component boundaries.
   const memoedRenderChild: RenderChildFn = useCallback(
-    (children, layoutContext, pRenderContext) => {
+    (children, layoutContext, pRenderContext, childUidInfoRef, ref, rest) => {
       return renderChild(
         children,
         layoutContext ?? stripDirectChildProps(layoutContextRef.current),
         pRenderContext || parentRenderContext,
-        uidInfoRef,
+        childUidInfoRef ?? uidInfoRef,
+        ref,
+        rest,
       );
     },
     [renderChild, parentRenderContext, uidInfoRef, layoutContextRef],

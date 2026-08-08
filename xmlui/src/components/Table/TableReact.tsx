@@ -60,6 +60,7 @@ import { toCssVar } from "../../components-core/theming/layout-resolver";
 import { buildInferredColumns } from "./table-column-inference";
 import { formatTableCellValue, type TableCellRenderModel } from "./table-cell-formatting";
 import { normalizeColumnType, type NormalizedColumnType } from "../Column/column-types";
+import { useLocaleProfile, type LocaleProfile } from "../../components-core/i18n";
 
 // =====================================================================================================================
 // Helper types
@@ -439,8 +440,12 @@ function SelectionToggle({
   );
 }
 
-function renderTypedCellValue(value: unknown, columnType: NormalizedColumnType): ReactNode {
-  return renderCellModel(formatTableCellValue(value, columnType), columnType);
+function renderTypedCellValue(
+  value: unknown,
+  columnType: NormalizedColumnType,
+  localeProfile: LocaleProfile,
+): ReactNode {
+  return renderCellModel(formatTableCellValue(value, columnType, { localeProfile }), columnType);
 }
 
 function renderCellModel(
@@ -933,6 +938,7 @@ export const Table = memo(
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) {
     const { getThemeVar } = useTheme();
+    const localeProfile = useLocaleProfile();
     const effectiveUserSelectCell =
       cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
     const effectiveUserSelectRow =
@@ -1667,7 +1673,7 @@ export const Table = memo(
                       {cellRenderer
                         ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
                         : columnType
-                          ? renderTypedCellValue(cell?.getValue(), columnType)
+                          ? renderTypedCellValue(cell?.getValue(), columnType, localeProfile)
                           : (flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),
