@@ -21561,5 +21561,41 @@ export default {
       ],
       "requiresAccessibleName": true
     }
+  },
+  "Locale": {
+    "status": "experimental",
+    "description": "`Locale` creates a scoped locale context for its descendants. It can override the locale ID and locale formatting traits such as decimal and grouping separators.",
+    "nonVisual": true,
+    "props": {
+      "locale": {
+        "description": "BCP-47 locale ID used by descendants for translation and formatting.",
+        "valueType": "string"
+      },
+      "decimalSeparator": {
+        "description": "Override for the decimal separator used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "groupSeparator": {
+        "description": "Override for the grouping separator used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "thousandSeparator": {
+        "description": "Alias for `groupSeparator`. Use this to override the thousands/grouping separator.",
+        "valueType": "string"
+      },
+      "minusSign": {
+        "description": "Override for the minus sign used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "currency": {
+        "description": "Default currency trait for descendants.",
+        "valueType": "string"
+      },
+      "numberingSystem": {
+        "description": "Unicode numbering system identifier forwarded to Intl number formatting when supported.",
+        "valueType": "string"
+      }
+    },
+    "opaque": true
   }
 };
