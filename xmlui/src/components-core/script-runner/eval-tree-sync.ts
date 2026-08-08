@@ -67,6 +67,7 @@ import {
   setExprValue,
 } from "./eval-tree-common";
 import { ensureMainThread } from "./process-statement-common";
+import { evalTrace } from "./eval-trace";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { assertSyncResult, callSyncFunction } from "./sync-runtime";
 import { evaluateCompiledBinding } from "../script-compiler";
@@ -126,6 +127,12 @@ export function evalBinding(
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
+  // --- Evaluation trace (see eval-trace.ts): names the binding about to
+  // --- evaluate. Placed before the compiled-bindings branch so both paths
+  // --- log. No-op outside the host-armed window.
+  evalTrace("eval", () =>
+    String((expr as any)?.source ?? "").slice(0, 80) || "type:" + String((expr as any)?.type ?? "?"),
+  );
   if (evalContext.options?.compileBindings && expr.type !== T_ARROW_EXPRESSION) {
     const previousArrowInvoker = evalContext.compiledArrowInvoker;
     evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
