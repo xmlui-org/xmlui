@@ -719,7 +719,32 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   scrollRef.current = scrollParent;
 
   const hasHeight = useHasExplicitHeight(parentRef);
-  const hasOutsideScroll = scrollRef.current && !hasHeight;
+  const [stretchToParent, setStretchToParent] = useState(false);
+
+  useIsomorphicLayoutEffect(() => {
+    const wrapper = parentRef.current;
+    const parent = wrapper?.parentElement;
+    if (!parent) {
+      return;
+    }
+
+    const parentStyle = getComputedStyle(parent);
+    const isColumnFlexParent =
+      parentStyle.display.includes("flex") && parentStyle.flexDirection === "column";
+    const parentStretches = Number.parseFloat(parentStyle.flexGrow) > 0;
+    const isInsideForm = !!wrapper.closest("form");
+
+    if (
+      isColumnFlexParent &&
+      parentStretches &&
+      !isInsideForm &&
+      !hasExplicitWrapperHeight(wrapper)
+    ) {
+      setStretchToParent(true);
+    }
+  }, []);
+
+  const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
 
   // Create a ref for the Virtualizer's scroll container
   // When using outside scroll, we need a ref that points to the scroll parent
@@ -1195,6 +1220,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
               styles.outerListWrapper,
               {
                 [styles.hasOutsideScroll]: hasOutsideScroll,
+                [styles.stretchToParent]: stretchToParent,
               },
               classes?.[COMPONENT_PART_KEY],
               className,
@@ -1279,6 +1305,20 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     </ListItemTypeContext.Provider>
   );
 }));
+
+/**
+ * Checks whether the list wrapper has a real height constraint.
+ */
+function hasExplicitWrapperHeight(wrapper: HTMLDivElement): boolean {
+  const originalHeight = getComputedStyle(wrapper).height;
+  const originalInlineHeight = wrapper.style.height || "";
+
+  wrapper.style.height = "auto";
+  const autoHeight = getComputedStyle(wrapper).height;
+  wrapper.style.height = originalInlineHeight;
+
+  return originalHeight !== autoHeight || !!originalInlineHeight;
+}
 
 // --- Helper function for List item rendering
 export function MemoizedSection({
