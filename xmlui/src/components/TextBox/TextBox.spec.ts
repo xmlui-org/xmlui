@@ -784,6 +784,40 @@ test.describe("Theme Vars", () => {
     await expect(driver.component).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
+  test("focus ring renders all sides inside full-width input", async ({
+    initTestBed,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`<TextBox testId="input" />`, {
+      testThemeVars: {
+        "outlineWidth-TextBox--focus": "4px",
+        "outlineColor-TextBox--focus": "rgb(0, 255, 0)",
+        "outlineStyle-TextBox--focus": "solid",
+      },
+    });
+    const driver = await createTextBoxDriver("input");
+    await driver.input.focus();
+    await expect(driver.input).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 255, 0)",
+    });
+  });
+
   test("disabled backgroundColor applies when disabled", async ({
     initTestBed,
     createTextBoxDriver,

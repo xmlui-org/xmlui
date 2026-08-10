@@ -159,6 +159,136 @@ test.describe("smoke tests", () => {
     });
   });
 
+  test("ghost secondary focus ring uses the input-style ring", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`<Button label="Cancel" variant="ghost" themeColor="secondary" />`, {
+      testThemeVars: {
+        "outlineWidth-Button-secondary-ghost--focus": "4px",
+        "outlineColor-Button-secondary-ghost--focus": "rgb(0, 123, 255)",
+        "outlineStyle-Button-secondary-ghost--focus": "solid",
+      },
+    });
+    const driver = await createButtonDriver();
+    await driver.component.focus();
+    await expect(driver.component).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      const buttonStyles = getComputedStyle(element);
+      return {
+        pseudoContent: styles.content,
+        width: styles.borderWidth,
+        style: styles.borderStyle,
+        color: styles.borderColor,
+        inset: styles.inset,
+        outlineStyle: buttonStyles.outlineStyle,
+      };
+    });
+    expect(focusRing).toEqual({
+      pseudoContent: '""',
+      width: "4px",
+      style: "solid",
+      color: "rgb(0, 123, 255)",
+      inset: "-1px",
+      outlineStyle: "none",
+    });
+  });
+
+  test("ghost secondary focus ring uses the default input focus color", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`<Button label="Cancel" variant="ghost" themeColor="secondary" />`, {
+      testThemeVars: {
+        "outlineColor--focus": "rgb(0, 123, 255)",
+      },
+    });
+    const driver = await createButtonDriver();
+    await driver.component.focus();
+    await expect(driver.component).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      const buttonStyles = getComputedStyle(element);
+      return {
+        pseudoContent: styles.content,
+        width: styles.borderWidth,
+        style: styles.borderStyle,
+        color: styles.borderColor,
+        inset: styles.inset,
+        outlineStyle: buttonStyles.outlineStyle,
+      };
+    });
+    expect(focusRing.pseudoContent).toBe('""');
+    expect(focusRing.width).toBe("2px");
+    expect(focusRing.style).toBe("solid");
+    expect(focusRing.color).toBe("rgb(0, 123, 255)");
+    expect(focusRing.inset).toBe("-1px");
+    expect(focusRing.outlineStyle).toBe("none");
+  });
+
+  test("solid primary focus ring contrasts with the button fill", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`<Button label="Save" variant="solid" themeColor="primary" />`);
+    const driver = await createButtonDriver();
+    await driver.component.focus();
+    await expect(driver.component).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      const buttonStyles = getComputedStyle(element);
+      return {
+        pseudoContent: styles.content,
+        width: styles.borderWidth,
+        style: styles.borderStyle,
+        color: styles.borderColor,
+        inset: styles.inset,
+        outlineStyle: buttonStyles.outlineStyle,
+        borderColor: buttonStyles.borderColor,
+        backgroundColor: buttonStyles.backgroundColor,
+      };
+    });
+    expect(focusRing.pseudoContent).toBe('""');
+    expect(focusRing.width).toBe("2px");
+    expect(focusRing.style).toBe("solid");
+    expect(focusRing.color).not.toBe("rgba(0, 0, 0, 0)");
+    expect(focusRing.color).not.toBe("rgb(255, 255, 255)");
+    expect(focusRing.color).not.toBe("rgb(248, 251, 253)");
+    expect(focusRing.color).not.toBe(focusRing.borderColor);
+    expect(focusRing.color).not.toBe(focusRing.backgroundColor);
+    expect(focusRing.inset).toBe("-1px");
+    expect(focusRing.outlineStyle).toBe("none");
+  });
+
+  test("focused button outline does not create scrollable overflow", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Stack testId="scroller" width="260px" height="120px" scrollStyle="normal">
+        <Button label="Save" testId="save" />
+      </Stack>
+    `);
+
+    await page.getByTestId("save").focus();
+
+    const overflow = await page.getByTestId("scroller").evaluate((element) => {
+      const scrollContainer = element.querySelector<HTMLElement>('[style*="overflow: auto"]') ?? element;
+      return {
+        scrollWidth: scrollContainer.scrollWidth,
+        clientWidth: scrollContainer.clientWidth,
+        scrollHeight: scrollContainer.scrollHeight,
+        clientHeight: scrollContainer.clientHeight,
+      };
+    });
+    expect(overflow.scrollWidth).toBe(overflow.clientWidth);
+    expect(overflow.scrollHeight).toBe(overflow.clientHeight);
+  });
+
   // fonts
   const EXPECTED_FONT_FAMILY = "Arial, sans-serif";
   const EXPECTED_FONT_SIZE = "20px";

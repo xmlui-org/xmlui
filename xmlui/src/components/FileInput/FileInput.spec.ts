@@ -17,6 +17,25 @@ test("component displays browse button", async ({ initTestBed, createFileInputDr
   await expect(driver.getBrowseButton()).toContainText("Choose File");
 });
 
+test("default browse button does not render an icon", async ({ page, initTestBed }) => {
+  await initTestBed(`<FileInput/>`);
+  const browseButton = page.getByRole("button", { name: "Browse" });
+
+  await expect(browseButton.locator("[data-part-id='icon']")).not.toBeAttached();
+  await expect(browseButton.locator("[data-icon-name]")).not.toBeAttached();
+});
+
+test("browse button renders explicit icon", async ({ page, initTestBed }) => {
+  await initTestBed(`<FileInput buttonIcon="test"/>`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
+  const browseButton = page.getByRole("button", { name: "Browse" });
+
+  await expect(browseButton.locator("[data-icon-name='test']")).toBeVisible();
+});
+
 test("component displays placeholder text", async ({ initTestBed, createFileInputDriver }) => {
   await initTestBed(`<FileInput placeholder="Select a file..."/>`);
   const driver = await createFileInputDriver();
@@ -167,6 +186,85 @@ test("component applies theme variables correctly", async ({
   const driver = await createFileInputDriver();
   // FileInput uses Button themes, so check the button
   await expect(driver.getBrowseButton()).toHaveCSS("background-color", "rgb(255, 0, 0)");
+});
+
+test("focus ring renders all sides inside full-width input", async ({
+  initTestBed,
+  createFileInputDriver,
+}) => {
+  await initTestBed(`<FileInput testId="fileInput" />`, {
+    testThemeVars: {
+      "outlineWidth-FileInput--focus": "4px",
+      "outlineColor-FileInput--focus": "rgb(0, 123, 255)",
+      "outlineStyle-FileInput--focus": "solid",
+    },
+  });
+  const driver = await createFileInputDriver("fileInput");
+  await driver.getTextBox().focus();
+  await expect(driver.getTextBox()).toBeFocused();
+
+  const focusRing = await driver.component
+    .locator('[class*="_textBoxWrapper_"]')
+    .first()
+    .evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+  expect(focusRing).toEqual({
+    top: "4px",
+    right: "4px",
+    bottom: "4px",
+    left: "4px",
+    color: "rgb(0, 123, 255)",
+  });
+});
+
+test("focus ring renders all sides when tabbing to input wrapper", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+    <VStack>
+      <Button label="Before" testId="before" />
+      <FileInput testId="fileInput" />
+    </VStack>
+  `, {
+    testThemeVars: {
+      "outlineWidth-FileInput--focus": "4px",
+      "outlineColor-FileInput--focus": "rgb(0, 123, 255)",
+      "outlineStyle-FileInput--focus": "solid",
+    },
+  });
+
+  await page.getByTestId("before").focus();
+  await page.keyboard.press("Tab");
+
+  const inputWrapper = page.getByTestId("fileInput").locator('[class*="_textBoxWrapper_"]').first();
+  await expect(inputWrapper).toBeFocused();
+
+  const focusRing = await inputWrapper.evaluate((element) => {
+    const styles = getComputedStyle(element, "::after");
+    return {
+      top: styles.borderTopWidth,
+      right: styles.borderRightWidth,
+      bottom: styles.borderBottomWidth,
+      left: styles.borderLeftWidth,
+      color: styles.borderTopColor,
+    };
+  });
+  expect(focusRing).toEqual({
+    top: "4px",
+    right: "4px",
+    bottom: "4px",
+    left: "4px",
+    color: "rgb(0, 123, 255)",
+  });
 });
 
 test("component shows validation states", async ({ initTestBed, createFileInputDriver }) => {

@@ -1,4 +1,5 @@
 import type { BundleStore, LocaleBundle } from "./bundle-store";
+import { xmluiDefaultFallbackMessages } from "./builtin-bundles/xmlui-en";
 import type { I18nDiagnostic } from "./diagnostics";
 import { formatIcuMessage, IcuFormatError, type MessageVariables } from "./icu";
 
@@ -14,8 +15,9 @@ export function translateMessage(
   vars: MessageVariables | undefined,
   options: TranslatorOptions,
 ): string {
-  const pattern = options.store.lookup(options.locale, key);
+  let pattern = options.store.lookup(options.locale, key);
   if (pattern === undefined) {
+    pattern = lookupXmluiFallback(key);
     options.onDiagnostic?.({
       code: "missing-key",
       severity: options.strict ? "error" : "warn",
@@ -23,7 +25,9 @@ export function translateMessage(
       key,
       message: `Missing translation key "${key}" for locale "${options.locale}".`,
     });
-    return key;
+    if (pattern === undefined) {
+      return key;
+    }
   }
   try {
     return formatIcuMessage(pattern, vars, options.locale);
@@ -38,6 +42,11 @@ export function translateMessage(
     });
     return key;
   }
+}
+
+function lookupXmluiFallback(key: string): string | undefined {
+  if (!key.startsWith("xmlui.")) return undefined;
+  return xmluiDefaultFallbackMessages[key as keyof typeof xmluiDefaultFallbackMessages];
 }
 
 export function normalizeLocaleBundle(input: unknown): LocaleBundle | undefined {

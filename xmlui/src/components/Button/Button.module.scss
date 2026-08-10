@@ -7,6 +7,11 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+@function createThemeVarWithFallback($componentVariable, $fallbackVariable) {
+  $themeVars: t.appendThemeVarWithFallback($themeVars, $componentVariable, $fallbackVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
 $component: "Button";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-xs");
@@ -35,6 +40,29 @@ $boxShadow-Button--hover: createThemeVar('boxShadow-#{$component}--hover');
 $gap-Button: createThemeVar('gap-#{$component}');
 $transition-Button: createThemeVar('transition-#{$component}');
 
+@mixin focusRing($colorScheme, $variant) {
+  outline: none;
+
+  &::after {
+    inset: createThemeVarWithFallback(
+      'outlineOffset-#{$component}-#{$colorScheme}-#{$variant}--focus',
+      'outlineOffset-#{$component}--focus'
+    );
+    border-width: createThemeVarWithFallback(
+      'outlineWidth-#{$component}-#{$colorScheme}-#{$variant}--focus',
+      'outlineWidth-#{$component}--focus'
+    );
+    border-color: createThemeVarWithFallback(
+      'outlineColor-#{$component}-#{$colorScheme}-#{$variant}--focus',
+      'outlineColor-#{$component}--focus'
+    );
+    border-style: createThemeVarWithFallback(
+      'outlineStyle-#{$component}-#{$colorScheme}-#{$variant}--focus',
+      'outlineStyle-#{$component}--focus'
+    );
+  }
+}
+
 // --- CSS properties of solid buttons with the specified color scheme
 @mixin solid($colorScheme){
   font-family: createThemeVar('fontFamily-#{$component}-#{$colorScheme}-solid');
@@ -50,10 +78,7 @@ $transition-Button: createThemeVar('transition-#{$component}');
   transition: createThemeVar('transition-#{$component}-#{$colorScheme}-solid');
 
   &:focus-visible {
-    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-solid--focus');
-    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-solid--focus');
-    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-solid--focus');
-    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-solid--focus');
+    @include focusRing($colorScheme, 'solid');
   }
 
   &:not([disabled]) {
@@ -93,10 +118,7 @@ $transition-Button: createThemeVar('transition-#{$component}');
   background: transparent;
 
   &:focus-visible {
-    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-outlined--focus');
+    @include focusRing($colorScheme, 'outlined');
   }
 
   &:not([disabled]) {
@@ -133,10 +155,7 @@ $transition-Button: createThemeVar('transition-#{$component}');
   color: createThemeVar('textColor-#{$component}-#{$colorScheme}-ghost');
 
   &:focus-visible {
-    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-ghost--focus');
+    @include focusRing($colorScheme, 'ghost');
   }
 
   &:not([disabled]) {
@@ -167,6 +186,7 @@ $transition-Button: createThemeVar('transition-#{$component}');
     min-width: 0;
     padding: 0;
     margin: 0;
+    position: relative;
     border-style: solid;
     transition: $transition-Button;
     user-select: none;
@@ -175,6 +195,15 @@ $transition-Button: createThemeVar('transition-#{$component}');
     gap: $gap-Button;
     justify-content: center;
     align-items: center;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
 
     &.alignStart {
       justify-content: start;

@@ -23,7 +23,6 @@ import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "FileInput";
-const DEFAULT_ICON = "browse:FileInput";
 
 export const FileInputMd = createMetadata({
   status: "stable",
@@ -59,8 +58,7 @@ export const FileInputMd = createMetadata({
     },
     buttonIcon: {
       description:
-        `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
-        `instances with the "icon.browse:FileInput" declaration in the app configuration file.`,
+        `The ID of the icon to display in the button. No icon is displayed by default.`,
       valueType: "icon",
     },
     buttonIconPosition: {
@@ -186,14 +184,14 @@ export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
     _props,
     { node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes },
   ) => {
-    const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
+    const iconName = extractValue.asOptionalString(node.props.buttonIcon);
     return (
       <FileInput
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         variant={extractValue(node.props.buttonVariant)}
         buttonThemeColor={extractValue(node.props.buttonThemeColor)}
         buttonSize={extractValue(node.props.buttonSize)}
-        buttonIcon={<ThemedIcon name={iconName} fallback="folder-open" />}
+        buttonIcon={iconName ? <ThemedIcon name={iconName} /> : undefined}
         buttonIconPosition={extractValue(node.props.buttonIconPosition)}
         buttonLabel={extractValue.asOptionalString(node.props.buttonLabel)}
         updateState={updateState}

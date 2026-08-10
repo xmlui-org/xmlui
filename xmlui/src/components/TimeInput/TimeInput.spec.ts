@@ -1111,6 +1111,40 @@ test.describe("Theme Variables", () => {
     await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
   });
 
+  test("focus ring renders all sides inside full-width input", async ({
+    initTestBed,
+    createTimeInputDriver,
+  }) => {
+    await initTestBed(`<TimeInput testId="time-input" />`, {
+      testThemeVars: {
+        "outlineWidth-TimeInput--focus": "4px",
+        "outlineColor-TimeInput--focus": "rgb(0, 123, 255)",
+        "outlineStyle-TimeInput--focus": "solid",
+      },
+    });
+    const driver = await createTimeInputDriver("time-input");
+    await driver.hourInput.focus();
+    await expect(driver.hourInput).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
+  });
+
   test("handles invalid validationStatus", async ({ initTestBed, page }) => {
     await initTestBed(`<TimeInput testId="timeInput" validationStatus="invalid" />`, {
       testThemeVars: {

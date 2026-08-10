@@ -161,10 +161,14 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
   }
 
   &:has(.input:focus-visible) {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+    outline: none;
+
+    &::after {
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
+    }
   }
 
   .input {
@@ -200,6 +204,7 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
 
 @layer components {
   .inputRoot {
+    position: relative;
     display: flex;
     align-items: center;
     gap: $gap-adornment-TextBox;
@@ -213,6 +218,14 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
     overflow: hidden;
     @include t.paddingVars($themeVars, $componentName);
     @include variant("");
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
 
     &.error {
       @include variant("error");

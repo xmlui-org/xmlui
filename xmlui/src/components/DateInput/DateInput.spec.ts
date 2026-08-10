@@ -1142,6 +1142,40 @@ test.describe("Theme Variables", () => {
     await expect(driver.component).toBeVisible();
     await expect(driver.clearButton).toBeVisible();
   });
+
+  test("focus ring renders all sides inside full-width input", async ({
+    initTestBed,
+    createDateInputDriver,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" />`, {
+      testThemeVars: {
+        "outlineWidth-DateInput--focus": "4px",
+        "outlineColor-DateInput--focus": "rgb(0, 123, 255)",
+        "outlineStyle-DateInput--focus": "solid",
+      },
+    });
+    const driver = await createDateInputDriver("dateInput");
+    await driver.monthInput.focus();
+    await expect(driver.monthInput).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
+  });
 });
 
 // =============================================================================

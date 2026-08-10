@@ -149,10 +149,14 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     }
 
     &:focus-visible {
-      outline-width: createThemeVar('Input:outlineWidth-#{$componentName}#{$suffix}--focus');
-      outline-color: createThemeVar('Input:outlineColor-#{$componentName}#{$suffix}--focus');
-      outline-style: createThemeVar('Input:outlineStyle-#{$componentName}#{$suffix}--focus');
-      outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}#{$suffix}--focus');
+      outline: none;
+
+      &::after {
+        inset: createThemeVar('Input:outlineOffset-#{$componentName}#{$suffix}--focus');
+        border-width: createThemeVar('Input:outlineWidth-#{$componentName}#{$suffix}--focus');
+        border-color: createThemeVar('Input:outlineColor-#{$componentName}#{$suffix}--focus');
+        border-style: createThemeVar('Input:outlineStyle-#{$componentName}#{$suffix}--focus');
+      }
     }
   }
 
@@ -171,6 +175,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
    * Common trigger styles for both SimpleSelect and searchable/multiSelect
    */
   .selectTrigger {
+    position: relative;
     outline: none;
     width: 100%;
     height: max-content;
@@ -227,11 +232,23 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
       border-color: $borderColor-Select--disabled;
     }
 
-    &:focus {
-      outline-width: $outlineWidth-Select--focus;
-      outline-color: $outlineColor-Select--focus;
-      outline-style: $outlineStyle-Select--focus;
-      outline-offset: $outlineOffset-Select--focus;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+
+      &::after {
+        inset: $outlineOffset-Select--focus;
+        border-width: $outlineWidth-Select--focus;
+        border-color: $outlineColor-Select--focus;
+        border-style: $outlineStyle-Select--focus;
+      }
     }
 
     .placeholder {
