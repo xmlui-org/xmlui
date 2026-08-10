@@ -1304,6 +1304,40 @@ test.describe("Theme Variables", () => {
     }
   };
 
+  test("focus ring renders all sides inside full-width input", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`<Select testId="test" />`, {
+      testThemeVars: {
+        "outlineWidth-Select--focus": "4px",
+        "outlineColor-Select--focus": "rgb(0, 123, 255)",
+        "outlineStyle-Select--focus": "solid",
+      },
+    });
+    const driver = await createSelectDriver("test");
+    await driver.component.focus();
+    await expect(driver.component).toBeFocused();
+
+    const focusRing = await driver.component.evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
+  });
+
   test("applies correct borderRadius across variants", async ({ initTestBed, page }) => {
     await runPerVariant(initTestBed, page, "borderRadius", "border-radius", "12px");
   });

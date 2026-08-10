@@ -79,6 +79,19 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
   });
 
+  test("default button labels do not leak missing i18n keys", async ({ initTestBed, page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("xmlui.locale", "hu-HU");
+    });
+
+    await initTestBed(`<Form/>`);
+
+    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    await expect(page.getByText("xmlui.form.cancel")).not.toBeVisible();
+    await expect(page.getByText("xmlui.form.save")).not.toBeVisible();
+  });
+
   test("component renders custom button labels", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form cancelLabel="Go Back" saveLabel="Submit"/>

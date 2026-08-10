@@ -166,11 +166,15 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--focus");
   }
 
-  &:has(.dateInputWrapper input:focus-visible) {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+  &:has(input:focus-visible) {
+    outline: none;
+
+    &::after {
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
+    }
   }
 
   .adornment {
@@ -180,6 +184,7 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
 
 @layer components {
   .dateInputWrapper {
+    position: relative;
     display: flex;
     align-items: center;
     width: fit-content;
@@ -192,6 +197,14 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     overflow: hidden;
     gap: $gap-adornment-DateInput;
     @include t.paddingVars($themeVars, $componentName);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
 
     &.disabled {
       opacity: $opacity-DateInput--disabled;

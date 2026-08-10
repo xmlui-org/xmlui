@@ -188,10 +188,22 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     }
 
     &.focused {
-      outline-width: $outlineWidth-AutoComplete--focus;
-      outline-color: $outlineColor-AutoComplete--focus;
-      outline-style: $outlineStyle-AutoComplete--focus;
-      outline-offset: $outlineOffset-AutoComplete--focus;
+      outline: none;
+
+      &::after {
+        inset: $outlineOffset-AutoComplete--focus;
+        border-width: $outlineWidth-AutoComplete--focus;
+        border-color: $outlineColor-AutoComplete--focus;
+        border-style: $outlineStyle-AutoComplete--focus;
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
     }
   }
 

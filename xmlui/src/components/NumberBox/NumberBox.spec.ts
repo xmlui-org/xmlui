@@ -845,20 +845,33 @@ test.describe("Theme Variables", () => {
     await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(20, 20, 20)");
   });
 
-  test("focus outline properties apply on focus", async ({ initTestBed, page }) => {
+  test("focus ring renders all sides inside full-width input", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
       testThemeVars: {
-        "outlineWidth-NumberBox--focus": "2px",
+        "outlineWidth-NumberBox--focus": "4px",
         "outlineColor-NumberBox--focus": "rgb(0, 123, 255)",
         "outlineStyle-NumberBox--focus": "solid",
-        "outlineOffset-NumberBox--focus": "2px",
       },
     });
     await page.getByRole("spinbutton").focus();
-    await expect(page.getByTestId("input")).toHaveCSS("outline-width", "2px");
-    await expect(page.getByTestId("input")).toHaveCSS("outline-color", "rgb(0, 123, 255)");
-    await expect(page.getByTestId("input")).toHaveCSS("outline-style", "solid");
-    await expect(page.getByTestId("input")).toHaveCSS("outline-offset", "2px");
+
+    const focusRing = await page.getByTestId("input").evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
   });
 
   test("placeholder textColor applies correctly", async ({ initTestBed, page }) => {

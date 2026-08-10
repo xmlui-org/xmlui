@@ -143,10 +143,7 @@ $borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentN
   }
 
   &:focus-visible {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
+    outline: none;
   }
 
   &::placeholder {
@@ -207,6 +204,41 @@ $borderColor-TextArea--disabled: createThemeVar("Input:borderColor-#{$componentN
     position: relative;
     display: block;
     width: 100%;
+
+    &:has(.textarea:focus-visible)::after {
+      content: "";
+      position: absolute;
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}");
+      pointer-events: none;
+    }
+
+    &:has(.textarea.error:focus-visible)::after {
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}--error--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}--error--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}--error--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}--error--focus");
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}--error");
+    }
+
+    &:has(.textarea.warning:focus-visible)::after {
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}--warning--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}--warning--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}--warning--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}--warning--focus");
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}--warning");
+    }
+
+    &:has(.textarea.valid:focus-visible)::after {
+      inset: createThemeVar("Input:outlineOffset-#{$componentName}--success--focus");
+      border-width: createThemeVar("Input:outlineWidth-#{$componentName}--success--focus");
+      border-color: createThemeVar("Input:outlineColor-#{$componentName}--success--focus");
+      border-style: createThemeVar("Input:outlineStyle-#{$componentName}--success--focus");
+      border-radius: createThemeVar("Input:borderRadius-#{$componentName}--success");
+    }
   }
 
   .floatingFeedback {

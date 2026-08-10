@@ -560,6 +560,35 @@ test.describe("Visual States", () => {
     await expect(textarea).toHaveCSS("color", "rgb(0, 0, 255)");
   });
 
+  test("focus ring renders all sides inside full-width input", async ({ initTestBed, page }) => {
+    await initTestBed(`<TextArea testId="input" />`, {
+      testThemeVars: {
+        "outlineWidth-TextArea--focus": "4px",
+        "outlineColor-TextArea--focus": "rgb(0, 123, 255)",
+        "outlineStyle-TextArea--focus": "solid",
+      },
+    });
+    await page.getByRole("textbox").focus();
+
+    const focusRing = await page.getByTestId("input").first().evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
+  });
+
   test("component handles hover state", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea />`, {
       testThemeVars: {

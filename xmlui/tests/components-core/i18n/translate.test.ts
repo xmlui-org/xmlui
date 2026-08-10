@@ -28,6 +28,22 @@ describe("translateMessage", () => {
     );
   });
 
+  it("uses built-in XMLUI fallback text for missing framework keys", () => {
+    const onDiagnostic = vi.fn();
+    const store = createBundleStore();
+
+    expect(
+      translateMessage("xmlui.form.cancel", undefined, { store, locale: "hu-HU", onDiagnostic }),
+    ).toBe("Cancel");
+    expect(onDiagnostic).toHaveBeenCalledWith(
+      expect.objectContaining({
+        code: "missing-key",
+        key: "xmlui.form.cancel",
+        locale: "hu-HU",
+      }),
+    );
+  });
+
   it("formats ICU messages from the bundle", () => {
     const store = createBundleStore([
       {

@@ -923,6 +923,36 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Theme Variables", () => {
+  test("focus ring renders all sides inside full-width input", async ({ initTestBed, page }) => {
+    await initTestBed(`<AutoComplete testId="test" />`, {
+      testThemeVars: {
+        "outlineWidth-AutoComplete--focus": "4px",
+        "outlineColor-AutoComplete--focus": "rgb(0, 123, 255)",
+        "outlineStyle-AutoComplete--focus": "solid",
+      },
+    });
+    await page.getByRole("combobox").focus();
+    await expect(page.getByRole("combobox")).toBeFocused();
+
+    const focusRing = await page.getByTestId("test").evaluate((element) => {
+      const styles = getComputedStyle(element, "::after");
+      return {
+        top: styles.borderTopWidth,
+        right: styles.borderRightWidth,
+        bottom: styles.borderBottomWidth,
+        left: styles.borderLeftWidth,
+        color: styles.borderTopColor,
+      };
+    });
+    expect(focusRing).toEqual({
+      top: "4px",
+      right: "4px",
+      bottom: "4px",
+      left: "4px",
+      color: "rgb(0, 123, 255)",
+    });
+  });
+
   [
     { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
