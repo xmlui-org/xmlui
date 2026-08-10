@@ -2002,6 +2002,96 @@ test.describe("Basic Functionality", () => {
       await expect(tree.getByTestId("4")).not.toBeVisible();
     });
 
+    test("preserves descendant expansion state when a parent is collapsed and re-expanded", async ({
+      initTestBed,
+      createTreeDriver,
+      page,
+    }) => {
+      await initTestBed(`
+        <VStack height="400px">
+          <Tree testId="tree"
+            dataFormat="flat"
+            defaultExpanded='{["doc-root", "proj-web", "media-profile-pic"]}'
+            data='{${JSON.stringify(multiBranchTreeData)}}'>
+            <property name="itemTemplate">
+              <HStack testId="{$item.id}:{$item.name}:depth:{$item.depth}" verticalAlignment="center">
+                <Text value="{$item.name}" />
+              </HStack>
+            </property>
+          </Tree>
+        </VStack>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      await expect(tree.component).toBeVisible();
+
+      const projects = page.getByRole("treeitem", { name: "Projects" });
+      const webApps = page.getByRole("treeitem", { name: "Web Apps" });
+      const mobileApps = page.getByRole("treeitem", { name: "Mobile Apps" });
+
+      await expect(projects).toHaveAttribute("aria-expanded", "true");
+      await expect(webApps).toHaveAttribute("aria-expanded", "true");
+      await expect(mobileApps).toHaveAttribute("aria-expanded", "false");
+      await expect(tree.getByTestId("proj-ecommerce:E-commerce Site:depth:2")).toBeVisible();
+      await expect(tree.getByTestId("proj-ios-app:iOS Shopping App:depth:2")).not.toBeVisible();
+
+      await mobileApps.locator("[data-tree-expand-icon]").click();
+      await expect(mobileApps).toHaveAttribute("aria-expanded", "true");
+      await expect(tree.getByTestId("proj-ios-app:iOS Shopping App:depth:2")).toBeVisible();
+
+      await projects.locator("[data-tree-expand-icon]").click();
+      await expect(projects).toHaveAttribute("aria-expanded", "false");
+      await expect(tree.getByTestId("proj-web:Web Apps:depth:1")).not.toBeVisible();
+      await expect(tree.getByTestId("proj-mobile:Mobile Apps:depth:1")).not.toBeVisible();
+
+      await projects.locator("[data-tree-expand-icon]").click();
+      await expect(projects).toHaveAttribute("aria-expanded", "true");
+      await expect(webApps).toHaveAttribute("aria-expanded", "true");
+      await expect(mobileApps).toHaveAttribute("aria-expanded", "true");
+      await expect(tree.getByTestId("proj-ecommerce:E-commerce Site:depth:2")).toBeVisible();
+      await expect(tree.getByTestId("proj-ios-app:iOS Shopping App:depth:2")).toBeVisible();
+    });
+
+    test("preserves descendant expansion state when collapseNode API is used", async ({
+      initTestBed,
+      createButtonDriver,
+      createTreeDriver,
+    }) => {
+      await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              defaultExpanded="{[1, 2]}"
+              data='{${JSON.stringify(flatTreeData)}}'>
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="collapse-root" onClick="treeApi.collapseNode(1)" />
+          <Button testId="expand-root" onClick="treeApi.expandNode(1)" />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const collapseRootButton = await createButtonDriver("collapse-root");
+      const expandRootButton = await createButtonDriver("expand-root");
+
+      await expect(tree.getByTestId("4")).toBeVisible();
+
+      await collapseRootButton.click();
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+
+      await expandRootButton.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await expect(tree.getByTestId("4")).toBeVisible();
+    });
+
     test(
       "supports expansion toggle by chevron click",
       SKIP_REASON.TO_BE_IMPLEMENTED("Redundant with existing expand icon tests"),

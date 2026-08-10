@@ -1175,6 +1175,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       } else {
         // Collapsing the node
         const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+        let shouldClearDescendantExpansion = false;
 
         // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
         if (currentLoadingState === "loaded" && loadChildren) {
@@ -1192,6 +1193,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
           // If autoLoadAfter is 0, immediately mark node as unloaded
           if (effectiveAutoLoadAfter === 0) {
+            shouldClearDescendantExpansion = true;
             setNodeStates((prev) => new Map(prev).set(node.key, "unloaded"));
 
             // Update the loaded field in source data
@@ -1235,11 +1237,14 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         );
 
         if (nodeToCollapse) {
-          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
-
-          setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+          if (shouldClearDescendantExpansion) {
+            const idsToRemove = collectDescendantIds(nodeToCollapse, true);
+            setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+          } else {
+            setExpandedIds((prev) => prev.filter((id) => String(id) !== String(node.key)));
+          }
         } else {
-          setExpandedIds((prev) => prev.filter((id) => id !== node.key));
+          setExpandedIds((prev) => prev.filter((id) => String(id) !== String(node.key)));
         }
 
         // Fire nodeDidCollapse event
@@ -1587,10 +1592,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           (n) => String(n.key) === String(nodeId),
         );
         if (nodeToCollapse) {
-          const idsToRemove = collectDescendantIds(nodeToCollapse, true);
-
-          // Remove all descendant IDs from expanded list
-          setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+          let shouldClearDescendantExpansion = false;
 
           // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
           const currentLoadingState = nodeStates.get(nodeId) || "unloaded";
@@ -1610,6 +1612,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
             // If autoLoadAfter is 0, immediately mark node as unloaded
             if (effectiveAutoLoadAfter === 0) {
+              shouldClearDescendantExpansion = true;
               setNodeStates((prev) => new Map(prev).set(nodeId, "unloaded"));
 
               // Update the loaded field in source data
@@ -1646,6 +1649,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
                 return currentData;
               });
             }
+          }
+
+          if (shouldClearDescendantExpansion) {
+            const idsToRemove = collectDescendantIds(nodeToCollapse, true);
+            setExpandedIds((prev) => prev.filter((id) => !idsToRemove.has(String(id))));
+          } else {
+            setExpandedIds((prev) => prev.filter((id) => String(id) !== String(nodeId)));
           }
 
           // Fire nodeDidCollapse event

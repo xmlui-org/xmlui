@@ -3372,10 +3372,10 @@ test.describe("Imperative API", () => {
         .toBe("getExpandedAfterCollapse");
 
       currentState = await testStateDriver.testState();
-      expect(currentState.expandedCount).toBe(4);
-      // When node 2 is collapsed, its descendants (4, 5) are also removed from expanded list
-      expect(currentState.expandedNodes).toEqual(expect.arrayContaining([1, 3, 6, 7]));
-      expect(currentState.expandedNodes).not.toEqual(expect.arrayContaining([2, 4, 5]));
+      expect(currentState.expandedCount).toBe(6);
+      // Collapsing node 2 removes only node 2; its descendants keep their expansion state.
+      expect(currentState.expandedNodes).toEqual(expect.arrayContaining([1, 3, 4, 5, 6, 7]));
+      expect(currentState.expandedNodes).not.toEqual(expect.arrayContaining([2]));
     });
   });
 });
