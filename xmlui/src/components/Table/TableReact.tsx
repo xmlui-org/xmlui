@@ -1388,7 +1388,26 @@ export const Table = memo(
 
     const hasHeight = useHasExplicitHeight(wrapperRef);
 
-    const hasOutsideScroll = scrollRef.current && !hasHeight;
+    const [stretchToParent, setStretchToParent] = useState(false);
+
+    useIsomorphicLayoutEffect(() => {
+      const wrapper = wrapperRef.current;
+      const parent = wrapper?.parentElement;
+      if (!parent) {
+        return;
+      }
+
+      const parentStyle = getComputedStyle(parent);
+      const isColumnFlexParent =
+        parentStyle.display.includes("flex") && parentStyle.flexDirection === "column";
+      const parentStretches = Number.parseFloat(parentStyle.flexGrow) > 0;
+
+      if (isColumnFlexParent && parentStretches && !hasExplicitWrapperHeight(wrapper)) {
+        setStretchToParent(true);
+      }
+    }, []);
+
+    const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
@@ -2006,7 +2025,10 @@ export const Table = memo(
     return (
       <div
         {...rest}
-        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.noScroll]: hasOutsideScroll })}
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+          [styles.noScroll]: hasOutsideScroll,
+          [styles.stretchToParent]: stretchToParent,
+        })}
         tabIndex={0}
         onKeyDown={compositeKeyDown}
         onClick={(e) => {
@@ -2266,6 +2288,21 @@ function ColumnOrderingIndicator({
   ) : (
     <ThemedIcon name={iconNoSort} size="12" />
   ); //nosort
+}
+
+/**
+ * Checks whether the table wrapper has a real height constraint. Table's base
+ * max-height should not count as explicit height for stretch-parent detection.
+ */
+function hasExplicitWrapperHeight(wrapper: HTMLDivElement): boolean {
+  const originalHeight = getComputedStyle(wrapper).height;
+  const originalInlineHeight = wrapper.style.height || "";
+
+  wrapper.style.height = "auto";
+  const autoHeight = getComputedStyle(wrapper).height;
+  wrapper.style.height = originalInlineHeight;
+
+  return originalHeight !== autoHeight || !!originalInlineHeight;
 }
 
 /**
