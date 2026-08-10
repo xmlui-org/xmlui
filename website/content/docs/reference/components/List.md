@@ -1475,9 +1475,34 @@ This property limits the number of items displayed in the `List`. If not set, al
 
 This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
+This boolean property indicates whether the list is currently loading data. While loading is `true`
+and no list items are available, the list shows its loading UI after the configured
+[`loadingDelay`](#loadingdelay).
+
 ```xmlui-pg copy display name="Example: loading" height="120px"
 <App>
-  <List loading="true" />
+  <List loading="true" loadingDelay="0" />
+</App>
+```
+
+### `loadingDelay` [#loadingdelay]
+
+> [!DEF]  default: **400**
+
+The delay in milliseconds before showing the loading UI. Set to `0` to show immediately, or a higher value to prevent flicker for fast-loading data.
+
+The `loadingDelay` property controls how many milliseconds the list waits before showing its loading
+UI. The default is `400`, which prevents flicker when data loads quickly. Set it to `0` to show the
+loading UI immediately.
+
+```xmlui-pg copy display name="Example: loading delay" height="180px" /loadingDelay/
+<App var.isLoading="{false}" var.items="{[]}">
+  <Button
+    label="Load"
+    onClick="isLoading = true; delay(1000); items = [{ id: 1, name: 'Loaded item' }]; isLoading = false" />
+  <List loading="{isLoading}" loadingDelay="400" data="{items}">
+    <Text>{$item.name}</Text>
+  </List>
 </App>
 ```
 

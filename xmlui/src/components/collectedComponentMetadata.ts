@@ -64,6 +64,7 @@ import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
+import { ValueMd } from "./Value/Value";
 import { TextAreaMd } from "./TextArea/TextArea";
 import { AccordionMd } from "./Accordion/Accordion";
 import { TabItemMd } from "./Tabs/TabItem";
@@ -418,6 +419,7 @@ Object.assign(metadataRegistry, {
   Stepper: StepperMd,
   Step: StepMd,
   Text: TextMd,
+  Value: ValueMd,
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
   TileGrid: TileGridMd,

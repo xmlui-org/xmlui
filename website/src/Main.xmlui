@@ -730,6 +730,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Display typed values outside tables"
+                            to="/docs/howto/display-typed-values-outside-tables"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pin columns in a wide table"
                             to="/docs/howto/pin-columns-in-a-wide-table"
                         />
@@ -2488,6 +2493,11 @@
             <Page url="/docs/howto/format-table-columns-by-type">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/format-table-columns-by-type.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/display-typed-values-outside-tables">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/display-typed-values-outside-tables.md']}"
                 />
             </Page>
             <Page url="/docs/howto/pin-columns-in-a-wide-table">
