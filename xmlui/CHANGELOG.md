@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.14.5
+
+### Patch Changes
+
+- 0947073: Fix List sizing inside star-height containers so overflowing items scroll within the available parent height instead of expanding the parent.
+- 0947073: Fix Table sizing inside star-height containers so overflowing rows scroll within the available parent height instead of expanding the parent.
+
 ## 0.14.4
 
 ### Patch Changes
