@@ -1,5 +1,17 @@
 # xmlui
 
+## 0.14.4
+
+### Patch Changes
+
+- 955d1a4: Fix compiled binding expressions with `new` constructors such as `new Date(...)`.
+- f495e50: Fix compiled event handler artifacts for single non-arrow expression handlers by applying the same handler preparation fallback used by interpreted execution.
+- f495e50: Add loadingDelay to Table and List to prevent loading UI flicker during fast data loads.
+- 29d5e21: Add the `Locale` component for scoped locale and formatting overrides.
+- 955d1a4: Fix typed table column formatting to use the active app locale by default and support per-column `typeOptions.locale` overrides.
+- 442db40: Fix Tree collapse so re-expanding a parent preserves descendant expansion state.
+- 3aba39c: Fix stretched Tree layouts so expanding nodes scrolls inside the Tree viewport instead of increasing parent height.
+
 ## 0.14.3
 
 ### Patch Changes
