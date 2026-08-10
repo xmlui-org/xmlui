@@ -16,6 +16,17 @@ describe("resolveLocale", () => {
     ).toEqual({ locale: "de-DE", source: "app" });
   });
 
+  it("honors explicit app locale even when no matching bundle is available", () => {
+    expect(
+      resolveLocale({
+        appProp: "hu-hu",
+        navigatorLanguages: ["en-US"],
+        available: ["en"],
+        fallback: "en",
+      }),
+    ).toEqual({ locale: "hu-HU", source: "app" });
+  });
+
   it("uses the first available navigator locale", () => {
     expect(
       resolveLocale({

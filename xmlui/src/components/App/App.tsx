@@ -407,7 +407,7 @@ function AppNode({
       persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
       themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
-      locale={extractValue(node.props.locale)}
+      locale={extractValue.asOptionalString(node.props.locale)}
       localeBundles={extractValue(node.props.localeBundles)}
       auditPolicy={extractValue(node.props.auditPolicy)}
       direction={extractValue.asOptionalString(node.props.direction, "auto")}

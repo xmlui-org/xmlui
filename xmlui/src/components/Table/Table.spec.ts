@@ -220,6 +220,31 @@ test.describe("Basic Functionality", () => {
       await expect(numberCells.nth(3)).toHaveText("45.5");
     });
 
+    test("uses root App locale for inferred number column rendering", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <App locale="hu-HU">
+          <Text testId="active-locale" value="{App.locale}" />
+          <Text testId="locale-number" value="{App.formatNumber(3123.45)}" />
+          <Table
+            data='{[
+              { id: 1, customer: "Ada", total: 3123.45, paid: true },
+              { id: 2, customer: "Grace", total: 87.5, paid: false }
+            ]}'
+          />
+        </App>
+      `);
+
+      await expect(page.getByTestId("active-locale")).toHaveText("hu-HU");
+      await expect(page.getByTestId("locale-number")).toHaveText("3123,45");
+
+      const numberCells = page.locator('[data-column-cell-kind="number"]');
+      await expect(numberCells.nth(0)).toHaveText("3123,45");
+      await expect(numberCells.nth(1)).toHaveText("87,5");
+    });
+
     test("uses idKey and UUID values for inferred id-like display types", async ({
       initTestBed,
       page,

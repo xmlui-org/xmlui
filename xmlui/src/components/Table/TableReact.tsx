@@ -448,6 +448,17 @@ function renderTypedCellValue(
   return renderCellModel(formatTableCellValue(value, columnType, { localeProfile }), columnType);
 }
 
+function getLocaleProfileRenderKey(localeProfile: LocaleProfile): string {
+  return [
+    localeProfile.locale,
+    localeProfile.decimalSeparator ?? "",
+    localeProfile.groupSeparator ?? "",
+    localeProfile.minusSign ?? "",
+    localeProfile.currency ?? "",
+    localeProfile.numberingSystem ?? "",
+  ].join("\u0000");
+}
+
 function renderCellModel(
   model: TableCellRenderModel,
   columnType?: NormalizedColumnType,
@@ -1630,10 +1641,22 @@ export const Table = memo(
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
 
+    const localeRenderKey = getLocaleProfileRenderKey(localeProfile);
+
     // Stable ref for cell rendering context (effectiveUserSelectCell / cellVerticalAlign can
     // change when theme/props change, but we don't want to recreate TableMemoizedCells for that).
-    const cellRenderStateRef = useRef({ effectiveUserSelectCell, cellVerticalAlign });
-    cellRenderStateRef.current = { effectiveUserSelectCell, cellVerticalAlign };
+    const cellRenderStateRef = useRef({
+      effectiveUserSelectCell,
+      cellVerticalAlign,
+      localeProfile,
+      localeRenderKey,
+    });
+    cellRenderStateRef.current = {
+      effectiveUserSelectCell,
+      cellVerticalAlign,
+      localeProfile,
+      localeRenderKey,
+    };
 
     // TableMemoizedCells — analogous to TileGridMemoizedItem.
     // Created ONCE (useMemo([], [])), reads latest cell data from rowsRef via closure.
@@ -1648,14 +1671,20 @@ export const Table = memo(
           rowIndex,
           isSelected: _isSelected,
           renderVersion: _rv,
+          localeRenderKey: _localeRenderKey,
         }: {
           rowIndex: number;
           isSelected: boolean;
           renderVersion: number;
+          localeRenderKey: string;
         }) {
           const row = rowsRef.current[rowIndex];
           if (!row) return null;
-          const { effectiveUserSelectCell: userSelectCell, cellVerticalAlign: vertAlign } =
+          const {
+            effectiveUserSelectCell: userSelectCell,
+            cellVerticalAlign: vertAlign,
+            localeProfile: currentLocaleProfile,
+          } =
             cellRenderStateRef.current;
           return (
             <>
@@ -1692,7 +1721,7 @@ export const Table = memo(
                       {cellRenderer
                         ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
                         : columnType
-                          ? renderTypedCellValue(cell?.getValue(), columnType, localeProfile)
+                          ? renderTypedCellValue(cell?.getValue(), columnType, currentLocaleProfile)
                           : (flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),
@@ -1707,7 +1736,8 @@ export const Table = memo(
         (prev, next) =>
           prev.rowIndex === next.rowIndex &&
           prev.isSelected === next.isSelected &&
-          prev.renderVersion === next.renderVersion,
+          prev.renderVersion === next.renderVersion &&
+          prev.localeRenderKey === next.localeRenderKey,
       );
     }, []);
 
@@ -1824,6 +1854,7 @@ export const Table = memo(
                 rowIndex={rowIndex}
                 isSelected={row.getIsSelected()}
                 renderVersion={s.renderVersion}
+                localeRenderKey={cellRenderStateRef.current.localeRenderKey}
               />
             </tr>
           );

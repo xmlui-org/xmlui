@@ -32,7 +32,7 @@ export function resolveLocale(input: LocaleResolverInput): { locale: string; sou
     ["persisted", input.persisted],
   ] as const) {
     const normalized = safeNormalize(candidate);
-    if (normalized && isAllowed(normalized, available)) {
+    if (normalized) {
       return { locale: normalized, source };
     }
   }
