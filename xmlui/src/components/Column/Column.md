@@ -149,6 +149,7 @@ You can pass layout properties to a Column:
 Use it for common display semantics without writing custom cell markup.
 The type affects display only; it does not validate, convert, or mutate the underlying data.
 If a value cannot be formatted for the selected type, the table falls back to plain text for that cell.
+Use [`Value`](/docs/reference/components/Value) for the same read-only typed display behavior outside tables.
 
 ### Type Syntax
 

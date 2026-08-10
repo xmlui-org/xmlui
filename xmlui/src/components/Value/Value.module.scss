@@ -1,0 +1,96 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Value";
+$borderColor-Value: createThemeVar("borderColor-#{$component}");
+
+@layer components {
+  .value {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .number {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .longText {
+    display: inline-block;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .compactText {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95em;
+  }
+
+  .color {
+    display: inline-flex;
+    align-items: center;
+    gap: t.$space-2;
+  }
+
+  .colorSwatch {
+    width: 0.9em;
+    height: 0.9em;
+    flex: 0 0 auto;
+    border: 1px solid $borderColor-Value;
+    border-radius: 2px;
+  }
+
+  .image {
+    display: block;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .avatar {
+    border-radius: 50%;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    gap: t.$space-1;
+  }
+
+  .iconLabel {
+    font-size: 0.9em;
+  }
+
+  .checkbox {
+    display: inline-flex;
+    width: 1.1em;
+    height: 1.1em;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $borderColor-Value;
+    border-radius: 2px;
+    font-size: 0.9em;
+    line-height: 1;
+  }
+
+  .tag {
+    display: inline-block;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

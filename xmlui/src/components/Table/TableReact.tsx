@@ -58,9 +58,9 @@ import {
 } from "../../parsers/keybinding-parser/keybinding-parser";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
 import { buildInferredColumns } from "./table-column-inference";
-import { formatTableCellValue, type TableCellRenderModel } from "./table-cell-formatting";
 import { normalizeColumnType, type NormalizedColumnType } from "../Column/column-types";
 import { useLocaleProfile, type LocaleProfile } from "../../components-core/i18n";
+import { Value } from "../Value/ValueReact";
 
 // =====================================================================================================================
 // Helper types
@@ -440,14 +440,6 @@ function SelectionToggle({
   );
 }
 
-function renderTypedCellValue(
-  value: unknown,
-  columnType: NormalizedColumnType,
-  localeProfile: LocaleProfile,
-): ReactNode {
-  return renderCellModel(formatTableCellValue(value, columnType, { localeProfile }), columnType);
-}
-
 function getLocaleProfileRenderKey(localeProfile: LocaleProfile): string {
   return [
     localeProfile.locale,
@@ -457,190 +449,6 @@ function getLocaleProfileRenderKey(localeProfile: LocaleProfile): string {
     localeProfile.currency ?? "",
     localeProfile.numberingSystem ?? "",
   ].join("\u0000");
-}
-
-function renderCellModel(
-  model: TableCellRenderModel,
-  columnType?: NormalizedColumnType,
-): ReactNode {
-  const longTextClampStyle = getLongTextClampStyle(columnType);
-  const longTextTitle = longTextClampStyle && shouldShowClampedTitle(columnType) ? model.text : undefined;
-  switch (model.kind) {
-    case "empty":
-      return null;
-    case "link":
-      return (
-        <a
-          href={model.href}
-          title={model.href}
-          data-column-cell-kind="link"
-          className={classnames(styles.typedCell, styles.typedCellLink)}
-        >
-          {model.text}
-        </a>
-      );
-    case "number":
-      return (
-        <span
-          data-column-cell-kind="number"
-          className={classnames(styles.typedCell, styles.typedCellNumber)}
-        >
-          <span data-number-part="integer">{model.integerPart}</span>
-          {model.decimalSeparator && (
-            <span data-number-part="decimal">{model.decimalSeparator}</span>
-          )}
-          {model.fractionPart && <span data-number-part="fraction">{model.fractionPart}</span>}
-          {model.suffixPart && <span data-number-part="suffix">{model.suffixPart}</span>}
-        </span>
-      );
-    case "checkbox":
-      return (
-        <span
-          data-column-cell-kind="checkbox"
-          className={classnames(styles.typedCell, styles.typedCellCheckbox)}
-          role="checkbox"
-          aria-checked={!!model.text}
-        >
-          {model.text}
-        </span>
-      );
-    case "markdown":
-      return (
-        <span
-          data-column-cell-kind="markdown"
-          className={classnames(styles.typedCell, styles.typedCellLongText)}
-          style={longTextClampStyle}
-          title={longTextTitle}
-        >
-          {renderInlineMarkdown(model.text)}
-        </span>
-      );
-    case "color":
-      return (
-        <span
-          data-column-cell-kind="color"
-          className={classnames(styles.typedCell, styles.typedCellColor)}
-        >
-          <span
-            data-color-swatch
-            className={styles.typedCellColorSwatch}
-            style={{ backgroundColor: model.color }}
-            aria-hidden
-          />
-          <span>{model.text}</span>
-        </span>
-      );
-    case "image":
-    case "avatar":
-      return (
-        <img
-          data-column-cell-kind={model.kind}
-          className={classnames(styles.typedCellImage, {
-            [styles.typedCellAvatar]: model.kind === "avatar",
-          })}
-          src={model.src}
-          alt={model.alt}
-        />
-      );
-    case "icon":
-      return (
-        <span
-          data-column-cell-kind="icon"
-          className={classnames(styles.typedCell, styles.typedCellIcon)}
-        >
-          <ThemedIcon name={model.iconName} fallback={model.iconName} aria-label={model.text} />
-          <span className={styles.typedCellIconLabel}>{model.text}</span>
-        </span>
-      );
-    default:
-      return (
-        <span
-          data-column-cell-kind={model.kind}
-          className={classnames(styles.typedCell, getTypedCellClassName(model.kind))}
-          style={isLongTextLikeModel(model.kind) ? longTextClampStyle : undefined}
-          title={isLongTextLikeModel(model.kind) ? longTextTitle : undefined}
-        >
-          {model.text}
-        </span>
-      );
-  }
-}
-
-function getLongTextClampStyle(columnType?: NormalizedColumnType): CSSProperties | undefined {
-  if (!columnType) {
-    return undefined;
-  }
-  const maxLines = positiveIntegerOption(columnType, "maxLines") ?? positiveIntegerOption(columnType, "lines");
-  if (maxLines === undefined) {
-    return undefined;
-  }
-  return {
-    display: "-webkit-box",
-    WebkitBoxOrient: "vertical",
-    WebkitLineClamp: maxLines,
-    overflow: "hidden",
-  } as CSSProperties;
-}
-
-function shouldShowClampedTitle(columnType?: NormalizedColumnType): boolean {
-  return columnType?.options?.tooltip !== false;
-}
-
-function isLongTextLikeModel(kind: TableCellRenderModel["kind"]): boolean {
-  return kind === "long-text" || kind === "address";
-}
-
-function positiveIntegerOption(
-  columnType: NormalizedColumnType,
-  optionName: string,
-): number | undefined {
-  const value = columnType.options?.[optionName];
-  return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : undefined;
-}
-
-function getTypedCellClassName(kind: TableCellRenderModel["kind"]): string | undefined {
-  switch (kind) {
-    case "long-text":
-    case "address":
-      return styles.typedCellLongText;
-    case "code":
-    case "json":
-      return styles.typedCellCode;
-    case "tag":
-    case "tags":
-      return styles.typedCellTag;
-    case "short-text":
-    case "id":
-    case "uuid":
-      return styles.typedCellCompactText;
-    default:
-      return undefined;
-  }
-}
-
-function renderInlineMarkdown(text: string): ReactNode[] {
-  const nodes: ReactNode[] = [];
-  const pattern = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(text))) {
-    if (match.index > lastIndex) {
-      nodes.push(text.slice(lastIndex, match.index));
-    }
-    nodes.push(
-      match[2] ? (
-        <strong key={match.index}>{match[2]}</strong>
-      ) : (
-        <em key={match.index}>{match[3]}</em>
-      ),
-    );
-    lastIndex = pattern.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
-  return nodes;
 }
 
 //These are the important styles to make sticky column pinning work!
@@ -1721,7 +1529,14 @@ export const Table = memo(
                       {cellRenderer
                         ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
                         : columnType
-                          ? renderTypedCellValue(cell?.getValue(), columnType, currentLocaleProfile)
+                          ? (
+                              <Value
+                                value={cell?.getValue()}
+                                valueType={columnType}
+                                localeProfile={currentLocaleProfile}
+                                withColumnKindAttribute
+                              />
+                            )
                           : (flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),

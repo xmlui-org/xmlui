@@ -85,6 +85,7 @@ interface ImportMetaEnv {
   readonly VITE_USED_COMPONENTS_TileGrid: string;
   readonly VITE_USED_COMPONENTS_Tree: string;
   readonly VITE_USED_COMPONENTS_TreeDisplay: string;
+  readonly VITE_USED_COMPONENTS_Value: string;
   readonly VITE_USED_COMPONENTS_XmluiCodeHightlighter: string;
 }
 

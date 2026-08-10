@@ -555,6 +555,11 @@
           "to": "/docs/reference/components/VStack",
           "label": "VStack",
           "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/Value",
+          "label": "Value",
+          "icon": "component"
         }
       ]
     }

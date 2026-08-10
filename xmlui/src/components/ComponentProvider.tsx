@@ -32,6 +32,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
+import { valueComponentRenderer } from "./Value/Value";
 import { i18nComponentRenderer } from "./I18n/I18n";
 import { localeComponentRenderer } from "./Locale/Locale";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
@@ -472,6 +473,9 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_Value !== "false") {
+      this.registerCoreComponent(valueComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_I18n !== "false") {
       this.registerCoreComponent(i18nComponentRenderer);
