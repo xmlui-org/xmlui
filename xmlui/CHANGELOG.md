@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.14.6
+
+### Patch Changes
+
+- e2cdd65: Add a read-only Value component for displaying typed values outside tables.
+- cb0e458: Fix App locale formatting so explicit locales such as `hu-HU` are honored without requiring a matching translation bundle, including inferred Table number columns.
+
 ## 0.14.5
 
 ### Patch Changes
