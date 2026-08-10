@@ -8,10 +8,11 @@ Tree supports two data shapes: flat arrays where each node references its parent
 ---app display
 <App>
   <HStack gap="$space-6">
-    <VStack width="*">
+    <VStack width="*" height="240px">
       <Text variant="strong">Flat format</Text>
       <Text variant="secondary" size="sm">Each node references its parent by ID</Text>
       <Tree
+        height="180px"
         dataFormat="flat"
         idField="id"
         nameField="name"
@@ -26,10 +27,11 @@ Tree supports two data shapes: flat arrays where each node references its parent
         ]}"
       />
     </VStack>
-    <VStack width="*">
+    <VStack width="*" height="240px">
       <Text variant="strong">Hierarchy format</Text>
       <Text variant="secondary" size="sm">Each node embeds its children inline</Text>
       <Tree
+        height="180px"
         dataFormat="hierarchy"
         idField="key"
         nameField="title"

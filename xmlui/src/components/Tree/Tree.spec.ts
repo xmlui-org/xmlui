@@ -3744,6 +3744,98 @@ test.describe("Events", () => {
 // =============================================================================
 
 test.describe("Scroll Styling", () => {
+  test("keeps an App-stretched Card stable when star-height Tree nodes expand", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [
+      { id: "root-a", name: "Root A", parentId: null },
+      { id: "root-a-1", name: "A 1", parentId: "root-a" },
+      { id: "root-a-2", name: "A 2", parentId: "root-a" },
+      { id: "root-a-3", name: "A 3", parentId: "root-a" },
+      { id: "root-a-4", name: "A 4", parentId: "root-a" },
+      { id: "root-a-5", name: "A 5", parentId: "root-a" },
+      { id: "root-b", name: "Root B", parentId: null },
+      { id: "root-b-1", name: "B 1", parentId: "root-b" },
+      { id: "root-b-2", name: "B 2", parentId: "root-b" },
+      { id: "root-b-3", name: "B 3", parentId: "root-b" },
+      { id: "root-b-4", name: "B 4", parentId: "root-b" },
+      { id: "root-b-5", name: "B 5", parentId: "root-b" },
+      { id: "root-c", name: "Root C", parentId: null },
+      { id: "root-c-1", name: "C 1", parentId: "root-c" },
+      { id: "root-c-2", name: "C 2", parentId: "root-c" },
+      { id: "root-c-3", name: "C 3", parentId: "root-c" },
+      { id: "root-c-4", name: "C 4", parentId: "root-c" },
+      { id: "root-c-5", name: "C 5", parentId: "root-c" },
+    ];
+
+    await initTestBed(`
+      <App layout="condensed" scrollWholePage="false">
+        <AppHeader>
+          <property name="logoTemplate">
+            <Heading level="h3" value="Example App"/>
+          </property>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Card testId="card" backgroundColor="yellow" height="*">
+              <Text value="Home" />
+              <H2>Page content</H2>
+              <Tree
+                testId="tree"
+                height="*"
+                itemClickExpands="true"
+                dataFormat="flat"
+                data='{${JSON.stringify(data)}}'>
+              </Tree>
+            </Card>
+          </Page>
+        </Pages>
+        <Footer>Powered by XMLUI</Footer>
+      </App>
+    `);
+
+    const card = page.getByTestId("card");
+    const tree = page.getByTestId("tree");
+
+    await expect(card).toBeVisible();
+    await expect(tree).toBeVisible();
+
+    const initialMetrics = await page.evaluate(() => {
+      const card = document.querySelector('[data-testid="card"]') as HTMLElement;
+      const tree = document.querySelector('[data-testid="tree"]') as HTMLElement;
+      return {
+        cardHeight: Math.round(card.getBoundingClientRect().height),
+        treeHeight: Math.round(tree.getBoundingClientRect().height),
+      };
+    });
+
+    for (const name of ["Root A", "Root B", "Root C"]) {
+      const item = page.getByRole("treeitem", { name });
+      await item.click();
+      await expect(item).toHaveAttribute("aria-expanded", "true");
+    }
+
+    const expandedMetrics = await page.evaluate(() => {
+      const card = document.querySelector('[data-testid="card"]') as HTMLElement;
+      const tree = document.querySelector('[data-testid="tree"]') as HTMLElement;
+      return {
+        cardHeight: Math.round(card.getBoundingClientRect().height),
+        treeHeight: Math.round(tree.getBoundingClientRect().height),
+        treeClientHeight: tree.clientHeight,
+        treeScrollHeight: tree.scrollHeight,
+      };
+    });
+
+    expect(expandedMetrics.cardHeight).toBe(initialMetrics.cardHeight);
+    expect(expandedMetrics.treeHeight).toBe(initialMetrics.treeHeight);
+    expect(expandedMetrics.treeScrollHeight).toBeGreaterThan(expandedMetrics.treeClientHeight);
+  });
+
   test("renders with scrollStyle='normal'", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack height="200px">

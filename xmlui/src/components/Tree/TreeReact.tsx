@@ -2516,7 +2516,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     }
   }, []);
 
-
   return (
     <Scroller
       ref={treeContainerRef}
@@ -2528,7 +2527,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
-      style={{ height: overflow ? "auto" : "100%", overflow: overflow ?? "auto" }}
+      style={{
+        height: overflow ? "auto" : "100%",
+        minHeight: 0,
+        maxHeight: "100%",
+        contain: "size",
+        overflow: overflow ?? "auto",
+      }}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
     >

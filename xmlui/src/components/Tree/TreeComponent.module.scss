@@ -24,6 +24,8 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
 @layer components {
   .wrapper {
     flex: 1;
+    min-height: 0;
+    max-height: 100%;
     // Add small padding to provide breathing room for focus indicators
     padding: 1px 2px;
     // Remove focus outline since individual tree items handle focus styling
@@ -145,4 +147,3 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
 :export {
   themeVars: t.json-stringify($themeVars);
 }
-

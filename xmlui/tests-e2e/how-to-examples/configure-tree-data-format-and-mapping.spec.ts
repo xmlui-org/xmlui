@@ -22,21 +22,23 @@ test.describe("Tree flat vs hierarchy data format", { tag: "@website" }, () => {
 
   test("flat tree shows all nodes fully expanded", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
+    const flatTree = page.getByRole("tree", { name: "Tree navigation" }).first();
     // All flat-format nodes should be visible since defaultExpanded="all"
-    await expect(page.getByText("Electronics").first()).toBeVisible();
-    await expect(page.getByText("Phones").first()).toBeVisible();
-    await expect(page.getByText("Laptops").first()).toBeVisible();
-    await expect(page.getByText("iPhone").first()).toBeVisible();
-    await expect(page.getByText("Pixel").first()).toBeVisible();
+    await expect(flatTree.getByRole("treeitem", { name: "Electronics" })).toBeVisible();
+    await expect(flatTree.getByRole("treeitem", { name: "Phones" })).toBeVisible();
+    await expect(flatTree.getByRole("treeitem", { name: "Laptops" })).toBeVisible();
+    await expect(flatTree.getByRole("treeitem", { name: "iPhone" })).toBeVisible();
+    await expect(flatTree.getByRole("treeitem", { name: "Pixel" })).toBeVisible();
   });
 
   test("hierarchy tree shows all nodes fully expanded", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
+    const hierarchyTree = page.getByRole("tree", { name: "Tree navigation" }).nth(1);
     // Both trees render identical node labels; the hierarchy tree renders the same items
-    await expect(page.getByText("Electronics").nth(1)).toBeVisible();
-    await expect(page.getByText("Phones").nth(1)).toBeVisible();
-    await expect(page.getByText("Laptops").nth(1)).toBeVisible();
-    await expect(page.getByText("iPhone").nth(1)).toBeVisible();
-    await expect(page.getByText("Pixel").nth(1)).toBeVisible();
+    await expect(hierarchyTree.getByRole("treeitem", { name: "Electronics" })).toBeVisible();
+    await expect(hierarchyTree.getByRole("treeitem", { name: "Phones" })).toBeVisible();
+    await expect(hierarchyTree.getByRole("treeitem", { name: "Laptops" })).toBeVisible();
+    await expect(hierarchyTree.getByRole("treeitem", { name: "iPhone" })).toBeVisible();
+    await expect(hierarchyTree.getByRole("treeitem", { name: "Pixel" })).toBeVisible();
   });
 });
