@@ -2402,6 +2402,77 @@ test.describe("groupBy with function", () => {
   });
 });
 
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Regression", () => {
+  test("keeps App-stretched Card stable when List items exceed available height", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = Array.from({ length: 18 }, (_, index) => {
+      const items = [
+        { name: "Apples", quantity: 5, unit: "pieces", category: "fruits", key: 5 },
+        { name: "Bananas", quantity: 6, unit: "pieces", category: "fruits", key: 4 },
+        { name: "Carrots", quantity: 100, unit: "grams", category: "vegetables", key: 3 },
+        { name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables", key: 2 },
+        { name: "Milk", quantity: 10, unit: "liter", category: "dairy", key: 1 },
+        { name: "Cheese", quantity: 200, unit: "grams", category: "dairy", key: 0 },
+      ];
+      return { id: index, ...items[index % items.length] };
+    });
+
+    await initTestBed(`
+      <App layout="condensed" scrollWholePage="false">
+        <AppHeader>
+          <property name="logoTemplate">
+            <Heading level="h3" value="Example App"/>
+          </property>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Card testId="card" backgroundColor="yellow" height="*">
+              <Text value="Home" />
+              <H2>Page content</H2>
+              <List testId="list" data='{${JSON.stringify(data)}}'>
+                <H1>{$item.name}</H1>
+                <H2>{$item.quantity} {$item.unit}</H2>
+              </List>
+            </Card>
+          </Page>
+        </Pages>
+        <Footer>Powered by XMLUI</Footer>
+      </App>
+    `);
+
+    const card = page.getByTestId("card");
+    const list = page.getByTestId("list");
+
+    await expect(card).toBeVisible();
+    await expect(list).toBeVisible();
+
+    const metrics = await page.evaluate(() => {
+      const card = document.querySelector('[data-testid="card"]') as HTMLElement;
+      const list = document.querySelector('[data-testid="list"]') as HTMLElement;
+      return {
+        cardHeight: Math.round(card.getBoundingClientRect().height),
+        listHeight: Math.round(list.getBoundingClientRect().height),
+        listClientHeight: list.clientHeight,
+        listScrollHeight: list.scrollHeight,
+      };
+    });
+
+    expect(metrics.cardHeight).toBeLessThanOrEqual(page.viewportSize()!.height);
+    expect(metrics.listHeight).toBeLessThan(metrics.listScrollHeight);
+    expect(metrics.listScrollHeight).toBeGreaterThan(metrics.listClientHeight);
+  });
+});
+
 test.describe("scroll event", () => {
   // A long, bounded list so the viewport actually scrolls. Built in JS as an
   // array-literal expression (matching the other tests' `data="{[...]}"`

@@ -48,6 +48,13 @@ $outlineOffset-selectionCheckbox-List--focus: createThemeVarWithFallback("outlin
         position: relative; // Needed for Virtualizer to measure its offset
       }
     }
+
+    &.stretchToParent {
+      flex: 1;
+      min-height: 0;
+      max-height: 100%;
+      contain: size;
+    }
   }
 
   .innerListWrapper {

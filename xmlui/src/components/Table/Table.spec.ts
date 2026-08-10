@@ -5223,6 +5223,72 @@ test.describe("refreshOn Property", () => {
 // =============================================================================
 
 test.describe("Regression", () => {
+  test("keeps App-stretched Card stable when Table rows exceed available height", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = Array.from({ length: 18 }, (_, index) => {
+      const items = [
+        { name: "Apples", quantity: 5, unit: "pieces", category: "fruits", key: 5 },
+        { name: "Bananas", quantity: 6, unit: "pieces", category: "fruits", key: 4 },
+        { name: "Carrots", quantity: 100, unit: "grams", category: "vegetables", key: 3 },
+        { name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables", key: 2 },
+        { name: "Milk", quantity: 10, unit: "liter", category: "dairy", key: 1 },
+        { name: "Cheese", quantity: 200, unit: "grams", category: "dairy", key: 0 },
+      ];
+      return { id: index, ...items[index % items.length] };
+    });
+
+    await initTestBed(`
+      <App layout="condensed" scrollWholePage="false">
+        <AppHeader>
+          <property name="logoTemplate">
+            <Heading level="h3" value="Example App"/>
+          </property>
+        </AppHeader>
+        <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+        </NavPanel>
+        <Pages fallbackPath="/">
+          <Page url="/">
+            <Card testId="card" backgroundColor="yellow" height="*">
+              <Text value="Home" />
+              <H2>Page content</H2>
+              <Table testId="table" data='{${JSON.stringify(data)}}'>
+                <Column bindTo="name"/>
+                <Column bindTo="quantity"/>
+                <Column bindTo="unit"/>
+              </Table>
+            </Card>
+          </Page>
+        </Pages>
+        <Footer>Powered by XMLUI</Footer>
+      </App>
+    `);
+
+    const card = page.getByTestId("card");
+    const table = page.getByTestId("table");
+
+    await expect(card).toBeVisible();
+    await expect(table).toBeVisible();
+
+    const metrics = await page.evaluate(() => {
+      const card = document.querySelector('[data-testid="card"]') as HTMLElement;
+      const table = document.querySelector('[data-testid="table"]') as HTMLElement;
+      return {
+        cardHeight: Math.round(card.getBoundingClientRect().height),
+        tableHeight: Math.round(table.getBoundingClientRect().height),
+        tableClientHeight: table.clientHeight,
+        tableScrollHeight: table.scrollHeight,
+      };
+    });
+
+    expect(metrics.cardHeight).toBeLessThanOrEqual(page.viewportSize()!.height);
+    expect(metrics.tableHeight).toBeLessThan(metrics.tableScrollHeight);
+    expect(metrics.tableScrollHeight).toBeGreaterThan(metrics.tableClientHeight);
+  });
+
   test("table inside HStack > VStack does not shrink continuously on initial render", async ({
     initTestBed,
     page,
