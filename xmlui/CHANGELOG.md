@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.14.8
+
+### Patch Changes
+
+- b9f7ab7: Fix compiled event handlers so top-level arrow-function handlers execute instead of evaluating to an unused function value.
+
+  Log the effective script execution mode when an XMLUI app starts.
+
+- b9f7ab7: Fix markup-declared reactive globals so optimizer dependency tracking treats `global.*` names as app globals.
+- b9f7ab7: Change `Table.canResizeColumns` to default to `true`.
+
 ## 0.14.7
 
 ### Patch Changes
