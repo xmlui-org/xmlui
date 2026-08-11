@@ -596,6 +596,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Present a short list of choices with a RadioGroup"
+                            to="/docs/howto/present-choices-with-a-radiogroup"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Create a two-handle range slider"
                             to="/docs/howto/create-a-two-handle-range-slider"
                         />
@@ -2358,6 +2363,11 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/copy-billing-to-shipping.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/present-choices-with-a-radiogroup">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/present-choices-with-a-radiogroup.md']}"
                 />
             </Page>
             <Page
