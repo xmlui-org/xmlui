@@ -658,7 +658,7 @@ Check what happens when you resize table columns:
 
 ```xmlui-pg name="Example: width"
 <App>
-  <Table data='{
+  <Table canResizeColumns="{true}" data='{
   [
     {
       id: 0,

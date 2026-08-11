@@ -196,6 +196,7 @@ type TableProps = {
   columns?: OurColumnMetadata[];
   columnInference?: string;
   columnSizing?: TableColumnSizing;
+  canResizeColumns?: boolean;
   idKey?: string;
   hasExplicitColumns?: boolean;
   isPaginated?: boolean;
@@ -686,6 +687,7 @@ export const Table = memo(
       columns = defaultProps.columns,
       columnInference = defaultProps.columnInference,
       columnSizing: columnSizingMode = defaultProps.columnSizing,
+      canResizeColumns = defaultProps.canResizeColumns,
       idKey: inferenceIdKey = defaultProps.idKey,
       hasExplicitColumns = false,
       isPaginated,
@@ -959,7 +961,7 @@ export const Table = memo(
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
-          enableResizing: col.canResize,
+          enableResizing: col.canResize ?? canResizeColumns,
           enableSorting: col.canSort !== false && !!col.accessorKey,
           enablePinning: col.pinTo !== undefined,
           meta: {
@@ -1018,7 +1020,7 @@ export const Table = memo(
           return { width, starSizedWidth };
         }
       });
-    }, [effectiveColumnSizingMode, getThemeVar, safeColumns]);
+    }, [canResizeColumns, effectiveColumnSizingMode, getThemeVar, safeColumns]);
 
     // --- Prepare the selection column separately so hover-driven updates stay isolated to it
     const selectColumn: ColumnDef<any> = useMemo(() => {

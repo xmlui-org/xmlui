@@ -151,6 +151,30 @@ Determines where to place the pagination button row in the layout. It works the 
 
 Available values: `start`, `center` **(default)**, `end`
 
+### `canResizeColumns` [#canresizecolumns]
+
+> [!DEF]  default: **false**
+
+Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.
+
+Set `canResizeColumns` to `true` to let users resize all table columns by dragging header borders.
+
+```xmlui-pg name="Example: canResizeColumns"
+<App>
+  <Table
+    canResizeColumns="{true}"
+    data='{[
+      { id: 1, product: "Notebook", quantity: 12, category: "Office" },
+      { id: 2, product: "Pencil", quantity: 48, category: "Office" }
+    ]}'
+  >
+    <Column bindTo="product" />
+    <Column bindTo="quantity" canResize="{false}" />
+    <Column bindTo="category" />
+  </Table>
+</App>
+```
+
 ### `cellUserSelect` [#celluserselect]
 
 > [!DEF]  default: **"none"**

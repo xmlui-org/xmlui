@@ -3129,6 +3129,56 @@ test.describe("Edge Cases", () => {
 
     expect(Math.abs(headerBoxAfter!.width - cellBoxAfter!.width)).toBeLessThan(4);
   });
+
+  test("columns are not resizable by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        testId="table"
+      >
+        <Column bindTo="name" header="Name" />
+        <Column bindTo="quantity" header="Quantity" />
+      </Table>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator('thead th div[class*="resizer"]')).toHaveCount(0);
+  });
+
+  test("canResizeColumns sets column resize default and Column canResize overrides it", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack>
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
+          canResizeColumns="{true}"
+          testId="enabled-table"
+        >
+          <Column bindTo="name" header="Name" />
+          <Column bindTo="quantity" header="Quantity" canResize="{false}" />
+        </Table>
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
+          canResizeColumns="{false}"
+          testId="disabled-table"
+        >
+          <Column bindTo="name" header="Name" canResize="{true}" />
+          <Column bindTo="quantity" header="Quantity" />
+        </Table>
+      </VStack>
+    `);
+
+    await expect(page.getByTestId("enabled-table")).toBeVisible();
+    await expect(page.getByTestId("disabled-table")).toBeVisible();
+    await expect(
+      page.getByTestId("enabled-table").locator('thead th div[class*="resizer"]'),
+    ).toHaveCount(1);
+    await expect(
+      page.getByTestId("disabled-table").locator('thead th div[class*="resizer"]'),
+    ).toHaveCount(1);
+  });
 });
 
 // =============================================================================
