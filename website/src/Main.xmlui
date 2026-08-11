@@ -735,6 +735,16 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Use interactive Column controls"
+                            to="/docs/howto/use-interactive-column-controls"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Align table Column headers"
+                            to="/docs/howto/align-table-column-headers"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Display typed values outside tables"
                             to="/docs/howto/display-typed-values-outside-tables"
                         />
@@ -2010,6 +2020,16 @@
             <!-- New how-to articles: Data Loading & APIs -->
 
             <!-- New how-to articles: Tables & Data Display -->
+            <Page url="/docs/howto/use-interactive-column-controls">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/use-interactive-column-controls.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/align-table-column-headers">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/align-table-column-headers.md']}"
+                />
+            </Page>
 
             <!-- New how-to articles: Lists, Trees & Iteration -->
             <!-- Hidden pending xmlui-dnd-list extension (https://github.com/rdhyee/xmlui-dnd-list)

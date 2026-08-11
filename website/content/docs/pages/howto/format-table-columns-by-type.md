@@ -155,5 +155,6 @@ When children are present, they render instead of the default `type` output.
 
 - [Column](/docs/reference/components/Column) - all supported column properties
 - [Table](/docs/reference/components/Table) - inferred and explicit table columns
+- [Use interactive Column controls](/docs/howto/use-interactive-column-controls) - render checkbox, switch, and color controls in table cells
 - [Display typed values outside tables](/docs/howto/display-typed-values-outside-tables) - use the same display types with `Value`
 - [Use smart Table columns](/docs/howto/use-smart-table-columns) - render tables without writing `Column` children

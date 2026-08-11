@@ -1,7 +1,9 @@
 import styles from "../Toggle/Toggle.module.scss";
 
+import React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -98,15 +100,29 @@ export const SwitchMd = createMetadata({
   },
 });
 
+type ThemedToggleProps = React.ComponentPropsWithoutRef<typeof Toggle>;
+export const ThemedSwitch = React.forwardRef<HTMLInputElement, ThemedToggleProps>(
+  function ThemedSwitch({ className, ...props }: ThemedToggleProps, ref) {
+    const themeClass = useComponentThemeClass(SwitchMd);
+    return (
+      <Toggle
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const switchComponentRenderer = wrapComponent(
   COMP,
-  Toggle,
+  ThemedSwitch,
   SwitchMd,
   {
     exposeRegisterApi: true,
     stateful: true,
     events: {},
-    customRender(_props, {
+    customRender(props, {
       node,
       extractValue,
       classes,
@@ -116,9 +132,10 @@ export const switchComponentRenderer = wrapComponent(
       registerComponentApi,
     }) {
       return (
-        <Toggle
+        <ThemedSwitch
           enabled={extractValue.asOptionalBoolean(node.props.enabled)}
           classes={classes}
+          className={props.className}
           initialValue={extractValue.asOptionalBoolean(
             node.props.initialValue,
             defaultProps.initialValue,

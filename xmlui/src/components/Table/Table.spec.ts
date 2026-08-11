@@ -16,6 +16,7 @@
  */
 
 import { expect, test } from "../../testing/fixtures";
+import type { Locator } from "@playwright/test";
 
 // Sample data for testing
 const sampleData = [
@@ -24,6 +25,53 @@ const sampleData = [
   { id: 3, name: "Carrot", quantity: 10, category: "Vegetable" },
   { id: 4, name: "Spinach", quantity: 2, category: "Vegetable" },
 ];
+
+async function expectControlCentered(cell: Locator, control: Locator) {
+  await expect(cell).toBeVisible();
+  await expect(control).toBeVisible();
+  const cellBox = await cell.boundingBox();
+  const controlBox = await control.boundingBox();
+  expect(cellBox).not.toBeNull();
+  expect(controlBox).not.toBeNull();
+  const cellCenter = cellBox!.x + cellBox!.width / 2;
+  const controlCenter = controlBox!.x + controlBox!.width / 2;
+  expect(Math.abs(cellCenter - controlCenter)).toBeLessThanOrEqual(2);
+}
+
+async function getHeaderContentMetrics(header: Locator) {
+  return header.evaluate((element) => {
+    const content = element.querySelector('[class*="headerContent"]');
+    const indicator = element.querySelector('[class*="orderingIndicator"]');
+    if (!content || !indicator) {
+      return null;
+    }
+
+    const textNode = Array.from(content.childNodes).find(
+      (node) => node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
+    );
+    if (!textNode) {
+      return null;
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    const textRect = range.getBoundingClientRect();
+    range.detach();
+    const indicatorRect = indicator.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    const groupLeft = Math.min(textRect.left, indicatorRect.left);
+    const groupRight = Math.max(textRect.right, indicatorRect.right);
+
+    return {
+      contentLeft: contentRect.left,
+      contentRight: contentRect.right,
+      contentCenter: contentRect.left + contentRect.width / 2,
+      groupLeft,
+      groupRight,
+      groupCenter: (groupLeft + groupRight) / 2,
+    };
+  });
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -646,6 +694,254 @@ test.describe("Basic Functionality", () => {
       await expect(page.locator('[data-column-cell-kind="enum"]')).toHaveText("Sent to customer");
     });
 
+    test("interactive typed columns fire didChange with row context", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.rows="{[{checked: false, enabled: false, accent: '#112233'}]}">
+          <Table data="{rows}" testId="table">
+            <Column
+              bindTo="checked"
+              type="checkbox"
+              onDidChange="(value, row, rowIndex, columnId) => {
+                row.checked = value;
+                testState = { value, rowIndex, columnId, rowValue: row.checked };
+              }" />
+            <Column
+              bindTo="enabled"
+              type="switch"
+              onDidChange="(value, row, rowIndex, columnId) => {
+                row.enabled = value;
+                testState = { value, rowIndex, columnId, rowValue: row.enabled };
+              }" />
+            <Column
+              bindTo="accent"
+              type="color"
+              onDidChange="(value, row, rowIndex, columnId) => {
+                row.accent = value;
+                testState = { value, rowIndex, columnId, rowValue: row.accent };
+              }" />
+          </Table>
+        </Fragment>
+      `);
+
+      await page.getByRole("checkbox", { name: "checked row 1" }).click();
+      await expect.poll(testStateDriver.testState).toEqual({
+        value: true,
+        rowIndex: 0,
+        columnId: "checked",
+        rowValue: true,
+      });
+
+      await page.getByRole("switch", { name: "enabled row 1" }).click();
+      await expect.poll(testStateDriver.testState).toEqual({
+        value: true,
+        rowIndex: 0,
+        columnId: "enabled",
+        rowValue: true,
+      });
+
+      const colorInput = page.locator('[data-column-cell-kind="color"]');
+      await colorInput.fill("#445566");
+      await expect.poll(testStateDriver.testState).toEqual({
+        value: "#445566",
+        rowIndex: 0,
+        columnId: "accent",
+        rowValue: "#445566",
+      });
+    });
+
+    test("readOnly interactive typed columns do not fire didChange", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data="{[{checked: false, enabled: false, accent: '#112233'}]}">
+          <Column
+            bindTo="checked"
+            type="checkbox"
+            readOnly
+            onDidChange="testState = 'checkbox changed'" />
+          <Column
+            bindTo="enabled"
+            type="switch"
+            readOnly
+            onDidChange="testState = 'switch changed'" />
+          <Column
+            bindTo="accent"
+            type="color"
+            readOnly
+            onDidChange="testState = 'color changed'" />
+        </Table>
+      `);
+
+      const checkbox = page.getByRole("checkbox", { name: "checked row 1" });
+      await expect(checkbox).toHaveAttribute("aria-readonly", "true");
+      await checkbox.click();
+      await expect(checkbox).not.toBeChecked();
+
+      const switchControl = page.getByRole("switch", { name: "enabled row 1" });
+      await expect(switchControl).toHaveAttribute("aria-readonly", "true");
+      await switchControl.click();
+      await expect(switchControl).toHaveAttribute("aria-checked", "false");
+
+      const colorInput = page.locator('td[data-column-id="accent"] input[type="color"]');
+      await expect(colorInput).toBeDisabled();
+      await expect(colorInput).toHaveValue("#112233");
+
+      await expect.poll(testStateDriver.testState).toEqual(null);
+    });
+
+    test("disabled interactive typed columns do not accept input", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table data="{[{checked: false, enabled: false, accent: '#112233'}]}">
+          <Column
+            bindTo="checked"
+            type="checkbox"
+            enabled="false" />
+          <Column
+            bindTo="enabled"
+            type="switch"
+            enabled="false" />
+          <Column
+            bindTo="accent"
+            type="color"
+            enabled="false" />
+        </Table>
+      `);
+
+      await expect(page.getByRole("checkbox", { name: "checked row 1" })).toBeDisabled();
+      await expect(page.getByRole("switch", { name: "enabled row 1" })).toBeDisabled();
+      await expect(page.locator('td[data-column-id="accent"] input[type="color"]')).toBeDisabled();
+    });
+
+    test("willChange controls whether interactive typed columns commit changes", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table data="{[{locked: false, allowed: false, accent: '#112233'}]}">
+          <Column
+            bindTo="locked"
+            type="checkbox"
+            onWillChange="() => false"
+            onDidChange="testState = 'locked changed'" />
+          <Column
+            bindTo="allowed"
+            type="switch"
+            onWillChange="() => undefined"
+            onDidChange="(value, row, rowIndex, columnId) => testState = { value, rowIndex, columnId }" />
+          <Column
+            bindTo="accent"
+            type="color"
+            onWillChange="() => false"
+            onDidChange="testState = 'color changed'" />
+        </Table>
+      `);
+
+      const lockedCheckbox = page.getByRole("checkbox", { name: "locked row 1" });
+      await lockedCheckbox.click();
+      await expect(lockedCheckbox).not.toBeChecked();
+      await expect.poll(testStateDriver.testState).toEqual(null);
+
+      const allowedSwitch = page.getByRole("switch", { name: "allowed row 1" });
+      await allowedSwitch.click();
+      await expect(allowedSwitch).toHaveAttribute("aria-checked", "true");
+      await expect.poll(testStateDriver.testState).toEqual({
+        value: true,
+        rowIndex: 0,
+        columnId: "allowed",
+      });
+
+      const colorInput = page.locator('td[data-column-id="accent"] input[type="color"]');
+      await colorInput.fill("#445566");
+      await expect(colorInput).toHaveValue("#112233");
+      await expect.poll(testStateDriver.testState).toEqual({
+        value: true,
+        rowIndex: 0,
+        columnId: "allowed",
+      });
+    });
+
+    test("interactive typed columns use smart default widths and center controls", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table data="{[{shortCheck: true, longCheck: true, enabled: true, accent: '#112233'}]}">
+          <Column bindTo="shortCheck" type="checkbox" header="On" />
+          <Column bindTo="longCheck" type="checkbox" header="Really long checkbox header" />
+          <Column bindTo="enabled" type="switch" header="Switch" />
+          <Column bindTo="accent" type="color" header="Color" />
+        </Table>
+      `);
+
+      const shortHeader = page.locator('th[data-column-id="shortCheck"]');
+      const longHeader = page.locator('th[data-column-id="longCheck"]');
+
+      await expect(shortHeader).toBeVisible();
+      await expect(longHeader).toBeVisible();
+      const shortHeaderBox = await shortHeader.boundingBox();
+      const longHeaderBox = await longHeader.boundingBox();
+      expect(shortHeaderBox).not.toBeNull();
+      expect(longHeaderBox).not.toBeNull();
+      expect(longHeaderBox!.width).toBeGreaterThan(shortHeaderBox!.width + 80);
+
+      await expectControlCentered(
+        page.locator('td[data-column-id="shortCheck"]'),
+        page.getByRole("checkbox", { name: "shortCheck row 1" }),
+      );
+      await expectControlCentered(
+        page.locator('td[data-column-id="longCheck"]'),
+        page.getByRole("checkbox", { name: "longCheck row 1" }),
+      );
+      await expectControlCentered(
+        page.locator('td[data-column-id="enabled"]'),
+        page.getByRole("switch", { name: "enabled row 1" }),
+      );
+      await expectControlCentered(
+        page.locator('td[data-column-id="accent"]'),
+        page.locator('td[data-column-id="accent"] input[type="color"]'),
+      );
+    });
+
+    test("headerHorizontalAlignment aligns header text and sort icon together", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data="{[{start: 'Alpha', center: 'Bravo', end: 'Charlie'}]}"
+          alwaysShowSortingIndicator
+          canResizeColumns="false"
+        >
+          <Column bindTo="start" header="Start" width="{180}" headerHorizontalAlignment="start" />
+          <Column bindTo="center" header="Center" width="{180}" headerHorizontalAlignment="center" />
+          <Column bindTo="end" header="End" width="{180}" headerHorizontalAlignment="end" />
+        </Table>
+      `);
+
+      const startMetrics = await getHeaderContentMetrics(page.locator('th[data-column-id="start"]'));
+      const centerMetrics = await getHeaderContentMetrics(
+        page.locator('th[data-column-id="center"]'),
+      );
+      const endMetrics = await getHeaderContentMetrics(page.locator('th[data-column-id="end"]'));
+
+      expect(startMetrics).not.toBeNull();
+      expect(centerMetrics).not.toBeNull();
+      expect(endMetrics).not.toBeNull();
+
+      expect(Math.abs(startMetrics!.groupLeft - startMetrics!.contentLeft)).toBeLessThanOrEqual(2);
+      expect(Math.abs(centerMetrics!.groupCenter - centerMetrics!.contentCenter)).toBeLessThanOrEqual(
+        2,
+      );
+      expect(Math.abs(endMetrics!.groupRight - endMetrics!.contentRight)).toBeLessThanOrEqual(2);
+    });
+
     test("renders visual and structured explicit column types", async ({ initTestBed, page }) => {
       const imageUrl =
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
@@ -681,11 +977,7 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
-      await expect(page.locator('[data-column-cell-kind="color"]')).toHaveText("#336699");
-      await expect(page.locator("[data-color-swatch]")).toHaveCSS(
-        "background-color",
-        "rgb(51, 102, 153)",
-      );
+      await expect(page.locator('[data-column-cell-kind="color"]')).toHaveValue("#336699");
       await expect(page.getByRole("link", { name: "+1 555 123 4567" })).toHaveAttribute(
         "href",
         "tel:+1 555 123 4567",
@@ -724,6 +1016,68 @@ test.describe("Basic Functionality", () => {
 
       await expect(page.locator("td").filter({ hasText: "Custom 1234.5" })).toBeVisible();
       await expect(page.locator("td").filter({ hasText: "$1,234.50" })).toHaveCount(0);
+    });
+
+    test("custom cell child with percentage width uses the available column content width", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+          <Table
+            data='{[
+            { id: 1, customer: "Ada", partialCustomer: "Ada", total: 123.45 },
+            { id: 2, customer: "Grace", partialCustomer: "Grace", total: 87.5 }
+          ]}'
+          width="600px"
+        >
+          <Column bindTo="customer" header="Customer" width="240px">
+            <Select testId="fullSelect" initialValue="{$cell}" width="100%">
+              <Option value="Ada">Ada</Option>
+              <Option value="Grace">Grace</Option>
+            </Select>
+          </Column>
+          <Column bindTo="partialCustomer" header="Partial" width="240px">
+            <Select testId="partialSelect" initialValue="{$cell}" width="80%">
+              <Option value="Ada">Ada</Option>
+              <Option value="Grace">Grace</Option>
+            </Select>
+          </Column>
+          <Column bindTo="total" header="Total" width="100px" type="number" />
+        </Table>
+      `);
+
+      async function getWidthMetrics(columnId: string) {
+        const cell = page.locator(`td[data-column-id="${columnId}"]`).first();
+        const select = cell.getByRole("combobox");
+        await expect(select).toBeVisible();
+
+        return cell.evaluate((cell) => {
+          const cellBox = cell.getBoundingClientRect();
+          const content = cell.firstElementChild as HTMLElement;
+          const control = cell.querySelector('[role="combobox"]') as HTMLElement;
+          const contentStyles = window.getComputedStyle(content);
+          const availableWidth =
+            cellBox.width -
+            Number.parseFloat(contentStyles.paddingLeft) -
+            Number.parseFloat(contentStyles.paddingRight);
+
+          return {
+            availableWidth,
+            controlWidth: control.getBoundingClientRect().width,
+          };
+        });
+      }
+
+      const fullMetrics = await getWidthMetrics("customer");
+      expect(fullMetrics.controlWidth).toBeGreaterThan(180);
+      expect(Math.abs(fullMetrics.controlWidth - fullMetrics.availableWidth)).toBeLessThanOrEqual(
+        2,
+      );
+
+      const partialMetrics = await getWidthMetrics("partialCustomer");
+      expect(
+        Math.abs(partialMetrics.controlWidth - partialMetrics.availableWidth * 0.8),
+      ).toBeLessThanOrEqual(2);
     });
   });
 

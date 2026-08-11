@@ -4565,6 +4565,16 @@ export default {
         "description": "This property defines a label for a particular column. If not set, the `bindTo` property value is used for the label.",
         "valueType": "string"
       },
+      "headerHorizontalAlignment": {
+        "description": "This property sets the horizontal alignment of the column header content, including the sort indicator.",
+        "availableValues": [
+          "start",
+          "center",
+          "end"
+        ],
+        "isStrictEnum": true,
+        "valueType": "string"
+      },
       "width": {
         "description": "This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).If not defined, the component will use a width according to the column values and the available space.",
         "valueType": "any"
@@ -4596,12 +4606,44 @@ export default {
         "valueType": "boolean"
       },
       "type": {
-        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate, convert, or mutate the underlying data. Custom child markup inside the `Column` overrides type rendering.",
+        "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `checkbox`, `switch`, `color`, `enum`, `image`, or `json` to select common table cell behavior. The type does not validate, convert, or mutate the underlying data. The `checkbox`, `switch`, and `color` types render interactive controls. Custom child markup inside the `Column` overrides type rendering.",
         "valueType": "string"
       },
       "typeOptions": {
         "description": "This property provides additional display options for the column type. Use it for object-shaped configuration, such as enum/status label maps, link labels, or image/avatar alt text, and long-text options such as `maxLines`. Values in `typeOptions` override compact options specified in the `type` string.",
         "valueType": "any"
+      },
+      "readOnly": {
+        "description": "This property marks interactive typed cells in the column as read-only. It is applied to the underlying control for `checkbox`, `switch`, and `color` column types.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "enabled": {
+        "description": "This property controls whether interactive typed cells in the column respond to user events. It is applied to the underlying control for `checkbox`, `switch`, and `color` column types.",
+        "valueType": "boolean",
+        "defaultValue": true
+      }
+    },
+    "events": {
+      "willChange": {
+        "description": "This event is triggered before an interactive typed cell in the column changes its value. Return explicit false to cancel the change.",
+        "signature": "willChange(newValue: any, row: any, rowIndex: number, columnId: string): boolean | void",
+        "parameters": {
+          "newValue": "The new cell value.",
+          "row": "The row data object associated with the changed cell.",
+          "rowIndex": "The zero-based visible row index.",
+          "columnId": "The column identifier."
+        }
+      },
+      "didChange": {
+        "description": "This event is triggered when an interactive typed cell in the column changes its value.",
+        "signature": "didChange(newValue: any, row: any, rowIndex: number, columnId: string): void",
+        "parameters": {
+          "newValue": "The new cell value.",
+          "row": "The row data object associated with the changed cell.",
+          "rowIndex": "The zero-based visible row index.",
+          "columnId": "The column identifier."
+        }
       }
     },
     "contextVars": {
