@@ -13239,6 +13239,11 @@ export default {
         "description": "Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "closeOnClickAway": {
+        "description": "When `true`, clicking outside the dialog closes it.",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {

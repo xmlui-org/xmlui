@@ -105,6 +105,63 @@ test.describe("Open/Close", () => {
     await expect(page.getByTestId("isOpen")).toHaveText("false");
   });
 
+  test("closeOnClickAway=true closes dialog when clicking outside", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" closeOnClickAway="true">
+          <Text testId="content">content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await page.mouse.click(20, 20);
+    await expect(page.getByTestId("content")).not.toBeVisible();
+  });
+
+  test("closeOnClickAway=false keeps dialog open when clicking outside", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" closeOnClickAway="false">
+          <Text testId="content">content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await page.mouse.click(20, 20);
+    await expect(page.getByTestId("content")).toBeVisible();
+  });
+
+  test("onClose fires when clicking outside with closeOnClickAway=true", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal" closeOnClickAway="true" onClose="testState = 'closed'">
+          <Text testId="content">content</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await expect(page.getByTestId("content")).toBeVisible();
+    await page.mouse.click(20, 20);
+    await expect.poll(testStateDriver.testState).toEqual("closed");
+  });
+
   test("maxWidth works", async ({ page, initTestBed, createModalDialogDriver }) => {
     await initTestBed(`
       <Fragment>

@@ -119,6 +119,22 @@ Click outside the dialog to close it.
 
 %-PROP-END
 
+%-PROP-START closeOnClickAway
+
+```xmlui-pg name="Close on Click Away" height="220px"
+---app copy display name="Example: closeOnClickAway"
+<App>
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog id="dialog" closeOnClickAway="false" title="Example Dialog">
+    <Text>Clicking outside leaves this dialog open.</Text>
+  </ModalDialog>
+</App>
+---desc
+Use the close button to close the dialog.
+```
+
+%-PROP-END
+
 %-EVENT-START close
 
 In this example, the `close` event counts how many times you closed the dialog:
