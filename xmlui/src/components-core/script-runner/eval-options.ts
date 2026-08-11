@@ -45,12 +45,31 @@ export function createEventEvalOptions(
   };
 }
 
-function shouldCompileBindings(appContext?: AppContextObject): boolean {
+export type ScriptExecutionMode = {
+  mode: "compiled" | "interpreted" | "mixed";
+  bindings: "compiled" | "interpreted";
+  eventHandlers: "compiled" | "interpreted";
+};
+
+export function getScriptExecutionMode(
+  appContext?: Pick<AppContextObject, "xmluiConfig">,
+): ScriptExecutionMode {
+  const bindings = shouldCompileBindings(appContext as AppContextObject)
+    ? "compiled"
+    : "interpreted";
+  const eventHandlers = shouldCompileEventHandlers(appContext as AppContextObject)
+    ? "compiled"
+    : "interpreted";
+  const mode = bindings === eventHandlers ? bindings : "mixed";
+  return { mode, bindings, eventHandlers };
+}
+
+function shouldCompileBindings(appContext?: Pick<AppContextObject, "xmluiConfig">): boolean {
   const config = appContext?.xmluiConfig;
   return config?.compileBindings ?? config?.compileScripts ?? false;
 }
 
-function shouldCompileEventHandlers(appContext?: AppContextObject): boolean {
+function shouldCompileEventHandlers(appContext?: Pick<AppContextObject, "xmluiConfig">): boolean {
   const config = appContext?.xmluiConfig;
   return config?.compileEventHandlers ?? config?.compileScripts ?? false;
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createBindingEvalOptions,
   createEventEvalOptions,
+  getScriptExecutionMode,
 } from "../../../src/components-core/script-runner/eval-options";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 import { extractParam } from "../../../src/components-core/utils/extractParam";
@@ -166,5 +167,35 @@ describe("event eval options", () => {
     await processStatementQueueAsync(statements, evalContext as any);
 
     expect(evalContext.localContext.count).toBe(3);
+  });
+});
+
+describe("script execution mode", () => {
+  it("reports interpreted mode by default", () => {
+    expect(getScriptExecutionMode()).toEqual({
+      mode: "interpreted",
+      bindings: "interpreted",
+      eventHandlers: "interpreted",
+    });
+  });
+
+  it("reports compiled mode when compileScripts is enabled", () => {
+    expect(getScriptExecutionMode({ xmluiConfig: { compileScripts: true } } as any)).toEqual({
+      mode: "compiled",
+      bindings: "compiled",
+      eventHandlers: "compiled",
+    });
+  });
+
+  it("reports mixed mode when one script track is explicitly interpreted", () => {
+    expect(
+      getScriptExecutionMode({
+        xmluiConfig: { compileScripts: true, compileEventHandlers: false },
+      } as any),
+    ).toEqual({
+      mode: "mixed",
+      bindings: "compiled",
+      eventHandlers: "interpreted",
+    });
   });
 });

@@ -171,12 +171,13 @@ function recomputeUsesForApp(
   if (!entryPoint) {
     return;
   }
+  const effectiveAppGlobalNames = getEffectiveAppGlobalNames(entryPoint, appGlobalNames);
 
   // Pass 1: analyze all compound component bodies to collect their globalDepsUsed.
   const compoundGlobalDeps = new Map<string, ReadonlySet<string>>();
   appDef.components?.forEach((compound) => {
     if (compound.component) {
-      computeUsesForTree(compound.component, resolveOptimizerMetadata, appGlobalNames);
+      computeUsesForTree(compound.component, resolveOptimizerMetadata, effectiveAppGlobalNames);
       if (compound.name && compound.component.computedGlobalUses?.length) {
         compoundGlobalDeps.set(compound.name, new Set(compound.component.computedGlobalUses));
       }
@@ -194,12 +195,25 @@ function recomputeUsesForApp(
       }
     : resolveOptimizerMetadata;
 
-  computeUsesForTree(entryPoint, enhancedMetadata, appGlobalNames);
+  computeUsesForTree(entryPoint, enhancedMetadata, effectiveAppGlobalNames);
   appDef.components?.forEach((compound) => {
     if (compound.component) {
-      computeUsesForTree(compound.component, enhancedMetadata, appGlobalNames);
+      computeUsesForTree(compound.component, enhancedMetadata, effectiveAppGlobalNames);
     }
   });
+}
+
+function getEffectiveAppGlobalNames(
+  entryPoint: ComponentDef,
+  appGlobalNames: ReadonlySet<string> | undefined,
+): ReadonlySet<string> {
+  const markupGlobalNames = Object.keys(entryPoint.globalVars ?? {}).filter(
+    (name) => !name.startsWith("__"),
+  );
+  if (markupGlobalNames.length === 0) {
+    return appGlobalNames ?? new Set<string>();
+  }
+  return new Set([...(appGlobalNames ?? []), ...markupGlobalNames]);
 }
 
 // ---------------------------------------------------------------------------
