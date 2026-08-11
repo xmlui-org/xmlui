@@ -4592,9 +4592,8 @@ export default {
         "valueType": "string"
       },
       "canResize": {
-        "description": "This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.",
-        "valueType": "boolean",
-        "defaultValue": true
+        "description": "This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. When omitted, the column uses the parent `Table` component's `canResizeColumns` value. Double-clicking the column border resets to the original size.",
+        "valueType": "boolean"
       },
       "type": {
         "description": "This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate, convert, or mutate the underlying data. Custom child markup inside the `Column` overrides type rendering.",
@@ -17415,6 +17414,11 @@ export default {
         ],
         "isStrictEnum": true,
         "defaultValue": "auto"
+      },
+      "canResizeColumns": {
+        "description": "Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.",
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",

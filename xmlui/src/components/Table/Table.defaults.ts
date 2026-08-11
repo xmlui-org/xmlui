@@ -6,6 +6,7 @@ export const defaultProps = {
   columns: EMPTY_ARRAY,
   columnInference: "first-n(25)",
   columnSizing: "auto" as "auto" | "stretch" | "balanced" | "content",
+  canResizeColumns: false,
   isPaginated: false,
   loading: false,
   loadingDelay: 400,

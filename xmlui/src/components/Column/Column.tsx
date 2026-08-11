@@ -67,8 +67,9 @@ export const ColumnMd = createMetadata({
       description:
         `This property indicates whether the user can resize the column. If set to ` +
         `\`true\`, the column can be resized by dragging the column border. If set to ` +
-        `\`false\`, the column cannot be resized. Double-clicking the column border ` +
-        `resets to the original size.`,
+        `\`false\`, the column cannot be resized. When omitted, the column uses the ` +
+        `parent \`Table\` component's \`canResizeColumns\` value. Double-clicking the ` +
+        `column border resets to the original size.`,
       valueType: "boolean",
       defaultValue: defaultProps.canResize,
     },

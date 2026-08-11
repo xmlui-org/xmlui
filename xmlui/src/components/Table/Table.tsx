@@ -113,6 +113,14 @@ export const TableMd = createMetadata({
       isStrictEnum: true,
       defaultValue: defaultProps.columnSizing,
     },
+    canResizeColumns: {
+      description:
+        `Indicates whether columns can be resized by dragging their header borders. ` +
+        `Individual \`Column\` components can override this table-level default with ` +
+        `their own \`canResize\` property.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.canResizeColumns,
+    },
     idKey: {
       description:
         `This property is used to specify the unique ID property in the data array. ` +
@@ -931,6 +939,7 @@ const TableWithColumns = memo(
             columns={columns}
             columnInference={extractValue.asOptionalString(node.props.columnInference)}
             columnSizing={extractValue.asOptionalString(node.props.columnSizing)}
+            canResizeColumns={extractValue.asOptionalBoolean(node.props.canResizeColumns)}
             idKey={idKey}
             hasExplicitColumns={hasExplicitColumns}
             pageSizeOptions={extractValue(node.props.pageSizeOptions)}

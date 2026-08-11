@@ -160,9 +160,7 @@ Indicates the name of the current row item's property, the value of which to lay
 
 ### `canResize` [#canresize]
 
-> [!DEF]  default: **true**
-
-This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
+This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. When omitted, the column uses the parent `Table` component's `canResizeColumns` value. Double-clicking the column border resets to the original size.
 
 ### `canSort` [#cansort]
 
@@ -693,7 +691,7 @@ Check what happens when you resize table columns:
 
 ```xmlui-pg name="Example: width"
 <App>
-  <Table data='{
+  <Table canResizeColumns="{true}" data='{
   [
     {
       id: 0,
