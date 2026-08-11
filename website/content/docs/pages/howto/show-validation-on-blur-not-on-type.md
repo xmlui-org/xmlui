@@ -1,93 +1,57 @@
 # Show validation on blur, not on type
 
-Use customValidationsDebounce on the input field to delay custom validation until the user pauses typing or leaves the field.
+Set `validationMode` on a field to control *when* its error appears: as the user types, or only when they leave the field.
 
-A username field runs a server call to check whether the chosen name is taken. Firing that check on every keystroke would flood the server with requests. `customValidationsDebounce` batches rapid changes so the `onValidate` handler only runs after the user has stopped typing for a set number of milliseconds.
+Firing a validation error on every keystroke — flagging "too short" before the user has finished typing — feels nagging. `validationMode` decides the timing:
 
-```xmlui-pg copy display name="Debounced username availability check"
----api
-{
-  "apiUrl": "/api",
-  "operations": {
-    "check-username": {
-      "url": "/check-username",
-      "method": "post",
-      "handler": "return { taken: true }"
-    }
-  }
-}
----app display
+- **`onChanged`** — show the error on every keystroke (validate as you type).
+- **`onLostFocus`** — show or clear the error *only* when the field loses focus (validate on blur).
+- **`errorLate`** (default) — show the error on blur, then keep it live on every keystroke until the input becomes valid.
+
+The two fields below carry the same rules (`required`, `minLength="3"`) and differ only in `validationMode`. Type one or two characters in each: the first flags immediately; the second stays quiet until you click away.
+
+```xmlui-pg copy display name="Validation timing: on type vs on blur"
 <App>
   <Form
-    data="{{ username: '' }}"
-    onSubmit="(data) => toast('Registered as: ' + data.username)"
-    saveLabel="Register"
+    data="{{ handle: '', display: '' }}"
+    onSubmit="(data) => toast('Saved ' + data.handle)"
+    saveLabel="Save"
   >
     <TextBox
-      label="Username"
-      bindTo="username"
+      label="Handle — validated as you type (onChanged)"
+      bindTo="handle"
       required="true"
       minLength="3"
-      customValidationsDebounce="500"
-      onValidate="async (value) => {
-        if (!value || value.length < 3) return null;
-        const res = await fetch('/api/check-username', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: value })
-        });
-        const data = await res.json();
-        return data.taken ? '\u201c' + value + '\u201d is already taken' : null;
-      }"
-      placeholder="Letters and numbers only, at least 3 characters."
-    />
-    <TextBox label="Email" bindTo="email" pattern="email" required="true" />
+      validationMode="onChanged"
+      placeholder="Type one letter to see the error appear immediately" />
+    <TextBox
+      label="Display name — validated on blur (onLostFocus)"
+      bindTo="display"
+      required="true"
+      minLength="3"
+      validationMode="onLostFocus"
+      placeholder="Type one letter, then click away to see the error" />
   </Form>
 </App>
 ```
 
 ## Key points
 
-**`customValidationsDebounce` only delays `onValidate`**: Built-in validators (`required`, `pattern`, `minLength`, `maxLength`, `regex`) are not affected — they continue to run immediately when the field loses focus or when the form tries to submit. Only the `onValidate` handler is debounced:
+**`validationMode` sets the timing, not the rules.** The same validators (`required`, `pattern`, `minLength`, `onValidate`, …) run either way; `validationMode` only decides *when their result is shown*. `onLostFocus` is the "don't nag me while I'm typing" choice.
 
 ```xmlui
-<TextBox
-  bindTo="username"
-  required="true"               <!-- evaluated immediately -->
-  minLength="3"                 <!-- evaluated immediately -->
-  customValidationsDebounce="500"
-  onValidate="async (v) => checkAvailability(v)"  <!-- delayed 500 ms -->
-/>
+<TextBox bindTo="handle" required="true" minLength="3" validationMode="onLostFocus" />
 ```
 
-**Recommended debounce values**: For API calls, 300–500 ms is a good starting point. Values below 200 ms may still generate excessive requests; values above 800 ms make the form feel sluggish. Purely local `onValidate` logic can use 0 (or omit the prop) to run synchronously.
+**`errorLate` (the default) is a middle ground.** It waits for the first blur to show an error, but once an error is visible it updates on every keystroke — so the user gets immediate feedback *while fixing* a known problem, without being flagged before they've had a chance.
 
-**`onValidate` can be `async`**: The handler may return a `Promise<string | null>`. XMLUI waits for the promise to resolve before showing or clearing the error indicator:
+**Set it per field.** `validationMode` is a field-level property — put it on each input whose timing you want to control (as on the two `TextBox`es above).
 
-```xmlui
-<TextBox
-  bindTo="email"
-  customValidationsDebounce="400"
-  onValidate="async (v) => {
-    const exists = await api.emailExists(v);
-    return exists ? 'Email already registered' : null;
-  }"
-/>
-```
-
-**The form blocks submission while validation is pending**: If `onValidate` is still running when the user presses Save, XMLUI waits for the promise to settle before deciding whether to proceed. The user cannot accidentally submit while the async check is in-flight.
-
-**Return `null` to clear an existing error**: Once the user fixes the value, `onValidate` runs again and can return `null` to remove the previous error message:
-
-```xmlui
-onValidate="async (v) => {
-  const taken = await checkUsername(v);
-  return taken ? 'Already taken' : null;
-}"
-```
+**For validation that calls an API, add a debounce.** When `onValidate` hits the server (e.g. a username-availability check), pair the timing with `customValidationsDebounce` so the call fires only after the user pauses — see [Check uniqueness with an API](/docs/howto/add-an-async-uniqueness-check).
 
 ---
 
 **See also**
-- [TextBox component](/docs/reference/components/TextBox) — `customValidationsDebounce`, `onValidate`, built-in validators
-- [Add an async uniqueness check](/docs/howto/add-an-async-uniqueness-check) — full async validation example with DataSource
+- [TextBox component](/docs/reference/components/TextBox) — `validationMode`, built-in validators, `onValidate`
+- [Form component](/docs/reference/components/Form) — grouping fields and submission handling
+- [Check uniqueness with an API](/docs/howto/add-an-async-uniqueness-check) — async `onValidate` with `customValidationsDebounce`

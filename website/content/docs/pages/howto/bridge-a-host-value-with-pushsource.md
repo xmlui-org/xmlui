@@ -14,12 +14,13 @@ render before the first `emit`.
 
 ```xmlui-pg copy display name="Subscribe a host value stream"
 <App>
-  <!-- window.subscribeAgentStatus is provided by the host shell; it calls
-       emit(...) whenever the status changes and returns an unsubscribe fn. -->
+  <!-- docsSubscribeAgentStatus is a docs-only source: it emit()s a new status
+       every 1.5s and returns an unsubscribe fn. In a real app this is your
+       postMessage / Tauri event / WebSocket subscription. -->
   <PushSource
     id="agentStatus"
     initial="{{ state: 'idle' }}"
-    subscribe="{window.subscribeAgentStatus}" />
+    subscribe="{window.docsSubscribeAgentStatus}" />
 
   <Text value="Agent is {agentStatus.value.state}" />
 </App>

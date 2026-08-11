@@ -6,22 +6,35 @@ counter — pair `PushSource` with a `ChangeListener` that watches its value.
 This is the push counterpart to reacting to a `DataSource` result.
 
 ```xmlui-pg copy display name="React to each pushed change"
+---app display
 <App var.refreshes="{0}">
-  <!-- window.subscribeSessionsChanged emits a tick whenever the host sees the
-       session list change on disk. -->
-  <PushSource id="sessionsChanged" subscribe="{window.subscribeSessionsChanged}" />
+  <!-- docsSubscribeTick is a docs-only source: it emit()s a new tick every
+       1.5s. In a real app this is your host's "something changed" signal. -->
+  <PushSource id="changed" subscribe="{window.docsSubscribeTick}" />
 
-  <DataSource id="sessions" url="/api/sessions" />
+  <DataSource id="items" url="/api/items" />
 
   <ChangeListener
-    listenTo="{sessionsChanged.value}"
-    onDidChange="() => { sessions.refetch(); refreshes++; }" />
+    listenTo="{changed.value}"
+    onDidChange="() => { items.refetch(); refreshes++; }" />
 
-  <Text value="Refetched {refreshes} time(s)" />
-  <List data="{sessions.value}">
+  <Text value="Reacted {refreshes} time(s)" />
+  <List data="{items.value}">
     <Text value="{$item.name}" />
   </List>
 </App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.n = 0",
+  "operations": {
+    "get-items": {
+      "url": "/items",
+      "method": "get",
+      "handler": "$state.n = $state.n + 1; return [{ id: 1, name: 'fetch #' + $state.n + ' - alpha' }, { id: 2, name: 'fetch #' + $state.n + ' - beta' }]"
+    }
+  }
+}
 ```
 
 This is the exact shape Bram uses to keep pull-based `DataSource`s fresh from

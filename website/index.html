@@ -122,6 +122,32 @@
         return result;
       };
 
+      // Docs-only PushSource sources: each emits a value stream on an interval
+      // and returns an unsubscribe fn, giving the PushSource / ChangeListener
+      // how-to playgrounds a live host-style source to push from.
+      globalThis.docsSubscribeTick = function (emit) {
+        var n = 0;
+        var id = setInterval(function () {
+          emit(++n);
+        }, 1500);
+        return function () {
+          clearInterval(id);
+        };
+      };
+
+      globalThis.docsSubscribeAgentStatus = function (emit) {
+        var states = ["idle", "thinking", "typing", "done"];
+        var i = 0;
+        emit({ state: states[0] }); // synchronous seed, wins over `initial`
+        var id = setInterval(function () {
+          i = (i + 1) % states.length;
+          emit({ state: states[i] });
+        }, 1500);
+        return function () {
+          clearInterval(id);
+        };
+      };
+
       globalThis.formatMonth = function (month) {
         // Input: '2022-06'
         const [year, monthNum] = month.split("-");
