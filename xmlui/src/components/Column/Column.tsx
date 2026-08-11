@@ -1,12 +1,31 @@
 import type React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
-import type { LayoutContext } from "../../abstractions/RendererDefs";
+import type { LayoutContext, ValueExtractor } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { createMetadata } from "../metadata-helpers";
+import { createMetadata, dEnabled, dReadonly } from "../metadata-helpers";
+import { alignmentOptionValues } from "../abstractions";
 import { defaultProps } from "./Column.defaults";
 import { Column } from "./ColumnReact";
 
 const COMP = "Column";
+
+function hasPercentageWidthCustomCellChild(
+  children: ComponentDef[] | undefined,
+  extractValue: ValueExtractor,
+) {
+  return children?.some((child) => {
+    const width = child.props?.width;
+    if (width === undefined) {
+      return false;
+    }
+    try {
+      return /^\d+(?:\.\d+)?%$/.test(extractValue(width)?.toString().trim() ?? "");
+    } catch {
+      return false;
+    }
+  }) ?? false;
+}
 
 export const ColumnMd = createMetadata({
   status: "stable",
@@ -27,6 +46,13 @@ export const ColumnMd = createMetadata({
       description:
         "This property defines a label for a particular column. If not set, the " +
         "`bindTo` property value is used for the label.",
+      valueType: "string",
+    },
+    headerHorizontalAlignment: {
+      description:
+        "This property sets the horizontal alignment of the column header content, including the sort indicator.",
+      availableValues: alignmentOptionValues,
+      isStrictEnum: true,
       valueType: "string",
     },
     width: {
@@ -77,9 +103,10 @@ export const ColumnMd = createMetadata({
       description:
         `This property provides a display hint for the column's cell values. Use compact values ` +
         `such as \`text\`, \`email\`, \`number(8,3)\`, \`currency(USD)\`, \`date(short)\`, ` +
-        `\`datetime\`, \`boolean\`, \`enum\`, \`image\`, or \`json\` to select common table ` +
-        `cell formatting behavior. The type affects display only; it does not validate, convert, ` +
-        `or mutate the underlying data. Custom child markup inside the \`Column\` overrides type ` +
+        `\`datetime\`, \`boolean\`, \`checkbox\`, \`switch\`, \`color\`, \`enum\`, \`image\`, or ` +
+        `\`json\` to select common table cell behavior. The type does not validate, convert, ` +
+        `or mutate the underlying data. The \`checkbox\`, \`switch\`, and \`color\` types render ` +
+        `interactive controls. Custom child markup inside the \`Column\` overrides type ` +
         `rendering.`,
       valueType: "string",
     },
@@ -90,6 +117,43 @@ export const ColumnMd = createMetadata({
         `alt text, and long-text options such as \`maxLines\`. Values in \`typeOptions\` override compact options specified in the \`type\` ` +
         `string.`,
       valueType: "any",
+    },
+    readOnly: {
+      ...dReadonly(),
+      description:
+        `This property marks interactive typed cells in the column as read-only. It is applied ` +
+        `to the underlying control for \`checkbox\`, \`switch\`, and \`color\` column types.`,
+    },
+    enabled: {
+      ...dEnabled(),
+      description:
+        `This property controls whether interactive typed cells in the column respond to user ` +
+        `events. It is applied to the underlying control for \`checkbox\`, \`switch\`, and ` +
+        `\`color\` column types.`,
+    },
+  },
+  events: {
+    willChange: {
+      description:
+        "This event is triggered before an interactive typed cell in the column changes its value. Return explicit false to cancel the change.",
+      signature: "willChange(newValue: any, row: any, rowIndex: number, columnId: string): boolean | void",
+      parameters: {
+        newValue: "The new cell value.",
+        row: "The row data object associated with the changed cell.",
+        rowIndex: "The zero-based visible row index.",
+        columnId: "The column identifier.",
+      },
+    },
+    didChange: {
+      description:
+        "This event is triggered when an interactive typed cell in the column changes its value.",
+      signature: "didChange(newValue: any, row: any, rowIndex: number, columnId: string): void",
+      parameters: {
+        newValue: "The new cell value.",
+        row: "The row data object associated with the changed cell.",
+        rowIndex: "The zero-based visible row index.",
+        columnId: "The column identifier.",
+      },
     },
   },
   contextVars: {
@@ -116,7 +180,7 @@ export const ColumnMd = createMetadata({
 
 export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
   customRender: (
-    _props,
+    props,
     { node, extractValue, renderChild, classes, appContext, layoutContext },
   ) => {
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
@@ -165,12 +229,20 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
       <Column
         style={Object.keys(style).length > 0 ? style : undefined}
         header={extractValue.asDisplayText(node.props.header)}
+        headerHorizontalAlignment={extractValue.asOptionalString(
+          node.props.headerHorizontalAlignment,
+        )}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
         canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
         pinTo={extractValue.asOptionalString(node.props.pinTo)}
         type={extractValue.asOptionalString(node.props.type)}
         typeOptions={extractValue(node.props.typeOptions)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
+        willChange={props.onWillChange}
+        didChange={props.onDidChange}
+        fillCellContent={hasPercentageWidthCustomCellChild(node.children, extractValue)}
         width={extractValue(node.props.width)}
         minWidth={extractValue(node.props.minWidth)}
         maxWidth={extractValue(node.props.maxWidth)}

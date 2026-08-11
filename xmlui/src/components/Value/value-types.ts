@@ -31,6 +31,7 @@ export const VALUE_TYPE_NAMES = [
   "iso-date",
   "boolean",
   "checkbox",
+  "switch",
   "yes-no",
   "status",
   "enum",

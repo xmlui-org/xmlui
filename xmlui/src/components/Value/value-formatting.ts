@@ -16,6 +16,7 @@ export type ValueRenderModel =
         | "json"
         | "boolean"
         | "checkbox"
+        | "switch"
         | "yes-no"
         | "date"
         | "tag"
@@ -112,6 +113,9 @@ export function formatValue(
 
     case "checkbox":
       return { kind: "checkbox", text: value ? "✓" : "" };
+
+    case "switch":
+      return { kind: "switch", text: value ? "true" : "false" };
 
     case "yes-no":
       return { kind: "yes-no", text: value ? "Yes" : "No" };

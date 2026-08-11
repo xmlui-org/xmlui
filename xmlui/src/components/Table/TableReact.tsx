@@ -46,6 +46,8 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
+import { ThemedColorPicker } from "../ColorPicker/ColorPicker";
+import { ThemedSwitch } from "../Switch/Switch";
 import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
@@ -79,8 +81,14 @@ declare module "@tanstack/table-core" {
     starSizedWidth?: string;
     accessorKey?: string;
     pinTo?: string;
+    headerHorizontalAlignment?: string;
     cellRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
     columnType?: NormalizedColumnType;
+    readOnly?: boolean;
+    enabled?: boolean;
+    willChange?: AsyncFunction;
+    didChange?: AsyncFunction;
+    fillCellContent?: boolean;
   }
 }
 
@@ -274,6 +282,14 @@ function defaultIsRowUnselectable(_: any) {
 }
 
 function getDefaultTypeStyle(columnType?: NormalizedColumnType): CSSProperties | undefined {
+  if (columnType && INTERACTIVE_COLUMN_TYPES.has(columnType.name)) {
+    return {
+      display: "flex",
+      justifyContent: "center",
+      textAlign: "center",
+    };
+  }
+
   if (!columnType || !END_ALIGNED_COLUMN_TYPES.has(columnType.name)) {
     return undefined;
   }
@@ -299,8 +315,17 @@ function resolveColumnSizingMode(
 function getDefaultTypeWidth(
   columnType: NormalizedColumnType | undefined,
   columnSizing: Exclude<TableColumnSizing, "auto">,
+  header?: string,
+  canSort?: boolean,
+  canResize?: boolean,
 ): string | number | undefined {
-  if (!columnType || columnSizing === "stretch") {
+  if (!columnType) {
+    return undefined;
+  }
+  if (INTERACTIVE_COLUMN_TYPES.has(columnType.name)) {
+    return getInteractiveColumnDefaultWidth(columnType.name, header, canSort, canResize);
+  }
+  if (columnSizing === "stretch") {
     return undefined;
   }
   if (columnSizing === "balanced" && STAR_WIDTH_TYPES.has(columnType.name)) {
@@ -323,6 +348,20 @@ const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
 
+const DEFAULT_CELL_HORIZONTAL_PADDING = 12;
+const DEFAULT_INTERACTIVE_CELL_INLINE_PADDING = DEFAULT_CELL_HORIZONTAL_PADDING / 2;
+const DEFAULT_HEADER_HORIZONTAL_PADDING = 12;
+const HEADER_RESIZE_HANDLE_WIDTH = 6;
+const HEADER_SORT_INDICATOR_WIDTH = 16;
+const HEADER_SORT_INDICATOR_GAP = 4;
+const AVERAGE_HEADER_CHARACTER_WIDTH = 7;
+
+const INTERACTIVE_COLUMN_CONTROL_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
+  checkbox: 20,
+  switch: 58,
+  color: 50,
+};
+
 const TYPE_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
   id: 96,
   uuid: 260,
@@ -337,7 +376,6 @@ const TYPE_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
   duration: 112,
   rating: 96,
   boolean: 88,
-  checkbox: 64,
   "yes-no": 88,
   date: 128,
   time: 112,
@@ -349,6 +387,56 @@ const TYPE_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
   status: 128,
   tag: 128,
 };
+
+const INTERACTIVE_COLUMN_TYPES = new Set<NormalizedColumnType["name"]>([
+  "checkbox",
+  "switch",
+  "color",
+]);
+
+function getInteractiveColumnDefaultWidth(
+  columnTypeName: NormalizedColumnType["name"],
+  header?: string,
+  canSort?: boolean,
+  canResize?: boolean,
+): number {
+  const controlWidth =
+    (INTERACTIVE_COLUMN_CONTROL_WIDTHS[columnTypeName] ?? 0) + DEFAULT_CELL_HORIZONTAL_PADDING;
+  const headerWidth = estimateHeaderWidth(header, canSort, canResize);
+  return Math.ceil(Math.max(controlWidth, headerWidth));
+}
+
+function estimateHeaderWidth(header?: string, canSort?: boolean, canResize?: boolean): number {
+  const text = header?.trim();
+  if (!text) {
+    return 0;
+  }
+  return (
+    estimateHeaderTextWidth(text) +
+    DEFAULT_HEADER_HORIZONTAL_PADDING +
+    (canSort ? HEADER_SORT_INDICATOR_WIDTH + HEADER_SORT_INDICATOR_GAP : 0) +
+    (canResize ? HEADER_RESIZE_HANDLE_WIDTH : 0)
+  );
+}
+
+function estimateHeaderTextWidth(text: string): number {
+  return text.length * AVERAGE_HEADER_CHARACTER_WIDTH;
+}
+
+function getHeaderJustifyContent(
+  horizontalAlignment?: string,
+): React.CSSProperties["justifyContent"] | undefined {
+  if (!horizontalAlignment) {
+    return undefined;
+  }
+  return horizontalAlignment === "start"
+    ? "flex-start"
+    : horizontalAlignment === "center"
+      ? "center"
+      : horizontalAlignment === "end"
+        ? "flex-end"
+        : horizontalAlignment;
+}
 
 const CONTENT_WIDTHS: Partial<Record<NormalizedColumnType["name"], number>> = {
   text: 180,
@@ -439,6 +527,123 @@ function SelectionToggle({
       />
     </div>
   );
+}
+
+type TypedColumnCellProps = {
+  value: unknown;
+  valueType: NormalizedColumnType;
+  localeProfile: LocaleProfile;
+  row: any;
+  rowIndex: number;
+  columnId: string;
+  readOnly?: boolean;
+  enabled?: boolean;
+  onWillChange?: AsyncFunction;
+  onDidChange?: AsyncFunction;
+};
+
+function TypedColumnCell({
+  value,
+  valueType,
+  localeProfile,
+  row,
+  rowIndex,
+  columnId,
+  readOnly,
+  enabled,
+  onWillChange,
+  onDidChange,
+}: TypedColumnCellProps) {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  const handleDidChange = useCallback(
+    async (newValue: boolean | string) => {
+      const shouldChange = await onWillChange?.(newValue, row, rowIndex, columnId);
+      if (shouldChange === false) {
+        return;
+      }
+      setLocalValue(newValue);
+      onDidChange?.(newValue, row, rowIndex, columnId);
+    },
+    [columnId, onDidChange, onWillChange, row, rowIndex],
+  );
+
+  if (!INTERACTIVE_COLUMN_TYPES.has(valueType.name)) {
+    return (
+      <Value
+        value={value}
+        valueType={valueType}
+        localeProfile={localeProfile}
+        withColumnKindAttribute
+      />
+    );
+  }
+
+  const ariaLabel = `${columnId} row ${rowIndex + 1}`;
+  const commonControlProps = {
+    "aria-label": ariaLabel,
+    "data-column-cell-kind": valueType.name,
+  };
+
+  switch (valueType.name) {
+    case "checkbox":
+      return (
+        <Toggle
+          {...commonControlProps}
+          value={toBooleanCellValue(localValue)}
+          readOnly={readOnly}
+          enabled={enabled}
+          onDidChange={handleDidChange}
+        />
+      );
+    case "switch":
+      return (
+        <ThemedSwitch
+          {...commonControlProps}
+          value={toBooleanCellValue(localValue)}
+          readOnly={readOnly}
+          enabled={enabled}
+          onDidChange={handleDidChange}
+          variant="switch"
+        />
+      );
+    case "color":
+      return (
+        <ThemedColorPicker
+          {...commonControlProps}
+          value={toColorCellValue(localValue)}
+          readOnly={readOnly}
+          enabled={enabled}
+          onDidChange={handleDidChange}
+        />
+      );
+    default:
+      return null;
+  }
+}
+
+function toBooleanCellValue(value: unknown): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) && value !== 0;
+  }
+  if (typeof value === "string") {
+    return value.trim() !== "" && value.toLowerCase() !== "false";
+  }
+  return !!value;
+}
+
+function toColorCellValue(value: unknown): string {
+  if (typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value)) {
+    return value;
+  }
+  return "#000000";
 }
 
 function getLocaleProfileRenderKey(localeProfile: LocaleProfile): string {
@@ -944,8 +1149,18 @@ export const Table = memo(
       return safeColumns.map((col, idx) => {
         // --- Obtain column width information
         const columnType = col.type ? normalizeColumnType(col.type, col.typeOptions).type : undefined;
+        const header = col.header ?? col.accessorKey ?? " ";
+        const enableResizing = col.canResize ?? canResizeColumns;
+        const enableSorting = col.canSort !== false && !!col.accessorKey;
         const effectiveColumnWidth =
-          col.width ?? getDefaultTypeWidth(columnType, effectiveColumnSizingMode);
+          col.width ??
+          getDefaultTypeWidth(
+            columnType,
+            effectiveColumnSizingMode,
+            header,
+            enableSorting,
+            enableResizing,
+          );
         const effectiveMinWidth =
           col.minWidth ?? getDefaultTypeMinWidth(columnType, effectiveColumnSizingMode);
         const { width, starSizedWidth } = getColumnWidth(effectiveColumnWidth, true, "width");
@@ -956,22 +1171,28 @@ export const Table = memo(
 
         const customColumn = {
           ...col,
-          header: col.header ?? col.accessorKey ?? " ",
+          header,
           id: col.id ?? col.accessorKey ?? "col_" + idx,
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
-          enableResizing: col.canResize ?? canResizeColumns,
-          enableSorting: col.canSort !== false && !!col.accessorKey,
+          enableResizing,
+          enableSorting,
           enablePinning: col.pinTo !== undefined,
           meta: {
             starSizedWidth,
             pinTo: col.pinTo,
             style: columnStyle,
             className: col.className,
+            headerHorizontalAlignment: col.headerHorizontalAlignment,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
             columnType,
+            readOnly: col.readOnly,
+            enabled: col.enabled,
+            willChange: col.willChange,
+            didChange: col.didChange,
+            fillCellContent: col.fillCellContent,
           },
         };
         return customColumn;
@@ -1428,6 +1649,8 @@ export const Table = memo(
     // Use a ref to avoid recreating VirtualTableRow when rows change
     const rowsRef = useRef(rows);
     rowsRef.current = rows;
+    const safeDataRef = useRef(safeData);
+    safeDataRef.current = safeData;
 
     // --- Stable ref for all values accessed inside VirtualTableRow.
     // Keeping VirtualTableRow identity stable is critical: virtua's ListItem uses
@@ -1501,10 +1724,35 @@ export const Table = memo(
               {row.getVisibleCells().map((cell, i) => {
                 const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
                 const columnType = cell.column.columnDef?.meta?.columnType;
+                const isInteractiveColumn =
+                  columnType !== undefined && INTERACTIVE_COLUMN_TYPES.has(columnType.name);
+                const readOnly = cell.column.columnDef?.meta?.readOnly;
+                const enabled = cell.column.columnDef?.meta?.enabled;
+                const willChange = cell.column.columnDef?.meta?.willChange;
+                const didChange = cell.column.columnDef?.meta?.didChange;
+                const fillCellContent = cell.column.columnDef?.meta?.fillCellContent;
+                const cellColumnId = cell.column.columnDef?.meta?.accessorKey ?? cell.column.id;
                 const size = cell.column.getSize();
                 const columnClassName = cell.column.columnDef?.meta?.className;
                 const columnStyle = cell.column.columnDef?.meta?.style;
+                const rowSourceIndex =
+                  typeof row.original.order === "number" ? row.original.order - 1 : rowIndex;
+                const sourceRow = safeDataRef.current[rowSourceIndex] ?? row.original;
                 const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
+                const cellContentStyle: React.CSSProperties = {
+                  userSelect: userSelectCell as React.CSSProperties["userSelect"],
+                };
+                if (fillCellContent) {
+                  cellContentStyle.width = "100%";
+                  cellContentStyle.boxSizing = "border-box";
+                }
+                if (isInteractiveColumn) {
+                  cellContentStyle.width = "100%";
+                  cellContentStyle.boxSizing = "border-box";
+                  cellContentStyle.display = "flex";
+                  cellContentStyle.justifyContent = "center";
+                  cellContentStyle.paddingInline = DEFAULT_INTERACTIVE_CELL_INLINE_PADDING;
+                }
                 const alignmentClass =
                   vertAlign === "top"
                     ? styles.alignTop
@@ -1526,17 +1774,23 @@ export const Table = memo(
                   >
                     <div
                       className={styles.cellContent}
-                      style={{ userSelect: userSelectCell as React.CSSProperties["userSelect"] }}
+                      style={cellContentStyle}
                     >
                       {cellRenderer
                         ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
                         : columnType
                           ? (
-                              <Value
+                              <TypedColumnCell
                                 value={cell?.getValue()}
                                 valueType={columnType}
                                 localeProfile={currentLocaleProfile}
-                                withColumnKindAttribute
+                                row={sourceRow}
+                                rowIndex={rowIndex}
+                                columnId={cellColumnId}
+                                readOnly={readOnly}
+                                enabled={enabled}
+                                onWillChange={willChange}
+                                onDidChange={didChange}
                               />
                             )
                           : (flexRender(
@@ -1957,6 +2211,9 @@ export const Table = memo(
                   >
                     {headerGroup.headers.map((header, headerIndex) => {
                       const { width, ...style } = header.column.columnDef.meta?.style || {};
+                      const headerJustifyContent = getHeaderJustifyContent(
+                        header.column.columnDef.meta?.headerHorizontalAlignment,
+                      );
                       const size = header.getSize();
                       const alignmentClass =
                         cellVerticalAlign === "top"
@@ -1993,6 +2250,9 @@ export const Table = memo(
                               className={styles.headerContent}
                               style={{
                                 ...style,
+                                width: headerJustifyContent ? "100%" : undefined,
+                                boxSizing: headerJustifyContent ? "border-box" : undefined,
+                                justifyContent: headerJustifyContent,
                                 userSelect:
                                   effectiveUserSelectHeading as React.CSSProperties["userSelect"],
                               }}

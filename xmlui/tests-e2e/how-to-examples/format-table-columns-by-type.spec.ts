@@ -100,14 +100,13 @@ test.describe("Display enums and statuses", { tag: "@website" }, () => {
   });
 });
 
-// display-only example — no interaction to test
 test.describe("Display structured and media values", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,
     "display-structured-and-media-values",
   );
 
-  test("initial state renders json, tags, color, and avatar values", async ({
+  test("initial state renders json, tags, color input, and avatar values", async ({
     initTestBed,
     page,
   }) => {
@@ -115,11 +114,7 @@ test.describe("Display structured and media values", { tag: "@website" }, () => 
 
     await expect(page.locator('[data-column-cell-kind="json"]')).toHaveText('{"level":"admin"}');
     await expect(page.locator('[data-column-cell-kind="tags"]')).toHaveText("math, logic");
-    await expect(page.locator('[data-column-cell-kind="color"]')).toHaveText("#336699");
-    await expect(page.locator("[data-color-swatch]")).toHaveCSS(
-      "background-color",
-      "rgb(51, 102, 153)",
-    );
+    await expect(page.locator('[data-column-cell-kind="color"]')).toHaveValue("#336699");
     await expect(page.getByRole("img", { name: "Sample avatar" })).toBeVisible();
     await expect(page.locator('[data-column-cell-kind="avatar"]')).toHaveCSS(
       "border-radius",
