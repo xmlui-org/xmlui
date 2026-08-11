@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.14.9
+
+### Patch Changes
+
+- a7f1e2b: Add interactive checkbox, switch, and color typed table columns with Column willChange/didChange events, enabled and read-only control support, and header horizontal alignment.
+- a7f1e2b: Fix custom table cell children with percentage widths so they size against the available column content width.
+- e12475c: Add `closeOnClickAway` to `ModalDialog` so apps can keep dialogs open when users click outside them.
+- e12475c: Update React and React DOM to 18.3.1.
+
 ## 0.14.8
 
 ### Patch Changes

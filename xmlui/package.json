@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.14.8",
+  "version": "0.14.9",
   "sideEffects": [
     "**/*.css",
     "src/components-core/analyzer/rules/**/*.ts"
