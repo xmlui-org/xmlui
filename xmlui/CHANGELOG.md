@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.14.7
+
+### Patch Changes
+
+- bb43c9e: Add fallback text for built-in XMLUI framework labels when the active locale has no translation, render input and button focus rings evenly on all sides, and avoid reserving FileInput button space for a missing default icon.
+- 6e40923: Add `Table.canResizeColumns` to control the default resize behavior for all table columns, while allowing individual `Column.canResize` values to override it.
+
 ## 0.14.6
 
 ### Patch Changes
