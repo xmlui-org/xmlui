@@ -184,6 +184,22 @@ describe("event-async compiled script target", () => {
     expect(evalContext.localContext.count).toBe(2);
   });
 
+  it("executes top-level arrow expression handlers with multi-statement bodies", async () => {
+    const artifact = compileEventAsyncStatementSource(
+      "() => { auth = { user: { name: 'John Doe' } }; result = auth.user.name; }",
+      "Main.xmlui#event-arrow-handler",
+    );
+    const evalContext = {
+      localContext: { auth: null, result: null },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    } as any;
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.auth).toEqual({ user: { name: "John Doe" } });
+    expect(evalContext.localContext.result).toBe("John Doe");
+  });
+
   it("executes template literals", async () => {
     const artifact = compileEventAsyncStatementSource(
       "message = `Hello ${user.name}, count ${count}`;",

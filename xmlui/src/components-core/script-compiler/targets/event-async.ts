@@ -254,6 +254,10 @@ function emitEventExpressionStatementExpression(
   expr: Expression,
   context: CompilerContext,
 ): void {
+  if (expr.type === T_ARROW_EXPRESSION) {
+    emitEventArrowCall(writer, expr, context);
+    return;
+  }
   if (expr.type === T_MEMBER_ACCESS_EXPRESSION) {
     const receiverName = context.nextTemp();
     const updateRootName = getNonLocalRootIdentifier(expr.obj, context);
@@ -291,24 +295,33 @@ function emitArrowExpressionStatement(
   statement: ArrowExpressionStatement,
   context: CompilerContext,
 ): void {
-  if (
-    statement.expr.async ||
-    containsNonSerializableLiteral(statement.expr) ||
-    isMultiStatementArrow(statement.expr)
-  ) {
+  if (statement.expr.async || containsNonSerializableLiteral(statement.expr)) {
     throwUnsupportedCompiledScriptNode(statement.expr, context.sourceId);
   }
   emitBeforeStatement(writer, statement);
   const returnName = context.nextTemp();
-  writer.write(`const ${returnName} = await runtime.call(runtime.arrow(`, statement);
-  writer.write(JSON.stringify(statement.expr), statement.expr);
-  writer.write(
-    ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread);",
-    statement,
-  );
+  writer.write(`const ${returnName} = `, statement);
+  emitEventArrowCall(writer, statement.expr, context);
+  writer.write(";", statement);
   writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
   emitAfterStatement(writer, statement);
   writer.write(`return ${returnName};`, statement);
+}
+
+function emitEventArrowCall(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
+  if (expr.async || containsNonSerializableLiteral(expr)) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  writer.write("await runtime.call(runtime.arrow(", expr);
+  writer.write(JSON.stringify(expr), expr);
+  writer.write(
+    ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread)",
+    expr,
+  );
 }
 
 function emitExpressionStatement(
@@ -2299,10 +2312,6 @@ function containsNonSerializableLiteral(node: any): boolean {
     }
   }
   return false;
-}
-
-function isMultiStatementArrow(expr: ArrowExpression): boolean {
-  return expr.statement.type === T_BLOCK_STATEMENT && expr.statement.stmts.length > 1;
 }
 
 function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {

@@ -83,6 +83,7 @@ import {
   registerAuditSink as registerAuditSinkImpl,
   registerAuditHeuristic as registerAuditHeuristicImpl,
 } from "../audit";
+import { getScriptExecutionMode } from "../script-runner/eval-options";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -208,6 +209,10 @@ export function AppContent({
   const xmluiConfig = useMemo(
     () => mergeXmluiConfig(appGlobals, xmluiConfigRaw),
     [appGlobals, xmluiConfigRaw],
+  );
+  const scriptExecutionMode = useMemo(
+    () => getScriptExecutionMode({ xmluiConfig }),
+    [xmluiConfig],
   );
 
   // --- W5-1 / plan #09 Step 0: wire the forms validator registry to this app's
@@ -649,6 +654,15 @@ export function AppContent({
   const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const isNestedApp = globalProps?.isNested;
+
+  useEffect(() => {
+    if (typeof console !== "undefined" && console.log) {
+      console.log(
+        `[xmlui] App started in ${scriptExecutionMode.mode} script mode ` +
+          `(bindings: ${scriptExecutionMode.bindings}, event handlers: ${scriptExecutionMode.eventHandlers})`,
+      );
+    }
+  }, [scriptExecutionMode]);
 
   useEffect(() => {
     onInit?.();

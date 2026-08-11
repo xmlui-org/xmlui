@@ -17418,7 +17418,7 @@ export default {
       "canResizeColumns": {
         "description": "Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",

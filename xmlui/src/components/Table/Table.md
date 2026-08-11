@@ -176,22 +176,22 @@ Here, the component displays rocket information coming from the official SpaceX 
 
 %-PROP-START canResizeColumns
 
-Set `canResizeColumns` to `true` to let users resize all table columns by dragging header borders.
-The default is `false`.
+Set `canResizeColumns` to `false` to prevent users from resizing all table columns by default.
+The default is `true`.
 
 Individual `Column` components can override this table-level default with their own `canResize` property.
 
 ```xmlui-pg name="Example: canResizeColumns"
 <App>
   <Table
-    canResizeColumns="{true}"
+    canResizeColumns="{false}"
     data='{[
       { id: 1, product: "Notebook", quantity: 12, category: "Office" },
       { id: 2, product: "Pencil", quantity: 48, category: "Office" }
     ]}'
   >
-    <Column bindTo="product" />
-    <Column bindTo="quantity" canResize="{false}" />
+    <Column bindTo="product" canResize="{true}" />
+    <Column bindTo="quantity" />
     <Column bindTo="category" />
   </Table>
 </App>

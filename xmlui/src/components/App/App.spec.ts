@@ -11,6 +11,26 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("app")).toBeVisible();
   });
 
+  test("logs script execution mode on app start", async ({ initTestBed, page }) => {
+    const startupLog = new Promise<string>((resolve) => {
+      page.on("console", (msg) => {
+        const text = msg.text();
+        if (text.includes("[xmlui] App started in compiled script mode")) {
+          resolve(text);
+        }
+      });
+    });
+
+    await initTestBed(`<App testId="app">test text</App>`, {
+      xmluiConfig: { compileScripts: true },
+    });
+
+    await expect(page.getByTestId("app")).toBeVisible();
+    await expect(await startupLog).toContain(
+      "bindings: compiled, event handlers: compiled",
+    );
+  });
+
   test("renders with horizontal layout", async ({ initTestBed, page }) => {
     await initTestBed(`<App layout="horizontal">test text</App>`);
     await expect(page.getByText("test text")).toBeVisible();

@@ -3130,7 +3130,7 @@ test.describe("Edge Cases", () => {
     expect(Math.abs(headerBoxAfter!.width - cellBoxAfter!.width)).toBeLessThan(4);
   });
 
-  test("columns are not resizable by default", async ({ initTestBed, page }) => {
+  test("columns are resizable by default", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Table
         data='{${JSON.stringify(sampleData)}}'
@@ -3142,7 +3142,7 @@ test.describe("Edge Cases", () => {
     `);
 
     await expect(page.getByTestId("table")).toBeVisible();
-    await expect(page.locator('thead th div[class*="resizer"]')).toHaveCount(0);
+    await expect(page.locator('thead th div[class*="resizer"]')).toHaveCount(2);
   });
 
   test("canResizeColumns sets column resize default and Column canResize overrides it", async ({

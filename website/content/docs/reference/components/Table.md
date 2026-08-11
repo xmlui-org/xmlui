@@ -153,23 +153,23 @@ Available values: `start`, `center` **(default)**, `end`
 
 ### `canResizeColumns` [#canresizecolumns]
 
-> [!DEF]  default: **false**
+> [!DEF]  default: **true**
 
 Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.
 
-Set `canResizeColumns` to `true` to let users resize all table columns by dragging header borders.
+Set `canResizeColumns` to `false` to prevent users from resizing all table columns by default.
 
 ```xmlui-pg name="Example: canResizeColumns"
 <App>
   <Table
-    canResizeColumns="{true}"
+    canResizeColumns="{false}"
     data='{[
       { id: 1, product: "Notebook", quantity: 12, category: "Office" },
       { id: 2, product: "Pencil", quantity: 48, category: "Office" }
     ]}'
   >
-    <Column bindTo="product" />
-    <Column bindTo="quantity" canResize="{false}" />
+    <Column bindTo="product" canResize="{true}" />
+    <Column bindTo="quantity" />
     <Column bindTo="category" />
   </Table>
 </App>
