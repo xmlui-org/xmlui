@@ -51,6 +51,11 @@ export const ModalDialogMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.closeButtonVisible,
     },
+    closeOnClickAway: {
+      description: "When `true`, clicking outside the dialog closes it.",
+      valueType: "boolean",
+      defaultValue: defaultProps.closeOnClickAway,
+    },
   },
   events: {
     open: {
@@ -131,7 +136,14 @@ export const ThemedModalDialog = React.forwardRef<
 
 export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, ModalDialogMd, {
   exposeRegisterApi: true,
-  exclude: ["fullScreen", "title", "titleTemplate", "closeButtonVisible", "externalAnimation"],
+  exclude: [
+    "fullScreen",
+    "title",
+    "titleTemplate",
+    "closeButtonVisible",
+    "closeOnClickAway",
+    "externalAnimation",
+  ],
   events: [],
   customRender(
     _props,
@@ -180,6 +192,7 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
         title={extractValue(node.props?.title)}
         titleTemplate={renderChild(node.props?.titleTemplate)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
+        closeOnClickAway={extractValue.asOptionalBoolean(node.props.closeOnClickAway)}
         externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
         onClose={lookupEventHandler("close")}
         onOpen={lookupEventHandler("open")}

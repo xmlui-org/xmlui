@@ -48,6 +48,7 @@ type ModalProps = {
   title?: string;
   titleTemplate?: ReactNode;
   closeButtonVisible?: boolean;
+  closeOnClickAway?: boolean;
   externalAnimation?: boolean;
 };
 
@@ -159,6 +160,7 @@ export const ModalDialog = memo(React.forwardRef(
       title,
       titleTemplate,
       closeButtonVisible = defaultProps.closeButtonVisible,
+      closeOnClickAway = defaultProps.closeOnClickAway,
       className,
       classes,
       onOpen,
@@ -262,11 +264,11 @@ export const ModalDialog = memo(React.forwardRef(
           )}
           onPointerDownOutside={(event) => {
             if (
-              event.target instanceof Element &&
-              (event.target.closest("._debug-inspect-button") !== null ||
-                event.target.localName === "com-1password-button")
+              !closeOnClickAway ||
+              (event.target instanceof Element &&
+                (event.target.closest("._debug-inspect-button") !== null ||
+                  event.target.localName === "com-1password-button"))
             ) {
-              //we prevent the auto modal close on clicking the inspect button
               event.preventDefault();
             }
           }}
