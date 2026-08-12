@@ -2,6 +2,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import type { ApiActionOptions, DownloadOperationDef } from "../RestApiProxy";
 import RestApiProxy from "../RestApiProxy";
+import { extractParam } from "../utils/extractParam";
 
 import { createAction } from "./actions";
 
@@ -38,10 +39,17 @@ async function download(
 
   const api = new RestApiProxy(appContext);
   const _url = api.resolveUrl({ operation, params: context, resolveBindingExpressions });
+  const operationHeaders = resolveBindingExpressions
+    ? extractParam(context, headers, appContext)
+    : headers;
+  const configHeaders = appContext.xmluiConfig?.headers ?? appContext.appGlobals?.headers;
+  const hasOperationHeaders = Object.keys(operationHeaders || {}).length !== 0;
+  const hasConfigHeaders = Object.keys(configHeaders || {}).length !== 0;
 
   if (
     (operation.method && (operation.method as string).toLowerCase() !== "get") ||
-    Object.keys((appContext.xmluiConfig?.headers ?? appContext.appGlobals?.headers) || {}).length !== 0 || //if we have any headers for the api, we can't use the iframe trick
+    hasOperationHeaders || // if the download needs per-request headers, we can't use the iframe trick
+    hasConfigHeaders || //if we have any headers for the api, we can't use the iframe trick
     appContext.apiInterceptorContext.isMocked(_url) //if we mock this url, the mock can't work in an iframe, so we must fall back to download it with the restApiProxy
   ) {
     const file: File = await api.execute({
