@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.14.10
+
+### Patch Changes
+
+- 2ef9630: Add `tooltip` and `tooltipOptions` properties to Column for showing and configuring tooltips over cells in the column.
+- 2ef9630: Fix Column typed-cell change events so row context variables like `$item` and `$row` resolve in `willChange` and `didChange` handlers.
+- 2ef9630: Fix Select numeric and null option values so numeric options stay checked when reselected and null options do not break Radix Select rendering.
+- b409b78: Allow `Form.reset(data)` to replace the form values and establish data as a new pristine baseline.
+
 ## 0.14.9
 
 ### Patch Changes
