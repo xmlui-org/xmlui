@@ -4575,6 +4575,14 @@ export default {
         "isStrictEnum": true,
         "valueType": "string"
       },
+      "tooltip": {
+        "description": "This property sets the tooltip text shown when hovering over cells in this column.",
+        "valueType": "string"
+      },
+      "tooltipOptions": {
+        "description": "This property sets options for configuring column cell tooltips, such as delay and position.",
+        "valueType": "any"
+      },
       "width": {
         "description": "This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).If not defined, the component will use a width according to the column values and the available space.",
         "valueType": "any"

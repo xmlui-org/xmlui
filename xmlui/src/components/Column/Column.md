@@ -610,6 +610,59 @@ Use `start`, `center`, or `end`.
 
 %-PROP-END
 
+%-PROP-START tooltip
+
+Set `tooltip` to show text when users hover over cells in the column.
+The tooltip is evaluated for each cell, so it can use Column context variables such as `$item`, `$row`, `$cell`, `$itemIndex`, `$rowIndex`, and `$colIndex`.
+Use `tooltipOptions` to configure the tooltip position, delay, arrow, and collision behavior.
+Like tooltip behavior options on visual components, `tooltipOptions` accepts either an object or a semicolon-separated string.
+
+```xmlui-pg copy display name="Example: column cell tooltip"
+<Table data="{[
+  { id: 1, name: 'Ada', enabled: true }
+]}">
+  <Column
+    bindTo="name"
+    tooltip="{$item.id + ' - ' + $cell}"
+    tooltipOptions="{{side:'right', delayDuration:0}}"
+  />
+  <Column
+    bindTo="enabled"
+    type="switch"
+    tooltip="Toggle whether the contact is enabled"
+    tooltipOptions="side:bottom; delayDuration:0"
+  />
+</Table>
+```
+
+%-PROP-END
+
+%-PROP-START tooltipOptions
+
+Set `tooltipOptions` to configure the tooltip shown for cells in this column.
+The accepted options match the `Tooltip` component: `delayDuration`, `skipDelayDuration`, `defaultOpen`, `showArrow`, `side`, `align`, `sideOffset`, `alignOffset`, and `avoidCollisions`.
+You can provide the options as an object or as a semicolon-separated string.
+
+```xmlui-pg copy display name="Example: column tooltip options"
+<Table data="{[
+  { name: 'Ada', enabled: true }
+]}">
+  <Column
+    bindTo="name"
+    tooltip="Shown on the right"
+    tooltipOptions="{{side:'right', align:'center', delayDuration:0}}"
+  />
+  <Column
+    bindTo="enabled"
+    type="switch"
+    tooltip="Shown below"
+    tooltipOptions="side:bottom; align:start; delayDuration:0"
+  />
+</Table>
+```
+
+%-PROP-END
+
 %-PROP-START pinTo
 
 >[!WARNING]

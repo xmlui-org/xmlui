@@ -49,6 +49,7 @@ import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
 import { ThemedColorPicker } from "../ColorPicker/ColorPicker";
 import { ThemedSwitch } from "../Switch/Switch";
 import { ThemedIcon } from "../Icon/Icon";
+import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { ThemedPagination, type Position } from "../Pagination/Pagination";
@@ -82,6 +83,8 @@ declare module "@tanstack/table-core" {
     accessorKey?: string;
     pinTo?: string;
     headerHorizontalAlignment?: string;
+    tooltipOptions?: Record<string, any>;
+    tooltipRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
     cellRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
     columnType?: NormalizedColumnType;
     readOnly?: boolean;
@@ -562,14 +565,14 @@ function TypedColumnCell({
 
   const handleDidChange = useCallback(
     async (newValue: boolean | string) => {
-      const shouldChange = await onWillChange?.(newValue, row, rowIndex, columnId);
+      const shouldChange = await onWillChange?.(newValue, row, rowIndex, columnId, value);
       if (shouldChange === false) {
         return;
       }
       setLocalValue(newValue);
-      onDidChange?.(newValue, row, rowIndex, columnId);
+      onDidChange?.(newValue, row, rowIndex, columnId, value);
     },
-    [columnId, onDidChange, onWillChange, row, rowIndex],
+    [columnId, onDidChange, onWillChange, row, rowIndex, value],
   );
 
   if (!INTERACTIVE_COLUMN_TYPES.has(valueType.name)) {
@@ -1187,6 +1190,8 @@ export const Table = memo(
             headerHorizontalAlignment: col.headerHorizontalAlignment,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
+            tooltipOptions: col.tooltipOptions,
+            tooltipRenderer: col.tooltipRenderer,
             columnType,
             readOnly: col.readOnly,
             enabled: col.enabled,
@@ -1730,6 +1735,8 @@ export const Table = memo(
                 const enabled = cell.column.columnDef?.meta?.enabled;
                 const willChange = cell.column.columnDef?.meta?.willChange;
                 const didChange = cell.column.columnDef?.meta?.didChange;
+                const tooltipOptions = cell.column.columnDef?.meta?.tooltipOptions;
+                const tooltipRenderer = cell.column.columnDef?.meta?.tooltipRenderer;
                 const fillCellContent = cell.column.columnDef?.meta?.fillCellContent;
                 const cellColumnId = cell.column.columnDef?.meta?.accessorKey ?? cell.column.id;
                 const size = cell.column.getSize();
@@ -1753,12 +1760,45 @@ export const Table = memo(
                   cellContentStyle.justifyContent = "center";
                   cellContentStyle.paddingInline = DEFAULT_INTERACTIVE_CELL_INLINE_PADDING;
                 }
+                if (tooltipRenderer) {
+                  cellContentStyle.width = "100%";
+                  cellContentStyle.boxSizing = "border-box";
+                }
                 const alignmentClass =
                   vertAlign === "top"
                     ? styles.alignTop
                     : vertAlign === "bottom"
                       ? styles.alignBottom
                       : styles.alignCenter;
+                const cellContent = (
+                  <div
+                    className={styles.cellContent}
+                    style={cellContentStyle}
+                  >
+                    {cellRenderer
+                      ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
+                      : columnType
+                        ? (
+                            <TypedColumnCell
+                              value={cell?.getValue()}
+                              valueType={columnType}
+                              localeProfile={currentLocaleProfile}
+                              row={sourceRow}
+                              rowIndex={rowIndex}
+                              columnId={cellColumnId}
+                              readOnly={readOnly}
+                              enabled={enabled}
+                              onWillChange={willChange}
+                              onDidChange={didChange}
+                            />
+                          )
+                        : (flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          ) as ReactNode)}
+                  </div>
+                );
+                const tooltipTemplate = tooltipRenderer?.(sourceRow, rowIndex, i, cell?.getValue());
                 return (
                   <td
                     className={classnames(styles.cell, alignmentClass, columnClassName)}
@@ -1772,32 +1812,17 @@ export const Table = memo(
                       ...styleWithoutWidth,
                     } as React.CSSProperties}
                   >
-                    <div
-                      className={styles.cellContent}
-                      style={cellContentStyle}
-                    >
-                      {cellRenderer
-                        ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
-                        : columnType
-                          ? (
-                              <TypedColumnCell
-                                value={cell?.getValue()}
-                                valueType={columnType}
-                                localeProfile={currentLocaleProfile}
-                                row={sourceRow}
-                                rowIndex={rowIndex}
-                                columnId={cellColumnId}
-                                readOnly={readOnly}
-                                enabled={enabled}
-                                onWillChange={willChange}
-                                onDidChange={didChange}
-                              />
-                            )
-                          : (flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            ) as ReactNode)}
-                    </div>
+                    {tooltipTemplate ? (
+                      <Tooltip
+                        text=""
+                        tooltipTemplate={tooltipTemplate}
+                        {...tooltipOptions}
+                      >
+                        {cellContent}
+                      </Tooltip>
+                    ) : (
+                      cellContent
+                    )}
                   </td>
                 );
               })}

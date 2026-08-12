@@ -55,6 +55,16 @@ export const ColumnMd = createMetadata({
       isStrictEnum: true,
       valueType: "string",
     },
+    tooltip: {
+      description:
+        "This property sets the tooltip text shown when hovering over cells in this column.",
+      valueType: "string",
+    },
+    tooltipOptions: {
+      description:
+        "This property sets options for configuring column cell tooltips, such as delay and position.",
+      valueType: "any",
+    },
     width: {
       description:
         "This property defines the width of the column. You can use a numeric value, a pixel " +
@@ -181,7 +191,7 @@ export const ColumnMd = createMetadata({
 export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
   customRender: (
     props,
-    { node, extractValue, renderChild, classes, appContext, layoutContext },
+    { node, extractValue, renderChild, classes, appContext, layoutContext, lookupEventHandler },
   ) => {
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
     const canSortDefault = appContext?.xmluiConfig?.columnCanSortDefault ?? defaultProps.canSort;
@@ -225,6 +235,32 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
       style.verticalAlign = verticalAlignment as React.CSSProperties["verticalAlign"]; // Also set verticalAlign for fallback
     }
 
+    const createTypedCellEventHandler = (eventName: "willChange" | "didChange") => {
+      if (!node.events?.[eventName]) {
+        return undefined;
+      }
+
+      return (
+        newValue: any,
+        row: any,
+        rowIndex: number,
+        columnId: string,
+        cellValue: any,
+      ) => {
+        const handler = lookupEventHandler(eventName, {
+          context: {
+            $item: row,
+            $row: row,
+            $itemIndex: rowIndex,
+            $rowIndex: rowIndex,
+            $cell: cellValue,
+          },
+          ephemeral: true,
+        });
+        return handler?.(newValue, row, rowIndex, columnId);
+      };
+    };
+
     return (
       <Column
         style={Object.keys(style).length > 0 ? style : undefined}
@@ -232,6 +268,8 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         headerHorizontalAlignment={extractValue.asOptionalString(
           node.props.headerHorizontalAlignment,
         )}
+        tooltip={node.props.tooltip}
+        tooltipOptions={extractValue(node.props.tooltipOptions, true)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
         canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
@@ -240,8 +278,8 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         typeOptions={extractValue(node.props.typeOptions)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
-        willChange={props.onWillChange}
-        didChange={props.onDidChange}
+        willChange={createTypedCellEventHandler("willChange") ?? props.onWillChange}
+        didChange={createTypedCellEventHandler("didChange") ?? props.onDidChange}
         fillCellContent={hasPercentageWidthCustomCellChild(node.children, extractValue)}
         width={extractValue(node.props.width)}
         minWidth={extractValue(node.props.minWidth)}

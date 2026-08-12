@@ -225,6 +225,39 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Zero")).toBeVisible();
   });
 
+  test("numeric selected value is checked and not cleared when reselected", async ({
+    page,
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+    <Fragment var.changeMarker="unchanged">
+      <Select
+        id="mySelect"
+        initialValue="{1}"
+        onDidChange="value => changeMarker = value == null ? 'null' : value">
+        <Option value="{1}" label="Ada"/>
+        <Option value="{2}" label="Grace"/>
+      </Select>
+      <Text testId="text">Selected value: {mySelect.value}</Text>
+      <Text testId="changeMarker">{changeMarker}</Text>
+    </Fragment>
+  `);
+    const driver = await createSelectDriver("mySelect");
+
+    await expect(driver.component).toHaveText("Ada");
+    await driver.toggleOptionsVisibility();
+
+    const selectedOption = page.getByRole("option", { name: "Ada" });
+    await expect(selectedOption).toHaveAttribute("data-state", "checked");
+    await expect(selectedOption.locator('[data-icon-name="checkmark"]')).toBeVisible();
+
+    await selectedOption.click();
+
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
+    await expect(page.getByTestId("changeMarker")).toHaveText("unchanged");
+  });
+
   // --- autoFocus prop
 
   test("autoFocus brings the focus to component", async ({

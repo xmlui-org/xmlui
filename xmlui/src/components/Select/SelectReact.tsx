@@ -54,7 +54,7 @@ export function isIntrinsicHeightKeyword(value?: CSSProperties["height"]): boole
 
 export type { SelectVariant } from "./Select.defaults";
 
-export type SingleValueType = string | number;
+export type SingleValueType = string | number | boolean | null;
 export type ValueType = SingleValueType | SingleValueType[];
 
 // Core Select component props
@@ -547,6 +547,10 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   // Handle option selection
   const toggleOption = useCallback(
     (selectedValue: SingleValueType) => {
+      if (!multiSelect && String(selectedValue) === String(currentValue)) {
+        return;
+      }
+
       const newSelectedValue = multiSelect
         ? Array.isArray(currentValue)
           ? currentValue.map((v) => String(v)).includes(String(selectedValue))

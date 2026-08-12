@@ -752,6 +752,139 @@ test.describe("Basic Functionality", () => {
       });
     });
 
+    test("column tooltip is shown over column cells", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data="{[{id: 1, name: 'Ada', enabled: true}]}" testId="table">
+          <Column
+            bindTo="name"
+            tooltip="{$item.id + ' - ' + $cell}"
+            tooltipOptions="{{side:'right', delayDuration:0}}"
+          />
+        </Table>
+      `);
+
+      await page.locator('td[data-column-id="name"]').hover();
+      const tooltip = page.getByRole("tooltip");
+      await expect(tooltip).toHaveText("1 - Ada");
+      await expect(page.locator("[data-tooltip-container]")).toHaveAttribute("data-side", "right");
+    });
+
+    test("column tooltipOptions accepts string options", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data="{[{enabled: true}]}" testId="table">
+          <Column
+            bindTo="enabled"
+            type="switch"
+            tooltip="Toggle availability"
+            tooltipOptions="side:bottom; delayDuration:0"
+          />
+        </Table>
+      `);
+
+      await page.getByRole("switch", { name: "enabled row 1" }).hover();
+      await expect(page.getByRole("tooltip")).toHaveText("Toggle availability");
+      await expect(page.locator("[data-tooltip-container]")).toHaveAttribute("data-side", "bottom");
+    });
+
+    test("column tooltip resolves row context for custom column content", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{[
+            { id: 1, customer: 1, total: 123.45, paid: true },
+            { id: 2, customer: 2, total: 87.5, paid: false }
+          ]}'
+        >
+          <Column
+            bindTo="customer"
+            header="Customer"
+            width="200px"
+            tooltip="{$item.id + ' - ' + $cell}"
+          >
+            <Select initialValue="{$cell}" width="80%">
+              <Option value="{1}" label="Ada" />
+              <Option value="{2}" label="Grace" />
+            </Select>
+          </Column>
+          <Column bindTo="paid" type="switch" />
+          <Column bindTo="total" header="Total" width="100px" type="number" />
+        </Table>
+      `);
+
+      await page.locator('td[data-column-id="customer"]').first().hover();
+      await expect(page.getByRole("tooltip")).toHaveText("1 - 1");
+    });
+
+    test("interactive typed column events resolve row context variables", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.rows="{[
+          { id: 1, paid: false, locked: false },
+          { id: 2, paid: true, locked: false }
+        ]}">
+          <Table data="{rows}" testId="table">
+            <Column
+              bindTo="paid"
+              type="switch"
+              onDidChange="(value) => {
+                testState = {
+                  phase: 'did',
+                  value,
+                  itemId: $item.id,
+                  rowId: $row.id,
+                  itemIndex: $itemIndex,
+                  rowIndex: $rowIndex,
+                  cell: $cell
+                };
+              }" />
+            <Column
+              bindTo="locked"
+              type="checkbox"
+              onWillChange="(value) => {
+                testState = {
+                  phase: 'will',
+                  value,
+                  itemId: $item.id,
+                  rowId: $row.id,
+                  itemIndex: $itemIndex,
+                  rowIndex: $rowIndex,
+                  cell: $cell
+                };
+                return false;
+              }" />
+          </Table>
+        </Fragment>
+      `);
+
+      await page.getByRole("switch", { name: "paid row 1" }).click();
+      await expect.poll(testStateDriver.testState).toEqual({
+        phase: "did",
+        value: true,
+        itemId: 1,
+        rowId: 1,
+        itemIndex: 0,
+        rowIndex: 0,
+        cell: false,
+      });
+
+      const lockedCheckbox = page.getByRole("checkbox", { name: "locked row 2" });
+      await lockedCheckbox.click();
+      await expect(lockedCheckbox).not.toBeChecked();
+      await expect.poll(testStateDriver.testState).toEqual({
+        phase: "will",
+        value: true,
+        itemId: 2,
+        rowId: 2,
+        itemIndex: 1,
+        rowIndex: 1,
+        cell: false,
+      });
+    });
+
     test("readOnly interactive typed columns do not fire didChange", async ({
       initTestBed,
       page,

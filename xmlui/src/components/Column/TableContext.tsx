@@ -1,6 +1,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext } from "react";
-import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+
+type TypedCellChangeHandler = (
+  newValue: any,
+  row: any,
+  rowIndex: number,
+  columnId: string,
+  cellValue: any,
+) => any;
 
 export type OurColumnMetadata = {
   style?: CSSProperties;
@@ -20,9 +27,11 @@ export type OurColumnMetadata = {
   typeOptions?: any;
   readOnly?: boolean;
   enabled?: boolean;
-  willChange?: AsyncFunction;
-  didChange?: AsyncFunction;
+  willChange?: TypedCellChangeHandler;
+  didChange?: TypedCellChangeHandler;
   fillCellContent?: boolean;
+  tooltipOptions?: any;
+  tooltipRenderer?: (row: any, rowIndex: number, colIndex: number, value: any) => ReactNode;
   cellRenderer?: (row: any, rowIndex: number, colIndex: number, value: any) => ReactNode;
 };
 
