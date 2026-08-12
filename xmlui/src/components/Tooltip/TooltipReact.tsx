@@ -64,6 +64,11 @@ type TooltipProps = TooltipOptions & React.HTMLAttributes<HTMLDivElement> & {
   open?: boolean;
 
   /**
+   * Called when Radix requests an open state change.
+   */
+  onOpenChange?: (open: boolean) => void;
+
+  /**
    * The text content to display in the tooltip
    */
   text: string;
@@ -98,6 +103,7 @@ export const Tooltip = memo(forwardRef(function Tooltip({
   avoidCollisions = defaultProps.avoidCollisions,
   children,
   open,
+  onOpenChange,
   className,
   classes,
 }: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
@@ -117,7 +123,7 @@ export const Tooltip = memo(forwardRef(function Tooltip({
 
   return (
     <RadixTooltip.Provider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
-      <RadixTooltip.Root defaultOpen={defaultOpen} open={open}>
+      <RadixTooltip.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
         <RadixTooltip.Trigger asChild>{trigger}</RadixTooltip.Trigger>
         <RadixTooltip.Portal container={root}>
           {showTooltip && (

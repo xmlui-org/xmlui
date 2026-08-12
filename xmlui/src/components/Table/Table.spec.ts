@@ -818,6 +818,66 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByRole("tooltip")).toHaveText("1 - 1");
     });
 
+    test("column tooltip stays hidden while and after a select dropdown is open", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{[
+            { id: 1, customer: 1, total: 123.45, paid: true },
+            { id: 2, customer: 2, total: 87.5, paid: false }
+          ]}'
+        >
+          <Column
+            bindTo="customer"
+            header="Customer"
+            width="200px"
+            tooltip="{$item.id + ' - ' + $cell}"
+            tooltipOptions="{{delayDuration:0}}"
+          >
+            <Select initialValue="{$cell}">
+              <Option value="{1}" label="Ada" />
+              <Option value="{2}" label="Grace" />
+            </Select>
+          </Column>
+          <Column bindTo="paid" type="switch" />
+          <Column bindTo="total" header="Total" width="100px" type="number" />
+        </Table>
+      `);
+
+      const customerCell = page.locator('td[data-column-id="customer"]').first();
+
+      await customerCell.hover();
+      await expect(page.getByRole("tooltip")).toHaveText("1 - 1");
+
+      await page.getByRole("combobox").first().click();
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await expect(page.getByRole("tooltip")).toBeHidden();
+
+      await page.getByRole("option", { name: "Grace" }).hover();
+      await expect(page.getByRole("tooltip")).toBeHidden();
+
+      await page.getByRole("option", { name: "Grace" }).click();
+      await expect(page.getByRole("listbox")).toBeHidden();
+      await expect(page.getByRole("tooltip")).toBeHidden();
+
+      await customerCell.hover();
+      await expect(page.getByRole("tooltip")).toHaveText("1 - 1");
+
+      await page.getByRole("combobox").first().click();
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await page.getByRole("option", { name: "Ada" }).hover();
+      await expect(page.getByRole("tooltip")).toBeHidden();
+
+      await page.mouse.click(1, 1);
+      await expect(page.getByRole("listbox")).toBeHidden();
+      await expect(page.getByRole("tooltip")).toBeHidden();
+
+      await customerCell.hover();
+      await expect(page.getByRole("tooltip")).toHaveText("1 - 1");
+    });
+
     test("interactive typed column events resolve row context variables", async ({
       initTestBed,
       page,
