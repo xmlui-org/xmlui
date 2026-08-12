@@ -5,6 +5,7 @@ import { useSelect } from "./SelectContext";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
+import { OptionTooltip } from "../Option/OptionTooltip";
 
 const SELECT_ITEM_VALUE_PREFIX = "__xmlui_select_value__";
 
@@ -20,7 +21,7 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
     const itemValue = toRadixSelectItemValue(value);
     const selected = toRadixSelectItemValue(selectedValue) === itemValue;
 
-    return (
+    const item = (
       <Item
         ref={ref}
         className={classnames(className, styles.selectOption)}
@@ -77,6 +78,12 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
           </>
         )}
       </Item>
+    );
+
+    return (
+      <OptionTooltip tooltip={option.tooltip} tooltipOptions={option.tooltipOptions}>
+        {item}
+      </OptionTooltip>
     );
   },
 );

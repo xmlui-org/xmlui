@@ -396,6 +396,7 @@ interface TreeComponentProps {
   onPasteAction?: (node: FlatTreeNode) => void | Promise<void>;
   onDeleteAction?: (node: FlatTreeNode) => void | Promise<void>;
   lookupEventHandler?: any;
+  renderVersion?: number;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
   classes?: Record<string, string>;
@@ -444,6 +445,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     onPasteAction,
     onDeleteAction,
     lookupEventHandler,
+    renderVersion,
     itemRenderer,
     className,
     classes,
@@ -1423,6 +1425,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       animateExpand,
       expandRotation,
       spinnerDelay,
+      renderVersion,
     };
   }, [
     flatTreeData,
@@ -1439,6 +1442,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     animateExpand,
     expandRotation,
     spinnerDelay,
+    renderVersion,
   ]);
 
   // Shared API implementation to avoid duplication between ref and component APIs

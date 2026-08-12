@@ -1,4 +1,5 @@
-import type { CSSProperties, ForwardedRef, ReactNode } from "react";
+import type { CSSProperties, ForwardedRef, PointerEvent, ReactElement, ReactNode } from "react";
+import { cloneElement, isValidElement } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import type {
   CellContext,
@@ -117,6 +118,128 @@ export type CheckboxTolerance = (typeof CheckboxToleranceValues)[number];
 
 export const TableColumnSizingValues = ["auto", "stretch", "balanced", "content"] as const;
 export type TableColumnSizing = (typeof TableColumnSizingValues)[number];
+
+function hasExpandedInteractiveDescendant(element: HTMLElement | null) {
+  return !!element?.querySelector('[aria-expanded="true"]');
+}
+
+const TableCellTooltip = memo(function TableCellTooltip({
+  children,
+  tooltipTemplate,
+  tooltipOptions,
+}: {
+  children: ReactNode;
+  tooltipTemplate: ReactNode;
+  tooltipOptions?: Record<string, any>;
+}) {
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const pointerInsideTriggerRef = useRef(false);
+  const hadExpandedInteractiveDescendantRef = useRef(false);
+  const reopenOnPointerMoveRef = useRef(false);
+  const [open, setOpen] = useState(false);
+
+  const closeTooltip = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const syncInteractiveDescendantState = useCallback(() => {
+    const hasExpandedDescendant = hasExpandedInteractiveDescendant(triggerRef.current);
+    if (hasExpandedDescendant || hadExpandedInteractiveDescendantRef.current) {
+      pointerInsideTriggerRef.current = false;
+      reopenOnPointerMoveRef.current =
+        hadExpandedInteractiveDescendantRef.current && !hasExpandedDescendant;
+      closeTooltip();
+    }
+    hadExpandedInteractiveDescendantRef.current = hasExpandedDescendant;
+  }, [closeTooltip]);
+
+  useEffect(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+
+    const observer = new MutationObserver(syncInteractiveDescendantState);
+    observer.observe(trigger, {
+      attributes: true,
+      attributeFilter: ["aria-expanded"],
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, [syncInteractiveDescendantState]);
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      setOpen(
+        nextOpen &&
+          pointerInsideTriggerRef.current &&
+          !hasExpandedInteractiveDescendant(triggerRef.current),
+      );
+    },
+    [],
+  );
+
+  const handlePointerEnter = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      pointerInsideTriggerRef.current = true;
+      if (reopenOnPointerMoveRef.current && !hasExpandedInteractiveDescendant(triggerRef.current)) {
+        reopenOnPointerMoveRef.current = false;
+        setOpen(true);
+      }
+      if (isValidElement(children)) {
+        (children as ReactElement<any>).props.onPointerEnter?.(event);
+      }
+    },
+    [children],
+  );
+
+  const handlePointerMove = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      if (!hasExpandedInteractiveDescendant(triggerRef.current)) {
+        pointerInsideTriggerRef.current = true;
+        if (reopenOnPointerMoveRef.current) {
+          reopenOnPointerMoveRef.current = false;
+          setOpen(true);
+        }
+      }
+      if (isValidElement(children)) {
+        (children as ReactElement<any>).props.onPointerMove?.(event);
+      }
+    },
+    [children],
+  );
+
+  const handlePointerLeave = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      pointerInsideTriggerRef.current = false;
+      closeTooltip();
+      if (isValidElement(children)) {
+        (children as ReactElement<any>).props.onPointerLeave?.(event);
+      }
+    },
+    [children, closeTooltip],
+  );
+
+  const trigger = isValidElement(children)
+    ? cloneElement(children as ReactElement<any>, {
+        ref: triggerRef,
+        onPointerEnter: handlePointerEnter,
+        onPointerMove: handlePointerMove,
+        onPointerLeave: handlePointerLeave,
+      })
+    : children;
+
+  return (
+    <Tooltip
+      text=""
+      tooltipTemplate={tooltipTemplate}
+      open={open}
+      onOpenChange={handleOpenChange}
+      {...tooltipOptions}
+    >
+      {trigger}
+    </Tooltip>
+  );
+});
 
 // =====================================================================================================================
 // Table Action Context Types
@@ -1813,13 +1936,12 @@ export const Table = memo(
                     } as React.CSSProperties}
                   >
                     {tooltipTemplate ? (
-                      <Tooltip
-                        text=""
+                      <TableCellTooltip
                         tooltipTemplate={tooltipTemplate}
-                        {...tooltipOptions}
+                        tooltipOptions={tooltipOptions}
                       >
                         {cellContent}
-                      </Tooltip>
+                      </TableCellTooltip>
                     ) : (
                       cellContent
                     )}

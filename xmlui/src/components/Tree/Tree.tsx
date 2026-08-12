@@ -534,6 +534,8 @@ function TreeWithStableRenderer({ renderChild, itemTemplate, ...treeProps }: Tre
   const stableRenderChildRef = useRef<RenderChildFn>(
     (node: any, ctx: any) => renderChildRef.current(node, ctx),
   );
+  const renderVersionRef = useRef(0);
+  renderVersionRef.current++;
 
   // Stable itemRenderer: only recreates when the template node reference changes.
   const stableItemRenderer = useMemo(
@@ -557,7 +559,13 @@ function TreeWithStableRenderer({ renderChild, itemTemplate, ...treeProps }: Tre
     [itemTemplate],
   );
 
-  return <TreeComponent {...treeProps} itemRenderer={stableItemRenderer} />;
+  return (
+    <TreeComponent
+      {...treeProps}
+      itemRenderer={stableItemRenderer}
+      renderVersion={renderVersionRef.current}
+    />
+  );
 }
 
 /**

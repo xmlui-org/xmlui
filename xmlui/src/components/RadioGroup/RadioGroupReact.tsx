@@ -22,6 +22,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, OrientationOptions, ValidationStatus } from "../abstractions";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { OptionTooltip } from "../Option/OptionTooltip";
 import { UnwrappedRadioItem } from "./RadioItemReact";
 import { convertOptionValue } from "../Option/OptionReact";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
@@ -263,6 +264,8 @@ export const RadioGroupOption = ({
   optionRenderer,
   style,
   className,
+  tooltip,
+  tooltipOptions,
 }: Option) => {
   const id = useId();
   const radioGroupContext = useContext(RadioGroupStatusContext);
@@ -309,7 +312,7 @@ export const RadioGroupOption = ({
     );
   }, [enabled, id, label, optionRenderer, statusStyles, value, radioGroupContext]);
 
-  return (
+  const option = (
     <div
       key={id}
       className={classnames(styles.radioOptionContainer, className)}
@@ -328,5 +331,11 @@ export const RadioGroupOption = ({
         item
       )}
     </div>
+  );
+
+  return (
+    <OptionTooltip tooltip={tooltip} tooltipOptions={tooltipOptions}>
+      {option}
+    </OptionTooltip>
   );
 };

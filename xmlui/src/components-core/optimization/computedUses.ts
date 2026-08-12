@@ -175,6 +175,26 @@ function depsOfRecord(
   return { all, reads };
 }
 
+function isComponentDefValue(value: unknown): value is ComponentDef {
+  return typeof value === "object" && value !== null && typeof (value as any).type === "string";
+}
+
+function collectComponentDefValues(record: Record<string, unknown> | undefined): ComponentDef[] {
+  const defs: ComponentDef[] = [];
+  if (!record) return defs;
+  const visit = (value: unknown) => {
+    if (isComponentDefValue(value)) {
+      defs.push(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+    }
+  };
+  Object.values(record).forEach(visit);
+  return defs;
+}
+
 /**
  * Collects the union of parent-scope identifiers referenced by all code-behind
  * functions. Each function is an ArrowExpression (identified by ARROW_EXPR_MARK).
@@ -550,6 +570,8 @@ function computeUsesInternal(
       processChildList(slotChildren);
     }
   }
+  processChildList(collectComponentDefValues(node.props as Record<string, unknown> | undefined));
+  processChildList(collectComponentDefValues(node.events as Record<string, unknown> | undefined));
 
   const keepDep = (d: string) =>
     !localDeclared.has(d) &&

@@ -21,6 +21,7 @@ import type { Option, ValidationStatus } from "../abstractions";
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
 import { ThemedIcon } from "../../components/Icon/Icon";
 import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
+import { OptionTooltip } from "../../components/Option/OptionTooltip";
 import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -991,40 +992,42 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
           {groupHeaderContent}
         </div>
       )}
-      <div
-        id={id}
-        role="option"
-        aria-disabled={!enabled}
-        aria-selected={selected}
-        className={classnames(styles.autoCompleteOption, {
-          [styles.disabledOption]: !enabled,
-          [styles.highlighted]: isHighlighted,
-        })}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        onMouseEnter={() => {
-          if (itemIndex !== undefined && itemIndex !== -1 && setSelectedIndex && enabled) {
-            setSelectedIndex(itemIndex);
-          }
-        }}
-        onClick={handleClick}
-      >
-        {children ? (
-          <>
-            <div className={styles.autoCompleteOptionContent}>{children}</div>
-            {selected && <ThemedIcon name="checkmark" />}
-          </>
-        ) : optionRenderer ? (
-          optionRenderer({ label, value, enabled }, selectedValue as any, false)
-        ) : (
-          <>
-            <div className={styles.autoCompleteOptionContent}>{label}</div>
-            {selected && <ThemedIcon name="checkmark" />}
-          </>
-        )}
-      </div>
+      <OptionTooltip tooltip={option.tooltip} tooltipOptions={option.tooltipOptions}>
+        <div
+          id={id}
+          role="option"
+          aria-disabled={!enabled}
+          aria-selected={selected}
+          className={classnames(styles.autoCompleteOption, {
+            [styles.disabledOption]: !enabled,
+            [styles.highlighted]: isHighlighted,
+          })}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseEnter={() => {
+            if (itemIndex !== undefined && itemIndex !== -1 && setSelectedIndex && enabled) {
+              setSelectedIndex(itemIndex);
+            }
+          }}
+          onClick={handleClick}
+        >
+          {children ? (
+            <>
+              <div className={styles.autoCompleteOptionContent}>{children}</div>
+              {selected && <ThemedIcon name="checkmark" />}
+            </>
+          ) : optionRenderer ? (
+            optionRenderer({ label, value, enabled }, selectedValue as any, false)
+          ) : (
+            <>
+              <div className={styles.autoCompleteOptionContent}>{label}</div>
+              {selected && <ThemedIcon name="checkmark" />}
+            </>
+          )}
+        </div>
+      </OptionTooltip>
     </>
   );
 }

@@ -72,6 +72,33 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree — basic cases", () => {
     expect(root.computedUses).toEqual(["b"]);
   });
 
+  it("implicit container includes dependencies from ComponentDef template props", () => {
+    const itemTemplate = node("HStack", {
+      children: [
+        node("Text", { props: { value: "{$item.name}" } }),
+        node("Button", { events: { click: parsedEvent("result = typeof menu") } }),
+        node("Button", { events: { click: parsedEvent("menu.openAt(null, $item)") } }),
+      ],
+    });
+    const root = node("Stack", {
+      vars: { result: "{'unset'}" },
+      children: [
+        node("ContextMenu", { uid: "menu" }),
+        node("Tree", {
+          props: {
+            data: "{nodes}",
+            itemTemplate,
+          },
+        }),
+      ],
+    });
+
+    computeUsesForTree(root);
+
+    const tree = root.children![1];
+    expect(tree.computedUses).toEqual(["menu", "nodes", "result"]);
+  });
+
   it("local var does not bubble to computedUses", () => {
     const root = node("Stack", {
       vars: { x: "{0}" },

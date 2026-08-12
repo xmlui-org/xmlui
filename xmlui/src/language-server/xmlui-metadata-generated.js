@@ -14407,6 +14407,14 @@ export default {
         "valueType": "boolean",
         "defaultValue": true
       },
+      "tooltip": {
+        "description": "This property sets the tooltip text shown when hovering over this option.",
+        "valueType": "string"
+      },
+      "tooltipOptions": {
+        "description": "This property sets options for configuring this option's tooltip, such as delay and position.",
+        "valueType": "any"
+      },
       "keywords": {
         "description": "An array of keywords that can be used for searching and filtering the option. These keywords are not displayed but help users find the option through search.",
         "valueType": "string[]"

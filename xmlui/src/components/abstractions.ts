@@ -8,6 +8,8 @@ export type Option = {
   label: string;
   value: string;
   enabled?: boolean;
+  tooltip?: string;
+  tooltipOptions?: any;
   style?: CSSProperties;
   className?: string;
   readOnly?: boolean;

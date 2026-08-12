@@ -29,6 +29,30 @@ type ContextMenuProps = {
   menuWidth?: string;
 };
 
+function sanitizeContextValue(value: any, seen = new WeakSet<object>()): any {
+  if (value === null || value === undefined || typeof value !== "object") {
+    return value;
+  }
+  if (seen.has(value)) {
+    return undefined;
+  }
+  seen.add(value);
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeContextValue(item, seen));
+  }
+
+  const ret: Record<string, any> = {};
+  for (const key of Object.keys(value)) {
+    try {
+      ret[key] = sanitizeContextValue(value[key], seen);
+    } catch {
+      // Context can be a live framework proxy; skip proxy-internal fields that
+      // cannot be read safely after crossing into menu state.
+    }
+  }
+  return ret;
+}
+
 export const ContextMenu = memo(forwardRef(function ContextMenu(
   {
     children,
@@ -49,6 +73,7 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
   const [enableClicks, setEnableClicks] = useState(true);
   const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const ignoreOutsideUntilRef = useRef(0);
   const effectiveMenuWidth = menuWidth ?? getThemeVar("minWidth-ContextMenu") ?? "160px";
 
   const getContainerInfo = useCallback(() => {
@@ -95,10 +120,11 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
     });
 
     // Store the context data in state
-    updateState?.({ $context: context });
+    updateState?.({ $context: sanitizeContextValue(context) });
     
     // Disable clicks temporarily
     setEnableClicks(false);
+    ignoreOutsideUntilRef.current = Date.now() + 100;
     
     // Open the menu
     setOpen(true);
@@ -194,7 +220,13 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
             tabIndex={-1}
             loop={true}
             onEscapeKeyDown={closeMenu}
-            onInteractOutside={closeMenu}
+            onInteractOutside={(event) => {
+              if (Date.now() < ignoreOutsideUntilRef.current) {
+                event.preventDefault();
+                return;
+              }
+              closeMenu();
+            }}
           >
             {children}
           </DropdownMenuPrimitive.Content>
