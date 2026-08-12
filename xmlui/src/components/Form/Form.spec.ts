@@ -1618,6 +1618,55 @@ test.describe("Basic Functionality", () => {
       await expect(nameInput.field).toHaveValue("Initial");
     });
 
+    test("reset with data establishes a new pristine baseline", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Form
+            id="testForm"
+            data="{{ name: 'Initial', address: { city: 'Old city' } }}">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+            <FormItem label="City" bindTo="address.city" testId="cityField" />
+          </Form>
+          <Button
+            testId="adopt"
+            label="Adopt"
+            onClick="testForm.reset({ name: 'Canonical', address: { city: 'New city' } })" />
+          <Button testId="reset" label="Reset" onClick="testForm.reset()" />
+          <Button
+            testId="inspect"
+            label="Inspect"
+            onClick="testState = { data: testForm.getData(), dirty: testForm.isDirty() }" />
+        </Fragment>
+      `);
+
+      const nameItem = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameItem.input);
+      const cityItem = await createFormItemDriver("cityField");
+      const cityInput = await createTextBoxDriver(cityItem.input);
+
+      await nameInput.field.fill("Draft");
+      await page.getByTestId("adopt").click();
+
+      await expect(nameInput.field).toHaveValue("Canonical");
+      await expect(cityInput.field).toHaveValue("New city");
+      await page.getByTestId("inspect").click();
+      await expect.poll(testStateDriver.testState).toEqual({
+        data: { name: "Canonical", address: { city: "New city" } },
+        dirty: false,
+      });
+
+      await nameInput.field.fill("Another draft");
+      await page.getByTestId("reset").click();
+
+      await expect(nameInput.field).toHaveValue("Canonical");
+      await expect(cityInput.field).toHaveValue("New city");
+    });
+
     test("validate method returns validation results without submitting", async ({
       initTestBed,
       page,

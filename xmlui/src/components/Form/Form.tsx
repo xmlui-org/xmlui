@@ -365,8 +365,13 @@ export const FormMd = createMetadata({
   },
   apis: {
     reset: {
-      description: "This method resets the form to its initial state, clearing all user input.",
-      signature: "reset(): void",
+      description:
+        "This method resets the form to its initial state. When `data` is provided, the form " +
+        "adopts it as both the current value and the new initial baseline, leaving the form pristine.",
+      signature: "reset(data?: Record<string, any>): void",
+      parameters: {
+        data: "Optional form data to install as the new initial baseline.",
+      },
     },
     update: {
       description:
