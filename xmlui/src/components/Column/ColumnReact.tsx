@@ -7,14 +7,17 @@ import { MemoizedItem } from "../../components/container-helpers";
 import { useTableContext } from "./TableContext";
 import type { OurColumnMetadata } from "./TableContext";
 import { useIsomorphicLayoutEffect, useShallowCompareMemoize } from "../../components-core/utils/hooks";
+import { parseTooltipOptions } from "../Tooltip/Tooltip";
 
 type Props = OurColumnMetadata & {
+  tooltip?: any;
+  tooltipOptions?: any;
   nodeChildren?: ComponentDef[];
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
 };
 
-export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
+export const Column = memo(function Column({ tooltip, tooltipOptions, nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
   const stableColumnMetadata = useShallowCompareMemoize(columnMetadata);
@@ -64,15 +67,61 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
     return hasChildren ? cellRenderer : undefined;
   }, [cellRenderer, hasChildren]);
 
+  const tooltipNode = useMemo<ComponentDef | undefined>(() => {
+    if (tooltip === undefined || tooltip === null || tooltip === "") {
+      return undefined;
+    }
+    return {
+      type: "TextNode",
+      props: { value: tooltip },
+    };
+  }, [tooltip]);
+
+  const tooltipRenderer = useCallback(
+    (row: any, rowIndex: number, colIndex: number, value: any) => {
+      if (!tooltipNode) return undefined;
+      return (
+        <MemoizedItem
+          node={tooltipNode}
+          contextVars={{
+            $item: row,
+            $rowIndex: rowIndex,
+            $colIndex: colIndex,
+            $row: row,
+            $itemIndex: rowIndex,
+            $cell: value,
+          }}
+          renderChild={renderChildRef.current}
+          layoutContext={cellLayoutContextRef.current}
+        />
+      );
+    },
+    [tooltipNode],
+  );
+
+  const parsedTooltipOptions = useMemo(
+    () => parseTooltipOptions(tooltipOptions),
+    [tooltipOptions],
+  );
+
   useIsomorphicLayoutEffect(() => {
     registerColumn(
       {
         ...stableColumnMetadata,
         cellRenderer: safeCellRenderer,
+        tooltipOptions: parsedTooltipOptions,
+        tooltipRenderer,
       },
       id,
     );
-  }, [stableColumnMetadata, id, registerColumn, safeCellRenderer]);
+  }, [
+    stableColumnMetadata,
+    id,
+    registerColumn,
+    safeCellRenderer,
+    parsedTooltipOptions,
+    tooltipRenderer,
+  ]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {

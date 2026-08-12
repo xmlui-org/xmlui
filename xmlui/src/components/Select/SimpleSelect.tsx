@@ -23,6 +23,7 @@ import { Part } from "../Part/Part";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { toRadixSelectItemValue } from "./SelectOption";
 
 interface SimpleSelectProps {
   value: SingleValueType;
@@ -185,21 +186,22 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     // Passing undefined would trigger a controlled→uncontrolled transition that
     // causes Radix to fire onValueChange("") unexpectedly.
     const stringValue = useMemo(() => {
-      return value != null && value !== "" ? String(value) : "";
+      return value !== undefined && value !== "" ? toRadixSelectItemValue(value) : "";
     }, [value]);
 
     // Handle value changes with proper type conversion
     const handleValueChange = useCallback(
       (val: string) => {
         if (readOnly) return;
-        onValueChange(val);
+        const selectedOption = options.find((option) => toRadixSelectItemValue(option.value) === val);
+        onValueChange(selectedOption ? selectedOption.value : val);
       },
-      [onValueChange, readOnly],
+      [onValueChange, options, readOnly],
     );
 
     const selectedOption = useMemo(() => {
-      return options.find((option) => `${option.value}` === `${value}`);
-    }, [options, value]);
+      return options.find((option) => toRadixSelectItemValue(option.value) === stringValue);
+    }, [options, stringValue]);
 
     // Group options if groupBy is provided
     const groupedOptions = useMemo(() => {
@@ -375,7 +377,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                       options.map((option) => (
                         <SelectOption
                           key={option.value ?? option.label}
-                          value={String(option.value)}
+                          value={option.value}
                           label={option.label}
                           enabled={option.enabled}
                           className={styles.selectOption}
