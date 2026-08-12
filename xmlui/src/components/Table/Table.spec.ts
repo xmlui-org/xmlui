@@ -17,6 +17,7 @@
 
 import { expect, test } from "../../testing/fixtures";
 import type { Locator } from "@playwright/test";
+import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
 // Sample data for testing
 const sampleData = [
@@ -883,6 +884,69 @@ test.describe("Basic Functionality", () => {
         rowIndex: 1,
         cell: false,
       });
+    });
+
+    test("interactive typed column action events resolve row context variables", async ({
+      initTestBed,
+      page,
+    }) => {
+      const apiInterceptor: ApiInterceptorDefinition = {
+        operations: {
+          "checkbox-context": {
+            url: "/api/checked/1/true",
+            method: "get",
+            handler: `return { event: "checkbox" };`,
+          },
+          "switch-context": {
+            url: "/api/paid/1/true",
+            method: "get",
+            handler: `return { event: "switch" };`,
+          },
+          "color-context": {
+            url: "/api/accent/1/445566",
+            method: "get",
+            handler: `return { event: "color" };`,
+          },
+        },
+      };
+
+      const { testStateDriver } = await initTestBed(
+        `
+        <Table data="{[{ id: 1, checked: false, paid: false, accent: '#112233' }]}" testId="table">
+          <Column bindTo="checked" type="checkbox">
+            <event name="didChange">
+              <APICall
+                url="/api/checked/{$item.id}/{$param}"
+                onSuccess="result => testState = [...(testState || []), result.event]" />
+            </event>
+          </Column>
+          <Column bindTo="paid" type="switch">
+            <event name="didChange">
+              <APICall
+                url="/api/paid/{$item.id}/{$param}"
+                onSuccess="result => testState = [...(testState || []), result.event]" />
+            </event>
+          </Column>
+          <Column bindTo="accent" type="color">
+            <event name="didChange">
+              <APICall
+                url="/api/accent/{$item.id}/{$param.substring(1)}"
+                onSuccess="result => testState = [...(testState || []), result.event]" />
+            </event>
+          </Column>
+        </Table>
+      `,
+        { apiInterceptor },
+      );
+
+      await page.getByRole("checkbox", { name: "checked row 1" }).click();
+      await expect.poll(testStateDriver.testState).toEqual(["checkbox"]);
+
+      await page.getByRole("switch", { name: "paid row 1" }).click();
+      await expect.poll(testStateDriver.testState).toEqual(["checkbox", "switch"]);
+
+      await page.locator('td[data-column-id="accent"] input[type="color"]').fill("#445566");
+      await expect.poll(testStateDriver.testState).toEqual(["checkbox", "switch", "color"]);
     });
 
     test("readOnly interactive typed columns do not fire didChange", async ({

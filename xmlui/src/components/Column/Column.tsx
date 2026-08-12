@@ -247,17 +247,21 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         columnId: string,
         cellValue: any,
       ) => {
+        const context = {
+          $item: row,
+          $row: row,
+          $itemIndex: rowIndex,
+          $rowIndex: rowIndex,
+          $cell: cellValue,
+        };
         const handler = lookupEventHandler(eventName, {
-          context: {
-            $item: row,
-            $row: row,
-            $itemIndex: rowIndex,
-            $rowIndex: rowIndex,
-            $cell: cellValue,
-          },
+          context,
           ephemeral: true,
         });
-        return handler?.(newValue, row, rowIndex, columnId);
+        return handler?.(newValue, row, rowIndex, columnId, cellValue, {
+          __xmluiActionOptions: true,
+          context,
+        });
       };
     };
 

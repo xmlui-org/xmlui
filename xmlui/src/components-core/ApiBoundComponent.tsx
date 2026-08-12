@@ -73,7 +73,8 @@ export function ApiBoundComponent({
             file,
             fieldName,
           } = actionComponent.props;
-          return `(eventArgs) => {
+          return `(eventArgs, arg1, arg2, arg3, arg4, arg5) => {
+            const actionOptions = arg5?.__xmluiActionOptions ? arg5 : arg1;
             return Actions.upload({
               asForm: ${JSON.stringify(asForm)},
               formParams: ${JSON.stringify(formParams)},
@@ -85,7 +86,7 @@ export function ApiBoundComponent({
               method: ${JSON.stringify(method)},
               file: ${JSON.stringify(file)},
               fieldName: ${JSON.stringify(fieldName)},
-              params: { '$param': eventArgs },
+              params: { ...(actionOptions?.context ?? {}), '$param': eventArgs },
               onError: ${prepareEvent(error)},
               onSuccess: ${prepareEvent(success)},
               onProgress: eventArgs.onProgress,
@@ -97,7 +98,8 @@ export function ApiBoundComponent({
         case "FileDownload": {
           const { url, queryParams, rawBody, body, headers, method, fileName } =
             actionComponent.props;
-          return `(eventArgs) => {
+          return `(eventArgs, arg1, arg2, arg3, arg4, arg5) => {
+            const actionOptions = arg5?.__xmluiActionOptions ? arg5 : arg1;
             return Actions.download({
               queryParams: ${JSON.stringify(queryParams)},
               rawBody: ${JSON.stringify(rawBody)},
@@ -106,7 +108,7 @@ export function ApiBoundComponent({
               headers: ${JSON.stringify(headers)},
               method: ${JSON.stringify(method)},
               fileName: ${JSON.stringify(fileName)},
-              params: { '$param': eventArgs },
+              params: { ...(actionOptions?.context ?? {}), '$param': eventArgs },
             }, { resolveBindingExpressions: true });
           }`;
         }
@@ -134,7 +136,8 @@ export function ApiBoundComponent({
             body,
           } = actionComponent.props;
 
-          return `(eventArgs, options) => {
+          return `(eventArgs, arg1, arg2, arg3, arg4, arg5) => {
+            const actionOptions = arg5?.__xmluiActionOptions ? arg5 : arg1;
             return Actions.callApi({
               uid: ${JSON.stringify(uid)},
               headers: ${JSON.stringify(headers)},
@@ -142,7 +145,7 @@ export function ApiBoundComponent({
               url: ${JSON.stringify(url)},
               queryParams: ${JSON.stringify(queryParams)},
               rawBody: ${JSON.stringify(rawBody)},
-              body: ${JSON.stringify(body)} || (options?.passAsDefaultBody ? eventArgs : undefined),
+              body: ${JSON.stringify(body)} || (actionOptions?.passAsDefaultBody ? eventArgs : undefined),
               confirmTitle: ${JSON.stringify(confirmTitle)},
               confirmMessage: ${JSON.stringify(confirmMessage)},
               confirmButtonLabel: ${JSON.stringify(confirmButtonLabel)},
@@ -150,7 +153,7 @@ export function ApiBoundComponent({
               inProgressNotificationMessage: ${JSON.stringify(inProgressNotificationMessage)},
               completedNotificationMessage: ${JSON.stringify(completedNotificationMessage)},
               errorNotificationMessage: ${JSON.stringify(errorNotificationMessage)},
-              params: { '$param': eventArgs },
+              params: { ...(actionOptions?.context ?? {}), '$param': eventArgs },
               onError: ${prepareEvent(error)},
               onProgress: ${prepareEvent(progress)},
               onBeforeRequest: ${prepareEvent(beforeRequest)},
