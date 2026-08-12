@@ -3601,6 +3601,60 @@ test.describe("Events", () => {
     await expect(output).toHaveText("Context menu triggered");
   });
 
+  test("item template handlers can access sibling ContextMenu API in compound components", async ({
+    initTestBed,
+    page,
+  }) => {
+    const data = [{ id: 1, name: "Root", children: [{ id: 2, name: "Child" }] }];
+    await initTestBed(
+      `
+      <App>
+        <ScopeReproHost />
+      </App>
+      `,
+      {
+        components: [
+          `
+          <Component name="ScopeReproHost">
+            <ScopeRepro nodes='{${JSON.stringify(data)}}' />
+          </Component>
+          `,
+          `
+          <Component name="ScopeRepro" var.result="{'unset'}">
+            <ContextMenu id="menu">
+              <MenuItem label="Rename" onClick="result = $context.name" />
+            </ContextMenu>
+            <Text testId="result" value="{result}" />
+            <VStack height="200px">
+              <Tree
+                height="*"
+                data="{$props.nodes || []}"
+                dataFormat="hierarchy"
+                defaultExpanded="first-level">
+                <property name="itemTemplate">
+                  <HStack gap="1rem" verticalAlignment="center">
+                    <Text value="{$item.name}" />
+                    <Button label="typeof menu" onClick="result = typeof menu" />
+                    <Button label="openAt" onClick="(ev) => menu.openAt(ev, $item)" />
+                  </HStack>
+                </property>
+              </Tree>
+            </VStack>
+          </Component>
+          `,
+        ],
+      },
+    );
+
+    await page.getByRole("button", { name: "typeof menu" }).first().click();
+    await expect(page.getByTestId("result")).toHaveText("object");
+
+    await page.getByRole("button", { name: "openAt" }).first().click();
+    await expect(page.getByRole("menuitem", { name: "Rename" })).toBeVisible();
+    await page.getByRole("menuitem", { name: "Rename" }).click();
+    await expect(page.getByTestId("result")).toHaveText("Root");
+  });
+
   test("contextMenu event receives node context ($item) on right click label", async ({
     initTestBed,
     page,
