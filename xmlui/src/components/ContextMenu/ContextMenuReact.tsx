@@ -29,6 +29,13 @@ type ContextMenuProps = {
   menuWidth?: string;
 };
 
+type OpeningEventInfo = {
+  event: Event | null;
+  target: EventTarget | null;
+  timeStamp: number;
+  ignoreInitialFocusOutside: boolean;
+};
+
 function sanitizeContextValue(value: any, seen = new WeakSet<object>()): any {
   if (value === null || value === undefined || typeof value !== "object") {
     return value;
@@ -73,7 +80,7 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
   const [enableClicks, setEnableClicks] = useState(true);
   const [contentReady, setContentReady] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const ignoreOutsideUntilRef = useRef(0);
+  const openingEventInfoRef = useRef<OpeningEventInfo | null>(null);
   const effectiveMenuWidth = menuWidth ?? getThemeVar("minWidth-ContextMenu") ?? "160px";
 
   const getContainerInfo = useCallback(() => {
@@ -99,6 +106,7 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
 
   const closeMenu = useCallback(() => {
     setOpen(false);
+    openingEventInfoRef.current = null;
     // Do NOT clear $context here — onClick handlers (especially async ones
     // like confirm()) may still reference it after the menu closes.
     // $context is overwritten on the next openAt() call.
@@ -124,7 +132,13 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
     
     // Disable clicks temporarily
     setEnableClicks(false);
-    ignoreOutsideUntilRef.current = Date.now() + 100;
+    const openingEvent = "nativeEvent" in event ? event.nativeEvent : event;
+    openingEventInfoRef.current = {
+      event: openingEvent,
+      target: openingEvent.target,
+      timeStamp: openingEvent.timeStamp,
+      ignoreInitialFocusOutside: true,
+    };
     
     // Open the menu
     setOpen(true);
@@ -221,10 +235,28 @@ export const ContextMenu = memo(forwardRef(function ContextMenu(
             loop={true}
             onEscapeKeyDown={closeMenu}
             onInteractOutside={(event) => {
-              if (Date.now() < ignoreOutsideUntilRef.current) {
+              const originalEvent = (event as CustomEvent<{ originalEvent?: Event }>).detail
+                ?.originalEvent;
+              const openingEventInfo = openingEventInfoRef.current;
+              const isOpeningEvent =
+                !!openingEventInfo &&
+                !!originalEvent &&
+                (originalEvent === openingEventInfo.event ||
+                  (originalEvent.target === openingEventInfo.target &&
+                    originalEvent.timeStamp === openingEventInfo.timeStamp));
+              const isInitialFocusOutside =
+                !!openingEventInfo &&
+                openingEventInfo.ignoreInitialFocusOutside &&
+                originalEvent?.type === "focusin";
+              if (isOpeningEvent || isInitialFocusOutside) {
+                openingEventInfoRef.current = {
+                  ...openingEventInfo,
+                  ignoreInitialFocusOutside: false,
+                };
                 event.preventDefault();
                 return;
               }
+              openingEventInfoRef.current = null;
               closeMenu();
             }}
           >
