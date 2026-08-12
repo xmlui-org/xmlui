@@ -511,6 +511,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Combine immediate-save settings with scoped Forms"
+                            to="/docs/howto/combine-immediate-save-settings-with-scoped-forms"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Build a multi-step wizard form"
                             to="/docs/howto/build-a-multi-step-wizard-form"
                         />
