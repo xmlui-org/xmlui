@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.14.11
+
+### Patch Changes
+
+- b729536: Fix typed Column action events so nested APICall, FileDownload, and FileUpload handlers receive row context variables such as `$item`, `$row`, and `$cell`.
+- 32f130b: Add tooltip and tooltipOptions support to Option across Select, AutoComplete, and RadioGroup.
+- 32f130b: Fix Table column tooltips reopening while hovering an open Select dropdown rendered from a cell.
+- 32f130b: Fix Tree item templates so handlers can access sibling component APIs such as ContextMenu and pass tree item context through openAt.
+
 ## 0.14.10
 
 ### Patch Changes
