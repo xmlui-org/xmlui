@@ -31,7 +31,7 @@ export const tooltipBehavior: Behavior = {
     },
   },
   canAttach: (context, node, metadata) => {
-    if (metadata?.nonVisual) {
+    if (metadata?.nonVisual || node.type === "Option") {
       return false;
     }
     const { extractValue } = context;

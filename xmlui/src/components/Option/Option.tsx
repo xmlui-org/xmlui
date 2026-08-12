@@ -33,6 +33,15 @@ export const OptionMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
+    tooltip: {
+      description: "This property sets the tooltip text shown when hovering over this option.",
+      valueType: "string",
+    },
+    tooltipOptions: {
+      description:
+        "This property sets options for configuring this option's tooltip, such as delay and position.",
+      valueType: "any",
+    },
     keywords: {
       description:
         "An array of keywords that can be used for searching and filtering the option. " +
@@ -43,7 +52,7 @@ export const OptionMd = createMetadata({
 });
 
 export const optionComponentRenderer = wrapComponent(COMP, OptionNative, OptionMd, {
-  exclude: ["label", "value", "enabled", "keywords"],
+  exclude: ["label", "value", "enabled", "tooltip", "tooltipOptions", "keywords"],
   customRender(_props, { node, extractValue, classes, renderChild, layoutContext }) {
     const label = extractValue.asOptionalString(node.props.label);
     let value = extractValue(node.props.value);
@@ -58,7 +67,14 @@ export const optionComponentRenderer = wrapComponent(COMP, OptionNative, OptionM
 
     // Extract all extra properties (like category, etc.) for grouping and filtering
     const extraProps: Record<string, any> = {};
-    const knownProps = new Set(["label", "value", "enabled", "keywords"]);
+    const knownProps = new Set([
+      "label",
+      "value",
+      "enabled",
+      "tooltip",
+      "tooltipOptions",
+      "keywords",
+    ]);
     Object.keys(node.props).forEach((key) => {
       if (!knownProps.has(key)) {
         extraProps[key] = extractValue(node.props[key]);
@@ -70,6 +86,8 @@ export const optionComponentRenderer = wrapComponent(COMP, OptionNative, OptionM
         label={label || textNodeChild}
         value={value !== undefined && value !== "" ? value : label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        tooltip={extractValue.asOptionalString(node.props.tooltip)}
+        tooltipOptions={extractValue(node.props.tooltipOptions, true)}
         keywords={extractValue.asOptionalStringArray(node.props.keywords)}
         className={classes?.[COMPONENT_PART_KEY]}
         optionRenderer={

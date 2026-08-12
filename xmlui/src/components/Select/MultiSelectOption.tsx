@@ -4,6 +4,7 @@ import { useSelect } from "./SelectContext";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
+import { OptionTooltip } from "../Option/OptionTooltip";
 
 export const MultiSelectOption = forwardRef<
   HTMLDivElement,
@@ -44,7 +45,7 @@ export const MultiSelectOption = forwardRef<
     }
   };
 
-  return (
+  const item = (
     <div
       id={id}
       ref={forwardedRef}
@@ -78,5 +79,11 @@ export const MultiSelectOption = forwardRef<
         )}
       </div>
     </div>
+  );
+
+  return (
+    <OptionTooltip tooltip={option.tooltip} tooltipOptions={option.tooltipOptions}>
+      {item}
+    </OptionTooltip>
   );
 });

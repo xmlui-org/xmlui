@@ -24,6 +24,7 @@ import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspe
 import { ThemedIcon } from "../Icon/Icon";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { OptionTooltip } from "../Option/OptionTooltip";
 import { HiddenOption } from "./HiddenOption";
 import { SimpleSelect } from "./SimpleSelect";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
@@ -975,20 +976,17 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                             ) : (
                               <div className={styles.groupHeader}>{groupName}</div>
                             )}
-                            {groupOptions.map(({ value, label, enabled, keywords }, groupIndex) => {
+                            {groupOptions.map((option) => {
                               // Use flattenedGroupedOptions for correct index when groupBy is set
                               const optionsList = flattenedGroupedOptions || filteredOptions;
                               const globalIndex = optionsList.findIndex(
-                                (opt) => opt.value === value,
+                                (opt) => opt.value === option.value,
                               );
                               return (
                                 <SelectOptionItem
-                                  key={value}
+                                  key={option.value}
+                                  {...option}
                                   readOnly={readOnly}
-                                  value={value}
-                                  label={label}
-                                  enabled={enabled}
-                                  keywords={keywords}
                                   isHighlighted={selectedIndex === globalIndex}
                                   itemIndex={globalIndex}
                                 />
@@ -998,14 +996,11 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                         ))
                       ) : (
                         // Render flat filtered options
-                        filteredOptions.map(({ value, label, enabled, keywords }, index) => (
+                        filteredOptions.map((option, index) => (
                           <SelectOptionItem
-                            key={value}
+                            key={option.value}
+                            {...option}
                             readOnly={readOnly}
-                            value={value}
-                            label={label}
-                            enabled={enabled}
-                            keywords={keywords}
                             isHighlighted={selectedIndex === index}
                             itemIndex={index}
                           />
@@ -1077,7 +1072,7 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
     }
   };
 
-  return (
+  const item = (
     <div
       ref={optionRef}
       role="option"
@@ -1112,5 +1107,11 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
         )}
       </div>
     </div>
+  );
+
+  return (
+    <OptionTooltip tooltip={option.tooltip} tooltipOptions={option.tooltipOptions}>
+      {item}
+    </OptionTooltip>
   );
 }

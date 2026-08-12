@@ -245,6 +245,86 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual("b");
   });
 
+  test("shows tooltip for Select option", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
+      <Select testId="select">
+        <Option
+          label="Ada"
+          value="ada"
+          tooltip="First programmer"
+          tooltipOptions="right; delayDuration:0"
+        />
+        <Option label="Grace" value="grace" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver("select");
+    await driver.toggleOptionsVisibility();
+
+    await page.getByRole("option", { name: "Ada" }).hover();
+    await expect(page.getByRole("tooltip")).toHaveText("First programmer");
+    await expect(page.locator("[data-tooltip-container]")).toHaveAttribute("data-side", "right");
+  });
+
+  test("shows tooltip for searchable Select option", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="select" searchable="true">
+        <Option
+          label="Ada"
+          value="ada"
+          tooltip="Searchable option"
+          tooltipOptions="{{delayDuration:0}}"
+        />
+        <Option label="Grace" value="grace" />
+      </Select>
+    `);
+
+    const driver = await createSelectDriver("select");
+    await driver.toggleOptionsVisibility();
+
+    await page.getByRole("option", { name: "Ada" }).hover();
+    await expect(page.getByRole("tooltip")).toHaveText("Searchable option");
+  });
+
+  test("shows tooltip for AutoComplete option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete>
+        <Option
+          label="Ada"
+          value="ada"
+          tooltip="Autocomplete option"
+          tooltipOptions="{{delayDuration:0}}"
+        />
+        <Option label="Grace" value="grace" />
+      </AutoComplete>
+    `);
+
+    await page.getByRole("combobox").click();
+    await page.getByRole("option", { name: "Ada" }).hover();
+    await expect(page.getByRole("tooltip")).toHaveText("Autocomplete option");
+  });
+
+  test("shows tooltip for RadioGroup option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option
+          label="Ada"
+          value="ada"
+          tooltip="Radio option"
+          tooltipOptions="{{delayDuration:0}}"
+        />
+        <Option label="Grace" value="grace" />
+      </RadioGroup>
+    `);
+
+    await page.getByText("Ada").hover();
+    await expect(page.getByRole("tooltip")).toHaveText("Radio option");
+  });
+
   test("handles numeric values correctly", async ({ initTestBed, page, createSelectDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
