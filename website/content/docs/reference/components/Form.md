@@ -432,9 +432,28 @@ This method returns a deep clone of the current form data object. Changes to the
 
 ### `reset` [#reset]
 
-This method resets the form to its initial state, clearing all user input.
+This method resets the form to its initial state. When `data` is provided, the form adopts it as both the current value and the new initial baseline, leaving the form pristine.
 
-**Signature**: `reset(): void`
+**Signature**: `reset(data?: Record<string, any>): void`
+
+- `data`: Optional form data to install as the new initial baseline.
+
+Pass data to `reset` to replace the current values and establish a new clean initial baseline.
+Later parameterless resets return to that baseline.
+
+```xmlui-pg copy display name="Example: reset with new initial data"
+<App>
+  <Form id="profileForm"
+    data="{{ name: 'Original name' }}"
+    padding="0.5rem"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem bindTo="name" label="Name" />
+  </Form>
+  <Button
+    label="Adopt canonical data"
+    onClick="profileForm.reset({ name: 'Canonical name' })" />
+</App>
+```
 
 ### `update` [#update]
 

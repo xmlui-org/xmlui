@@ -175,6 +175,27 @@ The following example uses the first argument to inspect what will be submitted,
 
 %-EVENT-END
 
+%-API-START reset
+
+Pass data to `reset` to replace the current values and establish a new clean initial baseline.
+Later parameterless resets return to that baseline.
+
+```xmlui-pg copy display name="Example: reset with new initial data"
+<App>
+  <Form id="profileForm"
+    data="{{ name: 'Original name' }}"
+    padding="0.5rem"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem bindTo="name" label="Name" />
+  </Form>
+  <Button
+    label="Adopt canonical data"
+    onClick="profileForm.reset({ name: 'Canonical name' })" />
+</App>
+```
+
+%-API-END
+
 %-API-START update
 
 This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly. 

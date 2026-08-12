@@ -236,8 +236,17 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.RESET: {
+      const resetBaseline = action.payload.hasData
+        ? cloneDeep(action.payload.data)
+        : state.resetBaseline;
       return {
         ...initialState,
+        subject: action.payload.clear
+          ? {}
+          : resetBaseline === undefined
+            ? {}
+            : cloneDeep(resetBaseline),
+        resetBaseline,
         resetVersion: (state.resetVersion ?? 0) + 1,
       };
     }
@@ -254,6 +263,7 @@ interface FormState {
   noSubmitFields: Record<string, boolean>; // Track noSubmit flag for each field
   submitInProgress?: boolean;
   resetVersion?: number;
+  resetBaseline?: any;
 }
 
 const initialState: FormState = {
@@ -264,6 +274,7 @@ const initialState: FormState = {
   noSubmitFields: {},
   submitInProgress: false,
   resetVersion: 0,
+  resetBaseline: undefined,
 };
 
 type OnSubmit = (
@@ -809,7 +820,7 @@ const Form = memo(forwardRef(function (
       } else if (dataAfterSubmit === "clear") {
         flushSync(() => {
           onClearAfterSubmit?.();
-          doReset();
+          doReset(undefined, true);
         });
       } else {
         // "keep" (default): fire the reset event (backward compat) without resetting form state
@@ -936,8 +947,19 @@ const Form = memo(forwardRef(function (
     }
   });
 
-  const doReset = useEvent(() => {
-    dispatch(formReset());
+  const doReset = useEvent((data?: Record<string, any>, clear = false) => {
+    const hasData = data !== undefined;
+    if (hasData && (typeof data !== "object" || data === null || Array.isArray(data))) {
+      return;
+    }
+    dispatch({
+      ...formReset(),
+      payload: {
+        data,
+        hasData,
+        clear,
+      },
+    });
     onReset?.();
   });
 
@@ -1068,7 +1090,7 @@ const Form = memo(forwardRef(function (
         style={style}
         className={classnames(styles.formWrapper, { [styles.stickyForm]: stickyButtonRow }, classes?.[COMPONENT_PART_KEY], className)}
         onSubmit={doSubmit}
-        onReset={doReset}
+        onReset={() => doReset()}
         id={id}
         key={formState.resetVersion}
         ref={formRef}
@@ -1238,7 +1260,9 @@ export const FormWithContextVar = forwardRef(function (
   const effectiveInitialValue =
     clearedAtResetVersion !== null && clearedAtResetVersion === formState.resetVersion
       ? EMPTY_OBJECT
-      : rawInitialValue;
+      : formState.resetBaseline === undefined
+        ? rawInitialValue
+        : formState.resetBaseline;
   const submitMethod =
     extractValue.asOptionalString(node.props.submitMethod) || (rawInitialValue ? "put" : "post");
   const inProgressNotificationMessage =
