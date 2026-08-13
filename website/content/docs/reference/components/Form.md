@@ -65,6 +65,12 @@ The following example demonstrates using it:
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
 
+### `cancelButtonVisible` [#cancelbuttonvisible]
+
+> [!DEF]  default: **true**
+
+Shows (`true`) or hides (`false`) the Cancel button in the form's button row.
+
 ### `cancelLabel` [#cancellabel]
 
 > [!DEF]  default: **"Cancel"**

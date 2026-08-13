@@ -89,6 +89,11 @@ export const FormMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.cancelLabel,
     },
+    cancelButtonVisible: {
+      description: "Shows (`true`) or hides (`false`) the Cancel button in the form's button row.",
+      valueType: "boolean",
+      defaultValue: defaultProps.cancelButtonVisible,
+    },
     saveLabel: {
       description: `This property defines the label of the Save button.`,
       valueType: "string",

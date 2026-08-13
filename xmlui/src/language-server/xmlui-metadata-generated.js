@@ -6980,6 +6980,11 @@ export default {
         "valueType": "string",
         "defaultValue": "Cancel"
       },
+      "cancelButtonVisible": {
+        "description": "Shows (`true`) or hides (`false`) the Cancel button in the form's button row.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
       "saveLabel": {
         "description": "This property defines the label of the Save button.",
         "valueType": "string",

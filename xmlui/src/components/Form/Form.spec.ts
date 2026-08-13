@@ -3222,6 +3222,21 @@ test("cancel button is rendered with cancelLabel", async ({ initTestBed, createF
   await expect(driver.submitButton).toHaveText("Save");
 });
 
+test("cancel button is hidden when cancelButtonVisible is false", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+      <Form testId="form" cancelButtonVisible="false">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
+
+  await expect(page.getByRole("button", { name: "Cancel" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+});
+
 test("save button is rendered with saveLabel", async ({ initTestBed, createFormDriver }) => {
   await initTestBed(`
       <Form testId="form" saveLabel="Submit">
@@ -3710,6 +3725,15 @@ test.describe("Behaviors and Parts", () => {
     initTestBed,
   }) => {
     await initTestBed(`<Form testId="test" cancelLabel="" />`);
+    const cancelButton = page.locator("[data-part-id='cancelButton']");
+    await expect(cancelButton).not.toBeVisible();
+  });
+
+  test("cancelButton part is not present when cancelButtonVisible is false", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`<Form testId="test" cancelButtonVisible="false" />`);
     const cancelButton = page.locator("[data-part-id='cancelButton']");
     await expect(cancelButton).not.toBeVisible();
   });

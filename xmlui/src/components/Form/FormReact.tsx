@@ -296,6 +296,7 @@ type Props = {
   classes?: Record<string, string>;
   enabled?: boolean;
   cancelLabel?: string;
+  cancelButtonVisible?: boolean;
   saveLabel?: string;
   saveInProgressLabel?: string;
   savePendingLabel?: string;
@@ -393,6 +394,7 @@ const Form = memo(forwardRef(function (
     classes,
     enabled = true,
     cancelLabel,
+    cancelButtonVisible = defaultProps.cancelButtonVisible,
     saveLabel,
     saveInProgressLabel,
     savePendingLabel,
@@ -979,7 +981,7 @@ const Form = memo(forwardRef(function (
   });
 
   const cancelButton =
-    resolvedCancelLabel === "" ? null : (
+    !cancelButtonVisible || resolvedCancelLabel === "" ? null : (
       <Part partId={PART_CANCEL_BUTTON} key={PART_CANCEL_BUTTON}>
         <Button
           key="cancel"
@@ -1323,6 +1325,7 @@ export const FormWithContextVar = forwardRef(function (
         id={node.uid}
         classes={classes}
         cancelLabel={extractValue(node.props.cancelLabel)}
+        cancelButtonVisible={extractValue.asOptionalBoolean(node.props.cancelButtonVisible)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
         savePendingLabel={extractValue(node.props.savePendingLabel)}
