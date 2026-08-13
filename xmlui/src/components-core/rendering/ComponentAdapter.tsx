@@ -3,7 +3,7 @@ import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRe
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ParentRenderContext, ReceivedContextVars } from "../../abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -62,6 +62,36 @@ import { is } from "immer/dist/internal.js";
 import { enterRenderPhase, exitRenderPhase } from "../scheduler";
 import { emitRuntimeTypeContractDiagnostics } from "../type-contracts/runtime";
 import { createBindingEvalOptions } from "../script-runner/eval-options";
+
+const RESERVED_RECEIVED_CONTEXT_VARS = new Set(["$props", "$self", "$this"]);
+
+function collectReceivedContextVars(
+  contextVars: Record<string, any> | undefined,
+  receivesContextVars: ReceivedContextVars | undefined,
+): Record<string, any> | undefined {
+  if (!contextVars || receivesContextVars === undefined) return undefined;
+  const result: Record<string, any> = {};
+  let hasAny = false;
+  const copyKey = (key: string) => {
+    if (RESERVED_RECEIVED_CONTEXT_VARS.has(key)) return;
+    if (key in contextVars) {
+      result[key] = contextVars[key];
+      hasAny = true;
+    }
+  };
+  if (receivesContextVars === true) {
+    for (const key of Object.keys(contextVars)) {
+      copyKey(key);
+    }
+  } else if (receivesContextVars === false) {
+    return undefined;
+  } else {
+    for (const key of receivesContextVars) {
+      copyKey(key);
+    }
+  }
+  return hasAny ? result : undefined;
+}
 
 /**
  * Plan #6 W7-1 — surface the per-component / per-event concurrency knobs
@@ -1116,7 +1146,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
  * of the slot.
  */
 function slotRenderer(
-  { node, extractValue, renderChild, lookupAction, layoutContext }: RendererContext<any>,
+  { node, extractValue, renderChild, lookupAction, layoutContext, contextVars }: RendererContext<any>,
   parentRenderContext?: ParentRenderContext,
 ) {
   // --- Get the template name from the slot
@@ -1148,6 +1178,15 @@ function slotRenderer(
   }
 
   if (parentRenderContext) {
+    const receivedContextVars = collectReceivedContextVars(
+      contextVars,
+      parentRenderContext.receivesContextVars,
+    );
+    const parentContextVars =
+      parentRenderContext.contextVars || receivedContextVars
+        ? { ...parentRenderContext.contextVars, ...receivedContextVars }
+        : undefined;
+    const hasParentContextVars = !isEmpty(parentContextVars);
     // --- We may use a named slot to get the content from the parent
     if (templateName === undefined) {
       // --- The slot is not named
@@ -1155,6 +1194,16 @@ function slotRenderer(
         // --- simply render the children from the parent
         // --- The parent does not provide a template for the slot.
         if (parentRenderContext.children) {
+          if (hasParentContextVars) {
+            return (
+              <SlotItem
+                node={parentRenderContext.children}
+                renderChild={parentRenderContext.renderChild}
+                contextVars={parentContextVars}
+                layoutContext={layoutContext}
+              />
+            );
+          }
           return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
         }
       } else {
@@ -1164,6 +1213,7 @@ function slotRenderer(
             node={parentRenderContext.children}
             renderChild={parentRenderContext.renderChild}
             slotProps={slotProps}
+            contextVars={parentContextVars}
             layoutContext={layoutContext}
           />
         );
@@ -1178,6 +1228,7 @@ function slotRenderer(
             node={parentRenderContext.props[templateName]}
             renderChild={parentRenderContext.renderChild}
             slotProps={slotProps}
+            contextVars={parentContextVars}
             layoutContext={layoutContext}
           />
         );

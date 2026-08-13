@@ -1,4 +1,8 @@
-import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  ReceivedContextVars,
+} from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
 import { collectVariableDependencies } from "../../components-core/script-runner/visitors";
@@ -138,6 +142,54 @@ function parseSlotProvides(value: string | undefined): Set<string> {
       .filter(Boolean)
       .map((item) => (item.startsWith("$") ? item : `$${item}`)),
   );
+}
+
+const RESERVED_RECEIVED_CONTEXT_VARS = new Set(["$props", "$self", "$this"]);
+const RECEIVED_CONTEXT_VAR_REGEX = /^\$[A-Za-z_][A-Za-z0-9_]*$/;
+
+function parseReceivesContextVars(
+  value: string | undefined,
+  reportInvalid: (value: string, reason: string) => void,
+): ReceivedContextVars | undefined {
+  const trimmed = value?.trim();
+
+  if (trimmed === undefined || trimmed === "" || trimmed === "true" || trimmed === "{true}") {
+    return true;
+  }
+  if (trimmed === "false" || trimmed === "{false}") {
+    return false;
+  }
+
+  if (trimmed.startsWith("{") || trimmed.endsWith("}")) {
+    reportInvalid(trimmed, "Expressions are only valid for boolean true or false.");
+    return undefined;
+  }
+
+  const rawNames = trimmed.split(",");
+  const names: string[] = [];
+  for (const rawName of rawNames) {
+    const name = rawName.trim();
+    if (!name) {
+      reportInvalid(trimmed, "Empty context variable names are not allowed.");
+      return undefined;
+    }
+    if (name === "*") {
+      reportInvalid(trimmed, "Use true to receive all context variables instead of '*'.");
+      return undefined;
+    }
+    if (!RECEIVED_CONTEXT_VAR_REGEX.test(name)) {
+      reportInvalid(trimmed, `Context variable name '${name}' is not valid.`);
+      return undefined;
+    }
+    if (RESERVED_RECEIVED_CONTEXT_VARS.has(name)) {
+      reportInvalid(trimmed, `Context variable '${name}' is reserved.`);
+      return undefined;
+    }
+    if (!names.includes(name)) {
+      names.push(name);
+    }
+  }
+  return names;
 }
 
 let lastParseId = 0;
@@ -324,6 +376,12 @@ function transformXmluiNode(
 
     const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
     const capabilitiesAttr = attrs.find((attr) => attr.name === "capabilities");
+    const receivesContextVarsAttr = attrs.find((attr) => attr.name === "receivesContextVars");
+    const receivesContextVars = receivesContextVarsAttr
+      ? parseReceivesContextVars(receivesContextVarsAttr.value, (value, reason) =>
+          reportError(DIAGS_TRANSFORM.invalidReceivesContextVars(value, reason)),
+        )
+      : undefined;
     const trustAttr = attrs.find((attr) => attr.name === "trust");
     const trust: UdcTrust = trustAttr?.value === "untrusted" ? "untrusted" : "trusted";
 
@@ -498,9 +556,13 @@ function transformXmluiNode(
     if (codeBehind) {
       component.codeBehind = codeBehind.value;
     }
+    if (receivesContextVars !== undefined) {
+      component.receivesContextVars = receivesContextVars;
+    }
 
     // --- Attach declared contract when the UDC carried declaration blocks or
-    // sandbox attributes (`capabilities` / `trust`).
+    // sandbox attributes (`capabilities` / `trust`).  `receivesContextVars`
+    // alone is a context forwarding option, not a full scope contract.
     if (hasDeclarations || capabilitiesAttr || trustAttr) {
       component.contract = {
         name: compoundName.value,
@@ -511,6 +573,14 @@ function transformXmluiNode(
         slotProvides: declSlotProvides,
         capabilities: parseUdcCapabilities(capabilitiesAttr?.value),
         capabilitiesDeclared: capabilitiesAttr !== undefined,
+        receivesContextVars:
+          receivesContextVars === true
+            ? true
+            : receivesContextVars === false
+              ? false
+            : receivesContextVars !== undefined
+              ? new Set(receivesContextVars)
+              : undefined,
         trust,
       };
     }

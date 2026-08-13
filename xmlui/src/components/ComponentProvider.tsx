@@ -66,7 +66,11 @@ import {
 } from "./Splitter/Splitter";
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
-import { validateUdcPropReferences } from "../components-core/udc-sandbox";
+import {
+  normalizeReceivedContextVars,
+  normalizeUdcContract,
+  validateUdcPropReferences,
+} from "../components-core/udc-sandbox";
 import { collectUnconditionalRefs, findUdcCycles } from "../components-core/udcCycleDetection";
 import { dynamicHeightListComponentRenderer } from "./List/List";
 import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
@@ -1115,6 +1119,17 @@ export class ComponentRegistry {
     namespace: string,
     themeNamespacePrefix?: string,
   ) {
+    const normalizedContract = normalizeUdcContract(compoundComponentDef.contract);
+    const normalizedReceivesContextVars = normalizeReceivedContextVars(
+      compoundComponentDef.receivesContextVars,
+    );
+    if (normalizedContract) {
+      compoundComponentDef.contract = normalizedContract;
+    }
+    if (normalizedReceivesContextVars !== undefined) {
+      compoundComponentDef.receivesContextVars = normalizedReceivesContextVars;
+    }
+
     const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
     const mergedMetadata = metadata ? { ...autoMetadata, ...metadata } : autoMetadata;
 
@@ -1131,7 +1146,8 @@ export class ComponentRegistry {
           <CompoundComponent
             api={compoundComponentDef.api}
             scriptCollected={compoundComponentDef.component.scriptCollected}
-            contract={compoundComponentDef.contract as any}
+            contract={normalizedContract}
+            receivesContextVars={compoundComponentDef.receivesContextVars}
             compound={compoundComponentDef.component as ComponentDef}
             {...rendererContext}
           />
@@ -1139,7 +1155,7 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
       metadata: mergedMetadata,
-      udcContract: compoundComponentDef.contract,
+      udcContract: normalizedContract,
     };
 
     this.registerComponentRenderer(component, namespace, themeNamespacePrefix);

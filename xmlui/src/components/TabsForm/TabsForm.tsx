@@ -93,6 +93,13 @@ export const TabsFormMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    tabsKeepMounted: {
+      description:
+        "When `true`, keeps all inner `Tabs` panels mounted and hides inactive panels. " +
+        "Defaults to `true` so fields in inactive form tabs remain registered.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
     tabsActiveTab: {
       description:
         "Zero-based index of the initially active tab in the inner `Tabs`. Defaults to 0.",
@@ -314,6 +321,7 @@ const FORWARDED_TABS_PROPS: Record<string, string> = {
   tabsTabAlignment: "tabAlignment",
   tabsAccordionView: "accordionView",
   tabsDistributeEvenly: "distributeEvenly",
+  tabsKeepMounted: "keepMounted",
   tabsActiveTab: "activeTab",
 };
 
@@ -333,7 +341,7 @@ export const tabsFormComponentRenderer = wrapComponent(COMP, () => null, TabsFor
       if (v !== undefined) formProps[key] = v;
     }
 
-    const tabsProps: Record<string, unknown> = {};
+    const tabsProps: Record<string, unknown> = { keepMounted: true };
     for (const [tabsFormKey, tabsKey] of Object.entries(FORWARDED_TABS_PROPS)) {
       const v = node.props?.[tabsFormKey];
       if (v !== undefined) tabsProps[tabsKey] = v;

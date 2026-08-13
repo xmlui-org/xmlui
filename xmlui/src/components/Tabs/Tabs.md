@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Content organization**: Efficiently displays multiple content sections in a single interface area
 - **Flexible orientation**: Supports both horizontal (tabs on top) and vertical (tabs on side) layouts
 - **Active tab control**: Programmatically set which tab is initially selected
@@ -49,7 +50,7 @@ You can create `TabItem` children dynamically:
 
 %-PROP-START headerTemplate
 
-```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -57,8 +58,8 @@ You can create `TabItem` children dynamically:
       <Text color="green">Account {$header.index}</Text>
     </property>
     <Items data="{[
-        {id: 1, name: 'AcmeCorp'}, 
-        {id: 2, name: 'BetaLLC'}, 
+        {id: 1, name: 'AcmeCorp'},
+        {id: 2, name: 'BetaLLC'},
         {id: 3, name: 'GammaInc'}]
       }">
       <TabItem label="Account {$item}">
@@ -70,6 +71,7 @@ You can create `TabItem` children dynamically:
 ```
 
 The `headerTemplate` property allows you to customize the appearance of tab headers. The template receives a `$header` context variable with the following properties:
+
 - `id` (optional): External ID if provided to TabItem
 - `index`: Zero-based index of the tab
 - `label`: The tab's label text
@@ -77,7 +79,7 @@ The `headerTemplate` property allows you to customize the appearance of tab head
 
 Individual tab items have an optional identifier, which is passed to the header template.
 
-```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -221,6 +223,27 @@ The accordion view is particularly useful for mobile layouts or when you need to
 
 %-PROP-END
 
+%-PROP-START keepMounted
+
+By default, `Tabs` mounts only the active tab item; inactive tab item content is unmounted. Set `keepMounted` to `true` to keep every tab item mounted and hide inactive panels instead. This preserves local component state and ongoing operations in inactive tabs.
+
+```xmlui-pg copy display name="Example: keepMounted" /keepMounted/ height="260px"
+<App>
+  <Tabs keepMounted="true">
+    <TabItem label="Draft">
+      <TextBox placeholder="This value stays mounted while hidden" />
+    </TabItem>
+    <TabItem label="Preview">
+      <Text>Switch back to Draft; the input component was hidden, not unmounted.</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+> [!INFO] `TabsForm` opts into this mode for its generated inner `Tabs` so fields in inactive form tabs remain registered.
+
+%-PROP-END
+
 %-API-START next
 
 ```xmlui-pg copy display name="Example: next()" /next/ height="250px"
@@ -241,6 +264,7 @@ The accordion view is particularly useful for mobile layouts or when you need to
 %-EVENT-START didChange
 
 The event handler gets these parameters, which refer to the active tab after the change:
+
 - `index`: The active tab index
 - `id`: The identifier of the active tab (if not defined, the framework provides an auto-generated id)
 - `label`: The label of the active tab
@@ -248,7 +272,7 @@ The event handler gets these parameters, which refer to the active tab after the
 ```xmlui-pg copy display name="Example: didChange" /onDidChange/ height="200px"
 <App var.lastTab="(none)">
   <Tabs onDidChange="
-    (newIndex, id, label) => 
+    (newIndex, id, label) =>
       lastTab = newIndex + ': ' + label + ' (' + id + ')'
     ">
     <TabItem id="account" label="Account">
@@ -264,7 +288,6 @@ The event handler gets these parameters, which refer to the active tab after the
   <Text>Tab index changed to {lastTab}</Text>
 </App>
 ```
-
 
 %-EVENT-END
 

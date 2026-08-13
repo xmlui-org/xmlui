@@ -9,6 +9,7 @@ import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs"
 type SlotItemProps = {
   node: ComponentDef | Array<ComponentDef>;
   slotProps?: any;
+  contextVars?: Record<string, any>;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
 };
@@ -19,13 +20,20 @@ type SlotItemProps = {
  * the parent.
  */
 export const SlotItem = memo(
-  ({ node, renderChild, layoutContext, slotProps = EMPTY_OBJECT }: SlotItemProps) => {
+  ({
+    node,
+    renderChild,
+    layoutContext,
+    slotProps = EMPTY_OBJECT,
+    contextVars = EMPTY_OBJECT,
+  }: SlotItemProps) => {
     const shallowMemoedSlotProps = useShallowCompareMemoize(slotProps);
+    const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
 
     // --- Transform all Slot properties into context values so that they can be 
     // --- used in the slot content (in the parent component)
     const nodeWithItem = useMemo(() => {
-      const templateProps = {};
+      const templateProps = { ...shallowMemoedContextVars };
       Object.entries(shallowMemoedSlotProps).forEach(([key, value]) => {
         templateProps["$" + key] = value;
       });
@@ -36,7 +44,7 @@ export const SlotItem = memo(
         contextVars: templateProps,
         children: Array.isArray(node) ? node : [node],
       } as ContainerWrapperDef;
-    }, [node, shallowMemoedSlotProps]);
+    }, [node, shallowMemoedContextVars, shallowMemoedSlotProps]);
 
     // --- Render the slot content
     return <>{renderChild(nodeWithItem, layoutContext)}</>;

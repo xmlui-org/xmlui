@@ -2,7 +2,7 @@ import React, { forwardRef, isValidElement, useMemo } from "react";
 import type { LayoutContext } from "../abstractions/RendererDefs";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentDef, ReceivedContextVars } from "../abstractions/ComponentDefs";
 import { pushXsLog, getCurrentTrace } from "./inspector/inspectorUtils";
 import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
@@ -23,6 +23,7 @@ import {
 import {
   buildScopeGate,
   narrowCapabilities,
+  normalizeReceivedContextVars,
   parseCapabilityList,
   validateUdcPropReferences,
   type UdcContract,
@@ -33,6 +34,17 @@ import {
 // so the warning fires only once per type (development builds only).
 const warnedLayoutForwardTypes = new Set<string>();
 
+// Items-loop and context variables that historically propagated through the UDC boundary.
+// Keep this behavior for compatibility while `receivesContextVars` covers new cases.
+const LEGACY_PROPAGATED_CONTEXT_VARS = [
+  "$item",
+  "$itemIndex",
+  "$isFirst",
+  "$isLast",
+  "$context",
+] as const;
+const RESERVED_RECEIVED_CONTEXT_VARS = new Set(["$props", "$self", "$this"]);
+
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
   compound: ComponentDef;
@@ -40,6 +52,7 @@ type CompoundComponentProps = {
   api?: Record<string, any>;
   scriptCollected?: CollectedDeclarations;
   contract?: UdcContract;
+  receivesContextVars?: ReceivedContextVars;
 } & RendererContext;
 
 // Acts as a bridge between a compound component definition and its renderer.
@@ -53,6 +66,7 @@ export const CompoundComponent = forwardRef(
       api,
       scriptCollected,
       contract,
+      receivesContextVars,
       renderChild,
       extractValue,
       layoutContext,
@@ -113,12 +127,6 @@ export const CompoundComponent = forwardRef(
     }, [extractValue, lookupSyncCallback, node.props]);
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
-
-    // Items-loop and context variables that must propagate through the UDC boundary.
-    // The UDC container uses narrowing which blocks local context vars,
-    // so $item/$itemIndex/$isFirst/$isLast/$context would otherwise be invisible inside the
-    // UDC template and break logic (e.g. form bindings or context menus).
-    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast", "$context"] as const;
 
     const udcContract = contract ?? ((compound as any).contract as UdcContract | undefined);
     // W8-1 (plan #14): strict UDC sandbox is on by default.  Authors must
@@ -222,18 +230,50 @@ export const CompoundComponent = forwardRef(
 
     const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
 
+    const receivedContextVarSpec = useMemo<ReceivedContextVars>(() => {
+      const declaredReceives = normalizeReceivedContextVars(
+        receivesContextVars ?? effectiveContract?.receivesContextVars,
+      );
+      if (declaredReceives === true) {
+        return true;
+      }
+      if (declaredReceives === false) {
+        return [];
+      }
+      if (declaredReceives) {
+        return declaredReceives;
+      }
+      const names = new Set<string>(LEGACY_PROPAGATED_CONTEXT_VARS);
+      return Array.from(names);
+    }, [effectiveContract?.receivesContextVars, receivesContextVars]);
+
     const propagatedContextVars = useMemo(() => {
       if (!contextVars) return undefined;
       const result: Record<string, any> = {};
       let hasAny = false;
-      for (const key of PROPAGATED_CONTEXT_VARS) {
+
+      const copyKey = (key: string) => {
+        if (RESERVED_RECEIVED_CONTEXT_VARS.has(key)) return;
         if (key in contextVars) {
           result[key] = contextVars[key];
           hasAny = true;
         }
+      };
+
+      if (receivedContextVarSpec === true) {
+        for (const key of Object.keys(contextVars)) {
+          copyKey(key);
+        }
+      } else if (receivedContextVarSpec === false) {
+        return undefined;
+      } else {
+        for (const key of receivedContextVarSpec) {
+          copyKey(key);
+        }
       }
+
       return hasAny ? result : undefined;
-    }, [contextVars]);
+    }, [contextVars, receivedContextVarSpec]);
 
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
@@ -358,8 +398,17 @@ export const CompoundComponent = forwardRef(
         renderChild,
         props: node.props,
         children: node.children,
+        contextVars: propagatedContextVars,
+        receivesContextVars: receivedContextVarSpec,
       };
-    }, [hasTemplateProps, node.children, node.props, renderChild]);
+    }, [
+      hasTemplateProps,
+      node.children,
+      node.props,
+      propagatedContextVars,
+      receivedContextVarSpec,
+      renderChild,
+    ]);
 
     // Remove the wrapChild prop from layout context, because that wrapping already happened
     // for the compound component instance. When the compound component has a layout className

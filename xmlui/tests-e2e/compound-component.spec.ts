@@ -71,6 +71,141 @@ test("ChildSlot rendered in compound components", async ({ page, initTestBed }) 
   await expect(page.getByText(EXPECTED_TEXT_CHILDREN)).toBeVisible();
 });
 
+test("receivesContextVars passes Table cell context into compound default slot", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `
+    <Table data="{[
+      { id: 0, name: 'Apples', quantity: 5 },
+      { id: 1, name: 'Bananas', quantity: 6 }
+    ]}">
+      <RedColumn bindTo="name">
+        <Text testId="cell-text">{$cell}</Text>
+      </RedColumn>
+      <Column bindTo="quantity" />
+    </Table>
+    `,
+    {
+      components: [
+        `
+        <Component name="RedColumn" receivesContextVars="$cell">
+          <Column bindTo="{$props.bindTo}">
+            <Stack backgroundColor="red">
+              <Slot />
+            </Stack>
+          </Column>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await expect(page.getByTestId("cell-text").first()).toHaveText("Apples");
+  await expect(page.getByTestId("cell-text").nth(1)).toHaveText("Bananas");
+});
+
+test("receivesContextVars key-only form passes all context vars into compound slot", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `
+    <Table data="{[
+      { id: 0, name: 'Apples', quantity: 5 },
+      { id: 1, name: 'Bananas', quantity: 6 }
+    ]}">
+      <AllContextColumn bindTo="name">
+        <Text testId="cell-text">{$rowIndex}: {$cell}</Text>
+      </AllContextColumn>
+    </Table>
+    `,
+    {
+      components: [
+        `
+        <Component name="AllContextColumn" receivesContextVars>
+          <Column bindTo="{$props.bindTo}">
+            <Slot />
+          </Column>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await expect(page.getByTestId("cell-text").first()).toHaveText("0: Apples");
+  await expect(page.getByTestId("cell-text").nth(1)).toHaveText("1: Bananas");
+});
+
+test("receivesContextVars alone does not activate the UDC scope contract", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `
+    <App global.count="{2}">
+      <Table data="{[
+        { id: 0, name: 'Apples' },
+        { id: 1, name: 'Bananas' }
+      ]}">
+        <RedColumn bindTo="name">
+          <Text testId="cell-text">{$cell}</Text>
+        </RedColumn>
+      </Table>
+    </App>
+    `,
+    {
+      noFragmentWrapper: true,
+      components: [
+        `
+        <Component name="RedColumn" receivesContextVars>
+          <Column bindTo="{$props.bindTo}">
+            <Slot />
+          </Column>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await expect(page.locator("[data-error-boundary]")).toHaveCount(0);
+  await expect(page.getByTestId("cell-text").first()).toHaveText("Apples");
+  await expect(page.getByTestId("cell-text").nth(1)).toHaveText("Bananas");
+});
+
+test("receivesContextVars false does not pass Table cell context into compound slot", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(
+    `
+    <Table data="{[
+      { id: 0, name: 'Apples' },
+      { id: 1, name: 'Bananas' }
+    ]}">
+      <NoContextColumn bindTo="name">
+        <Text testId="cell-text">{$cell}</Text>
+      </NoContextColumn>
+    </Table>
+    `,
+    {
+      components: [
+        `
+        <Component name="NoContextColumn" receivesContextVars="false">
+          <Column bindTo="{$props.bindTo}">
+            <Slot />
+          </Column>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await expect(page.getByTestId("cell-text").first()).toHaveText("");
+  await expect(page.getByTestId("cell-text").nth(1)).toHaveText("");
+});
+
 test("Default slot rendered in compound components", async ({ page, initTestBed }) => {
   const EXPECTED_DEFAULT_SLOT = "Default slot content";
   await initTestBed(`<Custom></Custom>`, {

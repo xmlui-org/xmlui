@@ -87,6 +87,33 @@ export function buildScopeGate(
     "navigate",
     ...slotContext,
   ]);
+  if (contract.receivesContextVars === true) {
+    return {
+      isAllowed: (name) => name.startsWith("$") || allowed.has(name),
+      canRead: (name) => name.startsWith("$") || allowed.has(name),
+      createDiagnostic: (name) => ({
+        code: "udc-scope-leak",
+        severity: strict ? "error" : "info",
+        udc: contract.name,
+        message:
+          `UDC "${contract.name}" read "${name}" from its parent scope, but "${name}" ` +
+          `is not part of the declared UDC contract.`,
+        data: { identifier: name },
+      }),
+      assertCanRead(name) {
+        if (name.startsWith("$") || allowed.has(name)) return;
+        const diagnostic = this.createDiagnostic(name);
+        if (strict) {
+          throw new UdcScopeError(diagnostic);
+        }
+      },
+    };
+  }
+  if (contract.receivesContextVars) {
+    for (const name of contract.receivesContextVars) {
+      allowed.add(name);
+    }
+  }
 
   return {
     isAllowed: (name) => allowed.has(name),

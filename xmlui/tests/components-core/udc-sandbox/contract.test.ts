@@ -8,6 +8,7 @@ import {
   emptyContract,
   gateCapability,
   narrowCapabilities,
+  serializeContract,
   validateUdcPropReferences,
   type UdcCapability,
   type UdcContract,
@@ -106,6 +107,90 @@ describe("udc-sandbox / parser produces UdcContract", () => {
     expect(c.capabilitiesDeclared).toBe(true);
     expect(c.trust).toBe("untrusted");
     expect(Array.from(c.slotProvides!.get("row")!)).toEqual(["$item", "$index"]);
+  });
+
+  it("collects receivesContextVars as all vars from key-only and true values", () => {
+    const keyOnly = parseCompound(`
+      <Component name="CellShell" receivesContextVars>
+        <Stack />
+      </Component>
+    `);
+    expect(keyOnly.receivesContextVars).toBe(true);
+    expect(keyOnly.contract).toBeUndefined();
+
+    const booleanTrue = parseCompound(`
+      <Component name="CellShell" receivesContextVars="{true}">
+        <Stack />
+      </Component>
+    `);
+    expect(booleanTrue.receivesContextVars).toBe(true);
+    expect(booleanTrue.contract).toBeUndefined();
+  });
+
+  it("collects receivesContextVars context variable names", () => {
+    const def = parseCompound(`
+      <Component name="CellShell" receivesContextVars="$cell, $rowIndex, $cell">
+        <Stack />
+      </Component>
+    `);
+    expect(def.receivesContextVars).toEqual(["$cell", "$rowIndex"]);
+    expect(def.contract).toBeUndefined();
+  });
+
+  it("collects receivesContextVars false as a boolean declaration", () => {
+    const def = parseCompound(`
+      <Component name="CellShell" receivesContextVars="false">
+        <Stack />
+      </Component>
+    `);
+    expect(def.receivesContextVars).toBe(false);
+    expect(def.contract).toBeUndefined();
+  });
+
+  it("includes receivesContextVars when the UDC also declares a contract", () => {
+    const def = parseCompound(`
+      <Component name="CellShell" receivesContextVars="$cell, $rowIndex">
+        <Prop name="bindTo" />
+        <Column bindTo="{$props.bindTo}">
+          <Slot />
+        </Column>
+      </Component>
+    `);
+    expect(def.receivesContextVars).toEqual(["$cell", "$rowIndex"]);
+    const contractReceives = (def.contract as UdcContract).receivesContextVars;
+    expect(contractReceives).toBeInstanceOf(Set);
+    expect(Array.from(contractReceives as ReadonlySet<string>)).toEqual(["$cell", "$rowIndex"]);
+  });
+
+  it("reports invalid receivesContextVars values", () => {
+    const cases = ["*", "$cell,", "{$cell}", "$props", "cell", "$cell, rowIndex"];
+    for (const value of cases) {
+      const result = xmlUiMarkupToComponent(
+        `<Component name="CellShell" receivesContextVars="${value}"><Stack /></Component>`,
+        "Main.xmlui",
+      );
+      expect(result.errors[0]?.code).toBe("T033");
+    }
+  });
+
+  it("serializes receivesContextVars in UDC manifests", () => {
+    const contract = {
+      ...emptyContract("CellShell"),
+      receivesContextVars: new Set(["$rowIndex", "$cell"]),
+    };
+    expect(serializeContract(contract).receivesContextVars).toEqual(["$cell", "$rowIndex"]);
+
+    const allContract = {
+      ...emptyContract("CellShell"),
+      receivesContextVars: true as const,
+    };
+    expect(serializeContract(allContract).receivesContextVars).toBe(true);
+
+    const noneContract = {
+      ...emptyContract("CellShell"),
+      receivesContextVars: false as const,
+    };
+    expect(serializeContract(noneContract).receivesContextVars).toBe(false);
   });
 
   it("grants all capabilities by default when declarations omit capabilities", () => {

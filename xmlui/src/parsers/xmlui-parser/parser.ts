@@ -792,6 +792,7 @@ export function parseXmlUiMarkup(
         attr.name !== "name" &&
         attr.name !== "codeBehind" &&
         attr.name !== "capabilities" &&
+        attr.name !== "receivesContextVars" &&
         attr.name !== "trust"
       ) {
         errorAt(

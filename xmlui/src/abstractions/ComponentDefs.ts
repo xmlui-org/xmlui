@@ -178,6 +178,8 @@ export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
 // XMLUI allows the creation of reusable components assembled from other XMLUI
 // components (with markup). This type represents such components. The name
 // `CompoundComponent` refers to the assembled nature of reusable components.
+export type ReceivedContextVars = boolean | readonly string[];
+
 export interface CompoundComponentDef extends Scriptable {
   // Each compound component must have a unique name. The markup uses this name to refer
   // to the particular compound component.
@@ -209,6 +211,13 @@ export interface CompoundComponentDef extends Scriptable {
   debug?: Record<string, any>;
 
   codeBehind?: string;
+
+  /**
+   * Context variables the reusable component explicitly receives from its
+   * caller's runtime context. `true` means all non-reserved context variables,
+   * `false` means no context variables.
+   */
+  receivesContextVars?: ReceivedContextVars;
 
   /**
    * Optional declared contract produced by the parser when the UDC defines
@@ -781,4 +790,6 @@ export interface ParentRenderContext {
   renderChild: RenderChildFn;
   children?: ComponentDef[];
   props?: Record<string, any>;
+  contextVars?: Record<string, any>;
+  receivesContextVars?: ReceivedContextVars;
 }
