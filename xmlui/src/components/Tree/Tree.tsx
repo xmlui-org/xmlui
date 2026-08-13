@@ -481,6 +481,7 @@ export const TreeMd = createMetadata({
     [`textColor-${COMP}`]: "$textColor-primary",
     [`textColor-${COMP}--selected`]: "$color-primary-900",
     [`textColor-${COMP}--hover`]: "$textColor-primary",
+    [`borderRadius-${COMP}-row`]: "4px",
     [`borderColor-${COMP}-row--focus`]: "$color-primary-500",
     [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",

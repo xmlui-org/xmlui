@@ -15,6 +15,7 @@ $backgroundColor-Tree-row--hover: createThemeVar("backgroundColor-#{$component}-
 $textColor-Tree: createThemeVar("textColor-#{$component}");
 $textColor-Tree--selected: createThemeVar("textColor-#{$component}--selected");
 $textColor-Tree--hover: createThemeVar("textColor-#{$component}--hover");
+$borderRadius-Tree-row: createThemeVar("borderRadius-#{$component}-row");
 $borderColor-Tree-row--focus: createThemeVar("borderColor-#{$component}-row--focus");
 $outlineColor-Tree--focus: createThemeVar("outlineColor-#{$component}--focus");
 $outlineWidth-Tree--focus: createThemeVar("outlineWidth-#{$component}--focus");
@@ -47,7 +48,7 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
     // Add small margin to ensure focus ring has space
     margin: 0 1px;
     // Use border-radius to make focus ring more polished
-    border-radius: 2px;
+    border-radius: $borderRadius-Tree-row;
     transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     
     // Remove browser default focus outline since we handle focus styling with CSS classes
@@ -62,14 +63,16 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
       color: $textColor-Tree--selected;
       
       &:focus-visible {
-        // Use inset box-shadow to stay within bounds
-        box-shadow: inset 0 0 0 2px $outlineColor-Tree--focus;
+        box-shadow: inset 0 0 0 $outlineWidth-Tree--focus $outlineColor-Tree--focus;
+        outline: 0 $outlineStyle-Tree--focus transparent;
+        outline-offset: $outlineOffset-Tree--focus;
       }
     }
 
     &.focused {
-      // Use inset box-shadow to stay within row bounds and avoid clipping
-      box-shadow: inset 0 0 0 2px $outlineColor-Tree--focus;
+      box-shadow: inset 0 0 0 $outlineWidth-Tree--focus $outlineColor-Tree--focus;
+      outline: 0 $outlineStyle-Tree--focus transparent;
+      outline-offset: $outlineOffset-Tree--focus;
     }
 
     &:hover:not(.selected) {

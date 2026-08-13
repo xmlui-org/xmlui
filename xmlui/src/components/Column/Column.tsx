@@ -7,6 +7,8 @@ import { createMetadata, dEnabled, dReadonly } from "../metadata-helpers";
 import { alignmentOptionValues } from "../abstractions";
 import { defaultProps } from "./Column.defaults";
 import { Column } from "./ColumnReact";
+import { extractParam } from "../../components-core/utils/extractParam";
+import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
 
 const COMP = "Column";
 
@@ -14,17 +16,19 @@ function hasPercentageWidthCustomCellChild(
   children: ComponentDef[] | undefined,
   extractValue: ValueExtractor,
 ) {
-  return children?.some((child) => {
-    const width = child.props?.width;
-    if (width === undefined) {
-      return false;
-    }
-    try {
-      return /^\d+(?:\.\d+)?%$/.test(extractValue(width)?.toString().trim() ?? "");
-    } catch {
-      return false;
-    }
-  }) ?? false;
+  return (
+    children?.some((child) => {
+      const width = child.props?.width;
+      if (width === undefined) {
+        return false;
+      }
+      try {
+        return /^\d+(?:\.\d+)?%$/.test(extractValue(width)?.toString().trim() ?? "");
+      } catch {
+        return false;
+      }
+    }) ?? false
+  );
 }
 
 export const ColumnMd = createMetadata({
@@ -146,7 +150,8 @@ export const ColumnMd = createMetadata({
     willChange: {
       description:
         "This event is triggered before an interactive typed cell in the column changes its value. Return explicit false to cancel the change.",
-      signature: "willChange(newValue: any, row: any, rowIndex: number, columnId: string): boolean | void",
+      signature:
+        "willChange(newValue: any, row: any, rowIndex: number, columnId: string): boolean | void",
       parameters: {
         newValue: "The new cell value.",
         row: "The row data object associated with the changed cell.",
@@ -191,7 +196,16 @@ export const ColumnMd = createMetadata({
 export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
   customRender: (
     props,
-    { node, extractValue, renderChild, classes, appContext, layoutContext, lookupEventHandler },
+    {
+      node,
+      extractValue,
+      renderChild,
+      classes,
+      appContext,
+      layoutContext,
+      lookupEventHandler,
+      state,
+    },
   ) => {
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
     const canSortDefault = appContext?.xmluiConfig?.columnCanSortDefault ?? defaultProps.canSort;
@@ -240,13 +254,7 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         return undefined;
       }
 
-      return (
-        newValue: any,
-        row: any,
-        rowIndex: number,
-        columnId: string,
-        cellValue: any,
-      ) => {
+      return (newValue: any, row: any, rowIndex: number, columnId: string, cellValue: any) => {
         const context = {
           $item: row,
           $row: row,
@@ -265,6 +273,32 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
       };
     };
 
+    const createTypedCellBooleanResolver = (propName: "readOnly" | "enabled") => {
+      const rawValue = node.props[propName];
+      if (rawValue === undefined) {
+        return undefined;
+      }
+
+      return (row: any, rowIndex: number, colIndex: number, columnId: string, cellValue: any) => {
+        const context = {
+          $item: row,
+          $row: row,
+          $itemIndex: rowIndex,
+          $rowIndex: rowIndex,
+          $colIndex: colIndex,
+          $cell: cellValue,
+          $columnId: columnId,
+        };
+        return asOptionalBoolean(
+          extractParam({ ...state, ...context }, rawValue, appContext, true),
+          propName === "enabled" ? true : undefined,
+        );
+      };
+    };
+
+    const enabledResolver = createTypedCellBooleanResolver("enabled");
+    const readOnlyResolver = createTypedCellBooleanResolver("readOnly");
+
     return (
       <Column
         style={Object.keys(style).length > 0 ? style : undefined}
@@ -281,7 +315,9 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         type={extractValue.asOptionalString(node.props.type)}
         typeOptions={extractValue(node.props.typeOptions)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        readOnlyResolver={readOnlyResolver}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
+        enabledResolver={enabledResolver}
         willChange={createTypedCellEventHandler("willChange") ?? props.onWillChange}
         didChange={createTypedCellEventHandler("didChange") ?? props.onDidChange}
         fillCellContent={hasPercentageWidthCustomCellChild(node.children, extractValue)}

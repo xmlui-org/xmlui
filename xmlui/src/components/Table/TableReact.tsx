@@ -51,7 +51,7 @@ import { ThemedColorPicker } from "../ColorPicker/ColorPicker";
 import { ThemedSwitch } from "../Switch/Switch";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
-import { type OurColumnMetadata } from "../Column/TableContext";
+import { type OurColumnMetadata, type TypedCellBooleanResolver } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { ThemedPagination, type Position } from "../Pagination/Pagination";
 import { Part } from "../Part/Part";
@@ -89,7 +89,9 @@ declare module "@tanstack/table-core" {
     cellRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
     columnType?: NormalizedColumnType;
     readOnly?: boolean;
+    readOnlyResolver?: TypedCellBooleanResolver;
     enabled?: boolean;
+    enabledResolver?: TypedCellBooleanResolver;
     willChange?: AsyncFunction;
     didChange?: AsyncFunction;
     fillCellContent?: boolean;
@@ -167,16 +169,13 @@ const TableCellTooltip = memo(function TableCellTooltip({
     return () => observer.disconnect();
   }, [syncInteractiveDescendantState]);
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      setOpen(
-        nextOpen &&
-          pointerInsideTriggerRef.current &&
-          !hasExpandedInteractiveDescendant(triggerRef.current),
-      );
-    },
-    [],
-  );
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    setOpen(
+      nextOpen &&
+        pointerInsideTriggerRef.current &&
+        !hasExpandedInteractiveDescendant(triggerRef.current),
+    );
+  }, []);
 
   const handlePointerEnter = useCallback(
     (event: PointerEvent<HTMLElement>) => {
@@ -661,9 +660,12 @@ type TypedColumnCellProps = {
   localeProfile: LocaleProfile;
   row: any;
   rowIndex: number;
+  colIndex: number;
   columnId: string;
   readOnly?: boolean;
+  readOnlyResolver?: TypedCellBooleanResolver;
   enabled?: boolean;
+  enabledResolver?: TypedCellBooleanResolver;
   onWillChange?: AsyncFunction;
   onDidChange?: AsyncFunction;
 };
@@ -674,9 +676,12 @@ function TypedColumnCell({
   localeProfile,
   row,
   rowIndex,
+  colIndex,
   columnId,
   readOnly,
+  readOnlyResolver,
   enabled,
+  enabledResolver,
   onWillChange,
   onDidChange,
 }: TypedColumnCellProps) {
@@ -714,6 +719,10 @@ function TypedColumnCell({
     "aria-label": ariaLabel,
     "data-column-cell-kind": valueType.name,
   };
+  const resolvedReadOnly =
+    readOnlyResolver?.(row, rowIndex, colIndex, columnId, localValue) ?? readOnly;
+  const resolvedEnabled =
+    enabledResolver?.(row, rowIndex, colIndex, columnId, localValue) ?? enabled;
 
   switch (valueType.name) {
     case "checkbox":
@@ -721,8 +730,8 @@ function TypedColumnCell({
         <Toggle
           {...commonControlProps}
           value={toBooleanCellValue(localValue)}
-          readOnly={readOnly}
-          enabled={enabled}
+          readOnly={resolvedReadOnly}
+          enabled={resolvedEnabled}
           onDidChange={handleDidChange}
         />
       );
@@ -731,8 +740,8 @@ function TypedColumnCell({
         <ThemedSwitch
           {...commonControlProps}
           value={toBooleanCellValue(localValue)}
-          readOnly={readOnly}
-          enabled={enabled}
+          readOnly={resolvedReadOnly}
+          enabled={resolvedEnabled}
           onDidChange={handleDidChange}
           variant="switch"
         />
@@ -742,8 +751,8 @@ function TypedColumnCell({
         <ThemedColorPicker
           {...commonControlProps}
           value={toColorCellValue(localValue)}
-          readOnly={readOnly}
-          enabled={enabled}
+          readOnly={resolvedReadOnly}
+          enabled={resolvedEnabled}
           onDidChange={handleDidChange}
         />
       );
@@ -1092,7 +1101,10 @@ export const Table = memo(
     const { getThemeVar } = useTheme();
     const localeProfile = useLocaleProfile();
     const effectiveUserSelectCell =
-      cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+      cellUserSelect ??
+      userSelectCell ??
+      getThemeVar("userSelect-cell-Table") ??
+      defaultProps.userSelectCell;
     const effectiveUserSelectRow =
       userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
     const effectiveUserSelectHeading =
@@ -1194,7 +1206,12 @@ export const Table = memo(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
         // Modifier-only keys match no table action. Without this guard they bubble to
         // Main.xmlui → runCodeAsync → cloneDeep(state) → ~160ms freeze per key-repeat.
-        if (event.key === "Control" || event.key === "Meta" || event.key === "Shift" || event.key === "Alt") {
+        if (
+          event.key === "Control" ||
+          event.key === "Meta" ||
+          event.key === "Shift" ||
+          event.key === "Alt"
+        ) {
           event.stopPropagation();
           return;
         }
@@ -1207,7 +1224,7 @@ export const Table = memo(
           onKeyDown(event);
         }
       },
-      [handleKeyboardActions, onKeyDown]
+      [handleKeyboardActions, onKeyDown],
     );
 
     // --- Create data with order information whenever the items in the table change
@@ -1274,7 +1291,9 @@ export const Table = memo(
     const columnsWithCustomCell: ColumnDef<any>[] = useMemo(() => {
       return safeColumns.map((col, idx) => {
         // --- Obtain column width information
-        const columnType = col.type ? normalizeColumnType(col.type, col.typeOptions).type : undefined;
+        const columnType = col.type
+          ? normalizeColumnType(col.type, col.typeOptions).type
+          : undefined;
         const header = col.header ?? col.accessorKey ?? " ";
         const enableResizing = col.canResize ?? canResizeColumns;
         const enableSorting = col.canSort !== false && !!col.accessorKey;
@@ -1317,7 +1336,9 @@ export const Table = memo(
             tooltipRenderer: col.tooltipRenderer,
             columnType,
             readOnly: col.readOnly,
+            readOnlyResolver: col.readOnlyResolver,
             enabled: col.enabled,
+            enabledResolver: col.enabledResolver,
             willChange: col.willChange,
             didChange: col.didChange,
             fillCellContent: col.fillCellContent,
@@ -1355,9 +1376,7 @@ export const Table = memo(
                     );
                     width = parseFloat(remEmMatch[1]) * (isNaN(rootFontSize) ? 16 : rootFontSize);
                   } else {
-                    throw new Error(
-                      `Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`,
-                    );
+                    throw new Error(`Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`);
                   }
                 }
               }
@@ -1845,8 +1864,7 @@ export const Table = memo(
             effectiveUserSelectCell: userSelectCell,
             cellVerticalAlign: vertAlign,
             localeProfile: currentLocaleProfile,
-          } =
-            cellRenderStateRef.current;
+          } = cellRenderStateRef.current;
           return (
             <>
               {row.getVisibleCells().map((cell, i) => {
@@ -1855,7 +1873,9 @@ export const Table = memo(
                 const isInteractiveColumn =
                   columnType !== undefined && INTERACTIVE_COLUMN_TYPES.has(columnType.name);
                 const readOnly = cell.column.columnDef?.meta?.readOnly;
+                const readOnlyResolver = cell.column.columnDef?.meta?.readOnlyResolver;
                 const enabled = cell.column.columnDef?.meta?.enabled;
+                const enabledResolver = cell.column.columnDef?.meta?.enabledResolver;
                 const willChange = cell.column.columnDef?.meta?.willChange;
                 const didChange = cell.column.columnDef?.meta?.didChange;
                 const tooltipOptions = cell.column.columnDef?.meta?.tooltipOptions;
@@ -1894,31 +1914,28 @@ export const Table = memo(
                       ? styles.alignBottom
                       : styles.alignCenter;
                 const cellContent = (
-                  <div
-                    className={styles.cellContent}
-                    style={cellContentStyle}
-                  >
-                    {cellRenderer
-                      ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
-                      : columnType
-                        ? (
-                            <TypedColumnCell
-                              value={cell?.getValue()}
-                              valueType={columnType}
-                              localeProfile={currentLocaleProfile}
-                              row={sourceRow}
-                              rowIndex={rowIndex}
-                              columnId={cellColumnId}
-                              readOnly={readOnly}
-                              enabled={enabled}
-                              onWillChange={willChange}
-                              onDidChange={didChange}
-                            />
-                          )
-                        : (flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          ) as ReactNode)}
+                  <div className={styles.cellContent} style={cellContentStyle}>
+                    {cellRenderer ? (
+                      cellRenderer(row.original, rowIndex, i, cell?.getValue())
+                    ) : columnType ? (
+                      <TypedColumnCell
+                        value={cell?.getValue()}
+                        valueType={columnType}
+                        localeProfile={currentLocaleProfile}
+                        row={sourceRow}
+                        rowIndex={rowIndex}
+                        colIndex={i}
+                        columnId={cellColumnId}
+                        readOnly={readOnly}
+                        readOnlyResolver={readOnlyResolver}
+                        enabled={enabled}
+                        enabledResolver={enabledResolver}
+                        onWillChange={willChange}
+                        onDidChange={didChange}
+                      />
+                    ) : (
+                      (flexRender(cell.column.columnDef.cell, cell.getContext()) as ReactNode)
+                    )}
                   </div>
                 );
                 const tooltipTemplate = tooltipRenderer?.(sourceRow, rowIndex, i, cell?.getValue());
@@ -1927,13 +1944,15 @@ export const Table = memo(
                     className={classnames(styles.cell, alignmentClass, columnClassName)}
                     key={`${cell.id}-${i}`}
                     data-column-id={cell.column.id}
-                    style={{
-                      width: size,
-                      "--column-width": `${size}px`,
-                      flexShrink: 0,
-                      ...getCommonPinningStyles(cell.column),
-                      ...styleWithoutWidth,
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        width: size,
+                        "--column-width": `${size}px`,
+                        flexShrink: 0,
+                        ...getCommonPinningStyles(cell.column),
+                        ...styleWithoutWidth,
+                      } as React.CSSProperties
+                    }
                   >
                     {tooltipTemplate ? (
                       <TableCellTooltip
@@ -2192,10 +2211,7 @@ export const Table = memo(
         });
         const prevKeys = Object.keys(prev);
         const nextKeys = Object.keys(next);
-        if (
-          prevKeys.length === nextKeys.length &&
-          nextKeys.every((k) => prev[k] === next[k])
-        ) {
+        if (prevKeys.length === nextKeys.length && nextKeys.every((k) => prev[k] === next[k])) {
           return prev;
         }
         return next;
@@ -2238,7 +2254,13 @@ export const Table = memo(
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes, safeColumns, columnsWithCustomCell, rowsSelectable, hideSelectionCheckboxes]);
+    }, [
+      recalculateStarSizes,
+      safeColumns,
+      columnsWithCustomCell,
+      rowsSelectable,
+      hideSelectionCheckboxes,
+    ]);
 
     useIsomorphicLayoutEffect(() => {
       registerComponentApi(selectionApi);
@@ -2327,7 +2349,10 @@ export const Table = memo(
                       const target = event.target as HTMLElement;
 
                       // Allow native checkbox clicks to be handled by Toggle's onChange
-                      if (target.tagName.toLowerCase() === "input" && target.getAttribute("type") === "checkbox") {
+                      if (
+                        target.tagName.toLowerCase() === "input" &&
+                        target.getAttribute("type") === "checkbox"
+                      ) {
                         return;
                       }
 

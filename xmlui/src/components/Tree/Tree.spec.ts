@@ -1435,18 +1435,18 @@ test.describe("Basic Functionality", () => {
       const focusedItem = tree.getNodeWrapperByTestId("2");
       await expect(focusedItem).toBeVisible();
 
-      // Check that focus outline uses custom theme variables
-      // Focus styling uses inset box-shadow with the outline color
+      // Check that focus ring uses custom theme variables
       await expect(focusedItem).toHaveCSS(
         "box-shadow",
-        `${FOCUS_OUTLINE_COLOR} 0px 0px 0px 2px inset`,
+        `${FOCUS_OUTLINE_COLOR} 0px 0px 0px ${FOCUS_OUTLINE_WIDTH} inset`,
       );
 
       // Also verify the focused item has the correct CSS class
       await expect(focusedItem).toHaveClass(/focused/);
 
-      // Verify box-shadow contains the custom focus outline color
-      const boxShadowValue = await focusedItem.evaluate((el) => getComputedStyle(el).boxShadow);
+      const boxShadowValue = await focusedItem.evaluate(
+        (el) => getComputedStyle(el).boxShadow,
+      );
       expect(boxShadowValue).toContain(FOCUS_OUTLINE_COLOR);
 
       // Test that focus can move to different items
@@ -1455,7 +1455,7 @@ test.describe("Basic Functionality", () => {
       await expect(nextFocusedItem).toHaveClass(/focused/);
       await expect(nextFocusedItem).toHaveCSS(
         "box-shadow",
-        `${FOCUS_OUTLINE_COLOR} 0px 0px 0px 2px inset`,
+        `${FOCUS_OUTLINE_COLOR} 0px 0px 0px ${FOCUS_OUTLINE_WIDTH} inset`,
       );
 
       // Previous item should no longer be focused
@@ -1515,10 +1515,13 @@ test.describe("Basic Functionality", () => {
       const focusedItem = tree.getNodeWrapperByTestId("2");
       await expect(focusedItem).toHaveClass(/focused/);
 
-      // Verify the focus outline uses all custom theme variables
-      // Note: In the current implementation, focus uses inset box-shadow rather than outline
-      // but the theme variables should still be available for potential outline styling
-      await expect(focusedItem).toHaveCSS("box-shadow", /0, 255, 0/);
+      // Verify the focus ring uses the custom box-shadow variables
+      await expect(focusedItem).toHaveCSS(
+        "box-shadow",
+        `${FOCUS_OUTLINE_COLOR} 0px 0px 0px ${FOCUS_OUTLINE_WIDTH} inset`,
+      );
+      await expect(focusedItem).toHaveCSS("outline-style", FOCUS_OUTLINE_STYLE);
+      await expect(focusedItem).toHaveCSS("outline-offset", FOCUS_OUTLINE_OFFSET);
     });
 
     test("combined selection and focus states work together", async ({
@@ -1605,7 +1608,7 @@ test.describe("Basic Functionality", () => {
         const finalBoxShadowValue = await focusedElement.evaluate(
           (el) => getComputedStyle(el).boxShadow,
         );
-        expect(finalBoxShadowValue).toContain("50, 50, 255");
+        expect(finalBoxShadowValue).toContain(FOCUS_OUTLINE_COLOR);
       }
       // If no focused element, skip focus-specific validation since focus behavior varies
 
