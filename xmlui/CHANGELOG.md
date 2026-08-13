@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.14.12
+
+### Patch Changes
+
+- 8231c93: Fix Column enabled and readOnly expressions so interactive typed cells re-evaluate them with the current row context.
+- d2eb90f: Fix `Actions.download()` so GET requests with custom per-call headers use the fetch download path instead of the headerless iframe path.
+- 8231c93: Add the TabItem deactivated event and document Tabs keepMounted behavior for preserving inactive tab state.
+- 8231c93: Fix Tree so explicit height layout values are respected inside kept-mounted TabItems, and apply Tree focus theme variables while preserving the box-shadow focus ring.
+- 8231c93: Add `receivesContextVars` to user-defined components so they can explicitly receive runtime context variables across component and slot boundaries.
+
 ## 0.14.11
 
 ### Patch Changes
