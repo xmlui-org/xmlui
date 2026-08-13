@@ -372,6 +372,18 @@ export class XmlUiHelper {
       ],
       childNodes: Array.isArray(nested) ? [...nested] : [nested],
     };
+    if (def.receivesContextVars !== undefined) {
+      componentNode.attributes!.push({
+        type: "XmlUiAttribute",
+        name: "receivesContextVars",
+        value:
+          def.receivesContextVars === true
+            ? "true"
+            : def.receivesContextVars === false
+              ? "false"
+              : def.receivesContextVars.join(", "),
+      });
+    }
 
     // --- Transform APIs
     if (def.api) {

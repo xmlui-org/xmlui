@@ -146,6 +146,8 @@ When the parent provides children or template properties, CompoundComponent asse
   renderChild: parentRenderChild,   // Parent's render function (preserves parent scope)
   props: node.props,                // All props including template properties
   children: node.children,          // Direct children for default slot
+  contextVars: receivedContextVars, // Selected context vars received by the UDC
+  receivesContextVars: receiveSpec, // Needed when Slot render site adds more context
 }
 ```
 
@@ -154,6 +156,29 @@ This context is passed down through `renderChild` and becomes available to `slot
 ### 5. Rendering
 
 CompoundComponent calls `renderChild(containerNode, layoutContext, parentRenderContext)`, which routes through ComponentWrapper → ContainerWrapper → ComponentAdapter, rendering the internal markup.
+
+---
+
+## Received Context Variables
+
+UDCs are isolated from parent local scope by default, except for the legacy item/context variables that already crossed the boundary (`$item`, `$itemIndex`, `$isFirst`, `$isLast`, `$context`). The `receivesContextVars` attribute lets a component definition explicitly receive additional runtime context variables:
+
+```xml
+<Component name="RedColumn" receivesContextVars="$cell, $rowIndex">
+  <Column bindTo="{$props.bindTo}">
+    <Slot />
+  </Column>
+</Component>
+```
+
+Accepted forms:
+
+- `<Component receivesContextVars>` is boolean `true` and receives all non-reserved context variables.
+- `receivesContextVars="true"` and `receivesContextVars="{true}"` also receive all context variables.
+- `receivesContextVars="false"` and `receivesContextVars="{false}"` receive none.
+- A string names one context variable, or a comma-separated list. Each name must include its leading `$`.
+
+Invalid values raise parser diagnostic `T033`: arbitrary expressions, `*`, empty list entries, invalid identifiers, and reserved names (`$props`, `$self`, `$this`). Explicit name lists are exact, so include legacy names if the UDC still needs them. During slot transposition, `slotRenderer()` also collects context variables from the `<Slot />` render site, which lets container components such as `Table`/`Column` expose `$cell` to the parent-provided slot content.
 
 ---
 
@@ -257,9 +282,9 @@ Slot transposition involves three overlapping scopes:
 |-------|------------------|-------------|
 | **Parent scope** | Parent's variables, IDs, event handlers | Rendering slot content (via `parentRenderContext.renderChild`) |
 | **Component scope** | `$props`, component vars, methods, `emitEvent` | Evaluating slot property expressions, rendering non-slot content |
-| **Slot content scope** | Parent scope + slot-provided `$` context variables | Inside the transposed slot content |
+| **Slot content scope** | Parent scope + received context variables + slot-provided `$` context variables | Inside the transposed slot content |
 
-This design ensures that `{userName}` in a parent's template resolves in the parent's scope (where `userName` exists), even though the template physically renders inside the component's layout. Slot properties like `$item` bridge data from the component scope into the slot content scope.
+This design ensures that `{userName}` in a parent's template resolves in the parent's scope (where `userName` exists), even though the template physically renders inside the component's layout. Received context variables bridge selected ambient runtime context into slot content, and slot properties like `$item` bridge data from the component scope into the slot content scope. Slot properties take precedence if both provide the same `$` name.
 
 ---
 

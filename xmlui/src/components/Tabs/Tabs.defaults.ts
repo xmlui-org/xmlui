@@ -4,5 +4,5 @@ export const defaultProps = {
   tabAlignment: "start" as "start" | "end" | "center" | "stretch",
   accordionView: false,
   distributeEvenly: false,
-  keepMounted: undefined as boolean | undefined,
+  keepMounted: false,
 };

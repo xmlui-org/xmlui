@@ -24,7 +24,6 @@ import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
-import { useIsInsideForm } from "../Form/FormContext";
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onContextMenu"> & {
   id?: string;
@@ -71,9 +70,7 @@ export const Tabs = memo(forwardRef(function Tabs(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const isInsideForm = useIsInsideForm();
-  const resolvedKeepMounted = keepMounted ?? isInsideForm;
-  const { tabItems, tabContextValue } = useTabContextValue(resolvedKeepMounted);
+  const { tabItems, tabContextValue } = useTabContextValue(keepMounted);
   const _id = useId();
   const tabsId = id || _id;
 

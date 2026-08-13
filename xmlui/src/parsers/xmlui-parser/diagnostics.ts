@@ -322,6 +322,7 @@ export const ErrCodesTransform = {
   scriptParse: "T030",
   globalNotAllowedInNested: "T031",
   varNameStartsWithDollar: "T032",
+  invalidReceivesContextVars: "T033",
   ...ErrorCodes,
 } as const;
 
@@ -377,6 +378,14 @@ export const DIAGS_TRANSFORM = {
     return {
       code: ErrCodesTransform.varNameStartsWithDollar,
       message: `Reactive variable names cannot start with '$': '${varName}'.`,
+    };
+  },
+  invalidReceivesContextVars: function (value: string, reason: string) {
+    return {
+      code: ErrCodesTransform.invalidReceivesContextVars,
+      message:
+        `Invalid receivesContextVars value '${value}'. ` +
+        `${reason} Use true, false, a context variable name, or comma-separated context variable names.`,
     };
   },
 } as const;

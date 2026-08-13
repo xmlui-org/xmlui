@@ -685,6 +685,11 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.invalidReusableCompAttr);
   });
 
+  it("allows receivesContextVars attribute in compound component", () => {
+    const { errors } = parseSource("<Component name='MyComp' receivesContextVars><Stack/></Component>");
+    expect(errors).toHaveLength(0);
+  });
+
   it("event attribute starts with on", () => {
     const { errors } = parseSource("<Stack><event name='onClick' /></Stack>");
     expect(errors[0].code).toBe(ErrCodesParser.eventNoOnPrefix);

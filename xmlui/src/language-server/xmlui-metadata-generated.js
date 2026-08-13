@@ -18604,6 +18604,11 @@ export default {
         "description": "This event is triggered when the tab is activated.",
         "signature": "activated(): void",
         "parameters": {}
+      },
+      "deactivated": {
+        "description": "This event is triggered when the tab is deactivated.",
+        "signature": "deactivated(): void",
+        "parameters": {}
       }
     },
     "contextVars": {
@@ -18657,7 +18662,8 @@ export default {
         "valueType": "ComponentDef"
       },
       "keepMounted": {
-        "description": "When enabled, all tab panels remain mounted in the DOM even when not active — inactive panels are hidden with `display: none`. This ensures that form fields inside non-visible tabs stay registered with an enclosing Form. Defaults to `true` when the Tabs component is inside a Form, `false` otherwise.",
+        "description": "When enabled, all tab panels remain mounted in the DOM even when not active — inactive panels are hidden with `display: none`. This preserves local component state and ongoing operations in inactive tabs. Defaults to `false`.",
+        "defaultValue": false,
         "valueType": "boolean"
       },
       "gap": {

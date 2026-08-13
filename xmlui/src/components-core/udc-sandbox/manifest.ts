@@ -36,6 +36,7 @@ export interface SerializedUdcContract {
   events: string[];
   methods: string[];
   slots: Array<string | { name: string; provides?: string[] }>;
+  receivesContextVars?: boolean | string[];
   capabilities: UdcCapability[];
   trust?: "trusted" | "untrusted";
 }
@@ -65,6 +66,14 @@ export function serializeContract(contract: UdcContract): SerializedUdcContract 
         const provides = contract.slotProvides?.get(name);
         return provides?.size ? { name, provides: Array.from(provides).sort() } : name;
       }),
+    receivesContextVars:
+      contract.receivesContextVars === true
+        ? true
+        : contract.receivesContextVars === false
+          ? false
+        : contract.receivesContextVars
+          ? Array.from(contract.receivesContextVars).sort()
+          : undefined,
     capabilities: Array.from(contract.capabilities).sort(),
     trust: contract.trust,
   };
@@ -116,6 +125,14 @@ function normalizeSerializedContract(contract: SerializedUdcContract): Serialize
       .sort((a, b) =>
         (typeof a === "string" ? a : a.name).localeCompare(typeof b === "string" ? b : b.name),
       ),
+    receivesContextVars:
+      contract.receivesContextVars === true
+        ? true
+        : contract.receivesContextVars === false
+          ? false
+        : contract.receivesContextVars
+          ? [...contract.receivesContextVars].sort()
+          : undefined,
     capabilities: [...(contract.capabilities ?? [])].sort(),
     trust: contract.trust ?? "trusted",
   };

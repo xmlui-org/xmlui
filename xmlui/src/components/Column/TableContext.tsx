@@ -9,6 +9,14 @@ type TypedCellChangeHandler = (
   cellValue: any,
 ) => any;
 
+export type TypedCellBooleanResolver = (
+  row: any,
+  rowIndex: number,
+  colIndex: number,
+  columnId: string,
+  cellValue: any,
+) => boolean | undefined;
+
 export type OurColumnMetadata = {
   style?: CSSProperties;
   className?: string;
@@ -26,7 +34,9 @@ export type OurColumnMetadata = {
   type?: string;
   typeOptions?: any;
   readOnly?: boolean;
+  readOnlyResolver?: TypedCellBooleanResolver;
   enabled?: boolean;
+  enabledResolver?: TypedCellBooleanResolver;
   willChange?: TypedCellChangeHandler;
   didChange?: TypedCellChangeHandler;
   fillCellContent?: boolean;

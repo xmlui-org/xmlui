@@ -66,6 +66,8 @@ export interface UdcSlotDecl {
   provides?: ReadonlySet<string>;
 }
 
+export type UdcReceivedContextVars = boolean | ReadonlySet<string>;
+
 // ---------------------------------------------------------------------------
 // Aggregate contract
 // ---------------------------------------------------------------------------
@@ -83,6 +85,8 @@ export interface UdcContract {
   slots: ReadonlySet<string>;
   /** Slot context variables provided by each declared slot, keyed by slot name. */
   slotProvides?: ReadonlyMap<string, ReadonlySet<string>>;
+  /** Context variables this UDC explicitly receives from its caller. */
+  receivesContextVars?: UdcReceivedContextVars;
   /** Declared capabilities. */
   capabilities: ReadonlySet<UdcCapability>;
   /** Whether the `capabilities` attribute was explicitly present. */
@@ -111,6 +115,91 @@ export function emptyContract(name: string): UdcContract {
     capabilities: new Set(),
     capabilitiesDeclared: false,
     trust: "trusted",
+  };
+}
+
+export function normalizeReceivedContextVars(value: unknown): boolean | string[] | undefined {
+  if (value === true || value === "true") return true;
+  if (value === false || value === "false") return false;
+  if (value instanceof Set) {
+    return Array.from(value).filter((item): item is string => typeof item === "string");
+  }
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
+  return undefined;
+}
+
+function normalizeMap<T>(
+  value: unknown,
+  normalizeValue: (value: unknown, key: string) => T,
+): ReadonlyMap<string, T> {
+  if (value instanceof Map) return value as ReadonlyMap<string, T>;
+  if (Array.isArray(value)) {
+    return new Map(
+      value
+        .filter((item) => item && typeof item === "object" && typeof (item as any).name === "string")
+        .map((item) => [(item as any).name, normalizeValue(item, (item as any).name)]),
+    );
+  }
+  if (value && typeof value === "object") {
+    return new Map(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        normalizeValue(item, key),
+      ]),
+    );
+  }
+  return new Map();
+}
+
+function normalizeSet(value: unknown): ReadonlySet<string> {
+  if (value instanceof Set) return value as ReadonlySet<string>;
+  if (Array.isArray(value)) {
+    return new Set(
+      value
+        .map((item) => (typeof item === "string" ? item : (item as any)?.name))
+        .filter((item): item is string => typeof item === "string"),
+    );
+  }
+  if (value && typeof value === "object") {
+    return new Set(Object.keys(value as Record<string, unknown>));
+  }
+  return new Set();
+}
+
+export function normalizeUdcContract(contract: unknown): UdcContract | undefined {
+  if (!contract || typeof contract !== "object") return undefined;
+  const raw = contract as Record<string, unknown>;
+  const receivesContextVars = normalizeReceivedContextVars(raw.receivesContextVars);
+  const capabilitiesDeclared = raw.capabilitiesDeclared === true;
+  const capabilities = Array.from(normalizeSet(raw.capabilities)).filter(
+    (item): item is UdcCapability => isUdcCapability(item),
+  );
+  return {
+    name: typeof raw.name === "string" ? raw.name : "",
+    props: normalizeMap(raw.props, (value, key) => ({
+      name: typeof (value as any)?.name === "string" ? (value as any).name : key,
+      ...((value as any)?.type !== undefined ? { type: (value as any).type } : {}),
+      ...((value as any)?.required !== undefined ? { required: (value as any).required } : {}),
+      ...((value as any)?.defaultValue !== undefined
+        ? { defaultValue: (value as any).defaultValue }
+        : {}),
+    })),
+    events: normalizeSet(raw.events),
+    methods: normalizeSet(raw.methods),
+    slots: normalizeSet(raw.slots),
+    slotProvides: normalizeMap(raw.slotProvides, (value) => normalizeSet(value)),
+    ...(receivesContextVars === true
+      ? { receivesContextVars: true }
+      : receivesContextVars === false
+        ? { receivesContextVars: false }
+      : receivesContextVars
+        ? { receivesContextVars: new Set(receivesContextVars) }
+        : {}),
+    capabilities: capabilitiesDeclared
+      ? new Set(capabilities)
+      : new Set(capabilities.length > 0 ? capabilities : ALL_UDC_CAPABILITIES),
+    capabilitiesDeclared,
+    trust: raw.trust === "untrusted" ? "untrusted" : "trusted",
   };
 }
 

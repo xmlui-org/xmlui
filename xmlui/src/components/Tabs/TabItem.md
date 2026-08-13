@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Label definition**: Provides the clickable tab header text via the label property
 - **Content container**: Wraps any child components that display when the tab is active
 - **Structural organization**: Creates the relationship between tab headers and their corresponding content
@@ -13,7 +14,7 @@ Always used as a direct child of [Tabs](/docs/reference/components/Tabs) compone
 
 %-PROP-START headerTemplate
 
-```xmlui-pg copy {7-9} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {7-9} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <TabItem label="Home">
@@ -38,7 +39,7 @@ Always used as a direct child of [Tabs](/docs/reference/components/Tabs) compone
 
 %-EVENT-START activated
 
-```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px" 
+```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px"
 <App var.activationCount="{0}">
   <Tabs>
     <TabItem label="Account" onActivated="activationCount++">
@@ -52,6 +53,27 @@ Always used as a direct child of [Tabs](/docs/reference/components/Tabs) compone
     </TabItem>
   </Tabs>
   <Text>The Account tab has been activated {activationCount} times.</Text>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START deactivated
+
+```xmlui-pg copy display name="Example: deactivated" /onDeactivated/ height="200px"
+<App var.deactivationCount="{0}">
+  <Tabs>
+    <TabItem label="Account" onDeactivated="deactivationCount++">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  <Text>The Account tab has been deactivated {deactivationCount} times.</Text>
 </App>
 ```
 

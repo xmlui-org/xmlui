@@ -70,9 +70,9 @@ export const TabsMd = createMetadata({
     keepMounted: {
       description:
         `When enabled, all tab panels remain mounted in the DOM even when not active — ` +
-        `inactive panels are hidden with \`display: none\`. This ensures that form fields ` +
-        `inside non-visible tabs stay registered with an enclosing Form. ` +
-        `Defaults to \`true\` when the Tabs component is inside a Form, \`false\` otherwise.`,
+        `inactive panels are hidden with \`display: none\`. This preserves local component ` +
+        `state and ongoing operations in inactive tabs. Defaults to \`false\`.`,
+      defaultValue: defaultProps.keepMounted,
       valueType: "boolean",
     },
     gap: {

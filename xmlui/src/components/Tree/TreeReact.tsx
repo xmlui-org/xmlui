@@ -400,6 +400,7 @@ interface TreeComponentProps {
   itemRenderer: (item: any) => ReactNode;
   className?: string;
   classes?: Record<string, string>;
+  hasExplicitHeight?: boolean;
 }
 
 export const TreeComponent = memo((props: TreeComponentProps) => {
@@ -450,6 +451,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     className,
     classes,
     overflow,
+    hasExplicitHeight,
   } = props;
   // Internal selection state for uncontrolled usage
   // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
@@ -2542,9 +2544,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
       style={{
-        height: overflow ? "auto" : "100%",
+        ...(!hasExplicitHeight ? { height: overflow ? "auto" : "100%" } : {}),
         minHeight: 0,
-        maxHeight: "100%",
+        ...(!hasExplicitHeight ? { maxHeight: "100%" } : {}),
         contain: "size",
         overflow: overflow ?? "auto",
       }}

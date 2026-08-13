@@ -33,6 +33,7 @@ export type Tab = {
   className?: string;
   classes?: Record<string, string>;
   activated?: () => void;
+  deactivated?: () => void;
 };
 
 export const LinkTargetNames = ["_self", "_blank", "_parent", "_top", "_unfencedTop"] as const;

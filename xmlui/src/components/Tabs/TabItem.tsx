@@ -25,6 +25,11 @@ export const TabItemMd = createMetadata({
       signature: "activated(): void",
       parameters: {},
     },
+    deactivated: {
+      description: "This event is triggered when the tab is deactivated.",
+      signature: "deactivated(): void",
+      parameters: {},
+    },
   },
   contextVars: {
     $header: {
@@ -60,6 +65,7 @@ export const tabItemComponentRenderer = wrapComponent(COMP, TabItemComponent, Ta
         id={extractValue(node.uid)}
         label={extractValue(node.props.label)}
         activated={lookupEventHandler("activated")}
+        deactivated={lookupEventHandler("deactivated")}
         headerRenderer={
           node.props.headerTemplate
             ? (item) => {

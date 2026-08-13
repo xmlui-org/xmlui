@@ -608,9 +608,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.locator('[data-column-cell-kind="uuid"]')).toHaveText(
         "47f4d9f8-2f6a-4e3d-9bf5-010d74822c6f",
       );
-      await expect(page.locator('[data-column-cell-kind="id"]').first()).toHaveText(
-        "customer...",
-      );
+      await expect(page.locator('[data-column-cell-kind="id"]').first()).toHaveText("customer...");
       await expect(page.locator('[data-column-cell-kind="id"]').nth(1)).toHaveText(
         "customer-00000042",
       );
@@ -1076,6 +1074,34 @@ test.describe("Basic Functionality", () => {
       await expect(page.locator('td[data-column-id="accent"] input[type="color"]')).toBeDisabled();
     });
 
+    test("interactive typed column enabled re-evaluates with row context changes", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.rows="{[{isActive: false}]}">
+          <Table data="{rows}">
+            <Column
+              bindTo="isActive"
+              type="switch"
+              enabled="{$item === undefined || !$item.isActive}"
+              onDidChange="(value) => {
+                rows = rows.map((row, index) => index === 0 ? { ...row, isActive: value } : row);
+                testState = rows[0].isActive;
+              }" />
+          </Table>
+        </Fragment>
+      `);
+
+      const switchControl = page.getByRole("switch", { name: "isActive row 1" });
+      await expect(switchControl).toBeEnabled();
+
+      await switchControl.click();
+      await expect.poll(testStateDriver.testState).toEqual(true);
+      await expect(switchControl).toHaveAttribute("aria-checked", "true");
+      await expect(switchControl).toBeDisabled();
+    });
+
     test("willChange controls whether interactive typed columns commit changes", async ({
       initTestBed,
       page,
@@ -1182,7 +1208,9 @@ test.describe("Basic Functionality", () => {
         </Table>
       `);
 
-      const startMetrics = await getHeaderContentMetrics(page.locator('th[data-column-id="start"]'));
+      const startMetrics = await getHeaderContentMetrics(
+        page.locator('th[data-column-id="start"]'),
+      );
       const centerMetrics = await getHeaderContentMetrics(
         page.locator('th[data-column-id="center"]'),
       );
@@ -1193,9 +1221,9 @@ test.describe("Basic Functionality", () => {
       expect(endMetrics).not.toBeNull();
 
       expect(Math.abs(startMetrics!.groupLeft - startMetrics!.contentLeft)).toBeLessThanOrEqual(2);
-      expect(Math.abs(centerMetrics!.groupCenter - centerMetrics!.contentCenter)).toBeLessThanOrEqual(
-        2,
-      );
+      expect(
+        Math.abs(centerMetrics!.groupCenter - centerMetrics!.contentCenter),
+      ).toBeLessThanOrEqual(2);
       expect(Math.abs(endMetrics!.groupRight - endMetrics!.contentRight)).toBeLessThanOrEqual(2);
     });
 
@@ -6054,7 +6082,10 @@ test.describe("Table in HStack layout", () => {
     expect(tableBox!.width).toBeCloseTo(hstackBox!.width, -1);
   });
 
-  test("Table inside HStack (no VStack wrapper) renders correctly", async ({ initTestBed, page }) => {
+  test("Table inside HStack (no VStack wrapper) renders correctly", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <HStack testId="hstack">
         <Table
@@ -6078,7 +6109,10 @@ test.describe("Table in HStack layout", () => {
     expect(tableBox!.width).toBeGreaterThan(0);
   });
 
-  test("VStack with explicit width inside HStack respects the explicit width", async ({ initTestBed, page }) => {
+  test("VStack with explicit width inside HStack respects the explicit width", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <HStack testId="hstack">
         <VStack testId="vstack" width="400px">

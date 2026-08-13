@@ -12,12 +12,15 @@ export type {
   UdcEventDecl,
   UdcMethodDecl,
   UdcPropDecl,
+  UdcReceivedContextVars,
   UdcSlotDecl,
 } from "./contract";
 export { emptyContract } from "./contract";
 export {
   ALL_UDC_CAPABILITIES,
   isUdcCapability,
+  normalizeReceivedContextVars,
+  normalizeUdcContract,
   parseCapabilityList,
   parseProvidesList,
 } from "./contract";

@@ -1206,6 +1206,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Receive context variables in a component"
+                            to="/docs/howto/receive-context-variables-in-a-component"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Emit a custom event from a component"
                             to="/docs/howto/emit-a-custom-event-from-a-component"
                         />
@@ -2049,6 +2054,11 @@
             <!-- New how-to articles: Theming & Styling -->
 
             <!-- New how-to articles: User-Defined Components -->
+            <Page url="/docs/howto/receive-context-variables-in-a-component">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/receive-context-variables-in-a-component.md']}"
+                />
+            </Page>
 
             <!-- New how-to articles: Scripting & Reactivity -->
 

@@ -218,6 +218,18 @@ test.describe("forwarded Tabs props", () => {
     `);
     await expect(page.getByText("Beta body")).toBeVisible();
   });
+
+  test("tabsKeepMounted=false restores mount/unmount behavior", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TabsForm data="{{ name: '' }}" tabsKeepMounted="{false}">
+        <FormSegment label="Alpha"><Text testId="alpha">Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text testId="beta">Beta body</Text></FormSegment>
+      </TabsForm>
+    `);
+
+    await expect(page.getByTestId("alpha")).toBeVisible();
+    await expect(page.getByTestId("beta")).toHaveCount(0);
+  });
 });
 
 // =============================================================================

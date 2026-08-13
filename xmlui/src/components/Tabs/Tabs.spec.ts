@@ -1594,6 +1594,66 @@ test.describe("regression tests", () => {
   });
 });
 
+test.describe("TabItem activation events", () => {
+  test("onDeactivated fires when the active TabItem loses active status", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Tabs>
+        <TabItem label="First" onDeactivated="testState = (testState || 0) + 1">
+          <Text>First content</Text>
+        </TabItem>
+        <TabItem label="Second">
+          <Text>Second content</Text>
+        </TabItem>
+        <TabItem label="Third">
+          <Text>Third content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByText("First content")).toBeVisible();
+
+    await page.getByRole("tab", { name: "Second" }).click();
+    await expect(page.getByText("Second content")).toBeVisible();
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    await page.getByRole("tab", { name: "Third" }).click();
+    await expect(page.getByText("Third content")).toBeVisible();
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    await page.getByRole("tab", { name: "First" }).click();
+    await expect(page.getByText("First content")).toBeVisible();
+    await page.getByRole("tab", { name: "Second" }).click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("onDeactivated does not fire for a TabItem that starts inactive", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Tabs>
+        <TabItem label="First">
+          <Text>First content</Text>
+        </TabItem>
+        <TabItem label="Second" onDeactivated="testState = 'deactivated'">
+          <Text>Second content</Text>
+        </TabItem>
+        <TabItem label="Third">
+          <Text>Third content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByText("First content")).toBeVisible();
+    await page.getByRole("tab", { name: "Third" }).click();
+    await expect(page.getByText("Third content")).toBeVisible();
+    expect(await testStateDriver.testState()).toBeNull();
+  });
+});
+
 // =============================================================================
 // KEEP MOUNTED TESTS
 // =============================================================================
@@ -1659,6 +1719,33 @@ test.describe("keepMounted", () => {
     await expect(page.getByTestId("content1")).toHaveCount(1);
   });
 
+  test("keepMounted=true preserves tab content component state outside of Form", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Tabs keepMounted="{true}">
+        <TabItem label="Draft">
+          <TextBox testId="draft" />
+        </TabItem>
+        <TabItem label="Preview">
+          <Text>Preview content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    const draft = await createTextBoxDriver("draft");
+    await draft.field.fill("kept while hidden");
+
+    await page.getByRole("tab", { name: "Preview" }).click();
+    await expect(page.getByText("Preview content")).toBeVisible();
+    await expect(page.getByTestId("draft")).not.toBeVisible();
+
+    await page.getByRole("tab", { name: "Draft" }).click();
+    await expect(draft.field).toHaveValue("kept while hidden");
+  });
+
   test("keepMounted=false does not render inactive tabs even inside Form", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
@@ -1677,7 +1764,7 @@ test.describe("keepMounted", () => {
     await expect(page.getByTestId("content2")).toHaveCount(0);
   });
 
-  test("defaults to keepMounted=true inside Form", async ({ initTestBed, page }) => {
+  test("defaults to keepMounted=false inside Form", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
         <Tabs>
@@ -1693,18 +1780,17 @@ test.describe("keepMounted", () => {
 
     // Active tab visible
     await expect(page.getByTestId("content1")).toBeVisible();
-    // Inactive tab in DOM but hidden (because inside Form)
-    await expect(page.getByTestId("content2")).toHaveCount(1);
-    await expect(page.getByTestId("content2")).not.toBeVisible();
+    // Inactive tab is not mounted by default, even inside Form
+    await expect(page.getByTestId("content2")).toHaveCount(0);
   });
 
-  test("form fields in hidden tabs preserve values on submit", async ({ initTestBed, page }) => {
+  test("form fields in hidden tabs preserve values on submit with keepMounted=true", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form
         data="{{ firstname: 'John', lastname: 'Doe', phone: '123-456-7890', email: 'john@example.com' }}"
         onSubmit="data => testState = JSON.stringify(data)"
       >
-        <Tabs>
+        <Tabs keepMounted="{true}">
           <TabItem label="Personal">
             <TextBox bindTo="firstname" label="First Name" />
             <TextBox bindTo="lastname" label="Last Name" />
@@ -1727,7 +1813,7 @@ test.describe("keepMounted", () => {
     expect(result.email).toBe("john@example.com");
   });
 
-  test("typed values survive tab switches with default keepMounted inside Form", async ({
+  test("typed values survive tab switches with mount/unmount mode inside Form", async ({
     initTestBed,
     page,
     createTextBoxDriver,

@@ -481,6 +481,7 @@ export const TreeMd = createMetadata({
     [`textColor-${COMP}`]: "$textColor-primary",
     [`textColor-${COMP}--selected`]: "$color-primary-900",
     [`textColor-${COMP}--hover`]: "$textColor-primary",
+    [`borderRadius-${COMP}-row`]: "4px",
     [`borderColor-${COMP}-row--focus`]: "$color-primary-500",
     [`outlineColor-${COMP}--focus`]: "$outlineColor--focus",
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
@@ -648,6 +649,9 @@ export const treeComponentRenderer = wrapComponent(
           onPasteAction={lookupEventHandler("pasteAction")}
           onDeleteAction={lookupEventHandler("deleteAction")}
           overflow={extractValue(node.props.overflow)}
+          hasExplicitHeight={
+            node.props.height !== undefined || node.props.maxHeight !== undefined
+          }
           lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         />
       );

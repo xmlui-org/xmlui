@@ -29,6 +29,7 @@ User-defined components (UDCs) are **compound components** — they have a publi
 | `method:methodName="expression"` | `CompoundComponentDef.api` |
 | `var:varName="value"` | merged into `nestedComponent.vars` |
 | `codeBehind="MyComp.xmlui.xs"` | `CompoundComponentDef.codeBehind` |
+| `receivesContextVars` | explicit context-variable forwarding option |
 | `on*` attributes | `CompoundComponentDef.events` (via `parseEvent`) |
 | `<variable>` children | merged into `nestedComponent.vars` |
 | Single root element (or multi wrapped in Fragment) | `CompoundComponentDef.component` |
@@ -76,9 +77,36 @@ React `forwardRef` component. Responsibilities:
    - `updateState(key, value)` — programmatic state mutation
 4. **Parent render context** — created only when parent provides templates or children:
    ```typescript
-   { renderChild: parentRenderChild, props: node.props, children: node.children }
+   {
+     renderChild: parentRenderChild,
+     props: node.props,
+     children: node.children,
+     contextVars: receivedContextVars,
+     receivesContextVars: receiveSpec
+   }
    ```
 5. **Rendering** — calls `renderChild(containerNode, layoutContext, parentRenderContext)`
+
+### Received Context Variables
+
+UDC scope is isolated by default, except for legacy forwarded item/context vars (`$item`, `$itemIndex`, `$isFirst`, `$isLast`, `$context`). A component definition can opt into receiving other runtime context variables with `receivesContextVars`:
+
+```xml
+<Component name="RedColumn" receivesContextVars="$cell, $rowIndex">
+  <Column bindTo="{$props.bindTo}">
+    <Slot />
+  </Column>
+</Component>
+```
+
+Accepted forms:
+
+- `<Component receivesContextVars>` is boolean `true` and receives all non-reserved context variables.
+- `receivesContextVars="true"` and `receivesContextVars="{true}"` also receive all context variables.
+- `receivesContextVars="false"` and `receivesContextVars="{false}"` receive none.
+- A string names one context variable, or a comma-separated list. Each name must include its leading `$`.
+
+Invalid values raise parser diagnostic `T033`: arbitrary expressions, `*`, empty list entries, invalid identifiers, and reserved names (`$props`, `$self`, `$this`). Explicit name lists are exact; include legacy names if the UDC still needs them. Slot rendering also collects context variables at the `<Slot />` render site so cases such as `Table`/`Column` can pass `$cell` to transposed slot content.
 
 ### Behavior Skip
 
@@ -150,9 +178,9 @@ Three scopes in play during slot transposition:
 
 1. **Parent scope** — parent's variables, IDs, event handlers (used when rendering slot content)
 2. **Component scope** — component's `$props`, vars, methods (used when evaluating slot property expressions)
-3. **Slot content scope** — parent scope + slot-provided `$` context variables
+3. **Slot content scope** — parent scope + received context variables + slot-provided `$` context variables
 
-`parentRenderContext.renderChild` ensures slot content is rendered in parent scope. Slot properties bridge data from component scope to slot content scope.
+`parentRenderContext.renderChild` ensures slot content is rendered in parent scope. Received context variables bridge selected ambient runtime context into slot content, and slot properties bridge data from component scope to slot content scope. Slot properties take precedence when both provide the same `$` name.
 
 ## Event Emission
 
