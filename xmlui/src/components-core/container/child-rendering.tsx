@@ -1,12 +1,12 @@
 /**
  * Child Rendering Module
- * 
+ *
  * Handles child component rendering with:
  * - Recursive child rendering with proper ref composition
  * - Fragment wrapping for multiple children
  * - Key management for React reconciliation
  * - Props merging for single child elements
- * 
+ *
  * Part of Container.tsx refactoring - Step 4
  */
 
@@ -21,7 +21,10 @@ import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import type { LookupAsyncFnInner } from "./action-lookup";
 import type { LookupSyncFnInner } from "./action-lookup";
-import type { RegisterComponentApiFnInner, ComponentCleanupFn } from "../rendering/ContainerWrapper";
+import type {
+  RegisterComponentApiFnInner,
+  ComponentCleanupFn,
+} from "../rendering/ContainerWrapper";
 import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import { renderChild as renderChildUtil } from "../rendering/renderChild";
 import { mergeProps } from "../utils/mergeProps";
@@ -32,6 +35,8 @@ import { mergeProps } from "../utils/mergeProps";
 export interface ChildRendererConfig {
   // Current component state
   componentState: ContainerState;
+  // Latest full state reader for memo-blocked descendants
+  getCurrentState: () => ContainerState;
   // Global variables available to children
   globalVars?: Record<string, any>;
   // Dispatcher for state updates
@@ -58,6 +63,7 @@ export interface ChildRendererConfig {
 export function createChildRenderer(config: ChildRendererConfig) {
   const {
     componentState,
+    getCurrentState,
     globalVars,
     dispatch,
     appContext,
@@ -121,6 +127,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
         const renderedChild = renderChildUtil({
           node: child,
           state: componentState,
+          getCurrentState,
           globalVars,
           dispatch,
           appContext: childAppContext,
@@ -178,6 +185,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
     },
     [
       componentState,
+      getCurrentState,
       globalVars,
       dispatch,
       appContext,

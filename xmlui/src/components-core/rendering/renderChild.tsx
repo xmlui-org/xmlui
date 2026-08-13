@@ -35,6 +35,7 @@ export interface ChildRendererContext extends InnerRendererContext {
 export function renderChild({
   node,
   state,
+  getCurrentState,
   globalVars,
   dispatch,
   appContext,
@@ -57,7 +58,10 @@ export function renderChild({
     !hasVisibilityMountEvent || node.type === "TextNode" || node.type === "TextNodeCData";
 
   // --- Render only visible components, except visibility lifecycle adapters.
-  if (shouldCheckWhen && !resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext)) {
+  if (
+    shouldCheckWhen &&
+    !resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext)
+  ) {
     return null;
   }
 
@@ -130,6 +134,7 @@ export function renderChild({
       statePartChanged={statePartChanged}
       memoedVarsRef={memoedVarsRef}
       state={state}
+      getCurrentState={getCurrentState}
       globalVars={globalVars}
       dispatch={dispatch}
       appContext={appContext}

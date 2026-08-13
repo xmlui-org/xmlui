@@ -1102,6 +1102,52 @@ test.describe("Basic Functionality", () => {
       await expect(switchControl).toBeDisabled();
     });
 
+    test("interactive typed columns update bound rows and refresh row-scoped enabled expressions", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <App var.remainder="{0}">
+          <Table
+            data='{[
+              { id: 1, customer: "Ada", total: 123.45, paid: true },
+              { id: 2, customer: "Grace", total: 87.5, paid: false }
+            ]}'
+          >
+            <Column header="ID" bindTo="id" />
+            <Column header="Customer" bindTo="customer" />
+            <Column
+              header="Paid"
+              bindTo="paid"
+              type="switch"
+              enabled="{$item.id % remainder === 0}"
+              onDidChange="remainder = 1 - remainder"
+            />
+            <Column
+              header="Paid2"
+              bindTo="paid"
+              type="checkbox"
+              onDidChange="remainder = 1 - remainder"
+            />
+          </Table>
+          <Text testId="remainder">Remainder: {remainder}</Text>
+        </App>
+      `);
+
+      const paidSwitch = page.getByRole("switch", { name: "paid row 1" });
+      const paidCheckbox = page.getByRole("checkbox", { name: "paid row 1" });
+
+      await expect(paidSwitch).toBeDisabled();
+      await expect(paidSwitch).toHaveAttribute("aria-checked", "true");
+      await expect(paidCheckbox).toBeChecked();
+
+      await paidCheckbox.click();
+      await expect(page.getByTestId("remainder")).toHaveText("Remainder: 1");
+      await expect(paidCheckbox).not.toBeChecked();
+      await expect(paidSwitch).toHaveAttribute("aria-checked", "false");
+      await expect(paidSwitch).toBeEnabled();
+    });
+
     test("willChange controls whether interactive typed columns commit changes", async ({
       initTestBed,
       page,

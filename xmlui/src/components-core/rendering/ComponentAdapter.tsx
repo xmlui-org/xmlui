@@ -184,6 +184,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   {
     node,
     state,
+    getCurrentState,
     globalVars,
     appContext,
     dispatch,
@@ -418,7 +419,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     (eventName, actionOptions) => {
       if (import.meta.env.DEV) {
         if (actionOptions?.context) {
-          validateInjectedVars(safeNode.type, descriptor, actionOptions.context, eventName as string);
+          validateInjectedVars(
+            safeNode.type,
+            descriptor,
+            actionOptions.context,
+            eventName as string,
+          );
         }
       }
 
@@ -956,6 +962,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const rendererContext: RendererContext<any> = {
     node: safeNode,
     state: state[uid] || EMPTY_OBJECT,
+    getCurrentState,
     globalVars,
     contextVars,
     updateState: memoedUpdateState,
@@ -1146,7 +1153,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
  * of the slot.
  */
 function slotRenderer(
-  { node, extractValue, renderChild, lookupAction, layoutContext, contextVars }: RendererContext<any>,
+  {
+    node,
+    extractValue,
+    renderChild,
+    lookupAction,
+    layoutContext,
+    contextVars,
+  }: RendererContext<any>,
   parentRenderContext?: ParentRenderContext,
 ) {
   // --- Get the template name from the slot

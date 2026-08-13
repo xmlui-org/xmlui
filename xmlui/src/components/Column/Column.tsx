@@ -204,7 +204,7 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
       appContext,
       layoutContext,
       lookupEventHandler,
-      state,
+      getCurrentState,
     },
   ) => {
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
@@ -290,7 +290,7 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
           $columnId: columnId,
         };
         return asOptionalBoolean(
-          extractParam({ ...state, ...context }, rawValue, appContext, true),
+          extractParam({ ...getCurrentState(), ...context }, rawValue, appContext, true),
           propName === "enabled" ? true : undefined,
         );
       };

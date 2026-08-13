@@ -339,6 +339,7 @@ export const Container = memo(
 
     const { stableRenderChild } = createChildRenderer({
       componentState,
+      getCurrentState: () => stateRef.current,
       globalVars,
       dispatch,
       appContext,

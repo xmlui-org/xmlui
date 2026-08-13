@@ -1,4 +1,4 @@
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { cloneElement, isValidElement, useMemo, useRef } from "react";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import { renderChild } from "./renderChild";
@@ -15,7 +15,7 @@ type RootComponentProps = {
 function StandaloneComponent({ node, children, functions, vars }: RootComponentProps) {
   const memoedVarsRef = useRef<MemoedVars>(new Map());
   const rootNode = useMemo(() => {
-    if(node.type === "Container"){
+    if (node.type === "Container") {
       // If the node is already a Container, we can use it directly
       return {
         ...node,
@@ -26,7 +26,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
         vars: {
           ...node.vars,
           ...vars,
-        }
+        },
       };
     }
     return {
@@ -42,6 +42,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
   const renderedRoot = renderChild({
     node: rootNode,
     state: EMPTY_OBJECT,
+    getCurrentState: () => EMPTY_OBJECT,
     globalVars: undefined, // Let StateContainer extract and manage globalVars from node definition
     dispatch: noop,
     appContext: undefined,
@@ -53,7 +54,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
     cleanup: noop,
     memoedVarsRef,
   });
-  
+
   return !!children && isValidElement(renderedRoot)
     ? cloneElement(renderedRoot, null, children)
     : renderedRoot;
