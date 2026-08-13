@@ -54,6 +54,22 @@ export type DefaultExpansion = 'none' | 'all' | 'first-level' | (string | number
 // Node loading states for dynamic node handling
 export type NodeLoadingState = 'unloaded' | 'loading' | 'loaded';
 
+export interface TreeItemState {
+  expanded?: boolean;
+  collapsed?: boolean;
+  loaded?: boolean;
+  loadingState?: NodeLoadingState;
+  selected?: boolean;
+  expandedTimestamp?: number;
+  collapsedTimestamp?: number;
+  autoLoadAfter?: number | null;
+  dynamic?: boolean;
+}
+
+export interface TreeState extends Record<string, TreeItemState | number | undefined> {
+  scrollPosition?: number;
+}
+
 // Extended FlatTreeNode with loading state information
 export interface FlatTreeNodeWithState extends FlatTreeNode {
   loadingState: NodeLoadingState;

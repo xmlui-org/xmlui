@@ -20986,6 +20986,10 @@ export default {
         "valueType": "string",
         "defaultValue": "none"
       },
+      "initialTreeState": {
+        "description": "Initial tree state. Per-node state is keyed by source node ID and scrollPosition stores the vertical scroll offset. The state is applied as matching nodes become available; unknown node IDs are ignored.",
+        "valueType": "any"
+      },
       "autoExpandToSelection": {
         "description": "Automatically expand the path to the selected item.",
         "valueType": "boolean",
@@ -21162,6 +21166,17 @@ export default {
       "collapseAll": {
         "description": "Collapse all nodes in the tree.",
         "signature": "collapseAll(): void"
+      },
+      "getTreeState": {
+        "description": "Get tree state, including per-node expansion, loading, selection, timing state, and scrollPosition.",
+        "signature": "getTreeState(): TreeState"
+      },
+      "setTreeState": {
+        "description": "Apply tree state, including per-node state keyed by source node ID and scrollPosition. Node IDs that are not present in the tree are ignored.",
+        "signature": "setTreeState(treeState: TreeState): void",
+        "parameters": {
+          "treeState": "The tree state object, including per-node state keyed by source node ID and optional scrollPosition."
+        }
       },
       "expandToLevel": {
         "description": "Expand nodes up to the specified depth level (0-based).",

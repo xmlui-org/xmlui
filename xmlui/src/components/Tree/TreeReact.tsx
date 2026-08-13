@@ -18,6 +18,8 @@ import type {
   TreeDataFormat,
   DefaultExpansion,
   NodeLoadingState,
+  TreeItemState,
+  TreeState,
   FlatTreeNodeWithState,
 } from "../../components-core/abstractions/treeAbstractions";
 import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-core/utils/treeUtils";
@@ -286,6 +288,168 @@ const emptyTreeData: UnPackedTreeData = {
   treeItemsById: {},
 };
 
+const validNodeLoadingStates = new Set<NodeLoadingState>(["unloaded", "loading", "loaded"]);
+
+const hasOwnProperty = (value: object, property: string) =>
+  Object.prototype.hasOwnProperty.call(value, property);
+
+const getExpandedState = (state: TreeItemState): boolean | undefined => {
+  if (hasOwnProperty(state, "expanded") && typeof state.expanded === "boolean") {
+    return state.expanded;
+  }
+  if (hasOwnProperty(state, "collapsed") && typeof state.collapsed === "boolean") {
+    return !state.collapsed;
+  }
+  return undefined;
+};
+
+const getLoadingState = (state: TreeItemState): NodeLoadingState | undefined => {
+  if (validNodeLoadingStates.has(state.loadingState as NodeLoadingState)) {
+    return state.loadingState;
+  }
+  if (typeof state.loaded === "boolean") {
+    return state.loaded ? "loaded" : "unloaded";
+  }
+  return undefined;
+};
+
+const getSourceNodesById = (treeItemsById: Record<string, TreeNode>) => {
+  const nodesById = new Map<string, TreeNode>();
+  Object.values(treeItemsById).forEach((node) => {
+    nodesById.set(String(node.key), node);
+  });
+  return nodesById;
+};
+
+const getApplicableTreeStateEntries = (
+  treeState: TreeState | undefined,
+  treeItemsById: Record<string, TreeNode>,
+) => {
+  if (!treeState || typeof treeState !== "object") {
+    return [];
+  }
+
+  const nodesById = getSourceNodesById(treeItemsById);
+  return Object.entries(treeState).flatMap(([nodeId, state]) => {
+    if (!state || typeof state !== "object") {
+      return [];
+    }
+
+    const node = nodesById.get(String(nodeId));
+    return node ? [{ node, state: state as TreeItemState }] : [];
+  });
+};
+
+const getTreeStateScrollPosition = (treeState: TreeState | undefined) => {
+  return typeof treeState?.scrollPosition === "number" ? treeState.scrollPosition : undefined;
+};
+
+const getDefaultExpandedIds = (
+  defaultExpanded: DefaultExpansion,
+  treeData: TreeNode[],
+  treeItemsById: Record<string, TreeNode>,
+): (string | number)[] => {
+  const isUnloaded = (node: TreeNode): boolean => {
+    return node.loaded === false;
+  };
+
+  if (defaultExpanded === "first-level") {
+    return treeData.filter((node) => !isUnloaded(node)).map((node) => node.key);
+  } else if (defaultExpanded === "all") {
+    const allIds: (string | number)[] = [];
+    const collectIds = (nodes: TreeNode[]) => {
+      nodes.forEach((node) => {
+        if (!isUnloaded(node)) {
+          allIds.push(node.key);
+        }
+        if (node.children) {
+          collectIds(node.children);
+        }
+      });
+    };
+    collectIds(treeData);
+    return allIds;
+  } else if (Array.isArray(defaultExpanded)) {
+    const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
+    return expandedPaths.filter((nodeId) => {
+      const node = treeItemsById[String(nodeId)];
+      return !node || !isUnloaded(node);
+    });
+  }
+
+  return [];
+};
+
+const getInitialExpandedIds = (
+  defaultExpanded: DefaultExpansion,
+  treeData: TreeNode[],
+  treeItemsById: Record<string, TreeNode>,
+  initialTreeState: TreeState | undefined,
+) => {
+  const expandedIds = new Map<string, string | number>();
+  getDefaultExpandedIds(defaultExpanded, treeData, treeItemsById).forEach((nodeId) => {
+    expandedIds.set(String(nodeId), nodeId);
+  });
+
+  getApplicableTreeStateEntries(initialTreeState, treeItemsById).forEach(({ node, state }) => {
+    const expanded = getExpandedState(state);
+    if (expanded === undefined) {
+      return;
+    }
+
+    if (expanded) {
+      expandedIds.set(String(node.key), node.key);
+    } else {
+      expandedIds.delete(String(node.key));
+    }
+  });
+
+  return Array.from(expandedIds.values());
+};
+
+const getInitialMapFromTreeState = <T,>(
+  initialTreeState: TreeState | undefined,
+  treeItemsById: Record<string, TreeNode>,
+  getValue: (state: TreeItemState) => T | undefined,
+) => {
+  const map = new Map<string | number, T>();
+
+  getApplicableTreeStateEntries(initialTreeState, treeItemsById).forEach(({ node, state }) => {
+    const value = getValue(state);
+    if (value !== undefined) {
+      map.set(node.key, value);
+    }
+  });
+
+  return map;
+};
+
+const deleteMapEntryByStringKey = <T,>(map: Map<string | number, T>, nodeId: string) => {
+  for (const key of map.keys()) {
+    if (String(key) === nodeId) {
+      map.delete(key);
+    }
+  }
+};
+
+const getMapEntryByStringKey = <T,>(
+  map: Map<string | number, T>,
+  nodeId: string | number,
+): T | undefined => {
+  if (map.has(nodeId)) {
+    return map.get(nodeId);
+  }
+
+  const stringNodeId = String(nodeId);
+  for (const [key, value] of map.entries()) {
+    if (String(key) === stringNodeId) {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
 /**
  * Find all parent node IDs for a given node ID by traversing up the tree structure
  * @param nodeId The target node ID to find parents for
@@ -368,6 +532,7 @@ interface TreeComponentProps {
   selectedValue?: string | number;
   selectedId?: string | number;
   defaultExpanded?: DefaultExpansion;
+  initialTreeState?: TreeState;
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
   dynamicField?: string;
@@ -419,6 +584,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     selectedValue,
     selectedId,
     defaultExpanded = defaultProps.defaultExpanded,
+    initialTreeState,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
     dynamicField = defaultProps.dynamicField,
@@ -602,62 +768,46 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const effectiveSelectedId =
     isControlledMode && mappedSelectedId !== undefined ? mappedSelectedId : internalSelectedId;
 
-  // Initialize expanded IDs based on defaultExpanded prop
-  const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() => {
-    // Helper function to check if a node is unloaded (should not be auto-expanded)
-    const isUnloaded = (node: TreeNode): boolean => {
-      return node.loaded === false;
-    };
-
-    if (defaultExpanded === "first-level") {
-      return treeData.filter((node) => !isUnloaded(node)).map((node) => node.key);
-    } else if (defaultExpanded === "all") {
-      const allIds: (string | number)[] = [];
-      const collectIds = (nodes: TreeNode[]) => {
-        nodes.forEach((node) => {
-          if (!isUnloaded(node)) {
-            allIds.push(node.key);
-          }
-          if (node.children) {
-            collectIds(node.children);
-          }
-        });
-      };
-      collectIds(treeData);
-      return allIds;
-    } else if (Array.isArray(defaultExpanded)) {
-      // Expand full paths to specified nodes by including all parent nodes
-      // But exclude unloaded nodes from the expansion
-      const expandedPaths = expandParentPaths(defaultExpanded, treeItemsById);
-      return expandedPaths.filter((nodeId) => {
-        const node = treeItemsById[String(nodeId)];
-        return !node || !isUnloaded(node);
-      });
-    }
-    return [];
-  });
+  // Initialize expanded IDs based on defaultExpanded and initialTreeState props.
+  const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() =>
+    getInitialExpandedIds(defaultExpanded, treeData, treeItemsById, initialTreeState),
+  );
 
   // Node loading states management for dynamic loading
-  const [nodeStates, setNodeStates] = useState<Map<string | number, NodeLoadingState>>(new Map());
+  const [nodeStates, setNodeStates] = useState<Map<string | number, NodeLoadingState>>(() =>
+    getInitialMapFromTreeState(initialTreeState, treeItemsById, getLoadingState),
+  );
 
   // Expanded timestamps for tracking when nodes were expanded (Step 1: Auto-load feature)
-  const [expandedTimestamps, setExpandedTimestamps] = useState<Map<string | number, number>>(
-    new Map(),
+  const [expandedTimestamps, setExpandedTimestamps] = useState<Map<string | number, number>>(() =>
+    getInitialMapFromTreeState(initialTreeState, treeItemsById, (state) =>
+      typeof state.expandedTimestamp === "number" ? state.expandedTimestamp : undefined,
+    ),
   );
 
   // Auto-load after values for tracking per-node autoload thresholds (Step 2: Auto-load feature)
-  const [autoLoadAfterMap, setAutoLoadAfterMap] = useState<
-    Map<string | number, number | null>
-  >(new Map());
+  const [autoLoadAfterMap, setAutoLoadAfterMap] = useState<Map<string | number, number | null>>(
+    () =>
+      getInitialMapFromTreeState(initialTreeState, treeItemsById, (state) => {
+        if (typeof state.autoLoadAfter === "number" || state.autoLoadAfter === null) {
+          return state.autoLoadAfter;
+        }
+        return undefined;
+      }),
+  );
 
   // Dynamic state for tracking per-node dynamic values
-  const [dynamicStateMap, setDynamicStateMap] = useState<Map<string | number, boolean>>(
-    new Map(),
+  const [dynamicStateMap, setDynamicStateMap] = useState<Map<string | number, boolean>>(() =>
+    getInitialMapFromTreeState(initialTreeState, treeItemsById, (state) =>
+      typeof state.dynamic === "boolean" ? state.dynamic : undefined,
+    ),
   );
 
   // Collapsed timestamps for tracking when nodes were collapsed (Step 4: Auto-load feature)
-  const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string | number, number>>(
-    new Map(),
+  const [collapsedTimestamps, setCollapsedTimestamps] = useState<Map<string | number, number>>(() =>
+    getInitialMapFromTreeState(initialTreeState, treeItemsById, (state) =>
+      typeof state.collapsedTimestamp === "number" ? state.collapsedTimestamp : undefined,
+    ),
   );
 
   // Helper functions for managing node loading states
@@ -680,6 +830,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VirtualizerHandle>(null);
+  const pendingScrollPositionRef = useRef<number | undefined>(getTreeStateScrollPosition(initialTreeState));
+  const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
 
   // State and ref for measuring first item size when fixedItemSize is enabled
   const firstItemRef = useRef<HTMLDivElement>(null);
@@ -836,6 +988,280 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     setSelectedNodeById(undefined);
   }, [setSelectedNodeById]);
 
+  const queueScrollPositionRestore = useCallback((scrollPosition: number | undefined) => {
+    if (scrollPosition === undefined) {
+      return;
+    }
+
+    pendingScrollPositionRef.current = Math.max(0, scrollPosition);
+
+    if (scrollRestoreAnimationFrameRef.current !== undefined) {
+      cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+    }
+
+    scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
+      scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
+        const nextScrollPosition = pendingScrollPositionRef.current;
+        if (nextScrollPosition !== undefined) {
+          listRef.current?.scrollTo(nextScrollPosition);
+          pendingScrollPositionRef.current = undefined;
+        }
+        scrollRestoreAnimationFrameRef.current = undefined;
+      });
+    });
+  }, []);
+
+  const getEffectiveNodeLoadingState = useCallback(
+    (node: TreeNode): NodeLoadingState => {
+      const activeState = getMapEntryByStringKey(nodeStates, node.key);
+      if (activeState) {
+        return activeState;
+      }
+
+      return node.loaded === false ? "unloaded" : "loaded";
+    },
+    [nodeStates],
+  );
+
+  const getTreeState = useCallback((): TreeState => {
+    const selectedId =
+      effectiveSelectedId === undefined || effectiveSelectedId === null
+        ? undefined
+        : String(effectiveSelectedId);
+
+    const treeState = Object.values(treeItemsById).reduce<TreeState>((state, node) => {
+      const nodeId = String(node.key);
+      const expanded = expandedIds.some((expandedId) => String(expandedId) === nodeId);
+      const loadingState = getEffectiveNodeLoadingState(node);
+      const itemState: TreeItemState = {
+        expanded,
+        collapsed: !expanded,
+        loaded: loadingState === "loaded",
+        loadingState,
+        selected: selectedId === nodeId,
+      };
+      const expandedTimestamp = getMapEntryByStringKey(expandedTimestamps, node.key);
+      const collapsedTimestamp = getMapEntryByStringKey(collapsedTimestamps, node.key);
+      const autoLoadAfterValue = getMapEntryByStringKey(autoLoadAfterMap, node.key);
+      const dynamicValue = getMapEntryByStringKey(dynamicStateMap, node.key);
+
+      if (expandedTimestamp !== undefined) {
+        itemState.expandedTimestamp = expandedTimestamp;
+      }
+      if (collapsedTimestamp !== undefined) {
+        itemState.collapsedTimestamp = collapsedTimestamp;
+      }
+      if (autoLoadAfterValue !== undefined) {
+        itemState.autoLoadAfter = autoLoadAfterValue;
+      }
+      if (dynamicValue !== undefined) {
+        itemState.dynamic = dynamicValue;
+      }
+
+      state[nodeId] = itemState;
+      return state;
+    }, {});
+
+    treeState.scrollPosition = listRef.current?.scrollOffset ?? 0;
+    return treeState;
+  }, [
+    autoLoadAfterMap,
+    collapsedTimestamps,
+    dynamicStateMap,
+    effectiveSelectedId,
+    expandedIds,
+    expandedTimestamps,
+    getEffectiveNodeLoadingState,
+    treeItemsById,
+  ]);
+
+  const updateLoadedFieldsInData = useCallback(
+    (loadedByNodeId: Map<string, boolean>) => {
+      if (loadedByNodeId.size === 0) {
+        return;
+      }
+
+      updateInternalData((prevData) => {
+        const currentData = prevData ?? data;
+        const fieldId = fieldConfig.idField || "id";
+        const loadedFieldName = fieldConfig.loadedField || "loaded";
+
+        if (dataFormat === "flat" && Array.isArray(currentData)) {
+          return currentData.map((item) => {
+            const loaded = loadedByNodeId.get(String(item[fieldId]));
+            return loaded === undefined ? item : { ...item, [loadedFieldName]: loaded };
+          });
+        } else if (dataFormat === "hierarchy" && currentData) {
+          const updateHierarchy = (nodes: any[]): any[] => {
+            return nodes.map((node) => {
+              const loaded = loadedByNodeId.get(String(node[fieldId]));
+              const children = node[fieldConfig.childrenField || "children"];
+              const updatedChildren = Array.isArray(children)
+                ? updateHierarchy(children)
+                : children;
+
+              if (loaded === undefined && updatedChildren === children) {
+                return node;
+              }
+
+              return {
+                ...node,
+                ...(loaded !== undefined ? { [loadedFieldName]: loaded } : {}),
+                ...(Array.isArray(children)
+                  ? { [fieldConfig.childrenField || "children"]: updatedChildren }
+                  : {}),
+              };
+            });
+          };
+
+          if (Array.isArray(currentData)) {
+            return updateHierarchy(currentData);
+          }
+
+          return updateHierarchy([currentData])[0];
+        }
+
+        return currentData;
+      });
+    },
+    [data, dataFormat, fieldConfig, updateInternalData],
+  );
+
+  const applyTreeState = useCallback(
+    (treeState: TreeState | undefined, shouldApplyNode?: (nodeId: string) => boolean) => {
+      const entries = getApplicableTreeStateEntries(treeState, treeItemsById).filter(({ node }) => {
+        const nodeId = String(node.key);
+        return shouldApplyNode ? shouldApplyNode(nodeId) : true;
+      });
+
+      if (entries.length === 0) {
+        queueScrollPositionRestore(getTreeStateScrollPosition(treeState));
+        return;
+      }
+
+      const loadedByNodeId = new Map<string, boolean>();
+      entries.forEach(({ node, state }) => {
+        const loadingState = getLoadingState(state);
+        if (loadingState) {
+          loadedByNodeId.set(String(node.key), loadingState === "loaded");
+        }
+      });
+
+      setExpandedIds((prev) => {
+        const next = new Map<string, string | number>();
+        prev.forEach((nodeId) => {
+          next.set(String(nodeId), nodeId);
+        });
+
+        entries.forEach(({ node, state }) => {
+          const expanded = getExpandedState(state);
+          if (expanded === undefined) {
+            return;
+          }
+
+          if (expanded) {
+            next.set(String(node.key), node.key);
+          } else {
+            next.delete(String(node.key));
+          }
+        });
+
+        return Array.from(next.values());
+      });
+
+      setNodeStates((prev) => {
+        const next = new Map(prev);
+        entries.forEach(({ node, state }) => {
+          const loadingState = getLoadingState(state);
+          if (!loadingState) {
+            return;
+          }
+
+          deleteMapEntryByStringKey(next, String(node.key));
+          next.set(node.key, loadingState);
+        });
+        return next;
+      });
+
+      setExpandedTimestamps((prev) => {
+        const next = new Map(prev);
+        entries.forEach(({ node, state }) => {
+          if (typeof state.expandedTimestamp !== "number") {
+            return;
+          }
+          deleteMapEntryByStringKey(next, String(node.key));
+          next.set(node.key, state.expandedTimestamp);
+        });
+        return next;
+      });
+
+      setCollapsedTimestamps((prev) => {
+        const next = new Map(prev);
+        entries.forEach(({ node, state }) => {
+          if (typeof state.collapsedTimestamp !== "number") {
+            return;
+          }
+          deleteMapEntryByStringKey(next, String(node.key));
+          next.set(node.key, state.collapsedTimestamp);
+        });
+        return next;
+      });
+
+      setAutoLoadAfterMap((prev) => {
+        const next = new Map(prev);
+        entries.forEach(({ node, state }) => {
+          if (typeof state.autoLoadAfter !== "number" && state.autoLoadAfter !== null) {
+            return;
+          }
+          deleteMapEntryByStringKey(next, String(node.key));
+          next.set(node.key, state.autoLoadAfter);
+        });
+        return next;
+      });
+
+      setDynamicStateMap((prev) => {
+        const next = new Map(prev);
+        entries.forEach(({ node, state }) => {
+          if (typeof state.dynamic !== "boolean") {
+            return;
+          }
+          deleteMapEntryByStringKey(next, String(node.key));
+          next.set(node.key, state.dynamic);
+        });
+        return next;
+      });
+
+      const selectedEntry = entries.find(({ state }) => state.selected === true);
+      if (selectedEntry) {
+        setSelectedNodeById(selectedEntry.node.key);
+      } else if (entries.some(({ state }) => state.selected === false)) {
+        const selectedId =
+          effectiveSelectedId === undefined ? undefined : String(effectiveSelectedId);
+        if (
+          selectedId &&
+          entries.some(
+            ({ node, state }) => String(node.key) === selectedId && state.selected === false,
+          )
+        ) {
+          setSelectedNodeById(undefined);
+        }
+      }
+
+      updateLoadedFieldsInData(loadedByNodeId);
+      queueScrollPositionRestore(getTreeStateScrollPosition(treeState));
+    },
+    [
+      effectiveSelectedId,
+      queueScrollPositionRestore,
+      setSelectedNodeById,
+      treeItemsById,
+      updateLoadedFieldsInData,
+    ],
+  );
+
+  const appliedInitialTreeStateNodeIdsRef = useRef<Set<string>>(new Set());
+  const initialTreeStateRef = useRef<TreeState | undefined>(initialTreeState);
+
   // Initialize selection based on selectedValue prop - only on mount
   useEffect(() => {
     if (selectedValue !== undefined && !onSelectionChanged) {
@@ -843,6 +1269,51 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       setInternalSelectedId(selectedValue);
     }
   }, []); // Only run on mount
+
+  useEffect(() => {
+    if (initialTreeStateRef.current !== initialTreeState) {
+      initialTreeStateRef.current = initialTreeState;
+      appliedInitialTreeStateNodeIdsRef.current = new Set();
+      pendingScrollPositionRef.current = getTreeStateScrollPosition(initialTreeState);
+    }
+
+    if (!initialTreeState) {
+      return;
+    }
+
+    const appliedNodeIds = appliedInitialTreeStateNodeIdsRef.current;
+    const applicableEntries = getApplicableTreeStateEntries(initialTreeState, treeItemsById).filter(
+      ({ node }) => !appliedNodeIds.has(String(node.key)),
+    );
+
+    const scrollPosition = getTreeStateScrollPosition(initialTreeState);
+    if (applicableEntries.length === 0) {
+      if (pendingScrollPositionRef.current !== undefined) {
+        queueScrollPositionRestore(scrollPosition);
+      }
+      return;
+    }
+
+    applyTreeState(initialTreeState, (nodeId) => !appliedNodeIds.has(nodeId));
+    applicableEntries.forEach(({ node }) => appliedNodeIds.add(String(node.key)));
+  }, [applyTreeState, initialTreeState, queueScrollPositionRestore, treeItemsById]);
+
+  useEffect(() => {
+    const scrollPosition = pendingScrollPositionRef.current;
+    if (scrollPosition === undefined || !listRef.current) {
+      return;
+    }
+
+    queueScrollPositionRestore(scrollPosition);
+  }, [flatTreeData.length, expandedIds, queueScrollPositionRestore]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollRestoreAnimationFrameRef.current !== undefined) {
+        cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+      }
+    };
+  }, []);
 
   /**
    * ensure the selected item's parents are expanded when selection changes
@@ -1697,6 +2168,12 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       getSelectedNode,
 
+      getTreeState,
+
+      setTreeState: (treeState: TreeState) => {
+        applyTreeState(treeState);
+      },
+
       scrollIntoView: (nodeId: string | number, options?: ScrollIntoViewOptions) => {
         // Find the target node
         const targetNode = Object.values(treeItemsById).find(
@@ -2280,19 +2757,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Node state management methods
 
       getNodeLoadingState: (nodeId: string | number) => {
-        // First check nodeStates Map (active loading state)
-        const activeState = nodeStates.get(nodeId);
-        if (activeState) {
-          return activeState;
-        }
-
-        // Fallback to checking loaded field from source data
         const node = getNodeById(nodeId);
-        if (node && node.loaded === false) {
-          return "unloaded";
+        if (node) {
+          return getEffectiveNodeLoadingState(node);
         }
 
-        // Default to loaded
         return "loaded";
       },
 
@@ -2493,12 +2962,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     dataFormat,
     data,
     setInternalData,
+    applyTreeState,
     expandedTimestamps,
     autoLoadAfterMap,
     autoLoadAfter,
     dynamicStateMap,
     dynamic,
     dynamicField,
+    getEffectiveNodeLoadingState,
+    getTreeState,
     nodeStates,
     setNodeStates,
     loadChildren,
