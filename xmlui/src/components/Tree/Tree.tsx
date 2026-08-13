@@ -648,6 +648,9 @@ export const treeComponentRenderer = wrapComponent(
           onPasteAction={lookupEventHandler("pasteAction")}
           onDeleteAction={lookupEventHandler("deleteAction")}
           overflow={extractValue(node.props.overflow)}
+          hasExplicitHeight={
+            node.props.height !== undefined || node.props.maxHeight !== undefined
+          }
           lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         />
       );

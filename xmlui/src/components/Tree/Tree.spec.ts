@@ -3430,6 +3430,49 @@ test.describe("Theme Variables", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
+  test("respects fixed height layout inside a kept-mounted TabItem", async ({
+    initTestBed,
+    page,
+    createTreeDriver,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Tabs keepMounted height="*">
+          <TabItem label="Tab 1">
+            <H1>Tab 1</H1>
+            <Select>
+              <Option value="opt1" label="first" />
+              <Option value="opt2" label="second" />
+              <Option value="opt3" label="third" />
+              <Option value="opt4" label="fourth" />
+            </Select>
+          </TabItem>
+          <TabItem label="Tab 2">
+            <H1>Tab 2</H1>
+            <Tree
+              testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              height="200px"
+              data='{[
+                { id: 1, icon: "folder", name: "Root Item 1", parentId: null },
+                { id: 2, icon: "folder", name: "Child Item 1.1", parentId: 1 },
+                { id: 3, icon: "code", name: "Child Item 1.2", parentId: 1 },
+                { id: 4, icon: "code", name: "Grandchild Item 1.1.1", parentId: 2 }
+              ]}'
+            />
+          </TabItem>
+        </Tabs>
+      </App>
+    `);
+
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+
+    const tree = await createTreeDriver("tree");
+    await expect(tree.component).toBeVisible();
+    await expect(tree.component).toHaveCSS("height", "200px");
+  });
+
   test("handles null/undefined data gracefully", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="200px">
