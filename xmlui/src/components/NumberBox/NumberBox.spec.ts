@@ -203,6 +203,26 @@ test.describe("Basic Functionality", () => {
     await expect(driver.input).toHaveValue("3");
   });
 
+  test("clicking spinbox buttons sets nullish values to minimum", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox testId="null-value" initialValue="{null}" minValue="10" />
+        <NumberBox testId="undefined-value" initialValue="{undefined}" minValue="10" />
+      </Fragment>
+    `);
+    const nullValueDriver = await createNumberBoxDriver("null-value");
+    const undefinedValueDriver = await createNumberBoxDriver("undefined-value");
+
+    await nullValueDriver.increment();
+    await expect(nullValueDriver.input).toHaveValue("10");
+
+    await undefinedValueDriver.decrement();
+    await expect(undefinedValueDriver.input).toHaveValue("10");
+  });
+
   test("invalid step values use default step", async ({ initTestBed, createNumberBoxDriver }) => {
     await initTestBed(`<NumberBox initialValue="10" step="3.5" />`);
     const driver = await createNumberBoxDriver();
