@@ -82,6 +82,8 @@ const searchOptions: IFuseOptions<SearchItemData> = {
 };
 
 const MIN_MATCH_LENGTH = 2;
+const SEARCH_CANDIDATE_MULTIPLIER = 5;
+const MIN_SEARCH_CANDIDATES = 50;
 const EMPTY_STATIC_SEARCH_DATA: SearchItemData[] = [];
 const EMPTY_SEARCH_CONTEXT_CONTENT: Record<string, SearchItemData> = {};
 
@@ -226,12 +228,19 @@ export const Search = memo(function Search({
     // Ignore single characters
     if (debouncedValue.length < MIN_MATCH_LENGTH) return [];
 
+    const resultLimit = limit ?? defaultProps.limit;
+    const candidateLimit = Math.max(
+      resultLimit,
+      pageSize ?? resultLimit,
+      MIN_SEARCH_CANDIDATES,
+      resultLimit * SEARCH_CANDIDATE_MULTIPLIER,
+    );
     const limited = fuse.search(debouncedValue, {
-      limit: limit ?? defaultProps.limit,
+      limit: candidateLimit,
     });
     const mapped = postProcessSearch(limited, debouncedValue);
-    return groupAndSortByCategory(mapped);
-  }, [debouncedValue, fuse, limit]);
+    return groupAndSortByCategory(mapped, debouncedValue).slice(0, resultLimit);
+  }, [debouncedValue, fuse, limit, pageSize]);
 
   const totalCount = allResults.length;
 
@@ -1022,10 +1031,33 @@ const CATEGORY_PRIORITY: Partial<Record<string, number>> = {
 /**
  * Groups search results by category and sorts the groups first by explicit category
  * priority (docs before blog), then by their summed Fuse.js scores as a tiebreaker
- * (lower sum = better overall match quality), keeping items within each group in their
- * original score-sorted order.
+ * (lower sum = better overall match quality). Items inside each group prioritize
+ * normalized title matches before falling back to Fuse score.
  */
-function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
+function normalizeSearchText(value: string): string {
+  return value.toLocaleLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function getTitleMatchPriority(result: SearchResult, query: string): number {
+  const normalizedTitle = normalizeSearchText(result.item.title);
+  const normalizedQuery = normalizeSearchText(query);
+
+  if (!normalizedTitle || !normalizedQuery) return 2;
+  if (normalizedTitle === normalizedQuery) return 0;
+  if (normalizedTitle.startsWith(normalizedQuery)) return 1;
+  return 2;
+}
+
+function sortByTitlePriorityAndScore(results: SearchResult[], query: string): SearchResult[] {
+  return [...results].sort((a, b) => {
+    const priorityA = getTitleMatchPriority(a, query);
+    const priorityB = getTitleMatchPriority(b, query);
+    if (priorityA !== priorityB) return priorityA - priorityB;
+    return (a.score ?? 0) - (b.score ?? 0);
+  });
+}
+
+function groupAndSortByCategory(results: SearchResult[], query: string): SearchResult[] {
   const groups = new Map<string, SearchResult[]>();
   for (const result of results) {
     const cat = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
@@ -1047,7 +1079,7 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
     return (groupScores.get(a) ?? 0) - (groupScores.get(b) ?? 0);
   });
 
-  return sortedCategories.flatMap((cat) => groups.get(cat)!);
+  return sortedCategories.flatMap((cat) => sortByTitlePriorityAndScore(groups.get(cat)!, query));
 }
 
 /**
