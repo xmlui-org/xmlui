@@ -395,6 +395,277 @@ test.describe("Events and Vars", () => {
     await expect(page.getByTestId("content")).toBeVisible();
   });
 
+  test("setDirty and getDirty expose the dialog dirty state", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog id="modal">
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="markClean" onClick="modal.setDirty(false)">mark clean</Button>
+          <Button testId="readDirty" onClick="testState = modal.getDirty()">read dirty</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("readDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+
+    await page.getByTestId("markDirty").click();
+    await page.getByTestId("readDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+
+    await page.getByTestId("markClean").click();
+    await page.getByTestId("readDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+  });
+
+  test("dirtyChanged event fires when dialog dirty state changes", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.events="{[]}">
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          onDirtyChanged="(dirty) => { events.push(dirty); testState = events; }">
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="markClean" onClick="modal.setDirty(false)">mark clean</Button>
+        </ModalDialog>
+        <Button testId="read" onClick="testState = events">read</Button>
+      </Fragment>
+    `);
+
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual([]);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("markDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual([true]);
+
+    await page.getByTestId("markDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual([true]);
+
+    await page.getByTestId("markClean").click();
+    await expect.poll(testStateDriver.testState).toEqual([true, false]);
+
+    await page.getByTestId("markClean").click();
+    await expect.poll(testStateDriver.testState).toEqual([true, false]);
+  });
+
+  test("dirty dialog asks for confirmation before closing", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          canCloseMessage="Discard your draft?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Text testId="content">content</Text>
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="apiClose" onClick="modal.close()">close via api</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("markDirty").click();
+    await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.getByText("Discard your draft?")).toBeVisible();
+
+    await page.getByRole("button", { name: "Keep Editing" }).click();
+    await expect(page.getByTestId("content")).toBeVisible();
+
+    await page.getByTestId("apiClose").click();
+    await page.getByRole("button", { name: "Discard" }).click();
+    await expect(page.getByTestId("content")).not.toBeVisible();
+  });
+
+  test("clean dialog closes without confirmation", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          canCloseMessage="Discard your draft?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Text testId="content">content</Text>
+          <Button testId="apiClose" onClick="modal.close()">close via api</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("apiClose").click();
+    await expect(page.getByText("Discard your draft?")).not.toBeVisible();
+    await expect(page.getByTestId("content")).not.toBeVisible();
+  });
+
+  test("willClose returning false prevents close and skips dirty confirmation", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          canCloseMessage="Discard your draft?"
+          onWillClose="testState = 'willClose'; return false">
+          <Text testId="content">content</Text>
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="apiClose" onClick="modal.close()">close via api</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("markDirty").click();
+    await page.getByTestId("apiClose").click();
+
+    await expect.poll(testStateDriver.testState).toEqual("willClose");
+    await expect(page.getByText("Discard your draft?")).not.toBeVisible();
+    await expect(page.getByTestId("content")).toBeVisible();
+  });
+
+  test("willClose returning true allows dirty dialog to close without confirmation", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          canCloseMessage="Discard your draft?"
+          onWillClose="return true">
+          <Text testId="content">content</Text>
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="apiClose" onClick="modal.close()">close via api</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("markDirty").click();
+    await page.getByTestId("apiClose").click();
+
+    await expect(page.getByText("Discard your draft?")).not.toBeVisible();
+    await expect(page.getByTestId("content")).not.toBeVisible();
+  });
+
+  test("nested Form dirty state prompts before ModalDialog closes", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          testId="modal"
+          canCloseMessage="Discard form changes?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Form id="profileForm">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+          </Form>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Jane");
+
+    await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.getByText("Discard form changes?")).toBeVisible();
+
+    await page.getByRole("button", { name: "Keep Editing" }).click();
+    await expect(page.getByTestId("modal")).toBeVisible();
+
+    await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await page.getByRole("button", { name: "Discard" }).click();
+    await expect(page.getByTestId("modal")).not.toBeVisible();
+  });
+
+  test("nested Form dirty state fires ModalDialog dirtyChanged", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.events="{[]}">
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          onDirtyChanged="(dirty) => { events.push(dirty); testState = events; }">
+          <Form id="profileForm">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+            <Button testId="markClean" label="Mark Clean" onClick="profileForm.setDirty(false)" />
+          </Form>
+        </ModalDialog>
+        <Button testId="read" onClick="testState = events">read</Button>
+      </Fragment>
+    `);
+
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual([]);
+
+    await page.getByTestId("open").click();
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Jane");
+    await expect.poll(testStateDriver.testState).toEqual([true]);
+
+    await page.getByTestId("markClean").click();
+    await expect.poll(testStateDriver.testState).toEqual([true, false]);
+  });
+
+  test("nested Form setDirty false clears ModalDialog dirty guard", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          testId="modal"
+          canCloseMessage="Discard form changes?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Form id="profileForm">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+            <Button testId="markClean" label="Mark Clean" onClick="profileForm.setDirty(false)" />
+          </Form>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Jane");
+    await page.getByTestId("markClean").click();
+
+    await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.getByText("Discard form changes?")).not.toBeVisible();
+    await expect(page.getByTestId("modal")).not.toBeVisible();
+  });
+
   test("var on ModalDialog persists across open/close cycles", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>

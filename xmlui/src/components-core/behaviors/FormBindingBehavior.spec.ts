@@ -76,6 +76,34 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test("bound TextBox and NumberBox mark Form dirty", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Form id="testForm" data="{{ name: 'initial', count: 10 }}">
+          <TextBox testId="textbox" bindTo="name" />
+          <NumberBox testId="numberbox" bindTo="count" />
+        </Form>
+        <Button testId="read" onClick="testState = testForm.isDirty()">read</Button>
+        <Button testId="clean" onClick="testForm.setDirty(false)">clean</Button>
+      </Fragment>
+    `);
+
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+
+    await page.getByRole("textbox").fill("updated");
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+
+    await page.getByTestId("clean").click();
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+
+    await page.getByRole("spinbutton").fill("99");
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
   test("Select with 'bindTo' updates Form data", async ({
     initTestBed,
     page,

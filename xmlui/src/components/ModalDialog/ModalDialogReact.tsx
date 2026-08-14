@@ -16,6 +16,7 @@ import classnames from "classnames";
 import styles from "./ModalDialog.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import { ThemedIcon } from "../Icon/Icon";
@@ -36,19 +37,39 @@ const PART_CONTENT = "content";
 
 type OnClose = (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
 type OnOpen = (...args: any[]) => void;
+type CloseGuard = () => Promise<boolean | undefined | void> | boolean | undefined | void;
+type OnDirtyChanged = (dirty: boolean) => void;
+type ModalStateValue = {
+  isOpen?: boolean;
+  doClose: () => Promise<void>;
+  doOpen: (...openParams: any[]) => void;
+  setDirty: (dirty: boolean) => void;
+  getDirty: () => boolean;
+  setFormDirty: (formId: string, dirty: boolean) => void;
+  removeFormDirty: (formId: string) => void;
+  registerCloseGuard: (closeGuard?: CloseGuard) => () => void;
+  registerDirtyChanged: (onDirtyChanged?: OnDirtyChanged) => () => void;
+  openParams: any[] | null;
+};
 type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
   className?: string;
   classes?: Record<string, string>;
   onClose?: OnClose;
+  onWillClose?: CloseGuard;
   onOpen?: OnOpen;
+  onDirtyChanged?: OnDirtyChanged;
+  confirm?: AppContextObject["confirm"];
   children?: ReactNode;
   fullScreen?: boolean;
   title?: string;
   titleTemplate?: ReactNode;
   closeButtonVisible?: boolean;
   closeOnClickAway?: boolean;
+  canCloseMessage?: string;
+  confirmCloseLabel?: string;
+  cancelCloseLabel?: string;
   externalAnimation?: boolean;
 };
 
@@ -66,14 +87,16 @@ export const ModalDialogFrame = React.forwardRef(
     ref,
   ) => {
     const modalContextStateValue = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
-    const { doOpen, doClose, isOpen, openParams } = modalContextStateValue;
+    const { doOpen, doClose, setDirty, getDirty, openParams } = modalContextStateValue;
 
     useEffect(() => {
       registerComponentApi?.({
         open: doOpen,
         close: doClose,
+        setDirty,
+        getDirty,
       });
-    }, [doClose, doOpen, registerComponentApi]);
+    }, [doClose, doOpen, getDirty, registerComponentApi, setDirty]);
 
     return (
       <ModalStateContext.Provider value={modalContextStateValue}>
@@ -86,32 +109,97 @@ export const ModalDialogFrame = React.forwardRef(
   },
 );
 
-const ModalStateContext = React.createContext(null);
+const ModalStateContext = React.createContext<ModalStateValue | null>(null);
 
-function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClose?: OnClose) {
+function useModalLocalOpenState(
+  isInitiallyOpen?: boolean,
+  onOpen?: OnOpen,
+  onClose?: OnClose,
+): ModalStateValue {
   const [isOpen, setIsOpen] = useState(isInitiallyOpen);
   const isClosing = useRef(false);
-  const [openParams, setOpenParams] = useState(null);
+  const isDirtyRef = useRef(false);
+  const formDirtyRef = useRef(new Map<string, boolean>());
+  const closeGuardRef = useRef<CloseGuard | undefined>();
+  const dirtyChangedRef = useRef<OnDirtyChanged | undefined>();
+  const lastReportedDirtyRef = useRef(false);
+  const [openParams, setOpenParams] = useState<any[] | null>(null);
+
+  const getDirty = useEvent(() => {
+    if (isDirtyRef.current) {
+      return true;
+    }
+    return Array.from(formDirtyRef.current.values()).some((dirty) => dirty);
+  });
+
+  const notifyDirtyChanged = useEvent(() => {
+    const dirty = getDirty();
+    if (dirty !== lastReportedDirtyRef.current) {
+      lastReportedDirtyRef.current = dirty;
+      dirtyChangedRef.current?.(dirty);
+    }
+  });
 
   const doOpen = useEvent((...openParams: any) => {
+    isDirtyRef.current = false;
+    formDirtyRef.current.clear();
+    notifyDirtyChanged();
     setOpenParams(openParams);
     onOpen?.();
     setIsOpen(true);
+  });
+
+  const setDirty = useEvent((dirty: boolean) => {
+    isDirtyRef.current = dirty === true;
+    notifyDirtyChanged();
+  });
+
+  const setFormDirty = useEvent((formId: string, dirty: boolean) => {
+    formDirtyRef.current.set(formId, dirty === true);
+    notifyDirtyChanged();
+  });
+
+  const removeFormDirty = useEvent((formId: string) => {
+    formDirtyRef.current.delete(formId);
+    notifyDirtyChanged();
+  });
+
+  const registerCloseGuard = useEvent((closeGuard?: CloseGuard) => {
+    closeGuardRef.current = closeGuard;
+    return () => {
+      if (closeGuardRef.current === closeGuard) {
+        closeGuardRef.current = undefined;
+      }
+    };
+  });
+
+  const registerDirtyChanged = useEvent((onDirtyChanged?: OnDirtyChanged) => {
+    dirtyChangedRef.current = onDirtyChanged;
+    return () => {
+      if (dirtyChangedRef.current === onDirtyChanged) {
+        dirtyChangedRef.current = undefined;
+      }
+    };
   });
 
   const doClose = useEvent(async () => {
     if (!isClosing.current) {
       try {
         isClosing.current = true;
-        const result = await onClose?.();
+        const result = closeGuardRef.current
+          ? await closeGuardRef.current()
+          : await onClose?.();
         if (result === false) {
           return;
         }
+        isDirtyRef.current = false;
+        formDirtyRef.current.clear();
+        notifyDirtyChanged();
+        setIsOpen(false);
       } finally {
         isClosing.current = false;
       }
     }
-    setIsOpen(false);
   });
 
   return useMemo(() => {
@@ -119,35 +207,36 @@ function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClo
       isOpen,
       doClose,
       doOpen,
+      setDirty,
+      getDirty,
+      setFormDirty,
+      removeFormDirty,
+      registerCloseGuard,
+      registerDirtyChanged,
       openParams,
     };
-  }, [doClose, doOpen, isOpen, openParams]);
+  }, [
+    doClose,
+    doOpen,
+    getDirty,
+    isOpen,
+    openParams,
+    registerCloseGuard,
+    registerDirtyChanged,
+    removeFormDirty,
+    setDirty,
+    setFormDirty,
+  ]);
 }
 function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
   const modalStateContext = useContext(ModalStateContext);
   const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
 
-  // When inside a ModalDialogFrame context, wrap doClose so the inner onClose handler
-  // (which has access to inner container vars like counter) fires before the frame closes.
-  const wrappedDoClose = useEvent(async () => {
-    const result = await onClose?.();
-    if (result !== false) {
-      await modalStateContext?.doClose();
-    }
-  });
-
   if (!modalStateContext) {
     return modalLocalOpenState;
   }
 
-  if (!onClose) {
-    return modalStateContext;
-  }
-
-  return {
-    ...modalStateContext,
-    doClose: wrappedDoClose,
-  };
+  return modalStateContext;
 }
 
 export const ModalDialog = memo(React.forwardRef(
@@ -165,6 +254,12 @@ export const ModalDialog = memo(React.forwardRef(
       classes,
       onOpen,
       onClose,
+      onWillClose,
+      onDirtyChanged,
+      confirm,
+      canCloseMessage = defaultProps.canCloseMessage,
+      confirmCloseLabel = defaultProps.confirmCloseLabel,
+      cancelCloseLabel = defaultProps.cancelCloseLabel,
       externalAnimation = true,
       ...rest
     }: ModalProps,
@@ -182,7 +277,54 @@ export const ModalDialog = memo(React.forwardRef(
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
     const modalStateContext = useContext(ModalStateContext);
-    const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+    const {
+      isOpen,
+      doClose,
+      doOpen,
+      setDirty,
+      getDirty,
+      setFormDirty,
+      removeFormDirty,
+      registerCloseGuard,
+      registerDirtyChanged,
+    } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+
+    const confirmDirtyClose = useEvent(async () => {
+      if (confirm) {
+        return confirm({
+          message: canCloseMessage,
+          actionLabel: confirmCloseLabel,
+          cancelLabel: cancelCloseLabel,
+          actionThemeColor: "attention",
+        });
+      }
+      return typeof window !== "undefined" ? window.confirm(canCloseMessage) : false;
+    });
+
+    const shouldClose = useEvent(async () => {
+      if (onWillClose) {
+        const result = await onWillClose();
+        if (result === false) {
+          return false;
+        }
+      } else if (getDirty()) {
+        const confirmed = await confirmDirtyClose();
+        if (confirmed !== true) {
+          return false;
+        }
+      }
+
+      const result = await onClose?.();
+      return result !== false;
+    });
+
+    useEffect(() => {
+      return registerCloseGuard?.(shouldClose);
+    }, [registerCloseGuard, shouldClose]);
+
+    useEffect(() => {
+      return registerDirtyChanged?.(onDirtyChanged);
+    }, [onDirtyChanged, registerDirtyChanged]);
 
     // When inside a ModalDialogFrame, fire onOpen in the inner container context when the
     // dialog transitions from closed to open (triggered by the outer frame's doOpen call).
@@ -233,9 +375,14 @@ export const ModalDialog = memo(React.forwardRef(
       return {
         registerForm: (id: string) => {
           registeredForms.current.add(id);
+          setFormDirty(id, false);
         },
         unRegisterForm: (id: string) => {
           registeredForms.current.delete(id);
+          removeFormDirty(id);
+        },
+        setFormDirty: (id: string, dirty: boolean) => {
+          setFormDirty(id, dirty);
         },
         amITheSingleForm: (id: string) => {
           return registeredForms.current.size === 1 && registeredForms.current.has(id);
@@ -244,7 +391,7 @@ export const ModalDialog = memo(React.forwardRef(
           return doClose();
         },
       };
-    }, [doClose]);
+    }, [doClose, removeFormDirty, setFormDirty]);
 
     if (!root) {
       return null;

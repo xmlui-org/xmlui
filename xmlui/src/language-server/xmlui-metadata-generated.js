@@ -7210,6 +7210,16 @@ export default {
         "parameters": {
           "reason": "Why the submit was dropped (e.g. `drop-while-running`)."
         }
+      },
+      "dirtyChanged": {
+        "injectedVars": [
+          "$data"
+        ],
+        "description": "Fires when the Form's dirty state changes. The event receives the new dirty state.",
+        "signature": "dirtyChanged(dirty: boolean): void",
+        "parameters": {
+          "dirty": "The new dirty state of the Form."
+        }
       }
     },
     "contextVars": {
@@ -7253,6 +7263,18 @@ export default {
         "description": "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
         "signature": "getData(): Record<string, any>",
         "returns": "A deep clone of the current form data object."
+      },
+      "isDirty": {
+        "description": "This method returns whether the form is currently marked dirty.",
+        "signature": "isDirty(): boolean",
+        "returns": "`true` when the form has unsaved changes; otherwise, `false`."
+      },
+      "setDirty": {
+        "description": "This method marks the form as dirty or clean. Field changes automatically mark the form dirty.",
+        "signature": "setDirty(dirty: boolean): void",
+        "parameters": {
+          "dirty": "When `true`, the form is marked dirty; when `false`, it is marked clean."
+        }
       },
       "cancel": {
         "description": "Aborts the AbortController associated with the in-flight submit. The framework still awaits the submit handler's promise — cancellation is cooperative; handlers that wish to bail out early should observe the `$cancel` token / abort signal.",
@@ -13302,6 +13324,21 @@ export default {
         "description": "When `true`, clicking outside the dialog closes it.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "canCloseMessage": {
+        "description": "The confirmation message shown when the dialog is dirty and the user attempts to close it.",
+        "valueType": "string",
+        "defaultValue": "You have unsaved changes. Are you sure you want to close this dialog?"
+      },
+      "confirmCloseLabel": {
+        "description": "The label of the confirmation dialog button that closes a dirty modal dialog.",
+        "valueType": "string",
+        "defaultValue": "Close"
+      },
+      "cancelCloseLabel": {
+        "description": "The label of the confirmation dialog button that keeps a dirty modal dialog open.",
+        "valueType": "string",
+        "defaultValue": "Cancel"
       }
     },
     "events": {
@@ -13316,6 +13353,18 @@ export default {
         "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.",
         "signature": "close(): void",
         "parameters": {}
+      },
+      "willClose": {
+        "description": "This event is fired before the `ModalDialog` closes. Return an explicit `false` value to prevent the dialog from closing. When this event is defined, dirty-state confirmation is skipped.",
+        "signature": "willClose(): boolean | void",
+        "parameters": {}
+      },
+      "dirtyChanged": {
+        "description": "Fires when the ModalDialog's dirty state changes. The event receives the new dirty state.",
+        "signature": "dirtyChanged(dirty: boolean): void",
+        "parameters": {
+          "dirty": "The new dirty state of the ModalDialog."
+        }
       }
     },
     "apis": {
@@ -13329,6 +13378,17 @@ export default {
         "parameters": {
           "params": "An arbitrary number of parameters that can be used to pass data to the dialog."
         }
+      },
+      "setDirty": {
+        "description": "This method marks the modal dialog as dirty or clean. Dirty dialogs ask for confirmation before closing unless `willClose` is defined.",
+        "signature": "setDirty(dirty: boolean): void",
+        "parameters": {
+          "dirty": "When `true`, the dialog is marked dirty; when `false`, it is marked clean."
+        }
+      },
+      "getDirty": {
+        "description": "This method returns whether the modal dialog is currently marked dirty.",
+        "signature": "getDirty(): boolean"
       }
     },
     "contextVars": {

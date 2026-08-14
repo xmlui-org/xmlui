@@ -158,6 +158,9 @@ Available values: `start`, `center` **(default)**, `end`
 Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.
 
 Set `canResizeColumns` to `false` to prevent users from resizing all table columns by default.
+The default is `true`.
+
+Individual `Column` components can override this table-level default with their own `canResize` property.
 
 ```xmlui-pg name="Example: canResizeColumns"
 <App>

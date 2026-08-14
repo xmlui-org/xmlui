@@ -14,6 +14,7 @@ export enum FormActionKind {
   SUBMITTING = "FormActionKind:SUBMITTING",
   SUBMITTED = "FormActionKind:SUBMITTED",
   RESET = "FormActionKind:RESET",
+  SET_DIRTY = "FormActionKind:SET_DIRTY",
 }
 
 export type FormAction = {
@@ -112,6 +113,15 @@ export function formReset() {
   return {
     type: FormActionKind.RESET,
     payload: {},
+  };
+}
+
+export function formSetDirty(dirty: boolean) {
+  return {
+    type: FormActionKind.SET_DIRTY,
+    payload: {
+      dirty,
+    },
   };
 }
 

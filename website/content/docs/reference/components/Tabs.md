@@ -3,6 +3,7 @@
 `Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components.
 
 **Key features:**
+
 - **Content organization**: Efficiently displays multiple content sections in a single interface area
 - **Flexible orientation**: Supports both horizontal (tabs on top) and vertical (tabs on side) layouts
 - **Active tab control**: Programmatically set which tab is initially selected
@@ -142,7 +143,7 @@ Sets the gap (padding) between the tab header strip and the active tab panel con
 
 This property declares the template for the clickable tab area.
 
-```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-6} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -150,8 +151,8 @@ This property declares the template for the clickable tab area.
       <Text color="green">Account {$header.index}</Text>
     </property>
     <Items data="{[
-        {id: 1, name: 'AcmeCorp'}, 
-        {id: 2, name: 'BetaLLC'}, 
+        {id: 1, name: 'AcmeCorp'},
+        {id: 2, name: 'BetaLLC'},
         {id: 3, name: 'GammaInc'}]
       }">
       <TabItem label="Account {$item}">
@@ -163,6 +164,7 @@ This property declares the template for the clickable tab area.
 ```
 
 The `headerTemplate` property allows you to customize the appearance of tab headers. The template receives a `$header` context variable with the following properties:
+
 - `id` (optional): External ID if provided to TabItem
 - `index`: Zero-based index of the tab
 - `label`: The tab's label text
@@ -170,7 +172,7 @@ The `headerTemplate` property allows you to customize the appearance of tab head
 
 Individual tab items have an optional identifier, which is passed to the header template.
 
-```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {3-5} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <property name="headerTemplate">
@@ -193,7 +195,26 @@ Individual tab items have an optional identifier, which is passed to the header 
 
 ### `keepMounted` [#keepmounted]
 
-When enabled, all tab panels remain mounted in the DOM even when not active — inactive panels are hidden with `display: none`. This ensures that form fields inside non-visible tabs stay registered with an enclosing Form. Defaults to `true` when the Tabs component is inside a Form, `false` otherwise.
+> [!DEF]  default: **false**
+
+When enabled, all tab panels remain mounted in the DOM even when not active — inactive panels are hidden with `display: none`. This preserves local component state and ongoing operations in inactive tabs. Defaults to `false`.
+
+By default, `Tabs` mounts only the active tab item; inactive tab item content is unmounted. Set `keepMounted` to `true` to keep every tab item mounted and hide inactive panels instead. This preserves local component state and ongoing operations in inactive tabs.
+
+```xmlui-pg copy display name="Example: keepMounted" /keepMounted/ height="260px"
+<App>
+  <Tabs keepMounted="true">
+    <TabItem label="Draft">
+      <TextBox placeholder="This value stays mounted while hidden" />
+    </TabItem>
+    <TabItem label="Preview">
+      <Text>Switch back to Draft; the input component was hidden, not unmounted.</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+> [!INFO] `TabsForm` opts into this mode for its generated inner `Tabs` so fields in inactive form tabs remain registered.
 
 ### `orientation` [#orientation]
 
@@ -290,6 +311,7 @@ This event is triggered when value of Tabs has changed.
 - `newValue`: The new value of the component.
 
 The event handler gets these parameters, which refer to the active tab after the change:
+
 - `index`: The active tab index
 - `id`: The identifier of the active tab (if not defined, the framework provides an auto-generated id)
 - `label`: The label of the active tab
@@ -297,7 +319,7 @@ The event handler gets these parameters, which refer to the active tab after the
 ```xmlui-pg copy display name="Example: didChange" /onDidChange/ height="200px"
 <App var.lastTab="(none)">
   <Tabs onDidChange="
-    (newIndex, id, label) => 
+    (newIndex, id, label) =>
       lastTab = newIndex + ': ' + label + ' (' + id + ')'
     ">
     <TabItem id="account" label="Account">
