@@ -1667,6 +1667,90 @@ test.describe("Basic Functionality", () => {
       await expect(cityInput.field).toHaveValue("New city");
     });
 
+    test("isDirty and setDirty APIs expose and control dirty state", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Form id="testForm" hideButtonRowUntilDirty="true" data="{{ name: 'Initial' }}">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+          </Form>
+          <Button testId="read" onClick="testState = testForm.isDirty()">read</Button>
+          <Button testId="setDirty" onClick="testForm.setDirty(true)">set dirty</Button>
+          <Button testId="setClean" onClick="testForm.setDirty(false)">set clean</Button>
+        </Fragment>
+      `);
+
+      await page.getByTestId("read").click();
+      await expect.poll(testStateDriver.testState).toEqual(false);
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      await page.getByTestId("setDirty").click();
+      await page.getByTestId("read").click();
+      await expect.poll(testStateDriver.testState).toEqual(true);
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+
+      await page.getByTestId("setClean").click();
+      await page.getByTestId("read").click();
+      await expect.poll(testStateDriver.testState).toEqual(false);
+      await expect(page.getByRole("button", { name: "Save" })).not.toBeVisible();
+
+      const nameItem = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameItem.input);
+      await nameInput.field.fill("Changed");
+      await page.getByTestId("read").click();
+      await expect.poll(testStateDriver.testState).toEqual(true);
+      await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+    });
+
+    test("dirtyChanged event fires when dirty state changes", async ({
+      initTestBed,
+      page,
+      createFormItemDriver,
+      createTextBoxDriver,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment var.events="{[]}">
+          <Form
+            id="testForm"
+            data="{{ name: 'Initial' }}"
+            onDirtyChanged="(dirty) => { events.push(dirty); testState = events; }">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+          </Form>
+          <Button testId="read" onClick="testState = events">read</Button>
+          <Button testId="setDirty" onClick="testForm.setDirty(true)">set dirty</Button>
+          <Button testId="setClean" onClick="testForm.setDirty(false)">set clean</Button>
+          <Button testId="reset" onClick="testForm.reset()">reset</Button>
+        </Fragment>
+      `);
+
+      await page.getByTestId("read").click();
+      await expect.poll(testStateDriver.testState).toEqual([]);
+
+      const nameItem = await createFormItemDriver("nameField");
+      const nameInput = await createTextBoxDriver(nameItem.input);
+      await nameInput.field.fill("Changed");
+      await expect.poll(testStateDriver.testState).toEqual([true]);
+
+      await page.getByTestId("setDirty").click();
+      await expect.poll(testStateDriver.testState).toEqual([true]);
+
+      await page.getByTestId("setClean").click();
+      await expect.poll(testStateDriver.testState).toEqual([true, false]);
+
+      await page.getByTestId("setClean").click();
+      await expect.poll(testStateDriver.testState).toEqual([true, false]);
+
+      await nameInput.field.fill("Changed again");
+      await expect.poll(testStateDriver.testState).toEqual([true, false, true]);
+
+      await page.getByTestId("reset").click();
+      await expect.poll(testStateDriver.testState).toEqual([true, false, true, false]);
+    });
+
     test("validate method returns validation results without submitting", async ({
       initTestBed,
       page,
@@ -3222,6 +3306,21 @@ test("cancel button is rendered with cancelLabel", async ({ initTestBed, createF
   await expect(driver.submitButton).toHaveText("Save");
 });
 
+test("cancel button is hidden when cancelButtonVisible is false", async ({
+  page,
+  initTestBed,
+}) => {
+  await initTestBed(`
+      <Form testId="form" cancelButtonVisible="false">
+        <FormItem label="Name" bindTo="name" />
+        <FormItem label="Email" bindTo="email" />
+      </Form>
+    `);
+
+  await expect(page.getByRole("button", { name: "Cancel" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+});
+
 test("save button is rendered with saveLabel", async ({ initTestBed, createFormDriver }) => {
   await initTestBed(`
       <Form testId="form" saveLabel="Submit">
@@ -3710,6 +3809,15 @@ test.describe("Behaviors and Parts", () => {
     initTestBed,
   }) => {
     await initTestBed(`<Form testId="test" cancelLabel="" />`);
+    const cancelButton = page.locator("[data-part-id='cancelButton']");
+    await expect(cancelButton).not.toBeVisible();
+  });
+
+  test("cancelButton part is not present when cancelButtonVisible is false", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`<Form testId="test" cancelButtonVisible="false" />`);
     const cancelButton = page.locator("[data-part-id='cancelButton']");
     await expect(cancelButton).not.toBeVisible();
   });

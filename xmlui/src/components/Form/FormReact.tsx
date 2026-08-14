@@ -32,6 +32,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import {
   backendValidationArrived,
   FormActionKind,
+  formSetDirty,
   formSubmitted,
   formSubmitting,
   triedToSubmit,
@@ -134,6 +135,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {
       set(state.subject, uid, action.payload.value);
+      state.isDirty = true;
       state.interactionFlags[uid].isDirty = true;
       state.interactionFlags[uid].forceShowValidationResult = false;
       break;
@@ -194,6 +196,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.SUBMITTED: {
+      state.isDirty = false;
       state.submitInProgress = false;
       state.generalValidationResults = [];
       state.interactionFlags = {};
@@ -250,6 +253,16 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
         resetVersion: (state.resetVersion ?? 0) + 1,
       };
     }
+    case FormActionKind.SET_DIRTY: {
+      state.isDirty = action.payload.dirty === true;
+      if (!state.isDirty) {
+        Object.keys(state.interactionFlags).forEach((key) => {
+          state.interactionFlags[key].isDirty = false;
+          state.interactionFlags[key].afterFirstDirtyBlur = false;
+        });
+      }
+      break;
+    }
     default:
       break;
   }
@@ -257,6 +270,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
 
 interface FormState {
   subject: any;
+  isDirty: boolean;
   validationResults: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
@@ -268,6 +282,7 @@ interface FormState {
 
 const initialState: FormState = {
   subject: {},
+  isDirty: false,
   validationResults: {},
   generalValidationResults: [],
   interactionFlags: {},
@@ -285,6 +300,7 @@ type OnWillSubmit = (data: Record<string, any> | undefined, allData: Record<stri
 type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
+type OnDirtyChanged = (dirty: boolean) => void | Promise<void>;
 type Props = {
   formState: FormState;
   dispatch: Dispatch<ContainerAction | FormAction>;
@@ -296,6 +312,7 @@ type Props = {
   classes?: Record<string, string>;
   enabled?: boolean;
   cancelLabel?: string;
+  cancelButtonVisible?: boolean;
   saveLabel?: string;
   saveInProgressLabel?: string;
   savePendingLabel?: string;
@@ -308,6 +325,7 @@ type Props = {
   onCancel?: OnCancel;
   onReset?: OnReset;
   onSuccess?: OnSuccess;
+  onDirtyChanged?: OnDirtyChanged;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -393,6 +411,7 @@ const Form = memo(forwardRef(function (
     classes,
     enabled = true,
     cancelLabel,
+    cancelButtonVisible = defaultProps.cancelButtonVisible,
     saveLabel,
     saveInProgressLabel,
     savePendingLabel,
@@ -404,6 +423,7 @@ const Form = memo(forwardRef(function (
     onCancel,
     onReset,
     onSuccess,
+    onDirtyChanged,
     buttonRow,
     id,
     registerComponentApi,
@@ -452,7 +472,7 @@ const Form = memo(forwardRef(function (
   // recreated on every new submit attempt by `doSubmit`.
   const submitAbortRef = useRef<AbortController | null>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
-  const requestModalFormClose = useModalFormClose();
+  const { requestClose: requestModalFormClose, setDirty: setModalFormDirty } = useModalFormClose();
 
   // Check if any field has async validation in-flight (partial=true).
   // The Save button is disabled while this is true.
@@ -487,13 +507,17 @@ const Form = memo(forwardRef(function (
 
   const isEnabled = enabled && !formState.submitInProgress;
   const isDirty = useMemo(() => {
+    if (formState.isDirty) {
+      return true;
+    }
     return Object.entries(formState.interactionFlags).some(([key, flags]) => {
       if (flags.isDirty) {
         return true;
       }
       return false;
     });
-  }, [formState.interactionFlags]);
+  }, [formState.interactionFlags, formState.isDirty]);
+  const prevDirtyRef = useRef(isDirty);
 
   const formContextValue = useMemo(() => {
     return {
@@ -811,6 +835,7 @@ const Form = memo(forwardRef(function (
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
+        setModalFormDirty(false);
         void requestModalFormClose();
       }
       if (dataAfterSubmit === "reset") {
@@ -960,13 +985,20 @@ const Form = memo(forwardRef(function (
         clear,
       },
     });
+    setModalFormDirty(false);
     onReset?.();
+  });
+
+  const setDirty = useEvent((dirty: boolean) => {
+    setModalFormDirty(dirty === true);
+    dispatch(formSetDirty(dirty));
   });
 
   const updateData = useEvent((change: any) => {
     if (typeof change !== "object" || change === null || change === undefined) {
       return;
     }
+    setModalFormDirty(true);
     Object.entries(change).forEach(([key, value]) => {
       dispatch({
         type: FormActionKind.FIELD_VALUE_CHANGED,
@@ -979,7 +1011,7 @@ const Form = memo(forwardRef(function (
   });
 
   const cancelButton =
-    resolvedCancelLabel === "" ? null : (
+    !cancelButtonVisible || resolvedCancelLabel === "" ? null : (
       <Part partId={PART_CANCEL_BUTTON} key={PART_CANCEL_BUTTON}>
         <Button
           key="cancel"
@@ -1029,6 +1061,14 @@ const Form = memo(forwardRef(function (
     return isDirty;
   }, [isDirty]);
 
+  useEffect(() => {
+    setModalFormDirty(isDirty);
+    if (prevDirtyRef.current !== isDirty) {
+      prevDirtyRef.current = isDirty;
+      void onDirtyChanged?.(isDirty);
+    }
+  }, [isDirty, onDirtyChanged, setModalFormDirty]);
+
   // Load persisted form data on mount when persist is enabled
   useEffect(() => {
     if (!persistKey) return;
@@ -1068,9 +1108,19 @@ const Form = memo(forwardRef(function (
       validate: doValidate,
       getData,
       isDirty: getIsDirtyFlag,
+      setDirty,
       cancel: doCancelSubmit,
     });
-  }, [doReset, updateData, doValidate, getData, registerComponentApi, getIsDirtyFlag, doCancelSubmit]);
+  }, [
+    doReset,
+    updateData,
+    doValidate,
+    getData,
+    registerComponentApi,
+    getIsDirtyFlag,
+    setDirty,
+    doCancelSubmit,
+  ]);
 
   let safeButtonRow = (
     <>
@@ -1323,6 +1373,7 @@ export const FormWithContextVar = forwardRef(function (
         id={node.uid}
         classes={classes}
         cancelLabel={extractValue(node.props.cancelLabel)}
+        cancelButtonVisible={extractValue.asOptionalBoolean(node.props.cancelButtonVisible)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
         savePendingLabel={extractValue(node.props.savePendingLabel)}
@@ -1362,6 +1413,11 @@ export const FormWithContextVar = forwardRef(function (
           },
         })}
         onSuccess={lookupEventHandler("success", {
+          context: {
+            $data,
+          },
+        })}
+        onDirtyChanged={lookupEventHandler("dirtyChanged", {
           context: {
             $data,
           },

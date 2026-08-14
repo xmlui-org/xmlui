@@ -4,14 +4,14 @@
 
 **Key features:**
 - **Data binding**: Use `bindTo` to automatically display object properties
-- **Typed display**: Use `type` for common table-cell formatting such as email links, dates, numbers, currency, enum labels, and JSON
+- **Typed cells**: Use `type` for common table-cell formatting such as email links, dates, numbers, currency, enum labels, JSON, and interactive checkbox, switch, or color cells
 - **Component embedding**: Place any component inside `Column`: `Button`, `Text`, `Icon`, etc.
 - **Interactive behavior**: Enable/disable sorting and column resizing
 - **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
 - **Column pinning**: Pin columns to left or right edges for sticky behavior
 
-`Column` can bind a field, display that field with a type hint, or render completely custom child markup.
-The `type` property is display-oriented; it does not validate or convert the underlying data.
+`Column` can bind a field, display that field with a type hint, render an interactive typed control, or render completely custom child markup.
+The `type` property does not validate or convert the underlying data.
 When you place child components inside a `Column`, that custom content overrides `type` rendering.
 
 You can pass layout properties to a Column:
@@ -250,6 +250,25 @@ To change the default for all columns in your app, set `columnCanSortDefault` in
 }
 ```
 
+### `enabled` [#enabled]
+
+> [!DEF]  default: **true**
+
+This property controls whether interactive typed cells in the column respond to user events. It is applied to the underlying control for `checkbox`, `switch`, and `color` column types.
+
+Set `enabled="false"` to disable interactive typed cells.
+This property is `true` by default and is applied to the underlying control for `checkbox`, `switch`, and `color` column types.
+
+```xmlui-pg copy display name="Example: disabled interactive columns"
+<Table data="{[
+  { selected: true, enabled: false, accent: '#336699' }
+]}">
+  <Column bindTo="selected" type="checkbox" enabled="false" />
+  <Column bindTo="enabled" type="switch" enabled="false" />
+  <Column bindTo="accent" type="color" enabled="false" />
+</Table>
+```
+
 ### `header` [#header]
 
 This property defines a label for a particular column. If not set, the `bindTo` property value is used for the label.
@@ -322,6 +341,29 @@ This property defines a label for a particular column. If not set, the `bindTo` 
     <Column bindTo="unit" />
   </Table>
 </App>
+```
+
+### `headerHorizontalAlignment` [#headerhorizontalalignment]
+
+This property sets the horizontal alignment of the column header content, including the sort indicator.
+
+Available values: `start`, `center`, `end`
+
+`headerHorizontalAlignment` sets the horizontal alignment of the header content.
+The header text and the sort indicator are aligned together.
+Use `start`, `center`, or `end`.
+
+```xmlui-pg copy display name="Example: header horizontal alignment"
+<Table
+  data="{[
+    { name: 'Apples', quantity: 5 },
+    { name: 'Bananas', quantity: 6 }
+  ]}"
+  alwaysShowSortingIndicator
+>
+  <Column bindTo="name" header="Name" headerHorizontalAlignment="start" />
+  <Column bindTo="quantity" header="Quantity" headerHorizontalAlignment="end" />
+</Table>
 ```
 
 ### `maxWidth` [#maxwidth]
@@ -421,13 +463,86 @@ Scroll the table contents horizontally to see how the pinned columns are display
 </App>
 ```
 
+### `readOnly` [#readonly]
+
+> [!DEF]  default: **false**
+
+This property marks interactive typed cells in the column as read-only. It is applied to the underlying control for `checkbox`, `switch`, and `color` column types.
+
+Set `readOnly` to prevent users from changing interactive typed cells.
+This property is applied to the underlying control for `checkbox`, `switch`, and `color` column types.
+
+```xmlui-pg copy display name="Example: read-only interactive columns"
+<Table data="{[
+  { selected: true, enabled: false, accent: '#336699' }
+]}">
+  <Column bindTo="selected" type="checkbox" readOnly />
+  <Column bindTo="enabled" type="switch" readOnly />
+  <Column bindTo="accent" type="color" readOnly />
+</Table>
+```
+
+### `tooltip` [#tooltip]
+
+This property sets the tooltip text shown when hovering over cells in this column.
+
+Set `tooltip` to show text when users hover over cells in the column.
+The tooltip is evaluated for each cell, so it can use Column context variables such as `$item`, `$row`, `$cell`, `$itemIndex`, `$rowIndex`, and `$colIndex`.
+Use `tooltipOptions` to configure the tooltip position, delay, arrow, and collision behavior.
+Like tooltip behavior options on visual components, `tooltipOptions` accepts either an object or a semicolon-separated string.
+
+```xmlui-pg copy display name="Example: column cell tooltip"
+<Table data="{[
+  { id: 1, name: 'Ada', enabled: true }
+]}">
+  <Column
+    bindTo="name"
+    tooltip="{$item.id + ' - ' + $cell}"
+    tooltipOptions="{{side:'right', delayDuration:0}}"
+  />
+  <Column
+    bindTo="enabled"
+    type="switch"
+    tooltip="Toggle whether the contact is enabled"
+    tooltipOptions="side:bottom; delayDuration:0"
+  />
+</Table>
+```
+
+### `tooltipOptions` [#tooltipoptions]
+
+This property sets options for configuring column cell tooltips, such as delay and position.
+
+Set `tooltipOptions` to configure the tooltip shown for cells in this column.
+The accepted options match the `Tooltip` component: `delayDuration`, `skipDelayDuration`, `defaultOpen`, `showArrow`, `side`, `align`, `sideOffset`, `alignOffset`, and `avoidCollisions`.
+You can provide the options as an object or as a semicolon-separated string.
+
+```xmlui-pg copy display name="Example: column tooltip options"
+<Table data="{[
+  { name: 'Ada', enabled: true }
+]}">
+  <Column
+    bindTo="name"
+    tooltip="Shown on the right"
+    tooltipOptions="{{side:'right', align:'center', delayDuration:0}}"
+  />
+  <Column
+    bindTo="enabled"
+    type="switch"
+    tooltip="Shown below"
+    tooltipOptions="side:bottom; align:start; delayDuration:0"
+  />
+</Table>
+```
+
 ### `type` [#type]
 
-This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common table cell formatting behavior. The type affects display only; it does not validate, convert, or mutate the underlying data. Custom child markup inside the `Column` overrides type rendering.
+This property provides a display hint for the column's cell values. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `checkbox`, `switch`, `color`, `enum`, `image`, or `json` to select common table cell behavior. The type does not validate, convert, or mutate the underlying data. The `checkbox`, `switch`, and `color` types render interactive controls. Custom child markup inside the `Column` overrides type rendering.
 
 `type` tells the table how to display the column's bound values.
 Use it for common display semantics without writing custom cell markup.
-The type affects display only; it does not validate, convert, or mutate the underlying data.
+The type does not validate, convert, or mutate the underlying data.
+The `checkbox`, `switch`, and `color` types render interactive controls and can fire `didChange`.
 If a value cannot be formatted for the selected type, the table falls back to plain text for that cell.
 Use [`Value`](/docs/reference/components/Value) for the same read-only typed display behavior outside tables.
 
@@ -529,7 +644,8 @@ Use `typeOptions` to map raw values to readable labels; visual badges require cu
 | Type | Visual traits | Useful options |
 | --- | --- | --- |
 | `boolean` | Displays `true` or `false`. | None. |
-| `checkbox` | Displays a checkmark for truthy values and an empty cell for falsy values. The cell has checkbox semantics. | None. |
+| `checkbox` | Displays a checkbox control for truthy or falsy values. | None. |
+| `switch` | Displays a switch control for truthy or falsy values. | None. |
 | `yes-no` | Displays `Yes` or `No`. | None. |
 | `enum` | Displays the raw value or a mapped label as plain text. | `typeOptions="{{sent:{label:'Sent'}, draft:'Draft'}}"` or `typeOptions="{{values:{sent:'Sent'}}}"`. |
 | `status` | Displays the raw value or a mapped label as plain text. | Same mapping options as `enum`. |
@@ -538,7 +654,7 @@ Use `typeOptions` to map raw values to readable labels; visual badges require cu
 
 | Type | Visual traits | Useful options |
 | --- | --- | --- |
-| `color` | Displays a color swatch followed by the color text. | None. |
+| `color` | Displays a color picker control. | None. |
 | `tag` | Displays a single value with tag-like styling. | None. |
 | `tags` | Displays arrays as comma-separated values with tag-like styling. Non-array values display as text. | None. |
 | `image` | Displays the cell value as an image URL. | `typeOptions="{{alt:'Thumbnail'}}"` for accessible alt text. |
@@ -751,7 +867,63 @@ Check what happens when you resize table columns:
 
 ## Events [#events]
 
-This component does not have any events.
+### `didChange` [#didchange]
+
+This event is triggered when an interactive typed cell in the column changes its value.
+
+**Signature**: `didChange(newValue: any, row: any, rowIndex: number, columnId: string): void`
+
+- `newValue`: The new cell value.
+- `row`: The row data object associated with the changed cell.
+- `rowIndex`: The zero-based visible row index.
+- `columnId`: The column identifier.
+
+`didChange` runs after an interactive typed cell has accepted a new value.
+The event receives the new value, the row object, the zero-based visible row index, and the column id.
+
+```xmlui-pg copy display name="Example: handling interactive column changes"
+<Fragment var.rows="{[{ selected: false, accent: '#336699' }]}">
+  <Table data="{rows}">
+    <Column
+      bindTo="selected"
+      type="checkbox"
+      onDidChange="(newValue, row) => row.selected = newValue"
+    />
+    <Column
+      bindTo="accent"
+      type="color"
+      onDidChange="(newValue, row) => row.accent = newValue"
+    />
+  </Table>
+</Fragment>
+```
+
+### `willChange` [#willchange]
+
+This event is triggered before an interactive typed cell in the column changes its value. Return explicit false to cancel the change.
+
+**Signature**: `willChange(newValue: any, row: any, rowIndex: number, columnId: string): boolean | void`
+
+- `newValue`: The new cell value.
+- `row`: The row data object associated with the changed cell.
+- `rowIndex`: The zero-based visible row index.
+- `columnId`: The column identifier.
+
+`willChange` runs before an interactive typed cell commits a new value.
+Return explicit `false` to cancel the change. Returning `undefined` or omitting a return value allows the change to continue.
+
+```xmlui-pg copy display name="Example: cancelling an interactive column change"
+<Fragment var.rows="{[{ selected: false }]}">
+  <Table data="{rows}">
+    <Column
+      bindTo="selected"
+      type="checkbox"
+      onWillChange="(newValue) => newValue === true ? false : undefined"
+      onDidChange="(newValue, row) => row.selected = newValue"
+    />
+  </Table>
+</Fragment>
+```
 
 ## Exposed Methods [#exposed-methods]
 

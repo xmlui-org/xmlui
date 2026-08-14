@@ -3,6 +3,7 @@
 `TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, providing both the tab header label and the content that displays when the tab is selected. As a non-visual structural component, it serves as a container that organizes content into distinct, switchable sections.
 
 **Key features:**
+
 - **Label definition**: Provides the clickable tab header text via the label property
 - **Content container**: Wraps any child components that display when the tab is active
 - **Structural organization**: Creates the relationship between tab headers and their corresponding content
@@ -32,7 +33,7 @@ This component supports the following behaviors:
 
 This property allows the customization of the TabItem header.
 
-```xmlui-pg copy {7-9} display name="Example: headerTemplate" /headerTemplate/ height="200px" 
+```xmlui-pg copy {7-9} display name="Example: headerTemplate" /headerTemplate/ height="200px"
 <App>
   <Tabs>
     <TabItem label="Home">
@@ -65,7 +66,7 @@ This event is triggered when the tab is activated.
 
 **Signature**: `activated(): void`
 
-```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px" 
+```xmlui-pg copy display name="Example: activated" /onActivated/ height="200px"
 <App var.activationCount="{0}">
   <Tabs>
     <TabItem label="Account" onActivated="activationCount++">
@@ -79,6 +80,29 @@ This event is triggered when the tab is activated.
     </TabItem>
   </Tabs>
   <Text>The Account tab has been activated {activationCount} times.</Text>
+</App>
+```
+
+### `deactivated` [#deactivated]
+
+This event is triggered when the tab is deactivated.
+
+**Signature**: `deactivated(): void`
+
+```xmlui-pg copy display name="Example: deactivated" /onDeactivated/ height="200px"
+<App var.deactivationCount="{0}">
+  <Tabs>
+    <TabItem label="Account" onDeactivated="deactivationCount++">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  <Text>The Account tab has been deactivated {deactivationCount} times.</Text>
 </App>
 ```
 

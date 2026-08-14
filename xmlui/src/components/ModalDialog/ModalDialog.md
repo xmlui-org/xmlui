@@ -78,6 +78,56 @@ The `ModalDialog` component is also a container such as the [`Card`](/docs/refer
 >[!INFO]
 > When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
 
+### Preventing Accidental Close
+
+Use `setDirty(true)` when dialog content changes. When a dirty dialog is about to close, `ModalDialog` shows a confirmation prompt using `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel`.
+
+When the dialog hosts a `Form`, form field edits automatically count as dialog dirty state. The `dirtyChanged` event fires whenever this combined dirty state changes, so you can update labels, badges, or commands without polling `getDirty()`. If you define `willClose`, that event controls closing instead: returning an explicit `false` prevents the close and skips the dirty confirmation flow.
+
+```xmlui-pg name="Prevent Accidental Close" height="520px"
+---app copy display name="Example: prevent accidental close"
+<App var.dirtyStatus="clean" var.allowGuardedClose="{false}">
+  <HStack gap="$space-2">
+    <Button label="Edit Draft" onClick="draftDialog.open()" />
+    <Button label="Open Guarded Dialog" onClick="guardedDialog.open()" />
+  </HStack>
+
+  <ModalDialog
+    id="draftDialog"
+    title="Edit Draft"
+    canCloseMessage="Discard your unsaved changes?"
+    confirmCloseLabel="Discard"
+    cancelCloseLabel="Keep Editing"
+    onDirtyChanged="(dirty) => dirtyStatus = dirty ? 'dirty' : 'clean'">
+    <Form id="draftForm" data="{{ title: 'Quarterly plan', estimate: 12 }}">
+      <TextBox label="Title" bindTo="title" />
+      <NumberBox label="Estimate" bindTo="estimate" />
+    </Form>
+    <Text>State: {dirtyStatus}</Text>
+    <HStack gap="$space-2">
+      <Button
+        label="Mark Clean"
+        onClick="draftForm.setDirty(false)" />
+      <Button label="Close" onClick="draftDialog.close()" />
+    </HStack>
+  </ModalDialog>
+
+  <ModalDialog
+    id="guardedDialog"
+    title="Guarded Dialog"
+    onWillClose="return allowGuardedClose">
+    <Text>{allowGuardedClose
+      ? 'This dialog can close now.' : 'Close is currently blocked.'}
+    </Text>
+    <Button
+      label="{allowGuardedClose ? 'Block Close' : 'Allow Close'}"
+      onClick="allowGuardedClose = !allowGuardedClose" />
+  </ModalDialog>
+</App>
+---desc
+Edit the draft dialog and then close it to see the confirmation prompt. The guarded dialog uses `willClose`, so it stays open while closing is blocked.
+```
+
 %-DESC-END
 
 %-PROP-START fullScreen
@@ -135,6 +185,24 @@ Use the close button to close the dialog.
 
 %-PROP-END
 
+%-PROP-START canCloseMessage
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-PROP-END
+
+%-PROP-START confirmCloseLabel
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-PROP-END
+
+%-PROP-START cancelCloseLabel
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-PROP-END
+
 %-EVENT-START close
 
 In this example, the `close` event counts how many times you closed the dialog:
@@ -154,6 +222,18 @@ In this example, the `close` event counts how many times you closed the dialog:
 ---desc
 Open and close the dialog several times to test that it changes the counter.
 ```
+
+%-EVENT-END
+
+%-EVENT-START willClose
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-EVENT-END
+
+%-EVENT-START dirtyChanged
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
 
 %-EVENT-END
 
@@ -182,6 +262,18 @@ Open and close the dialog several times to test that it changes the counter.
 %-API-START open
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
+
+%-API-END
+
+%-API-START setDirty
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-API-END
+
+%-API-START getDirty
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
 
 %-API-END
 

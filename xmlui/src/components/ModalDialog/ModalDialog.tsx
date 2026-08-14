@@ -56,6 +56,24 @@ export const ModalDialogMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.closeOnClickAway,
     },
+    canCloseMessage: {
+      description:
+        "The confirmation message shown when the dialog is dirty and the user attempts to close it.",
+      valueType: "string",
+      defaultValue: defaultProps.canCloseMessage,
+    },
+    confirmCloseLabel: {
+      description:
+        "The label of the confirmation dialog button that closes a dirty modal dialog.",
+      valueType: "string",
+      defaultValue: defaultProps.confirmCloseLabel,
+    },
+    cancelCloseLabel: {
+      description:
+        "The label of the confirmation dialog button that keeps a dirty modal dialog open.",
+      valueType: "string",
+      defaultValue: defaultProps.cancelCloseLabel,
+    },
   },
   events: {
     open: {
@@ -75,6 +93,22 @@ export const ModalDialogMd = createMetadata({
       signature: "close(): void",
       parameters: {},
     },
+    willClose: {
+      description:
+        `This event is fired before the \`${COMP}\` closes. Return an explicit ` +
+        `\`false\` value to prevent the dialog from closing. When this event is defined, ` +
+        `dirty-state confirmation is skipped.`,
+      signature: "willClose(): boolean | void",
+      parameters: {},
+    },
+    dirtyChanged: {
+      description:
+        "Fires when the ModalDialog's dirty state changes. The event receives the new dirty state.",
+      signature: "dirtyChanged(dirty: boolean): void",
+      parameters: {
+        dirty: "The new dirty state of the ModalDialog.",
+      },
+    },
   },
   apis: {
     close: {
@@ -92,6 +126,18 @@ export const ModalDialogMd = createMetadata({
       parameters: {
         params: "An arbitrary number of parameters that can be used to pass data to the dialog.",
       },
+    },
+    setDirty: {
+      description:
+        "This method marks the modal dialog as dirty or clean. Dirty dialogs ask for confirmation before closing unless `willClose` is defined.",
+      signature: "setDirty(dirty: boolean): void",
+      parameters: {
+        dirty: "When `true`, the dialog is marked dirty; when `false`, it is marked clean.",
+      },
+    },
+    getDirty: {
+      description: "This method returns whether the modal dialog is currently marked dirty.",
+      signature: "getDirty(): boolean",
     },
   },
   contextVars: {
@@ -142,6 +188,9 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
     "titleTemplate",
     "closeButtonVisible",
     "closeOnClickAway",
+    "canCloseMessage",
+    "confirmCloseLabel",
+    "cancelCloseLabel",
     "externalAnimation",
   ],
   events: [],
@@ -156,6 +205,7 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
       lookupEventHandler,
       registerComponentApi,
       layoutContext,
+      appContext,
     },
   ) {
     // --- If the ModalDialog is not inside a ModalDialogFrame, wrap it in one.
@@ -193,9 +243,15 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
         titleTemplate={renderChild(node.props?.titleTemplate)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
         closeOnClickAway={extractValue.asOptionalBoolean(node.props.closeOnClickAway)}
+        canCloseMessage={extractValue.asOptionalString(node.props.canCloseMessage)}
+        confirmCloseLabel={extractValue.asOptionalString(node.props.confirmCloseLabel)}
+        cancelCloseLabel={extractValue.asOptionalString(node.props.cancelCloseLabel)}
         externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
         onClose={lookupEventHandler("close")}
+        onWillClose={lookupEventHandler("willClose")}
         onOpen={lookupEventHandler("open")}
+        onDirtyChanged={lookupEventHandler("dirtyChanged")}
+        confirm={appContext.confirm}
       >
         {renderChild(node.children, { type: "Stack" })}
       </ModalDialog>

@@ -79,6 +79,14 @@ This property defines the text to display for the option. If `label` is not defi
 </App>
 ```
 
+### `tooltip` [#tooltip]
+
+This property sets the tooltip text shown when hovering over this option.
+
+### `tooltipOptions` [#tooltipoptions]
+
+This property sets options for configuring this option's tooltip, such as delay and position.
+
 ### `value` [#value]
 
 This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value. If neither is defined, the option is not displayed.

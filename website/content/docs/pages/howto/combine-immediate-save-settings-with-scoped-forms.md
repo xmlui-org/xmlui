@@ -169,10 +169,10 @@ The first Weekly digest change intentionally fails so the example can demonstrat
 
 ## Reconcile external changes
 
-Save boundaries solve only one part of the problem. A polling result, subscription event, or another user's update can arrive while a Form is open. Route each incoming snapshot through one reconciliation function: pristine Forms adopt it; dirty Forms keep the user's draft and disclose that a newer server value is available.
+Save boundaries solve only one part of the problem. A polling result, subscription event, or another user's update can arrive while a Form is open. Track the Form's dirty state with `dirtyChanged`, then route each incoming snapshot through one reconciliation function: pristine Forms adopt it; dirty Forms keep the user's draft and disclose that a newer server value is available.
 
 ```xmlui-pg copy display name="Reconcile external changes with a scoped Form" id="reconcile-external-changes-with-a-scoped-form" height="640px"
-<App var.latestDelivery="{null}" var.deliveryChangedElsewhere="{false}">
+<App var.latestDelivery="{null}" var.deliveryChangedElsewhere="{false}" var.deliveryDirty="{false}">
   <script>
     function deliverySection(snapshot) {
       return {
@@ -186,7 +186,7 @@ Save boundaries solve only one part of the problem. A polling result, subscripti
     function receiveDeliverySnapshot(snapshot) {
       const incoming = deliverySection(snapshot);
 
-      if (deliveryForm.isDirty()) {
+      if (deliveryDirty) {
         latestDelivery = incoming;
         deliveryChangedElsewhere = true;
       } else {
@@ -237,6 +237,7 @@ Save boundaries solve only one part of the problem. A polling result, subscripti
         latestDelivery = null;
         deliveryChangedElsewhere = false;
       }"
+      onDirtyChanged="(dirty) => deliveryDirty = dirty"
       errorNotificationMessage="Could not save delivery settings."
       hideButtonRowUntilDirty="true"
       cancelLabel=""
@@ -293,6 +294,8 @@ Try the external update first with a pristine Form, then edit the sender name an
 ```
 
 **Use one reconciliation entry point**: The external update's actual response is passed to `receiveDeliverySnapshot()`. Its subsequent `settings.refetch()` updates the server-value caption; it does not reconcile the Form. In production, polling and subscription handlers should pass their snapshots through the same function.
+
+**Track dirty transitions with `dirtyChanged`**: The Form updates `deliveryDirty` whenever the user edits the draft, saves successfully, resets, or when code calls `setDirty()`. The reconciliation function can then use that state directly when an external snapshot arrives.
 
 **Preserve dirty drafts rather than overwriting them**: A pristine Form adopts an incoming canonical section immediately with `reset(data)`. A dirty Form retains its visible draft, remembers the newest section, displays **Settings changed elsewhere**, and offers **Reload server values**. Reload is an explicit discard that installs the remembered section as the new pristine baseline.
 

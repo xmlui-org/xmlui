@@ -32,6 +32,11 @@ export const TabsFormMd = createMetadata({
       valueType: "string",
       defaultValue: formDefaultProps.cancelLabel,
     },
+    cancelButtonVisible: {
+      description: "Shows (`true`) or hides (`false`) the Cancel button in the form's button row.",
+      valueType: "boolean",
+      defaultValue: formDefaultProps.cancelButtonVisible,
+    },
     saveInProgressLabel: {
       description: "Label shown on the Save button while the form is submitting.",
       valueType: "string",
@@ -287,6 +292,7 @@ const FORWARDED_FORM_PROPS = [
   "_data_url",
   "saveLabel",
   "cancelLabel",
+  "cancelButtonVisible",
   "saveInProgressLabel",
   "swapCancelAndSave",
   "hideButtonRow",

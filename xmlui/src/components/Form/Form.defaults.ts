@@ -1,5 +1,6 @@
 export const defaultProps = {
   cancelLabel: "Cancel",
+  cancelButtonVisible: true,
   saveLabel: "Save",
   saveInProgressLabel: "Saving...",
   savePendingLabel: "Validating...",

@@ -80,6 +80,56 @@ The `ModalDialog` component is also a container such as the [`Card`](/docs/refer
 >[!INFO]
 > When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
 
+### Preventing Accidental Close [#preventing-accidental-close]
+
+Use `setDirty(true)` when dialog content changes. When a dirty dialog is about to close, `ModalDialog` shows a confirmation prompt using `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel`.
+
+When the dialog hosts a `Form`, form field edits automatically count as dialog dirty state. The `dirtyChanged` event fires whenever this combined dirty state changes, so you can update labels, badges, or commands without polling `getDirty()`. If you define `willClose`, that event controls closing instead: returning an explicit `false` prevents the close and skips the dirty confirmation flow.
+
+```xmlui-pg name="Prevent Accidental Close" height="520px"
+---app copy display name="Example: prevent accidental close"
+<App var.dirtyStatus="clean" var.allowGuardedClose="{false}">
+  <HStack gap="$space-2">
+    <Button label="Edit Draft" onClick="draftDialog.open()" />
+    <Button label="Open Guarded Dialog" onClick="guardedDialog.open()" />
+  </HStack>
+
+  <ModalDialog
+    id="draftDialog"
+    title="Edit Draft"
+    canCloseMessage="Discard your unsaved changes?"
+    confirmCloseLabel="Discard"
+    cancelCloseLabel="Keep Editing"
+    onDirtyChanged="(dirty) => dirtyStatus = dirty ? 'dirty' : 'clean'">
+    <Form id="draftForm" data="{{ title: 'Quarterly plan', estimate: 12 }}">
+      <TextBox label="Title" bindTo="title" />
+      <NumberBox label="Estimate" bindTo="estimate" />
+    </Form>
+    <Text>State: {dirtyStatus}</Text>
+    <HStack gap="$space-2">
+      <Button
+        label="Mark Clean"
+        onClick="draftForm.setDirty(false)" />
+      <Button label="Close" onClick="draftDialog.close()" />
+    </HStack>
+  </ModalDialog>
+
+  <ModalDialog
+    id="guardedDialog"
+    title="Guarded Dialog"
+    onWillClose="return allowGuardedClose">
+    <Text>{allowGuardedClose
+      ? 'This dialog can close now.' : 'Close is currently blocked.'}
+    </Text>
+    <Button
+      label="{allowGuardedClose ? 'Block Close' : 'Allow Close'}"
+      onClick="allowGuardedClose = !allowGuardedClose" />
+  </ModalDialog>
+</App>
+---desc
+Edit the draft dialog and then close it to see the confirmation prompt. The guarded dialog uses `willClose`, so it stays open while closing is blocked.
+```
+
 **Context variables available during execution:**
 
 - `$param`: First parameter passed to the `open()` method
@@ -99,6 +149,22 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `cancelCloseLabel` [#cancelcloselabel]
+
+> [!DEF]  default: **"Cancel"**
+
+The label of the confirmation dialog button that keeps a dirty modal dialog open.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+### `canCloseMessage` [#canclosemessage]
+
+> [!DEF]  default: **"You have unsaved changes. Are you sure you want to close this dialog?"**
+
+The confirmation message shown when the dialog is dirty and the user attempts to close it.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
 ### `closeButtonVisible` [#closebuttonvisible]
 
 > [!DEF]  default: **true**
@@ -114,6 +180,32 @@ Shows (`true`) or hides (`false`) the visibility of the close button on the dial
 ---desc
 Click outside the dialog to close it.
 ```
+
+### `closeOnClickAway` [#closeonclickaway]
+
+> [!DEF]  default: **true**
+
+When `true`, clicking outside the dialog closes it.
+
+```xmlui-pg name="Close on Click Away" height="220px"
+---app copy display name="Example: closeOnClickAway"
+<App>
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog id="dialog" closeOnClickAway="false" title="Example Dialog">
+    <Text>Clicking outside leaves this dialog open.</Text>
+  </ModalDialog>
+</App>
+---desc
+Use the close button to close the dialog.
+```
+
+### `confirmCloseLabel` [#confirmcloselabel]
+
+> [!DEF]  default: **"Close"**
+
+The label of the confirmation dialog button that closes a dirty modal dialog.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
 
 ### `fullScreen` [#fullscreen]
 
@@ -172,6 +264,16 @@ In this example, the `close` event counts how many times you closed the dialog:
 Open and close the dialog several times to test that it changes the counter.
 ```
 
+### `dirtyChanged` [#dirtychanged]
+
+Fires when the ModalDialog's dirty state changes. The event receives the new dirty state.
+
+**Signature**: `dirtyChanged(dirty: boolean): void`
+
+- `dirty`: The new dirty state of the ModalDialog.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
 ### `open` [#open]
 
 This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).
@@ -198,6 +300,14 @@ In this example, the `open` event counts how many times you opened the dialog:
 Open and close the dialog several times to test that it changes the counter.
 ```
 
+### `willClose` [#willclose]
+
+This event is fired before the `ModalDialog` closes. Return an explicit `false` value to prevent the dialog from closing. When this event is defined, dirty-state confirmation is skipped.
+
+**Signature**: `willClose(): boolean | void`
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `close` [#close]
@@ -208,6 +318,14 @@ This method is used to close the `ModalDialog`. Invoke it using `modalId.close()
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
+### `getDirty` [#getdirty]
+
+This method returns whether the modal dialog is currently marked dirty.
+
+**Signature**: `getDirty(): boolean`
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
 ### `open` [#open]
 
 This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$param` and `$params` context values.
@@ -217,6 +335,16 @@ This method imperatively opens the modal dialog. You can pass an arbitrary numbe
 - `params`: An arbitrary number of parameters that can be used to pass data to the dialog.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
+
+### `setDirty` [#setdirty]
+
+This method marks the modal dialog as dirty or clean. Dirty dialogs ask for confirmation before closing unless `willClose` is defined.
+
+**Signature**: `setDirty(dirty: boolean): void`
+
+- `dirty`: When `true`, the dialog is marked dirty; when `false`, it is marked clean.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
 
 ## Parts [#parts]
 

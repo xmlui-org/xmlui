@@ -336,6 +336,34 @@ Use the `markNodeUnloaded` API method to mark a node as unloaded. The next time 
 </App>
 ```
 
+### Saving and Restoring Tree State [#saving-and-restoring-tree-state]
+
+Use `getTreeState` to read a JSON-friendly object keyed by source node IDs. The object also includes `scrollPosition`, the tree's current vertical scroll offset. Pass that object to `setTreeState` after remounting, or to `initialTreeState` so matching nodes and the scroll position are restored as the tree data becomes available. State entries for missing node IDs are ignored.
+
+```xmlui-pg display copy height="220px" /getTreeState/ name="Example: Save and restore state"
+<App var.savedState="{null}">
+  <Tree
+    id="tree"
+    testId="tree"
+    initialTreeState="{savedState}"
+    data='{[
+      { id: 1, name: "Root", parentId: null },
+      { id: 2, name: "Child A", parentId: 1 },
+      { id: 3, name: "Child B", parentId: 1 },
+      { id: 4, name: "Child C", parentId: 1 },
+      { id: 5, name: "Child D", parentId: 1 },
+      { id: 6, name: "Child E", parentId: 1 },
+      { id: 7, name: "Child F", parentId: 1 },
+      { id: 8, name: "Child G", parentId: 1 },
+    ]}'>
+  </Tree>
+  <HStack>
+    <Button onClick="savedState = tree.getTreeState()">Save State</Button>
+    <Button onClick="tree.setTreeState(savedState)">Restore State</Button>
+  </HStack>
+</App>
+```
+
 ### Auto-Reload After Time [#auto-reload-after-time]
 
 Set `autoLoadAfter` to automatically reload children after a specified time when a node is collapsed and re-expanded.
@@ -607,6 +635,10 @@ The size of the expand/collapse icons (default: "16").
 
 The property name in source data for unique identifiers.
 
+### `initialTreeState` [#initialtreestate]
+
+Initial tree state. Per-node state is keyed by source node ID and scrollPosition stores the vertical scroll offset. The state is applied as matching nodes become available; unknown node IDs are ignored.
+
 ### `itemClickExpands` [#itemclickexpands]
 
 > [!DEF]  default: **false**
@@ -853,6 +885,12 @@ Get the loading state of a dynamic node.
 
 - `nodeId`: The ID of the node to check loading state for
 
+### `getTreeState` [#gettreestate]
+
+Get tree state, including per-node expansion, loading, selection, timing state, and scrollPosition.
+
+**Signature**: `getTreeState(): TreeState`
+
 ### `insertNodeAfter` [#insertnodeafter]
 
 Insert a new node after an existing node at the same level.
@@ -983,6 +1021,14 @@ Replace a node's properties with new data using merge semantics. Properties not 
 </App>
 ```
 
+### `setTreeState` [#settreestate]
+
+Apply tree state, including per-node state keyed by source node ID and scrollPosition. Node IDs that are not present in the tree are ignored.
+
+**Signature**: `setTreeState(treeState: TreeState): void`
+
+- `treeState`: The tree state object, including per-node state keyed by source node ID and optional scrollPosition.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
@@ -992,6 +1038,7 @@ Replace a node's properties with new data using merge semantics. Properties not 
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--hover | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--selected | $color-primary-50 | $color-primary-50 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Tree-row--focus | $color-primary-500 | $color-primary-500 |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Tree-row | 4px | 4px |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Tree--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Tree--focus | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Tree--focus | $outlineStyle--focus | $outlineStyle--focus |

@@ -117,6 +117,36 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(page.getByRole("option")).toHaveCount(2);
   });
+
+  test("prioritizes normalized exact title matches from beyond the display limit", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<Search mode="inline" data="{searchData}" />`, {
+      extensionIds: "xmlui-search",
+      mainXs: `
+        var searchData = [
+          { path: '#guide-0', title: 'Modal Dialog guide 0', content: 'Article about modal dialog patterns' },
+          { path: '#guide-1', title: 'Modal Dialog guide 1', content: 'Article about modal dialog patterns' },
+          { path: '#guide-2', title: 'Modal Dialog guide 2', content: 'Article about modal dialog patterns' },
+          { path: '#guide-3', title: 'Modal Dialog guide 3', content: 'Article about modal dialog patterns' },
+          { path: '#guide-4', title: 'Modal Dialog guide 4', content: 'Article about modal dialog patterns' },
+          { path: '#guide-5', title: 'Modal Dialog guide 5', content: 'Article about modal dialog patterns' },
+          { path: '#guide-6', title: 'Modal Dialog guide 6', content: 'Article about modal dialog patterns' },
+          { path: '#guide-7', title: 'Modal Dialog guide 7', content: 'Article about modal dialog patterns' },
+          { path: '#guide-8', title: 'Modal Dialog guide 8', content: 'Article about modal dialog patterns' },
+          { path: '#guide-9', title: 'Modal Dialog guide 9', content: 'Article about modal dialog patterns' },
+          { path: '#guide-10', title: 'Modal Dialog guide 10', content: 'Article about modal dialog patterns' },
+          { path: '#modal-dialog', title: 'ModalDialog', content: 'Modal dialog reference documentation for ModalDialog' },
+        ];
+      `,
+    });
+
+    await page.getByRole("searchbox").fill("Modal Dialog");
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await expect(page.getByRole("option")).toHaveCount(10);
+    await expect(page.getByRole("option").first()).toContainText("ModalDialog");
+  });
 });
 
 // =============================================================================

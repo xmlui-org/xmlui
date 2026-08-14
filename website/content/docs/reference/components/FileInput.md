@@ -43,7 +43,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 ### `buttonIcon` [#buttonicon]
 
-The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the "icon.browse:FileInput" declaration in the app configuration file.
+The ID of the icon to display in the button. No icon is displayed by default.
 
 ```xmlui-pg copy display name="Example: buttonIcon"
 <App>

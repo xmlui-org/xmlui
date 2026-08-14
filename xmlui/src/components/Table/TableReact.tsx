@@ -666,6 +666,8 @@ type TypedColumnCellProps = {
   readOnlyResolver?: TypedCellBooleanResolver;
   enabled?: boolean;
   enabledResolver?: TypedCellBooleanResolver;
+  onValueChange?: (newValue: boolean | string) => void;
+  onValueChanged?: () => void;
   onWillChange?: AsyncFunction;
   onDidChange?: AsyncFunction;
 };
@@ -682,6 +684,8 @@ function TypedColumnCell({
   readOnlyResolver,
   enabled,
   enabledResolver,
+  onValueChange,
+  onValueChanged,
   onWillChange,
   onDidChange,
 }: TypedColumnCellProps) {
@@ -697,10 +701,12 @@ function TypedColumnCell({
       if (shouldChange === false) {
         return;
       }
+      onValueChange?.(newValue);
       setLocalValue(newValue);
       onDidChange?.(newValue, row, rowIndex, columnId, value);
+      onValueChanged?.();
     },
-    [columnId, onDidChange, onWillChange, row, rowIndex, value],
+    [columnId, onDidChange, onValueChange, onValueChanged, onWillChange, row, rowIndex, value],
   );
 
   if (!INTERACTIVE_COLUMN_TYPES.has(valueType.name)) {
@@ -1471,6 +1477,13 @@ export const Table = memo(
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
     }, [rowsSelectable, columnsWithCustomCell, hideSelectionCheckboxes, selectColumn]);
 
+    const columnRenderVersionRef = useRef(0);
+    const prevColumnsWithSelectColumnRef = useRef(columnsWithSelectColumn);
+    if (prevColumnsWithSelectColumnRef.current !== columnsWithSelectColumn) {
+      prevColumnsWithSelectColumnRef.current = columnsWithSelectColumn;
+      columnRenderVersionRef.current++;
+    }
+
     // --- Set up page information (using the first page size option)
     const [pagination, setPagination] = useState<PaginationState>({
       pageSize: effectiveIsPaginated ? effectivePageSize : Number.MAX_VALUE,
@@ -1792,6 +1805,7 @@ export const Table = memo(
     const firstRowRef = useRef<HTMLTableRowElement>(null);
 
     const hasData = safeData.length !== 0;
+    const [typedCellRevision, setTypedCellRevision] = useState(0);
 
     // Use a ref to avoid recreating VirtualTableRow when rows change
     const rowsRef = useRef(rows);
@@ -1805,6 +1819,8 @@ export const Table = memo(
     // ResizeObserver. If VirtualTableRow identity changes (useMemo recreates it),
     // React remounts all <tr> elements, but the effect doesn't re-run (index is the
     // same), so the new DOM nodes are never observed → rows stay visibility:hidden.
+    const rowRenderVersion =
+      renderVersion + layoutVersion + typedCellRevision + columnRenderVersionRef.current;
     const rowState = {
       focusedIndex,
       rowDisabledPredicate,
@@ -1816,7 +1832,7 @@ export const Table = memo(
       lookupEventHandler,
       rowDoubleClick,
       striped,
-      renderVersion: renderVersion + layoutVersion,
+      renderVersion: rowRenderVersion,
     };
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
@@ -1888,6 +1904,22 @@ export const Table = memo(
                 const rowSourceIndex =
                   typeof row.original.order === "number" ? row.original.order - 1 : rowIndex;
                 const sourceRow = safeDataRef.current[rowSourceIndex] ?? row.original;
+                const cachedCellValue = cell?.getValue();
+                const liveCellValue =
+                  cellColumnId &&
+                  sourceRow &&
+                  typeof sourceRow === "object" &&
+                  cellColumnId in sourceRow
+                    ? sourceRow[cellColumnId]
+                    : cachedCellValue;
+                const updateTypedCellValue = (newValue: boolean | string) => {
+                  if (cellColumnId) {
+                    row.original[cellColumnId] = newValue;
+                    if (sourceRow && typeof sourceRow === "object") {
+                      sourceRow[cellColumnId] = newValue;
+                    }
+                  }
+                };
                 const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
                 const cellContentStyle: React.CSSProperties = {
                   userSelect: userSelectCell as React.CSSProperties["userSelect"],
@@ -1916,10 +1948,10 @@ export const Table = memo(
                 const cellContent = (
                   <div className={styles.cellContent} style={cellContentStyle}>
                     {cellRenderer ? (
-                      cellRenderer(row.original, rowIndex, i, cell?.getValue())
+                      cellRenderer(row.original, rowIndex, i, liveCellValue)
                     ) : columnType ? (
                       <TypedColumnCell
-                        value={cell?.getValue()}
+                        value={liveCellValue}
                         valueType={columnType}
                         localeProfile={currentLocaleProfile}
                         row={sourceRow}
@@ -1930,6 +1962,8 @@ export const Table = memo(
                         readOnlyResolver={readOnlyResolver}
                         enabled={enabled}
                         enabledResolver={enabledResolver}
+                        onValueChange={updateTypedCellValue}
+                        onValueChanged={() => setTypedCellRevision((revision) => revision + 1)}
                         onWillChange={willChange}
                         onDidChange={didChange}
                       />
@@ -1938,7 +1972,7 @@ export const Table = memo(
                     )}
                   </div>
                 );
-                const tooltipTemplate = tooltipRenderer?.(sourceRow, rowIndex, i, cell?.getValue());
+                const tooltipTemplate = tooltipRenderer?.(sourceRow, rowIndex, i, liveCellValue);
                 return (
                   <td
                     className={classnames(styles.cell, alignmentClass, columnClassName)}
@@ -2502,7 +2536,7 @@ export const Table = memo(
               itemSize={rowHeight}
             >
               {rows.map((row) => (
-                <tr key={row.id} />
+                <tr key={row.id} data-render-version={rowRenderVersion} />
               ))}
             </Virtualizer>
           )}

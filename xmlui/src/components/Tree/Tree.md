@@ -334,6 +334,34 @@ Use the `markNodeUnloaded` API method to mark a node as unloaded. The next time 
 </App>
 ```
 
+### Saving and Restoring Tree State
+
+Use `getTreeState` to read a JSON-friendly object keyed by source node IDs. The object also includes `scrollPosition`, the tree's current vertical scroll offset. Pass that object to `setTreeState` after remounting, or to `initialTreeState` so matching nodes and the scroll position are restored as the tree data becomes available. State entries for missing node IDs are ignored.
+
+```xmlui-pg display copy height="220px" /getTreeState/ name="Example: Save and restore state"
+<App var.savedState="{null}">
+  <Tree
+    id="tree"
+    testId="tree"
+    initialTreeState="{savedState}"
+    data='{[
+      { id: 1, name: "Root", parentId: null },
+      { id: 2, name: "Child A", parentId: 1 },
+      { id: 3, name: "Child B", parentId: 1 },
+      { id: 4, name: "Child C", parentId: 1 },
+      { id: 5, name: "Child D", parentId: 1 },
+      { id: 6, name: "Child E", parentId: 1 },
+      { id: 7, name: "Child F", parentId: 1 },
+      { id: 8, name: "Child G", parentId: 1 },
+    ]}'>
+  </Tree>
+  <HStack>
+    <Button onClick="savedState = tree.getTreeState()">Save State</Button>
+    <Button onClick="tree.setTreeState(savedState)">Restore State</Button>
+  </HStack>
+</App>
+```
+
 ### Auto-Reload After Time
 
 Set `autoLoadAfter` to automatically reload children after a specified time when a node is collapsed and re-expanded.

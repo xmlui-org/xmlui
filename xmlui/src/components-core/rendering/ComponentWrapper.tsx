@@ -21,6 +21,7 @@ export const ComponentWrapper = memo(
       node,
       resolvedKey,
       state,
+      getCurrentState,
       globalVars,
       dispatch,
       appContext,
@@ -44,7 +45,6 @@ export const ComponentWrapper = memo(
     const componentRegistry = useComponentRegistry();
     const { descriptor } = componentRegistry.lookupComponentRenderer(node.type) || {};
     const stableLayoutContext = useRef(layoutContext);
-
 
     // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
@@ -142,7 +142,7 @@ export const ComponentWrapper = memo(
     // unrelated state changes) is preserved while event handlers can still write
     // to any parent variable even when it is absent from computedUses.
     const fullParentStateRef = useRef<Record<string, any> | undefined>(undefined);
-    fullParentStateRef.current = (nodeUses || nodeComputedUses) ? state : undefined;
+    fullParentStateRef.current = nodeUses || nodeComputedUses ? state : undefined;
 
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
@@ -151,7 +151,7 @@ export const ComponentWrapper = memo(
           resolvedKey={resolvedKey}
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
           parentState={scopedParentState}
-          fullParentStateRef={(nodeUses || nodeComputedUses) ? fullParentStateRef : undefined}
+          fullParentStateRef={nodeUses || nodeComputedUses ? fullParentStateRef : undefined}
           parentGlobalVars={globalVarsWithStableRef}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
@@ -173,6 +173,7 @@ export const ComponentWrapper = memo(
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}
           state={state}
+          getCurrentState={getCurrentState}
           globalVars={globalVars}
           dispatch={dispatch}
           appContext={appContext}
@@ -246,7 +247,11 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
         when: child.when,
         debug: child.debug,
       });
-    } else if (node.scriptCollected && child?.type === "Fragment" && child.children?.some((c) => c?.type === "DataSource" || c?.type === "PushSource")) {
+    } else if (
+      node.scriptCollected &&
+      child?.type === "Fragment" &&
+      child.children?.some((c) => c?.type === "DataSource" || c?.type === "PushSource")
+    ) {
       // When a <script> tag and a <DataSource> are siblings, the parser wraps the non-helper
       // siblings in a synthetic Fragment (see transform.ts wrapWithFragment). The parent node
       // will have `scriptCollected` set in exactly this case. We must NOT apply this to

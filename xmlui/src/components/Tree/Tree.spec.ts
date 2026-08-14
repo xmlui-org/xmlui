@@ -1444,9 +1444,7 @@ test.describe("Basic Functionality", () => {
       // Also verify the focused item has the correct CSS class
       await expect(focusedItem).toHaveClass(/focused/);
 
-      const boxShadowValue = await focusedItem.evaluate(
-        (el) => getComputedStyle(el).boxShadow,
-      );
+      const boxShadowValue = await focusedItem.evaluate((el) => getComputedStyle(el).boxShadow);
       expect(boxShadowValue).toContain(FOCUS_OUTLINE_COLOR);
 
       // Test that focus can move to different items
@@ -3088,6 +3086,296 @@ test.describe("Events", () => {
         expect(event.previousNode).toBeDefined();
         expect(event.previousNode.id).toBe(1);
       });
+    });
+  });
+
+  test.describe("Tree State API", () => {
+    test("getTreeState returns per-node expansion, loading, and selection state", async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      const treeDataWithLoadedState = [
+        { id: 1, name: "Root", parentId: null, loaded: true },
+        { id: 2, name: "Child A", parentId: 1, loaded: true },
+        { id: 3, name: "Child B", parentId: 1, loaded: false },
+        { id: 4, name: "Grandchild", parentId: 2, loaded: true },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              selectedValue="2"
+              loadedField="loaded"
+              data='{${JSON.stringify(treeDataWithLoadedState)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const stateButton = await createButtonDriver("state-btn");
+      await stateButton.click();
+
+      const treeState = await testStateDriver.testState();
+      expect(treeState["1"].expanded).toBe(true);
+      expect(treeState["1"].collapsed).toBe(false);
+      expect(treeState["2"].expanded).toBe(true);
+      expect(treeState["2"].selected).toBe(true);
+      expect(treeState["3"].loaded).toBe(false);
+      expect(treeState["3"].loadingState).toBe("unloaded");
+    });
+
+    test("getTreeState includes the current scroll position", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      const tallData = Array.from({ length: 100 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+        parentId: null,
+      }));
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="200px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              itemHeight="32"
+              data='{${JSON.stringify(tallData)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="scroll-btn" onClick="treeApi.scrollToItem(50);" />
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const scrollButton = await createButtonDriver("scroll-btn");
+      const stateButton = await createButtonDriver("state-btn");
+
+      await scrollButton.click();
+      await page.waitForTimeout(100);
+      await stateButton.click();
+
+      await expect
+        .poll(() => testStateDriver.testState().then((state) => state?.scrollPosition ?? 0))
+        .toBeGreaterThan(0);
+    });
+
+    test("setTreeState applies matching node state and ignores missing node IDs", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const treeDataForRestore = [
+        { id: 1, name: "Root", parentId: null, loaded: true },
+        { id: 2, name: "Child A", parentId: 1, loaded: true },
+        { id: 3, name: "Child B", parentId: 1, loaded: true },
+        { id: 4, name: "Grandchild", parentId: 2, loaded: true },
+      ];
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              loadedField="loaded"
+              data='{${JSON.stringify(treeDataForRestore)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="restore-btn" onClick="
+            treeApi.setTreeState({
+              1: { expanded: true },
+              2: { expanded: true },
+              3: { loaded: false },
+              4: { selected: true },
+              999: { expanded: true, loaded: false, selected: true }
+            });
+          " />
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const restoreButton = await createButtonDriver("restore-btn");
+      const stateButton = await createButtonDriver("state-btn");
+
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+      await restoreButton.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await expect(tree.getByTestId("4")).toBeVisible();
+
+      await stateButton.click();
+      const treeState = await testStateDriver.testState();
+      expect(treeState["3"].loaded).toBe(false);
+      expect(treeState["3"].loadingState).toBe("unloaded");
+      expect(treeState["4"].selected).toBe(true);
+      expect(treeState["999"]).toBeUndefined();
+    });
+
+    test("setTreeState restores scroll position", async ({ initTestBed, createButtonDriver, page }) => {
+      const tallData = Array.from({ length: 100 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+        parentId: null,
+      }));
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="200px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              itemHeight="32"
+              data='{${JSON.stringify(tallData)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="restore-btn" onClick="treeApi.setTreeState({ scrollPosition: 640 });" />
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const restoreButton = await createButtonDriver("restore-btn");
+      const stateButton = await createButtonDriver("state-btn");
+
+      await restoreButton.click();
+      await page.waitForTimeout(100);
+      await stateButton.click();
+
+      await expect
+        .poll(() => testStateDriver.testState().then((state) => state?.scrollPosition ?? 0))
+        .toBeGreaterThan(0);
+    });
+
+    test("initialTreeState applies when the tree mounts", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const treeDataForInitialState = [
+        { id: 1, name: "Root", parentId: null, loaded: true },
+        { id: 2, name: "Child A", parentId: 1, loaded: true },
+        { id: 3, name: "Child B", parentId: 1, loaded: true },
+        { id: 4, name: "Grandchild", parentId: 2, loaded: true },
+      ];
+      const initialTreeState = {
+        1: { expanded: true },
+        2: { expanded: true },
+        3: { loaded: false },
+        999: { expanded: true },
+      };
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="400px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              loadedField="loaded"
+              initialTreeState='{${JSON.stringify(initialTreeState)}}'
+              data='{${JSON.stringify(treeDataForInitialState)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const stateButton = await createButtonDriver("state-btn");
+
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await expect(tree.getByTestId("4")).toBeVisible();
+
+      await stateButton.click();
+      const treeState = await testStateDriver.testState();
+      expect(treeState["3"].loaded).toBe(false);
+      expect(treeState["999"]).toBeUndefined();
+    });
+
+    test("initialTreeState restores scroll position when the tree mounts", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      const tallData = Array.from({ length: 100 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+        parentId: null,
+      }));
+      const initialTreeState = {
+        scrollPosition: 640,
+      };
+
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <VStack height="200px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
+              itemHeight="32"
+              initialTreeState='{${JSON.stringify(initialTreeState)}}'
+              data='{${JSON.stringify(tallData)}}'
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="state-btn" onClick="testState = treeApi.getTreeState();" />
+        </Fragment>
+      `);
+
+      const stateButton = await createButtonDriver("state-btn");
+      await page.waitForTimeout(100);
+      await stateButton.click();
+
+      await expect
+        .poll(() => testStateDriver.testState().then((state) => state?.scrollPosition ?? 0))
+        .toBeGreaterThan(0);
     });
   });
 });

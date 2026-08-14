@@ -89,6 +89,11 @@ export const FormMd = createMetadata({
       valueType: "string",
       defaultValue: defaultProps.cancelLabel,
     },
+    cancelButtonVisible: {
+      description: "Shows (`true`) or hides (`false`) the Cancel button in the form's button row.",
+      valueType: "boolean",
+      defaultValue: defaultProps.cancelButtonVisible,
+    },
     saveLabel: {
       description: `This property defines the label of the Save button.`,
       valueType: "string",
@@ -331,6 +336,15 @@ export const FormMd = createMetadata({
         reason: "Why the submit was dropped (e.g. `drop-while-running`).",
       },
     },
+    dirtyChanged: {
+      injectedVars: ["$data"],
+      description:
+        "Fires when the Form's dirty state changes. The event receives the new dirty state.",
+      signature: "dirtyChanged(dirty: boolean): void",
+      parameters: {
+        dirty: "The new dirty state of the Form.",
+      },
+    },
   },
   contextVars: {
     $data: {
@@ -398,6 +412,19 @@ export const FormMd = createMetadata({
         "This method returns a deep clone of the current form data object. Changes to the returned object do not affect the form's internal state.",
       signature: "getData(): Record<string, any>",
       returns: "A deep clone of the current form data object.",
+    },
+    isDirty: {
+      description: "This method returns whether the form is currently marked dirty.",
+      signature: "isDirty(): boolean",
+      returns: "`true` when the form has unsaved changes; otherwise, `false`.",
+    },
+    setDirty: {
+      description:
+        "This method marks the form as dirty or clean. Field changes automatically mark the form dirty.",
+      signature: "setDirty(dirty: boolean): void",
+      parameters: {
+        dirty: "When `true`, the form is marked dirty; when `false`, it is marked clean.",
+      },
     },
     cancel: {
       description:

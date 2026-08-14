@@ -3,10 +3,83 @@
 **Key features:**
 - **Automatic data binding**: Form controls automatically sync with form data using `bindTo` properties
 - **Built-in validation**: Validates individual fields and overall form state before submission
+- **Dirty-state tracking**: Tracks edits automatically and exposes `isDirty()` and `setDirty()`
 - **Context sharing**: Provides `$data` and other context values accessible to all nested components
 - **Submission handling**: Manages form submission workflow and prevents invalid submissions
 
 See [this guide](/docs/guides/forms) for details.
+
+## Tracking Dirty State
+
+`Form` automatically becomes dirty when a nested `FormItem` or direct `bindTo` control changes. Use `isDirty()` to read that state, `setDirty()` when your own logic needs to mark the form clean or dirty, and `dirtyChanged` to react whenever the dirty state changes.
+
+When a `Form` is hosted in a `ModalDialog`, the dialog uses the form dirty state as part of its own close guard.
+
+```xmlui-pg copy display name="Example: dirty state" height="400px"
+<App var.status="clean">
+  <Form
+    id="profileForm"
+    data="{{ name: 'Ada', age: 36 }}"
+    onDirtyChanged="(dirty) => status = dirty ? 'dirty' : 'clean'">
+    <FormItem label="Name" bindTo="name" />
+    <NumberBox label="Age" bindTo="age" />
+  </Form>
+
+  <Text>Form state: {status}</Text>
+
+  <HStack gap="$space-2">
+    <Button
+      label="Mark Clean"
+      onClick="profileForm.setDirty(false)" />
+  </HStack>
+
+</App>
+```
+
+The next example places the same dirty-tracked Form inside a `ModalDialog`. Editing a bound field marks the Form dirty, the dialog treats that dirty state as its own close guard, and closing the dialog prompts for confirmation until the Form is marked clean.
+
+```xmlui-pg copy display name="Example: dirty form in a modal dialog" height="520px"
+<App var.formStatus="clean" var.dialogStatus="clean">
+  <Button label="Edit Profile" onClick="profileDialog.open()" />
+
+  <ModalDialog
+    id="profileDialog"
+    title="Edit Profile"
+    canCloseMessage="Discard your profile changes?"
+    confirmCloseLabel="Discard"
+    cancelCloseLabel="Keep Editing">
+    <Form
+      id="profileForm"
+      hideButtonRow="true"
+      data="{{ name: 'Ada Lovelace', role: 'Architect', weeklyHours: 32 }}"
+      onDirtyChanged="(dirty) => {
+        formStatus = dirty ? 'dirty' : 'clean';
+        dialogStatus = profileDialog.getDirty() ? 'dirty' : 'clean';
+      }">
+      <FormItem label="Name" bindTo="name" />
+      <TextBox label="Role" bindTo="role" />
+      <NumberBox label="Weekly Hours" bindTo="weeklyHours" />
+    </Form>
+
+    <Text>
+      Form: {formStatus}; Dialog: {dialogStatus}
+    </Text>
+
+    <HStack gap="$space-2">
+      <Button
+        label="Mark Form Clean"
+        onClick="profileForm.setDirty(false)" />
+      <Button
+        label="Mark Dialog Dirty"
+        onClick="
+          profileDialog.setDirty(true);
+          dialogStatus = profileDialog.getDirty() ? 'dirty' : 'clean'"
+      />
+      <Button label="Close" onClick="profileDialog.close()" />
+    </HStack>
+  </ModalDialog>
+</App>
+```
 
 %-DESC-END
 
@@ -121,6 +194,14 @@ Fields can override `itemRequireLabelMode` with `requireLabelMode`:
 
 %-EVENT-END
 
+%-EVENT-START dirtyChanged
+
+The `dirtyChanged` event fires whenever the Form's dirty state changes. The event argument is the new dirty state.
+
+See [Tracking Dirty State](#tracking-dirty-state) for an example.
+
+%-EVENT-END
+
 %-EVENT-START willSubmit
 
 The `onWillSubmit` handler receives **two arguments**:
@@ -193,6 +274,18 @@ Later parameterless resets return to that baseline.
     onClick="profileForm.reset({ name: 'Canonical name' })" />
 </App>
 ```
+
+%-API-END
+
+%-API-START isDirty
+
+See [Tracking Dirty State](#tracking-dirty-state) for an example.
+
+%-API-END
+
+%-API-START setDirty
+
+See [Tracking Dirty State](#tracking-dirty-state) for an example.
 
 %-API-END
 

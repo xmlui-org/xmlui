@@ -20,15 +20,13 @@ export interface InteractionDetail {
 }
 
 // Function signature for logging user interactions (for inspector/debugging)
-export type LogInteractionFn = (
-  interaction: string,
-  detail?: InteractionDetail
-) => void;
+export type LogInteractionFn = (interaction: string, detail?: InteractionDetail) => void;
 
 // This interface defines the renderer context for the exposed components of the
 // XMLUI framework.
-export interface RendererContext<TMd extends ComponentMetadata = ComponentMetadata>
-  extends ComponentRendererContextBase<TMd> {
+export interface RendererContext<
+  TMd extends ComponentMetadata = ComponentMetadata,
+> extends ComponentRendererContextBase<TMd> {
   uid: symbol; // The unique identifier of the component instance
 
   updateState: UpdateStateFn; // A component invokes this function to change its internal state
@@ -229,6 +227,9 @@ export interface ComponentRendererContextBase<TMd extends ComponentMetadata = Co
 
   // The state of the container in which the component is rendered
   state: ContainerState;
+
+  // Gets the latest full container state, even when this component is memo-blocked.
+  getCurrentState: () => ContainerState;
 
   // Global variables that flow down to all containers regardless of `uses`
   globalVars?: Record<string, any>;

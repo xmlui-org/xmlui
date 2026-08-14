@@ -288,6 +288,23 @@ test.describe("form integration", () => {
     await expect(page.getByRole("button", { name: "Discard" })).toBeVisible();
   });
 
+  test("cancelButtonVisible=false hides the forwarded Cancel button", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TabsForm
+        data="{{ name: '' }}"
+        cancelButtonVisible="false">
+        <FormSegment label="Alpha">
+          <FormItem label="Name" bindTo="name" />
+        </FormSegment>
+      </TabsForm>
+    `);
+    await expect(page.getByRole("button", { name: "Cancel" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
+  });
+
   test("hideButtonRow=true hides Save and Cancel", async ({ initTestBed, page }) => {
     await initTestBed(`
       <TabsForm data="{{ name: '' }}" hideButtonRow="true">

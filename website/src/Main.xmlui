@@ -516,6 +516,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Protect a modal Form from accidental close"
+                            to="/docs/howto/protect-a-modal-form-from-accidental-close"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Build a multi-step wizard form"
                             to="/docs/howto/build-a-multi-step-wizard-form"
                         />
@@ -2026,6 +2031,11 @@
             </Page>
 
             <!-- New how-to articles: Forms & Validation -->
+            <Page url="/docs/howto/protect-a-modal-form-from-accidental-close">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/protect-a-modal-form-from-accidental-close.md']}"
+                />
+            </Page>
 
             <!-- New how-to articles: Data Loading & APIs -->
 

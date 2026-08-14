@@ -706,10 +706,10 @@ function applyStep(
   integersOnly: boolean,
 ) {
   const currentValue = toUsableNumber(valueStrRep, integersOnly);
-  if (isEmptyLike(currentValue)) return;
+  if (isEmptyLike(currentValue)) return min;
 
   const clampedValue = clamp(currentValue + step, min, max);
-  const fractionLength = valueStrRep.split('.')[1]?.length ?? 0;
+  const fractionLength = valueStrRep.split(".")[1]?.length ?? 0;
   return roundTo(clampedValue, fractionLength);
 
   // ---
