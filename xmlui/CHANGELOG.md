@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.14.13
+
+### Patch Changes
+
+- d832312: Add a `cancelButtonVisible` flag to `Form` and `TabsForm` so apps can hide the built-in Cancel button without clearing its label.
+- d832312: Add dirty-close confirmation and willClose guarding APIs to ModalDialog, plus Form dirty-state APIs, dirtyChanged event, and ModalDialog/Form dirty-state integration.
+- d832312: Fix NumberBox spinner buttons so nullish values step to the minimum value.
+- d832312: Fix interactive Table typed cells so they update the bound row value and refresh row-scoped Column enabled and readOnly expressions against current state.
+- d832312: Add Tree APIs for reading and applying per-node tree state and scroll position, plus an initialTreeState prop for restoring persisted state as nodes become available.
+
 ## 0.14.12
 
 ### Patch Changes

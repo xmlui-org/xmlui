@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.15
+
+### Patch Changes
+
+- d832312: Fix search ranking so normalized exact title matches, such as `ModalDialog` for a `Modal Dialog` query, are surfaced ahead of broader article matches.
+
 ## 0.1.14
 
 ### Patch Changes
