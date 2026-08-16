@@ -13060,6 +13060,16 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "interpolateBindings": {
+        "description": "When `true` (default), the content is treated as **authored** markup: `@{...}` binding expressions are evaluated and replaced with their values, and `xmlui-pg` playground fences and tree-display blocks are rendered as live examples. Set this to `false` for content that arrives at runtime as **data** (transcripts, logs, user text) so that `@{...}` sequences — which collide with real-world syntax such as PowerShell hashtable literals (`@{ ... }`) — render literally instead of being evaluated, and a quoted `xmlui-pg` fence renders as a code block instead of being rewritten into a live playground.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "allowHtml": {
+        "description": "When `true` (default), a subset of raw HTML embedded in the content is rendered as real elements. Set this to `false` for content that arrives at runtime as **data** so that raw HTML tags render as literal text instead of markup — a quoted `<table>` shows its tags rather than building a table. Only the HTML-tag interpretation is affected; markdown formatting, code fences, and inline code are untouched. Pair with `interpolateBindings=\"false\"` for a fully data-safe render.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
       "showHeadingAnchors": {
         "description": "This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.",
         "valueType": "boolean"
