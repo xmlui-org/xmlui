@@ -12,6 +12,7 @@ import {
   throwUnsupportedCompiledScriptNode,
   UnsupportedCompiledScriptNodeError,
 } from "../../../src/components-core/script-compiler";
+import { clearCompiledScriptNativeFnCache } from "../../../src/components-core/script-compiler/artifact";
 
 describe("compiled script artifacts", () => {
   it("derives source ranges from scripting tokens", () => {
@@ -138,6 +139,79 @@ describe("compiled script artifacts", () => {
     );
     expect(body).toContain("//# sourceMappingURL=/@xmlui-source/src/Main.xmlui.map");
     expect(body).not.toContain("base64");
+  });
+
+  // xmlui-org/xmlui#3763. The artifact — the compiled JS *source* — was already
+  // cached by source text in binding-sync-executor.ts, but every evaluation
+  // still ran `new Function` on it, so compile cost scaled with component
+  // instance count. These assert reference identity rather than timing: a
+  // second call returning the same function object IS "new Function did not run
+  // again", with nothing to flake.
+  describe("native function reuse", () => {
+    const makeArtifact = (js: string) =>
+      createCompiledScriptArtifact({
+        target: "binding-sync",
+        sourceId: "Main.xmlui#reuse",
+        sourceText: "{count + 1}",
+        js,
+      });
+
+    it("reuses one compiled function across instantiations of the same artifact", () => {
+      clearCompiledScriptNativeFnCache();
+      const artifact = makeArtifact("return runtime.resolve('count') + 1;");
+
+      const first = instantiateCompiledScriptArtifact<number>(artifact, {
+        resolve: () => 2,
+      });
+      const second = instantiateCompiledScriptArtifact<number>(artifact, {
+        resolve: () => 5,
+      });
+
+      expect(second.nativeFn).toBe(first.nativeFn);
+      // The wrapper is still per call, so each keeps its own runtime.
+      expect(first.execute({ evalContext: createEvalContext({}) })).toBe(3);
+      expect(second.execute({ evalContext: createEvalContext({}) })).toBe(6);
+    });
+
+    it("keeps a per-call runtime out of a shared function", () => {
+      clearCompiledScriptNativeFnCache();
+      const artifact = makeArtifact("return runtime.tag;");
+
+      const a = instantiateCompiledScriptArtifact<string>(artifact, { tag: "a" } as any);
+      const b = instantiateCompiledScriptArtifact<string>(artifact, { tag: "b" } as any);
+
+      expect(b.nativeFn).toBe(a.nativeFn);
+      // Interleaved, because the async event executor passes a fresh runtime per
+      // invocation: a shared instance wrapper would cross-contaminate these.
+      expect(a.execute({ evalContext: createEvalContext({}) })).toBe("a");
+      expect(b.execute({ evalContext: createEvalContext({}) })).toBe("b");
+      expect(a.execute({ evalContext: createEvalContext({}) })).toBe("a");
+    });
+
+    it("compiles separately when the emitted body differs", () => {
+      clearCompiledScriptNativeFnCache();
+      const artifact = makeArtifact("return 1;");
+
+      const plain = instantiateCompiledScriptArtifact(artifact, {});
+      const mapped = instantiateCompiledScriptArtifact(artifact, {}, { sourceMapMode: "inline" });
+
+      // Source maps change the function body, so they must not share a product.
+      expect(mapped.nativeFn).not.toBe(plain.nativeFn);
+      expect(instantiateCompiledScriptArtifact(artifact, {}).nativeFn).toBe(plain.nativeFn);
+    });
+
+    it("does not share a function between distinct artifacts", () => {
+      clearCompiledScriptNativeFnCache();
+      const one = makeArtifact("return 1;");
+      const two = makeArtifact("return 2;");
+
+      const first = instantiateCompiledScriptArtifact<number>(one, {});
+      const second = instantiateCompiledScriptArtifact<number>(two, {});
+
+      expect(second.nativeFn).not.toBe(first.nativeFn);
+      expect(first.execute({ evalContext: createEvalContext({}) })).toBe(1);
+      expect(second.execute({ evalContext: createEvalContext({}) })).toBe(2);
+    });
   });
 
   it("throws a structured error for unsupported nodes", () => {
