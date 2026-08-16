@@ -80,6 +80,17 @@ export const MarkdownMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.interpolateBindings,
     },
+    allowHtml: {
+      description:
+        "When `true` (default), a subset of raw HTML embedded in the content is rendered " +
+        "as real elements. Set this to `false` for content that arrives at runtime as " +
+        "**data** so that raw HTML tags render as literal text instead of markup — a " +
+        "quoted `<table>` shows its tags rather than building a table. Only the HTML-tag " +
+        "interpretation is affected; markdown formatting, code fences, and inline code are " +
+        "untouched. Pair with `interpolateBindings=\"false\"` for a fully data-safe render.",
+      valueType: "boolean",
+      defaultValue: defaultProps.allowHtml,
+    },
     showHeadingAnchors: {
       description:
         "This boolean property specifies whether heading anchors should be " +
@@ -297,6 +308,7 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
     "removeIndents",
     "removeBr",
     "interpolateBindings",
+    "allowHtml",
     "codeHighlighter",
     "showHeadingAnchors",
     "grayscale",
@@ -342,6 +354,10 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
           node.props.interpolateBindings,
           defaultProps.interpolateBindings,
         )}
+        allowHtml={extractValue.asOptionalBoolean(
+          node.props.allowHtml,
+          defaultProps.allowHtml,
+        )}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
@@ -377,6 +393,7 @@ type TransformedMarkdownProps = {
   removeIndents?: boolean;
   removeBr?: boolean;
   interpolateBindings?: boolean;
+  allowHtml?: boolean;
   className?: string;
   classes?: Record<string, string>;
   extractValue: ValueExtractor;
@@ -401,6 +418,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       removeIndents,
       removeBr,
       interpolateBindings,
+      allowHtml,
       className,
       classes,
       extractValue,
@@ -467,6 +485,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         ref={ref}
         removeIndents={removeIndents}
         removeBr={removeBr}
+        allowHtml={allowHtml}
         codeHighlighter={codeHighlighter}
         className={className}
         classes={classes}

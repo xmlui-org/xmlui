@@ -1190,3 +1190,64 @@ test.describe("raw HTML in content", () => {
     await expect(driver.component.locator("mark")).toHaveText("flagged");
   });
 });
+
+test.describe("allowHtml", () => {
+  test("default (true) renders raw inline HTML as an element", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[Say <mark>flagged</mark> here]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator("mark")).toHaveText("flagged");
+  });
+
+  test("allowHtml=false renders raw inline HTML as literal text", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(
+      `<Markdown allowHtml="false"><![CDATA[Say <mark>flagged</mark> here]]></Markdown>`,
+    );
+    const driver = await createMarkdownDriver();
+    // No element is produced; the raw tags render as literal characters.
+    await expect(driver.component.locator("mark")).toHaveCount(0);
+    await expect(driver.component).toContainText("Say <mark>flagged</mark> here");
+  });
+
+  test("allowHtml=false preserves a lone unterminated tag as literal text (no data loss)", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // Dropping rehype-raw / skipHtml would delete this tag entirely; the remark
+    // text-conversion keeps it verbatim.
+    await initTestBed(`<Markdown allowHtml="false"><![CDATA[trailing <notclosed]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component).toContainText("trailing <notclosed");
+  });
+
+  test("allowHtml=false does not disturb a fenced code block", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // Content inside a code fence is already literal (rehype-raw never touched it),
+    // so neutralization must not double-escape it.
+    await initTestBed(
+      "<Markdown allowHtml=\"false\"><![CDATA[```\n<div>in a fence</div>\n```]]></Markdown>",
+    );
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator("code")).toContainText("<div>in a fence</div>");
+    await expect(driver.component).not.toContainText("&lt;div&gt;");
+  });
+
+  test("interpolateBindings=false + allowHtml=false is fully data-safe on a mixed payload", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(
+      `<Markdown interpolateBindings="false" allowHtml="false"><![CDATA[cmd @{ LogName = 22 } then <b>bold?</b>]]></Markdown>`,
+    );
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator("b")).toHaveCount(0);
+    await expect(driver.component).toContainText("cmd @{ LogName = 22 } then <b>bold?</b>");
+  });
+});

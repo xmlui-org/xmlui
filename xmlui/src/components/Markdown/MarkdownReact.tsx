@@ -115,6 +115,23 @@ const preventPlaygroundParagraphWrap = () => {
   };
 };
 
+/**
+ * Remark plugin (mdast level, so it runs before `rehypeRaw` reparses raw HTML)
+ * that neutralizes raw HTML for data-fed content: each raw `html` node is turned
+ * into a `text` node carrying the same source string, so `<b>hi</b>` renders as
+ * the literal characters `<b>hi</b>` instead of a bold element. Because it targets
+ * only `html` nodes, code fences, inline code, blockquotes, and markdown syntax are
+ * untouched — and a lone unclosed `<tag>` survives as literal text (no data loss,
+ * unlike dropping `rehypeRaw` / `skipHtml`). Included only when `allowHtml === false`.
+ */
+const neutralizeRawHtml = () => {
+  return function transformer(tree: Node) {
+    visit(tree, "html", (node: any) => {
+      node.type = "text";
+    });
+  };
+};
+
 /** Normalize the `highlightText` prop (`string | string[]`) to a list of needles.
  *  A string stays a single phrase (never whitespace-split — that would break an
  *  intentional `"foo bar"` phrase highlight); an array is treated as independent
@@ -254,6 +271,7 @@ import { defaultProps } from "./Markdown.defaults";
 type MarkdownProps = {
   removeIndents?: boolean;
   removeBr?: boolean;
+  allowHtml?: boolean;
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
@@ -314,6 +332,7 @@ export const Markdown = memo(
     {
       removeIndents = defaultProps.removeIndents,
       removeBr = defaultProps.removeBr,
+      allowHtml = defaultProps.allowHtml,
       children,
       style,
       className,
@@ -452,8 +471,13 @@ export const Markdown = memo(
     // Stable remark plugins array — only changes when markdownImgParser changes (never, with [] deps above).
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const remarkPlugins = useMemo(
-      () => [remarkGfm, markdownCodeBlockParser, markdownImgParser],
-      [markdownImgParser],
+      () => {
+        const plugins: any[] = [remarkGfm, markdownCodeBlockParser, markdownImgParser];
+        // For data-fed content, render raw HTML as literal text instead of elements.
+        if (allowHtml === false) plugins.push(neutralizeRawHtml);
+        return plugins;
+      },
+      [markdownImgParser, allowHtml],
     );
 
     return (

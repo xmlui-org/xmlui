@@ -188,6 +188,27 @@ Set `interpolateBindings="false"` for data-fed content so every `@{...}` sequenc
 
 %-PROP-END
 
+%-PROP-START allowHtml
+
+By default, `Markdown` renders a subset of raw HTML embedded in the content as real elements — a `<table>` in the text builds a table. That is fine for markup you author, but for content that arrives at runtime as **data** (transcripts, logs, user input) any quoted HTML would render as live markup and can break layout.
+
+Set `allowHtml="false"` so raw HTML tags render as **literal text** instead. Only the HTML-tag interpretation is neutralized — markdown formatting, code fences, and inline code are untouched, and an unterminated tag survives verbatim rather than being dropped.
+
+This axis is independent of `interpolateBindings`. Pair the two (`interpolateBindings="false" allowHtml="false"`) for a fully data-safe render: nothing is evaluated, nothing is rewritten, and no HTML is activated.
+
+```xmlui-pg copy display name="Example: allowHtml"
+<App var.dataLine="{'Rendered row: <tr><td>oops</td></tr> — and a bare <script> tag'}">
+  <VStack gap="8px">
+    <Text variant="strong">allowHtml="true" (default)</Text>
+    <Markdown content="{dataLine}" />
+    <Text variant="strong">allowHtml="false"</Text>
+    <Markdown allowHtml="false" content="{dataLine}" />
+  </VStack>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START removeIndents
 
 ```xmlui-pg copy display name="Example: removeIndents property"
