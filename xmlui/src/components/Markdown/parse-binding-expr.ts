@@ -72,14 +72,21 @@ export function parseBindingExpression(text: string, extractValue: ValueExtracto
     // The (?<!\\) is a "negative lookbehind" in regex that ensures that
     // if escaping the @{...} expression like this: \@{...}, we don't match it
     const regex = /(?<!\\)\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
-    return segText.replace(regex, (_, expr) => {
-      const extracted = extractValue(`{${expr}}`);
-      const resultExpr = mapByType(extracted);
-      // The result expression might be an object, in that case we stringify it here,
-      // at the last step, so that there are no unnecessary apostrophes
-      return typeof resultExpr === "object" && resultExpr !== null
-        ? JSON.stringify(resultExpr)
-        : resultExpr;
+    return segText.replace(regex, (match, expr) => {
+      try {
+        const extracted = extractValue(`{${expr}}`);
+        const resultExpr = mapByType(extracted);
+        // The result expression might be an object, in that case we stringify it here,
+        // at the last step, so that there are no unnecessary apostrophes
+        return typeof resultExpr === "object" && resultExpr !== null
+          ? JSON.stringify(resultExpr)
+          : resultExpr;
+      } catch {
+        // Fail soft: a `@{...}` that fails to parse or throws during evaluation
+        // renders as its literal text rather than propagating out of the useMemo
+        // and crashing the whole Markdown surface via the error boundary.
+        return match;
+      }
     });
   }
 

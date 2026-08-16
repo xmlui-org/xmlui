@@ -1065,3 +1065,128 @@ test.describe("highlightText", () => {
     await expect(page.locator("mark")).toHaveCount(0);
   });
 });
+
+test.describe("interpolateBindings", () => {
+  test("default (true) evaluates @{...} bindings", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[sum is @{1 + 1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("sum is 2");
+  });
+
+  test("interpolateBindings=false renders @{...} literally", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(
+      `<Markdown interpolateBindings="false"><![CDATA[sum is @{1 + 1}]]></Markdown>`,
+    );
+    await expect((await createMarkdownDriver()).component).toHaveText("sum is @{1 + 1}");
+  });
+
+  test("interpolateBindings=false leaves colliding PowerShell syntax intact", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(
+      `<Markdown interpolateBindings="false"><![CDATA[Get-WinEvent -FilterHashtable @{ LogName = 3077 }]]></Markdown>`,
+    );
+    await expect((await createMarkdownDriver()).component).toHaveText(
+      "Get-WinEvent -FilterHashtable @{ LogName = 3077 }",
+    );
+  });
+
+  test("default (true) removes an empty @{} expression", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // Same syntax as a LaTeX inter-column spec `@{}`; the default path strips it.
+    await initTestBed(`<Markdown><![CDATA[col@{}spec]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("colspec");
+  });
+
+  test("interpolateBindings=false preserves an empty @{} expression", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // The LaTeX `@{}` column-spec case: with interpolation off it must render
+    // literally rather than being silently deleted.
+    await initTestBed(`<Markdown interpolateBindings="false"><![CDATA[col@{}spec]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("col@{}spec");
+  });
+
+  test("a binding that throws during evaluation fails soft (renders literally, no crash)", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // `LogName = 22` assigns to an identifier not in scope, which throws in the
+    // script engine. With fail-soft, the expression renders as its literal text
+    // instead of propagating and crashing the whole Markdown surface.
+    await initTestBed(`<Markdown><![CDATA[cmd @{ LogName = 22 }]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toContainText("@{ LogName = 22 }");
+  });
+
+  test("interpolateBindings=false does not rewrite a quoted xmlui-pg fence into a playground", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // Content that merely *quotes* a playground fence (transcripts do this) must
+    // render as an ordinary code block, not be rewritten into a live playground.
+    await initTestBed(
+      "<Markdown interpolateBindings=\"false\"><![CDATA[```xmlui-pg\n<App><Text>hello</Text></App>\n```]]></Markdown>",
+    );
+    const driver = await createMarkdownDriver();
+    await expect(driver.component).toBeAttached();
+    // The raw fence source survives as text; no NestedApp playground is mounted.
+    await expect(driver.component).toContainText("<App><Text>hello</Text></App>");
+  });
+
+  test("interpolateBindings=false preserves a quoted four-backtick xmlui-pg fence (no 4->3 rewrite)", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // A four-backtick `xmlui-pg` fence displayed literally inside a five-backtick
+    // display fence. The ungated engine's playground observer rewrites the inner
+    // fence 4->3 even here; with interpolation off the observer is skipped, so the
+    // four backticks survive and no playground UI is mounted.
+    const md =
+      "`````\n" +
+      "````xmlui-pg\n" +
+      '<App>\n  <Text value="quoted example, not a live playground" />\n</App>\n' +
+      "````\n" +
+      "`````";
+    await initTestBed(`<Markdown interpolateBindings="false"><![CDATA[${md}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component).toBeAttached();
+    // The inner fence keeps all four backticks (would be three if the observer ran).
+    await expect(driver.component).toContainText("````xmlui-pg");
+    await expect(driver.component).toContainText('quoted example, not a live playground');
+  });
+});
+
+// Pins the raw-inline-HTML behavior for downstream consumers of data-fed content.
+// `Markdown` renders a subset of raw HTML via rehype-raw; `interpolateBindings`
+// gates only the XMLUI authoring transforms (bindings, playground, tree display),
+// NOT the HTML pass-through. So quoted markup in data content still renders as
+// real elements — consumers that must show HTML literally have to escape it first.
+test.describe("raw HTML in content", () => {
+  test("raw inline HTML renders as a real element (default)", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[Say <mark>flagged</mark> here]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator("mark")).toHaveText("flagged");
+  });
+
+  test("raw inline HTML still renders as an element with interpolateBindings=false", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(
+      `<Markdown interpolateBindings="false"><![CDATA[Say <mark>flagged</mark> here]]></Markdown>`,
+    );
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator("mark")).toHaveText("flagged");
+  });
+});

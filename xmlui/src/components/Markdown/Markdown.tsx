@@ -67,6 +67,19 @@ export const MarkdownMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.removeBr,
     },
+    interpolateBindings: {
+      description:
+        "When `true` (default), the content is treated as **authored** markup: `@{...}` " +
+        "binding expressions are evaluated and replaced with their values, and `xmlui-pg` " +
+        "playground fences and tree-display blocks are rendered as live examples. Set this " +
+        "to `false` for content that arrives at runtime as **data** (transcripts, logs, " +
+        "user text) so that `@{...}` sequences — which collide with real-world syntax such " +
+        "as PowerShell hashtable literals (`@{ ... }`) — render literally instead of being " +
+        "evaluated, and a quoted `xmlui-pg` fence renders as a code block instead of being " +
+        "rewritten into a live playground.",
+      valueType: "boolean",
+      defaultValue: defaultProps.interpolateBindings,
+    },
     showHeadingAnchors: {
       description:
         "This boolean property specifies whether heading anchors should be " +
@@ -283,6 +296,7 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
     "content",
     "removeIndents",
     "removeBr",
+    "interpolateBindings",
     "codeHighlighter",
     "showHeadingAnchors",
     "grayscale",
@@ -324,6 +338,10 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
         classes={classes}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+        interpolateBindings={extractValue.asOptionalBoolean(
+          node.props.interpolateBindings,
+          defaultProps.interpolateBindings,
+        )}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
@@ -358,6 +376,7 @@ type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
   removeBr?: boolean;
+  interpolateBindings?: boolean;
   className?: string;
   classes?: Record<string, string>;
   extractValue: ValueExtractor;
@@ -381,6 +400,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       children,
       removeIndents,
       removeBr,
+      interpolateBindings,
       className,
       classes,
       extractValue,
@@ -408,30 +428,39 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       // --- Resolve xmlui playground definitions
 
       let resolvedMd = children;
-      while (true) {
-        const nextPlayground = observePlaygroundPattern(resolvedMd);
-        if (!nextPlayground) break;
 
-        resolvedMd =
-          resolvedMd.slice(0, nextPlayground[0]) +
-          convertPlaygroundPatternToMarkdown(nextPlayground[2], {
-            enableTracing: enablePlaygroundTracing,
-          }) +
-          resolvedMd.slice(nextPlayground[1]);
+      // `interpolateBindings="false"` means "this content is data, not authoring":
+      // skip every transform that treats the text as authored markup. That covers
+      // playground-fence rewriting and tree-display rewriting (content that merely
+      // *quotes* an `xmlui-pg` fence — chat transcripts do this constantly — must
+      // not be rewritten as if it declared one), as well as `@{...}` binding
+      // interpolation (runtime `@{...}` should render literally, not evaluate).
+      if (interpolateBindings !== false) {
+        while (true) {
+          const nextPlayground = observePlaygroundPattern(resolvedMd);
+          if (!nextPlayground) break;
+
+          resolvedMd =
+            resolvedMd.slice(0, nextPlayground[0]) +
+            convertPlaygroundPatternToMarkdown(nextPlayground[2], {
+              enableTracing: enablePlaygroundTracing,
+            }) +
+            resolvedMd.slice(nextPlayground[1]);
+        }
+
+        while (true) {
+          const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+          if (!nextTreeDisplay) break;
+          resolvedMd =
+            resolvedMd.slice(0, nextTreeDisplay[0]) +
+            convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+            resolvedMd.slice(nextTreeDisplay[1]);
+        }
+
+        resolvedMd = parseBindingExpression(resolvedMd, extractValue);
       }
-
-      while (true) {
-        const nextTreeDisplay = observeTreeDisplay(resolvedMd);
-        if (!nextTreeDisplay) break;
-        resolvedMd =
-          resolvedMd.slice(0, nextTreeDisplay[0]) +
-          convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
-          resolvedMd.slice(nextTreeDisplay[1]);
-      }
-
-      resolvedMd = parseBindingExpression(resolvedMd, extractValue);
       return resolvedMd;
-    }, [children, enablePlaygroundTracing, extractValue]);
+    }, [children, enablePlaygroundTracing, extractValue, interpolateBindings]);
 
     return (
       <Markdown
