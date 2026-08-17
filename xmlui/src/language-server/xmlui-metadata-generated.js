@@ -12150,7 +12150,7 @@ export default {
         "description": "This property contains the current page information. Setting this property also enures the `List` uses pagination."
       },
       "idKey": {
-        "description": "Denotes which attribute of an item acts as the ID or key of the item",
+        "description": "Denotes which attribute of an item acts as the ID or key of the item. The named attribute must hold a value that is unique across the data and never empty: it is the row's identity, so duplicate or empty values make virtualized rows reconcile incorrectly (rows can paint over one another) and cause selection state to be shared between rows.",
         "valueType": "string",
         "defaultValue": "id"
       },

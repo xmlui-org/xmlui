@@ -2655,3 +2655,113 @@ test.describe("scroll event", () => {
     expect(await testStateDriver.testState()).toEqual(null);
   });
 });
+
+// =============================================================================
+// IDKEY UNIQUENESS DIAGNOSTIC (dev builds only)
+// =============================================================================
+
+test.describe("idKey uniqueness diagnostic", () => {
+  // Collect console warnings that name the diagnostic, so an unrelated warning
+  // elsewhere in the page cannot make these tests pass or fail by accident.
+  const collectIdKeyWarnings = (page) => {
+    const warnings: string[] = [];
+    page.on("console", (msg) => {
+      const text = msg.text();
+      if (msg.type() === "warning" && text.includes("List: idKey")) {
+        warnings.push(text);
+      }
+    });
+    return warnings;
+  };
+
+  test("warns when idKey values are empty", async ({ initTestBed, createListDriver, page }) => {
+    const warnings = collectIdKeyWarnings(page);
+    await initTestBed(`
+      <List idKey="id" data="{[
+        { id: '', name: 'Alpha' },
+        { id: '', name: 'Beta' },
+        { id: 'c', name: 'Gamma' }
+      ]}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Gamma");
+
+    await expect.poll(() => warnings.length).toBeGreaterThan(0);
+    const empty = warnings.find((w) => w.includes("empty or missing"));
+    expect(empty).toContain('idKey "id"');
+    expect(empty).toContain("2 row(s)");
+  });
+
+  test("warns when idKey values are duplicated", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    const warnings = collectIdKeyWarnings(page);
+    await initTestBed(`
+      <List idKey="id" data="{[
+        { id: 'dup', name: 'Alpha' },
+        { id: 'dup', name: 'Beta' },
+        { id: 'c', name: 'Gamma' }
+      ]}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Gamma");
+
+    await expect.poll(() => warnings.length).toBeGreaterThan(0);
+    const duplicate = warnings.find((w) => w.includes("shared by more than one row"));
+    expect(duplicate).toContain('idKey "id"');
+    expect(duplicate).toContain('"dup"');
+  });
+
+  // The case that keeps the diagnostic from becoming noise: a well-formed list
+  // must stay silent, or developers learn to ignore the warning.
+  test("stays silent when idKey values are unique and non-empty", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    const warnings = collectIdKeyWarnings(page);
+    await initTestBed(`
+      <List idKey="id" data="{[
+        { id: 'a', name: 'Alpha' },
+        { id: 'b', name: 'Beta' },
+        { id: 'c', name: 'Gamma' }
+      ]}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Gamma");
+    await page.waitForTimeout(200);
+
+    expect(warnings).toEqual([]);
+  });
+
+  // Grouped lists insert synthetic section header/footer rows that are not keyed
+  // by idKey; they must not be counted as empty ids.
+  test("does not count section rows as empty ids", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    const warnings = collectIdKeyWarnings(page);
+    await initTestBed(`
+      <List idKey="id" groupBy="category" data="{[
+        { id: 'a', name: 'Alpha', category: 'one' },
+        { id: 'b', name: 'Beta', category: 'two' }
+      ]}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Beta");
+    await page.waitForTimeout(200);
+
+    expect(warnings).toEqual([]);
+  });
+});
