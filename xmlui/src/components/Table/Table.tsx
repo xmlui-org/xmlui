@@ -54,6 +54,14 @@ function hasColumnChild(children: ComponentDef[] | undefined): boolean {
   );
 }
 
+function hasNestedEventHandlers(children: ComponentDef[] | undefined): boolean {
+  return !!children?.some(
+    (child) =>
+      (child.events && Object.keys(child.events).length > 0) ||
+      hasNestedEventHandlers(child.children),
+  );
+}
+
 export const TableMd = createMetadata({
   status: "stable",
   description: "`Table` presents structured data for viewing, sorting, selection, and interaction.",
@@ -753,9 +761,14 @@ const TableWithColumns = memo(
       const refreshOn = extractValue(node.props.refreshOn);
       const renderVersionRef = useRef(0);
       const prevRefreshOnRef = useRef(refreshOn);
+      const hasEventfulCellContent = useMemo(
+        () => hasNestedEventHandlers(node.children),
+        [node.children],
+      );
 
       const shouldForceRefresh =
-        node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+        (node.props.refreshOn === undefined && hasEventfulCellContent) ||
+        prevRefreshOnRef.current !== refreshOn;
       if (shouldForceRefresh) {
         prevRefreshOnRef.current = refreshOn;
         renderVersionRef.current++;

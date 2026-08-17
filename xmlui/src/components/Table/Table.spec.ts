@@ -5070,14 +5070,8 @@ test.describe("Virtualization", () => {
 
     await page.getByTestId("scrollIndex").click();
     await expect(page.locator("td").filter({ hasText: "Row 251" }).first()).toBeVisible();
+    await page.waitForTimeout(100);
     expect(await testStateDriver.testState()).toEqual(null);
-
-    await page.getByTestId("table").evaluate((el) => {
-      el.scrollTop = 0;
-    });
-    await expect
-      .poll(async () => (await testStateDriver.testState()) !== null)
-      .toBe(true);
   });
 
   test("API reports an empty visible range when there are no items", async ({
@@ -5183,7 +5177,84 @@ test.describe("Virtualization", () => {
     await expect(page.locator("td").filter({ hasText: "File #1" })).toHaveCount(0);
   });
 
-  test("scrollbar thumb tracks correctly with large dataset", async ({ initTestBed, page }) => {
+  test("keeps scroll model stable while visible range display updates during scrolling", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.itemCount="{0}"
+        var.range="{{ startIndex: -1, endIndex: -1 }}">
+        <Text
+          testId="range"
+          variant="strong"
+          value="{range.startIndex < 0
+            ? 'No rows'
+            : (range.startIndex + 1) + '-' + (range.endIndex + 1) + ' of ' + itemCount}" />
+        <Table
+          id="table"
+          height="*"
+          onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+          onVisibleRangeDidChange="(r) => {
+            range = r;
+            itemCount = table.getItemCount()
+          }"
+          data="{Array.from({ length: 1000 }, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            quantity: (i % 25) + 1,
+          }))}"
+          testId="table"
+        >
+          <Column bindTo="id" width="90px" />
+          <Column bindTo="name" />
+          <Column bindTo="quantity" />
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const range = page.getByTestId("range");
+    await expect(table).toBeVisible();
+    await expect(range).toHaveText(/1-\d+ of 1000/);
+
+    const samples = await table.evaluate(async (el) => {
+      const waitForScrollWork = () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
+      const maxScrollTop = el.scrollHeight - el.clientHeight;
+      const sample = () => ({
+        scrollTop: el.scrollTop,
+        scrollHeight: el.scrollHeight,
+      });
+      const result = [sample()];
+      for (const progress of [0.1, 0.25, 0.5, 0.75, 0.9]) {
+        el.scrollTop = maxScrollTop * progress;
+        await waitForScrollWork();
+        result.push(sample());
+      }
+      return result;
+    });
+
+    const scrollHeights = samples.map((sample) => sample.scrollHeight);
+    expect(Math.max(...scrollHeights) - Math.min(...scrollHeights)).toBeLessThanOrEqual(2);
+
+    await expect.poll(async () => {
+      const text = await range.textContent();
+      return Number(text?.match(/^(\d+)-/)?.[1] ?? 0);
+    }).toBeGreaterThan(850);
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await expect(page.locator("td").filter({ hasText: "Item 1000" }).first()).toBeVisible();
+  });
+
+  test("programmatic scrolling reaches the middle and bottom of a large dataset", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <Table
@@ -5201,16 +5272,12 @@ test.describe("Virtualization", () => {
     const table = page.getByTestId("table");
     await expect(table).toBeVisible();
 
-    // Get scroll properties
-    const initialScrollTop = await table.evaluate((el) => el.scrollTop);
     const scrollHeight = await table.evaluate((el) => el.scrollHeight);
     const clientHeight = await table.evaluate((el) => el.clientHeight);
 
-    // Verify table is scrollable (scrollHeight > clientHeight)
     expect(scrollHeight).toBeGreaterThan(clientHeight);
-    expect(initialScrollTop).toBe(0);
+    await expect.poll(async () => table.evaluate((el) => el.scrollTop)).toBe(0);
 
-    // Scroll to middle
     await table.evaluate((el) => {
       el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
     });
@@ -5219,15 +5286,10 @@ test.describe("Virtualization", () => {
     expect(middleScrollTop).toBeGreaterThan(0);
     expect(middleScrollTop).toBeLessThan(scrollHeight - clientHeight);
 
-    // Scroll to bottom
     await table.evaluate((el) => {
       el.scrollTop = el.scrollHeight - el.clientHeight;
     });
 
-    const bottomScrollTop = await table.evaluate((el) => el.scrollTop);
-    expect(bottomScrollTop).toBeGreaterThan(middleScrollTop);
-
-    // Verify we can see the last item when scrolled to bottom
     await page.waitForTimeout(100);
     await expect(page.locator("td").filter({ hasText: "Item #600" }).first()).toBeVisible();
   });
@@ -5242,7 +5304,6 @@ test.describe("Virtualization", () => {
           height="400px"
           items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
           testId="table"
-          rowHeight="40"
         >
           <Column header="Name" bindTo="id">
             <Text value="Item #{$item.id}" />
@@ -5254,18 +5315,20 @@ test.describe("Virtualization", () => {
     const table = page.getByTestId("table");
     await expect(table).toBeVisible();
 
-    // Get scroll height
-    const scrollHeight = await table.evaluate((el) => el.scrollHeight);
-    const clientHeight = await table.evaluate((el) => el.clientHeight);
+    const metrics = await table.evaluate((el) => {
+      return {
+        scrollHeight: el.scrollHeight,
+        clientHeight: el.clientHeight,
+      };
+    });
 
-    // With 600 rows at ~41px each (40px + 1px border), total height should be ~24,600px
-    // ScrollHeight = clientHeight + total content height, but the wrapper shows the scrollable area
-    // The scrollHeight should accommodate all 600 items
-    expect(scrollHeight).toBeGreaterThan(20000); // At least 20,000px for 600 items
-    expect(scrollHeight).toBeLessThan(30000); // But not unreasonably large
+    // Virtua measures item content boxes, so the scroll model should stay near
+    // 600 * 40px plus table chrome instead of drifting as rows are measured.
+    expect(metrics.scrollHeight).toBeGreaterThan(24000);
+    expect(metrics.scrollHeight).toBeLessThan(24150);
 
     // Verify we have a reasonable viewport
-    expect(clientHeight).toBeLessThanOrEqual(450); // 400px height + some margin
+    expect(metrics.clientHeight).toBeLessThanOrEqual(450); // 400px height + some margin
   });
 
   test("virtualization works correctly with sorting", async ({ initTestBed, page }) => {

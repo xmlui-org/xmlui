@@ -1621,6 +1621,7 @@ export const Table = memo(
     }, []);
 
     const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
+    const scrollElementRef = hasOutsideScroll ? scrollRef : wrapperRef;
 
     const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
 
@@ -1843,6 +1844,7 @@ export const Table = memo(
       lookupEventHandler,
       rowDoubleClick,
       striped,
+      rowHeight,
       renderVersion: rowRenderVersion,
     };
     const rowStateRef = useRef(rowState);
@@ -2042,6 +2044,8 @@ export const Table = memo(
               ref={composedRowRef}
               style={{
                 ...style,
+                boxSizing: "content-box",
+                height: s.rowHeight,
                 minWidth: "max-content",
                 userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
               }}
@@ -2308,6 +2312,24 @@ export const Table = memo(
     ]);
 
     const programmaticScroll = useRef(false);
+    const programmaticScrollReleaseTimer = useRef<number | null>(null);
+    const scheduleProgrammaticScrollRelease = useEvent(() => {
+      if (programmaticScrollReleaseTimer.current !== null) {
+        window.clearTimeout(programmaticScrollReleaseTimer.current);
+      }
+      programmaticScrollReleaseTimer.current = window.setTimeout(() => {
+        programmaticScroll.current = false;
+        programmaticScrollReleaseTimer.current = null;
+      }, 80);
+    });
+    useEffect(() => {
+      return () => {
+        if (programmaticScrollReleaseTimer.current !== null) {
+          window.clearTimeout(programmaticScrollReleaseTimer.current);
+        }
+      };
+    }, []);
+
     const computeVisibleRange = useCallback(() => {
       const v = virtualizerRef.current;
       const rowCount = rowsRef.current.length;
@@ -2355,20 +2377,18 @@ export const Table = memo(
             visibleRange: computeVisibleRange() ?? { startIndex: -1, endIndex: -1 },
             itemCount: rowCount,
           });
+        } else if (programmaticScroll.current) {
+          scheduleProgrammaticScrollRelease();
         }
         reportVisibleRange();
       },
-      [computeVisibleRange, onScroll, reportVisibleRange],
+      [computeVisibleRange, onScroll, reportVisibleRange, scheduleProgrammaticScrollRelease],
     );
 
     const runProgrammaticScroll = useEvent((scroll: () => void) => {
       programmaticScroll.current = true;
       scroll();
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          programmaticScroll.current = false;
-        });
-      });
+      scheduleProgrammaticScrollRelease();
     });
 
     const scrollToBottom = useEvent(() => {
@@ -2653,10 +2673,11 @@ export const Table = memo(
           )}
           {hasData && (
             <Virtualizer
+              key={hasOutsideScroll ? "outside-scroll" : "inside-scroll"}
               as="tbody"
               item={VirtualTableRow as CustomItemComponent}
               ref={virtualizerRef}
-              scrollRef={wrapperRef}
+              scrollRef={scrollElementRef}
               startMargin={startMargin}
               itemSize={rowHeight}
               onScroll={handleVirtuaScroll}
