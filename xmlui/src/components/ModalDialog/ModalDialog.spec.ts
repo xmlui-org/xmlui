@@ -463,6 +463,7 @@ test.describe("Events and Vars", () => {
         <Button testId="open" onClick="modal.open()">open</Button>
         <ModalDialog
           id="modal"
+          confirmCloseTitle="Unsaved Draft"
           canCloseMessage="Discard your draft?"
           confirmCloseLabel="Discard"
           cancelCloseLabel="Keep Editing">
@@ -476,6 +477,7 @@ test.describe("Events and Vars", () => {
     await page.getByTestId("open").click();
     await page.getByTestId("markDirty").click();
     await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.getByText("Unsaved Draft")).toBeVisible();
     await expect(page.getByText("Discard your draft?")).toBeVisible();
 
     await page.getByRole("button", { name: "Keep Editing" }).click();

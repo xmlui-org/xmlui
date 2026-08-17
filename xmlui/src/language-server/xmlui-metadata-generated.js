@@ -13325,6 +13325,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": true
       },
+      "confirmCloseTitle": {
+        "description": "The title shown in the confirmation dialog when a dirty modal dialog is about to close.",
+        "valueType": "string",
+        "defaultValue": "Unsaved changes"
+      },
       "canCloseMessage": {
         "description": "The confirmation message shown when the dialog is dirty and the user attempts to close it.",
         "valueType": "string",

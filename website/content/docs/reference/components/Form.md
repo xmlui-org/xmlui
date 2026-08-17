@@ -47,6 +47,7 @@ The next example places the same dirty-tracked Form inside a `ModalDialog`. Edit
   <ModalDialog
     id="profileDialog"
     title="Edit Profile"
+    confirmCloseTitle="Unsaved Profile"
     canCloseMessage="Discard your profile changes?"
     confirmCloseLabel="Discard"
     cancelCloseLabel="Keep Editing">

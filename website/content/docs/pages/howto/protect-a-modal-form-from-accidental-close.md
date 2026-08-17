@@ -14,6 +14,7 @@ When a `ModalDialog` hosts a `Form`, XMLUI connects the Form's dirty flag to the
   <ModalDialog
     id="profileDialog"
     title="Edit profile"
+    confirmCloseTitle="Unsaved Profile"
     canCloseMessage="Discard your profile changes?"
     confirmCloseLabel="Discard"
     cancelCloseLabel="Keep Editing"
@@ -55,7 +56,7 @@ When a `ModalDialog` hosts a `Form`, XMLUI connects the Form's dirty flag to the
 
 **`onDirtyChanged` is the right place to update surrounding UI**: The dialog emits `dirtyChanged` with the new combined dirty state. Use it for badges, labels, disabled states, or analytics without polling `getDirty()`.
 
-**The confirmation belongs to the ModalDialog**: Set `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel` on the dialog. These labels appear in the confirmation dialog used when a dirty modal is about to close.
+**The confirmation belongs to the ModalDialog**: Set `confirmCloseTitle`, `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel` on the dialog. These values appear in the confirmation dialog used when a dirty modal is about to close.
 
 **Mark the Form clean when the draft is accepted or discarded**: A successful save can call `form.setDirty(false)` before closing. A discard action usually calls `form.reset()` so visible field values return to the pristine baseline before the dialog closes.
 

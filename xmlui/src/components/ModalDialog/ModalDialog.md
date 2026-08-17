@@ -80,7 +80,7 @@ The `ModalDialog` component is also a container such as the [`Card`](/docs/refer
 
 ### Preventing Accidental Close
 
-Use `setDirty(true)` when dialog content changes. When a dirty dialog is about to close, `ModalDialog` shows a confirmation prompt using `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel`.
+Use `setDirty(true)` when dialog content changes. When a dirty dialog is about to close, `ModalDialog` shows a confirmation prompt using `confirmCloseTitle`, `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel`.
 
 When the dialog hosts a `Form`, form field edits automatically count as dialog dirty state. The `dirtyChanged` event fires whenever this combined dirty state changes, so you can update labels, badges, or commands without polling `getDirty()`. If you define `willClose`, that event controls closing instead: returning an explicit `false` prevents the close and skips the dirty confirmation flow.
 
@@ -95,6 +95,7 @@ When the dialog hosts a `Form`, form field edits automatically count as dialog d
   <ModalDialog
     id="draftDialog"
     title="Edit Draft"
+    confirmCloseTitle="Unsaved Draft"
     canCloseMessage="Discard your unsaved changes?"
     confirmCloseLabel="Discard"
     cancelCloseLabel="Keep Editing"
@@ -186,6 +187,12 @@ Use the close button to close the dialog.
 %-PROP-END
 
 %-PROP-START canCloseMessage
+
+See [Preventing Accidental Close](#preventing-accidental-close) for an example.
+
+%-PROP-END
+
+%-PROP-START confirmCloseTitle
 
 See [Preventing Accidental Close](#preventing-accidental-close) for an example.
 
