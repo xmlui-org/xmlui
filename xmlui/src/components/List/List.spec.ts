@@ -293,110 +293,185 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toContainText("Item 2");
   });
 
-  test("scrollToTop method works", async ({ initTestBed, createListDriver, page }) => {
-    await initTestBed(`
-      <List id="testList" data="{[
-        {id: 1, name: 'Item 1'},
-        {id: 2, name: 'Item 2'},
-        {id: 3, name: 'Item 3'},
-        {id: 4, name: 'Item 4'},
-        {id: 5, name: 'Item 5'}
-      ]}">
-        <Text>{$item.name}</Text>
+  // ---------------------------------------------------------------------------
+  // Scroll API tests.
+  //
+  // These drive the component API from markup (a Button onClick) rather than
+  // from page.evaluate: component APIs are NOT exposed on `window` in the test
+  // bed, so the previous `const list = (window as any).testList; if
+  // (list?.scrollToTop) {...}` shape silently skipped every call, and the
+  // paired `toContainText` assertion passed whether or not anything scrolled.
+  //
+  // They assert the scroll container's scrollTop, for the same reason: with a
+  // short list every item is in the DOM regardless of scroll position, so a
+  // text assertion cannot distinguish "scrolled" from "did nothing".
+  //
+  // Each API is covered in BOTH scroll modes. Outside-scroll (no explicit
+  // height, an ancestor scrolls) was entirely untested and entirely broken —
+  // see xmlui-org/xmlui#3760 and the Virtualizer key comment in ListReact.tsx.
+  // ---------------------------------------------------------------------------
+
+  // 200 rows x 30px = 6000px of content.
+  const SCROLL_DATA = "{Array.from({length: 200}, (_, i) => ({id: 'row-' + i, name: 'Item ' + i}))}";
+
+  // Bounded height: the List itself scrolls.
+  const insideScrollApp = (buttons: string) => `
+    <VStack>
+      <List id="testList" height="300px" data="${SCROLL_DATA}">
+        <Text height="30px">{$item.name}</Text>
       </List>
-    `);
-    const driver = await createListDriver();
+      ${buttons}
+    </VStack>
+  `;
 
-    // Scroll down first
-    await driver.scrollTo("bottom");
+  // No explicit height: an ancestor scrolls and the List virtualizes against it.
+  const outsideScrollApp = (buttons: string) => `
+    <VStack>
+      <VStack testId="scroller" height="300px" overflowY="scroll">
+        <List id="testList" data="${SCROLL_DATA}">
+          <Text height="30px">{$item.name}</Text>
+        </List>
+      </VStack>
+      ${buttons}
+    </VStack>
+  `;
 
-    // Use API to scroll to top
-    await page.evaluate(() => {
-      const list = (window as any).testList;
-      if (list?.scrollToTop) {
-        list.scrollToTop();
-      }
+  // The element that actually scrolls, in either mode: the only descendant
+  // whose content overflows its box.
+  const scrollTopOf = (page: any) =>
+    page.evaluate(() => {
+      let found = -1;
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          found = Math.round(el.scrollTop);
+        }
+      });
+      return found;
     });
 
-    // Should show first item
-    await expect(driver.component).toContainText("Item 1");
-  });
+  const setScrollTop = async (page: any, value: number) => {
+    await page.evaluate((v: number) => {
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          el.scrollTop = v;
+        }
+      });
+    }, value);
+  };
 
-  test("scrollToBottom method works", async ({ initTestBed, createListDriver, page }) => {
-    await initTestBed(`
-      <List id="testList" data="{[
-        {id: 1, name: 'Item 1'},
-        {id: 2, name: 'Item 2'},
-        {id: 3, name: 'Item 3'},
-        {id: 4, name: 'Item 4'},
-        {id: 5, name: 'Item 5'}
-      ]}">
-        <Text>{$item.name}</Text>
-      </List>
-    `);
-    const driver = await createListDriver();
+  for (const [mode, app] of [
+    ["inside-scroll", insideScrollApp],
+    ["outside-scroll", outsideScrollApp],
+  ] as const) {
+    test(`scrollToTop method works (${mode})`, async ({ initTestBed, page }) => {
+      await initTestBed(
+        app(`<Button testId="act" label="top" onClick="testList.scrollToTop()" />`),
+      );
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
 
-    // Use API to scroll to bottom
-    await page.evaluate(() => {
-      const list = (window as any).testList;
-      if (list?.scrollToBottom) {
-        list.scrollToBottom();
-      }
+      await setScrollTop(page, 900);
+      await expect.poll(() => scrollTopOf(page)).toBe(900);
+
+      await page.getByTestId("act").click();
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
     });
 
-    // Should show last items
-    await expect(driver.component).toContainText("Item 5");
-  });
+    test(`scrollToBottom method works (${mode})`, async ({ initTestBed, page }) => {
+      await initTestBed(
+        app(`<Button testId="act" label="bottom" onClick="testList.scrollToBottom()" />`),
+      );
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
 
-  test("scrollToIndex method works", async ({ initTestBed, createListDriver, page }) => {
-    await initTestBed(`
-      <List id="testList" data="{[
-        {id: 1, name: 'Item 1'},
-        {id: 2, name: 'Item 2'},
-        {id: 3, name: 'Item 3'},
-        {id: 4, name: 'Item 4'},
-        {id: 5, name: 'Item 5'}
-      ]}">
-        <Text>{$item.name}</Text>
-      </List>
-    `);
-    const driver = await createListDriver();
-
-    // Use API to scroll to specific index
-    await page.evaluate(() => {
-      const list = (window as any).testList;
-      if (list?.scrollToIndex) {
-        list.scrollToIndex(2);
-      }
+      await page.getByTestId("act").click();
+      // 200 rows * 30px - 300px viewport = 5700.
+      await expect.poll(() => scrollTopOf(page)).toBe(5700);
     });
 
-    // Should show item around index 2
-    await expect(driver.component).toContainText("Item 3");
-  });
+    test(`scrollToIndex method works (${mode})`, async ({ initTestBed, page }) => {
+      await initTestBed(
+        app(`<Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />`),
+      );
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
 
-  test("scrollToId method works", async ({ initTestBed, createListDriver, page }) => {
-    await initTestBed(`
-      <List id="testList" idKey="id" data="{[
-        {id: 'item-1', name: 'First Item'},
-        {id: 'item-target', name: 'Target Item'},
-        {id: 'item-3', name: 'Third Item'}
-      ]}">
-        <Text>{$item.name}</Text>
-      </List>
-    `);
-    const driver = await createListDriver();
-
-    // Use API to scroll to specific ID
-    await page.evaluate(() => {
-      const list = (window as any).testList;
-      if (list?.scrollToId) {
-        list.scrollToId("item-target");
-      }
+      await page.getByTestId("act").click();
+      // Item 50 starts at 50 * 30px.
+      await expect.poll(() => scrollTopOf(page)).toBe(1500);
     });
 
-    // Should show target item
-    await expect(driver.component).toContainText("Target Item");
-  });
+    test(`scrollToId method works (${mode})`, async ({ initTestBed, page }) => {
+      await initTestBed(
+        app(`<Button testId="act" label="id" onClick="testList.scrollToId('row-50')" />`),
+      );
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
+
+      await page.getByTestId("act").click();
+      await expect.poll(() => scrollTopOf(page)).toBe(1500);
+    });
+
+    test(`list virtualizes rather than rendering every row (${mode})`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(app(""));
+      // Outside-scroll used to render all 200 rows because virtua had bound its
+      // viewport to the List's own root, whose height is content-sized.
+      await expect
+        .poll(async () =>
+          page.evaluate(() => {
+            const c = document.querySelector("[data-list-container]") as HTMLElement;
+            if (!c) return -1;
+            const seen = new Set(
+              Array.from(c.querySelectorAll("*"))
+                .map((e) => (e.textContent || "").trim())
+                .filter((t) => /^Item \d+$/.test(t)),
+            );
+            return seen.size;
+          }),
+        )
+        .toBeLessThan(40);
+    });
+  }
+
+  // The original xmlui-org/xmlui#3760 report: content that appears ABOVE the
+  // list after mount. `useStartMargin` only recomputes on the scroll
+  // container's own resize (and its rAF retry is guarded on `newMargin === 0`),
+  // so the cached offset stays at its mount-time value and index-targeted
+  // scrolls land short by exactly the height of the new content.
+  //
+  // This was unreachable while the scroll APIs were inert; fixing the viewport
+  // binding exposed it. Measured: with a 200px block revealed above,
+  // scrollToIndex(50) lands at 1500 instead of 1700.
+  //
+  // Note scrollToTop is NOT affected: virtua's $scrollToIndex adds
+  // store.$getStartSpacerSize() to the caller's offset, and scrollToTop passes
+  // `offset: -startMargin`, so the stale value cancels itself at index 0.
+  test.fixme(
+    "scrollToIndex accounts for content revealed above the list (outside-scroll)",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <VStack var.showTop="{false}">
+          <VStack testId="scroller" height="300px" overflowY="scroll">
+            <VStack when="{showTop}" testId="above" height="200px">
+              <Text>revealed after mount</Text>
+            </VStack>
+            <List id="testList" data="${SCROLL_DATA}">
+              <Text height="30px">{$item.name}</Text>
+            </List>
+          </VStack>
+          <Button testId="reveal" label="reveal" onClick="showTop = true" />
+          <Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />
+        </VStack>
+      `);
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
+
+      await page.getByTestId("reveal").click();
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
+
+      await page.getByTestId("act").click();
+      // 200px revealed above + item 50 at 1500px within the list.
+      await expect.poll(() => scrollTopOf(page)).toBe(1700);
+    },
+  );
 
   test("shows loading state when loading is true and no data", async ({
     initTestBed,
@@ -2539,3 +2614,4 @@ test.describe("scroll event", () => {
       .toBe(true);
   });
 });
+

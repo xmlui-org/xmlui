@@ -1247,7 +1247,26 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
                 })}
                 data-list-container={true}
               >
+                {/* key on the resolved scroll viewport: Virtualizer observes its
+                    viewport in a mount-only layout effect whose microtask reads
+                    scrollRef.current once and never revisits it (virtua
+                    Virtualizer.tsx, empty dep array). On the first render
+                    parentRef.current is still null, so useScrollParent returns
+                    null, hasOutsideScroll is falsy, and scrollElementRef is
+                    parentRef — the List's own root. virtua then binds to that
+                    root permanently, even though later renders pass scrollRef.
+                    The result was a dead letter in outside-scroll mode: scroll
+                    APIs set scrollTop on a non-scrollable div (no movement, no
+                    error) and the viewport sized to full content height, so
+                    every row rendered — 200 of 200 in a 200-row list, vs 17
+                    when bounded. Remounting on the flip re-runs that effect
+                    against the resolved ref. At the render-2 flip nothing is
+                    measured yet, so the remount is free; a later legitimate
+                    flip discards virtua's measurement cache, which is still
+                    better than staying bound to the wrong element.
+                    xmlui-org/xmlui#3760 */}
                 <Virtualizer
+                  key={hasOutsideScroll ? "outside-scroll" : "inside-scroll"}
                   ref={virtualizerRef}
                   scrollRef={scrollElementRef}
                   shift={shift}
