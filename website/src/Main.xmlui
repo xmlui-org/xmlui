@@ -614,6 +614,11 @@
                             label="Create a two-handle range slider"
                             to="/docs/howto/create-a-two-handle-range-slider"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Drive a Slider with a runtime domain"
+                            to="/docs/howto/drive-a-slider-with-a-runtime-domain"
+                        />
                     </NavGroup>
 
                     <NavGroup label="Data Loading & APIs">
