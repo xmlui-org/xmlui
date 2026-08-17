@@ -654,6 +654,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Read data with a POST request"
+                            to="/docs/howto/read-data-with-a-post-request"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Invalidate related data after a write"
                             to="/docs/howto/control-cache-invalidation"
                         />
