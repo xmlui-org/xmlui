@@ -314,6 +314,42 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 
 %-PROP-END
 
+%-PROP-START highlightText
+
+Wraps matching text in `<mark>` elements, without the caller having to split the string into segments. Matching is identical to [`Markdown`'s property of the same name](/components/Markdown#highlighttext) — case-insensitive, a string treated as one phrase, an array as independent terms, terms under 2 characters ignored — so a list mixing `Text` and `Markdown` rows highlights consistently.
+
+```xmlui-pg copy display name="Example: highlightText"
+<App>
+  <Text highlightText="ticker">The pty ticker fires once per second.</Text>
+  <Text highlightText="{['pty', 'ticker']}">The pty layer and the ticker.</Text>
+</App>
+```
+
+Because the marks are rendered inside the `Text` element itself, a match falling in the middle of a word does not break the word, and styling set on the `Text` applies once rather than needing to be repeated per segment.
+
+%-PROP-END
+
+%-PROP-START highlightActiveIndex
+
+Selects which occurrence of [`highlightText`](#highlighttext) is the *active* match: it gets `data-active="true"`, is styled with `backgroundColor-markActive-Text`, and is scrolled into view.
+
+Occurrences are counted across all terms in document order, matching `Markdown`. That shared numbering is the point: a find-in-page stepping through a list of mixed `Text` and `Markdown` rows walks every match as one sequence, regardless of which component rendered it.
+
+```xmlui-pg copy display name="Example: highlightActiveIndex"
+<App var.step="{0}">
+  <HStack>
+    <Button label="Previous" onClick="step = Math.max(0, step - 1)" />
+    <Button label="Next" onClick="step = Math.min(2, step + 1)" />
+    <Text value="Match {step + 1} of 3" />
+  </HStack>
+  <Text highlightText="pty" highlightActiveIndex="{step}">
+    The pty ticker, the pty layer, and the pty menu.
+  </Text>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START overflowMode
 
 Here are a few examples.

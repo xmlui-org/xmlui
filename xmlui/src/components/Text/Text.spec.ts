@@ -2250,3 +2250,133 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toHaveText("Smoke test");
   });
 });
+
+// =============================================================================
+// HIGHLIGHT TEXT
+// =============================================================================
+
+test.describe("highlightText", () => {
+  test("wraps a single term in a mark", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text testId="t" highlightText="ticker" value="The pty ticker fires." />`);
+    const marks = page.getByTestId("t").locator("mark");
+    await expect(marks).toHaveCount(1);
+    await expect(marks.first()).toHaveText("ticker");
+  });
+
+  test("matches case-insensitively and keeps the source casing", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<Text testId="t" highlightText="pty" value="PTY and pty." />`);
+    const marks = page.getByTestId("t").locator("mark");
+    await expect(marks).toHaveCount(2);
+    await expect(marks.nth(0)).toHaveText("PTY");
+    await expect(marks.nth(1)).toHaveText("pty");
+  });
+
+  test("highlights each term of a string array independently", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Text testId="t" highlightText="{['pty', 'ticker']}" value="The pty layer and the ticker." />`,
+    );
+    const marks = page.getByTestId("t").locator("mark");
+    await expect(marks).toHaveCount(2);
+    await expect(marks.nth(0)).toHaveText("pty");
+    await expect(marks.nth(1)).toHaveText("ticker");
+  });
+
+  // A match inside a word is what forced the hand-rolled two-level inline/pre-wrap
+  // construction downstream: inline-block or flex segments introduce a break
+  // opportunity mid-word and split it. The mark must not break the word.
+  test("a match inside a word does not split the word", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Text testId="t" width="400px" highlightText="tick" value="antitickerdisestablish" />`,
+    );
+    const container = page.getByTestId("t");
+    await expect(container.locator("mark")).toHaveText("tick");
+    await expect(container).toHaveText("antitickerdisestablish");
+
+    // One line box: the highlighted run must not wrap the word onto a second line.
+    const boxes = await container.locator("mark").boundingBox();
+    const containerBox = await container.boundingBox();
+    expect(boxes).not.toBeNull();
+    expect(containerBox).not.toBeNull();
+    expect(containerBox!.height).toBeLessThan(boxes!.height * 2);
+  });
+
+  // Whitespace around a match must survive the split into text nodes and marks.
+  // Asserted against an unhighlighted copy of the same value rather than a literal,
+  // because XMLUI renders runs of spaces as space+nbsp pairs — the point is that
+  // highlighting changes nothing about the text, whatever that encoding is.
+  test("preserves whitespace around a match under pre-wrap", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="plain" whiteSpace="pre-wrap" value="  before   match   after  " />
+        <Text testId="marked" whiteSpace="pre-wrap" highlightText="match"
+          value="  before   match   after  " />
+      </Fragment>
+    `);
+    const plain = await page.getByTestId("plain").textContent();
+    const marked = await page.getByTestId("marked").textContent();
+    expect(marked).toEqual(plain);
+    await expect(page.getByTestId("marked").locator("mark")).toHaveText("match");
+  });
+
+  test("the longest overlapping term wins, so marks never nest", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Text testId="t" highlightText="{['cat', 'category']}" value="the category of cat" />`,
+    );
+    const marks = page.getByTestId("t").locator("mark");
+    await expect(marks).toHaveCount(2);
+    await expect(marks.nth(0)).toHaveText("category");
+    await expect(marks.nth(1)).toHaveText("cat");
+    await expect(page.getByTestId("t").locator("mark mark")).toHaveCount(0);
+  });
+
+  test("highlightActiveIndex marks the Nth occurrence in document order", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Text testId="t" highlightText="{['pty', 'ticker']}" highlightActiveIndex="{1}"
+         value="pty then ticker then pty" />`,
+    );
+    const active = page.getByTestId("t").locator('mark[data-active="true"]');
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("ticker");
+  });
+
+  test("counts occurrences across terms, not per term", async ({ initTestBed, page }) => {
+    // Document order is pty(0), ticker(1), pty(2) — index 2 is the second 'pty',
+    // which per-term counting would place at index 1.
+    await initTestBed(
+      `<Text testId="t" highlightText="{['pty', 'ticker']}" highlightActiveIndex="{2}"
+         value="pty then ticker then pty" />`,
+    );
+    const active = page.getByTestId("t").locator('mark[data-active="true"]');
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("pty");
+  });
+
+  test("terms shorter than 2 characters are a no-op", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text testId="t" highlightText="a" value="a cat sat" />`);
+    await expect(page.getByTestId("t").locator("mark")).toHaveCount(0);
+    await expect(page.getByTestId("t")).toHaveText("a cat sat");
+  });
+
+  test("an empty string and an empty array are no-ops", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="empty" highlightText="" value="nothing marked" />
+        <Text testId="arr" highlightText="{[]}" value="nothing marked" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("empty").locator("mark")).toHaveCount(0);
+    await expect(page.getByTestId("arr").locator("mark")).toHaveCount(0);
+  });
+
+  test("renders unchanged when no term matches", async ({ initTestBed, page }) => {
+    await initTestBed(`<Text testId="t" highlightText="absent" value="The pty ticker fires." />`);
+    await expect(page.getByTestId("t").locator("mark")).toHaveCount(0);
+    await expect(page.getByTestId("t")).toHaveText("The pty ticker fires.");
+  });
+});
