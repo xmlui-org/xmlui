@@ -28,6 +28,7 @@ export type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBl
   invalidMessages?: string[];
   minStepsBetweenThumbs?: number;
   onDidChange?: (newValue: number | number[]) => void;
+  onDidCommit?: (newValue: number | number[]) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   updateState?: UpdateStateFn;
@@ -93,6 +94,7 @@ export const Slider = memo(forwardRef(
       inverted,
       updateState,
       onDidChange = noop,
+      onDidCommit = noop,
       onFocus = noop,
       onBlur = noop,
       registerComponentApi,
@@ -187,6 +189,21 @@ export const Slider = memo(forwardRef(
       [onDidChange, updateState],
     );
 
+    // Fired once per completed adjustment rather than per step crossed: Radix's own
+    // commit (pointer release, and each arrow/Page/Home/End keydown), the small-step
+    // keyboard path below that Radix never sees, and the setValue() API. Deliberately
+    // NOT fired by the initialValue/min/max effect above — that is the component
+    // re-seeding itself from new props, not a value anyone asked for.
+    const commitValue = useCallback(
+      (value: number[]) => {
+        if (readOnly || !enabled) {
+          return;
+        }
+        onDidCommit(value.length === 1 ? value[0] : value);
+      },
+      [onDidCommit, readOnly, enabled],
+    );
+
     const onInputChange = useCallback(
       (value: number[]) => {
         if (readOnly) {
@@ -240,6 +257,7 @@ export const Slider = memo(forwardRef(
       const formattedValue = formatValue(newValue, min, min, max);
       const valueToUpdate = formattedValue.length === 1 ? formattedValue[0] : formattedValue;
       updateValue(valueToUpdate);
+      commitValue(formattedValue);
     });
 
     useEffect(() => {
@@ -286,8 +304,10 @@ export const Slider = memo(forwardRef(
         const newValues = [...displayValue];
         newValues[focusedThumbIndex] = newThumbValue;
         onInputChange(newValues);
+        // Radix never sees this key, so its onValueCommit cannot fire for it.
+        commitValue(newValues);
       },
-      [step, readOnly, enabled, displayValue, min, max, onInputChange],
+      [step, readOnly, enabled, displayValue, min, max, onInputChange, commitValue],
     );
 
       return (
@@ -309,6 +329,7 @@ export const Slider = memo(forwardRef(
               onFocus={handleOnFocus}
               onBlur={handleOnBlur}
               onValueChange={onInputChange}
+              onValueCommit={commitValue}
               onMouseOver={onShowTooltip}
               onMouseLeave={onHideTooltip}
               onPointerDown={onShowTooltip}

@@ -93,6 +93,16 @@ export const SliderMd = createMetadata({
   },
   events: {
     didChange: dDidChange(COMP),
+    didCommit: {
+      description:
+        `This event is triggered when the user finishes an adjustment of \`${COMP}\`, ` +
+        `rather than on every step crossed while dragging. Use it for expensive work ` +
+        `(filtering a result set, fetching) and keep \`didChange\` for live display.`,
+      signature: "didCommit(newValue: any): void",
+      parameters: {
+        newValue: "The committed value of the component.",
+      },
+    },
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
   },
@@ -192,6 +202,7 @@ export const sliderComponentRenderer = wrapComponent(COMP, Slider, SliderMd, {
         initialValue={extractValue(node.props.initialValue)}
         updateState={updateState}
         onDidChange={lookupEventHandler("didChange")}
+        onDidCommit={lookupEventHandler("didCommit")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}

@@ -15936,6 +15936,13 @@ export default {
           "newValue": "The new value of the component."
         }
       },
+      "didCommit": {
+        "description": "This event is triggered when the user finishes an adjustment of `Slider`, rather than on every step crossed while dragging. Use it for expensive work (filtering a result set, fetching) and keep `didChange` for live display.",
+        "signature": "didCommit(newValue: any): void",
+        "parameters": {
+          "newValue": "The committed value of the component."
+        }
+      },
       "gotFocus": {
         "description": "This event is triggered when the Slider has received the focus.",
         "signature": "gotFocus(): void",

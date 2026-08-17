@@ -434,6 +434,122 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual(2);
   });
 
+  test("didCommit fires once per drag while didChange fires per step", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.changes="{0}" var.commits="{0}">
+        <Slider
+          initialValue="20"
+          maxValue="100"
+          onDidChange="changes++; testState = { changes, commits }"
+          onDidCommit="commits++; testState = { changes, commits }" />
+      </Fragment>
+    `);
+    const thumb = page.getByRole("slider");
+    const box = await thumb.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2 + 80, box!.y + box!.height / 2, { steps: 10 });
+    await page.mouse.up();
+
+    await expect.poll(async () => (await testStateDriver.testState())?.commits).toEqual(1);
+    expect((await testStateDriver.testState())?.changes).toBeGreaterThan(1);
+  });
+
+  test("didCommit does not fire when a drag ends where it started", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.changes="{0}" var.commits="{0}">
+        <Slider
+          initialValue="20"
+          maxValue="100"
+          onDidChange="changes++; testState = { changes, commits }"
+          onDidCommit="commits++; testState = { changes, commits }" />
+      </Fragment>
+    `);
+    const thumb = page.getByRole("slider");
+    const box = await thumb.boundingBox();
+    const startX = box!.x + box!.width / 2;
+    const startY = box!.y + box!.height / 2;
+
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 60, startY, { steps: 8 });
+    await page.mouse.move(startX, startY, { steps: 8 });
+    await page.mouse.up();
+
+    // The value moved and came back, so didChange fired but nothing was committed.
+    await expect.poll(async () => (await testStateDriver.testState())?.changes).toBeGreaterThan(1);
+    expect((await testStateDriver.testState())?.commits).toEqual(0);
+  });
+
+  test("didCommit event fires on keyboard adjustment and passes the value", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Slider onDidCommit="arg => testState = arg" initialValue="1" />
+    `);
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("didCommit event fires for range sliders with both values", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Slider onDidCommit="arg => testState = arg" initialValue="{[20, 60]}" maxValue="100" />
+    `);
+    const firstThumb = page.getByRole("slider").first();
+    await firstThumb.focus();
+    await firstThumb.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual([21, 60]);
+  });
+
+  test("didCommit does not fire when disabled", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Slider enabled="false" onDidCommit="testState = 'committed'" />
+    `);
+    const slider = page.getByRole("slider");
+    await slider.focus();
+    await slider.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+
+  test("re-seeding from initialValue/minValue/maxValue fires neither event", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Downstream apps reset their own filter state when a slider's domain changes and
+    // rely on the re-seed staying silent; an event here would overwrite that reset.
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.seed="{20}" var.lo="{0}" var.hi="{100}">
+        <Slider
+          initialValue="{seed}"
+          minValue="{lo}"
+          maxValue="{hi}"
+          onDidChange="testState = 'changed'"
+          onDidCommit="testState = 'committed'" />
+        <Button testId="reseed" onClick="seed = 40; lo = 10; hi = 80" />
+      </Fragment>
+    `);
+    const slider = page.getByRole("slider");
+    await expect(slider).toHaveAttribute("aria-valuenow", "20");
+
+    await page.getByTestId("reseed").click();
+    await expect(slider).toHaveAttribute("aria-valuenow", "40");
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+
   test("gotFocus event fires on focus", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Slider onGotFocus="testState = 'focused'" />
@@ -534,6 +650,17 @@ test.describe("Api", () => {
     `);
     await page.getByTestId("setBtn").click();
     await expect.poll(testStateDriver.testState).toEqual("api-changed");
+  });
+
+  test("setValue API triggers didCommit", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Slider id="mySlider" maxValue="100" onDidCommit="arg => testState = arg" />
+        <Button testId="setBtn" onClick="mySlider.setValue(75)" />
+      </Fragment>
+    `);
+    await page.getByTestId("setBtn").click();
+    await expect.poll(testStateDriver.testState).toEqual(75);
   });
 
   test("focus API focuses the slider", async ({ initTestBed, page }) => {
