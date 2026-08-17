@@ -374,6 +374,8 @@ When `segments` is set it supplies the component's content — `value` and any c
 If no segment carries `active`, [`highlightActiveIndex`](#highlightactiveindex) selects which `hit` is active, counting in document order — the same numbering `highlightText` uses, so a find-in-page can step through a list mixing both kinds of row as one sequence.
 
 > [!INFO] `segments` expresses **one kind of span**: whether it matched a search, and whether it is the current match. It is deliberately not a general mechanism for styling arbitrary runs of text. Content that carries other, orthogonal span kinds — added and removed words in a diff, say, which a row may hold *alongside* search hits — needs its own styling and should compose those runs itself. Keeping this property to a single meaning is what lets `hit` and `active` mean the same thing here as they do for `highlightText`.
+>
+> The field set — `text`, `hit`, `active` — is **closed for this release**, and that is a decision rather than an oversight. Should a second span kind ever warrant first-class support, a per-segment variant is the intended extension point; until then, content needing more than one kind of span composes it itself.
 
 %-PROP-END
 
