@@ -2661,6 +2661,11 @@ test.describe("scroll event", () => {
 // =============================================================================
 
 test.describe("idKey uniqueness diagnostic", () => {
+  test.skip(
+    process.env.PLAYWRIGHT_USE_DEV_SERVER === "false",
+    "List idKey diagnostics are dev-build console warnings.",
+  );
+
   // Collect console warnings that name the diagnostic, so an unrelated warning
   // elsewhere in the page cannot make these tests pass or fail by accident.
   const collectIdKeyWarnings = (page) => {

@@ -369,7 +369,7 @@ export const useRealBackground = (element: HTMLElement) => {
 //   return entered;
 // };
 
-export const useStartMargin = (
+export const useStartMarginState = (
   hasOutsideScroll: boolean,
   parentRef: MutableRefObject<HTMLElement | null | undefined>,
   scrollRef: MutableRefObject<HTMLElement | null | undefined>,
@@ -418,7 +418,15 @@ export const useStartMargin = (
     }
   }, [hasOutsideScroll, calculateStartMargin]);
 
-  return startMargin;
+  return { startMargin, measureStartMargin: calculateStartMargin };
+};
+
+export const useStartMargin = (
+  hasOutsideScroll: boolean,
+  parentRef: MutableRefObject<HTMLElement | null | undefined>,
+  scrollRef: MutableRefObject<HTMLElement | null | undefined>,
+) => {
+  return useStartMarginState(hasOutsideScroll, parentRef, scrollRef).startMargin;
 };
 
 export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivElement | null>) {
