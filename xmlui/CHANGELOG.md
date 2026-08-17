@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.14.14
+
+### Patch Changes
+
+- 4b3cc52: Reuse compiled binding functions across component instances and mounts instead of recompiling on every evaluation, removing per-instance `new Function` cost from render.
+- b8f6cfd: Fix List in outside-scroll mode so it virtualizes and its scroll APIs work: the virtualizer bound to the list's own root instead of the resolved scroll container, leaving scrollToTop, scrollToBottom, scrollToIndex, and scrollToId inert and every row mounted.
+- 8632251: Add `confirmCloseTitle` to ModalDialog dirty-close confirmation.
+- ae02320: Add a `didCommit` event to `Slider`, fired once when an adjustment finishes rather than on every step crossed during a drag, so expensive handlers (filtering a result set, fetching) can run per gesture while `didChange` keeps driving the live readout.
+- e1798b2: Fix virtualized Table scrolling so visible-range state updates do not cause the scrollbar model to drift while scrolling large datasets.
+- 2ad3a15: Add virtualized range and count APIs, plus scroll range events, for Table and List.
+
 ## 0.14.13
 
 ### Patch Changes
