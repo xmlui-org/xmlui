@@ -2380,3 +2380,142 @@ test.describe("highlightText", () => {
     await expect(page.getByTestId("t")).toHaveText("The pty ticker fires.");
   });
 });
+
+// =============================================================================
+// SEGMENTS (pre-computed highlight spans)
+// =============================================================================
+
+test.describe("segments", () => {
+  const collectTextWarnings = (page) => {
+    const warnings: string[] = [];
+    page.on("console", (msg) => {
+      const text = msg.text();
+      if (msg.type() === "warning" && text.includes("Text:")) warnings.push(text);
+    });
+    return warnings;
+  };
+
+  test("renders hit and non-hit segments in order", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Text testId="t" segments="{[
+        {text: 'no match ', hit: false},
+        {text: 'match', hit: true},
+        {text: ' after', hit: false}
+      ]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("no match match after");
+    await expect(page.getByTestId("t").locator("mark")).toHaveCount(1);
+    await expect(page.getByTestId("t").locator("mark")).toHaveText("match");
+  });
+
+  test("a per-segment active flag marks that segment", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Text testId="t" segments="{[
+        {text: 'one', hit: true},
+        {text: ' ', hit: false},
+        {text: 'two', hit: true, active: true}
+      ]}" />
+    `);
+    const active = page.getByTestId("t").locator('mark[data-active="true"]');
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("two");
+  });
+
+  test("highlightActiveIndex selects the Nth hit when no segment is active", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Text testId="t" highlightActiveIndex="{1}" segments="{[
+        {text: 'one', hit: true},
+        {text: ' plain ', hit: false},
+        {text: 'two', hit: true},
+        {text: ' ', hit: false},
+        {text: 'three', hit: true}
+      ]}" />
+    `);
+    const active = page.getByTestId("t").locator('mark[data-active="true"]');
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("two");
+  });
+
+  test("a per-segment active flag wins over highlightActiveIndex", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Text testId="t" highlightActiveIndex="{0}" segments="{[
+        {text: 'one', hit: true},
+        {text: ' ', hit: false},
+        {text: 'two', hit: true, active: true}
+      ]}" />
+    `);
+    const active = page.getByTestId("t").locator('mark[data-active="true"]');
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("two");
+  });
+
+  test("segments wins over highlightText and warns in dev", async ({ initTestBed, page }) => {
+    const warnings = collectTextWarnings(page);
+    await initTestBed(`
+      <Text testId="t" highlightText="ignored" value="ignored value"
+        segments="{[{text: 'from ', hit: false}, {text: 'segments', hit: true}]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("from segments");
+    await expect(page.getByTestId("t").locator("mark")).toHaveText("segments");
+    await expect
+      .poll(() => warnings.filter((w) => w.includes("both set")).length)
+      .toBeGreaterThan(0);
+  });
+
+  // The data-fed refetch case: a binding that momentarily yields undefined must fall
+  // back silently. Warning here would fire on every refetch, and throwing would take
+  // out the row.
+  test("undefined segments falls back to value without warning", async ({
+    initTestBed,
+    page,
+  }) => {
+    const warnings = collectTextWarnings(page);
+    await initTestBed(`<Text testId="t" segments="{undefined}" value="plain value" />`);
+    await expect(page.getByTestId("t")).toHaveText("plain value");
+    await page.waitForTimeout(200);
+    expect(warnings).toEqual([]);
+  });
+
+  test("malformed segments falls back to value and warns", async ({ initTestBed, page }) => {
+    const warnings = collectTextWarnings(page);
+    await initTestBed(`
+      <Fragment>
+        <Text testId="notarray" segments="{'oops'}" value="plain value" />
+        <Text testId="noText" segments="{[{hit: true}]}" value="plain value" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("notarray")).toHaveText("plain value");
+    await expect(page.getByTestId("noText")).toHaveText("plain value");
+    await expect.poll(() => warnings.length).toBeGreaterThan(1);
+  });
+
+  test("a hit inside a word does not split the word", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Text testId="t" width="400px" segments="{[
+        {text: 'anti', hit: false},
+        {text: 'tick', hit: true},
+        {text: 'erdisestablish', hit: false}
+      ]}" />
+    `);
+    const container = page.getByTestId("t");
+    await expect(container).toHaveText("antitickerdisestablish");
+    const markBox = await container.locator("mark").boundingBox();
+    const containerBox = await container.boundingBox();
+    expect(containerBox!.height).toBeLessThan(markBox!.height * 2);
+  });
+
+  test("an empty segments array renders no content and no marks", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<Text testId="t" segments="{[]}" value="ignored" />`);
+    await expect(page.getByTestId("t")).toHaveText("");
+    await expect(page.getByTestId("t").locator("mark")).toHaveCount(0);
+  });
+});

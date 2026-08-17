@@ -131,8 +131,19 @@ export const TextMd = createMetadata({
         "and scrolled into view. Occurrences are counted **across all terms in document " +
         "order**, matching `Markdown`, so a find-in-page stepping through a mixed list walks " +
         "every match as one sequence regardless of which component rendered it. -1 or unset " +
-        "means none.",
+        "means none. With [`segments`](#segments), counts over the `hit` segments instead.",
       valueType: "number",
+    },
+    segments: {
+      description:
+        "Pre-computed highlight spans, as an array of `{ text, hit, active }` objects. Use " +
+        "this instead of [`highlightText`](#highlighttext) when the highlights are decided " +
+        "upstream rather than by matching a search term here — a full-text search snippet, " +
+        "for example, whose marks fall on token boundaries that cannot be reproduced by " +
+        "substring matching. Segments with `hit` are rendered as highlighted; `active` marks " +
+        `the current occurrence. When set, \`segments\` supplies the \`${COMP}\`'s content and ` +
+        "`highlightText` is ignored.",
+      valueType: "any",
     },
   },
   events: {
@@ -313,6 +324,7 @@ export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
           extractValue(node.props.highlightText) as string | string[] | undefined
         }
         highlightActiveIndex={extractValue.asOptionalNumber(node.props.highlightActiveIndex)}
+        segments={extractValue(node.props.segments)}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}
