@@ -2386,6 +2386,12 @@ test.describe("highlightText", () => {
 // =============================================================================
 
 test.describe("segments", () => {
+  // The diagnostics below are guarded by import.meta.env.DEV, so they exist only in a
+  // dev build. CI (and PLAYWRIGHT_USE_DEV_SERVER=false locally) serves the prebuilt
+  // production test bed, where the console.warn calls are compiled out — mirrors the
+  // server choice in playwright.config.ts rather than assuming CI is the only case.
+  const devBuild = process.env.PLAYWRIGHT_USE_DEV_SERVER !== "false" && !process.env.CI;
+
   const collectTextWarnings = (page) => {
     const warnings: string[] = [];
     page.on("console", (msg) => {
@@ -2455,14 +2461,23 @@ test.describe("segments", () => {
     await expect(active).toHaveText("two");
   });
 
-  test("segments wins over highlightText and warns in dev", async ({ initTestBed, page }) => {
-    const warnings = collectTextWarnings(page);
+  test("segments wins over highlightText", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Text testId="t" highlightText="ignored" value="ignored value"
         segments="{[{text: 'from ', hit: false}, {text: 'segments', hit: true}]}" />
     `);
     await expect(page.getByTestId("t")).toHaveText("from segments");
     await expect(page.getByTestId("t").locator("mark")).toHaveText("segments");
+  });
+
+  test("warns when segments and highlightText are both set", async ({ initTestBed, page }) => {
+    test.skip(!devBuild, "The warning is compiled out of production builds");
+    const warnings = collectTextWarnings(page);
+    await initTestBed(`
+      <Text testId="t" highlightText="ignored" value="ignored value"
+        segments="{[{text: 'from ', hit: false}, {text: 'segments', hit: true}]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("from segments");
     await expect
       .poll(() => warnings.filter((w) => w.includes("both set")).length)
       .toBeGreaterThan(0);
@@ -2479,11 +2494,12 @@ test.describe("segments", () => {
     await initTestBed(`<Text testId="t" segments="{undefined}" value="plain value" />`);
     await expect(page.getByTestId("t")).toHaveText("plain value");
     await page.waitForTimeout(200);
-    expect(warnings).toEqual([]);
+    // Only meaningful where warnings exist at all; in a production build nothing warns,
+    // so asserting silence there would bank a pass that proves nothing.
+    if (devBuild) expect(warnings).toEqual([]);
   });
 
-  test("malformed segments falls back to value and warns", async ({ initTestBed, page }) => {
-    const warnings = collectTextWarnings(page);
+  test("malformed segments falls back to value", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment>
         <Text testId="notarray" segments="{'oops'}" value="plain value" />
@@ -2492,6 +2508,20 @@ test.describe("segments", () => {
     `);
     await expect(page.getByTestId("notarray")).toHaveText("plain value");
     await expect(page.getByTestId("noText")).toHaveText("plain value");
+    await expect(page.getByTestId("notarray").locator("mark")).toHaveCount(0);
+    await expect(page.getByTestId("noText").locator("mark")).toHaveCount(0);
+  });
+
+  test("warns when segments is malformed", async ({ initTestBed, page }) => {
+    test.skip(!devBuild, "The warning is compiled out of production builds");
+    const warnings = collectTextWarnings(page);
+    await initTestBed(`
+      <Fragment>
+        <Text testId="notarray" segments="{'oops'}" value="plain value" />
+        <Text testId="noText" segments="{[{hit: true}]}" value="plain value" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("notarray")).toHaveText("plain value");
     await expect.poll(() => warnings.length).toBeGreaterThan(1);
   });
 
