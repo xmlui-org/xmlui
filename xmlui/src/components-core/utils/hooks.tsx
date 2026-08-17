@@ -450,8 +450,8 @@ export const useStartMarginState = (
 
 /**
  * Value-only form, for callers that consume `startMargin` solely as virtua's
- * prop and never scroll imperatively (Table). Prefer `useStartMarginState`
- * when call-time accuracy matters.
+ * prop and never scroll imperatively. Prefer `useStartMarginState` when
+ * call-time accuracy matters.
  */
 export const useStartMargin = (
   hasOutsideScroll: boolean,
