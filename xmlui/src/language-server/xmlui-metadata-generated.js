@@ -13060,6 +13060,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "interpolateBindings": {
+        "description": "This boolean property specifies whether XMLUI-specific markdown authoring syntax is processed. When set to `false`, `@{...}` binding expressions, `xmlui-pg` playground fences, and `xmlui-tree` fences render as literal markdown content. Use this for markdown text that comes from runtime data rather than app-authored content.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
       "showHeadingAnchors": {
         "description": "This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.",
         "valueType": "boolean"

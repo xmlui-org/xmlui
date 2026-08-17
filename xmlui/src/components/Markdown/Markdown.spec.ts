@@ -602,6 +602,59 @@ test.describe("Binding expression code-fence exclusion regression", () => {
   });
 });
 
+test.describe("Binding interpolation opt-out", () => {
+  test("renders data-fed @{} content literally when interpolation is disabled", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`
+      <App var.note="{'Get-WinEvent -FilterHashtable @{ LogName = 22 }'}">
+        <Markdown content="{note}" interpolateBindings="false" />
+      </App>
+    `);
+
+    await expect((await createMarkdownDriver()).component).toHaveText(
+      "Get-WinEvent -FilterHashtable @{ LogName = 22 }",
+    );
+  });
+
+  test("does not transform xmlui-pg fences when interpolation is disabled", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "```xmlui-pg\n<Button label=\"Should stay source\" />\n```";
+    await initTestBed(`<Markdown interpolateBindings="false"><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.getByRole("button", { name: "Should stay source" })).not.toBeAttached();
+    await expect(page.locator("code").filter({ hasText: "Should stay source" })).toBeVisible();
+  });
+
+  test("does not transform xmlui-tree fences when interpolation is disabled", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = "```xmlui-tree\nroot\n  child\n```";
+    await initTestBed(`<Markdown interpolateBindings="false"><![CDATA[${SOURCE}]]></Markdown>`);
+
+    await expect(page.locator("code").filter({ hasText: "root" })).toBeVisible();
+  });
+
+  test("renders a failing binding expression literally instead of crashing", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`
+      <App var.note="{'Get-WinEvent -FilterHashtable @{ LogName = 22 }'}">
+        <Markdown content="{note}" />
+      </App>
+    `);
+
+    await expect((await createMarkdownDriver()).component).toHaveText(
+      "Get-WinEvent -FilterHashtable @{ LogName = 22 }",
+    );
+  });
+});
+
 // =============================================================================
 // xmlui-pg: nested code fences with four backticks
 // =============================================================================

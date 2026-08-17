@@ -72,8 +72,13 @@ export function parseBindingExpression(text: string, extractValue: ValueExtracto
     // The (?<!\\) is a "negative lookbehind" in regex that ensures that
     // if escaping the @{...} expression like this: \@{...}, we don't match it
     const regex = /(?<!\\)\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
-    return segText.replace(regex, (_, expr) => {
-      const extracted = extractValue(`{${expr}}`);
+    return segText.replace(regex, (match, expr) => {
+      let extracted: unknown;
+      try {
+        extracted = extractValue(`{${expr}}`);
+      } catch {
+        return match;
+      }
       const resultExpr = mapByType(extracted);
       // The result expression might be an object, in that case we stringify it here,
       // at the last step, so that there are no unnecessary apostrophes

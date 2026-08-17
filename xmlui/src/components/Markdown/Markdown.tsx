@@ -67,6 +67,15 @@ export const MarkdownMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.removeBr,
     },
+    interpolateBindings: {
+      description:
+        "This boolean property specifies whether XMLUI-specific markdown authoring syntax " +
+        "is processed. When set to `false`, `@{...}` binding expressions, `xmlui-pg` " +
+        "playground fences, and `xmlui-tree` fences render as literal markdown content. " +
+        "Use this for markdown text that comes from runtime data rather than app-authored content.",
+      valueType: "boolean",
+      defaultValue: defaultProps.interpolateBindings,
+    },
     showHeadingAnchors: {
       description:
         "This boolean property specifies whether heading anchors should be " +
@@ -283,6 +292,7 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
     "content",
     "removeIndents",
     "removeBr",
+    "interpolateBindings",
     "codeHighlighter",
     "showHeadingAnchors",
     "grayscale",
@@ -324,6 +334,10 @@ export const markdownComponentRenderer = wrapComponent(COMP, Markdown, MarkdownM
         classes={classes}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+        interpolateBindings={extractValue.asOptionalBoolean(
+          node.props.interpolateBindings,
+          defaultProps.interpolateBindings,
+        )}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
         showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
@@ -358,6 +372,7 @@ type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
   removeBr?: boolean;
+  interpolateBindings?: boolean;
   className?: string;
   classes?: Record<string, string>;
   extractValue: ValueExtractor;
@@ -381,6 +396,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       children,
       removeIndents,
       removeBr,
+      interpolateBindings = defaultProps.interpolateBindings,
       className,
       classes,
       extractValue,
@@ -404,34 +420,37 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         return null;
       }
 
-      // --- Resolve binding expression values
-      // --- Resolve xmlui playground definitions
-
       let resolvedMd = children;
-      while (true) {
-        const nextPlayground = observePlaygroundPattern(resolvedMd);
-        if (!nextPlayground) break;
 
-        resolvedMd =
-          resolvedMd.slice(0, nextPlayground[0]) +
-          convertPlaygroundPatternToMarkdown(nextPlayground[2], {
-            enableTracing: enablePlaygroundTracing,
-          }) +
-          resolvedMd.slice(nextPlayground[1]);
+      if (interpolateBindings) {
+        // --- Resolve xmlui playground definitions
+        while (true) {
+          const nextPlayground = observePlaygroundPattern(resolvedMd);
+          if (!nextPlayground) break;
+
+          resolvedMd =
+            resolvedMd.slice(0, nextPlayground[0]) +
+            convertPlaygroundPatternToMarkdown(nextPlayground[2], {
+              enableTracing: enablePlaygroundTracing,
+            }) +
+            resolvedMd.slice(nextPlayground[1]);
+        }
+
+        while (true) {
+          const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+          if (!nextTreeDisplay) break;
+          resolvedMd =
+            resolvedMd.slice(0, nextTreeDisplay[0]) +
+            convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+            resolvedMd.slice(nextTreeDisplay[1]);
+        }
+
+        // --- Resolve binding expression values
+        resolvedMd = parseBindingExpression(resolvedMd, extractValue);
       }
 
-      while (true) {
-        const nextTreeDisplay = observeTreeDisplay(resolvedMd);
-        if (!nextTreeDisplay) break;
-        resolvedMd =
-          resolvedMd.slice(0, nextTreeDisplay[0]) +
-          convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
-          resolvedMd.slice(nextTreeDisplay[1]);
-      }
-
-      resolvedMd = parseBindingExpression(resolvedMd, extractValue);
       return resolvedMd;
-    }, [children, enablePlaygroundTracing, extractValue]);
+    }, [children, enablePlaygroundTracing, extractValue, interpolateBindings]);
 
     return (
       <Markdown

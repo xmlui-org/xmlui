@@ -124,6 +124,11 @@ Function calls are executed: @{x()}
 </App>
 ```
 
+Set `interpolateBindings="false"` when rendering Markdown that comes from runtime data
+such as chat messages, logs, transcripts, or API responses. In this mode, `@{...}`
+binding expressions and XMLUI-specific `xmlui-pg` / `xmlui-tree` fences render as
+literal Markdown content instead of being evaluated or transformed.
+
 ## XMLUI playground apps
 
 `xmlui-pg` fences accept the same entrypoint format as `Main.xmlui`.
@@ -169,6 +174,15 @@ The component itself cannot be styled, but the components that render the final 
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 
+
+%-PROP-END
+
+%-PROP-START interpolateBindings
+
+Set this property to `false` when the Markdown content is runtime data rather than
+app-authored content. This prevents `@{...}` binding expressions, `xmlui-pg`
+playground fences, and `xmlui-tree` fences from being processed as XMLUI authoring
+syntax.
 
 %-PROP-END
 

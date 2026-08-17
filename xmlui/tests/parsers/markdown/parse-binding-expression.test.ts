@@ -99,6 +99,17 @@ describe("parseBindingExpression - Safari Compatibility", () => {
     const result = parseBindingExpression(input, mockValueExtractor);
     expect(result).toBe("EXTRACTED({a})EXTRACTED({b})");
   });
+
+  it("should render failed bindings literally", () => {
+    const input = "Before @{invalid} After";
+    const throwingExtractor = (() => {
+      throw new Error("Cannot evaluate");
+    }) as any;
+
+    const result = parseBindingExpression(input, throwingExtractor);
+
+    expect(result).toBe("Before @{invalid} After");
+  });
 });
 
 describe("parseBindingExpression - code fence handling", () => {
