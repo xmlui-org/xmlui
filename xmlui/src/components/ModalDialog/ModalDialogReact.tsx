@@ -67,6 +67,7 @@ type ModalProps = {
   titleTemplate?: ReactNode;
   closeButtonVisible?: boolean;
   closeOnClickAway?: boolean;
+  confirmCloseTitle?: string;
   canCloseMessage?: string;
   confirmCloseLabel?: string;
   cancelCloseLabel?: string;
@@ -257,6 +258,7 @@ export const ModalDialog = memo(React.forwardRef(
       onWillClose,
       onDirtyChanged,
       confirm,
+      confirmCloseTitle = defaultProps.confirmCloseTitle,
       canCloseMessage = defaultProps.canCloseMessage,
       confirmCloseLabel = defaultProps.confirmCloseLabel,
       cancelCloseLabel = defaultProps.cancelCloseLabel,
@@ -292,6 +294,7 @@ export const ModalDialog = memo(React.forwardRef(
     const confirmDirtyClose = useEvent(async () => {
       if (confirm) {
         return confirm({
+          title: confirmCloseTitle,
           message: canCloseMessage,
           actionLabel: confirmCloseLabel,
           cancelLabel: cancelCloseLabel,

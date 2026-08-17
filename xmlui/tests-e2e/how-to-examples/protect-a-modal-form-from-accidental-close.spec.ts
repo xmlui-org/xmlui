@@ -26,6 +26,7 @@ test.describe("Protect a dirty modal Form", { tag: "@website" }, () => {
     await expect(page.getByText("dirty")).toBeVisible();
 
     await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByText("Unsaved Profile")).toBeVisible();
     await expect(page.getByText("Discard your profile changes?")).toBeVisible();
 
     await page.getByRole("button", { name: "Keep Editing" }).click();

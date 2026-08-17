@@ -56,6 +56,12 @@ export const ModalDialogMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.closeOnClickAway,
     },
+    confirmCloseTitle: {
+      description:
+        "The title shown in the confirmation dialog when a dirty modal dialog is about to close.",
+      valueType: "string",
+      defaultValue: defaultProps.confirmCloseTitle,
+    },
     canCloseMessage: {
       description:
         "The confirmation message shown when the dialog is dirty and the user attempts to close it.",
@@ -188,6 +194,7 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
     "titleTemplate",
     "closeButtonVisible",
     "closeOnClickAway",
+    "confirmCloseTitle",
     "canCloseMessage",
     "confirmCloseLabel",
     "cancelCloseLabel",
@@ -243,6 +250,7 @@ export const modalViewComponentRenderer = wrapComponent(COMP, ModalDialog, Modal
         titleTemplate={renderChild(node.props?.titleTemplate)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
         closeOnClickAway={extractValue.asOptionalBoolean(node.props.closeOnClickAway)}
+        confirmCloseTitle={extractValue.asOptionalString(node.props.confirmCloseTitle)}
         canCloseMessage={extractValue.asOptionalString(node.props.canCloseMessage)}
         confirmCloseLabel={extractValue.asOptionalString(node.props.confirmCloseLabel)}
         cancelCloseLabel={extractValue.asOptionalString(node.props.cancelCloseLabel)}
