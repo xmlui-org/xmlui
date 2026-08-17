@@ -49,8 +49,9 @@ This event fires once the user finishes an adjustment, while `didChange` fires o
 Drag a thumb: the first line follows every step, the second updates only when you let go.
 ```
 
-Two details worth knowing before you move expensive work here:
+Three details worth knowing before you move expensive work here:
 
+- **The two events are additive, not exclusive.** Adopting `didCommit` does not quiet `didChange` — it keeps firing per step, which is what lets a live readout follow the thumbs while the expensive work waits for the release. Move work *to* `didCommit`; do not drop `didChange`.
 - Keyboard adjustments commit **per key-down, including auto-repeat** — holding an arrow key produces one commit per repeat, not one when the key is released. If a slider is realistically keyboard-driven, the commit handler may still need a debounce.
 - The event follows values the app or the user asks for: a pointer release that actually moved the value, a keyboard adjustment, and the `setValue()` method. Re-seeding the component by changing `initialValue`, `minValue`, or `maxValue` fires neither `didCommit` nor `didChange`.
 
