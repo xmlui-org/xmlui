@@ -17938,6 +17938,11 @@ export default {
         "description": "When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "rowHeight": {
+        "description": "Sets the row heights for the table. Cells that are taller than this value will have their content truncated",
+        "valueType": "number",
+        "defaultValue": 40
       }
     },
     "events": {

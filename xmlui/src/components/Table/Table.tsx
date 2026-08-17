@@ -468,6 +468,12 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.striped,
     },
+    rowHeight: {
+      description:
+        "Sets the row heights for the table. Cells that are taller than this value will have their content truncated",
+      valueType: "number",
+      defaultValue: defaultProps.rowHeight,
+    },
   },
   events: {
     contextMenu: {
@@ -1042,6 +1048,7 @@ const TableWithColumns = memo(
             headerHeight={extractValue.asSize(node.props.headerHeight)}
             rowDisabledPredicate={stableRowDisabledPredicate}
             rowUnselectablePredicate={stableRowUnselectablePredicate}
+            rowHeight={extractValue.asOptionalNumber(node.props.rowHeight)}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}

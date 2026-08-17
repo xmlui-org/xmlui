@@ -5141,6 +5141,21 @@ test.describe("Virtualization", () => {
     await expect(page.locator("td").filter({ hasText: "File #500" })).toHaveCount(0);
   });
 
+  test("passes rowHeight from the XMLUI Table to rendered rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table
+        rowHeight="72"
+        items="{[{id: 1, name: 'First row'}]}"
+        testId="table"
+      >
+        <Column header="Name" bindTo="name" />
+      </Table>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator("tbody tr").first()).toHaveCSS("height", "72px");
+  });
+
   test("renders new rows when scrolling through large dataset", async ({ initTestBed, page }) => {
     await initTestBed(`
       <App scrollWholePage="false">
