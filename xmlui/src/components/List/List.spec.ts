@@ -2657,6 +2657,37 @@ test.describe("scroll event", () => {
 });
 
 // =============================================================================
+// IDKEY UNIQUENESS
+// =============================================================================
+
+// The diagnostic below is a dev-build console warning and is skipped against the
+// production test bed, so this covers the part that must hold in every build: bad
+// idKey values are a data-quality problem the warning reports, not a reason for the
+// component to stop rendering.
+test.describe("idKey uniqueness", () => {
+  test("renders rows even when idKey values are duplicated or empty", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    await initTestBed(`
+      <List idKey="id" data="{[
+        { id: '', name: 'Alpha' },
+        { id: '', name: 'Beta' },
+        { id: 'dup', name: 'Gamma' },
+        { id: 'dup', name: 'Delta' }
+      ]}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Alpha");
+    await expect(driver.component).toContainText("Beta");
+    await expect(driver.component).toContainText("Gamma");
+    await expect(driver.component).toContainText("Delta");
+  });
+});
+
+// =============================================================================
 // IDKEY UNIQUENESS DIAGNOSTIC (dev builds only)
 // =============================================================================
 
