@@ -1984,6 +1984,92 @@ This event is triggered when a table row is double-clicked. The handler receives
 ```
 
 %-EVENT-END
+%-EVENT-START scroll
+
+This event fires as the user scrolls the table. The event object includes `scrollTop`, `scrollHeight`, `viewportSize`, `atEnd`, `visibleRange`, and `itemCount`.
+
+It is only fired for user-driven scrolls; the table's own programmatic scrolls do not trigger it. Use `visibleRange` and `itemCount` to display the currently visible range while the user scrolls.
+
+%-EVENT-END
+
+%-EVENT-START visibleRangeDidChange
+
+This event fires when the visible row range changes. It also fires for non-user-scroll changes, such as initial measurement or programmatic scrolling.
+
+%-EVENT-END
+
+%-API-START getItemCount
+
+Returns the number of rows in the table's current virtualized row model. Use this with `getVisibleRange()` to build a display such as `234-245 of 1000`.
+
+For paginated tables, this count is the number of rows in the current page's virtualized row model.
+
+%-API-END
+
+%-API-START getVisibleRange
+
+Returns the currently visible row range as `{ startIndex, endIndex }`. Indexes are zero-based and inclusive, so add `1` when displaying them to users.
+
+When the table is empty or not yet measured, the method returns `{ startIndex: -1, endIndex: -1 }`. This is the pull-style counterpart of the `visibleRangeDidChange` event.
+
+```xmlui-pg copy display name="Example: visible range display" height="420px"
+<App
+  scrollWholePage="false"
+  var.itemCount="{0}"
+  var.range="{{ startIndex: -1, endIndex: -1 }}">
+  <Text
+    variant="strong"
+    value="{range.startIndex < 0
+      ? 'No rows'
+      : (range.startIndex + 1) + '-' 
+        + (range.endIndex + 1) + ' of ' + itemCount}" 
+  />
+  <Table
+    id="table"
+    height="*"
+    onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+    onVisibleRangeDidChange="(r) => { 
+      range = r; 
+      itemCount = table.getItemCount() 
+    }"
+    data="{Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      name: 'Item ' + (i + 1),
+      quantity: (i % 25) + 1,
+    }))}">
+    <Column bindTo="id" width="90px" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+  </Table>
+</App>
+```
+
+%-API-END
+
+%-API-START scrollToBottom
+
+See the [`getVisibleRange`](#getvisiblerange) example for displaying the visible range while scrolling.
+
+%-API-END
+
+%-API-START scrollToTop
+
+See the [`getVisibleRange`](#getvisiblerange) example.
+
+%-API-END
+
+%-API-START scrollToIndex
+
+See the [`getVisibleRange`](#getvisiblerange) example.
+
+%-API-END
+
+%-API-START scrollToId
+
+See the [`getVisibleRange`](#getvisiblerange) example.
+
+%-API-END
+
 %-API-START clearSelection
 
 

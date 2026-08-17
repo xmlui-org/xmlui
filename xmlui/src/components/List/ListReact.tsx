@@ -269,6 +269,8 @@ type DynamicHeightListProps = {
     scrollHeight: number;
     viewportSize: number;
     atEnd: boolean;
+    visibleRange: { startIndex: number; endIndex: number };
+    itemCount: number;
   }) => void;
   onVisibleRangeDidChange?: (range: { startIndex: number; endIndex: number }) => void;
   keyBindings?: Record<string, string>;
@@ -1142,14 +1144,26 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
           scrollHeight: virtualizerRef.current.scrollSize,
           viewportSize: virtualizerRef.current.viewportSize,
           atEnd,
+          visibleRange: computeVisibleRange() ?? { startIndex: -1, endIndex: -1 },
+          itemCount: rows.length,
         });
       }
       reportVisibleRange();
       tryToFetchPrevPage();
       tryToFetchNextPage();
     },
-    [scrollAnchor, onScroll, reportVisibleRange, tryToFetchNextPage, tryToFetchPrevPage],
+    [scrollAnchor, onScroll, computeVisibleRange, rows.length, reportVisibleRange, tryToFetchNextPage, tryToFetchPrevPage],
   );
+
+  const runProgrammaticScroll = useEvent((scroll: () => void) => {
+    programmaticScroll.current = true;
+    scroll();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        programmaticScroll.current = false;
+      });
+    });
+  });
 
   const scrollToBottom = useEvent(() => {
     const v = virtualizerRef.current;
@@ -1160,19 +1174,23 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       // landing short of the settled bottom. scrollTo(scrollSize) clamps to
       // the true bottom regardless of item boundaries — the same call the
       // scrollAnchor="bottom" internals use for exactly this reason.
-      v.scrollTo(v.scrollSize + startMargin);
+      runProgrammaticScroll(() => v.scrollTo(v.scrollSize + startMargin));
     }
   });
 
   const scrollToTop = useEvent(() => {
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin });
+      runProgrammaticScroll(() =>
+        virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin }),
+      );
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    virtualizerRef.current?.scrollToIndex(index, {
-      offset: -startMargin,
+    runProgrammaticScroll(() => {
+      virtualizerRef.current?.scrollToIndex(index, {
+        offset: -startMargin,
+      });
     });
   });
 
@@ -1186,6 +1204,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   const getVisibleRange = useEvent(() => {
     return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
   });
+  const getItemCount = useEvent(() => rows.length);
 
   useIsomorphicLayoutEffect(() => {
     registerComponentApi?.({
@@ -1193,10 +1212,11 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       scrollToTop,
       scrollToIndex,
       scrollToId,
+      getItemCount,
       getVisibleRange,
       ...selectionApi,
     });
-  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, getVisibleRange, selectionApi]);
+  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, getItemCount, getVisibleRange, selectionApi]);
   // REVIEW: I changed this code line because in the build version rows[index] was undefined
   // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
   const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);

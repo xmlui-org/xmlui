@@ -259,14 +259,15 @@ export const ListMd = createMetadata({
         `describing the current scroll state. It is only fired for user-driven scrolls; ` +
         `the list's own programmatic and auto-follow scrolls do not trigger it. Use it ` +
         `together with the \`atEnd\` flag and the \`scrollToBottom()\` method to implement ` +
-        `follow-newest and read-pause behavior.`,
+        `follow-newest and read-pause behavior, or with \`visibleRange\` and \`itemCount\` ` +
+        `to display a visible item range.`,
       signature:
-        "scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean }): void",
+        "scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean, visibleRange: { startIndex: number, endIndex: number }, itemCount: number }): void",
       parameters: {
         event:
           "The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total " +
           "scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled " +
-          "to within ~1.5px of the bottom).",
+          "to within ~1.5px of the bottom), plus `visibleRange` and `itemCount`.",
       },
     },
     visibleRangeDidChange: {
@@ -380,6 +381,11 @@ export const ListMd = createMetadata({
       parameters: {
         id: "The ID of the item to scroll to.",
       },
+    },
+    getItemCount: {
+      description:
+        "This method returns the number of items in the list's current virtualized row model.",
+      signature: "getItemCount(): number",
     },
     getVisibleRange: {
       description:

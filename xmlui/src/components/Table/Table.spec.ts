@@ -4919,6 +4919,193 @@ test.describe("Keyboard Shortcuts", () => {
 // =============================================================================
 
 test.describe("Virtualization", () => {
+  test("visible range display works with App scrolling disabled and star-height Table", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.itemCount="{0}"
+        var.range="{{ startIndex: -1, endIndex: -1 }}">
+        <Text
+          testId="range"
+          variant="strong"
+          value="{range.startIndex < 0
+            ? 'No rows'
+            : (range.startIndex + 1) + '-' + (range.endIndex + 1) + ' of ' + itemCount}" />
+        <Table
+          id="table"
+          height="*"
+          onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+          onVisibleRangeDidChange="(r) => { range = r; itemCount = table.getItemCount() }"
+          data="{Array.from({ length: 1000 }, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            quantity: (i % 25) + 1,
+          }))}"
+          testId="table">
+          <Column bindTo="id" width="90px" />
+          <Column bindTo="name" />
+          <Column bindTo="quantity" />
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const range = page.getByTestId("range");
+    await expect(table).toBeVisible();
+    await expect(range).toHaveText(/1-\d+ of 1000/);
+
+    await table.evaluate((el) => {
+      el.scrollTop = 233 * 41;
+    });
+
+    await expect(range).toHaveText(/(1[5-9]\d|2[0-5]\d)-\d+ of 1000/);
+  });
+
+  test("API reports item count and visible range", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App scrollWholePage="false">
+        <VStack>
+          <Button
+            testId="capture"
+            label="Capture"
+            onClick="testState = { count: table.getItemCount(), range: table.getVisibleRange() }"
+          />
+          <Table
+            id="table"
+            height="400px"
+            items="{Array.from({length: 1000}, (_, i) => ({id: i + 1}))}"
+            testId="table"
+          >
+            <Column header="ID" bindTo="id">
+              <Text value="{$item.id}" />
+            </Column>
+          </Table>
+        </VStack>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const capture = page.getByTestId("capture");
+    await expect(table).toBeVisible();
+
+    await capture.click();
+    await expect.poll(async () => (await testStateDriver.testState())?.count).toBe(1000);
+    const initialState = await testStateDriver.testState();
+    expect(initialState.range.startIndex).toBe(0);
+    expect(initialState.range.endIndex).toBeGreaterThan(initialState.range.startIndex);
+    expect(initialState.range.endIndex).toBeLessThan(30);
+
+    await table.evaluate((el) => {
+      el.scrollTop = 233 * 41;
+    });
+    await page.waitForTimeout(100);
+
+    await capture.click();
+    await expect
+      .poll(async () => (await testStateDriver.testState())?.range.startIndex)
+      .toBeGreaterThan(0);
+    const scrolledState = await testStateDriver.testState();
+    expect(scrolledState.count).toBe(1000);
+    expect(scrolledState.range.startIndex).toBeGreaterThan(150);
+    expect(scrolledState.range.startIndex).toBeLessThan(260);
+    expect(scrolledState.range.endIndex).toBeGreaterThan(scrolledState.range.startIndex);
+    expect(scrolledState.range.endIndex).toBeLessThan(300);
+  });
+
+  test("scroll APIs move the virtualized table viewport", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <HStack>
+          <Button testId="scroll-index" label="Scroll index" onClick="table.scrollToIndex(250)" />
+          <Button testId="scroll-id" label="Scroll id" onClick="table.scrollToId('row-400')" />
+        </HStack>
+        <Table
+          id="table"
+          height="400px"
+          items="{Array.from({length: 1000}, (_, i) => ({id: 'row-' + (i + 1), label: 'Row ' + (i + 1)}))}"
+          testId="table"
+        >
+          <Column header="Label" bindTo="label">
+            <Text value="{$item.label}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+
+    await page.getByTestId("scroll-index").click();
+    await expect(page.locator("td").filter({ hasText: "Row 251" }).first()).toBeVisible();
+
+    await page.getByTestId("scroll-id").click();
+    await expect(page.locator("td").filter({ hasText: "Row 400" }).first()).toBeVisible();
+  });
+
+  test("scroll event does not fire for public scroll APIs", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App scrollWholePage="false">
+        <Button
+          testId="scrollIndex"
+          label="Scroll"
+          onClick="table.scrollToIndex(250)"
+        />
+        <Table
+          id="table"
+          height="400px"
+          items="{Array.from({length: 1000}, (_, i) => ({id: 'row-' + (i + 1), label: 'Row ' + (i + 1)}))}"
+          onScroll="(e) => testState = (testState || 0) + 1"
+          testId="table"
+        >
+          <Column header="Label" bindTo="label">
+            <Text value="{$item.label}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+
+    await page.getByTestId("scrollIndex").click();
+    await expect(page.locator("td").filter({ hasText: "Row 251" }).first()).toBeVisible();
+    expect(await testStateDriver.testState()).toEqual(null);
+
+    await page.getByTestId("table").evaluate((el) => {
+      el.scrollTop = 0;
+    });
+    await expect
+      .poll(async () => (await testStateDriver.testState()) !== null)
+      .toBe(true);
+  });
+
+  test("API reports an empty visible range when there are no items", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Button
+          testId="capture"
+          label="Capture"
+          onClick="testState = { count: table.getItemCount(), range: table.getVisibleRange() }"
+        />
+        <Table id="table" data="{[]}" testId="table">
+          <Column header="ID" bindTo="id" />
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await page.getByTestId("capture").click();
+
+    await expect.poll(testStateDriver.testState).toEqual({
+      count: 0,
+      range: { startIndex: -1, endIndex: -1 },
+    });
+  });
+
   test("only renders visible rows when height is constrained with large dataset", async ({
     initTestBed,
     page,

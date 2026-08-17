@@ -1934,6 +1934,8 @@ current scroll state: `scrollTop` (the current scroll offset), `scrollHeight` (t
 scrollable size), `viewportSize` (the visible size), and `atEnd` (`true` when the list is
 scrolled to within ~1.5px of the bottom).
 
+The object also includes `visibleRange` and `itemCount`, which you can use to display a range such as `234-245 of 1000`.
+
 The event fires only for user-driven scrolls; the list's own programmatic scrolls and its
 `scrollAnchor="bottom"` auto-follow do **not** trigger it. This makes it suitable for
 implementing follow-newest plus read-pause: track `atEnd` from this event, and when new data
@@ -2070,6 +2072,42 @@ follow your form input styling:
 | `outlineOffset-selectionCheckbox-List--focus` | `outlineOffset-Checkbox--focus` |
 
 %-STYLE-END
+
+%-API-START getVisibleRange
+
+Use `getVisibleRange()` with `getItemCount()`, or read the same values from the `scroll` event, to display the currently visible item range.
+
+```xmlui-pg copy display name="Example: visible range display" height="420px"
+<App
+  scrollWholePage="false"
+  var.itemCount="{0}"
+  var.range="{{ startIndex: -1, endIndex: -1 }}">
+  <Text
+    variant="strong"
+    value="{range.startIndex < 0
+      ? 'No items'
+      : (range.startIndex + 1) + '-' 
+        + (range.endIndex + 1) + ' of ' + itemCount}" 
+  />
+  <List
+    id="list"
+    height="*"
+    onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+    onVisibleRangeDidChange="(r) => { 
+      range = r; 
+      itemCount = list.getItemCount() 
+    }"
+    data="{Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      name: 'Item ' + (i + 1),
+      category: i % 2 === 0 ? 'Even' : 'Odd',
+    }))}">
+    <Text value="{$item.name + ' - ' + $item.category}" />
+  </List>
+</App>
+```
+
+%-API-END
 
 %-API-START scrollToBottom
 

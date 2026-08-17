@@ -496,6 +496,38 @@ export const TableMd = createMetadata({
         item: "The clicked table row item.",
       },
     },
+    scroll: {
+      description:
+        `This event fires as the user scrolls the table. The handler receives an object ` +
+        `describing the current scroll state. It is only fired for user-driven scrolls; ` +
+        `the table's own programmatic scrolls do not trigger it. Use it together with ` +
+        `the \`atEnd\` flag and the \`scrollToBottom()\` method to implement ` +
+        `follow-newest and read-pause behavior, or with \`visibleRange\` and ` +
+        `\`itemCount\` to display a visible row range.`,
+      signature:
+        "scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean, visibleRange: { startIndex: number, endIndex: number }, itemCount: number }): void",
+      parameters: {
+        event:
+          "The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total " +
+          "scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled " +
+          "to within ~1.5px of the bottom), plus `visibleRange` and `itemCount`.",
+      },
+    },
+    visibleRangeDidChange: {
+      description:
+        `This event fires when the range of visible table rows changes — whatever caused it: ` +
+        `a user scroll, a programmatic scroll, or content growth. Unlike the \`scroll\` event, ` +
+        `it is not suppressed during the table's own programmatic scrolls, because consumers ` +
+        `of the visible range care about what is visible, not why it became visible. It fires ` +
+        `only when the range actually shifts (deduplicated by value).`,
+      signature:
+        "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
+      parameters: {
+        range:
+          "The visible range: `startIndex` (first visible row index) and `endIndex` " +
+          "(last visible row index), inclusive, in the table's current row order.",
+      },
+    },
     selectionDidChange: {
       description:
         `This event is triggered when the table's current selection (the rows selected) changes. ` +
@@ -581,6 +613,45 @@ export const TableMd = createMetadata({
     },
   },
   apis: {
+    scrollToTop: {
+      description: "This method scrolls the table to the top.",
+      signature: "scrollToTop(): void",
+    },
+    scrollToBottom: {
+      description: "This method scrolls the table to the bottom.",
+      signature: "scrollToBottom(): void",
+    },
+    scrollToIndex: {
+      description:
+        "This method scrolls the table to a specific row index. The method accepts an index as a parameter.",
+      signature: "scrollToIndex(index: number): void",
+      parameters: {
+        index: "The row index to scroll to.",
+      },
+    },
+    scrollToId: {
+      description:
+        "This method scrolls the table to a specific row. The method accepts a row ID as a parameter.",
+      signature: "scrollToId(id: string): void",
+      parameters: {
+        id: "The ID of the row to scroll to.",
+      },
+    },
+    getItemCount: {
+      description:
+        `This method returns the number of rows in the table's current virtualized row model. ` +
+        `For an unpaginated table, this is the number of rows supplied through \`data\` or ` +
+        `\`items\`; for a paginated table, this is the number of rows on the current page.`,
+      signature: "getItemCount(): number",
+    },
+    getVisibleRange: {
+      description:
+        `This method returns the currently visible row range as an object with \`startIndex\` ` +
+        `and \`endIndex\` (inclusive, in the table's current row order). Returns ` +
+        `\`{ startIndex: -1, endIndex: -1 }\` when the table is empty or not yet measured. ` +
+        `The pull-style counterpart of the \`visibleRangeDidChange\` event.`,
+      signature: "getVisibleRange(): { startIndex: number, endIndex: number }",
+    },
     clearSelection: {
       description: `This method clears the list of currently selected table rows.`,
       signature: "clearSelection(): void",
@@ -711,6 +782,10 @@ const TableWithColumns = memo(
       );
       const stableRowDoubleClick = useEvent((...args: any[]) =>
         lookupEventHandler("rowDoubleClick")?.(...args),
+      );
+      const stableScroll = useEvent((...args: any[]) => lookupEventHandler("scroll")?.(...args));
+      const stableVisibleRangeDidChange = useEvent((...args: any[]) =>
+        lookupEventHandler("visibleRangeDidChange")?.(...args),
       );
       const stableSelectAllAction = useEvent((...args: any[]) =>
         lookupEventHandler("selectAllAction")?.(...args),
@@ -964,6 +1039,10 @@ const TableWithColumns = memo(
             onSelectionDidChange={stableSelectionDidChange}
             willSort={stableWillSort}
             rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+            onScroll={node.events?.scroll ? stableScroll : undefined}
+            onVisibleRangeDidChange={
+              node.events?.visibleRangeDidChange ? stableVisibleRangeDidChange : undefined
+            }
             onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
             onCutAction={node.events?.cutAction ? stableCutAction : undefined}
             onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}

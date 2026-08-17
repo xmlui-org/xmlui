@@ -389,6 +389,15 @@ type TableProps = {
   userSelectRow?: string;
   userSelectHeading?: string;
   keyBindings?: Record<string, string>;
+  onScroll?: (event: {
+    scrollTop: number;
+    scrollHeight: number;
+    viewportSize: number;
+    atEnd: boolean;
+    visibleRange: { startIndex: number; endIndex: number };
+    itemCount: number;
+  }) => void;
+  onVisibleRangeDidChange?: (range: { startIndex: number; endIndex: number }) => void;
   onSelectAllAction?: AsyncFunction;
   onCutAction?: AsyncFunction;
   onCopyAction?: AsyncFunction;
@@ -1092,6 +1101,8 @@ export const Table = memo(
       userSelectRow,
       userSelectHeading,
       keyBindings = defaultProps.keyBindings,
+      onScroll,
+      onVisibleRangeDidChange,
       onSelectAllAction,
       onCutAction,
       onCopyAction,
@@ -2296,9 +2307,123 @@ export const Table = memo(
       hideSelectionCheckboxes,
     ]);
 
+    const programmaticScroll = useRef(false);
+    const computeVisibleRange = useCallback(() => {
+      const v = virtualizerRef.current;
+      const rowCount = rowsRef.current.length;
+      if (!v || rowCount === 0) {
+        return null;
+      }
+      const startIndex = v.findItemIndex(v.scrollOffset);
+      const endIndex = Math.min(v.findItemIndex(v.scrollOffset + v.viewportSize), rowCount - 1);
+      return { startIndex, endIndex };
+    }, []);
+
+    const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
+    const reportVisibleRange = useCallback(() => {
+      if (!onVisibleRangeDidChange) return;
+      const range = computeVisibleRange();
+      if (!range) return;
+      const last = lastVisibleRange.current;
+      if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
+      lastVisibleRange.current = range;
+      onVisibleRangeDidChange(range);
+    }, [computeVisibleRange, onVisibleRangeDidChange]);
+
+    useEffect(() => {
+      if (!onVisibleRangeDidChange) return;
+      const raf = requestAnimationFrame(reportVisibleRange);
+      return () => cancelAnimationFrame(raf);
+    }, [onVisibleRangeDidChange, reportVisibleRange, rows]);
+
+    const lastScrollOffset = useRef(0);
+    const handleVirtuaScroll = useCallback(
+      (offset: number) => {
+        const v = virtualizerRef.current;
+        if (!v) return;
+        const atEnd = offset - v.scrollSize + v.viewportSize >= -1.5;
+        const prevOffset = lastScrollOffset.current;
+        lastScrollOffset.current = offset;
+        const offsetChanged = Math.abs(offset - prevOffset) > 0.5;
+        if (!programmaticScroll.current && offsetChanged) {
+          const rowCount = rowsRef.current.length;
+          onScroll?.({
+            scrollTop: offset,
+            scrollHeight: v.scrollSize,
+            viewportSize: v.viewportSize,
+            atEnd,
+            visibleRange: computeVisibleRange() ?? { startIndex: -1, endIndex: -1 },
+            itemCount: rowCount,
+          });
+        }
+        reportVisibleRange();
+      },
+      [computeVisibleRange, onScroll, reportVisibleRange],
+    );
+
+    const runProgrammaticScroll = useEvent((scroll: () => void) => {
+      programmaticScroll.current = true;
+      scroll();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          programmaticScroll.current = false;
+        });
+      });
+    });
+
+    const scrollToBottom = useEvent(() => {
+      const v = virtualizerRef.current;
+      if (v && rowsRef.current.length) {
+        runProgrammaticScroll(() => v.scrollTo(v.scrollSize + startMargin));
+      }
+    });
+
+    const scrollToTop = useEvent(() => {
+      if (rowsRef.current.length) {
+        runProgrammaticScroll(() =>
+          virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin }),
+        );
+      }
+    });
+
+    const scrollToIndex = useEvent((index: number) => {
+      runProgrammaticScroll(() => {
+        virtualizerRef.current?.scrollToIndex(index, { offset: -startMargin });
+      });
+    });
+
+    const scrollToId = useEvent((id: string) => {
+      const index = rowsRef.current.findIndex((row) => row.original?.[idKey] === id);
+      if (index >= 0) {
+        scrollToIndex(index);
+      }
+    });
+
+    const getItemCount = useEvent(() => rowsRef.current.length);
+    const getVisibleRange = useEvent(() => {
+      return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
+    });
+
     useIsomorphicLayoutEffect(() => {
-      registerComponentApi(selectionApi);
-    }, [registerComponentApi, selectionApi]);
+      registerComponentApi({
+        scrollToBottom,
+        scrollToTop,
+        scrollToIndex,
+        scrollToId,
+        getItemCount,
+        getVisibleRange,
+        ...selectionApi,
+      });
+    }, [
+      getItemCount,
+      getVisibleRange,
+      registerComponentApi,
+      scrollToBottom,
+      scrollToId,
+      scrollToIndex,
+      scrollToTop,
+      selectionApi,
+    ]);
 
     const paginationControls = (
       <ThemedPagination
@@ -2534,6 +2659,7 @@ export const Table = memo(
               scrollRef={wrapperRef}
               startMargin={startMargin}
               itemSize={rowHeight}
+              onScroll={handleVirtuaScroll}
             >
               {rows.map((row) => (
                 <tr key={row.id} data-render-version={rowRenderVersion} />

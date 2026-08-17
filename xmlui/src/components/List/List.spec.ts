@@ -2254,6 +2254,22 @@ test.describe("Row Selection", () => {
       await expect.poll(testStateDriver.testState).toEqual("Apple,Banana");
     });
 
+    test("getItemCount API returns current item count", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="getCountBtn" label="Get Count" onClick="testState = myList.getItemCount()" />
+      `);
+
+      await page.getByTestId("getCountBtn").click();
+
+      await expect.poll(testStateDriver.testState).toEqual(4);
+    });
+
     test("selectId API selects a specific row", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <List
@@ -2564,7 +2580,7 @@ test.describe("scroll event", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <List height="100px" data="{${longData}}"
-        onScroll="(e) => testState = { atEnd: e.atEnd, st: typeof e.scrollTop, sh: typeof e.scrollHeight, vs: typeof e.viewportSize }">
+        onScroll="(e) => testState = { atEnd: e.atEnd, st: typeof e.scrollTop, sh: typeof e.scrollHeight, vs: typeof e.viewportSize, itemCount: e.itemCount, range: e.visibleRange }">
         <Text>{$item.name}</Text>
       </List>
     `);
@@ -2579,6 +2595,9 @@ test.describe("scroll event", () => {
     expect(atBottom.st).toEqual("number");
     expect(atBottom.sh).toEqual("number");
     expect(atBottom.vs).toEqual("number");
+    expect(atBottom.itemCount).toEqual(50);
+    expect(atBottom.range.startIndex).toBeGreaterThan(0);
+    expect(atBottom.range.endIndex).toBeGreaterThanOrEqual(atBottom.range.startIndex);
 
     // User scroll back to the top: atEnd flips to false.
     await driver.scrollTo("top");
@@ -2613,5 +2632,26 @@ test.describe("scroll event", () => {
       .poll(async () => (await testStateDriver.testState()) !== null)
       .toBe(true);
   });
-});
 
+  test("scroll event does not fire for public scroll APIs", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Button testId="scrollBottom" label="Bottom" onClick="list.scrollToBottom()" />
+        <List id="list" height="100px" data="{${longData}}"
+          onScroll="(e) => testState = (testState || 0) + 1">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+    const driver = await createListDriver();
+
+    await page.getByTestId("scrollBottom").click();
+    await expect(driver.component).toContainText("Item 49");
+    await page.waitForTimeout(100);
+    expect(await testStateDriver.testState()).toEqual(null);
+  });
+});

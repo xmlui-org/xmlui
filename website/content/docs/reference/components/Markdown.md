@@ -171,6 +171,29 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `allowHtml` [#allowhtml]
+
+> [!DEF]  default: **true**
+
+When `true` (default), a subset of raw HTML embedded in the content is rendered as real elements. Set this to `false` for content that arrives at runtime as **data** so that raw HTML tags render as literal text instead of markup — a quoted `<table>` shows its tags rather than building a table. Only the HTML-tag interpretation is affected; markdown formatting, code fences, and inline code are untouched. Pair with `interpolateBindings="false"` for a fully data-safe render.
+
+By default, `Markdown` renders a subset of raw HTML embedded in the content as real elements — a `<table>` in the text builds a table. That is fine for markup you author, but for content that arrives at runtime as **data** (transcripts, logs, user input) any quoted HTML would render as live markup and can break layout.
+
+Set `allowHtml="false"` so raw HTML tags render as **literal text** instead. Only the HTML-tag interpretation is neutralized — markdown formatting, code fences, and inline code are untouched, and an unterminated tag survives verbatim rather than being dropped.
+
+This axis is independent of `interpolateBindings`. Pair the two (`interpolateBindings="false" allowHtml="false"`) for a fully data-safe render: nothing is evaluated, nothing is rewritten, and no HTML is activated.
+
+```xmlui-pg copy display name="Example: allowHtml"
+<App var.dataLine="{'Rendered row: <tr><td>oops</td></tr> — and a bare <script> tag'}">
+  <VStack gap="8px">
+    <Text variant="strong">allowHtml="true" (default)</Text>
+    <Markdown content="{dataLine}" />
+    <Text variant="strong">allowHtml="false"</Text>
+    <Markdown allowHtml="false" content="{dataLine}" />
+  </VStack>
+</App>
+```
+
 ### `anchorTemplate` [#anchortemplate]
 
 An optional template to customize the anchor link rendered next to each heading. Requires `showHeadingAnchors` to be `true`. The template receives `$anchorId` and `$anchorHref` as context variables.
@@ -257,6 +280,24 @@ Which occurrence (0-based) of `highlightText` is the active match: it is emphasi
 ### `highlightText` [#highlighttext]
 
 When set, wraps every case-insensitive occurrence in the rendered content in a `<mark>` element (highlighted). Accepts a **string** (a single phrase) or a **string array** (each term highlighted independently). Works across prose, code, and links. A term shorter than 2 characters, an empty string, or an empty array is a no-op.
+
+### `interpolateBindings` [#interpolatebindings]
+
+> [!DEF]  default: **true**
+
+When `true` (default), the content is treated as **authored** markup: `@{...}` binding expressions are evaluated and replaced with their values, and `xmlui-pg` playground fences and tree-display blocks are rendered as live examples. Set this to `false` for content that arrives at runtime as **data** (transcripts, logs, user text) so that `@{...}` sequences — which collide with real-world syntax such as PowerShell hashtable literals (`@{ ... }`) — render literally instead of being evaluated, and a quoted `xmlui-pg` fence renders as a code block instead of being rewritten into a live playground.
+
+By default, `Markdown` evaluates `@{...}` binding expressions in its content. That is convenient for text you author, but risky for text that arrives at runtime as **data** — transcripts, logs, or user input.
+
+The collision is a bare `@` immediately followed by `{`, which is common in real code and markup: PowerShell hashtables (`@{ LogName = "System" }`), Razor/Blazor code blocks (`@{ ... }`), Objective-C dictionary literals (`@{ @"k": v }`), Perl dereferences (`@{ $ref }`), and LaTeX column specs (`@{...}`). When such text is evaluated as a binding it produces wrong output or an error — and an empty `@{}` (e.g. a LaTeX inter-column spec) is silently **removed** rather than shown.
+
+Set `interpolateBindings="false"` for data-fed content so every `@{...}` sequence renders literally:
+
+```xmlui-pg copy display name="Example: interpolateBindings"
+<App var.logLine="{'Get-WinEvent -FilterHashtable @{ LogName = System; Id = 3077 }'}">
+  <Markdown interpolateBindings="false" content="{logLine}" />
+</App>
+```
 
 ### `openLinkInNewTab` [#openlinkinnewtab]
 

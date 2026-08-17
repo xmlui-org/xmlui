@@ -2006,16 +2006,18 @@ item as its only argument.
 
 ### `scroll` [#scroll]
 
-This event fires as the user scrolls the list. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the list's own programmatic and auto-follow scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior.
+This event fires as the user scrolls the list. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the list's own programmatic and auto-follow scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior, or with `visibleRange` and `itemCount` to display a visible item range.
 
-**Signature**: `scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean }): void`
+**Signature**: `scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean, visibleRange: { startIndex: number, endIndex: number }, itemCount: number }): void`
 
-- `event`: The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled to within ~1.5px of the bottom).
+- `event`: The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled to within ~1.5px of the bottom), plus `visibleRange` and `itemCount`.
 
 This event fires as the user scrolls the list. The handler receives an object describing the
 current scroll state: `scrollTop` (the current scroll offset), `scrollHeight` (the total
 scrollable size), `viewportSize` (the visible size), and `atEnd` (`true` when the list is
 scrolled to within ~1.5px of the bottom).
+
+The object also includes `visibleRange` and `itemCount`, which you can use to display a range such as `234-245 of 1000`.
 
 The event fires only for user-driven scrolls; the list's own programmatic scrolls and its
 `scrollAnchor="bottom"` auto-follow do **not** trigger it. This makes it suitable for
@@ -2175,6 +2177,12 @@ The following example demonstrates `clearSelection` and the other selection API 
 </App>
 ```
 
+### `getItemCount` [#getitemcount]
+
+This method returns the number of items in the list's current virtualized row model.
+
+**Signature**: `getItemCount(): number`
+
 ### `getSelectedIds` [#getselectedids]
 
 This method returns the list of currently selected list row IDs.
@@ -2196,6 +2204,38 @@ This method returns the list of currently selected list row items.
 This method returns the currently visible item range as an object with `startIndex` and `endIndex` (inclusive, in the list's row order). Returns `{ startIndex: -1, endIndex: -1 }` when the list is empty or not yet measured. The pull-style counterpart of the `visibleRangeDidChange` event.
 
 **Signature**: `getVisibleRange(): { startIndex: number, endIndex: number }`
+
+Use `getVisibleRange()` with `getItemCount()`, or read the same values from the `scroll` event, to display the currently visible item range.
+
+```xmlui-pg copy display name="Example: visible range display" height="420px"
+<App
+  scrollWholePage="false"
+  var.itemCount="{0}"
+  var.range="{{ startIndex: -1, endIndex: -1 }}">
+  <Text
+    variant="strong"
+    value="{range.startIndex < 0
+      ? 'No items'
+      : (range.startIndex + 1) + '-' 
+        + (range.endIndex + 1) + ' of ' + itemCount}" 
+  />
+  <List
+    id="list"
+    height="*"
+    onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+    onVisibleRangeDidChange="(r) => { 
+      range = r; 
+      itemCount = list.getItemCount() 
+    }"
+    data="{Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      name: 'Item ' + (i + 1),
+      category: i % 2 === 0 ? 'Even' : 'Odd',
+    }))}">
+    <Text value="{$item.name + ' - ' + $item.category}" />
+  </List>
+</App>
+```
 
 ### `scrollToBottom` [#scrolltobottom]
 

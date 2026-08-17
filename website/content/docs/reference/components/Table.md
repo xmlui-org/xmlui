@@ -2077,6 +2077,18 @@ This event is triggered when a table row is double-clicked. The handler receives
 </App>
 ```
 
+### `scroll` [#scroll]
+
+This event fires as the user scrolls the table. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the table's own programmatic scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior, or with `visibleRange` and `itemCount` to display a visible row range.
+
+**Signature**: `scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean, visibleRange: { startIndex: number, endIndex: number }, itemCount: number }): void`
+
+- `event`: The scroll state: `scrollTop` (current scroll offset), `scrollHeight` (total scrollable size), `viewportSize` (visible size), and `atEnd` (true when scrolled to within ~1.5px of the bottom), plus `visibleRange` and `itemCount`.
+
+This event fires as the user scrolls the table. The event object includes `scrollTop`, `scrollHeight`, `viewportSize`, `atEnd`, `visibleRange`, and `itemCount`.
+
+It is only fired for user-driven scrolls; the table's own programmatic scrolls do not trigger it. Use `visibleRange` and `itemCount` to display the currently visible range while the user scrolls.
+
 ### `selectAllAction` [#selectallaction]
 
 This event is triggered when the user presses the select all keyboard shortcut (default: Ctrl+A/Cmd+A) and `rowsSelectable` is set to `true`. The component automatically selects all rows before invoking this handler. The handler receives three parameters: the currently focused row (if any), all selected items, and all selected IDs.
@@ -2262,6 +2274,16 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
+### `visibleRangeDidChange` [#visiblerangedidchange]
+
+This event fires when the range of visible table rows changes — whatever caused it: a user scroll, a programmatic scroll, or content growth. Unlike the `scroll` event, it is not suppressed during the table's own programmatic scrolls, because consumers of the visible range care about what is visible, not why it became visible. It fires only when the range actually shifts (deduplicated by value).
+
+**Signature**: `visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void`
+
+- `range`: The visible range: `startIndex` (first visible row index) and `endIndex` (last visible row index), inclusive, in the table's current row order.
+
+This event fires when the visible row range changes. It also fires for non-user-scroll changes, such as initial measurement or programmatic scrolling.
+
 ### `willSort` [#willsort]
 
 This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction. When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
@@ -2445,6 +2467,16 @@ This method clears the list of currently selected table rows.
 </App>
 ```
 
+### `getItemCount` [#getitemcount]
+
+This method returns the number of rows in the table's current virtualized row model. For an unpaginated table, this is the number of rows supplied through `data` or `items`; for a paginated table, this is the number of rows on the current page.
+
+**Signature**: `getItemCount(): number`
+
+Returns the number of rows in the table's current virtualized row model. Use this with `getVisibleRange()` to build a display such as `234-245 of 1000`.
+
+For paginated tables, this count is the number of rows in the current page's virtualized row model.
+
 ### `getSelectedIds` [#getselectedids]
 
 This method returns the list of currently selected table rows IDs.
@@ -2460,6 +2492,84 @@ This method returns the list of currently selected table rows items.
 **Signature**: `getSelectedItems(): Array<TableRowItem>`
 
 (See the [example](#clearselection) at the `clearSelection` method)
+
+### `getVisibleRange` [#getvisiblerange]
+
+This method returns the currently visible row range as an object with `startIndex` and `endIndex` (inclusive, in the table's current row order). Returns `{ startIndex: -1, endIndex: -1 }` when the table is empty or not yet measured. The pull-style counterpart of the `visibleRangeDidChange` event.
+
+**Signature**: `getVisibleRange(): { startIndex: number, endIndex: number }`
+
+Returns the currently visible row range as `{ startIndex, endIndex }`. Indexes are zero-based and inclusive, so add `1` when displaying them to users.
+
+When the table is empty or not yet measured, the method returns `{ startIndex: -1, endIndex: -1 }`. This is the pull-style counterpart of the `visibleRangeDidChange` event.
+
+```xmlui-pg copy display name="Example: visible range display" height="420px"
+<App
+  scrollWholePage="false"
+  var.itemCount="{0}"
+  var.range="{{ startIndex: -1, endIndex: -1 }}">
+  <Text
+    variant="strong"
+    value="{range.startIndex < 0
+      ? 'No rows'
+      : (range.startIndex + 1) + '-' 
+        + (range.endIndex + 1) + ' of ' + itemCount}" 
+  />
+  <Table
+    id="table"
+    height="*"
+    onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+    onVisibleRangeDidChange="(r) => { 
+      range = r; 
+      itemCount = table.getItemCount() 
+    }"
+    data="{Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      name: 'Item ' + (i + 1),
+      quantity: (i % 25) + 1,
+    }))}">
+    <Column bindTo="id" width="90px" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+  </Table>
+</App>
+```
+
+### `scrollToBottom` [#scrolltobottom]
+
+This method scrolls the table to the bottom.
+
+**Signature**: `scrollToBottom(): void`
+
+See the [`getVisibleRange`](#getvisiblerange) example for displaying the visible range while scrolling.
+
+### `scrollToId` [#scrolltoid]
+
+This method scrolls the table to a specific row. The method accepts a row ID as a parameter.
+
+**Signature**: `scrollToId(id: string): void`
+
+- `id`: The ID of the row to scroll to.
+
+See the [`getVisibleRange`](#getvisiblerange) example.
+
+### `scrollToIndex` [#scrolltoindex]
+
+This method scrolls the table to a specific row index. The method accepts an index as a parameter.
+
+**Signature**: `scrollToIndex(index: number): void`
+
+- `index`: The row index to scroll to.
+
+See the [`getVisibleRange`](#getvisiblerange) example.
+
+### `scrollToTop` [#scrolltotop]
+
+This method scrolls the table to the top.
+
+**Signature**: `scrollToTop(): void`
+
+See the [`getVisibleRange`](#getvisiblerange) example.
 
 ### `selectAll` [#selectall]
 
