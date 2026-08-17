@@ -369,7 +369,26 @@ export const useRealBackground = (element: HTMLElement) => {
 //   return entered;
 // };
 
-export const useStartMargin = (
+/**
+ * Tracks how far down the scrollable content a list starts, and exposes a
+ * call-time re-measure.
+ *
+ * The cached value only refreshes on mount, on `hasOutsideScroll` change, on
+ * the *scroll container's* resize, and on one rAF retry guarded by
+ * `newMargin === 0`. None of those fire when content appears ABOVE the list:
+ * `parentRef` is the list's own root, which moves rather than resizes, and in
+ * outside-scroll mode `scrollRef` is an ancestor scroller whose box does not
+ * change when content appears inside it. So the cached value goes stale and
+ * stays stale.
+ *
+ * `measureStartMargin()` re-measures and publishes the result, so a caller that
+ * needs correctness at a specific instant (the imperative scroll APIs) can pay
+ * for a layout read exactly then, and virtua's `startMargin` prop converges to
+ * the same value on the following render. Nothing pays per render.
+ *
+ * xmlui-org/xmlui#3765
+ */
+export const useStartMarginState = (
   hasOutsideScroll: boolean,
   parentRef: MutableRefObject<HTMLElement | null | undefined>,
   scrollRef: MutableRefObject<HTMLElement | null | undefined>,
@@ -418,8 +437,27 @@ export const useStartMargin = (
     }
   }, [hasOutsideScroll, calculateStartMargin]);
 
-  return startMargin;
+  // Re-measure now, publish for the next render, and hand the caller the fresh
+  // value to use immediately.
+  const measureStartMargin = useEvent(() => {
+    const fresh = calculateStartMargin();
+    setStartMargin(fresh);
+    return fresh;
+  });
+
+  return { startMargin, measureStartMargin };
 };
+
+/**
+ * Value-only form, for callers that consume `startMargin` solely as virtua's
+ * prop and never scroll imperatively (Table). Prefer `useStartMarginState`
+ * when call-time accuracy matters.
+ */
+export const useStartMargin = (
+  hasOutsideScroll: boolean,
+  parentRef: MutableRefObject<HTMLElement | null | undefined>,
+  scrollRef: MutableRefObject<HTMLElement | null | undefined>,
+) => useStartMarginState(hasOutsideScroll, parentRef, scrollRef).startMargin;
 
 export function useHasExplicitHeight(parentRef: React.MutableRefObject<HTMLDivElement | null>) {
   const [hasHeight, setHasHeight] = useState(false);
