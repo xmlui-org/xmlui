@@ -1049,6 +1049,33 @@ test.describe("Validation Behavior", () => {
 
     await expect(page.getByText("Date required")).toBeVisible();
   });
+
+  test("autocomplete required validation blocks empty form submission", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <FormItem
+          testId="formItem"
+          bindTo="hero"
+          type="autocomplete"
+          label="Hero"
+          required="true"
+          requiredInvalidMessage="Hero required">
+          <Option value="bruce" label="Bruce Wayne" />
+          <Option value="clark" label="Clark Kent" />
+        </FormItem>
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    await formDriver.submitForm();
+
+    await expect.poll(testStateDriver.testState).toBeNull();
+    await expect(page.getByText("Hero required")).toBeVisible();
+  });
 });
 
 // =============================================================================

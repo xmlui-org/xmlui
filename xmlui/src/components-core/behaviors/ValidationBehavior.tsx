@@ -3,6 +3,10 @@ import { ValidationWrapper } from "../../components/FormItem/ValidationWrapper";
 import type { Behavior } from "./Behavior";
 import type { RequireLabelMode } from "../../components/abstractions";
 import type { FormItemValidations } from "../../components/Form/FormContext";
+import {
+  createBehaviorUnboundFieldId,
+  hasActiveValidationProp,
+} from "./formValidationBehaviorUtils";
 
 export const validationBehavior: Behavior = {
   metadata: {
@@ -18,8 +22,7 @@ export const validationBehavior: Behavior = {
       },
       requiredInvalidMessage: {
         valueType: "string",
-        description:
-          "Custom error message to display when the field is required but empty.",
+        description: "Custom error message to display when the field is required but empty.",
       },
       minLength: {
         valueType: "number",
@@ -31,8 +34,7 @@ export const validationBehavior: Behavior = {
       },
       lengthInvalidMessage: {
         valueType: "string",
-        description:
-          "Custom error message to display when input length is invalid.",
+        description: "Custom error message to display when input length is invalid.",
       },
       lengthInvalidSeverity: {
         valueType: "string",
@@ -49,8 +51,7 @@ export const validationBehavior: Behavior = {
       },
       rangeInvalidMessage: {
         valueType: "string",
-        description:
-          "Custom error message to display when input value is out of range.",
+        description: "Custom error message to display when input value is out of range.",
       },
       rangeInvalidSeverity: {
         valueType: "string",
@@ -63,8 +64,7 @@ export const validationBehavior: Behavior = {
       },
       patternInvalidMessage: {
         valueType: "string",
-        description:
-          "Custom error message to display when input does not match the pattern.",
+        description: "Custom error message to display when input does not match the pattern.",
       },
       patternInvalidSeverity: {
         valueType: "string",
@@ -77,8 +77,7 @@ export const validationBehavior: Behavior = {
       },
       regexInvalidMessage: {
         valueType: "string",
-        description:
-          "Custom error message to display when input does not match the regex.",
+        description: "Custom error message to display when input does not match the regex.",
       },
       regexInvalidSeverity: {
         valueType: "string",
@@ -143,7 +142,11 @@ export const validationBehavior: Behavior = {
 
     const bindTo = extractValue(node.props?.bindTo, true);
     const isFormItem = node.type === "FormItem";
-    if (!isFormItem && (bindTo === undefined || bindTo === null)) {
+    if (
+      !isFormItem &&
+      (bindTo === undefined || bindTo === null) &&
+      !hasActiveValidationProp(context, node)
+    ) {
       return false;
     }
 
@@ -160,7 +163,10 @@ export const validationBehavior: Behavior = {
     const { extractValue, node: componentNode, lookupEventHandler } = context;
     const renderedNode = node as ReactElement;
 
-    const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
+    const isFormItem = componentNode.type === "FormItem";
+    const bindTo =
+      extractValue.asOptionalString(componentNode.props?.bindTo) ??
+      (!isFormItem ? createBehaviorUnboundFieldId(componentNode.uid) : undefined);
     const itemIndex =
       (renderedNode.props as any)?.itemIndex ??
       extractValue.asOptionalNumber(componentNode.props?.itemIndex) ??
@@ -256,8 +262,6 @@ export const validationBehavior: Behavior = {
       matchValue,
       matchInvalidMessage,
     };
-
-    const isFormItem = componentNode.type === "FormItem";
 
     return (
       <ValidationWrapper

@@ -3,6 +3,10 @@ import type { RequireLabelMode } from "../../components/abstractions";
 import type { FormItemValidations } from "../../components/Form/FormContext";
 import { FormBindingWrapper } from "../../components/FormItem/FormBindingWrapper";
 import type { Behavior } from "./Behavior";
+import {
+  createBehaviorUnboundFieldId,
+  hasActiveValidationProp,
+} from "./formValidationBehaviorUtils";
 
 /**
  * Behavior for binding input components directly to a Form without requiring
@@ -55,7 +59,11 @@ export const formBindingBehavior: Behavior = {
     const bindTo = extractValue(node.props?.bindTo, true);
     // Check if the component exposes value/setValue APIs
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    if (!bindTo || !hasValueApiPair || node.type === "FormItem") {
+    if (
+      (!bindTo && !hasActiveValidationProp(context, node)) ||
+      !hasValueApiPair ||
+      node.type === "FormItem"
+    ) {
       return false;
     }
     return true;
@@ -63,7 +71,9 @@ export const formBindingBehavior: Behavior = {
   attach: (context, node, metadata) => {
     const { extractValue, node: componentNode, className, layoutContext } = context;
 
-    const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
+    const bindTo =
+      extractValue.asOptionalString(componentNode.props?.bindTo) ??
+      createBehaviorUnboundFieldId(componentNode.uid);
     const initialValue = extractValue(componentNode.props?.initialValue);
     const noSubmit = extractValue.asOptionalBoolean(componentNode.props?.noSubmit, false);
     const itemIndex =
