@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.14.15
+
+### Patch Changes
+
+- 4a5952f: Warn in development builds when a `List`'s `idKey` column holds duplicate or empty values, and document that those values are the row's identity. Duplicates and empties previously corrupted virtualized rows and collapsed selection state with nothing on the console.
+- b2f0661: Fix List scrollToIndex and scrollToId so they account for content that appears above the list after mount, by measuring the start margin when the call is made and letting the virtualizer's spacer carry it exactly once.
+- 1bb53b6: Fix Table scrollToIndex and scrollToId so they account for content that appears above the table after mount in outside-scroll layouts.
+- 092e8f3: Fix virtualized Table scrolling by following List's dynamic row-height measurement pattern, while still allowing taller cell content to expand rows.
+- 88a048e: Add `highlightText` and `highlightActiveIndex` to `Text`, matching `Markdown`'s properties of the same names. Highlighting plain text no longer requires either a Markdown parse or a hand-rolled construction of nested inline `Text` segments, and occurrences are numbered so a find-in-page can step through a list of mixed `Text` and `Markdown` rows as one sequence.
+- 6fef973: Add a `segments` property to `Text` for rendering pre-computed highlight spans, as an array of `{ text, hit, active }`. Content whose highlights are decided upstream — a full-text search snippet, whose marks fall on token boundaries that substring matching cannot reproduce — can now be rendered directly instead of through a hand-built stack of nested inline `Text` elements.
+
 ## 0.14.14
 
 ### Patch Changes
