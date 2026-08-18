@@ -224,14 +224,14 @@ export function collectVariableDependencies(
         case T_MEMBER_ACCESS_EXPRESSION:
           // --- Check for a simple member-access chain. If it exist, add the member to the chain with the "." syntax
           const memberChain = traverseMemberAccessChain(program);
-          return memberChain
+          return memberChain && !hasDynamicCalculatedMember(program)
             ? [memberChain]
             : collectDependencies(program.obj, program, "memberAccess");
 
         case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
           // --- Check for a simple member-access chain. If it exist, add the member to the chain with the "[]" syntax
           const calcMemberChain = traverseMemberAccessChain(program);
-          if (calcMemberChain) {
+          if (calcMemberChain && !hasDynamicCalculatedMember(program)) {
             return [calcMemberChain];
           }
           let calcDeps = collectDependencies(program.obj, program, "calculatedMember");
@@ -427,6 +427,20 @@ export function collectVariableDependencies(
         return scope.type !== "block" ? expr.name : null;
     }
     return null;
+  }
+
+  // --- Dynamic calculated keys, such as map[key] or rows[getKey()], must track
+  // --- the key expression separately; a combined path string would be treated
+  // --- as a static lodash path by dependency memoization.
+  function hasDynamicCalculatedMember(expr: Expression): boolean {
+    switch (expr.type) {
+      case T_MEMBER_ACCESS_EXPRESSION:
+        return hasDynamicCalculatedMember(expr.obj);
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+        return expr.member.type !== T_LITERAL || hasDynamicCalculatedMember(expr.obj);
+      default:
+        return false;
+    }
   }
 }
 

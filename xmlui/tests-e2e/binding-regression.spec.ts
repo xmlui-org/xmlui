@@ -25,6 +25,19 @@ test("Array.filter works with the binding engine #1", async ({ page, initTestBed
   await expect(page.getByTestId("button")).toHaveText("stuff: 2");
 });
 
+test("Computed member access re-derives when the key changes", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <App var.key="a" var.map="{{ a: 1, b: 2 }}" var.derived="{map[key]}">
+      <Text testId="out" value="derived={derived}" />
+      <Button testId="go" label="switch" onClick="key = 'b'" />
+    </App>
+  `);
+
+  await expect(page.getByTestId("out")).toHaveText("derived=1");
+  await page.getByTestId("go").click();
+  await expect(page.getByTestId("out")).toHaveText("derived=2");
+});
+
 test("Array.filter works with the binding engine #2", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Button

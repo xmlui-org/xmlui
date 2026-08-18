@@ -59,6 +59,21 @@ describe("parseParameterString", () => {
     }
   });
 
+  it("tracks computed member keys as compiled binding dependencies", () => {
+    // --- Act
+    const result = parseParameterString("{readings[dataset].min}", {
+      compileBindings: true,
+      sourceId: "Main.xmlui:current",
+    });
+
+    // --- Assert
+    expect(result.length).toBe(1);
+    expect(result[0].type).toBe("expression");
+    if (result[0].type === "expression") {
+      expect(result[0].compiled?.dependencies).toEqual(["readings", "dataset"]);
+    }
+  });
+
   it("throws unsupported node errors while compiling requested parse artifacts", () => {
     expect(() =>
       parseParameterString("{(async () => 1)}", {

@@ -227,7 +227,7 @@ describe("binding-sync expression compiler", () => {
   it("records dependencies on the generated artifact", () => {
     const artifact = compileBindingSyncExpressionSource("user[key] ?? fallback", "test:deps");
 
-    expect(artifact.dependencies).toEqual(["user[key]", "fallback"]);
+    expect(artifact.dependencies).toEqual(["user", "key", "fallback"]);
   });
 
   it("emits source mappings for compiled expression chunks", () => {

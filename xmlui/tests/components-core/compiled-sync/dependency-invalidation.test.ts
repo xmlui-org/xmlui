@@ -49,13 +49,15 @@ describe("compiled sync dependency invalidation", () => {
     expect(invalidatedBindings(bindings, dirtyRoots)).toEqual(expected);
   });
 
-  it("records the current computed-member dependency shape explicitly", () => {
+  it("records dynamic computed-member keys as separate dependencies", () => {
     const artifact = compileBindingSyncExpressionSource("obj[key]", "test:computed-member");
 
-    expect(artifact.dependencies).toEqual(["obj[key]"]);
+    expect(artifact.dependencies).toEqual(["obj", "key"]);
     expect(invalidatedBindings([{ id: "computed", expression: "obj[key]" }], ["obj"])).toEqual([
       "computed",
     ]);
-    expect(invalidatedBindings([{ id: "computed", expression: "obj[key]" }], ["key"])).toEqual([]);
+    expect(invalidatedBindings([{ id: "computed", expression: "obj[key]" }], ["key"])).toEqual([
+      "computed",
+    ]);
   });
 });
