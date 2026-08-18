@@ -12118,6 +12118,20 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       },
+      "renderCache": {
+        "description": "Controls whether the list keeps a bounded set of recently rendered virtualized rows mounted while they are outside the viewport. Keeping rows mounted reduces remount and measurement flash when users scroll back through recently viewed content.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "renderCacheSize": {
+        "description": "Maximum number of recently rendered virtualized rows to keep mounted when [`renderCache`](#rendercache) is enabled. Larger values can make repeat scrolling smoother but retain more DOM nodes.",
+        "valueType": "number",
+        "defaultValue": 80
+      },
+      "virtualBufferSize": {
+        "description": "Extra virtualizer buffer, in pixels, to render before and after the viewport. Increase this when fast scrolling reaches rows that have not been rendered before; unlike [`renderCache`](#rendercache), this prepares never-seen rows near the viewport.",
+        "valueType": "number"
+      },
       "groupBy": {
         "description": "This property sets which data item property is used to group the list items. Accepts a field name string or a function that receives an item and returns the group key. If not set, no grouping is done.",
         "valueType": "any"
@@ -17576,6 +17590,20 @@ export default {
         "description": "Indicates whether columns can be resized by dragging their header borders. Individual `Column` components can override this table-level default with their own `canResize` property.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "renderCache": {
+        "description": "Controls whether the table keeps a bounded set of recently rendered virtualized rows mounted while they are outside the viewport. Keeping rows mounted reduces remount and measurement flash when users scroll back through recently viewed content.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "renderCacheSize": {
+        "description": "Maximum number of recently rendered virtualized rows to keep mounted when [`renderCache`](#rendercache) is enabled. Larger values can make repeat scrolling smoother but retain more DOM nodes.",
+        "valueType": "number",
+        "defaultValue": 80
+      },
+      "virtualBufferSize": {
+        "description": "Extra virtualizer buffer, in pixels, to render before and after the viewport. Increase this when fast scrolling reaches rows that have not been rendered before; unlike [`renderCache`](#rendercache), this prepares never-seen rows near the viewport.",
+        "valueType": "number"
       },
       "idKey": {
         "description": "This property is used to specify the unique ID property in the data array. If the idKey points to a property that does not exist in the data items, that will result in incorrect behavior when using selectable rows.",

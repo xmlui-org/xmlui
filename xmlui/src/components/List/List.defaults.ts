@@ -17,6 +17,8 @@ export type SelectionCheckboxAnchor = (typeof selectionCheckboxAnchorValues)[num
 export const defaultProps = {
   idKey: "id",
   scrollAnchor: "top" as ScrollAnchoring,
+  renderCache: true,
+  renderCacheSize: 80,
   hideEmptyGroups: true,
   borderCollapse: true,
   groupsInitiallyExpanded: true,

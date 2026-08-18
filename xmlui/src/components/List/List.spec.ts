@@ -767,7 +767,7 @@ test.describe("Basic Functionality", () => {
       <Fragment var.items="{Array.from({length: 100}).map((_, i) => ({ id: i + 1, name: 'Item ' + (i + 1) }))}">
         <Button testId="add" label="Add"
           onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
-        <List testId="testList" scrollAnchor="bottom" height="80px" data="{items}">
+        <List testId="testList" scrollAnchor="bottom" renderCache="{false}" height="80px" data="{items}">
           <Text>{$item.name}</Text>
         </List>
       </Fragment>
@@ -802,7 +802,7 @@ test.describe("Basic Functionality", () => {
       <Fragment var.items="{[{ id: 1, name: 'Item 1' }]}">
         <Button testId="add" label="Add"
           onClick="items = [...items, { id: items.length + 1, name: 'Item ' + (items.length + 1) }]" />
-        <List testId="testList" scrollAnchor="bottom" maxHeight="80px" data="{items}">
+        <List testId="testList" scrollAnchor="bottom" renderCache="{false}" maxHeight="80px" data="{items}">
           <Text>{$item.name}</Text>
         </List>
       </Fragment>
@@ -1350,7 +1350,9 @@ test.describe("Virtualization", () => {
   test("renders new items when scrolling through large dataset", async ({ initTestBed, createListDriver, page }) => {
     await initTestBed(`
       <App scrollWholePage="false">
+        <Button testId="scroll" label="Scroll" onClick="list.scrollToIndex(599)" />
         <List
+          id="list"
           height="400px"
           data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
           <Text>{$item.name}</Text>
@@ -1370,7 +1372,7 @@ test.describe("Virtualization", () => {
     expect(countBefore).toBeLessThan(50);
 
     // Scroll to bottom
-    await driver.scrollTo("bottom");
+    await page.getByTestId("scroll").click();
     await page.waitForTimeout(150);
 
     // After scrolling to bottom, item count might change (virtualization update)
@@ -1380,6 +1382,96 @@ test.describe("Virtualization", () => {
     // Should still have virtualization (not render all 600)
     expect(countAfter).toBeLessThan(100);
     expect(countAfter).toBeGreaterThan(0);
+  });
+
+  test("retains recently rendered rows by default", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    await expect(driver.component).toBeVisible();
+    await expect(page.getByText("Item 1", { exact: true })).toBeVisible();
+    await page.waitForTimeout(50);
+
+    await page.evaluate(() => {
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          el.scrollTop = 5000;
+        }
+      });
+    });
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          let found = 0;
+          document.querySelectorAll("*").forEach((el: any) => {
+            if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+              found = Math.max(found, Math.round(el.scrollTop));
+            }
+          });
+          return found;
+        }),
+      )
+      .toBeGreaterThan(0);
+    await page.waitForTimeout(150);
+
+    await expect(page.getByText("Item 1", { exact: true })).toHaveCount(1);
+  });
+
+  test("can disable retained virtualized rows", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <List
+          height="400px"
+          renderCache="{false}"
+          data="{Array.from({length: 600}, (_, i) => ({id: i + 1, name: 'Item ' + (i + 1)}))}">
+          <Text>{$item.name}</Text>
+        </List>
+      </App>
+    `);
+
+    const driver = await createListDriver();
+    await expect(driver.component).toBeVisible();
+    await expect(page.getByText("Item 1", { exact: true })).toBeVisible();
+
+    await page.evaluate(() => {
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          el.scrollTop = 5000;
+        }
+      });
+    });
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          let found = 0;
+          document.querySelectorAll("*").forEach((el: any) => {
+            if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+              found = Math.max(found, Math.round(el.scrollTop));
+            }
+          });
+          return found;
+        }),
+      )
+      .toBeGreaterThan(0);
+    await page.waitForTimeout(150);
+
+    await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
   });
 
   test("scrollbar tracks correctly with large dataset", async ({ initTestBed, createListDriver, page }) => {

@@ -11,6 +11,8 @@
 **List vs Items:**
 Use `List` for complex data presentation requiring performance optimization, grouping, sorting, or visual formatting. Use `Items` for simple data iteration without layout requirements.
 
+`List` keeps a bounded cache of recently rendered virtualized rows by default. This reduces remount and measurement flash when users scroll back through content they have already seen. Set `renderCache="{false}"` to minimize mounted DOM nodes, tune `renderCacheSize` for the number of recently rendered rows to retain, and use `virtualBufferSize` when fast scrolling should prepare more never-seen rows just outside the viewport.
+
 In the following examples all use the same list of data which looks like so:
 
 | Id   | Name    | Quantity | Unit   | Category   | Key  |

@@ -7,6 +7,8 @@ export const defaultProps = {
   columnInference: "first-n(25)",
   columnSizing: "auto" as "auto" | "stretch" | "balanced" | "content",
   canResizeColumns: true,
+  renderCache: true,
+  renderCacheSize: 80,
   isPaginated: false,
   loading: false,
   loadingDelay: 400,
