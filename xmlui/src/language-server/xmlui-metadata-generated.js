@@ -21143,6 +21143,16 @@ export default {
         "description": "Initial tree state. Per-node state is keyed by source node ID and scrollPosition stores the vertical scroll offset. The state is applied as matching nodes become available; unknown node IDs are ignored.",
         "valueType": "any"
       },
+      "dataRefreshMode": {
+        "description": "Controls how the tree handles later data refreshes after the initial load. \"reset\" rebuilds the view from the default expansion state. \"preserve-state\" reconciles refreshed data with the current view state for unchanged source node IDs.",
+        "valueType": "string",
+        "availableValues": [
+          "reset",
+          "preserve-state"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "reset"
+      },
       "autoExpandToSelection": {
         "description": "Automatically expand the path to the selected item.",
         "valueType": "boolean",
@@ -21329,6 +21339,13 @@ export default {
         "signature": "setTreeState(treeState: TreeState): void",
         "parameters": {
           "treeState": "The tree state object, including per-node state keyed by source node ID and optional scrollPosition."
+        }
+      },
+      "preserveStateOnNextDataRefresh": {
+        "description": "Preserve the current tree view state for the next data refresh, even when dataRefreshMode is \"reset\". Optional operation metadata controls post-refresh scroll behavior.",
+        "signature": "preserveStateOnNextDataRefresh(options?: { operation?: \"insert\" | \"delete\" | \"update\", scrollTarget?: string | number | \"first-inserted\" | \"preserve\" }): void",
+        "parameters": {
+          "options": "Optional refresh intent. Use operation: \"insert\" to scroll the first inserted visible node into view if needed, operation: \"delete\" to preserve scroll, or scrollTarget to explicitly choose the post-refresh viewport target."
         }
       },
       "expandToLevel": {
