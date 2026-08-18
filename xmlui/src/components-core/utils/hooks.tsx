@@ -381,10 +381,10 @@ export const useRealBackground = (element: HTMLElement) => {
  * change when content appears inside it. So the cached value goes stale and
  * stays stale.
  *
- * `measureStartMargin()` re-measures and publishes the result, so a caller that
- * needs correctness at a specific instant (the imperative scroll APIs) can pay
- * for a layout read exactly then, and virtua's `startMargin` prop converges to
- * the same value on the following render. Nothing pays per render.
+ * `measureStartMargin()` re-measures without waiting for the cached value to
+ * refresh, so a caller that needs correctness at a specific instant (the
+ * imperative scroll APIs) can pay for a layout read exactly then. Nothing pays
+ * per render.
  *
  * xmlui-org/xmlui#3765
  */

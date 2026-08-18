@@ -1212,9 +1212,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
 
   // Every scroll API re-measures the start margin at call time rather than
   // reading the cache, which goes stale when content appears above the list
-  // (xmlui-org/xmlui#3765). measureStartMargin() also publishes the fresh value,
-  // so virtua's startMargin prop — and therefore store.$getStartSpacerSize(),
-  // which is fed from that prop — converges on the same number.
+  // (xmlui-org/xmlui#3765).
   const scrollToBottom = useEvent(() => {
     const v = virtualizerRef.current;
     if (v && rows.length) {
@@ -1242,18 +1240,18 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   });
 
-  // No offset. virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`,
-  // so passing -startMargin subtracted a quantity virtua adds straight back —
-  // the margin cancelled out of the sum and the call targeted the item's offset
-  // WITHIN the list rather than its position in the scrollable content. Letting
-  // the spacer carry the margin exactly once is what puts the row where the
-  // caller means. The measure call is still needed: the spacer is fed from the
-  // startMargin prop, so a stale cache leaves the spacer short by the same
-  // amount that the offset used to hide.
+  // virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`.
+  // The current spacer comes from the rendered `startMargin` prop, which can be
+  // stale in the same tick where we re-measure content that appeared above the
+  // list. Pass only the delta between the fresh margin and rendered margin:
+  // before React publishes the fresh prop this fills the missing spacer, and
+  // after it publishes the delta naturally falls back to zero.
   const scrollToIndex = useEvent((index) => {
     runProgrammaticScroll(() => {
-      measureStartMargin();
-      virtualizerRef.current?.scrollToIndex(index);
+      const freshMargin = measureStartMargin();
+      virtualizerRef.current?.scrollToIndex(index, {
+        offset: freshMargin - startMargin,
+      });
     });
   });
 
