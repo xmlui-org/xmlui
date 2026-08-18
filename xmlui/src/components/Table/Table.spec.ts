@@ -5310,14 +5310,62 @@ test.describe("Virtualization", () => {
     const scrollHeights = samples.map((sample) => sample.scrollHeight);
     expect(Math.max(...scrollHeights) - Math.min(...scrollHeights)).toBeLessThanOrEqual(2);
 
-    await expect.poll(async () => {
-      const text = await range.textContent();
-      return Number(text?.match(/^(\d+)-/)?.[1] ?? 0);
-    }).toBeGreaterThan(850);
+    await expect
+      .poll(async () => {
+        const text = await range.textContent();
+        return Number(text?.match(/^(\d+)-/)?.[1] ?? 0);
+      })
+      .toBeGreaterThan(850);
     await table.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
     });
     await expect(page.locator("td").filter({ hasText: "Item 1000" }).first()).toBeVisible();
+  });
+
+  test("allows virtualized rows to grow for taller cell content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.itemCount="{0}"
+        var.range="{{ startIndex: -1, endIndex: -1 }}">
+        <Text
+          testId="range"
+          variant="strong"
+          value="{range.startIndex < 0
+            ? 'No rows'
+            : (range.startIndex + 1) + '-' + (range.endIndex + 1) + ' of ' + itemCount}" />
+        <Table
+          id="table"
+          height="*"
+          onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+          onVisibleRangeDidChange="(r) => {
+            range = r;
+            itemCount = table.getItemCount()
+          }"
+          data="{Array.from({ length: 1000 }, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            quantity: (i % 25) + 1,
+          }))}"
+          testId="table"
+        >
+          <Column bindTo="id" width="90px" />
+          <Column bindTo="name" />
+          <Column bindTo="quantity">
+            <Text height="80px">{$cell}</Text>
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const firstRow = page.locator("tbody tr").first();
+    await expect(table).toBeVisible();
+    await expect(firstRow).toBeVisible();
+
+    const firstRowBox = await firstRow.boundingBox();
+    expect(firstRowBox).not.toBeNull();
+    expect(firstRowBox!.height).toBeGreaterThanOrEqual(80);
   });
 
   test("programmatic scrolling reaches the middle and bottom of a large dataset", async ({

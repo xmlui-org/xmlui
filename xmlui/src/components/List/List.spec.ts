@@ -336,6 +336,23 @@ test.describe("Basic Functionality", () => {
     </VStack>
   `;
 
+  // Outside-scroll, plus a 200px block that appears ABOVE the list only after
+  // mount — the shape that makes the start margin go stale.
+  const revealAboveApp = (buttons: string) => `
+    <VStack var.showTop="{false}">
+      <VStack testId="scroller" height="300px" overflowY="scroll">
+        <VStack when="{showTop}" testId="above" height="200px">
+          <Text>revealed after mount</Text>
+        </VStack>
+        <List id="testList" data="${SCROLL_DATA}">
+          <Text height="30px">{$item.name}</Text>
+        </List>
+      </VStack>
+      <Button testId="reveal" label="reveal" onClick="showTop = true" />
+      ${buttons}
+    </VStack>
+  `;
+
   // The element that actually scrolls, in either mode: the only descendant
   // whose content overflows its box.
   const scrollTopOf = (page: any) =>
@@ -358,6 +375,22 @@ test.describe("Basic Functionality", () => {
       });
     }, value);
   };
+
+  // The list's offset from the top of the scrollable content, measured from the
+  // DOM independently of anything the component caches. Not the same as the
+  // revealed block's height: stack gaps count too.
+  const startMarginOf = (page: any) =>
+    page.evaluate(() => {
+      const scroller = document.querySelector('[data-testid="scroller"]') as HTMLElement;
+      const container = scroller?.querySelector("[data-list-container]") as HTMLElement;
+      const listRoot = container?.parentElement as HTMLElement;
+      if (!scroller || !listRoot) return -1;
+      return Math.round(
+        listRoot.getBoundingClientRect().top -
+          scroller.getBoundingClientRect().top +
+          scroller.scrollTop,
+      );
+    });
 
   for (const [mode, app] of [
     ["inside-scroll", insideScrollApp],
@@ -432,46 +465,76 @@ test.describe("Basic Functionality", () => {
     });
   }
 
-  // The original xmlui-org/xmlui#3760 report: content that appears ABOVE the
-  // list after mount. `useStartMargin` only recomputes on the scroll
-  // container's own resize (and its rAF retry is guarded on `newMargin === 0`),
-  // so the cached offset stays at its mount-time value and index-targeted
-  // scrolls land short by exactly the height of the new content.
+  // Content that appears ABOVE the list after mount (xmlui-org/xmlui#3765).
   //
-  // This was unreachable while the scroll APIs were inert; fixing the viewport
-  // binding exposed it. Measured: with a 200px block revealed above,
-  // scrollToIndex(50) lands at 1500 instead of 1700.
+  // Two defects had to be fixed together. virtua computes the target as
+  // `offset + $getStartSpacerSize() + $getItemOffset(index)`, so passing
+  // `offset: -startMargin` subtracted a quantity virtua adds straight back and
+  // the margin cancelled out of the sum. And $getStartSpacerSize() is not an
+  // independent measurement — it is fed from the startMargin prop, i.e. the
+  // useStartMargin cache, which never recomputes when content appears above.
+  // With a block revealed above (M, measured below — 200px of content plus the
+  // stack gap) and item 50 at 1500px within the list:
   //
-  // Note scrollToTop is NOT affected: virtua's $scrollToIndex adds
-  // store.$getStartSpacerSize() to the caller's offset, and scrollToTop passes
-  // `offset: -startMargin`, so the stale value cancels itself at index 0.
-  test.fixme(
-    "scrollToIndex accounts for content revealed above the list (outside-scroll)",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
-        <VStack var.showTop="{false}">
-          <VStack testId="scroller" height="300px" overflowY="scroll">
-            <VStack when="{showTop}" testId="above" height="200px">
-              <Text>revealed after mount</Text>
-            </VStack>
-            <List id="testList" data="${SCROLL_DATA}">
-              <Text height="30px">{$item.name}</Text>
-            </List>
-          </VStack>
-          <Button testId="reveal" label="reveal" onClick="showTop = true" />
-          <Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />
-        </VStack>
-      `);
-      await expect.poll(() => scrollTopOf(page)).toBe(0);
+  //   offset: -M_stale  ->  -0 + 0 + 1500 = 1500      (was the bug)
+  //   offset: 0, stale  ->   0 + 0 + 1500 = 1500      (offset alone: insufficient)
+  //   offset: 0, fresh  ->   0 + M + 1500 = M + 1500  (correct)
+  //
+  // Every other test here has a zero margin, where all three readings agree,
+  // which is why this survived.
+  test("scrollToIndex accounts for content revealed above the list (outside-scroll)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(revealAboveApp(`<Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />`));
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
 
-      await page.getByTestId("reveal").click();
-      await expect.poll(() => scrollTopOf(page)).toBe(0);
+    await page.getByTestId("reveal").click();
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
 
-      await page.getByTestId("act").click();
-      // 200px revealed above + item 50 at 1500px within the list.
-      await expect.poll(() => scrollTopOf(page)).toBe(1700);
-    },
-  );
+    // Measured, not assumed: the block is 200px but the stack gap counts too.
+    const margin = await startMarginOf(page);
+    expect(margin).toBeGreaterThan(0);
+
+    await page.getByTestId("act").click();
+    // Item 50 sits at 50 * 30px within the list, which starts `margin` down.
+    await expect.poll(() => scrollTopOf(page)).toBe(margin + 1500);
+  });
+
+  test("scrollToId accounts for content revealed above the list (outside-scroll)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(revealAboveApp(`<Button testId="act" label="id" onClick="testList.scrollToId('row-50')" />`));
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+
+    await page.getByTestId("reveal").click();
+    const margin = await startMarginOf(page);
+    expect(margin).toBeGreaterThan(0);
+
+    await page.getByTestId("act").click();
+    await expect.poll(() => scrollTopOf(page)).toBe(margin + 1500);
+  });
+
+  // scrollToTop and scrollToBottom deliberately KEEP their margin-carrying
+  // offsets: they mean "the scroll container to its absolute start/end", which
+  // spans the content above the list, not "row 0 to the top of the viewport".
+  // Pinned by a test so the divergence is a decision rather than an accident.
+  test("scrollToTop reaches absolute top past content revealed above (outside-scroll)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(revealAboveApp(`<Button testId="act" label="top" onClick="testList.scrollToTop()" />`));
+    await page.getByTestId("reveal").click();
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+
+    await setScrollTop(page, 900);
+    await expect.poll(() => scrollTopOf(page)).toBe(900);
+
+    await page.getByTestId("act").click();
+    // 0, not 200: past the revealed block, not to the list's own first row.
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+  });
 
   test("shows loading state when loading is true and no data", async ({
     initTestBed,

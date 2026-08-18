@@ -2049,7 +2049,7 @@ export const Table = memo(
               style={{
                 ...style,
                 boxSizing: "content-box",
-                height: s.rowHeight,
+                minHeight: s.rowHeight,
                 minWidth: "max-content",
                 userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
               }}
@@ -2687,7 +2687,6 @@ export const Table = memo(
               ref={virtualizerRef}
               scrollRef={scrollElementRef}
               startMargin={startMargin}
-              itemSize={rowHeight}
               onScroll={handleVirtuaScroll}
             >
               {rows.map((row) => (

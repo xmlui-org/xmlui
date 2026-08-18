@@ -2530,7 +2530,9 @@ When the table is empty or not yet measured, the method returns `{ startIndex: -
     }))}">
     <Column bindTo="id" width="90px" />
     <Column bindTo="name" />
-    <Column bindTo="quantity" />
+    <Column bindTo="quantity">
+      <Text height="50px">{$cell}</Text>
+    </Column>
   </Table>
 </App>
 ```

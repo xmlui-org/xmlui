@@ -31,7 +31,7 @@ import {
   useHasExplicitHeight,
   useIsomorphicLayoutEffect,
   useScrollParent,
-  useStartMargin,
+  useStartMarginState,
 } from "../../components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
@@ -1210,6 +1210,11 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     });
   });
 
+  // Every scroll API re-measures the start margin at call time rather than
+  // reading the cache, which goes stale when content appears above the list
+  // (xmlui-org/xmlui#3765). measureStartMargin() also publishes the fresh value,
+  // so virtua's startMargin prop — and therefore store.$getStartSpacerSize(),
+  // which is fed from that prop — converges on the same number.
   const scrollToBottom = useEvent(() => {
     const v = virtualizerRef.current;
     if (v && rows.length) {
@@ -1219,23 +1224,36 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       // landing short of the settled bottom. scrollTo(scrollSize) clamps to
       // the true bottom regardless of item boundaries — the same call the
       // scrollAnchor="bottom" internals use for exactly this reason.
-      runProgrammaticScroll(() => v.scrollTo(v.scrollSize + startMargin));
+      runProgrammaticScroll(() => v.scrollTo(v.scrollSize + measureStartMargin()));
     }
   });
 
+  // scrollToTop and scrollToBottom keep their margin-carrying offsets: their
+  // intent is "the scroll container to its absolute start/end", which spans the
+  // content above the list, not "row 0 to the top of the viewport".
   const scrollToTop = useEvent(() => {
     if (rows.length) {
       runProgrammaticScroll(() =>
-        virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin }),
+        virtualizerRef.current?.scrollToIndex(0, {
+          align: "start",
+          offset: -measureStartMargin(),
+        }),
       );
     }
   });
 
+  // No offset. virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`,
+  // so passing -startMargin subtracted a quantity virtua adds straight back —
+  // the margin cancelled out of the sum and the call targeted the item's offset
+  // WITHIN the list rather than its position in the scrollable content. Letting
+  // the spacer carry the margin exactly once is what puts the row where the
+  // caller means. The measure call is still needed: the spacer is fed from the
+  // startMargin prop, so a stale cache leaves the spacer short by the same
+  // amount that the offset used to hide.
   const scrollToIndex = useEvent((index) => {
     runProgrammaticScroll(() => {
-      virtualizerRef.current?.scrollToIndex(index, {
-        offset: -startMargin,
-      });
+      measureStartMargin();
+      virtualizerRef.current?.scrollToIndex(index);
     });
   });
 
@@ -1268,7 +1286,11 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
 
   const rowCount = rows?.length ?? 0;
 
-  const startMargin = useStartMargin(hasOutsideScroll, parentRef, scrollRef);
+  const { startMargin, measureStartMargin } = useStartMarginState(
+    hasOutsideScroll,
+    parentRef,
+    scrollRef,
+  );
 
   return (
     <ListItemTypeContext.Provider value={rowTypeContextValue}>

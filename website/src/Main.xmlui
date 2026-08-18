@@ -614,6 +614,11 @@
                             label="Create a two-handle range slider"
                             to="/docs/howto/create-a-two-handle-range-slider"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Drive a Slider with a runtime domain"
+                            to="/docs/howto/drive-a-slider-with-a-runtime-domain"
+                        />
                     </NavGroup>
 
                     <NavGroup label="Data Loading & APIs">
@@ -651,6 +656,11 @@
                             icon="article"
                             label="Send custom headers per request"
                             to="/docs/howto/send-custom-headers-per-request"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Read data with a POST request"
+                            to="/docs/howto/read-data-with-a-post-request"
                         />
                         <NavLink
                             icon="article"
