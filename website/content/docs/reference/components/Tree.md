@@ -364,6 +364,57 @@ Use `getTreeState` to read a JSON-friendly object keyed by source node IDs. The 
 </App>
 ```
 
+### Preserving State Across Data Refreshes [#preserving-state-across-data-refreshes]
+
+When a tree is backed by data that can be refetched after a backend mutation, use `dataRefreshMode="preserve-state"` to reconcile refreshed data with the current view state. Matching source node IDs keep their expanded/collapsed state, selection is kept when the selected node still exists, and the tree avoids an intermediate reset before the refreshed rows appear.
+
+For a complete backend-style insert, update, and delete workflow, see [Preserve Tree state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
+
+```xmlui-pg display copy height="220px" /dataRefreshMode/ name="Example: Preserve state on refresh"
+<App var.items="{[
+  { id: 1, name: 'Root', parentId: null },
+  { id: 2, name: 'Child A', parentId: 1 },
+  { id: 3, name: 'Child B', parentId: 1 }
+]}">
+  <Tree
+    id="tree"
+    dataRefreshMode="preserve-state"
+    data="{items}">
+  </Tree>
+  <Button onClick="
+    items = [...items, { id: 4, name: 'Inserted', parentId: 1 }];
+  ">
+    Add Item
+  </Button>
+</App>
+```
+
+For mutation flows where only the next refresh should preserve state, call `preserveStateOnNextDataRefresh()` before triggering the operation. This one-shot API uses preserve-state reconciliation for the next observed `data` refresh even when `dataRefreshMode` is `reset`.
+
+```xmlui-pg display copy height="220px" /preserveStateOnNextDataRefresh/ name="Example: Preserve state for the next refresh"
+<App var.items="{[
+  { id: 1, name: 'Root', parentId: null },
+  { id: 2, name: 'Child A', parentId: 1 },
+  { id: 3, name: 'Child B', parentId: 1 }
+]}">
+  <Tree id="tree" dataRefreshMode="reset" data="{items}" />
+  <Button onClick="
+    tree.preserveStateOnNextDataRefresh({ operation: 'insert' });
+    items = [...items, { id: 4, name: 'Inserted', parentId: 1 }];
+  ">
+    Add Item
+  </Button>
+</App>
+```
+
+Refresh intent controls the viewport after the refreshed rows appear:
+
+- No options preserve the existing scroll position.
+- `{ operation: "insert" }` finds the first inserted source node ID and scrolls it into view only if it is outside the current viewport.
+- `{ operation: "delete" }` preserves the existing scroll position.
+- `{ scrollTarget: nodeId }` explicitly scrolls a node into view after reconciliation.
+- `{ scrollTarget: "preserve" }` forces scroll preservation.
+
 ### Auto-Reload After Time [#auto-reload-after-time]
 
 Set `autoLoadAfter` to automatically reload children after a specified time when a node is collapsed and re-expanded.
@@ -513,6 +564,18 @@ The data source of the tree. Format depends on the dataFormat property.
 > [!DEF]  default: **"flat"**
 
 The input data structure format: "flat" (array with parent relationships) or "hierarchy" (nested objects).
+
+### `dataRefreshMode` [#datarefreshmode]
+
+> [!DEF]  default: **"reset"**
+
+Controls how the tree handles later data refreshes after the initial load. "reset" rebuilds the view from the default expansion state. "preserve-state" reconciles refreshed data with the current view state for unchanged source node IDs.
+
+Available values: `reset` **(default)**, `preserve-state`
+
+Use `dataRefreshMode` when a Tree receives refreshed `data` after backend mutations. `reset` rebuilds the view from the default expansion state, while `preserve-state` reconciles refreshed rows with the current expansion, selection, loading, and scroll state for unchanged source node IDs.
+
+For a complete insert, update, and delete example using `preserveStateOnNextDataRefresh()`, see [Preserve Tree state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
 
 ### `defaultExpanded` [#defaultexpanded]
 
@@ -924,6 +987,14 @@ Mark a dynamic node as unloaded and collapse it.
 **Signature**: `markNodeUnloaded(nodeId: string | number): void`
 
 - `nodeId`: The ID of the node to mark as unloaded
+
+### `preserveStateOnNextDataRefresh` [#preservestateonnextdatarefresh]
+
+Preserve the current tree view state for the next data refresh, even when dataRefreshMode is "reset". Optional operation metadata controls post-refresh scroll behavior.
+
+**Signature**: `preserveStateOnNextDataRefresh(options?: { operation?: "insert" | "delete" | "update", scrollTarget?: string | number | "first-inserted" | "preserve" }): void`
+
+- `options`: Optional refresh intent. Use operation: "insert" to scroll the first inserted visible node into view if needed, operation: "delete" to preserve scroll, or scrollTarget to explicitly choose the post-refresh viewport target.
 
 ### `removeChildren` [#removechildren]
 

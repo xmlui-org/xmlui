@@ -8,6 +8,7 @@ import { TreeComponent } from "./TreeReact";
 import { defaultProps } from "./Tree.defaults";
 import styles from "./TreeComponent.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { TreeDataRefreshMode } from "../../components-core/abstractions/treeAbstractions";
 
 const COMP = "Tree";
 
@@ -88,6 +89,14 @@ export const TreeMd = createMetadata({
       description:
         "Initial tree state. Per-node state is keyed by source node ID and scrollPosition stores the vertical scroll offset. The state is applied as matching nodes become available; unknown node IDs are ignored.",
       valueType: "any",
+    },
+    dataRefreshMode: {
+      description:
+        'Controls how the tree handles later data refreshes after the initial load. "reset" rebuilds the view from the default expansion state. "preserve-state" reconciles refreshed data with the current view state for unchanged source node IDs.',
+      valueType: "string",
+      availableValues: ["reset", "preserve-state"],
+      isStrictEnum: true,
+      defaultValue: defaultProps.dataRefreshMode,
     },
     autoExpandToSelection: {
       description: `Automatically expand the path to the selected item.`,
@@ -318,6 +327,16 @@ export const TreeMd = createMetadata({
       signature: "setTreeState(treeState: TreeState): void",
       parameters: {
         treeState: "The tree state object, including per-node state keyed by source node ID and optional scrollPosition.",
+      },
+    },
+    preserveStateOnNextDataRefresh: {
+      description:
+        'Preserve the current tree view state for the next data refresh, even when dataRefreshMode is "reset". Optional operation metadata controls post-refresh scroll behavior.',
+      signature:
+        'preserveStateOnNextDataRefresh(options?: { operation?: "insert" | "delete" | "update", scrollTarget?: string | number | "first-inserted" | "preserve" }): void',
+      parameters: {
+        options:
+          'Optional refresh intent. Use operation: "insert" to scroll the first inserted visible node into view if needed, operation: "delete" to preserve scroll, or scrollTarget to explicitly choose the post-refresh viewport target.',
       },
     },
     expandToLevel: {
@@ -601,7 +620,7 @@ export const treeComponentRenderer = wrapComponent(
       "data", "dataFormat", "idField", "nameField", "iconField", "iconExpandedField",
       "iconCollapsedField", "parentIdField", "childrenField", "selectableField",
       "dynamicField", "loadedField", "autoLoadAfterField", "dynamic", "selectedValue",
-      "defaultExpanded", "initialTreeState", "autoExpandToSelection", "itemClickExpands",
+      "defaultExpanded", "initialTreeState", "dataRefreshMode", "autoExpandToSelection", "itemClickExpands",
       "iconCollapsed", "iconExpanded", "iconSize", "itemHeight", "fixedItemSize", "animateExpand",
       "expandRotation", "spinnerDelay", "scrollStyle", "showScrollerFade",
       "autoLoadAfter", "overflow", "itemTemplate",
@@ -631,6 +650,10 @@ export const treeComponentRenderer = wrapComponent(
           selectedId={extractValue(node.props.selectedId)}
           defaultExpanded={extractValue(node.props.defaultExpanded)}
           initialTreeState={extractValue(node.props.initialTreeState)}
+          dataRefreshMode={extractValue.asOptionalString(
+            node.props.dataRefreshMode,
+            defaultProps.dataRefreshMode,
+          ) as TreeDataRefreshMode}
           autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
           itemClickExpands={extractValue.asOptionalBoolean(node.props.itemClickExpands)}
           iconCollapsed={extractValue(node.props.iconCollapsed)}

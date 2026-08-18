@@ -1,4 +1,13 @@
-import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
+import {
+  type ReactNode,
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
@@ -16,6 +25,9 @@ import type {
   TreeFieldConfig,
   TreeSelectionEvent,
   TreeDataFormat,
+  TreeDataRefreshMode,
+  TreeDataRefreshOptions,
+  TreeDataRefreshScrollTarget,
   DefaultExpansion,
   NodeLoadingState,
   TreeItemState,
@@ -450,6 +462,80 @@ const getMapEntryByStringKey = <T,>(
   return undefined;
 };
 
+const getSourceIdSet = (treeItemsById: Record<string, TreeNode>) => {
+  const ids = new Set<string>();
+  Object.values(treeItemsById).forEach((node) => {
+    ids.add(String(node.key));
+  });
+  return ids;
+};
+
+const pruneMapBySourceIds = <T,>(
+  map: Map<string | number, T>,
+  sourceIds: Set<string>,
+): Map<string | number, T> => {
+  let changed = false;
+  const next = new Map<string | number, T>();
+  map.forEach((value, key) => {
+    if (sourceIds.has(String(key))) {
+      next.set(key, value);
+    } else {
+      changed = true;
+    }
+  });
+  return changed ? next : map;
+};
+
+const areIdArraysEqual = (left: (string | number)[], right: (string | number)[]) => {
+  if (left.length !== right.length) {
+    return false;
+  }
+  return left.every((value, index) => String(value) === String(right[index]));
+};
+
+const getExplicitlyUnloadedNodeIds = (treeItemsById: Record<string, TreeNode>) => {
+  const ids = new Set<string>();
+  Object.values(treeItemsById).forEach((node) => {
+    if (node.loaded === false) {
+      ids.add(String(node.key));
+    }
+  });
+  return ids;
+};
+
+const applyExplicitUnloadedNodesToTreeState = (
+  treeState: TreeState,
+  treeItemsById: Record<string, TreeNode>,
+): TreeState => {
+  const unloadedNodeIds = getExplicitlyUnloadedNodeIds(treeItemsById);
+  if (unloadedNodeIds.size === 0) {
+    return treeState;
+  }
+
+  const nextState: TreeState = { ...treeState };
+  unloadedNodeIds.forEach((nodeId) => {
+    const existingState = nextState[nodeId];
+    nextState[nodeId] =
+      existingState && typeof existingState === "object"
+        ? {
+            ...existingState,
+            loaded: false,
+            loadingState: "unloaded",
+          }
+        : {
+            loaded: false,
+            loadingState: "unloaded",
+          };
+  });
+  return nextState;
+};
+
+const shouldInferFirstInserted = (options?: TreeDataRefreshOptions) =>
+  options?.operation === "insert" || options?.scrollTarget === "first-inserted";
+
+const isPreserveScrollTarget = (target: TreeDataRefreshScrollTarget | undefined) =>
+  target === undefined || target === "preserve";
+
 /**
  * Find all parent node IDs for a given node ID by traversing up the tree structure
  * @param nodeId The target node ID to find parents for
@@ -533,6 +619,7 @@ interface TreeComponentProps {
   selectedId?: string | number;
   defaultExpanded?: DefaultExpansion;
   initialTreeState?: TreeState;
+  dataRefreshMode?: TreeDataRefreshMode;
   autoExpandToSelection?: boolean;
   itemClickExpands?: boolean;
   dynamicField?: string;
@@ -568,6 +655,19 @@ interface TreeComponentProps {
   hasExplicitHeight?: boolean;
 }
 
+interface PendingDataRefresh {
+  treeState: TreeState;
+  sourceIds: Set<string>;
+  scrollMetrics: TreeScrollMetrics;
+  options?: TreeDataRefreshOptions;
+}
+
+interface TreeScrollMetrics {
+  scrollPosition: number;
+  scrollSize: number;
+  viewportSize: number;
+}
+
 export const TreeComponent = memo((props: TreeComponentProps) => {
   const {
     registerComponentApi,
@@ -585,6 +685,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     selectedId,
     defaultExpanded = defaultProps.defaultExpanded,
     initialTreeState,
+    dataRefreshMode = defaultProps.dataRefreshMode,
     autoExpandToSelection = defaultProps.autoExpandToSelection,
     itemClickExpands = defaultProps.itemClickExpands,
     dynamicField = defaultProps.dynamicField,
@@ -750,6 +851,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   }, [effectiveData, dataFormat, fieldConfig]);
 
   const { treeData, treeItemsById } = transformedData;
+  const currentSourceIds = useMemo(() => getSourceIdSet(treeItemsById), [treeItemsById]);
 
   // Use selectedValue (source ID) directly since TreeNode.key is the source ID
   const mappedSelectedId = useMemo(() => {
@@ -828,10 +930,27 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Simplified focus management
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VirtualizerHandle>(null);
+  const previousDataRef = useRef<any>(data);
+  const hasReceivedDataRef = useRef(data !== undefined && data !== null);
+  const latestTreeStateRef = useRef<TreeState | undefined>(undefined);
+  const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+  const latestScrollMetricsRef = useRef<TreeScrollMetrics>({
+    scrollPosition: 0,
+    scrollSize: 0,
+    viewportSize: 0,
+  });
+  const pendingDataRefreshRef = useRef<PendingDataRefresh | undefined>(undefined);
+  const pendingRefreshScrollTargetRef = useRef<
+    | { type: "node"; nodeId: string | number }
+    | { type: "first-inserted"; insertedIds: Set<string> }
+    | undefined
+  >(undefined);
   const pendingScrollPositionRef = useRef<number | undefined>(getTreeStateScrollPosition(initialTreeState));
   const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
+  const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
 
   // State and ref for measuring first item size when fixedItemSize is enabled
   const firstItemRef = useRef<HTMLDivElement>(null);
@@ -988,28 +1107,39 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     setSelectedNodeById(undefined);
   }, [setSelectedNodeById]);
 
-  const queueScrollPositionRestore = useCallback((scrollPosition: number | undefined) => {
-    if (scrollPosition === undefined) {
+  const restorePendingScrollPosition = useCallback((clearAfterRestore = false) => {
+    const nextScrollPosition = pendingScrollPositionRef.current;
+    if (nextScrollPosition === undefined || !listRef.current) {
       return;
     }
 
-    pendingScrollPositionRef.current = Math.max(0, scrollPosition);
+    listRef.current.scrollTo(nextScrollPosition);
 
-    if (scrollRestoreAnimationFrameRef.current !== undefined) {
-      cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+    if (clearAfterRestore) {
+      pendingScrollPositionRef.current = undefined;
     }
+  }, []);
 
-    scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
+  const queueScrollPositionRestore = useCallback(
+    (scrollPosition: number | undefined) => {
+      if (scrollPosition === undefined) {
+        return;
+      }
+
+      pendingScrollPositionRef.current = Math.max(0, scrollPosition);
+      restorePendingScrollPosition();
+
+      if (scrollRestoreAnimationFrameRef.current !== undefined) {
+        cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+      }
+
       scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
-        const nextScrollPosition = pendingScrollPositionRef.current;
-        if (nextScrollPosition !== undefined) {
-          listRef.current?.scrollTo(nextScrollPosition);
-          pendingScrollPositionRef.current = undefined;
-        }
+        restorePendingScrollPosition(true);
         scrollRestoreAnimationFrameRef.current = undefined;
       });
-    });
-  }, []);
+    },
+    [restorePendingScrollPosition],
+  );
 
   const getEffectiveNodeLoadingState = useCallback(
     (node: TreeNode): NodeLoadingState => {
@@ -1075,14 +1205,27 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     treeItemsById,
   ]);
 
+  const getScrollMetrics = useCallback(
+    (): TreeScrollMetrics => ({
+      scrollPosition: listRef.current?.scrollOffset ?? 0,
+      scrollSize: listRef.current?.scrollSize ?? 0,
+      viewportSize: listRef.current?.viewportSize ?? 0,
+    }),
+    [],
+  );
+
   const updateLoadedFieldsInData = useCallback(
     (loadedByNodeId: Map<string, boolean>) => {
       if (loadedByNodeId.size === 0) {
         return;
       }
 
-      updateInternalData((prevData) => {
-        const currentData = prevData ?? data;
+      setInternalData((prevData) => {
+        if (prevData === undefined) {
+          return prevData;
+        }
+
+        const currentData = prevData;
         const fieldId = fieldConfig.idField || "id";
         const loadedFieldName = fieldConfig.loadedField || "loaded";
 
@@ -1124,7 +1267,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         return currentData;
       });
     },
-    [data, dataFormat, fieldConfig, updateInternalData],
+    [dataFormat, fieldConfig],
   );
 
   const applyTreeState = useCallback(
@@ -1259,6 +1402,124 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     ],
   );
 
+  const resetTreeStateForDataRefresh = useCallback(() => {
+    setPreservedScrollPaddingEnd(0);
+    const nextExpandedIds = getDefaultExpandedIds(defaultExpanded, treeData, treeItemsById);
+    setExpandedIds((prev) => (areIdArraysEqual(prev, nextExpandedIds) ? prev : nextExpandedIds));
+    setNodeStates((prev) => (prev.size === 0 ? prev : new Map()));
+    setExpandedTimestamps((prev) => (prev.size === 0 ? prev : new Map()));
+    setCollapsedTimestamps((prev) => (prev.size === 0 ? prev : new Map()));
+    setAutoLoadAfterMap((prev) => (prev.size === 0 ? prev : new Map()));
+    setDynamicStateMap((prev) => (prev.size === 0 ? prev : new Map()));
+    setFocusedIndex(-1);
+
+    if (!isControlledMode) {
+      setInternalSelectedId(mappedSelectedId);
+    }
+  }, [defaultExpanded, isControlledMode, mappedSelectedId, treeData, treeItemsById]);
+
+  const pruneTreeStateForCurrentData = useCallback(() => {
+    setExpandedIds((prev) => {
+      const next = prev.filter((nodeId) => currentSourceIds.has(String(nodeId)));
+      return next.length === prev.length ? prev : next;
+    });
+    setNodeStates((prev) => pruneMapBySourceIds(prev, currentSourceIds));
+    setExpandedTimestamps((prev) => pruneMapBySourceIds(prev, currentSourceIds));
+    setCollapsedTimestamps((prev) => pruneMapBySourceIds(prev, currentSourceIds));
+    setAutoLoadAfterMap((prev) => pruneMapBySourceIds(prev, currentSourceIds));
+    setDynamicStateMap((prev) => pruneMapBySourceIds(prev, currentSourceIds));
+
+    if (!isControlledMode && effectiveSelectedId !== undefined && effectiveSelectedId !== null) {
+      const selectedNode = Object.values(treeItemsById).find(
+        (node) => String(node.key) === String(effectiveSelectedId),
+      );
+      if (!selectedNode || selectedNode.selectable === false) {
+        setInternalSelectedId(undefined);
+      }
+    }
+  }, [currentSourceIds, effectiveSelectedId, isControlledMode, treeItemsById]);
+
+  const captureLatestTreeState = useCallback(() => {
+    latestTreeStateRef.current = getTreeState();
+    latestSourceIdsRef.current = currentSourceIds;
+    latestScrollMetricsRef.current = getScrollMetrics();
+  }, [currentSourceIds, getScrollMetrics, getTreeState]);
+
+  const clearPreservedScrollPaddingEnd = useCallback(() => {
+    setPreservedScrollPaddingEnd((prev) => (prev === 0 ? prev : 0));
+  }, []);
+
+  const preparePreservedScrollRange = useCallback(
+    (
+      options: TreeDataRefreshOptions | undefined,
+      previousSourceIds: Set<string>,
+      previousScrollMetrics: TreeScrollMetrics,
+    ) => {
+      if (!isPreserveScrollTarget(options?.scrollTarget)) {
+        setPreservedScrollPaddingEnd(0);
+        return;
+      }
+
+      const dataShrank = currentSourceIds.size < previousSourceIds.size;
+      if (options?.operation !== "delete" && !dataShrank) {
+        setPreservedScrollPaddingEnd(0);
+        return;
+      }
+
+      const currentScrollSize = listRef.current?.scrollSize ?? 0;
+      const currentViewportSize =
+        listRef.current?.viewportSize ?? previousScrollMetrics.viewportSize;
+      const currentMaxScrollPosition = Math.max(0, currentScrollSize - currentViewportSize);
+      const neededPadding = Math.ceil(
+        Math.max(0, previousScrollMetrics.scrollPosition - currentMaxScrollPosition),
+      );
+
+      setPreservedScrollPaddingEnd((prev) => (prev === neededPadding ? prev : neededPadding));
+    },
+    [currentSourceIds],
+  );
+
+  const prepareRefreshScrollTarget = useCallback(
+    (options: TreeDataRefreshOptions | undefined, previousSourceIds: Set<string>) => {
+      const explicitTarget = options?.scrollTarget;
+      if (explicitTarget === "preserve") {
+        pendingRefreshScrollTargetRef.current = undefined;
+        return;
+      }
+
+      if (isPreserveScrollTarget(explicitTarget)) {
+        if (shouldInferFirstInserted(options)) {
+          const insertedIds = new Set<string>();
+          currentSourceIds.forEach((nodeId) => {
+            if (!previousSourceIds.has(nodeId)) {
+              insertedIds.add(nodeId);
+            }
+          });
+          pendingRefreshScrollTargetRef.current =
+            insertedIds.size > 0 ? { type: "first-inserted", insertedIds } : undefined;
+        } else {
+          pendingRefreshScrollTargetRef.current = undefined;
+        }
+        return;
+      }
+
+      if (explicitTarget === "first-inserted") {
+        const insertedIds = new Set<string>();
+        currentSourceIds.forEach((nodeId) => {
+          if (!previousSourceIds.has(nodeId)) {
+            insertedIds.add(nodeId);
+          }
+        });
+        pendingRefreshScrollTargetRef.current =
+          insertedIds.size > 0 ? { type: "first-inserted", insertedIds } : undefined;
+        return;
+      }
+
+      pendingRefreshScrollTargetRef.current = { type: "node", nodeId: explicitTarget };
+    },
+    [currentSourceIds],
+  );
+
   const appliedInitialTreeStateNodeIdsRef = useRef<Set<string>>(new Set());
   const initialTreeStateRef = useRef<TreeState | undefined>(initialTreeState);
 
@@ -1269,6 +1530,67 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       setInternalSelectedId(selectedValue);
     }
   }, []); // Only run on mount
+
+  useLayoutEffect(() => {
+    const dataChanged = previousDataRef.current !== data;
+    const hasCurrentData = data !== undefined && data !== null;
+
+    if (!dataChanged) {
+      if (hasCurrentData) {
+        hasReceivedDataRef.current = true;
+      }
+      captureLatestTreeState();
+      return;
+    }
+
+    const isInitialDataArrival = !hasReceivedDataRef.current && hasCurrentData;
+    const pendingRefresh = pendingDataRefreshRef.current;
+    const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
+    const treeStateToApply = pendingRefresh?.treeState ?? latestTreeStateRef.current;
+    const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+    const previousScrollMetrics =
+      pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
+
+    pendingDataRefreshRef.current = undefined;
+    previousDataRef.current = data;
+    if (hasCurrentData) {
+      hasReceivedDataRef.current = true;
+    }
+
+    if (isInitialDataArrival) {
+      pendingRefreshScrollTargetRef.current = undefined;
+      setPreservedScrollPaddingEnd(0);
+      resetTreeStateForDataRefresh();
+      return;
+    }
+
+    if (shouldPreserve && treeStateToApply) {
+      const refreshState = applyExplicitUnloadedNodesToTreeState(treeStateToApply, treeItemsById);
+      applyTreeState(refreshState);
+      pruneTreeStateForCurrentData();
+      preparePreservedScrollRange(
+        pendingRefresh?.options,
+        previousSourceIds,
+        previousScrollMetrics,
+      );
+      prepareRefreshScrollTarget(pendingRefresh?.options, previousSourceIds);
+      return;
+    }
+
+    pendingRefreshScrollTargetRef.current = undefined;
+    setPreservedScrollPaddingEnd(0);
+    resetTreeStateForDataRefresh();
+  }, [
+    applyTreeState,
+    captureLatestTreeState,
+    dataRefreshMode,
+    data,
+    preparePreservedScrollRange,
+    prepareRefreshScrollTarget,
+    pruneTreeStateForCurrentData,
+    resetTreeStateForDataRefresh,
+    treeItemsById,
+  ]);
 
   useEffect(() => {
     if (initialTreeStateRef.current !== initialTreeState) {
@@ -1298,19 +1620,78 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     applicableEntries.forEach(({ node }) => appliedNodeIds.add(String(node.key)));
   }, [applyTreeState, initialTreeState, queueScrollPositionRestore, treeItemsById]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scrollPosition = pendingScrollPositionRef.current;
     if (scrollPosition === undefined || !listRef.current) {
       return;
     }
 
-    queueScrollPositionRestore(scrollPosition);
-  }, [flatTreeData.length, expandedIds, queueScrollPositionRestore]);
+    restorePendingScrollPosition();
+  }, [flatTreeData.length, expandedIds, restorePendingScrollPosition]);
+
+  const scrollNodeIntoViewIfNeeded = useCallback(
+    (nodeId: string | number) => {
+      const nodeIndex = flatTreeData.findIndex((item) => String(item.key) === String(nodeId));
+      const virtualizer = listRef.current;
+      if (nodeIndex < 0 || !virtualizer) {
+        return;
+      }
+
+      const itemOffset = virtualizer.getItemOffset(nodeIndex);
+      const itemSize = virtualizer.getItemSize(nodeIndex);
+      const viewportStart = virtualizer.scrollOffset;
+      const viewportEnd = viewportStart + virtualizer.viewportSize;
+      const itemEnd = itemOffset + itemSize;
+
+      if (itemOffset >= viewportStart && itemEnd <= viewportEnd) {
+        return;
+      }
+
+      virtualizer.scrollToIndex(nodeIndex, { align: "center" });
+    },
+    [flatTreeData],
+  );
+
+  useEffect(() => {
+    const pendingTarget = pendingRefreshScrollTargetRef.current;
+    if (!pendingTarget) {
+      return;
+    }
+
+    if (targetScrollAnimationFrameRef.current !== undefined) {
+      cancelAnimationFrame(targetScrollAnimationFrameRef.current);
+    }
+
+    targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+      targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+        const target = pendingRefreshScrollTargetRef.current;
+        if (!target) {
+          targetScrollAnimationFrameRef.current = undefined;
+          return;
+        }
+
+        const targetNodeId =
+          target.type === "node"
+            ? target.nodeId
+            : flatTreeData.find((node) => target.insertedIds.has(String(node.key)))?.key;
+
+        if (targetNodeId !== undefined) {
+          scrollNodeIntoViewIfNeeded(targetNodeId);
+        }
+
+        pendingRefreshScrollTargetRef.current = undefined;
+        targetScrollAnimationFrameRef.current = undefined;
+      });
+    });
+  }, [flatTreeData, scrollNodeIntoViewIfNeeded]);
 
   useEffect(() => {
     return () => {
       if (scrollRestoreAnimationFrameRef.current !== undefined) {
         cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+      }
+      if (targetScrollAnimationFrameRef.current !== undefined) {
+        cancelAnimationFrame(targetScrollAnimationFrameRef.current);
       }
     };
   }, []);
@@ -1749,6 +2130,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   // Simplified keyboard navigation handler
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      clearPreservedScrollPaddingEnd();
+
       if (flatTreeData.length === 0) return;
 
       const currentIndex = focusedIndex >= 0 ? focusedIndex : 0;
@@ -1878,7 +2261,17 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         setFocusedIndex(newIndex);
       }
     },
-    [focusedIndex, flatTreeData, toggleNode, setSelectedNodeById, onCutAction, onCopyAction, onPasteAction, onDeleteAction],
+    [
+      clearPreservedScrollPaddingEnd,
+      focusedIndex,
+      flatTreeData,
+      toggleNode,
+      setSelectedNodeById,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+    ],
   );
 
   const itemData = useMemo(() => {
@@ -2172,6 +2565,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       setTreeState: (treeState: TreeState) => {
         applyTreeState(treeState);
+      },
+
+      preserveStateOnNextDataRefresh: (options?: TreeDataRefreshOptions) => {
+        pendingDataRefreshRef.current = {
+          treeState: getTreeState(),
+          sourceIds: new Set(currentSourceIds),
+          scrollMetrics: getScrollMetrics(),
+          options,
+        };
       },
 
       scrollIntoView: (nodeId: string | number, options?: ScrollIntoViewOptions) => {
@@ -2951,6 +3353,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   }, [
     treeData,
     treeItemsById,
+    currentSourceIds,
     expandedIds,
     effectiveSelectedId,
     flatTreeData,
@@ -3015,6 +3418,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
+      onPointerDown={clearPreservedScrollPaddingEnd}
+      onTouchStart={clearPreservedScrollPaddingEnd}
+      onWheel={clearPreservedScrollPaddingEnd}
       style={{
         ...(!hasExplicitHeight ? { height: overflow ? "auto" : "100%" } : {}),
         minHeight: 0,
@@ -3041,6 +3447,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           );
         })}
       </Virtualizer>
+      {preservedScrollPaddingEnd > 0 ? (
+        <div aria-hidden="true" style={{ height: preservedScrollPaddingEnd }} />
+      ) : null}
     </Scroller>
   );
 });

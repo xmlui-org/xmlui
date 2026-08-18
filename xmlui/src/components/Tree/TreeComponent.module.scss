@@ -30,6 +30,8 @@ $outlineOffset-Tree--focus: createThemeVar("outlineOffset-#{$component}--focus")
     padding: 1px 2px;
     // Remove focus outline since individual tree items handle focus styling
     outline: none;
+    // Prevent browser scroll anchoring from moving the viewport when rows are inserted or removed.
+    overflow-anchor: none;
     
     &:focus {
       outline: none;

@@ -51,6 +51,17 @@ export type TreeDataFormat = 'flat' | 'hierarchy';
 
 export type DefaultExpansion = 'none' | 'all' | 'first-level' | (string | number)[];
 
+export type TreeDataRefreshMode = 'reset' | 'preserve-state';
+
+export type TreeDataRefreshOperation = 'insert' | 'delete' | 'update';
+
+export type TreeDataRefreshScrollTarget = string | number | 'first-inserted' | 'preserve';
+
+export interface TreeDataRefreshOptions {
+  operation?: TreeDataRefreshOperation;
+  scrollTarget?: TreeDataRefreshScrollTarget;
+}
+
 // Node loading states for dynamic node handling
 export type NodeLoadingState = 'unloaded' | 'loading' | 'loaded';
 

@@ -3089,6 +3089,316 @@ test.describe("Events", () => {
     });
   });
 
+  test.describe("Data Refresh State Preservation", () => {
+    test("preserves expansion for one reset-mode refresh after preserveStateOnNextDataRefresh", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const refreshData = [
+        { id: 1, name: "Root", parentId: null },
+        { id: 2, name: "Child A", parentId: 1 },
+        { id: 3, name: "Child B", parentId: 1 },
+      ];
+
+      await initTestBed(`
+        <App var.items='{${JSON.stringify(refreshData)}}'>
+          <VStack height="220px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataRefreshMode="reset"
+              data="{items}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-root" onClick="treeApi.expandNode(1);" />
+          <Button testId="add-preserved" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            items = [...items, { id: 4, name: 'Inserted', parentId: 1 }];
+          " />
+          <Button testId="add-reset" onClick="
+            items = [...items, { id: 5, name: 'Later inserted', parentId: 1 }];
+          " />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandRoot = await createButtonDriver("expand-root");
+      const addPreserved = await createButtonDriver("add-preserved");
+      const addReset = await createButtonDriver("add-reset");
+
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+      await expandRoot.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+
+      await addPreserved.click();
+      await expect(tree.getByTestId("4")).toBeVisible();
+      await expect(tree.getByTestId("2")).toBeVisible();
+
+      await addReset.click();
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+      await expect(tree.getByTestId("5")).not.toBeVisible();
+    });
+
+    test("preserves expansion across DataSource refetch with insert intent", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const backendData = [
+        { id: 1, name: "Root", parentId: null },
+        { id: 2, name: "Child A", parentId: 1 },
+        { id: 3, name: "Child B", parentId: 1 },
+      ];
+
+      await initTestBed(`
+        <App var.mockData='{${JSON.stringify(backendData)}}'>
+          <DataSource
+            id="treeData"
+            url="/api/tree"
+            onFetch="() => mockData.map(item => ({
+              id: item.id,
+              name: item.name,
+              parentId: item.parentId
+            }))" />
+          <VStack height="220px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataRefreshMode="reset"
+              data="{treeData}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-root" onClick="treeApi.expandNode(1);" />
+          <Button testId="add" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            mockData = [...mockData, { id: 4, name: 'Backend inserted', parentId: 1 }];
+            treeData.refetch();
+          " />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandRoot = await createButtonDriver("expand-root");
+      const add = await createButtonDriver("add");
+
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expandRoot.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+
+      await add.click();
+      await expect(tree.getByTestId("4")).toBeVisible();
+      await expect(tree.getByTestId("2")).toBeVisible();
+    });
+
+    test("uses later external data after a preserved DataSource refetch", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+      page,
+    }) => {
+      const backendData = [
+        { id: 1, name: "Root", parentId: null },
+        { id: 2, name: "Child A", parentId: 1 },
+        { id: 3, name: "Child B", parentId: 1 },
+      ];
+
+      await initTestBed(`
+        <App var.mockData='{${JSON.stringify(backendData)}}'>
+          <DataSource
+            id="treeData"
+            url="/api/tree"
+            onFetch="() => mockData.map(item => ({
+              id: item.id,
+              name: item.name,
+              parentId: item.parentId
+            }))" />
+          <VStack height="220px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataRefreshMode="reset"
+              defaultExpanded="{[1]}"
+              data="{treeData}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="add" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            mockData = [...mockData, { id: 4, name: 'Backend inserted', parentId: 1 }];
+            treeData.refetch();
+          " />
+          <Button testId="rename" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'update', scrollTarget: 2 });
+            mockData = mockData.map(item => item.id === 2
+              ? { ...item, name: 'Child A updated' }
+              : item);
+            treeData.refetch();
+          " />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const add = await createButtonDriver("add");
+      const rename = await createButtonDriver("rename");
+
+      await expect(tree.getByTestId("2")).toBeVisible();
+
+      await add.click();
+      await expect(tree.getByTestId("4")).toBeVisible();
+
+      await rename.click();
+      await expect(page.getByText("Child A updated")).toBeVisible();
+      await expect(page.getByText("Child A", { exact: true })).not.toBeVisible();
+    });
+
+    test("insert intent scrolls the first inserted visible node into view", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const largeData = [
+        { id: 1, name: "Root", parentId: null },
+        ...Array.from({ length: 80 }, (_, index) => ({
+          id: index + 2,
+          name: `Child ${index + 1}`,
+          parentId: 1,
+        })),
+      ];
+
+      await initTestBed(`
+        <App var.items='{${JSON.stringify(largeData)}}'>
+          <VStack height="120px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataRefreshMode="reset"
+              itemHeight="32"
+              data="{items}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-root" onClick="treeApi.expandNode(1);" />
+          <Button testId="scroll-mid" onClick="treeApi.scrollToItem(60);" />
+          <Button testId="add" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            items = [...items, { id: 1000, name: 'Inserted target', parentId: 1 }];
+          " />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandRoot = await createButtonDriver("expand-root");
+      const scrollMid = await createButtonDriver("scroll-mid");
+      const add = await createButtonDriver("add");
+
+      await expandRoot.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+      await scrollMid.click();
+      await expect(tree.getByTestId("1000")).not.toBeVisible();
+
+      await add.click();
+      await expect(tree.getByTestId("1000")).toBeVisible();
+    });
+
+    test("delete intent preserves scroll position", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+      page,
+    }) => {
+      const largeData = [
+        { id: 1, name: "Root", parentId: null },
+        ...Array.from({ length: 80 }, (_, index) => ({
+          id: index + 2,
+          name: `Child ${index + 1}`,
+          parentId: 1,
+        })),
+      ];
+
+      await initTestBed(`
+        <App var.items='{${JSON.stringify(largeData)}}'>
+          <VStack height="120px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataRefreshMode="reset"
+              itemHeight="32"
+              data="{items}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-root" onClick="treeApi.expandNode(1);" />
+          <Button testId="scroll-mid" onClick="treeApi.scrollToItem(60);" />
+          <Button testId="delete" onClick="
+            treeApi.preserveStateOnNextDataRefresh({ operation: 'delete' });
+            items = items.filter(item => item.id !== 5);
+          " />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandRoot = await createButtonDriver("expand-root");
+      const scrollMid = await createButtonDriver("scroll-mid");
+      const deleteButton = await createButtonDriver("delete");
+
+      await expandRoot.click();
+      await scrollMid.click();
+      await expect(tree.getByTestId("60")).toBeVisible();
+
+      const treeScroller = page.getByRole("tree", { name: "Tree navigation" });
+      await treeScroller.evaluate((element) => {
+        const scroller = element as HTMLElement;
+        (window as any).__treeScrollEvents = [];
+        scroller.addEventListener("scroll", () => {
+          (window as any).__treeScrollEvents.push(scroller.scrollTop);
+        });
+      });
+      const beforeScrollTop = await treeScroller.evaluate(
+        (element) => (element as HTMLElement).scrollTop,
+      );
+
+      await deleteButton.click();
+      await expect(tree.getByTestId("60")).toBeVisible();
+      await expect(tree.getByTestId("5")).not.toBeVisible();
+
+      const afterScrollTop = await treeScroller.evaluate(
+        (element) => (element as HTMLElement).scrollTop,
+      );
+      const scrollEvents = await page.evaluate(() => (window as any).__treeScrollEvents as number[]);
+      const distinctScrollPositions = new Set(scrollEvents.map((position) => Math.round(position)));
+      expect(Math.abs(afterScrollTop - beforeScrollTop)).toBeLessThanOrEqual(1);
+      expect(distinctScrollPositions.size).toBeLessThanOrEqual(1);
+    });
+  });
+
   test.describe("Tree State API", () => {
     test("getTreeState returns per-node expansion, loading, and selection state", async ({
       initTestBed,

@@ -1,4 +1,8 @@
-import type { TreeDataFormat, DefaultExpansion } from "../../components-core/abstractions/treeAbstractions";
+import type {
+  DefaultExpansion,
+  TreeDataFormat,
+  TreeDataRefreshMode,
+} from "../../components-core/abstractions/treeAbstractions";
 
 export const defaultProps = {
   dataFormat: "flat" as TreeDataFormat,
@@ -11,6 +15,7 @@ export const defaultProps = {
   childrenField: "children",
   selectableField: "selectable",
   defaultExpanded: "none" as DefaultExpansion,
+  dataRefreshMode: "reset" as TreeDataRefreshMode,
   autoExpandToSelection: true,
   itemClickExpands: false,
   dynamicField: "dynamic",

@@ -833,6 +833,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Preserve Tree state across data refreshes"
+                            to="/docs/howto/preserve-tree-state-across-data-refreshes"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pre-select a tree node on load"
                             to="/docs/howto/pre-select-a-tree-node-on-load"
                         />
@@ -2062,6 +2067,11 @@
             </Page>
 
             <!-- New how-to articles: Lists, Trees & Iteration -->
+            <Page url="/docs/howto/preserve-tree-state-across-data-refreshes">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/preserve-tree-state-across-data-refreshes.md']}"
+                />
+            </Page>
             <!-- Hidden pending xmlui-dnd-list extension (https://github.com/rdhyee/xmlui-dnd-list)
             -->
 
