@@ -66,6 +66,15 @@ import { buildInferredColumns } from "./table-column-inference";
 import { normalizeColumnType, type NormalizedColumnType } from "../Column/column-types";
 import { useLocaleProfile, type LocaleProfile } from "../../components-core/i18n";
 import { Value } from "../Value/ValueReact";
+import {
+  diffInsertedIds,
+  getSourceIdSet,
+  isPreserveScrollTarget,
+  shouldInferFirstInserted,
+  type CollectionDataRefreshMode,
+  type CollectionDataRefreshOptions,
+  type CollectionScrollMetrics,
+} from "../../components-core/abstractions/dataRefreshAbstractions";
 
 // =====================================================================================================================
 // Helper types
@@ -385,6 +394,7 @@ type TableProps = {
   columnSizing?: TableColumnSizing;
   canResizeColumns?: boolean;
   idKey?: string;
+  dataRefreshMode?: CollectionDataRefreshMode;
   hasExplicitColumns?: boolean;
   isPaginated?: boolean;
   loading?: boolean;
@@ -463,6 +473,20 @@ type TableProps = {
   alwaysShowHeader?: boolean;
   striped?: boolean;
 };
+
+type PendingDataRefresh = {
+  sourceIds: Set<string>;
+  scrollMetrics: CollectionScrollMetrics;
+  options?: CollectionDataRefreshOptions;
+};
+
+function getScrollMetrics(virtualizer: VirtualizerHandle | null): CollectionScrollMetrics {
+  return {
+    scrollPosition: virtualizer?.scrollOffset ?? 0,
+    scrollSize: virtualizer?.scrollSize ?? 0,
+    viewportSize: virtualizer?.viewportSize ?? 0,
+  };
+}
 
 function defaultIsRowDisabled(_: any) {
   return false;
@@ -1101,6 +1125,7 @@ export const Table = memo(
       columnSizing: columnSizingMode = defaultProps.columnSizing,
       canResizeColumns = defaultProps.canResizeColumns,
       idKey: inferenceIdKey = defaultProps.idKey,
+      dataRefreshMode = defaultProps.dataRefreshMode,
       hasExplicitColumns = false,
       isPaginated,
       loading = defaultProps.loading,
@@ -1194,6 +1219,8 @@ export const Table = memo(
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = useComposedRefs(wrapperRef, forwardedRef);
     const tableRef = useRef<HTMLTableElement>(null);
+    const virtualizerRef = useRef<VirtualizerHandle>(null);
+    const firstRowRef = useRef<HTMLTableRowElement>(null);
 
     const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
 
@@ -1651,6 +1678,25 @@ export const Table = memo(
 
     // --- Select the set of visible rows whenever the table rows change
     const rows = table.getRowModel().rows;
+    const currentSourceIds = useMemo(() => getSourceIdSet(safeData, idKey), [idKey, safeData]);
+    const previousDataRef = useRef<any>(data);
+    const hasReceivedDataRef = useRef(data !== undefined && data !== null);
+    const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+    const latestScrollMetricsRef = useRef<CollectionScrollMetrics>({
+      scrollPosition: 0,
+      scrollSize: 0,
+      viewportSize: 0,
+    });
+    const pendingDataRefreshRef = useRef<PendingDataRefresh | undefined>(undefined);
+    const pendingRefreshScrollTargetRef = useRef<
+      | { type: "row"; rowId: string | number }
+      | { type: "first-inserted"; insertedIds: Set<string> }
+      | undefined
+    >(undefined);
+    const pendingScrollPositionRef = useRef<number | undefined>(undefined);
+    const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
+    const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
+    const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
     const getRenderCacheRowId = useCallback(
       (index: number) => {
         const row = rows[index];
@@ -1895,9 +1941,6 @@ export const Table = memo(
     // ==================================================================================
     // Virtua Virtualization
     // ==================================================================================
-    const virtualizerRef = useRef<VirtualizerHandle>(null);
-    const firstRowRef = useRef<HTMLTableRowElement>(null);
-
     const hasData = safeData.length !== 0;
     const [typedCellRevision, setTypedCellRevision] = useState(0);
 
@@ -2503,7 +2546,9 @@ export const Table = memo(
     });
 
     const scrollToId = useEvent((id: string) => {
-      const index = rowsRef.current.findIndex((row) => row.original?.[idKey] === id);
+      const index = rowsRef.current.findIndex(
+        (row) => String(row.original?.[idKey]) === String(id),
+      );
       if (index >= 0) {
         scrollToIndex(index);
       }
@@ -2514,6 +2559,277 @@ export const Table = memo(
       return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
     });
 
+    const restorePendingScrollPosition = useCallback(
+      (clearAfterRestore = false) => {
+        const nextScrollPosition = pendingScrollPositionRef.current;
+        const virtualizer = virtualizerRef.current;
+        if (nextScrollPosition === undefined || !virtualizer) {
+          return;
+        }
+
+        clearRenderCache();
+        programmaticScroll.current = true;
+        virtualizer.scrollTo(nextScrollPosition);
+        scheduleProgrammaticScrollRelease();
+
+        if (clearAfterRestore) {
+          pendingScrollPositionRef.current = undefined;
+        }
+      },
+      [clearRenderCache, scheduleProgrammaticScrollRelease],
+    );
+
+    const queueScrollPositionRestore = useCallback(
+      (scrollPosition: number | undefined) => {
+        if (scrollPosition === undefined) {
+          return;
+        }
+
+        pendingScrollPositionRef.current = Math.max(0, scrollPosition);
+        restorePendingScrollPosition();
+
+        if (scrollRestoreAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+        }
+
+        scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
+          restorePendingScrollPosition(true);
+          scrollRestoreAnimationFrameRef.current = undefined;
+        });
+      },
+      [restorePendingScrollPosition],
+    );
+
+    const preparePreservedScrollRange = useCallback(
+      (
+        options: CollectionDataRefreshOptions | undefined,
+        previousSourceIds: Set<string>,
+        previousScrollMetrics: CollectionScrollMetrics,
+      ) => {
+        if (!isPreserveScrollTarget(options?.scrollTarget)) {
+          setPreservedScrollPaddingEnd(0);
+          return;
+        }
+
+        const dataShrank = currentSourceIds.size < previousSourceIds.size;
+        if (options?.operation !== "delete" && !dataShrank) {
+          setPreservedScrollPaddingEnd(0);
+          return;
+        }
+
+        const currentMetrics = getScrollMetrics(virtualizerRef.current);
+        const viewportSize = currentMetrics.viewportSize || previousScrollMetrics.viewportSize;
+        const currentMaxScrollPosition = Math.max(0, currentMetrics.scrollSize - viewportSize);
+        const neededPadding = Math.ceil(
+          Math.max(0, previousScrollMetrics.scrollPosition - currentMaxScrollPosition),
+        );
+        setPreservedScrollPaddingEnd((prev) => (prev === neededPadding ? prev : neededPadding));
+      },
+      [currentSourceIds],
+    );
+
+    const prepareRefreshScrollTarget = useCallback(
+      (options: CollectionDataRefreshOptions | undefined, previousSourceIds: Set<string>) => {
+        const explicitTarget = options?.scrollTarget;
+        if (explicitTarget === "preserve") {
+          pendingRefreshScrollTargetRef.current = undefined;
+          return;
+        }
+
+        if (isPreserveScrollTarget(explicitTarget)) {
+          pendingRefreshScrollTargetRef.current = shouldInferFirstInserted(options)
+            ? {
+                type: "first-inserted",
+                insertedIds: diffInsertedIds(previousSourceIds, currentSourceIds),
+              }
+            : undefined;
+          if (
+            pendingRefreshScrollTargetRef.current?.type === "first-inserted" &&
+            pendingRefreshScrollTargetRef.current.insertedIds.size === 0
+          ) {
+            pendingRefreshScrollTargetRef.current = undefined;
+          }
+          return;
+        }
+
+        if (explicitTarget === "first-inserted") {
+          const insertedIds = diffInsertedIds(previousSourceIds, currentSourceIds);
+          pendingRefreshScrollTargetRef.current =
+            insertedIds.size > 0 ? { type: "first-inserted", insertedIds } : undefined;
+          return;
+        }
+
+        pendingRefreshScrollTargetRef.current = { type: "row", rowId: explicitTarget };
+      },
+      [currentSourceIds],
+    );
+
+    const clampPaginationForCurrentData = useCallback(() => {
+      if (!effectiveIsPaginated) {
+        return;
+      }
+      setPagination((prev) => {
+        const pageCount = Math.max(1, Math.ceil(safeData.length / prev.pageSize));
+        const pageIndex = Math.min(prev.pageIndex, pageCount - 1);
+        return pageIndex === prev.pageIndex ? prev : { ...prev, pageIndex };
+      });
+    }, [effectiveIsPaginated, safeData.length]);
+
+    const captureLatestRefreshState = useCallback(() => {
+      latestSourceIdsRef.current = currentSourceIds;
+      latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
+    }, [currentSourceIds]);
+
+    useIsomorphicLayoutEffect(() => {
+      const dataChanged = previousDataRef.current !== data;
+      const hasCurrentData = data !== undefined && data !== null;
+
+      if (!dataChanged) {
+        if (hasCurrentData) {
+          hasReceivedDataRef.current = true;
+        }
+        captureLatestRefreshState();
+        return;
+      }
+
+      const isInitialDataArrival = !hasReceivedDataRef.current && hasCurrentData;
+      const pendingRefresh = pendingDataRefreshRef.current;
+      const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
+      const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+      const previousScrollMetrics = pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
+
+      pendingDataRefreshRef.current = undefined;
+      previousDataRef.current = data;
+      if (hasCurrentData) {
+        hasReceivedDataRef.current = true;
+      }
+
+      if (isInitialDataArrival) {
+        pendingRefreshScrollTargetRef.current = undefined;
+        setPreservedScrollPaddingEnd(0);
+        captureLatestRefreshState();
+        return;
+      }
+
+      if (shouldPreserve) {
+        clampPaginationForCurrentData();
+        preparePreservedScrollRange(
+          pendingRefresh?.options,
+          previousSourceIds,
+          previousScrollMetrics,
+        );
+        prepareRefreshScrollTarget(pendingRefresh?.options, previousSourceIds);
+        if (isPreserveScrollTarget(pendingRefresh?.options?.scrollTarget)) {
+          queueScrollPositionRestore(previousScrollMetrics.scrollPosition);
+        }
+        return;
+      }
+
+      pendingRefreshScrollTargetRef.current = undefined;
+      setPreservedScrollPaddingEnd(0);
+      captureLatestRefreshState();
+    }, [
+      captureLatestRefreshState,
+      clampPaginationForCurrentData,
+      data,
+      dataRefreshMode,
+      preparePreservedScrollRange,
+      prepareRefreshScrollTarget,
+      queueScrollPositionRestore,
+    ]);
+
+    useIsomorphicLayoutEffect(() => {
+      const scrollPosition = pendingScrollPositionRef.current;
+      if (scrollPosition === undefined || !virtualizerRef.current) {
+        return;
+      }
+
+      restorePendingScrollPosition();
+    }, [restorePendingScrollPosition, rows.length]);
+
+    const scrollRowIntoViewIfNeeded = useCallback(
+      (rowId: string | number) => {
+        const rowIndex = rowsRef.current.findIndex(
+          (row) => String(row.original?.[idKey]) === String(rowId),
+        );
+        const virtualizer = virtualizerRef.current;
+        if (rowIndex < 0 || !virtualizer) {
+          return;
+        }
+
+        const itemOffset = virtualizer.getItemOffset(rowIndex);
+        const itemSize = virtualizer.getItemSize(rowIndex);
+        const viewportStart = virtualizer.scrollOffset;
+        const viewportEnd = viewportStart + virtualizer.viewportSize;
+        const itemEnd = itemOffset + itemSize;
+
+        if (itemOffset >= viewportStart && itemEnd <= viewportEnd) {
+          return;
+        }
+
+        runProgrammaticScroll(() => virtualizer.scrollToIndex(rowIndex, { align: "center" }));
+      },
+      [idKey, runProgrammaticScroll],
+    );
+
+    useEffect(() => {
+      const pendingTarget = pendingRefreshScrollTargetRef.current;
+      if (!pendingTarget) {
+        return;
+      }
+
+      if (targetScrollAnimationFrameRef.current !== undefined) {
+        cancelAnimationFrame(targetScrollAnimationFrameRef.current);
+      }
+
+      targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+        targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+          const target = pendingRefreshScrollTargetRef.current;
+          if (!target) {
+            targetScrollAnimationFrameRef.current = undefined;
+            return;
+          }
+
+          const targetRowId =
+            target.type === "row"
+              ? target.rowId
+              : (rowsRef.current.find((row) =>
+                  target.insertedIds.has(String(row.original?.[idKey])),
+                )?.original?.[idKey] as string | number | undefined);
+
+          if (targetRowId !== undefined) {
+            scrollRowIntoViewIfNeeded(targetRowId);
+          }
+
+          pendingRefreshScrollTargetRef.current = undefined;
+          targetScrollAnimationFrameRef.current = undefined;
+        });
+      });
+    }, [idKey, rows, scrollRowIntoViewIfNeeded]);
+
+    const clearPreservedScrollPaddingEnd = useCallback(() => {
+      setPreservedScrollPaddingEnd((prev) => (prev === 0 ? prev : 0));
+    }, []);
+
+    useEffect(() => {
+      return () => {
+        if (scrollRestoreAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+        }
+        if (targetScrollAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(targetScrollAnimationFrameRef.current);
+        }
+      };
+    }, []);
+
+    const handleWrapperKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        clearPreservedScrollPaddingEnd();
+        compositeKeyDown(event);
+      },
+      [clearPreservedScrollPaddingEnd, compositeKeyDown],
+    );
+
     useIsomorphicLayoutEffect(() => {
       registerComponentApi({
         scrollToBottom,
@@ -2522,9 +2838,17 @@ export const Table = memo(
         scrollToId,
         getItemCount,
         getVisibleRange,
+        preserveStateOnNextDataRefresh: (options?: CollectionDataRefreshOptions) => {
+          pendingDataRefreshRef.current = {
+            sourceIds: new Set(currentSourceIds),
+            scrollMetrics: getScrollMetrics(virtualizerRef.current),
+            options,
+          };
+        },
         ...selectionApi,
       });
     }, [
+      currentSourceIds,
       getItemCount,
       getVisibleRange,
       registerComponentApi,
@@ -2570,7 +2894,10 @@ export const Table = memo(
           [styles.stretchToParent]: stretchToParent,
         })}
         tabIndex={0}
-        onKeyDown={compositeKeyDown}
+        onKeyDown={handleWrapperKeyDown}
+        onPointerDown={clearPreservedScrollPaddingEnd}
+        onTouchStart={clearPreservedScrollPaddingEnd}
+        onWheel={clearPreservedScrollPaddingEnd}
         onClick={(e) => {
           const target = e.target as HTMLElement;
 
@@ -2779,6 +3106,9 @@ export const Table = memo(
             </Virtualizer>
           )}
         </table>
+        {preservedScrollPaddingEnd > 0 ? (
+          <div aria-hidden="true" style={{ height: preservedScrollPaddingEnd }} />
+        ) : null}
         {loading && !hasData && (
           <div className={styles.loadingWrapper}>
             <Spinner delay={loadingDelay} />

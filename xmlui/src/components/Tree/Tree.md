@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Flat and hierarchical data structures**: You can select the most convenient data format to represent the tree. A set of properties enables you to map your data structure to the visual representation of the tree.
 - **Flexible expand/collapse**: You have several properties to represent the expanded and collapsed state of tree nodes. You can also specify several options that determine which tree items are collapsed initially.
 - **Dynamic (lazy) loading**: Load tree node children asynchronously on demand, with support for auto-reload thresholds and loading state feedback.
@@ -11,6 +12,7 @@
 With the `dataFormat` property, you can select between "flat" or "hierarchy" formats. The component transforms the data according to the value of this property into a visual representation.
 
 The "flat" and "hierarchy" data structures both use these fields for a particular tree node:
+
 - `id`: Unique ID of tree node
 - `name`: The field to be used as the display label
 - `icon`: An optional icon identifier. If specified, this icon is displayed with the tree item.
@@ -66,10 +68,11 @@ This example demonstrates the use of the "hiearchy" data mode:
 </App>
 ```
 
-When you use data (for example, retrieved from a backend), those structures may use different property names. The `Tree` component allows mapping data field names through these properties: 
+When you use data (for example, retrieved from a backend), those structures may use different property names. The `Tree` component allows mapping data field names through these properties:
+
 - `idField` (default: `id`)
 - `nameField` (default: `name`)
-- `iconField`  (default: `icon`)
+- `iconField` (default: `icon`)
 - `iconExpandedField` (default: `iconExpanded`)
 - `iconCollapsedField` (default: `iconCollapsed`)
 - `parentIdField` (default: `parentId`)
@@ -100,9 +103,10 @@ The following example uses the `idField`, `nameField`, and `parentIdField` mappi
 
 ## Expanding and collapsing tree nodes
 
-By default, when you click a tree node outside of its expand/collapse icon,  the specified item is selected. With the `expandOnItemClick` property (using the `true` value), you can change this behavior to expand or collapse the item when clicking its surface anywhere.
+By default, when you click a tree node outside of its expand/collapse icon, the specified item is selected. With the `expandOnItemClick` property (using the `true` value), you can change this behavior to expand or collapse the item when clicking its surface anywhere.
 
 You can use the `defaultExpanded` property to specify what nodes you want to see expanded initially. You can set this property to a list of node IDs or a string. When you specify IDs, the component expands the hierarchy to reveal the specified nodes. When the value is a string, you can use these options:
+
 - `none`: all nodes are collapsed (default)
 - `first-level`: all first-level nodes are expanded
 - `all`: all nodes are expanded
@@ -144,10 +148,11 @@ The following example demonstrates the use of `defaultExpanded` with tree node I
 ```
 
 You have several options to style the icons representing the expanded or collapsed state:
+
 - The icons used for the expanded and collapsed states can be changed with the `iconExpanded` and `iconCollapsed` properties, respectively.
 - You can specify a different size with the `iconSize` property (using only numeric values considered as pixels)
 - Using a rotate animation when changing the state with the `animateExpand` flag.
-The following option demonstrates the last two options:
+  The following option demonstrates the last two options:
 
 ```xmlui-pg display copy {4-5} height="220px" name="Example: expand/collapse options"
 <App>
@@ -177,6 +182,7 @@ You can set the `selectedValue` property to define the selected tree item, ot us
 ## Item templates
 
 You can override the default template used to display a tree item with the `itemTemplate` property. The template definition can use the `$item` context variable to access the item's attributes for display. `$item` provides these properties:
+
 - `id`: The unique node ID
 - `name`: The name of the node
 - `depth`: The depth level in the tree
@@ -284,9 +290,9 @@ Use the `$item.loadingState` context variable to display loading indicators. The
     }">
     <property name="itemTemplate">
       <HStack testId="{$item.id}" gap="$space-2">
-        <Icon name="{$item.loadingState === 'loaded' 
-          ? 'folder' 
-          : 'folder-outline'}" 
+        <Icon name="{$item.loadingState === 'loaded'
+          ? 'folder'
+          : 'folder-outline'}"
         />
         <Text>{$item.name}</Text>
         <Badge when="{$item.loadingState === 'loading'}" color="blue">
@@ -318,14 +324,14 @@ Use the `markNodeUnloaded` API method to mark a node as unloaded. The next time 
       loadCount++;
       delay(500);
       return [
-        { id: `item-${loadCount}-1`, 
-          name: `Item ${loadCount}.1`, 
+        { id: `item-${loadCount}-1`,
+          name: `Item ${loadCount}.1`,
           parentId: node.id
         },
-        { 
-          id: `item-${loadCount}-2`, 
-          name: `Item ${loadCount}.2`, 
-          parentId: node.id 
+        {
+          id: `item-${loadCount}-2`,
+          name: `Item ${loadCount}.2`,
+          parentId: node.id
         },
       ];
     }">
@@ -366,7 +372,7 @@ Use `getTreeState` to read a JSON-friendly object keyed by source node IDs. The 
 
 When a tree is backed by data that can be refetched after a backend mutation, use `dataRefreshMode="preserve-state"` to reconcile refreshed data with the current view state. Matching source node IDs keep their expanded/collapsed state, selection is kept when the selected node still exists, and the tree avoids an intermediate reset before the refreshed rows appear.
 
-For a complete backend-style insert, update, and delete workflow, see [Preserve Tree state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
+For a complete backend-style insert, update, and delete workflow, see [Preserve collection state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
 
 ```xmlui-pg display copy height="220px" /dataRefreshMode/ name="Example: Preserve state on refresh"
 <App var.items="{[
@@ -421,7 +427,7 @@ Set `autoLoadAfter` to automatically reload children after a specified time when
 <App var.loadCount="{0}">
   <VStack gap="$space-2">
     <Text>
-      Expand the node, collapse it, wait 3 seconds, 
+      Expand the node, collapse it, wait 3 seconds,
       and expand again to see auto-reload.
     </Text>
     <Tree
@@ -435,10 +441,10 @@ Set `autoLoadAfter` to automatically reload children after a specified time when
         loadCount++;
         delay(500);
         return [
-          { 
-              id: `ts-${getDate()}`, 
-              name: `Loaded at ${formatDateTime(getDate())} (${loadCount})`, 
-              parentId: node.id 
+          {
+              id: `ts-${getDate()}`,
+              name: `Loaded at ${formatDateTime(getDate())} (${loadCount})`,
+              parentId: node.id
           },
         ];
       }">
@@ -456,7 +462,7 @@ Set `autoLoadAfter` to automatically reload children after a specified time when
 
 Use `dataRefreshMode` when a Tree receives refreshed `data` after backend mutations. `reset` rebuilds the view from the default expansion state, while `preserve-state` reconciles refreshed rows with the current expansion, selection, loading, and scroll state for unchanged source node IDs.
 
-For a complete insert, update, and delete example using `preserveStateOnNextDataRefresh()`, see [Preserve Tree state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
+For a complete insert, update, and delete example using `preserveStateOnNextDataRefresh()`, see [Preserve collection state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
 
 %-PROP-END
 
@@ -625,9 +631,9 @@ The `spinnerDelay` property controls how long to wait before showing a loading s
         itemClickExpands
         spinnerDelay="0"
         data='{[{ id: 1, name: "Fast Load (200ms)", parentId: null }]}'
-        onLoadChildren="() => { 
-          delay(200); 
-          return [{ id: 2, name: 'Child', parentId: 1, dynamic: false }]; 
+        onLoadChildren="() => {
+          delay(200);
+          return [{ id: 2, name: 'Child', parentId: 1, dynamic: false }];
         }">
       </Tree>
     </VStack>
@@ -640,9 +646,9 @@ The `spinnerDelay` property controls how long to wait before showing a loading s
         itemClickExpands
         spinnerDelay="500"
         data='{[{ id: 3, name: "Fast Load (200ms)", parentId: null }]}'
-        onLoadChildren="() => { 
-          delay(200); 
-          return [{ id: 4, name: 'Child', parentId: 3, dynamic: false }]; 
+        onLoadChildren="() => {
+          delay(200);
+          return [{ id: 4, name: 'Child', parentId: 3, dynamic: false }];
         }">
       </Tree>
     </VStack>
@@ -674,10 +680,10 @@ The `spinnerDelay` property controls how long to wait before showing a loading s
         </HStack>
       </property>
     </Tree>
-    <Button onClick="tree.replaceNode(2, { 
-      name: 'final.txt', 
-      icon: 'checkmark', 
-      status: 'published' 
+    <Button onClick="tree.replaceNode(2, {
+      name: 'final.txt',
+      icon: 'checkmark',
+      status: 'published'
     })">
       Publish Draft
     </Button>

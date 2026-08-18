@@ -37,6 +37,7 @@ import type { RendererContext, LayoutContext } from "../../abstractions/Renderer
 import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { PositionValues } from "../Pagination/Pagination";
 import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
 
 const COMP = "Table";
 
@@ -49,9 +50,7 @@ const userSelectValues: PropertyValueDescription[] = [
 ];
 
 function hasColumnChild(children: ComponentDef[] | undefined): boolean {
-  return !!children?.some(
-    (child) => child.type === "Column" || hasColumnChild(child.children),
-  );
+  return !!children?.some((child) => child.type === "Column" || hasColumnChild(child.children));
 }
 
 function hasNestedEventHandlers(children: ComponentDef[] | undefined): boolean {
@@ -159,6 +158,16 @@ export const TableMd = createMetadata({
         `that will result in incorrect behavior when using selectable rows.`,
       valueType: "string",
       defaultValue: defaultProps.idKey,
+    },
+    dataRefreshMode: {
+      description:
+        `Controls how the table handles later data refreshes after the initial load. ` +
+        `\`reset\` keeps the table's default refresh behavior. \`preserve-state\` reconciles ` +
+        `refreshed data with the current view state for unchanged source row IDs.`,
+      valueType: "string",
+      availableValues: ["reset", "preserve-state"],
+      isStrictEnum: true,
+      defaultValue: defaultProps.dataRefreshMode,
     },
     isPaginated: {
       description:
@@ -551,8 +560,7 @@ export const TableMd = createMetadata({
         `it is not suppressed during the table's own programmatic scrolls, because consumers ` +
         `of the visible range care about what is visible, not why it became visible. It fires ` +
         `only when the range actually shifts (deduplicated by value).`,
-      signature:
-        "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
+      signature: "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
       parameters: {
         range:
           "The visible range: `startIndex` (first visible row index) and `endIndex` " +
@@ -710,6 +718,14 @@ export const TableMd = createMetadata({
       parameters: {
         id: `The ID of the row to select, or an array of IDs to select multiple rows.`,
       },
+    },
+    preserveStateOnNextDataRefresh: {
+      description:
+        `Preserve the current table view state for the next data refresh, even when ` +
+        `dataRefreshMode is \`reset\`. Optional operation metadata controls post-refresh ` +
+        `scroll behavior.`,
+      signature:
+        'preserveStateOnNextDataRefresh(options?: { operation?: "insert" | "delete" | "update", scrollTarget?: string | number | "first-inserted" | "preserve" }): void',
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -1055,6 +1071,12 @@ const TableWithColumns = memo(
             renderCacheSize={extractValue.asOptionalNumber(node.props.renderCacheSize)}
             virtualBufferSize={extractValue.asOptionalNumber(node.props.virtualBufferSize)}
             idKey={idKey}
+            dataRefreshMode={
+              extractValue.asOptionalString(
+                node.props.dataRefreshMode,
+                defaultProps.dataRefreshMode,
+              ) as CollectionDataRefreshMode
+            }
             hasExplicitColumns={hasExplicitColumns}
             pageSizeOptions={extractValue(node.props.pageSizeOptions)}
             pageSize={extractValue.asOptionalNumber(node.props.pageSize)}

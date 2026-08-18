@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const DEFAULT_VIRTUALIZED_RENDER_CACHE_SIZE = 80;
 
@@ -139,8 +139,13 @@ export function useVirtualizedRenderCache({
     publishKeepMountedIndexes();
   }, [clear, effectiveEnabled, publishKeepMountedIndexes]);
 
+  const safeKeepMountedIndexes = useMemo(
+    () => keepMountedIndexes.filter((index) => index >= 0 && index < rowCount),
+    [keepMountedIndexes, rowCount],
+  );
+
   return {
-    keepMountedIndexes,
+    keepMountedIndexes: safeKeepMountedIndexes,
     noteVisibleRange,
     clear,
   };

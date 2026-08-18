@@ -1,10 +1,12 @@
-# Preserve Tree state across data refreshes
+# Preserve collection state across data refreshes
 
-Use `preserveStateOnNextDataRefresh()` before a backend mutation when the next `Tree` data refresh should keep the current view state.
+Use `preserveStateOnNextDataRefresh()` before a backend mutation when the next `Tree`, `List`, or `Table` refresh should keep the user's current view state.
 
-When `Tree` is backed by a `DataSource`, a successful insert, update, or delete often ends with a refetch. By default, that refreshed `data` can reset the tree view. The one-shot API below tells the next refresh to reconcile the new rows with the current view: expanded nodes stay expanded when their IDs still exist, the scroll position is preserved unless you ask for a target, and inserts can scroll the first inserted node into view without flashing through an empty or reset tree.
+When a collection is backed by a `DataSource`, a successful insert, update, or delete often ends with a refetch. By default, that refreshed `data` can reset viewport state. The one-shot API below tells the next refresh to reconcile the new rows with the current view: matching IDs keep their preserved state, scroll position is preserved unless you ask for a target, and inserts can scroll the first inserted row into view without flashing through an empty or reset collection.
 
-```xmlui-pg copy display height="540px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="Tree refresh after insert, update, and delete"
+## Tree
+
+```xmlui-pg copy display height="540px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="Tree refresh after insert, update, and delete" id="tree-refresh-after-insert-update-and-delete"
 ---app display
 <App
   var.selectedNode="{null}"
@@ -89,9 +91,8 @@ When `Tree` is backed by a `DataSource`, a successful insert, update, or delete 
         value="Writing"
         colorMap="{statusColors}"
         when="{
-          insertNode.inProgress || updateNode.inProgress 
-            || deleteNode.inProgress}" 
-      />
+          insertNode.inProgress || updateNode.inProgress
+            || deleteNode.inProgress}" />
       <Badge
         value="Refreshing"
         colorMap="{statusColors}"
@@ -100,16 +101,16 @@ When `Tree` is backed by a `DataSource`, a successful insert, update, or delete 
         value="Ready"
         colorMap="{statusColors}"
         when="{
-          !insertNode.inProgress && !updateNode.inProgress && 
+          !insertNode.inProgress && !updateNode.inProgress &&
             !deleteNode.inProgress && !projectNodes.isRefetching
-        }" 
-      />
+        }" />
     </HStack>
 
     <Text variant="secondary">{lastAction}</Text>
 
     <Tree
       id="projectTree"
+      testId="project-tree"
       height="360px"
       data="{projectNodes}"
       dataRefreshMode="reset"
@@ -117,10 +118,10 @@ When `Tree` is backed by a `DataSource`, a successful insert, update, or delete 
       selectedValue="{selectedNode}"
       onSelectionDidChange="({ newNode }) => selectedNode = newNode?.id ?? null">
       <property name="itemTemplate">
-        <HStack 
-          testId="tree-node-{$item.id}" 
-          verticalAlignment="center" gap="$space-2"
-        >
+        <HStack
+          testId="tree-node-{$item.id}"
+          verticalAlignment="center"
+          gap="$space-2">
           <Icon name="{$item.hasChildren ? 'folder' : 'code'}" />
           <Text>{$item.name}</Text>
           <Badge value="changed" when="{$item.id === selectedNode}" />
@@ -158,25 +159,258 @@ When `Tree` is backed by a `DataSource`, a successful insert, update, or delete 
 }
 ```
 
+## List
+
+```xmlui-pg copy display height="500px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="List refresh after insert, update, and delete" id="list-refresh-after-insert-update-and-delete"
+---app display
+<App var.selectedTickets="" var.lastListAction="Ready">
+  <DataSource
+    id="tickets"
+    url="/api/tickets"
+    method="GET" />
+
+  <APICall
+    id="insertTicket"
+    method="post"
+    url="/api/tickets"
+    invalidates="{[]}"
+    onSuccess="(ticket) => {
+      lastListAction = 'Inserted ' + ticket.title;
+      tickets.refetch();
+    }" />
+
+  <APICall
+    id="updateTicket"
+    method="put"
+    url="/api/tickets/ticket-18"
+    invalidates="{[]}"
+    onSuccess="(ticket) => {
+      lastListAction = 'Updated ' + ticket.title + ' and kept it in view';
+      tickets.refetch();
+    }" />
+
+  <APICall
+    id="deleteTicket"
+    method="delete"
+    url="/api/tickets/ticket-28"
+    invalidates="{[]}"
+    onSuccess="(ticket) => {
+      lastListAction = 'Deleted ' + ticket.title;
+      tickets.refetch();
+    }" />
+
+  <script>
+    function addTicket() {
+      ticketList.preserveStateOnNextDataRefresh({ operation: 'insert' });
+      insertTicket.execute();
+    }
+
+    function renameTicket() {
+      ticketList.preserveStateOnNextDataRefresh({
+        operation: 'update',
+        scrollTarget: 'ticket-18'
+      });
+      updateTicket.execute();
+    }
+
+    function removeTicket() {
+      ticketList.preserveStateOnNextDataRefresh({ operation: 'delete' });
+      deleteTicket.execute();
+    }
+  </script>
+
+  <VStack gap="$space-4">
+    <HStack verticalAlignment="center" gap="$space-2">
+      <Button label="Insert ticket" onClick="addTicket()" />
+      <Button label="Update ticket 18" onClick="renameTicket()" />
+      <Button label="Delete ticket 28" themeColor="attention" onClick="removeTicket()" />
+    </HStack>
+
+    <Text variant="secondary">{lastListAction}</Text>
+    <Text>Selected tickets: {selectedTickets || "(none)"}</Text>
+
+    <List
+      id="ticketList"
+      testId="ticket-list"
+      height="300px"
+      data="{tickets}"
+      dataRefreshMode="reset"
+      rowsSelectable="true"
+      fixedItemSize="true"
+      onSelectionDidChange="(items) => selectedTickets = items.map(item => item.id).join(', ')">
+      <HStack height="36px" verticalAlignment="center" gap="$space-2">
+        <Text>{$item.title}</Text>
+        <Badge value="selected" when="{$isSelected}" />
+        <SpaceFiller />
+        <Text variant="secondary">{$item.owner}</Text>
+      </HStack>
+    </List>
+  </VStack>
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.nextTicketId = 31; $state.ticketVersion = 1; $state.tickets = Array.from({ length: 30 }, (_, i) => ({ id: 'ticket-' + (i + 1), title: 'Ticket ' + (i + 1), owner: i % 2 === 0 ? 'Support' : 'Product' }))",
+  "operations": {
+    "get-tickets": {
+      "url": "/tickets",
+      "method": "get",
+      "handler": "$state.tickets.map(ticket => ({ ...ticket }))"
+    },
+    "insert-ticket": {
+      "url": "/tickets",
+      "method": "post",
+      "handler": "const id = 'ticket-' + $state.nextTicketId++; const ticket = { id, title: 'New ticket ' + id.split('-')[1], owner: 'Support' }; $state.tickets.push(ticket); return { ...ticket };"
+    },
+    "update-ticket": {
+      "url": "/tickets/ticket-18",
+      "method": "put",
+      "handler": "$state.ticketVersion++; const ticket = $state.tickets.find(ticket => ticket.id === 'ticket-18'); if (!ticket) { throw Error('Ticket not found'); } ticket.title = 'Ticket 18 rev ' + $state.ticketVersion; return { ...ticket };"
+    },
+    "delete-ticket": {
+      "url": "/tickets/ticket-28",
+      "method": "delete",
+      "handler": "const ticket = $state.tickets.find(ticket => ticket.id === 'ticket-28') || { id: 'ticket-28', title: 'Ticket 28' }; $state.tickets = $state.tickets.filter(ticket => ticket.id !== 'ticket-28'); return { ...ticket };"
+    }
+  }
+}
+```
+
+## Table
+
+```xmlui-pg copy display height="520px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="Table refresh after insert, update, and delete" id="table-refresh-after-insert-update-and-delete"
+---app display
+<App var.selectedOrders="" var.lastTableAction="Ready">
+  <DataSource
+    id="orders"
+    url="/api/orders"
+    method="GET" />
+
+  <APICall
+    id="insertOrder"
+    method="post"
+    url="/api/orders"
+    invalidates="{[]}"
+    onSuccess="(order) => {
+      lastTableAction = 'Inserted ' + order.name;
+      orders.refetch();
+    }" />
+
+  <APICall
+    id="updateOrder"
+    method="put"
+    url="/api/orders/order-16"
+    invalidates="{[]}"
+    onSuccess="(order) => {
+      lastTableAction = 'Updated ' + order.name + ' and kept it in view';
+      orders.refetch();
+    }" />
+
+  <APICall
+    id="deleteOrder"
+    method="delete"
+    url="/api/orders/order-18"
+    invalidates="{[]}"
+    onSuccess="(order) => {
+      lastTableAction = 'Deleted ' + order.name;
+      orders.refetch();
+    }" />
+
+  <script>
+    function addOrder() {
+      orderTable.preserveStateOnNextDataRefresh({ operation: 'insert' });
+      insertOrder.execute();
+    }
+
+    function renameOrder() {
+      orderTable.preserveStateOnNextDataRefresh({
+        operation: 'update',
+        scrollTarget: 'order-16'
+      });
+      updateOrder.execute();
+    }
+
+    function removeOrder() {
+      orderTable.preserveStateOnNextDataRefresh({ operation: 'delete' });
+      deleteOrder.execute();
+    }
+  </script>
+
+  <VStack gap="$space-4">
+    <HStack verticalAlignment="center" gap="$space-2">
+      <Button label="Insert order" onClick="addOrder()" />
+      <Button label="Update order 16" onClick="renameOrder()" />
+      <Button label="Delete order 18" themeColor="attention" onClick="removeOrder()" />
+    </HStack>
+
+    <Text variant="secondary">{lastTableAction}</Text>
+    <Text>Selected orders: {selectedOrders || "(none)"}</Text>
+
+    <Table
+      id="orderTable"
+      testId="order-table"
+      height="320px"
+      data="{orders}"
+      dataRefreshMode="reset"
+      rowsSelectable="true"
+      rowHeight="36"
+      onSelectionDidChange="(items) => selectedOrders = items.map(item => item.id).join(', ')">
+      <Column header="Order" bindTo="name" canSort="true" />
+      <Column header="Owner" bindTo="owner" canSort="true" />
+      <Column header="Status" bindTo="status" />
+    </Table>
+  </VStack>
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.nextOrderId = 25; $state.orderVersion = 1; $state.orders = Array.from({ length: 24 }, (_, i) => ({ id: 'order-' + (i + 1), name: 'Order ' + (i + 1), owner: i % 2 === 0 ? 'Field' : 'Finance', status: i % 3 === 0 ? 'Ready' : 'Queued' }))",
+  "operations": {
+    "get-orders": {
+      "url": "/orders",
+      "method": "get",
+      "handler": "$state.orders.map(order => ({ ...order }))"
+    },
+    "insert-order": {
+      "url": "/orders",
+      "method": "post",
+      "handler": "const id = 'order-' + $state.nextOrderId++; const order = { id, name: 'New order ' + id.split('-')[1], owner: 'Field', status: 'Ready' }; $state.orders.push(order); return { ...order };"
+    },
+    "update-order": {
+      "url": "/orders/order-16",
+      "method": "put",
+      "handler": "$state.orderVersion++; const order = $state.orders.find(order => order.id === 'order-16'); if (!order) { throw Error('Order not found'); } order.name = 'Order 16 rev ' + $state.orderVersion; order.status = 'Ready'; return { ...order };"
+    },
+    "delete-order": {
+      "url": "/orders/order-18",
+      "method": "delete",
+      "handler": "const order = $state.orders.find(order => order.id === 'order-18') || { id: 'order-18', name: 'Order 18' }; $state.orders = $state.orders.filter(order => order.id !== 'order-18'); return { ...order };"
+    }
+  }
+}
+```
+
 ## Key points
 
-**Call the API before the refresh starts**: `projectTree.preserveStateOnNextDataRefresh(...)` marks only the next observed `data` refresh. In a real app, call it immediately before the mutation that will eventually refetch the tree data.
+**Call the API before the refresh starts**: `preserveStateOnNextDataRefresh(...)` marks only the next observed `data` refresh. In a real app, call it immediately before the mutation that will eventually refetch the collection data.
 
-**`dataRefreshMode="reset"` keeps normal behavior by default**: The example leaves the Tree in reset mode, then opts into preservation for each insert, update, or delete. The API call automatically makes the next refresh behave like `preserve-state`.
+**`dataRefreshMode="reset"` keeps normal behavior by default**: The examples leave each collection in reset mode, then opt into preservation for each insert, update, or delete. The API call automatically makes the next refresh behave like `preserve-state`.
 
-**Insert intent can choose the viewport for you**: `{ operation: 'insert' }` compares the old and refreshed data, finds the first inserted node ID, and scrolls it into view only if it is outside the current visible area.
+**Insert intent can choose the viewport for you**: `{ operation: 'insert' }` compares the old and refreshed data, finds the first inserted source ID, and scrolls it into view only if it is outside the current visible area.
 
-**Delete intent preserves scroll**: `{ operation: 'delete' }` keeps the scroll position because the deleted node may no longer exist as a valid target.
+**Delete intent preserves scroll**: `{ operation: 'delete' }` keeps the scroll position because the deleted row may no longer exist as a valid target. `Table` also clamps pagination if a deletion removes the current page.
 
-**Use `scrollTarget` when the operation has a known focus**: The update button passes `scrollTarget: 13`, so the refreshed API gateway row remains visible after the server returns the renamed node.
+**Use `scrollTarget` when the operation has a known focus**: The update buttons pass explicit row IDs so the refreshed row remains visible after the backend returns the changed data.
 
-**Stable IDs are required**: Preservation works by matching refreshed source rows by `idField`. If your backend sends custom names such as `nodeId` or `parentNodeId`, set `idField` and `parentIdField` accordingly.
+**Stable IDs are required**: Preservation works by matching refreshed source rows by `idKey` for `List` and `Table`, or `idField` for `Tree`. Set those props when your backend uses custom identity field names.
+
+Refresh animation is intentionally separate from preservation. The default behavior focuses on keeping data and state correct without adding layout motion; highlight-style row animation can be layered on later when your design calls for it.
 
 ---
 
 ## See also
 
 - [Chain a DataSource refetch](/docs/howto/chain-a-refetch) - refetch after a successful mutation
+- [Control cache invalidation](/docs/howto/control-cache-invalidation) - restrict which DataSource caches refresh after a write
 - [Configure Tree data format and mapping](/docs/howto/configure-tree-data-format-and-mapping) - map backend fields to Tree IDs and parents
-- [Lazy-load tree children on expand](/docs/howto/lazy-load-tree-children-on-expand) - fetch child nodes when a branch opens
-- [Pre-select a tree node on load](/docs/howto/pre-select-a-tree-node-on-load) - control Tree selection with `selectedValue`
+- [Follow a List to the bottom](/docs/howto/follow-a-list-to-the-bottom) - keep chat-style feeds anchored to the latest item

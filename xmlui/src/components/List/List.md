@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Virtualization**: Renders only visible items for optimal performance with large datasets
 - **Advanced grouping**: Group data by any field with customizable headers and footers
 - **Built-in sorting**: Sort by any data field in ascending or descending order
@@ -15,14 +16,14 @@ Use `List` for complex data presentation requiring performance optimization, gro
 
 In the following examples all use the same list of data which looks like so:
 
-| Id   | Name    | Quantity | Unit   | Category   | Key  |
-| :--- | :------ | :------- | :----- | :--------- | :--- |
-| 0    | Apples  | 5        | pieces | fruits     | 5    |
-| 1    | Bananas | 6        | pieces | fruits     | 4    |
-| 2    | Carrots | 100      | grams  | vegetables | 3    |
-| 3    | Spinach | 1        | bunch  | vegetables | 2    |
-| 4    | Milk    | 10       | liter  | diary      | 1    |
-| 5    | Cheese  | 200      | grams  | diary      | 0    |
+| Id  | Name    | Quantity | Unit   | Category   | Key |
+| :-- | :------ | :------- | :----- | :--------- | :-- |
+| 0   | Apples  | 5        | pieces | fruits     | 5   |
+| 1   | Bananas | 6        | pieces | fruits     | 4   |
+| 2   | Carrots | 100      | grams  | vegetables | 3   |
+| 3   | Spinach | 1        | bunch  | vegetables | 2   |
+| 4   | Milk    | 10       | liter  | diary      | 1   |
+| 5   | Cheese  | 200      | grams  | diary      | 0   |
 
 The data is provided as JSON.
 
@@ -115,9 +116,35 @@ See the [itemTemplate section](#itemtemplate).
 
 %-PROP-END
 
+%-PROP-START dataRefreshMode
+
+Use `dataRefreshMode="preserve-state"` when a List receives refreshed `data` after backend mutations. The list keeps the current scroll position, group expansion state, and row selection for source rows whose `idKey` values still exist.
+
+For a complete backend-style insert, update, and delete workflow, see [Preserve collection state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
+
+For mutation flows where only the next refresh should preserve state, call `preserveStateOnNextDataRefresh()` before updating or refetching the data:
+
+```xmlui-pg name="Example: Preserve List state for the next refresh" height="260px" /preserveStateOnNextDataRefresh/
+<App var.items="{Array.from({ length: 20 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+  <Button onClick="
+    list.preserveStateOnNextDataRefresh({ operation: 'insert' });
+    items = [...items, { id: 'row-new', name: 'Inserted row' }];
+  ">
+    Add row
+  </Button>
+  <List id="list" height="180px" dataRefreshMode="reset" data="{items}">
+    <Text value="{$item.name}" />
+  </List>
+</App>
+```
+
+Stable, unique `idKey` values are required. If an inserted row is outside the viewport and the refresh options use `operation: "insert"` or `scrollTarget: "first-inserted"`, the list scrolls the first inserted visible row into view after reconciliation.
+
+%-PROP-END
+
 %-PROP-START defaultGroups
 
->[!INFO]
+> [!INFO]
 > For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property, and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
 ```xmlui copy {4}
@@ -487,8 +514,8 @@ loading UI immediately.
 
 ```xmlui-pg name="Example: orderBy" height="400px"
 <App>
-  <List 
-    orderBy="{{ field: 'quantity', direction: 'desc' }}" 
+  <List
+    orderBy="{{ field: 'quantity', direction: 'desc' }}"
     data='{[
   {
     id: 0,
@@ -548,18 +575,18 @@ loading UI immediately.
 
 It contains the following boolean attributes:
 
-| Attribute            | Description                          |
-| :------------------- | :------------------------------------|
-| `hasPrevPage`        | Does the list have a previous page   |
-| `hasNextPage`        | Does the list have a next page       |
-| `isFetchingPrevPage` | _TBD_                                |
-| `isFetchingNextPage` | _TBD_                                |
+| Attribute            | Description                        |
+| :------------------- | :--------------------------------- |
+| `hasPrevPage`        | Does the list have a previous page |
+| `hasNextPage`        | Does the list have a next page     |
+| `isFetchingPrevPage` | _TBD_                              |
+| `isFetchingNextPage` | _TBD_                              |
 
 %-PROP-END
 
 %-PROP-START groupBy
 
->[!INFO]
+> [!INFO]
 > For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
 > or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
@@ -689,11 +716,11 @@ It contains the following boolean attributes:
 
 The structure of `$group` in a `groupFooterTemplate` is the following:
 
-| Attribute | Description                                                                                                   |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
-| items     | The items filtered from the original data list that fall into this section.                                   |
-| key       | The attribute name to section by provided via `groupBy`                                                       |
+| Attribute | Description                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items     | The items filtered from the original data list that fall into this section.                                 |
+| key       | The attribute name to section by provided via `groupBy`                                                     |
 
 This example displays a separator line in the groups' footer:
 
@@ -787,11 +814,11 @@ groupBy="category">
 
 The structure of `$group` in a `groupHeaderTemplate` is the following:
 
-| Attribute | Description                                                                                                   |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
-| items     | The items filtered from the original data list that fall into this section.                                   |
-| key       | The attribute name to section by provided via `groupBy`                                                       |
+| Attribute | Description                                                                                                 |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items     | The items filtered from the original data list that fall into this section.                                 |
+| key       | The attribute name to section by provided via `groupBy`                                                     |
 
 ```xmlui copy {3-7}
 <App>
@@ -1011,14 +1038,14 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
       <Stack>
         <Text variant="subtitle" value="{$group.key}" />
       </Stack>
-    </property>  
+    </property>
   </List>
 </App>
 ```
 
 ```xmlui-pg name="Example: availableGroups" height="400px"
 <App>
-  <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" 
+  <List availableGroups="{['fruits', 'vegetables']}" groupBy="category"
   data='{[
   {
     id: 0,
@@ -1073,7 +1100,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
       <Stack>
         <Text variant="subtitle" value="{$group.key}" />
       </Stack>
-    </property>  
+    </property>
   </List>
 </App>
 ```
@@ -1087,10 +1114,10 @@ Note how the `List` on the right has different borders:
 ```xmlui /borderCollapse/
 <App>
   <HStack>
-    <List 
+    <List
       data="{[...]}"
-      groupBy="category" 
-      borderCollapse="false" 
+      groupBy="category"
+      borderCollapse="false"
       width="$space-64"
     >
       <property name="groupHeaderTemplate">
@@ -1099,10 +1126,10 @@ Note how the `List` on the right has different borders:
         </Stack>
       </property>
     </List>
-    <List 
-      data="{[...]}" 
-      groupBy="category" 
-      borderCollapse="true" 
+    <List
+      data="{[...]}"
+      groupBy="category"
+      borderCollapse="true"
       width="$space-64"
     >
       <property name="groupHeaderTemplate">
@@ -1245,9 +1272,9 @@ Note how the groups in the right `List` are expanded by default:
 ```xmlui /groupsInitiallyExpanded/
 <App>
   <HStack gap="$space-2">
-    <List data="{[...]}" 
-      groupBy="category" 
-      groupsInitiallyExpanded="false" 
+    <List data="{[...]}"
+      groupBy="category"
+      groupsInitiallyExpanded="false"
       width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -1255,9 +1282,9 @@ Note how the groups in the right `List` are expanded by default:
         </Stack>
       </property>
     </List>
-    <List data="{[...]}" 
-      groupBy="category" 
-      groupsInitiallyExpanded="true" 
+    <List data="{[...]}"
+      groupBy="category"
+      groupsInitiallyExpanded="true"
       width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -1271,7 +1298,7 @@ Note how the groups in the right `List` are expanded by default:
 
 ```xmlui-pg name="Example: groupsInitiallyExpanded" height="400px"
 <App>
-  <HStack gap="$space-2"> 
+  <HStack gap="$space-2">
     <List data='{[
   {
     id: 0,
@@ -1321,7 +1348,7 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
   groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
     <property name="groupHeaderTemplate">
       <Stack>
@@ -1378,7 +1405,7 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
       groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -1479,7 +1506,7 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
   defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
     <property name="groupHeaderTemplate">
       <Stack>
@@ -1536,7 +1563,7 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
       defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -1582,10 +1609,10 @@ selection via click, keyboard, and the programmatic API still work as expected.
 
 ```xmlui copy /hideSelectionCheckboxes="true"/
 <App>
-  <List 
-    data='{[...]}' 
-    rowsSelectable="true" 
-    enableMultiRowSelection="true" 
+  <List
+    data='{[...]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
     hideSelectionCheckboxes="true"
   >
     <Text>{$item.name}</Text>
@@ -1652,7 +1679,7 @@ row height — ideal for card-style layouts.
 
 ```xmlui copy /selectionCheckboxAnchor="bottom-left"/
 <App>
-  <List data='{[...]}' 
+  <List data='{[...]}'
     rowsSelectable="true"
     selectionCheckboxPosition="overlay"
     selectionCheckboxAnchor="bottom-left">
@@ -1750,16 +1777,17 @@ The following example pre-selects the first and third items (IDs `0` and `2`) wh
 This property uses the following default key bindings:
 
 ```json
-{ 
-  "selectAll": "CmdOrCtrl+A", 
-  "cut": "CmdOrCtrl+X", 
-  "copy": "CmdOrCtrl+C", 
-  "paste": "CmdOrCtrl+V", 
+{
+  "selectAll": "CmdOrCtrl+A",
+  "cut": "CmdOrCtrl+X",
+  "copy": "CmdOrCtrl+C",
+  "paste": "CmdOrCtrl+V",
   "delete": "Delete"
 }
 ```
 
 You can use these accelerator key names:
+
 - `CmdOrCtrl`: Command on macOS, Ctrl on Windows/Linux
 - `Alt`: Alt/Option
 - `Shift`: Shift
@@ -1835,7 +1863,7 @@ The selection checkbox is automatically displayed as disabled for these rows, pr
 The following example demonstrates two independent `MyList` components sharing selection state
 through a global variable. Selecting a row in either list immediately reflects in the other:
 
->[!INFO]
+> [!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all Lists in the sync have that variable in their scope.
 
 ```xmlui-pg name="List"
@@ -1966,11 +1994,11 @@ arrives call [`scrollToBottom()`](#scrolltobottom) only while the user is still 
 ```xmlui copy {4}
 <App var.log="">
   <Text>{log}</Text>
-  <List 
-    data='{[...]}' 
-    rowsSelectable="true" 
+  <List
+    data='{[...]}'
+    rowsSelectable="true"
     enableMultiRowSelection="true"
-    onSelectAllAction="(row, items, ids) => 
+    onSelectAllAction="(row, items, ids) =>
       log = 'Selected all: ' + ids.join(', ')
     ">
     <Text>{$item.name}</Text>
@@ -2053,29 +2081,29 @@ appearance of selection checkboxes.
 
 **Selection colors:**
 
-| Theme variable | Default |
-| :--- | :--- |
-| `backgroundColor-List` | `$backgroundColor` |
-| `backgroundColor-selected-List` | `$color-primary-100` |
+| Theme variable                         | Default              |
+| :------------------------------------- | :------------------- |
+| `backgroundColor-List`                 | `$backgroundColor`   |
+| `backgroundColor-selected-List`        | `$color-primary-100` |
 | `backgroundColor-selected-List--hover` | `$color-primary-100` |
-| `backgroundColor-row-List--hover` | `$color-primary-50` |
+| `backgroundColor-row-List--hover`      | `$color-primary-50`  |
 
 **Selection checkbox appearance** — each variable falls back to the equivalent `Checkbox`
 component theme variable when not explicitly set, so the checkboxes automatically
 follow your form input styling:
 
-| Theme variable | Fallback |
-| :--- | :--- |
-| `borderRadius-selectionCheckbox-List` | `borderRadius-Checkbox` |
-| `borderColor-selectionCheckbox-List` | `borderColor-Checkbox` |
-| `backgroundColor-selectionCheckbox-List` | `backgroundColor-Checkbox` |
-| `borderColor-checked-selectionCheckbox-List` | `borderColor-checked-Checkbox` |
-| `backgroundColor-checked-selectionCheckbox-List` | `backgroundColor-checked-Checkbox` |
+| Theme variable                                     | Fallback                             |
+| :------------------------------------------------- | :----------------------------------- |
+| `borderRadius-selectionCheckbox-List`              | `borderRadius-Checkbox`              |
+| `borderColor-selectionCheckbox-List`               | `borderColor-Checkbox`               |
+| `backgroundColor-selectionCheckbox-List`           | `backgroundColor-Checkbox`           |
+| `borderColor-checked-selectionCheckbox-List`       | `borderColor-checked-Checkbox`       |
+| `backgroundColor-checked-selectionCheckbox-List`   | `backgroundColor-checked-Checkbox`   |
 | `backgroundColor-indicator-selectionCheckbox-List` | `backgroundColor-indicator-Checkbox` |
-| `outlineWidth-selectionCheckbox-List--focus` | `outlineWidth-Checkbox--focus` |
-| `outlineColor-selectionCheckbox-List--focus` | `outlineColor-Checkbox--focus` |
-| `outlineStyle-selectionCheckbox-List--focus` | `outlineStyle-Checkbox--focus` |
-| `outlineOffset-selectionCheckbox-List--focus` | `outlineOffset-Checkbox--focus` |
+| `outlineWidth-selectionCheckbox-List--focus`       | `outlineWidth-Checkbox--focus`       |
+| `outlineColor-selectionCheckbox-List--focus`       | `outlineColor-Checkbox--focus`       |
+| `outlineStyle-selectionCheckbox-List--focus`       | `outlineStyle-Checkbox--focus`       |
+| `outlineOffset-selectionCheckbox-List--focus`      | `outlineOffset-Checkbox--focus`      |
 
 %-STYLE-END
 
@@ -2092,16 +2120,16 @@ Use `getVisibleRange()` with `getItemCount()`, or read the same values from the 
     variant="strong"
     value="{range.startIndex < 0
       ? 'No items'
-      : (range.startIndex + 1) + '-' 
-        + (range.endIndex + 1) + ' of ' + itemCount}" 
+      : (range.startIndex + 1) + '-'
+        + (range.endIndex + 1) + ' of ' + itemCount}"
   />
   <List
     id="list"
     height="*"
     onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
-    onVisibleRangeDidChange="(r) => { 
-      range = r; 
-      itemCount = list.getItemCount() 
+    onVisibleRangeDidChange="(r) => {
+      range = r;
+      itemCount = list.getItemCount()
     }"
     data="{Array.from({ length: 1000 }, (_, i) => ({
       id: i + 1,
@@ -2129,8 +2157,8 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
       <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
     </HStack>
   </AppHeader>
-  <List 
-    id="myList" 
+  <List
+    id="myList"
     height="*"
     data="{
       Array.from({ length: 100 })
@@ -2176,10 +2204,10 @@ The following example demonstrates `clearSelection` and the other selection API 
     <Button label="Select 0, 2" onClick="list.selectId([0, 2])" />
     <Button label="Clear" onClick="list.clearSelection()" />
   </HStack>
-  <List 
-    id="list" 
-    data='{[...]}' 
-    rowsSelectable="true" 
+  <List
+    id="list"
+    data='{[...]}'
+    rowsSelectable="true"
     enableMultiRowSelection="true"
     onSelectionDidChange="(items) => selection = items.map(i => i.id).join(', ')"
   >

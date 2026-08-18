@@ -3,6 +3,7 @@
 `Table` presents structured data for viewing, sorting, selection, and interaction.
 
 **Key features:**
+
 - **Data integration**: Load data from APIs via [DataSource](/docs/reference/components/DataSource) or use static arrays
 - **Virtualization**: Only renders visible rows for smooth performance with large datasets
 - **Row selection**: Support single or multi-row selection for bulk operations
@@ -17,23 +18,25 @@ UUID-shaped string values infer the more specific `uuid` display type.
 
 **Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
 
+`Table` keeps a bounded cache of recently rendered virtualized rows by default. This reduces remount and measurement flash when users scroll back through content they have already seen. Set `renderCache="{false}"` to minimize mounted DOM nodes, tune `renderCacheSize` for the number of recently rendered rows to retain, and use `virtualBufferSize` when fast scrolling should prepare more never-seen rows just outside the viewport.
+
 In the following sections the examples use data with the structure outlined below:
 
-| Id   | Name    | Quantity | Unit   | Category   |
-| :--- | :------ | :------- | :----- | :--------- |
-| 0    | Apples  | 5        | pieces | fruits     |
-| 1    | Bananas | 6        | pieces | fruits     |
-| 2    | Carrots | 100      | grams  | vegetables |
-| 3    | Spinach | 1        | bunch  | vegetables |
-| 4    | Milk    | 10       | liter  | diary      |
-| 5    | Cheese  | 200      | grams  | diary      |
+| Id  | Name    | Quantity | Unit   | Category   |
+| :-- | :------ | :------- | :----- | :--------- |
+| 0   | Apples  | 5        | pieces | fruits     |
+| 1   | Bananas | 6        | pieces | fruits     |
+| 2   | Carrots | 100      | grams  | vegetables |
+| 3   | Spinach | 1        | bunch  | vegetables |
+| 4   | Milk    | 10       | liter  | diary      |
+| 5   | Cheese  | 200      | grams  | diary      |
 
 The data is provided as JSON. In the source code samples, the `data={[...]}` declaration represents the data above.
 
 All samples use table columns with the following definition unless noted otherwise
 (The `...` declaration nested into `<Table>` represents this column definition):
 
-```xmlui copy 
+```xmlui copy
 <Table data='{[...]}'>
   <Column bindTo="name"/>
   <Column bindTo="quantity"/>
@@ -214,7 +217,7 @@ The default value is `false`.
 
 ```xmlui copy /checkboxTolerance="comfortable"/
 <App>
-  <Table data='{[...]}' 
+  <Table data='{[...]}'
     rowsSelectable="true"
     checkboxTolerance="comfortable"
   >
@@ -276,7 +279,7 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     rowsSelectable="true"
     checkboxTolerance="comfortable">
     <Column bindTo="name"/>
@@ -318,33 +321,33 @@ The table expects `data` to resolve to an array of row objects.
 Only plain object rows participate in field discovery; primitive values, arrays, dates, inherited properties, and non-enumerable properties are ignored.
 The internal `order` field is also skipped.
 
-| Step | Rule |
-| --- | --- |
-| 1. Sample rows | `first-only`, `first-n(n)`, `sample(n)`, `all`, or `off` decides which rows are inspected. `sample(n)` uses a deterministic spread across the supplied array. |
+| Step               | Rule                                                                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Sample rows     | `first-only`, `first-n(n)`, `sample(n)`, `all`, or `off` decides which rows are inspected. `sample(n)` uses a deterministic spread across the supplied array.                                                 |
 | 2. Discover fields | The table reads enumerable own keys from sampled row objects. Field order follows first discovery: keys from earlier sampled rows come first, and newly discovered keys from later sampled rows are appended. |
-| 3. Create columns | Each discovered field becomes a sortable inferred column with `header` and `accessorKey` set to the field name. |
-| 4. Infer type | The sampled values for each field are inspected and mapped to a `Column` `type`. |
-| 5. Apply layout | The inferred type participates in `columnSizing`; numeric-like types align to the end, compact types get compact default widths in balanced sizing, and text-like types can use star sizing. |
+| 3. Create columns  | Each discovered field becomes a sortable inferred column with `header` and `accessorKey` set to the field name.                                                                                               |
+| 4. Infer type      | The sampled values for each field are inspected and mapped to a `Column` `type`.                                                                                                                              |
+| 5. Apply layout    | The inferred type participates in `columnSizing`; numeric-like types align to the end, compact types get compact default widths in balanced sizing, and text-like types can use star sizing.                  |
 
 Type inference ignores `null`, `undefined`, and empty string values when deciding the type.
 If no present values remain, or if the sampled values are mixed in a way the table cannot classify, the type falls back to `text`.
 
-| Sampled values | Inferred type |
-| --- | --- |
-| UUID-shaped strings | `uuid` |
-| Scalar values in the field named by `idKey` | `id` |
-| Finite numbers | `integer` when all numbers are integers; otherwise `number` |
-| Booleans | `boolean` |
-| Arrays of short strings | `tags` |
-| Other arrays | `array` |
-| Plain objects | `object` |
-| ISO date strings | `date` |
-| ISO datetime strings | `datetime` |
-| Mostly email, URL, or phone strings | `email`, `url`, or `phone` |
-| Name-like fields such as `name`, `customer`, `customerName`, `displayName`, `fullName`, or fields ending in `Name` | `name` |
-| Any string longer than 80 characters | `long-text` |
-| Low-cardinality short string sets | `enum` |
-| Other strings or unknown mixed values | `text` |
+| Sampled values                                                                                                     | Inferred type                                               |
+| ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| UUID-shaped strings                                                                                                | `uuid`                                                      |
+| Scalar values in the field named by `idKey`                                                                        | `id`                                                        |
+| Finite numbers                                                                                                     | `integer` when all numbers are integers; otherwise `number` |
+| Booleans                                                                                                           | `boolean`                                                   |
+| Arrays of short strings                                                                                            | `tags`                                                      |
+| Other arrays                                                                                                       | `array`                                                     |
+| Plain objects                                                                                                      | `object`                                                    |
+| ISO date strings                                                                                                   | `date`                                                      |
+| ISO datetime strings                                                                                               | `datetime`                                                  |
+| Mostly email, URL, or phone strings                                                                                | `email`, `url`, or `phone`                                  |
+| Name-like fields such as `name`, `customer`, `customerName`, `displayName`, `fullName`, or fields ending in `Name` | `name`                                                      |
+| Any string longer than 80 characters                                                                               | `long-text`                                                 |
+| Low-cardinality short string sets                                                                                  | `enum`                                                      |
+| Other strings or unknown mixed values                                                                              | `text`                                                      |
 
 Inference is display-oriented.
 It does not validate data, mutate rows, unwrap API response envelopes, or inspect server-side pages that are not present in the supplied `data` array.
@@ -537,6 +540,36 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
+### `dataRefreshMode` [#datarefreshmode]
+
+> [!DEF]  default: **"reset"**
+
+Controls how the table handles later data refreshes after the initial load. `reset` keeps the table's default refresh behavior. `preserve-state` reconciles refreshed data with the current view state for unchanged source row IDs.
+
+Available values: `reset` **(default)**, `preserve-state`
+
+Use `dataRefreshMode="preserve-state"` when a Table receives refreshed `data` after backend mutations. The table keeps the current scroll position, sort state, pagination state when still valid, column sizing, and row selection for source rows whose `idKey` values still exist. If deletion leaves the current page beyond the new page count, the table clamps to the last available page.
+
+For a complete backend-style insert, update, and delete workflow, see [Preserve collection state across data refreshes](/docs/howto/preserve-tree-state-across-data-refreshes).
+
+For mutation flows where only the next refresh should preserve state, call `preserveStateOnNextDataRefresh()` before updating or refetching the data:
+
+```xmlui-pg name="Example: Preserve Table state for the next refresh" height="300px" /preserveStateOnNextDataRefresh/
+<App var.items="{Array.from({ length: 20 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+  <Button onClick="
+    table.preserveStateOnNextDataRefresh({ operation: 'insert' });
+    items = [...items, { id: 'row-new', name: 'Inserted row' }];
+  ">
+    Add row
+  </Button>
+  <Table id="table" height="200px" dataRefreshMode="reset" data="{items}">
+    <Column bindTo="name" />
+  </Table>
+</App>
+```
+
+Stable, unique `idKey` values are required. If an inserted row is outside the current viewport and is present in the current row model, `operation: "insert"` or `scrollTarget: "first-inserted"` scrolls it into view after reconciliation. For paginated tables, insert targeting does not switch pages.
+
 ### `enableMultiRowSelection` [#enablemultirowselection]
 
 > [!DEF]  default: **true**
@@ -551,8 +584,8 @@ By default, the value of this property is `true`.
 
 ```xmlui copy /enableMultiRowSelection="false"/
 <App>
-  <Table data='{[...]}' 
-    rowsSelectable="true" 
+  <Table data='{[...]}'
+    rowsSelectable="true"
     enableMultiRowSelection="false">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -612,8 +645,8 @@ By default, the value of this property is `true`.
     category: "dairy",
     key: 0,
   },
-]}' 
-    rowsSelectable="true" 
+]}'
+    rowsSelectable="true"
     enableMultiRowSelection="false">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -689,7 +722,7 @@ It accepts common [size values](/docs/styles-and-themes/common-units#size-values
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     headerHeight="60px">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -784,7 +817,7 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     hideHeader="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -937,7 +970,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconNoSort="close">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -1014,7 +1047,7 @@ sorting is done according to the column, and the column is sorted in ascending o
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconSortAsc="chevronup">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -1093,7 +1126,7 @@ Select a column header and set it to descending ordering.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconSortDesc="chevrondown">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -1118,7 +1151,7 @@ This property is used to specify the unique ID property in the data array. If th
       { 'key': 1, 'name': 'Jane' },
       { 'key': 2, 'name': 'Bill' },
     ]}"
-  > 
+  >
     <Column bindTo="name"/>
   </Table>
 </App>
@@ -1195,7 +1228,7 @@ This property adds pagination controls to the `Table`. When enabled, the paginat
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1211,16 +1244,17 @@ This property defines keyboard shortcuts for table actions. Provide an object wi
 This property uses the following default key bindings:
 
 ```json
-{ 
-  "selectAll": "CmdOrCtrl+A", 
-  "cut": "CmdOrCtrl+X", 
-  "copy": "CmdOrCtrl+C", 
-  "paste": "CmdOrCtrl+V", 
+{
+  "selectAll": "CmdOrCtrl+A",
+  "cut": "CmdOrCtrl+X",
+  "copy": "CmdOrCtrl+C",
+  "paste": "CmdOrCtrl+V",
   "delete": "Delete"
 }
 ```
 
 You can use these accelerator key names:
+
 - `CmdOrCtrl`: Command on macOS, Ctrl on Windows/Linux
 - `Alt`: Alt/Options
 - `Shift`: Shift
@@ -1367,7 +1401,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1445,7 +1479,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     isPaginated="true" pageSizeOptions="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1472,6 +1506,18 @@ Available values: `top`, `bottom` **(default)**, `both`
 
 An expression whose value change forces all table rows and cells to re-render. Use this to ensure that closure variables bound in row or cell templates are updated when global state changes (e.g. `{selectMode}`). Without this, virtualized rows might retain stale references to global variables for performance reasons.
 
+### `renderCache` [#rendercache]
+
+> [!DEF]  default: **true**
+
+Controls whether the table keeps a bounded set of recently rendered virtualized rows mounted while they are outside the viewport. Keeping rows mounted reduces remount and measurement flash when users scroll back through recently viewed content.
+
+### `renderCacheSize` [#rendercachesize]
+
+> [!DEF]  default: **80**
+
+Maximum number of recently rendered virtualized rows to keep mounted when [`renderCache`](#rendercache) is enabled. Larger values can make repeat scrolling smoother but retain more DOM nodes.
+
 ### `rowDisabledPredicate` [#rowdisabledpredicate]
 
 This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
@@ -1489,7 +1535,7 @@ The following example disables all table rows where the item's quantity exceeds 
 </App>
 ```
 
->[!INFO]
+> [!INFO]
 > Disabled items are rendered with a different color.
 
 ```xmlui-pg name="Example: rowDisabledPredicate"
@@ -1619,7 +1665,7 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     rowsSelectable="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1715,7 +1761,7 @@ This property is used to determine which data property to sort by. If not define
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1789,7 +1835,7 @@ This property determines the sort order to be `ascending` or `descending`. This 
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" sortDirection="descending">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1883,7 +1929,7 @@ The name of a global variable to synchronize the table's selection state with. T
 
 The following example demonstrates how two independent `MyTable` components share selection state through a global variable. Selecting a row in either table immediately reflects in the other, and `selState` always holds the current selection:
 
->[!INFO]
+> [!INFO]
 > `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
 
 ```xmlui-pg name="Table"
@@ -1999,6 +2045,10 @@ Available values:
 | `contain` | Selection is contained within this element |
 | `all` | The entire element content is selected as one unit |
 
+### `virtualBufferSize` [#virtualbuffersize]
+
+Extra virtualizer buffer, in pixels, to render before and after the viewport. Increase this when fast scrolling reaches rows that have not been rendered before; unlike [`renderCache`](#rendercache), this prepares never-seen rows near the viewport.
+
 ## Events [#events]
 
 ### `contextMenu` [#contextmenu]
@@ -2059,7 +2109,7 @@ This event is fired when the user double-clicks a table row. The handler receive
 
 This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
 
-```xmlui copy {4}
+````xmlui copy {4}
 <App>
   <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
     <Column bindTo="name"/>
@@ -2075,7 +2125,7 @@ This event is triggered when a table row is double-clicked. The handler receives
     <Column bindTo="quantity"/>
   </Table>
 </App>
-```
+````
 
 ### `scroll` [#scroll]
 
@@ -2512,16 +2562,16 @@ When the table is empty or not yet measured, the method returns `{ startIndex: -
     variant="strong"
     value="{range.startIndex < 0
       ? 'No rows'
-      : (range.startIndex + 1) + '-' 
-        + (range.endIndex + 1) + ' of ' + itemCount}" 
+      : (range.startIndex + 1) + '-'
+        + (range.endIndex + 1) + ' of ' + itemCount}"
   />
   <Table
     id="table"
     height="*"
     onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
-    onVisibleRangeDidChange="(r) => { 
-      range = r; 
-      itemCount = table.getItemCount() 
+    onVisibleRangeDidChange="(r) => {
+      range = r;
+      itemCount = table.getItemCount()
     }"
     data="{Array.from({ length: 1000 }, (_, i) => ({
       id: i + 1,
@@ -2536,6 +2586,12 @@ When the table is empty or not yet measured, the method returns `{ startIndex: -
   </Table>
 </App>
 ```
+
+### `preserveStateOnNextDataRefresh` [#preservestateonnextdatarefresh]
+
+Preserve the current table view state for the next data refresh, even when dataRefreshMode is `reset`. Optional operation metadata controls post-refresh scroll behavior.
+
+**Signature**: `preserveStateOnNextDataRefresh(options?: { operation?: "insert" | "delete" | "update", scrollTarget?: string | number | "first-inserted" | "preserve" }): void`
 
 ### `scrollToBottom` [#scrolltobottom]
 
