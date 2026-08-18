@@ -373,9 +373,33 @@ When `segments` is set it supplies the component's content — `value` and any c
 
 If no segment carries `active`, [`highlightActiveIndex`](#highlightactiveindex) selects which `hit` is active, counting in document order — the same numbering `highlightText` uses, so a find-in-page can step through a list mixing both kinds of row as one sequence.
 
-> [!INFO] `segments` expresses **one kind of span**: whether it matched a search, and whether it is the current match. It is deliberately not a general mechanism for styling arbitrary runs of text. Content that carries other, orthogonal span kinds — added and removed words in a diff, say, which a row may hold *alongside* search hits — needs its own styling and should compose those runs itself. Keeping this property to a single meaning is what lets `hit` and `active` mean the same thing here as they do for `highlightText`.
->
-> The field set — `text`, `hit`, `active` — is **closed for this release**, and that is a decision rather than an oversight. Should a second span kind ever warrant first-class support, a per-segment variant is the intended extension point; until then, content needing more than one kind of span composes it itself.
+> [!INFO] Precedence is `active` > `hit` > `variant`: a segment that is a search hit renders as one, and its `variant` is ignored. Only `hit` segments are counted by [`highlightActiveIndex`](#highlightactiveindex), so variant spans never enter the sequence a find-in-page steps through.
+
+### A second span kind: `variant`
+
+Some content carries spans that have nothing to do with searching — a word that changed on one side of a diff, say — and a row may hold those *alongside* search hits. Give such a segment a `variant` naming its kind:
+
+```xmlui
+<Text segments="{[
+  { text: 'the ', hit: false },
+  { text: 'quick', variant: 'emphasis' },
+  { text: ' brown ', hit: false },
+  { text: 'fox', hit: true, active: true }
+]}" />
+```
+
+Colours come from your theme, keyed by the variant name:
+
+```
+backgroundColor-mark-emphasis-Text
+textColor-mark-emphasis-Text
+```
+
+Declare those for every variant you use. An undeclared variant renders as plain text — the span is still there, just unstyled — and a development build warns once per name so a typo in a data-driven field does not pass silently.
+
+This is deliberately not a general styling channel: exactly those two properties resolve, keyed by a name you declare in the theme, rather than arbitrary CSS travelling in your data.
+
+> [!INFO] Two namespaces here point in opposite directions, deliberately. In the **DOM**, a hit is a `<mark>` and a variant is a `<span data-variant="…">` — they are different kinds of thing, and code that counts or queries marks to find search hits should not also collect diff spans. In the **theme**, both live under `mark-` (`backgroundColor-mark-Text`, `backgroundColor-markActive-Text`, `backgroundColor-mark-emphasis-Text`) — from a theme author's side they are one family of span styling to keep visually coherent.
 
 %-PROP-END
 

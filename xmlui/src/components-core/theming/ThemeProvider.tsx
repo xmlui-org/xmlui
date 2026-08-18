@@ -14,6 +14,7 @@ import { normalizePath } from "../utils/misc";
 import { matchThemeVar } from "../theming/hvar";
 import { ThemeContext, ThemesContext } from "../theming/ThemeContext";
 import themeVars, { getVarKey } from "../theming/themeVars";
+import { replaceThemeVarRefs } from "./transformThemeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../constants";
 import { collectThemeChainByExtends } from "../theming/extendThemeUtils";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
@@ -632,30 +633,9 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
   return ret;
 
   function resolveThemeVarToCssVars(varName: string, theme: Record<string, string>) {
-    const value = theme[varName];
-    if (typeof value === "string" && value.includes("$")) {
-      return replaceThemeVar(value);
-    }
-    return value;
-  }
-
-  function replaceThemeVar(input: string) {
-    const regex = /\$([a-zA-Z0-9_-]+)/gi;
-    const matches = input.matchAll(regex);
-
-    //we go from 1, because result[1] is the whole stuff
-    if (matches) {
-      let ret = input;
-      for (const match of matches) {
-        const varName = match[1];
-        if (varName) {
-          ret = ret.replace(match[0], `var(${getVarKey(varName)})`);
-        }
-      }
-      return ret;
-    }
-
-    return input;
+    // Shared with the inline-<Theme> path in ThemeReact: one definition of how a
+    // `$token` reference becomes a CSS var, so the two cannot diverge again.
+    return replaceThemeVarRefs(theme[varName]);
   }
 }
 

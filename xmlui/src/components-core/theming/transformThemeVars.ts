@@ -3,9 +3,35 @@ import Color from "color";
 import { type HVar, parseHVar } from "../theming/hvar";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
 import { toCssVar } from "./layout-resolver";
+import { getVarKey } from "./themeVars";
 
 export function isThemeVarName(varName: any) {
   return typeof varName === "string" && varName?.startsWith("$");
+}
+
+/**
+ * Rewrite `$token` references inside a theme *value* into CSS custom-property
+ * references: `"$color-danger-200"` becomes `"var(--xmlui-color-danger-200)"`.
+ *
+ * Both paths that turn theme declarations into CSS need this, and for a while only
+ * one had it: theme definitions were rewritten while variables declared inline on a
+ * `<Theme>` were written through raw, so an app-defined variable given a `$token`
+ * value landed in the DOM as the literal string and computed to nothing. It lives
+ * here, exported, so the two paths cannot drift apart again.
+ */
+export function replaceThemeVarRefs(input: string): string {
+  if (typeof input !== "string" || !input.includes("$")) {
+    return input;
+  }
+  const regex = /\$([a-zA-Z0-9_-]+)/gi;
+  let ret = input;
+  for (const match of input.matchAll(regex)) {
+    const varName = match[1];
+    if (varName) {
+      ret = ret.replace(match[0], `var(${getVarKey(varName)})`);
+    }
+  }
+  return ret;
 }
 
 export function resolveThemeVar(
