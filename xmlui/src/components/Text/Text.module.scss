@@ -66,6 +66,14 @@ $borderStyle-Text-keyboard: createThemeVar("borderStyle-#{$component}-keyboard")
 $borderRadius-Text-keyboard: createThemeVar("borderRadius-#{$component}-keyboard");
 $paddingHorizontal-Text-keyboard: createThemeVar("paddingHorizontal-#{$component}-keyboard");
 
+// Variables for highlightText matches. Distinct from the `marked` variant below:
+// these style the <mark> elements this component generates from highlightText,
+// and default to Markdown's values so a list mixing Text and Markdown rows
+// highlights identically.
+$backgroundColor-mark-Text: createThemeVar("backgroundColor-mark-#{$component}");
+$textColor-mark-Text: createThemeVar("textColor-mark-#{$component}");
+$backgroundColor-markActive-Text: createThemeVar("backgroundColor-markActive-#{$component}");
+
 // Variables for marked variant
 $backgroundColor-Text-marked: createThemeVar("backgroundColor-#{$component}-marked");
 $textColor-Text-marked: createThemeVar("textColor-#{$component}-marked");
@@ -421,6 +429,20 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
   // whitespace (not between runs). Overrides the base .text inline-block.
   .inline {
     display: inline;
+  }
+
+  // highlightText matches. Deliberately a plain inline <mark> with no display or
+  // layout of its own: a match falling inside a word must not introduce a break
+  // opportunity there, which is exactly what inline-block or flex segments did in
+  // the hand-rolled construction this replaces.
+  .highlightMark {
+    background-color: $backgroundColor-mark-Text;
+    color: $textColor-mark-Text;
+    border-radius: 2px;
+  }
+
+  .highlightMark[data-active="true"] {
+    background-color: $backgroundColor-markActive-Text;
   }
 
   .noEllipsis {

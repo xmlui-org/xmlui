@@ -19079,6 +19079,14 @@ export default {
           }
         ],
         "isStrictEnum": true
+      },
+      "highlightText": {
+        "description": "When set, wraps every case-insensitive occurrence in the displayed text in a `<mark>` element (highlighted). Accepts a **string** (a single phrase) or a **string array** (each term highlighted independently). A term shorter than 2 characters, an empty string, or an empty array is a no-op. Matching is identical to `Markdown`'s property of the same name, so a list mixing `Text` and `Markdown` rows highlights consistently.",
+        "valueType": "string"
+      },
+      "highlightActiveIndex": {
+        "description": "Which occurrence (0-based) of `highlightText` is the active match: it is emphasized and scrolled into view. Occurrences are counted **across all terms in document order**, matching `Markdown`, so a find-in-page stepping through a mixed list walks every match as one sequence regardless of which component rendered it. -1 or unset means none.",
+        "valueType": "number"
       }
     },
     "events": {
@@ -19162,6 +19170,9 @@ export default {
       "borderStyle-Text-keyboard": "var(--xmlui-borderStyle-Text-keyboard)",
       "borderRadius-Text-keyboard": "var(--xmlui-borderRadius-Text-keyboard)",
       "paddingHorizontal-Text-keyboard": "var(--xmlui-paddingHorizontal-Text-keyboard)",
+      "backgroundColor-mark-Text": "var(--xmlui-backgroundColor-mark-Text)",
+      "textColor-mark-Text": "var(--xmlui-textColor-mark-Text)",
+      "backgroundColor-markActive-Text": "var(--xmlui-backgroundColor-markActive-Text)",
       "backgroundColor-Text-marked": "var(--xmlui-backgroundColor-Text-marked)",
       "textColor-Text-marked": "var(--xmlui-textColor-Text-marked)",
       "fontWeight-Text-marked": "var(--xmlui-fontWeight-Text-marked)",
@@ -19210,6 +19221,9 @@ export default {
       "fontFamily-Text": "$fontFamily",
       "fontSize-Text": "$fontSize",
       "fontWeight-Text": "$fontWeight-normal",
+      "backgroundColor-mark-Text": "$color-warn-200",
+      "textColor-mark-Text": "inherit",
+      "backgroundColor-markActive-Text": "$color-warn-400",
       "fontSize-Text-secondary": "$fontSize-sm",
       "textColor-Text-secondary": "$textColor-secondary",
       "fontWeight-Text-abbr": "$fontWeight-bold",

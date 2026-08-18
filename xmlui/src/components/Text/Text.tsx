@@ -115,6 +115,25 @@ export const TextMd = createMetadata({
       ],
       isStrictEnum: true,
     },
+    highlightText: {
+      description:
+        "When set, wraps every case-insensitive occurrence in the displayed text in a " +
+        "`<mark>` element (highlighted). Accepts a **string** (a single phrase) or a " +
+        "**string array** (each term highlighted independently). A term shorter than 2 " +
+        "characters, an empty string, or an empty array is a no-op. Matching is identical " +
+        `to \`Markdown\`'s property of the same name, so a list mixing \`${COMP}\` and ` +
+        "`Markdown` rows highlights consistently.",
+      valueType: "string",
+    },
+    highlightActiveIndex: {
+      description:
+        "Which occurrence (0-based) of `highlightText` is the active match: it is emphasized " +
+        "and scrolled into view. Occurrences are counted **across all terms in document " +
+        "order**, matching `Markdown`, so a find-in-page stepping through a mixed list walks " +
+        "every match as one sequence regardless of which component rendered it. -1 or unset " +
+        "means none.",
+      valueType: "number",
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -134,6 +153,12 @@ export const TextMd = createMetadata({
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontSize-${COMP}`]: "$fontSize",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
+
+    // Same values as Markdown's mark vars, so highlights look identical across a
+    // list that mixes Text and Markdown rows.
+    [`backgroundColor-mark-${COMP}`]: "$color-warn-200",
+    [`textColor-mark-${COMP}`]: "inherit",
+    [`backgroundColor-markActive-${COMP}`]: "$color-warn-400",
 
     [`fontSize-${COMP}-secondary`]: "$fontSize-sm",
     [`textColor-${COMP}-secondary`]: "$textColor-secondary",
@@ -284,6 +309,10 @@ export const textComponentRenderer = wrapComponent(COMP, Text, TextMd, {
         breakMode={extractValue(breakMode) as BreakMode | undefined}
         registerComponentApi={registerComponentApi}
         onContextMenu={lookupEventHandler("contextMenu")}
+        highlightText={
+          extractValue(node.props.highlightText) as string | string[] | undefined
+        }
+        highlightActiveIndex={extractValue.asOptionalNumber(node.props.highlightActiveIndex)}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

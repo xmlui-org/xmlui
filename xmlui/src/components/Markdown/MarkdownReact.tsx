@@ -38,6 +38,11 @@ import NestedAppAndCodeViewReact, {
 } from "../NestedApp/AppWithCodeViewReact";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
+import {
+  normalizeNeedles,
+  prepareNeedles,
+  scanHighlightSegments,
+} from "../../components-core/utils/highlight-terms";
 
 // ---------------------------------------------------------------------------
 // Module-level helpers — defined outside any component so their references
@@ -132,27 +137,6 @@ const neutralizeRawHtml = () => {
   };
 };
 
-/** Normalize the `highlightText` prop (`string | string[]`) to a list of needles.
- *  A string stays a single phrase (never whitespace-split — that would break an
- *  intentional `"foo bar"` phrase highlight); an array is treated as independent
- *  terms. Each needle is trimmed; those shorter than 2 characters are dropped, and
- *  case-insensitive duplicates are removed. */
-function normalizeNeedles(highlightText?: string | string[]): string[] {
-  if (highlightText == null) return [];
-  const raw = Array.isArray(highlightText) ? highlightText : [highlightText];
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const term of raw) {
-    const s = (term ?? "").trim();
-    const key = s.toLowerCase();
-    if (s.length >= 2 && !seen.has(key)) {
-      seen.add(key);
-      out.push(s);
-    }
-  }
-  return out;
-}
-
 /** Rehype plugin factory: wrap case-insensitive occurrences of any of `needles`
  *  in <mark> nodes. Operates on the parsed hast tree, so matches inside code,
  *  inline code, and links are handled correctly with no escaping. Matches are
@@ -164,10 +148,7 @@ function normalizeNeedles(highlightText?: string | string[]): string[] {
  *  never produce nested or overlapping marks. */
 function makeHighlightPlugin(needles: string[], activeIndex: number) {
   // Longest-first so an overlapping longer term is preferred at a given position.
-  const qs = needles
-    .map((n) => (n || "").toLowerCase())
-    .filter((q) => q.length >= 2)
-    .sort((a, b) => b.length - a.length);
+  const qs = prepareNeedles(needles);
   return function () {
     return function transformer(tree: Node) {
       if (qs.length === 0) return;
@@ -176,40 +157,24 @@ function makeHighlightPlugin(needles: string[], activeIndex: number) {
         if (!parent || typeof index !== "number") return;
         if (parent.tagName === "script" || parent.tagName === "style") return;
         if (parent.tagName === "mark") return; // already highlighted
-        const value: string = node.value || "";
-        const hay = value.toLowerCase();
-        const out: any[] = [];
-        let i = 0; // scan cursor
-        let last = 0; // start of pending unmarked text
-        let anyMatch = false;
-        while (i < value.length) {
-          let matchLen = 0;
-          for (const q of qs) {
-            if (hay.startsWith(q, i)) {
-              matchLen = q.length;
-              break;
-            }
-          }
-          if (matchLen > 0) {
-            anyMatch = true;
-            if (i > last) out.push({ type: "text", value: value.slice(last, i) });
-            const matched = value.slice(i, i + matchLen);
-            const isActive = matchOrdinal === activeIndex;
-            matchOrdinal++;
-            out.push({
-              type: "element",
-              tagName: "mark",
-              properties: isActive ? { "data-active": "true" } : {},
-              children: [{ type: "text", value: matched }],
-            });
-            i += matchLen;
-            last = i;
-          } else {
-            i++;
-          }
-        }
-        if (!anyMatch) return;
-        if (last < value.length) out.push({ type: "text", value: value.slice(last) });
+        // Ordinals continue across text nodes, which are visited in document order.
+        const { segments, nextOrdinal, hasMatch } = scanHighlightSegments(
+          node.value || "",
+          qs,
+          matchOrdinal,
+        );
+        if (!hasMatch) return;
+        matchOrdinal = nextOrdinal;
+        const out = segments.map((seg) =>
+          seg.hit
+            ? {
+                type: "element",
+                tagName: "mark",
+                properties: seg.ordinal === activeIndex ? { "data-active": "true" } : {},
+                children: [{ type: "text", value: seg.text }],
+              }
+            : { type: "text", value: seg.text },
+        );
         parent.children.splice(index, 1, ...out);
         return [SKIP, index + out.length]; // don't re-descend into the inserted <mark> nodes
       });

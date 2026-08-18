@@ -1,5 +1,5 @@
-import type { ForwardedRef, HTMLAttributes, Ref } from "react";
-import { forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
+import type { ForwardedRef, HTMLAttributes, ReactNode, Ref } from "react";
+import { Fragment, forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -17,6 +17,11 @@ import { useComponentStyle } from "../../components-core/theming/StyleContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
+import {
+  normalizeNeedles,
+  prepareNeedles,
+  scanHighlightSegments,
+} from "../../components-core/utils/highlight-terms";
 
 // =============================================================================
 // Custom Variant CSS Cache Infrastructure
@@ -109,6 +114,8 @@ type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   classes?: Record<string, string>;
   onContextMenu?: any;
   registerComponentApi?: RegisterComponentApiFn;
+  highlightText?: string | string[];
+  highlightActiveIndex?: number;
   [variantSpecificProps: string]: any;
 };
 
@@ -130,12 +137,72 @@ export const Text = memo(forwardRef(function Text(
     breakMode = defaultProps.breakMode,
     onContextMenu,
     registerComponentApi,
+    highlightText,
+    highlightActiveIndex,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef: ForwardedRef<HTMLElement>,
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const ref = useComposedRefs(innerRef, forwardedRef);
+
+  // --- Substring highlighting, sharing Markdown's matching core so that a list mixing
+  // Text and Markdown rows counts occurrences as one sequence (see highlight-terms.ts).
+  // An inline array prop is a new reference every render, so memoize on a serialized
+  // key. JSON rather than a joined string: no separator can collide with term
+  // content, and it stays unambiguous without needing a control character.
+  const needleKey = JSON.stringify(highlightText ?? "");
+  const needles = useMemo(
+    () => prepareNeedles(normalizeNeedles(highlightText)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [needleKey],
+  );
+  const activeIndex =
+    typeof highlightActiveIndex === "number" && highlightActiveIndex >= 0
+      ? highlightActiveIndex
+      : -1;
+
+  const highlightedChildren = useMemo(() => {
+    if (needles.length === 0) return children;
+    // Ordinals continue across sibling nodes so numbering matches document order.
+    let ordinal = 0;
+    const mapNode = (node: ReactNode, key?: number): ReactNode => {
+      // Only plain strings can be scanned. Anything else (an element child, a nested
+      // component) is passed through untouched rather than guessed at, and does not
+      // consume ordinals — we cannot see the text inside it.
+      if (typeof node !== "string") return node;
+      const { segments, nextOrdinal, hasMatch } = scanHighlightSegments(node, needles, ordinal);
+      ordinal = nextOrdinal;
+      if (!hasMatch) return node;
+      return (
+        <Fragment key={key}>
+          {segments.map((seg, i) =>
+            seg.hit ? (
+              <mark
+                key={i}
+                className={styles.highlightMark}
+                data-active={seg.ordinal === activeIndex ? "true" : undefined}
+              >
+                {seg.text}
+              </mark>
+            ) : (
+              <Fragment key={i}>{seg.text}</Fragment>
+            ),
+          )}
+        </Fragment>
+      );
+    };
+    if (Array.isArray(children)) return children.map((child, i) => mapNode(child, i));
+    return mapNode(children);
+  }, [children, needles, activeIndex]);
+
+  // Bring the active occurrence into view, matching Markdown's behavior so stepping
+  // matches across a mixed list scrolls the same way regardless of row type.
+  useEffect(() => {
+    if (activeIndex < 0 || needles.length === 0) return;
+    const el = innerRef.current?.querySelector('mark[data-active="true"]') as HTMLElement | null;
+    if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
+  }, [activeIndex, needleKey, needles.length]);
 
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
@@ -342,7 +409,7 @@ export const Text = memo(forwardRef(function Text(
           : {}),
       }}
     >
-      {children}
+      {highlightedChildren}
     </Element>
   );
 }));
