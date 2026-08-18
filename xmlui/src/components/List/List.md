@@ -223,6 +223,10 @@ See the [itemTemplate section](#itemtemplate).
 </App>
 ```
 
+> [!WARNING] The named attribute is the row's **identity**, not a display hint. Its values must be unique across the data and never empty. Duplicate or empty values make virtualized rows reconcile incorrectly — rows can paint on top of one another once the row set changes size — and cause selection state to be shared between rows. Neither failure raises an error; in a development build `List` warns on the console when it sees them.
+>
+> When rows come from several sources that each carry their own ids, those ids are usually not unique together. Synthesize a key that is unique across the combined set and point `idKey` at that instead.
+
 ```xmlui-pg name="Example: idKey" height="400px"
 <App>
   <List idKey="key" data='{[

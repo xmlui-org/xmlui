@@ -12150,7 +12150,7 @@ export default {
         "description": "This property contains the current page information. Setting this property also enures the `List` uses pagination."
       },
       "idKey": {
-        "description": "Denotes which attribute of an item acts as the ID or key of the item",
+        "description": "Denotes which attribute of an item acts as the ID or key of the item. The named attribute must hold a value that is unique across the data and never empty: it is the row's identity, so duplicate or empty values make virtualized rows reconcile incorrectly (rows can paint over one another) and cause selection state to be shared between rows.",
         "valueType": "string",
         "defaultValue": "id"
       },
@@ -15846,7 +15846,7 @@ export default {
     },
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value.",
+        "description": "This property sets the Slider's initial value. It is not read only at mount: changing `initialValue`, `minValue`, or `maxValue` re-seeds the thumbs into the current range. That re-seeding fires no events, which makes binding all three to a derived value the way to drive a slider whose domain changes at runtime.",
         "valueType": "any"
       },
       "minValue": {
@@ -15968,7 +15968,7 @@ export default {
         "signature": "get value(): number | [number, number] | undefined"
       },
       "setValue": {
-        "description": "This API sets the value of the `Slider`. You can use it to programmatically change the value.",
+        "description": "This API sets the value of the `Slider`. You can use it to programmatically change the value. The new value is clamped against the `minValue` and `maxValue` in effect **at the moment of the call**, so a deferred or debounced call made while those props are changing may clamp against the previous range. The call also fires `didChange` and `didCommit`, exactly as a user adjustment would. To reset a slider whose domain changes at runtime, rebind `initialValue` instead — that re-seeds without firing events.",
         "signature": "setValue(value: number | [number, number] | undefined): void",
         "parameters": {
           "value": "The new value to set. Can be a single value or an array of values for range sliders."

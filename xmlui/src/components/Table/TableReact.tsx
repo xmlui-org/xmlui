@@ -41,7 +41,7 @@ import {
   usePrevious,
   useResizeObserver,
   useScrollParent,
-  useStartMargin,
+  useStartMarginState,
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
@@ -1623,7 +1623,11 @@ export const Table = memo(
     const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
     const scrollElementRef = hasOutsideScroll ? scrollRef : wrapperRef;
 
-    const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
+    const { startMargin, measureStartMargin } = useStartMarginState(
+      hasOutsideScroll,
+      wrapperRef,
+      scrollRef,
+    );
 
     const theadRef = useRef<HTMLTableSectionElement>(null);
 
@@ -2394,21 +2398,25 @@ export const Table = memo(
     const scrollToBottom = useEvent(() => {
       const v = virtualizerRef.current;
       if (v && rowsRef.current.length) {
-        runProgrammaticScroll(() => v.scrollTo(v.scrollSize + startMargin));
+        runProgrammaticScroll(() => v.scrollTo(v.scrollSize + measureStartMargin()));
       }
     });
 
     const scrollToTop = useEvent(() => {
       if (rowsRef.current.length) {
         runProgrammaticScroll(() =>
-          virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -startMargin }),
+          virtualizerRef.current?.scrollToIndex(0, {
+            align: "start",
+            offset: -measureStartMargin(),
+          }),
         );
       }
     });
 
     const scrollToIndex = useEvent((index: number) => {
       runProgrammaticScroll(() => {
-        virtualizerRef.current?.scrollToIndex(index, { offset: -startMargin });
+        const freshMargin = measureStartMargin();
+        virtualizerRef.current?.scrollToIndex(index, { offset: freshMargin - startMargin });
       });
     });
 

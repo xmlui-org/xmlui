@@ -16,7 +16,7 @@
  */
 
 import { expect, test } from "../../testing/fixtures";
-import type { Locator } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
 // Sample data for testing
@@ -5044,6 +5044,75 @@ test.describe("Virtualization", () => {
     await expect(page.locator("td").filter({ hasText: "Row 400" }).first()).toBeVisible();
   });
 
+  const revealAboveTableApp = (button: string) => `
+    <VStack var.showTop="{false}">
+      <VStack testId="scroller" height="300px" overflowY="scroll">
+        <VStack when="{showTop}" testId="above" height="200px">
+          <Text>revealed after mount</Text>
+        </VStack>
+        <Table
+          id="table"
+          items="{Array.from({length: 1000}, (_, i) => ({id: 'row-' + (i + 1), label: 'Row ' + (i + 1)}))}"
+          testId="table"
+        >
+          <Column header="Label" bindTo="label">
+            <Text height="30px" value="{$item.label}" />
+          </Column>
+        </Table>
+      </VStack>
+      <Button testId="reveal" label="reveal" onClick="showTop = true" />
+      ${button}
+    </VStack>
+  `;
+
+  const targetRowOffsetFromHeader = (page: Page, rowIndex: number) =>
+    page.evaluate((index) => {
+      const header = document.querySelector("thead");
+      const target = Array.from(document.querySelectorAll("tbody tr")).find((row) =>
+        row.textContent?.includes(`Row ${index + 1}`),
+      );
+      if (!header || !target) {
+        return Number.POSITIVE_INFINITY;
+      }
+      return target.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
+    }, rowIndex);
+
+  test("scrollToIndex accounts for content revealed above the table (outside-scroll)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      revealAboveTableApp(`<Button testId="act" label="idx" onClick="table.scrollToIndex(50)" />`),
+    );
+    await expect(page.getByTestId("table")).toBeVisible();
+
+    await page.getByTestId("reveal").click();
+    await expect(page.getByTestId("above")).toBeVisible();
+
+    await page.getByTestId("act").click();
+    await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeLessThanOrEqual(5);
+    await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeGreaterThanOrEqual(-5);
+  });
+
+  test("scrollToId accounts for content revealed above the table (outside-scroll)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      revealAboveTableApp(
+        `<Button testId="act" label="id" onClick="table.scrollToId('row-51')" />`,
+      ),
+    );
+    await expect(page.getByTestId("table")).toBeVisible();
+
+    await page.getByTestId("reveal").click();
+    await expect(page.getByTestId("above")).toBeVisible();
+
+    await page.getByTestId("act").click();
+    await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeLessThanOrEqual(5);
+    await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeGreaterThanOrEqual(-5);
+  });
+
   test("scroll event does not fire for public scroll APIs", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App scrollWholePage="false">
@@ -5241,10 +5310,12 @@ test.describe("Virtualization", () => {
     const scrollHeights = samples.map((sample) => sample.scrollHeight);
     expect(Math.max(...scrollHeights) - Math.min(...scrollHeights)).toBeLessThanOrEqual(2);
 
-    await expect.poll(async () => {
-      const text = await range.textContent();
-      return Number(text?.match(/^(\d+)-/)?.[1] ?? 0);
-    }).toBeGreaterThan(850);
+    await expect
+      .poll(async () => {
+        const text = await range.textContent();
+        return Number(text?.match(/^(\d+)-/)?.[1] ?? 0);
+      })
+      .toBeGreaterThan(850);
     await table.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
     });

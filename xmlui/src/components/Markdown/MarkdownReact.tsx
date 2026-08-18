@@ -390,7 +390,7 @@ export const Markdown = memo(
     // Stable dependency key: an inline array prop is a new reference every render,
     // so memoize on the joined needle text rather than the array identity.
     const needleKey = Array.isArray(highlightText)
-      ? highlightText.join(" ")
+      ? highlightText.join("\u0000")
       : highlightText ?? "";
     const needles = useMemo(() => normalizeNeedles(highlightText), [needleKey]);
     const rehypePlugins = useMemo(
