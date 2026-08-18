@@ -104,10 +104,7 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual(true);
   });
 
-  test("Select with 'bindTo' updates Form data", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("Select with 'bindTo' updates Form data", async ({ initTestBed, page }) => {
     // The point of this test is to verify that the formBindingBehavior wires
     // a Select's value into the Form's submission payload. We drive the
     // Select via its exposed setValue API rather than clicking a dropdown
@@ -916,6 +913,32 @@ test.describe("Validation", () => {
 
     // Check that validation message appears somewhere on the page
     await expect(page.getByText("This field is required")).toBeVisible();
+  });
+
+  test("AutoComplete required validation blocks empty form submission", async ({
+    initTestBed,
+    page,
+    createFormDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = data">
+        <AutoComplete
+          testId="autocomplete"
+          bindTo="hero"
+          label="Hero"
+          required="true"
+          requiredInvalidMessage="Hero required">
+          <Option value="bruce" label="Bruce Wayne" />
+          <Option value="clark" label="Clark Kent" />
+        </AutoComplete>
+      </Form>
+    `);
+
+    const formDriver = await createFormDriver();
+    await formDriver.submitForm();
+
+    await expect.poll(testStateDriver.testState).toBeNull();
+    await expect(page.getByText("Hero required")).toBeVisible();
   });
 
   test("checkbox forces verbose feedback when form is concise", async ({

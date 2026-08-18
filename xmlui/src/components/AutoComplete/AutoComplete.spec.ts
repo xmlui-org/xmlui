@@ -179,7 +179,7 @@ test("multi mode keeps badge measurer hidden from users", async ({
 
   // Exactly one real badge per selected label (ghost spans are tagged
   // [data-ghost="badge"] and excluded here).
-  const realBadges = page.locator('span:not([data-ghost])');
+  const realBadges = page.locator("span:not([data-ghost])");
   await expect(realBadges.filter({ hasText: "Bruce Wayne" })).toHaveCount(1);
   await expect(realBadges.filter({ hasText: "Diana Prince" })).toHaveCount(1);
 
@@ -589,10 +589,8 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
   await expect(combobox).toHaveValue("Clark Kent");
 });
 
-test(
-  "custom Option children are preserved while filtering",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("custom Option children are preserved while filtering", async ({ initTestBed, page }) => {
+  await initTestBed(`
       <AutoComplete>
         <Option value="1" label="Bruce Wayne">
           <Text>CUSTOM Bruce</Text>
@@ -603,30 +601,27 @@ test(
       </AutoComplete>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
 
-    // Type to filter — only "Clark" should remain. The custom template for
-    // that option must still be rendered. Scope the assertion to the dropdown
-    // so we don't also match the hidden registration span that HiddenOption
-    // emits for data collection.
-    await page.keyboard.type("Clark");
-    await expect(listbox.getByText("CUSTOM Clark")).toBeVisible();
-    await expect(listbox.getByText("CUSTOM Bruce")).toHaveCount(0);
-  },
-);
+  // Type to filter — only "Clark" should remain. The custom template for
+  // that option must still be rendered. Scope the assertion to the dropdown
+  // so we don't also match the hidden registration span that HiddenOption
+  // emits for data collection.
+  await page.keyboard.type("Clark");
+  await expect(listbox.getByText("CUSTOM Clark")).toBeVisible();
+  await expect(listbox.getByText("CUSTOM Bruce")).toHaveCount(0);
+});
 
 // Regression: with `groupBy` set on AutoComplete, group headers must be
 // derived from the *visible* (filtered) options — not from the static input
 // order. If the first option of a group gets filtered out, the next visible
 // option in that group should now render its group's header.
-test(
-  "group header shifts to next visible option when filtering",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("group header shifts to next visible option when filtering", async ({ initTestBed, page }) => {
+  await initTestBed(`
       <AutoComplete multi="true" groupBy="clientName">
         <property name="groupHeaderTemplate">
           <Text>{($group || '').toUpperCase()}</Text>
@@ -640,45 +635,44 @@ test(
       </AutoComplete>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    await expect(page.getByRole("listbox")).toBeVisible();
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("listbox")).toBeVisible();
 
-    // Initially both VERGE and AURORA headers render once each.
-    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
-    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(1);
+  // Initially both VERGE and AURORA headers render once each.
+  await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+  await expect(page.getByText("AURORA", { exact: true })).toHaveCount(1);
 
-    // Filter out the original first VERGE option ("Analytics Dashboard").
-    // "Data Pipeline" remains and should now carry the VERGE header.
-    await page.keyboard.type("Pipeline");
-    await expect(page.getByText("Data Pipeline")).toBeVisible();
-    await expect(page.getByText("Analytics Dashboard")).toHaveCount(0);
-    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
-    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(0);
-  },
-);
+  // Filter out the original first VERGE option ("Analytics Dashboard").
+  // "Data Pipeline" remains and should now carry the VERGE header.
+  await page.keyboard.type("Pipeline");
+  await expect(page.getByText("Data Pipeline")).toBeVisible();
+  await expect(page.getByText("Analytics Dashboard")).toHaveCount(0);
+  await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+  await expect(page.getByText("AURORA", { exact: true })).toHaveCount(0);
+});
 
 // Regression: when no `groupHeaderTemplate` is provided, the group key string
 // itself renders as the header. Verifies the fallback path.
-test(
-  "groupBy without groupHeaderTemplate renders plain group name",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("groupBy without groupHeaderTemplate renders plain group name", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
       <AutoComplete groupBy="category">
         <Option value="apple" label="Apple" category="Fruit" />
         <Option value="carrot" label="Carrot" category="Vegetable" />
       </AutoComplete>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    await expect(page.getByRole("listbox")).toBeVisible();
-    await expect(page.getByText("Fruit", { exact: true })).toBeVisible();
-    await expect(page.getByText("Vegetable", { exact: true })).toBeVisible();
-  },
-);
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await expect(page.getByText("Fruit", { exact: true })).toBeVisible();
+  await expect(page.getByText("Vegetable", { exact: true })).toBeVisible();
+});
 
 // Regression: in multi mode the trigger used to wrap selected badges to new
 // rows (flex-wrap: wrap + height: max-content), which pushed the rest of the
@@ -690,10 +684,8 @@ test(
 // could push the measurement over budget and end up in "+N more". The
 // reservation now reads the CSS `min-width: 100px` instead, so badges go
 // into the overflow chip ONLY when they truly don't fit.
-test(
-  "all badges stay visible when they fit in the trigger",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("all badges stay visible when they fit in the trigger", async ({ initTestBed, page }) => {
+  await initTestBed(`
       <AutoComplete multi="true" width="600px">
         <Option value="1" label="Alpha" />
         <Option value="2" label="Beta" />
@@ -701,28 +693,28 @@ test(
       </AutoComplete>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
-    for (const label of ["Alpha", "Beta", "Gamma"]) {
-      await listbox.getByRole("option", { name: label }).click();
-    }
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+  for (const label of ["Alpha", "Beta", "Gamma"]) {
+    await listbox.getByRole("option", { name: label }).click();
+  }
 
-    await page.keyboard.press("Escape");
-    await expect(listbox).toBeHidden();
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
 
-    // With 600px, three short labels + the search input + actions clearly fit.
-    // No "+N more" chip must appear.
-    await expect(page.getByRole("button", { name: /more selected/ })).toHaveCount(0);
-  },
-);
+  // With 600px, three short labels + the search input + actions clearly fit.
+  // No "+N more" chip must appear.
+  await expect(page.getByRole("button", { name: /more selected/ })).toHaveCount(0);
+});
 
-test(
-  "multi-select truncates with +N more chip when badges overflow trigger width",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("multi-select truncates with +N more chip when badges overflow trigger width", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
       <Fragment>
         <AutoComplete multi="true" width="320px">
           <Option value="1" label="Alpha" />
@@ -735,41 +727,38 @@ test(
       </Fragment>
     `);
 
-    const below = page.getByTestId("below");
-    await expect(below).toBeVisible();
-    const before = await below.boundingBox();
+  const below = page.getByTestId("below");
+  await expect(below).toBeVisible();
+  const before = await below.boundingBox();
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await expect(combobox).toBeFocused();
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await expect(combobox).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
 
-    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
-      await listbox.getByRole("option", { name: label }).click();
-    }
+  for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+    await listbox.getByRole("option", { name: label }).click();
+  }
 
-    // Close the dropdown without colliding with the popover.
-    await page.keyboard.press("Escape");
-    await expect(listbox).toBeHidden();
+  // Close the dropdown without colliding with the popover.
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
 
-    // The "+N more" chip must appear because not every label fits at 320px.
-    const moreChip = page.getByRole("button", { name: /more selected/ });
-    await expect(moreChip).toBeVisible();
+  // The "+N more" chip must appear because not every label fits at 320px.
+  const moreChip = page.getByRole("button", { name: /more selected/ });
+  await expect(moreChip).toBeVisible();
 
-    // Below-element must not have shifted vertically.
-    const after = await below.boundingBox();
-    expect(Math.abs((after!.y) - (before!.y))).toBeLessThanOrEqual(4);
-  },
-);
+  // Below-element must not have shifted vertically.
+  const after = await below.boundingBox();
+  expect(Math.abs(after!.y - before!.y)).toBeLessThanOrEqual(4);
+});
 
 // Regression: clicking the body of the "+N more" chip opens the dropdown so
 // the user can review and refine the full selection.
-test(
-  "+N more chip opens the dropdown on click",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("+N more chip opens the dropdown on click", async ({ initTestBed, page }) => {
+  await initTestBed(`
       <AutoComplete multi="true" width="320px">
         <Option value="1" label="Alpha" />
         <Option value="2" label="Beta" />
@@ -779,32 +768,29 @@ test(
       </AutoComplete>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
-    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
-      await listbox.getByRole("option", { name: label }).click();
-    }
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+  for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+    await listbox.getByRole("option", { name: label }).click();
+  }
 
-    await page.keyboard.press("Escape");
-    await expect(listbox).toBeHidden();
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
 
-    const moreChip = page.getByRole("button", { name: /more selected/ });
-    await expect(moreChip).toBeVisible();
-    await moreChip.click();
-    await expect(listbox).toBeVisible();
-  },
-);
+  const moreChip = page.getByRole("button", { name: /more selected/ });
+  await expect(moreChip).toBeVisible();
+  await moreChip.click();
+  await expect(listbox).toBeVisible();
+});
 
 // Regression: clicking the close icon inside the "+N more" chip removes
 // exactly the overflow values, leaving the visible badges intact.
-test(
-  "+N more chip close icon deselects only the overflow items",
-  async ({ initTestBed, page }) => {
-    // Use a width that guarantees at least one visible badge plus overflow.
-    await initTestBed(`
+test("+N more chip close icon deselects only the overflow items", async ({ initTestBed, page }) => {
+  // Use a width that guarantees at least one visible badge plus overflow.
+  await initTestBed(`
       <Fragment var.picked="{[]}">
         <AutoComplete multi="true" width="450px"
                       onDidChange="(v) => picked = v || []">
@@ -818,40 +804,40 @@ test(
       </Fragment>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
-    for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
-      await listbox.getByRole("option", { name: label }).click();
-    }
-    // All five are selected now.
-    await expect(page.getByTestId("picked")).toHaveText("1,2,3,4,5");
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+  for (const label of ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]) {
+    await listbox.getByRole("option", { name: label }).click();
+  }
+  // All five are selected now.
+  await expect(page.getByTestId("picked")).toHaveText("1,2,3,4,5");
 
-    await page.keyboard.press("Escape");
-    await expect(listbox).toBeHidden();
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
 
-    // Find the close icon embedded in the "+N more" chip.
-    const moreChip = page.getByRole("button", { name: /more selected/ });
-    await expect(moreChip).toBeVisible();
-    // The chip contains the "+N more" label and a trailing close icon span.
-    await moreChip.locator("svg").last().click();
+  // Find the close icon embedded in the "+N more" chip.
+  const moreChip = page.getByRole("button", { name: /more selected/ });
+  await expect(moreChip).toBeVisible();
+  // The chip contains the "+N more" label and a trailing close icon span.
+  await moreChip.locator("svg").last().click();
 
-    // Only the visible prefix may remain; overflow values must be gone. We
-    // don't pin the exact count (depends on rounding/viewport), but the kept
-    // list must be an ordered prefix of "1,2,3,4,5" — when every badge sits
-    // in overflow the prefix is the empty string, which is still valid.
-    const kept = (await page.getByTestId("picked").textContent()) || "";
-    expect(kept).not.toEqual("1,2,3,4,5");
-    expect("1,2,3,4,5".startsWith(kept)).toBeTruthy();
-  },
-);
+  // Only the visible prefix may remain; overflow values must be gone. We
+  // don't pin the exact count (depends on rounding/viewport), but the kept
+  // list must be an ordered prefix of "1,2,3,4,5" — when every badge sits
+  // in overflow the prefix is the empty string, which is still valid.
+  const kept = (await page.getByTestId("picked").textContent()) || "";
+  expect(kept).not.toEqual("1,2,3,4,5");
+  expect("1,2,3,4,5".startsWith(kept)).toBeTruthy();
+});
 
-test(
-  "multi-select supports arrow-key navigation when search term is empty",
-  async ({ initTestBed, page }) => {
-    await initTestBed(`
+test("multi-select supports arrow-key navigation when search term is empty", async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(`
       <Fragment var.picked="{[]}">
         <AutoComplete multi="true" onDidChange="(v) => picked = v || []">
           <Option value="1" label="Bruce Wayne" />
@@ -862,23 +848,22 @@ test(
       </Fragment>
     `);
 
-    const combobox = page.getByRole("combobox");
-    await combobox.focus();
-    await expect(combobox).toBeFocused();
+  const combobox = page.getByRole("combobox");
+  await combobox.focus();
+  await expect(combobox).toBeFocused();
 
-    // Open dropdown (no typing → OptionTypeProvider render branch).
-    await page.keyboard.press("ArrowDown");
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
+  // Open dropdown (no typing → OptionTypeProvider render branch).
+  await page.keyboard.press("ArrowDown");
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
 
-    // Navigate to the second option without typing anything.
-    await page.keyboard.press("ArrowDown"); // first
-    await page.keyboard.press("ArrowDown"); // second
-    await page.keyboard.press("Enter");
+  // Navigate to the second option without typing anything.
+  await page.keyboard.press("ArrowDown"); // first
+  await page.keyboard.press("ArrowDown"); // second
+  await page.keyboard.press("Enter");
 
-    await expect(page.getByTestId("picked")).toHaveText("2");
-  },
-);
+  await expect(page.getByTestId("picked")).toHaveText("2");
+});
 
 // =============================================================================
 // VISUAL STATE TESTS
@@ -1237,7 +1222,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(inputPart).toBeVisible();
   });
 
-  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markRequired" bindTo="username">
@@ -1245,13 +1233,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markRequired" bindTo="username">
@@ -1259,13 +1250,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markOptional" bindTo="username">
@@ -1273,13 +1267,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markOptional" bindTo="username">
@@ -1287,13 +1284,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="true" requireLabelMode="markBoth" bindTo="username">
@@ -1301,13 +1301,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markBoth" bindTo="username">
@@ -1315,13 +1318,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).not.toContainText("*");
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markRequired">
         <AutoComplete testId="test" label="Username" required="false" requireLabelMode="markOptional" bindTo="username">
@@ -1329,13 +1335,16 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const label = page.getByText("Username");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <AutoComplete testId="test1" label="Required Field" required="true" bindTo="field1">
@@ -1346,10 +1355,10 @@ test.describe("Behaviors and Parts", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     const requiredLabel = page.getByText("Required Field");
     const optionalLabel = page.getByText("Optional Field");
-    
+
     await expect(requiredLabel).toContainText("*");
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
@@ -1527,7 +1536,36 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+  test("required blocks empty form submission without bindTo", async ({
+    initTestBed,
+    page,
+    createAutoCompleteDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="() => testState = 'submitted'">
+        <AutoComplete testId="input" required="{true}">
+          <Option value="1" label="Option 1" />
+        </AutoComplete>
+        <Button testId="submit" type="submit">Submit</Button>
+      </Form>
+    `);
+
+    await page.getByTestId("submit").click();
+
+    await expect.poll(testStateDriver.testState).toBeNull();
+
+    const driver = await createAutoCompleteDriver("input");
+    await driver.click();
+    await driver.selectLabel("Option 1");
+    await page.getByTestId("submit").click();
+
+    await expect.poll(testStateDriver.testState).toEqual("submitted");
+  });
+
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <AutoComplete testId="input" bindTo="input" required="{true}">
@@ -1536,19 +1574,22 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation by submitting empty required field
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text
     await expect(page.getByText("This field is required")).toBeVisible();
-    
+
     // Check absence of concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <AutoComplete testId="input" bindTo="input" required="{true}">
@@ -1557,17 +1598,17 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text (should be hidden)
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Check for concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    
+
     // Check that it shows error icon
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
@@ -1581,12 +1622,12 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     // Helper text hidden
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Concise feedback visible
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
@@ -1601,10 +1642,10 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // First make it invalid
     await page.getByTestId("submit").click();
-    
+
     // Now make it valid — click the combobox directly to ensure it has focus,
     // then select the option without force so focus returns to the combobox
     const combobox = page.getByRole("combobox");
@@ -1613,7 +1654,7 @@ test.describe("Validation Feedback", () => {
     // Ensure combobox has focus before blur so the blur event fires and triggers validation
     await expect(combobox).toBeFocused();
     await combobox.blur();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
@@ -1628,20 +1669,23 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
-    
+
     // Check tooltip content
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <AutoComplete
@@ -1654,7 +1698,7 @@ test.describe("Validation Feedback", () => {
         </AutoComplete>
       </Form>
     `);
-    
+
     // Should only have one label with the text "Search"
     const labels = page.getByText("Search");
     await expect(labels).toHaveCount(1);
