@@ -23,7 +23,7 @@ import {
   type CustomItemComponentProps,
   type CustomItemComponent,
 } from "virtua";
-import { orderBy } from "lodash-es";
+import { get } from "lodash-es";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -123,6 +123,59 @@ export type TableColumnSizing = (typeof TableColumnSizingValues)[number];
 
 function hasExpandedInteractiveDescendant(element: HTMLElement | null) {
   return !!element?.querySelector('[aria-expanded="true"]');
+}
+
+function sortTableData<T extends Record<string, any>>(
+  data: T[],
+  sortBy: string,
+  sortingDirection: SortingDirection,
+  locale: string,
+): T[] {
+  const direction = sortingDirection === "ascending" ? 1 : -1;
+  const collator = new Intl.Collator(locale);
+
+  return data
+    .map((item, index) => ({ item, index }))
+    .sort((left, right) => {
+      const result = compareTableSortValues(
+        get(left.item, sortBy),
+        get(right.item, sortBy),
+        collator,
+      );
+      return result === 0 ? left.index - right.index : result * direction;
+    })
+    .map(({ item }) => item);
+}
+
+function compareTableSortValues(a: unknown, b: unknown, collator: Intl.Collator): number {
+  if (a === b) {
+    return 0;
+  }
+  if (a == null) {
+    return 1;
+  }
+  if (b == null) {
+    return -1;
+  }
+  if (typeof a === "string" || typeof b === "string") {
+    return collator.compare(String(a), String(b));
+  }
+  if (typeof a === "number" && typeof b === "number") {
+    return a - b;
+  }
+  if (typeof a === "boolean" && typeof b === "boolean") {
+    return Number(a) - Number(b);
+  }
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() - b.getTime();
+  }
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return collator.compare(String(a), String(b));
 }
 
 const TableCellTooltip = memo(function TableCellTooltip({
@@ -1270,8 +1323,8 @@ export const Table = memo(
       if (!_sortBy) {
         return dataWithOrder;
       }
-      return orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc");
-    }, [_sortBy, _sortingDirection, dataWithOrder]);
+      return sortTableData(dataWithOrder, _sortBy, _sortingDirection, localeProfile.locale);
+    }, [_sortBy, _sortingDirection, dataWithOrder, localeProfile.locale]);
 
     const _updateSorting = useCallback(
       async (accessorKey: string) => {
