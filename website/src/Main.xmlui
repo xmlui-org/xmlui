@@ -833,7 +833,7 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Preserve Tree state across data refreshes"
+                            label="Preserve collection state across data refreshes"
                             to="/docs/howto/preserve-tree-state-across-data-refreshes"
                         />
                         <NavLink

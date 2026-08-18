@@ -3027,6 +3027,130 @@ test.describe("Basic Functionality", () => {
   });
 });
 
+test.describe("Data Refresh State Preservation", () => {
+  test("one-shot insert preservation scrolls first inserted row into view", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App scrollWholePage="false" var.items="{Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+        <Button
+          testId="add"
+          label="Add"
+          onClick="
+            table.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            items = [...items, { id: 'row-new', name: 'Inserted target' }];
+          "
+        />
+        <Table
+          id="table"
+          testId="table"
+          height="180px"
+          dataRefreshMode="reset"
+          data="{items}"
+          rowHeight="32"
+        >
+          <Column header="Name" bindTo="name">
+            <Text value="{$item.name}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Inserted target" })).not.toBeVisible();
+
+    await page.getByTestId("add").click();
+
+    await expect(page.getByRole("cell", { name: "Inserted target" })).toBeVisible();
+  });
+
+  test("preserved refresh drops deleted rows from uncontrolled selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App var.items="{[
+        { id: 'row-1', name: 'Row 1' },
+        { id: 'row-2', name: 'Row 2' },
+        { id: 'row-3', name: 'Row 3' }
+      ]}">
+        <Button testId="select" label="Select" onClick="table.selectId(['row-2', 'row-3'])" />
+        <Button
+          testId="delete"
+          label="Delete"
+          onClick="
+            table.preserveStateOnNextDataRefresh({ operation: 'delete' });
+            items = items.filter(item => item.id !== 'row-2');
+          "
+        />
+        <Button testId="capture" label="Capture" onClick="testState = table.getSelectedIds()" />
+        <Table
+          id="table"
+          testId="table"
+          rowsSelectable="true"
+          dataRefreshMode="reset"
+          data="{items}"
+        >
+          <Column header="Name" bindTo="name">
+            <Text value="{$item.name}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+
+    await page.getByTestId("select").click();
+    await page.getByTestId("capture").click();
+    await expect.poll(testStateDriver.testState).toEqual(["row-2", "row-3"]);
+
+    await page.getByTestId("delete").click();
+    await expect(page.getByRole("cell", { name: "Row 2" })).not.toBeVisible();
+    await page.getByTestId("capture").click();
+
+    await expect.poll(testStateDriver.testState).toEqual(["row-3"]);
+  });
+
+  test("clamps preserved pagination when refreshed data removes later pages", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.items="{Array.from({ length: 12 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+        <Button
+          testId="delete"
+          label="Delete"
+          onClick="
+            table.preserveStateOnNextDataRefresh({ operation: 'delete' });
+            items = items.slice(0, 4);
+          "
+        />
+        <Table
+          id="table"
+          testId="table"
+          dataRefreshMode="reset"
+          isPaginated="true"
+          pageSize="5"
+          data="{items}"
+        >
+          <Column header="Name" bindTo="name">
+            <Text value="{$item.name}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await page.getByRole("button", { name: "Last page" }).click();
+    await expect(page.getByRole("cell", { name: "Row 11" })).toBeVisible();
+
+    await page.getByTestId("delete").click();
+
+    await expect(page.getByRole("cell", { name: "Row 1" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Row 11" })).not.toBeVisible();
+  });
+});
+
 // =============================================================================
 // TESTS FOR FEATURES THAT NEED INVESTIGATION
 // =============================================================================
@@ -5314,7 +5438,12 @@ test.describe("Virtualization", () => {
     await page.waitForTimeout(100);
 
     // Now row 600 should be visible
-    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator("td")
+        .filter({ hasText: /^File #600$/ })
+        .first(),
+    ).toBeVisible();
 
     // And early rows should no longer be in the DOM
     await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(0);
@@ -5337,7 +5466,12 @@ test.describe("Virtualization", () => {
 
     const table = page.getByTestId("table");
     await expect(table).toBeVisible();
-    await expect(page.locator("td").filter({ hasText: /^File #1$/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator("td")
+        .filter({ hasText: /^File #1$/ })
+        .first(),
+    ).toBeVisible();
     await page.waitForTimeout(50);
 
     await table.evaluate((el) => {
@@ -5345,7 +5479,12 @@ test.describe("Virtualization", () => {
     });
     await page.waitForTimeout(100);
 
-    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator("td")
+        .filter({ hasText: /^File #600$/ })
+        .first(),
+    ).toBeVisible();
     await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(1);
   });
 
@@ -5367,14 +5506,24 @@ test.describe("Virtualization", () => {
 
     const table = page.getByTestId("table");
     await expect(table).toBeVisible();
-    await expect(page.locator("td").filter({ hasText: /^File #1$/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator("td")
+        .filter({ hasText: /^File #1$/ })
+        .first(),
+    ).toBeVisible();
 
     await table.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
     });
     await page.waitForTimeout(100);
 
-    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
+    await expect(
+      page
+        .locator("td")
+        .filter({ hasText: /^File #600$/ })
+        .first(),
+    ).toBeVisible();
     await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(0);
   });
 

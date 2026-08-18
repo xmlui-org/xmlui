@@ -11,11 +11,15 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toBeVisible();
   });
 
-  test("contextMenu event fires on right click", async ({ initTestBed, page, createListDriver }) => {
+  test("contextMenu event fires on right click", async ({
+    initTestBed,
+    page,
+    createListDriver,
+  }) => {
     const { testStateDriver } = await initTestBed(
       `<List data="{[{id: 1, name: 'Item 1'}]}" onContextMenu="testState = 'context-menu-fired'">
         <Text>{$item.name}</Text>
-      </List>`
+      </List>`,
     );
 
     const driver = await createListDriver();
@@ -312,7 +316,8 @@ test.describe("Basic Functionality", () => {
   // ---------------------------------------------------------------------------
 
   // 200 rows x 30px = 6000px of content.
-  const SCROLL_DATA = "{Array.from({length: 200}, (_, i) => ({id: 'row-' + i, name: 'Item ' + i}))}";
+  const SCROLL_DATA =
+    "{Array.from({length: 200}, (_, i) => ({id: 'row-' + i, name: 'Item ' + i}))}";
 
   // Bounded height: the List itself scrolls.
   const insideScrollApp = (buttons: string) => `
@@ -486,7 +491,9 @@ test.describe("Basic Functionality", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(revealAboveApp(`<Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />`));
+    await initTestBed(
+      revealAboveApp(`<Button testId="act" label="idx" onClick="testList.scrollToIndex(50)" />`),
+    );
     await expect.poll(() => scrollTopOf(page)).toBe(0);
 
     await page.getByTestId("reveal").click();
@@ -505,7 +512,9 @@ test.describe("Basic Functionality", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(revealAboveApp(`<Button testId="act" label="id" onClick="testList.scrollToId('row-50')" />`));
+    await initTestBed(
+      revealAboveApp(`<Button testId="act" label="id" onClick="testList.scrollToId('row-50')" />`),
+    );
     await expect.poll(() => scrollTopOf(page)).toBe(0);
 
     await page.getByTestId("reveal").click();
@@ -524,7 +533,9 @@ test.describe("Basic Functionality", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(revealAboveApp(`<Button testId="act" label="top" onClick="testList.scrollToTop()" />`));
+    await initTestBed(
+      revealAboveApp(`<Button testId="act" label="top" onClick="testList.scrollToTop()" />`),
+    );
     await page.getByTestId("reveal").click();
     await expect.poll(() => scrollTopOf(page)).toBe(0);
 
@@ -880,6 +891,90 @@ test.describe("Basic Functionality", () => {
     // Note: The pagination events are triggered internally by scrolling behavior
     // This test verifies the event handler is properly wired
     await expect.poll(testStateDriver.testState).toEqual(null);
+  });
+});
+
+test.describe("Data Refresh State Preservation", () => {
+  test("one-shot insert preservation scrolls first inserted item into view", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App scrollWholePage="false" var.items="{Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+        <Button
+          testId="add"
+          label="Add"
+          onClick="
+            list.preserveStateOnNextDataRefresh({ operation: 'insert' });
+            items = [...items, { id: 'row-new', name: 'Inserted target' }];
+          "
+        />
+        <List
+          id="list"
+          testId="list"
+          height="140px"
+          dataRefreshMode="reset"
+          data="{items}"
+          fixedItemSize="true"
+        >
+          <HStack height="32px" testId="{$item.id}">
+            <Text value="{$item.name}" />
+          </HStack>
+        </List>
+      </App>
+    `);
+
+    await expect(page.getByTestId("list")).toBeVisible();
+    await expect(page.getByTestId("row-new")).not.toBeVisible();
+
+    await page.getByTestId("add").click();
+
+    await expect(page.getByTestId("row-new")).toBeVisible();
+  });
+
+  test("preserved refresh drops deleted rows from uncontrolled selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App var.items="{[
+        { id: 'row-1', name: 'Row 1' },
+        { id: 'row-2', name: 'Row 2' },
+        { id: 'row-3', name: 'Row 3' }
+      ]}">
+        <Button testId="select" label="Select" onClick="list.selectId(['row-2', 'row-3'])" />
+        <Button
+          testId="delete"
+          label="Delete"
+          onClick="
+            list.preserveStateOnNextDataRefresh({ operation: 'delete' });
+            items = items.filter(item => item.id !== 'row-2');
+          "
+        />
+        <Button testId="capture" label="Capture" onClick="testState = list.getSelectedIds()" />
+        <List
+          id="list"
+          testId="list"
+          rowsSelectable="true"
+          dataRefreshMode="reset"
+          data="{items}"
+        >
+          <Text value="{$item.name}" />
+        </List>
+      </App>
+    `);
+
+    await expect(page.getByTestId("list")).toBeVisible();
+
+    await page.getByTestId("select").click();
+    await page.getByTestId("capture").click();
+    await expect.poll(testStateDriver.testState).toEqual(["row-2", "row-3"]);
+
+    await page.getByTestId("delete").click();
+    await expect(page.getByText("Row 2")).not.toBeVisible();
+    await page.getByTestId("capture").click();
+
+    await expect.poll(testStateDriver.testState).toEqual(["row-3"]);
   });
 });
 
@@ -1319,7 +1414,11 @@ test("pageInfo enables pagination", async ({ initTestBed, createListDriver }) =>
 // =============================================================================
 
 test.describe("Virtualization", () => {
-  test("only renders visible items when height is constrained with large dataset", async ({ initTestBed, createListDriver, page }) => {
+  test("only renders visible items when height is constrained with large dataset", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1347,7 +1446,11 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 1");
   });
 
-  test("renders new items when scrolling through large dataset", async ({ initTestBed, createListDriver, page }) => {
+  test("renders new items when scrolling through large dataset", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <Button testId="scroll" label="Scroll" onClick="list.scrollToIndex(599)" />
@@ -1367,7 +1470,7 @@ test.describe("Virtualization", () => {
     // Initially, item 600 should not be in the DOM
     const itemsBefore = page.locator("[data-list-item-type]");
     const countBefore = await itemsBefore.count();
-    
+
     // Should virtualize (not render all items)
     expect(countBefore).toBeLessThan(50);
 
@@ -1378,7 +1481,7 @@ test.describe("Virtualization", () => {
     // After scrolling to bottom, item count might change (virtualization update)
     const itemsAfter = page.locator("[data-list-item-type]");
     const countAfter = await itemsAfter.count();
-    
+
     // Should still have virtualization (not render all 600)
     expect(countAfter).toBeLessThan(100);
     expect(countAfter).toBeGreaterThan(0);
@@ -1429,11 +1532,7 @@ test.describe("Virtualization", () => {
     await expect(page.getByText("Item 1", { exact: true })).toHaveCount(1);
   });
 
-  test("can disable retained virtualized rows", async ({
-    initTestBed,
-    createListDriver,
-    page,
-  }) => {
+  test("can disable retained virtualized rows", async ({ initTestBed, createListDriver, page }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1474,7 +1573,11 @@ test.describe("Virtualization", () => {
     await expect(page.getByText("Item 1", { exact: true })).toHaveCount(0);
   });
 
-  test("scrollbar tracks correctly with large dataset", async ({ initTestBed, createListDriver, page }) => {
+  test("scrollbar tracks correctly with large dataset", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1492,7 +1595,7 @@ test.describe("Virtualization", () => {
     // Verify only visible items are rendered (virtualization working)
     const visibleItems = page.locator("[data-list-item-type]");
     const visibleCount = await visibleItems.count();
-    
+
     // Should have virtualized the list, not rendering all 600 items
     expect(visibleCount).toBeLessThan(50);
     expect(visibleCount).toBeGreaterThan(0);
@@ -1513,7 +1616,11 @@ test.describe("Virtualization", () => {
     await expect(list).toBeVisible();
   });
 
-  test("maintains consistent total scroll height with virtualization", async ({ initTestBed, createListDriver, page }) => {
+  test("maintains consistent total scroll height with virtualization", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1533,25 +1640,29 @@ test.describe("Virtualization", () => {
     // Verify virtualization is working by checking only visible items are rendered
     const items = page.locator("[data-list-item-type]");
     const itemCount = await items.count();
-    
+
     // Should virtualize, not render all 600 items
     expect(itemCount).toBeLessThan(100);
     expect(itemCount).toBeGreaterThan(0);
 
     // Get scroll height (should be consistent)
     const initialScrollHeight = await list.evaluate((el) => el.scrollHeight);
-    
+
     // Scroll around
     await driver.scrollTo("bottom");
     await page.waitForTimeout(100);
-    
+
     const bottomScrollHeight = await list.evaluate((el) => el.scrollHeight);
-    
+
     // Scroll height should remain consistent
     expect(Math.abs(initialScrollHeight - bottomScrollHeight)).toBeLessThan(10);
   });
 
-  test("virtualization works correctly with groupBy", async ({ initTestBed, createListDriver, page }) => {
+  test("virtualization works correctly with groupBy", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1586,7 +1697,11 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 1");
   });
 
-  test("virtualization works correctly with orderBy", async ({ initTestBed, createListDriver, page }) => {
+  test("virtualization works correctly with orderBy", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1615,7 +1730,11 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 1");
   });
 
-  test("virtualization works correctly with limit", async ({ initTestBed, createListDriver, page }) => {
+  test("virtualization works correctly with limit", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1641,7 +1760,11 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 1");
   });
 
-  test("no virtualization occurs when all items fit in viewport", async ({ initTestBed, createListDriver, page }) => {
+  test("no virtualization occurs when all items fit in viewport", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1668,7 +1791,11 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 5");
   });
 
-  test("virtualization handles dynamic height items gracefully", async ({ initTestBed, createListDriver, page }) => {
+  test("virtualization handles dynamic height items gracefully", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <List
@@ -1716,10 +1843,7 @@ const sampleData = [
 
 test.describe("Row Selection", () => {
   test.describe("rowsSelectable property", () => {
-    test("clicking a row selects it when rowsSelectable is true", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("clicking a row selects it when rowsSelectable is true", async ({ initTestBed, page }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
           <Text>{$item.name}</Text>
@@ -1749,10 +1873,7 @@ test.describe("Row Selection", () => {
       await expect(items.first()).not.toHaveAttribute("data-selected", "true");
     });
 
-    test("rows are not selectable when rowsSelectable is false", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("rows are not selectable when rowsSelectable is false", async ({ initTestBed, page }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="false">
           <Text>{$item.name}</Text>
@@ -1800,10 +1921,7 @@ test.describe("Row Selection", () => {
   });
 
   test.describe("enableMultiRowSelection property", () => {
-    test("allows selecting multiple rows with Ctrl/Meta+click", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("allows selecting multiple rows with Ctrl/Meta+click", async ({ initTestBed, page }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true">
           <Text>{$item.name}</Text>
@@ -1822,10 +1940,7 @@ test.describe("Row Selection", () => {
       await expect(items.nth(1)).toHaveAttribute("data-selected", "true");
     });
 
-    test("single-select mode replaces selection on click", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("single-select mode replaces selection on click", async ({ initTestBed, page }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="false">
           <Text>{$item.name}</Text>
@@ -2009,7 +2124,10 @@ test.describe("Row Selection", () => {
 
       // Click on a Vegetable row — should NOT be selected
       await items.filter({ hasText: "Carrot" }).click();
-      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute(
+        "data-selected",
+        "true",
+      );
       await expect.poll(testStateDriver.testState).toBe(0);
     });
 
@@ -2028,9 +2146,14 @@ test.describe("Row Selection", () => {
 
       const items = page.locator("[data-list-item-type='ITEM']");
       // The 3rd item (index 2) is Carrot (Vegetable) — its checkbox should not select it
-      const vegetableCheckbox = items.filter({ hasText: "Carrot" }).locator("input[type='checkbox']");
+      const vegetableCheckbox = items
+        .filter({ hasText: "Carrot" })
+        .locator("input[type='checkbox']");
       await vegetableCheckbox.click({ force: true });
-      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute(
+        "data-selected",
+        "true",
+      );
       await expect.poll(testStateDriver.testState).toBe(0);
     });
 
@@ -2044,7 +2167,9 @@ test.describe("Row Selection", () => {
 
       const items = page.locator("[data-list-item-type='ITEM']");
       // Vegetables (Carrot, Spinach) should have disabled checkboxes
-      const vegetableCheckbox = items.filter({ hasText: "Carrot" }).locator("input[type='checkbox']");
+      const vegetableCheckbox = items
+        .filter({ hasText: "Carrot" })
+        .locator("input[type='checkbox']");
       await expect(vegetableCheckbox).toBeDisabled();
 
       // Fruits (Apple, Banana) should have enabled checkboxes
@@ -2128,7 +2253,10 @@ test.describe("Row Selection", () => {
       await expect(firstRow).not.toHaveClass(/hasOverlayCheckbox/);
     });
 
-    test("overlay mode: row has hasOverlayCheckbox class, not hasCheckboxes", async ({ initTestBed, page }) => {
+    test("overlay mode: row has hasOverlayCheckbox class, not hasCheckboxes", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" selectionCheckboxPosition="overlay">
           <Text>{$item.name}</Text>
@@ -2149,7 +2277,10 @@ test.describe("Row Selection", () => {
       await expect(checkboxes).toHaveCount(4);
     });
 
-    test("overlay mode: checkbox position reflects anchor top-left (default)", async ({ initTestBed, page }) => {
+    test("overlay mode: checkbox position reflects anchor top-left (default)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
           selectionCheckboxPosition="overlay"
@@ -2159,7 +2290,11 @@ test.describe("Row Selection", () => {
           <Text>{$item.name}</Text>
         </List>
       `);
-      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      const wrapper = page
+        .locator("[data-list-item-type='ITEM']")
+        .first()
+        .locator("[class*='checkboxOverlay']")
+        .first();
       await expect(wrapper).toBeAttached();
       // Verify the style contains top and left offsets
       const style = await wrapper.getAttribute("style");
@@ -2177,14 +2312,21 @@ test.describe("Row Selection", () => {
           <Text>{$item.name}</Text>
         </List>
       `);
-      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      const wrapper = page
+        .locator("[data-list-item-type='ITEM']")
+        .first()
+        .locator("[class*='checkboxOverlay']")
+        .first();
       await expect(wrapper).toBeAttached();
       const style = await wrapper.getAttribute("style");
       expect(style).toContain("top: 10px");
       expect(style).toContain("right: 10px");
     });
 
-    test("overlay mode: bottom-left anchor uses bottom/left offsets", async ({ initTestBed, page }) => {
+    test("overlay mode: bottom-left anchor uses bottom/left offsets", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
           selectionCheckboxPosition="overlay"
@@ -2194,14 +2336,21 @@ test.describe("Row Selection", () => {
           <Text>{$item.name}</Text>
         </List>
       `);
-      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      const wrapper = page
+        .locator("[data-list-item-type='ITEM']")
+        .first()
+        .locator("[class*='checkboxOverlay']")
+        .first();
       await expect(wrapper).toBeAttached();
       const style = await wrapper.getAttribute("style");
       expect(style).toContain("bottom: 6px");
       expect(style).toContain("left: 6px");
     });
 
-    test("overlay mode: bottom-right anchor uses bottom/right offsets", async ({ initTestBed, page }) => {
+    test("overlay mode: bottom-right anchor uses bottom/right offsets", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
           selectionCheckboxPosition="overlay"
@@ -2211,7 +2360,11 @@ test.describe("Row Selection", () => {
           <Text>{$item.name}</Text>
         </List>
       `);
-      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      const wrapper = page
+        .locator("[data-list-item-type='ITEM']")
+        .first()
+        .locator("[class*='checkboxOverlay']")
+        .first();
       await expect(wrapper).toBeAttached();
       const style = await wrapper.getAttribute("style");
       expect(style).toContain("bottom: 4px");
@@ -2234,7 +2387,10 @@ test.describe("Row Selection", () => {
       await expect(items.first()).toHaveAttribute("data-selected", "true");
     });
 
-    test("selectionCheckboxSize applies width and height to checkbox input", async ({ initTestBed, page }) => {
+    test("selectionCheckboxSize applies width and height to checkbox input", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
           selectionCheckboxSize="24px">
@@ -2278,8 +2434,14 @@ test.describe("Row Selection", () => {
       // Items with id 1 (Apple) and 3 (Carrot) should be selected
       await expect(items.filter({ hasText: "Apple" })).toHaveAttribute("data-selected", "true");
       await expect(items.filter({ hasText: "Carrot" })).toHaveAttribute("data-selected", "true");
-      await expect(items.filter({ hasText: "Banana" })).not.toHaveAttribute("data-selected", "true");
-      await expect(items.filter({ hasText: "Spinach" })).not.toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Banana" })).not.toHaveAttribute(
+        "data-selected",
+        "true",
+      );
+      await expect(items.filter({ hasText: "Spinach" })).not.toHaveAttribute(
+        "data-selected",
+        "true",
+      );
     });
   });
 
@@ -2725,9 +2887,7 @@ test.describe("scroll event", () => {
   // style) rather than an in-markup Array.from, which the expression engine
   // doesn't evaluate.
   const longData =
-    "[" +
-    Array.from({ length: 50 }, (_, i) => `{id:${i},name:'Item ${i}'}`).join(",") +
-    "]";
+    "[" + Array.from({ length: 50 }, (_, i) => `{id:${i},name:'Item ${i}'}`).join(",") + "]";
 
   test("scroll event fires on user scroll and reports scroll state", async ({
     initTestBed,
@@ -2743,9 +2903,7 @@ test.describe("scroll event", () => {
 
     // User scroll to the bottom: event fires, atEnd is true, payload fully typed.
     await driver.scrollTo("bottom");
-    await expect
-      .poll(async () => (await testStateDriver.testState())?.atEnd)
-      .toEqual(true);
+    await expect.poll(async () => (await testStateDriver.testState())?.atEnd).toEqual(true);
     const atBottom = await testStateDriver.testState();
     expect(atBottom.st).toEqual("number");
     expect(atBottom.sh).toEqual("number");
@@ -2756,9 +2914,7 @@ test.describe("scroll event", () => {
 
     // User scroll back to the top: atEnd flips to false.
     await driver.scrollTo("top");
-    await expect
-      .poll(async () => (await testStateDriver.testState())?.atEnd)
-      .toEqual(false);
+    await expect.poll(async () => (await testStateDriver.testState())?.atEnd).toEqual(false);
   });
 
   test("scroll event does not fire for the list's own programmatic scroll", async ({
@@ -2783,9 +2939,7 @@ test.describe("scroll event", () => {
     // A genuine user scroll up DOES emit it. virtua can fire more than one
     // tick for a single jump, so assert "fired" rather than an exact count.
     await driver.scrollTo("top");
-    await expect
-      .poll(async () => (await testStateDriver.testState()) !== null)
-      .toBe(true);
+    await expect.poll(async () => (await testStateDriver.testState()) !== null).toBe(true);
   });
 
   test("scroll event does not fire for public scroll APIs", async ({

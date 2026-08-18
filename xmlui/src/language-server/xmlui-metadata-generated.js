@@ -12168,6 +12168,16 @@ export default {
         "valueType": "string",
         "defaultValue": "id"
       },
+      "dataRefreshMode": {
+        "description": "Controls how the list handles later data refreshes after the initial load. `reset` keeps the list's default refresh behavior. `preserve-state` reconciles refreshed data with the current view state for unchanged source row IDs.",
+        "valueType": "string",
+        "availableValues": [
+          "reset",
+          "preserve-state"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "reset"
+      },
       "groupsInitiallyExpanded": {
         "description": "This Boolean property defines whether the list groups are initially expanded.",
         "valueType": "boolean",
@@ -12393,6 +12403,10 @@ export default {
         "parameters": {
           "id": "The ID of the row to select, or an array of IDs to select multiple rows."
         }
+      },
+      "preserveStateOnNextDataRefresh": {
+        "description": "Preserve the current list view state for the next data refresh, even when dataRefreshMode is `reset`. Optional operation metadata controls post-refresh scroll behavior.",
+        "signature": "preserveStateOnNextDataRefresh(options?: { operation?: \"insert\" | \"delete\" | \"update\", scrollTarget?: string | number | \"first-inserted\" | \"preserve\" }): void"
       }
     },
     "contextVars": {
@@ -17610,6 +17624,16 @@ export default {
         "valueType": "string",
         "defaultValue": "id"
       },
+      "dataRefreshMode": {
+        "description": "Controls how the table handles later data refreshes after the initial load. `reset` keeps the table's default refresh behavior. `preserve-state` reconciles refreshed data with the current view state for unchanged source row IDs.",
+        "valueType": "string",
+        "availableValues": [
+          "reset",
+          "preserve-state"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "reset"
+      },
       "isPaginated": {
         "description": "This property adds pagination controls to the `Table`. When enabled, the pagination bar is automatically hidden if all rows fit on a single page. You can omit this property and set only `pageSize` instead — pagination will then activate automatically when the data length exceeds the page size and hide itself when it does not.",
         "valueType": "boolean",
@@ -18125,6 +18149,10 @@ export default {
         "parameters": {
           "id": "The ID of the row to select, or an array of IDs to select multiple rows."
         }
+      },
+      "preserveStateOnNextDataRefresh": {
+        "description": "Preserve the current table view state for the next data refresh, even when dataRefreshMode is `reset`. Optional operation metadata controls post-refresh scroll behavior.",
+        "signature": "preserveStateOnNextDataRefresh(options?: { operation?: \"insert\" | \"delete\" | \"update\", scrollTarget?: string | number | \"first-inserted\" | \"preserve\" }): void"
       }
     },
     "themeVars": {

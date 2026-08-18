@@ -1,4 +1,5 @@
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
 import type { ScrollAnchoring } from "../abstractions";
 
 export const selectionCheckboxPositionValues = ["before", "overlay"] as const;
@@ -16,6 +17,7 @@ export type SelectionCheckboxAnchor = (typeof selectionCheckboxAnchorValues)[num
 
 export const defaultProps = {
   idKey: "id",
+  dataRefreshMode: "reset" as CollectionDataRefreshMode,
   scrollAnchor: "top" as ScrollAnchoring,
   renderCache: true,
   renderCacheSize: 80,

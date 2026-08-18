@@ -25,6 +25,7 @@ import {
   selectionCheckboxAnchorValues,
 } from "./List.defaults";
 import { ListNative, MemoizedSection } from "./ListReact";
+import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
 
 const COMP = "List";
 
@@ -152,6 +153,16 @@ export const ListMd = createMetadata({
         "shared between rows.",
       valueType: "string",
       defaultValue: defaultProps.idKey,
+    },
+    dataRefreshMode: {
+      description:
+        `Controls how the list handles later data refreshes after the initial load. ` +
+        `\`reset\` keeps the list's default refresh behavior. \`preserve-state\` reconciles ` +
+        `refreshed data with the current view state for unchanged source row IDs.`,
+      valueType: "string",
+      availableValues: ["reset", "preserve-state"],
+      isStrictEnum: true,
+      defaultValue: defaultProps.dataRefreshMode,
     },
     groupsInitiallyExpanded: {
       description: `This Boolean property defines whether the list groups are initially expanded.`,
@@ -306,8 +317,7 @@ export const ListMd = createMetadata({
         `auto-follow scrolls, because consumers of the visible range (e.g. prioritizing ` +
         `work for on-screen items) care about what is visible, not why it became visible. ` +
         `It fires only when the range actually shifts (deduplicated by value).`,
-      signature:
-        "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
+      signature: "visibleRangeDidChange(range: { startIndex: number, endIndex: number }): void",
       parameters: {
         range:
           "The visible range: `startIndex` (first visible item index) and `endIndex` " +
@@ -450,6 +460,14 @@ export const ListMd = createMetadata({
       parameters: {
         id: `The ID of the row to select, or an array of IDs to select multiple rows.`,
       },
+    },
+    preserveStateOnNextDataRefresh: {
+      description:
+        `Preserve the current list view state for the next data refresh, even when ` +
+        `dataRefreshMode is \`reset\`. Optional operation metadata controls post-refresh ` +
+        `scroll behavior.`,
+      signature:
+        'preserveStateOnNextDataRefresh(options?: { operation?: "insert" | "delete" | "update", scrollTarget?: string | number | "first-inserted" | "preserve" }): void',
     },
   },
   contextVars: {
@@ -728,6 +746,12 @@ const ListWithSelection = memo(function ListWithSelection({
       scrollAnchor={node.props.scrollAnchor as any}
       pageInfo={extractValue(node.props.pageInfo)}
       idKey={extractValue(node.props.idKey)}
+      dataRefreshMode={
+        extractValue.asOptionalString(
+          node.props.dataRefreshMode,
+          defaultProps.dataRefreshMode,
+        ) as CollectionDataRefreshMode
+      }
       onContextMenu={lookupEventHandler("contextMenu")}
       requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
       requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}

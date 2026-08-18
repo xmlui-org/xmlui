@@ -1,7 +1,9 @@
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
 
 export const defaultProps = {
   idKey: "id",
+  dataRefreshMode: "reset" as CollectionDataRefreshMode,
   data: EMPTY_ARRAY,
   columns: EMPTY_ARRAY,
   columnInference: "first-n(25)",

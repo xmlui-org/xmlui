@@ -58,6 +58,15 @@ import {
   selectionCheckboxAnchorValues,
   type SelectionCheckboxAnchor,
 } from "./List.defaults";
+import {
+  diffInsertedIds,
+  getSourceIdSet,
+  isPreserveScrollTarget,
+  shouldInferFirstInserted,
+  type CollectionDataRefreshMode,
+  type CollectionDataRefreshOptions,
+  type CollectionScrollMetrics,
+} from "../../components-core/abstractions/dataRefreshAbstractions";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
@@ -137,8 +146,7 @@ export function useListData({
     if (groupBy === undefined) {
       return EMPTY_OBJECT;
     }
-    const iteratee =
-      typeof groupBy === "function" ? groupBy : (item: any) => item[groupBy];
+    const iteratee = typeof groupBy === "function" ? groupBy : (item: any) => item[groupBy];
     return groupByFunc(cappedItems, iteratee);
   }, [cappedItems, groupBy]);
 
@@ -222,7 +230,13 @@ const defaultItemRenderer = (item: any, id: any) => {
 
 type DynamicHeightListProps = {
   items: any[];
-  itemRenderer?: (item: any, id: any, index: number, count: number, isSelected: boolean) => ReactNode;
+  itemRenderer?: (
+    item: any,
+    id: any,
+    index: number,
+    count: number,
+    isSelected: boolean,
+  ) => ReactNode;
   sectionRenderer?: (group: any, id: any) => ReactNode;
   sectionFooterRenderer?: (group: any, id: any) => ReactNode;
   loading?: boolean;
@@ -237,6 +251,7 @@ type DynamicHeightListProps = {
   requestFetchNextPage?: () => any;
   pageInfo?: PageInfo;
   idKey?: string;
+  dataRefreshMode?: CollectionDataRefreshMode;
   style?: CSSProperties;
   className?: string;
   classes?: Record<string, string>;
@@ -278,6 +293,12 @@ type DynamicHeightListProps = {
   }) => void;
   onVisibleRangeDidChange?: (range: { startIndex: number; endIndex: number }) => void;
   keyBindings?: Record<string, string>;
+};
+
+type PendingDataRefresh = {
+  sourceIds: Set<string>;
+  scrollMetrics: CollectionScrollMetrics;
+  options?: CollectionDataRefreshOptions;
 };
 
 // --- Selection context for List items
@@ -559,33 +580,48 @@ const Item = forwardRef(
       <div
         className={classnames(styles.checkboxWrapper, {
           [styles.checkboxOverlay]: isOverlay,
-          [styles.checkboxAnchorTopRight]: isOverlay && selCtx.selectionCheckboxAnchor === "top-right",
-          [styles.checkboxAnchorBottomLeft]: isOverlay && selCtx.selectionCheckboxAnchor === "bottom-left",
-          [styles.checkboxAnchorBottomRight]: isOverlay && selCtx.selectionCheckboxAnchor === "bottom-right",
+          [styles.checkboxAnchorTopRight]:
+            isOverlay && selCtx.selectionCheckboxAnchor === "top-right",
+          [styles.checkboxAnchorBottomLeft]:
+            isOverlay && selCtx.selectionCheckboxAnchor === "bottom-left",
+          [styles.checkboxAnchorBottomRight]:
+            isOverlay && selCtx.selectionCheckboxAnchor === "bottom-right",
           [styles.checkboxDisabled]: isUnselectable,
         })}
-        style={isOverlay ? {
-          ...(selCtx.selectionCheckboxAnchor.includes("center")
-            ? { top: "50%", bottom: undefined, transform: "translateY(-50%)" }
-            : selCtx.selectionCheckboxAnchor.includes("top")
-              ? { top: selCtx.selectionCheckboxOffsetY, bottom: undefined }
-              : { bottom: selCtx.selectionCheckboxOffsetY, top: undefined }),
-          ...(selCtx.selectionCheckboxAnchor.includes("left")
-            ? { left: selCtx.selectionCheckboxOffsetX, right: undefined }
-            : { right: selCtx.selectionCheckboxOffsetX, left: undefined }),
-        } : undefined}
+        style={
+          isOverlay
+            ? {
+                ...(selCtx.selectionCheckboxAnchor.includes("center")
+                  ? { top: "50%", bottom: undefined, transform: "translateY(-50%)" }
+                  : selCtx.selectionCheckboxAnchor.includes("top")
+                    ? { top: selCtx.selectionCheckboxOffsetY, bottom: undefined }
+                    : { bottom: selCtx.selectionCheckboxOffsetY, top: undefined }),
+                ...(selCtx.selectionCheckboxAnchor.includes("left")
+                  ? { left: selCtx.selectionCheckboxOffsetX, right: undefined }
+                  : { right: selCtx.selectionCheckboxOffsetX, left: undefined }),
+              }
+            : undefined
+        }
         onClick={(e) => e.stopPropagation()}
       >
         <ThemedToggle
           value={isSelected}
           enabled={!isUnselectable}
           onDidChange={() => {
-            selCtx.onRowClick(index, { shiftKey: false, metaKey: true, ctrlKey: false } as React.MouseEvent);
+            selCtx.onRowClick(index, {
+              shiftKey: false,
+              metaKey: true,
+              ctrlKey: false,
+            } as React.MouseEvent);
           }}
-          style={selCtx.selectionCheckboxSize ? {
-            width: selCtx.selectionCheckboxSize,
-            height: selCtx.selectionCheckboxSize,
-          } : undefined}
+          style={
+            selCtx.selectionCheckboxSize
+              ? {
+                  width: selCtx.selectionCheckboxSize,
+                  height: selCtx.selectionCheckboxSize,
+                }
+              : undefined
+          }
         />
       </div>
     ) : null;
@@ -634,6 +670,14 @@ const Item = forwardRef(
 
 const ListItemTypeContext = createContext<(index: number) => RowType>((index) => RowType.ITEM);
 
+function getScrollMetrics(virtualizer: VirtualizerHandle | null): CollectionScrollMetrics {
+  return {
+    scrollPosition: virtualizer?.scrollOffset ?? 0,
+    scrollSize: virtualizer?.scrollSize ?? 0,
+    viewportSize: virtualizer?.viewportSize ?? 0,
+  };
+}
+
 /**
  * Virtua's `shift` prop helps maintain scroll position when prepending items (like message history).
  * Unfortunately it's finicky and must only be `true` when the beginning of the list changes, otherwise
@@ -660,353 +704,411 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
-export const ListNative = memo(forwardRef(function DynamicHeightList2(
-  {
-    items = EMPTY_ARRAY,
-    itemRenderer = defaultItemRenderer,
-    sectionRenderer,
-    sectionFooterRenderer,
-    loading,
-    loadingDelay = defaultProps.loadingDelay,
-    limit,
-    groupBy,
-    orderBy,
-    availableGroups,
-    scrollAnchor = defaultProps.scrollAnchor,
-    onContextMenu,
-    requestFetchPrevPage = noop,
-    requestFetchNextPage = noop,
-    pageInfo,
-    idKey = defaultProps.idKey,
-    style,
-    className,
-    classes,
-    emptyListPlaceholder,
-    groupsInitiallyExpanded = true,
-    defaultGroups = EMPTY_ARRAY,
-    registerComponentApi,
-    borderCollapse = defaultProps.borderCollapse,
-    fixedItemSize,
-    renderCache = defaultProps.renderCache,
-    renderCacheSize = defaultProps.renderCacheSize,
-    virtualBufferSize,
-    // Selection props
-    rowsSelectable = defaultProps.rowsSelectable,
-    enableMultiRowSelection = defaultProps.enableMultiRowSelection,
-    initiallySelected = defaultProps.initiallySelected,
-    syncWithAppState,
-    rowUnselectablePredicate,
-    hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
-    selectionCheckboxPosition = defaultProps.selectionCheckboxPosition,
-    selectionCheckboxAnchor = defaultProps.selectionCheckboxAnchor,
-    selectionCheckboxOffsetX,
-    selectionCheckboxOffsetY,
-    selectionCheckboxSize,
-    onSelectionDidChange,
-    onSelectAllAction,
-    onCutAction,
-    onCopyAction,
-    onPasteAction,
-    onDeleteAction,
-    rowDoubleClick,
-    onScroll,
-    onVisibleRangeDidChange,
-    keyBindings = defaultProps.keyBindings,
-    ...rest
-  }: DynamicHeightListProps,
-  ref,
-) {
-  const virtualizerRef = useRef<VirtualizerHandle>(null);
-  const parentRef = useRef<HTMLDivElement | null>(null);
-  const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
-  
-  // State and ref for measuring first item size when fixedItemSize is enabled
-  const firstItemRef = useRef<HTMLDivElement>(null);
+export const ListNative = memo(
+  forwardRef(function DynamicHeightList2(
+    {
+      items = EMPTY_ARRAY,
+      itemRenderer = defaultItemRenderer,
+      sectionRenderer,
+      sectionFooterRenderer,
+      loading,
+      loadingDelay = defaultProps.loadingDelay,
+      limit,
+      groupBy,
+      orderBy,
+      availableGroups,
+      scrollAnchor = defaultProps.scrollAnchor,
+      onContextMenu,
+      requestFetchPrevPage = noop,
+      requestFetchNextPage = noop,
+      pageInfo,
+      idKey = defaultProps.idKey,
+      dataRefreshMode = defaultProps.dataRefreshMode,
+      style,
+      className,
+      classes,
+      emptyListPlaceholder,
+      groupsInitiallyExpanded = true,
+      defaultGroups = EMPTY_ARRAY,
+      registerComponentApi,
+      borderCollapse = defaultProps.borderCollapse,
+      fixedItemSize,
+      renderCache = defaultProps.renderCache,
+      renderCacheSize = defaultProps.renderCacheSize,
+      virtualBufferSize,
+      // Selection props
+      rowsSelectable = defaultProps.rowsSelectable,
+      enableMultiRowSelection = defaultProps.enableMultiRowSelection,
+      initiallySelected = defaultProps.initiallySelected,
+      syncWithAppState,
+      rowUnselectablePredicate,
+      hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      selectionCheckboxPosition = defaultProps.selectionCheckboxPosition,
+      selectionCheckboxAnchor = defaultProps.selectionCheckboxAnchor,
+      selectionCheckboxOffsetX,
+      selectionCheckboxOffsetY,
+      selectionCheckboxSize,
+      onSelectionDidChange,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      rowDoubleClick,
+      onScroll,
+      onVisibleRangeDidChange,
+      keyBindings = defaultProps.keyBindings,
+      ...rest
+    }: DynamicHeightListProps,
+    ref,
+  ) {
+    const virtualizerRef = useRef<VirtualizerHandle>(null);
+    const parentRef = useRef<HTMLDivElement | null>(null);
+    const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
 
-  const scrollParent = useScrollParent(parentRef.current?.parentElement);
-  const scrollRef = useRef(scrollParent);
-  scrollRef.current = scrollParent;
+    // State and ref for measuring first item size when fixedItemSize is enabled
+    const firstItemRef = useRef<HTMLDivElement>(null);
 
-  const hasHeight = useHasExplicitHeight(parentRef);
-  const [stretchToParent, setStretchToParent] = useState(false);
+    const scrollParent = useScrollParent(parentRef.current?.parentElement);
+    const scrollRef = useRef(scrollParent);
+    scrollRef.current = scrollParent;
 
-  useIsomorphicLayoutEffect(() => {
-    const wrapper = parentRef.current;
-    const parent = wrapper?.parentElement;
-    if (!parent) {
-      return;
-    }
+    const hasHeight = useHasExplicitHeight(parentRef);
+    const [stretchToParent, setStretchToParent] = useState(false);
 
-    const parentStyle = getComputedStyle(parent);
-    const isColumnFlexParent =
-      parentStyle.display.includes("flex") && parentStyle.flexDirection === "column";
-    const parentStretches = Number.parseFloat(parentStyle.flexGrow) > 0;
-    const isInsideForm = !!wrapper.closest("form");
+    useIsomorphicLayoutEffect(() => {
+      const wrapper = parentRef.current;
+      const parent = wrapper?.parentElement;
+      if (!parent) {
+        return;
+      }
 
-    if (
-      isColumnFlexParent &&
-      parentStretches &&
-      !isInsideForm &&
-      !hasExplicitWrapperHeight(wrapper)
-    ) {
-      setStretchToParent(true);
-    }
-  }, []);
+      const parentStyle = getComputedStyle(parent);
+      const isColumnFlexParent =
+        parentStyle.display.includes("flex") && parentStyle.flexDirection === "column";
+      const parentStretches = Number.parseFloat(parentStyle.flexGrow) > 0;
+      const isInsideForm = !!wrapper.closest("form");
 
-  const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
+      if (
+        isColumnFlexParent &&
+        parentStretches &&
+        !isInsideForm &&
+        !hasExplicitWrapperHeight(wrapper)
+      ) {
+        setStretchToParent(true);
+      }
+    }, []);
 
-  // Create a ref for the Virtualizer's scroll container
-  // When using outside scroll, we need a ref that points to the scroll parent
-  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
+    const hasOutsideScroll = scrollRef.current && !hasHeight && !stretchToParent;
 
-  const shouldStickToBottom = useRef(scrollAnchor === "bottom");
-  // virtua's onScroll can't distinguish our own/auto scrolls from genuine user
-  // scrolls. A content-sized (e.g. maxHeight) bottom-anchored list grows from
-  // the top, so when content first overflows, the auto scroll-to-bottom would
-  // otherwise be read as "the user scrolled up" and follow would stop. We set
-  // this flag around our own scrollToIndex calls and ignore onScroll while set,
-  // so only a real user scroll can turn off stick-to-bottom.
-  const programmaticScroll = useRef(false);
-  const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
-  const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
-    setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
-  }, []);
+    // Create a ref for the Virtualizer's scroll container
+    // When using outside scroll, we need a ref that points to the scroll parent
+    const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
-  const expandContextValue = useMemo(() => {
-    return {
-      isExpanded: (id: any) =>
-        expanded[id] || (expanded[id] === undefined && groupsInitiallyExpanded),
-      toggleExpanded,
-    };
-  }, [expanded, groupsInitiallyExpanded, toggleExpanded]);
+    const shouldStickToBottom = useRef(scrollAnchor === "bottom");
+    // virtua's onScroll can't distinguish our own/auto scrolls from genuine user
+    // scrolls. A content-sized (e.g. maxHeight) bottom-anchored list grows from
+    // the top, so when content first overflows, the auto scroll-to-bottom would
+    // otherwise be read as "the user scrolled up" and follow would stop. We set
+    // this flag around our own scrollToIndex calls and ignore onScroll while set,
+    // so only a real user scroll can turn off stick-to-bottom.
+    const programmaticScroll = useRef(false);
+    const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
+    const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
+      setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
+    }, []);
 
-  const { rows } = useListData({
-    groupsInitiallyExpanded,
-    defaultGroups,
-    expanded,
-    items,
-    limit,
-    groupBy,
-    orderBy,
-    availableGroups,
-  });
+    const expandContextValue = useMemo(() => {
+      return {
+        isExpanded: (id: any) =>
+          expanded[id] || (expanded[id] === undefined && groupsInitiallyExpanded),
+        toggleExpanded,
+      };
+    }, [expanded, groupsInitiallyExpanded, toggleExpanded]);
 
-  const shift = useShift(rows, idKey);
-  const rowCount = rows?.length ?? 0;
+    // --- Safe items array for selection and refresh operations
+    const safeItems = Array.isArray(items) ? items : EMPTY_ARRAY;
 
-  const getRenderCacheRowId = useCallback(
-    (index: number) => {
-      const row = rows[index];
-      if (!row) return undefined;
-      switch (row._row_type) {
-        case RowType.SECTION:
-          return `section:${String(row.id)}`;
-        case RowType.SECTION_FOOTER:
-          return `section-footer:${String(row.id)}`;
-        default: {
-          const rowId = row[idKey];
-          return rowId === undefined || rowId === null || rowId === ""
-            ? `index:${index}`
-            : `item:${String(rowId)}`;
+    const { rows } = useListData({
+      groupsInitiallyExpanded,
+      defaultGroups,
+      expanded,
+      items,
+      limit,
+      groupBy,
+      orderBy,
+      availableGroups,
+    });
+
+    const shift = useShift(rows, idKey);
+    const rowCount = rows?.length ?? 0;
+    const currentSourceIds = useMemo(() => getSourceIdSet(safeItems, idKey), [idKey, safeItems]);
+    const previousDataRef = useRef<any>(items);
+    const hasReceivedDataRef = useRef(items !== undefined && items !== null);
+    const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+    const latestScrollMetricsRef = useRef<CollectionScrollMetrics>({
+      scrollPosition: 0,
+      scrollSize: 0,
+      viewportSize: 0,
+    });
+    const pendingDataRefreshRef = useRef<PendingDataRefresh | undefined>(undefined);
+    const pendingRefreshScrollTargetRef = useRef<
+      | { type: "row"; rowId: string | number }
+      | { type: "first-inserted"; insertedIds: Set<string> }
+      | undefined
+    >(undefined);
+    const pendingScrollPositionRef = useRef<number | undefined>(undefined);
+    const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
+    const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
+    const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
+
+    const getRenderCacheRowId = useCallback(
+      (index: number) => {
+        const row = rows[index];
+        if (!row) return undefined;
+        switch (row._row_type) {
+          case RowType.SECTION:
+            return `section:${String(row.id)}`;
+          case RowType.SECTION_FOOTER:
+            return `section-footer:${String(row.id)}`;
+          default: {
+            const rowId = row[idKey];
+            return rowId === undefined || rowId === null || rowId === ""
+              ? `index:${index}`
+              : `item:${String(rowId)}`;
+          }
+        }
+      },
+      [idKey, rows],
+    );
+
+    const {
+      keepMountedIndexes: renderCacheKeepMountedIndexes,
+      noteVisibleRange: noteRenderCacheVisibleRange,
+      clear: clearRenderCache,
+    } = useVirtualizedRenderCache({
+      enabled: renderCache,
+      maxSize: renderCacheSize,
+      rowCount,
+      getRowId: getRenderCacheRowId,
+    });
+
+    // --- Get visible items (non-section items from rows) for selection
+    const visibleItems = useMemo(() => {
+      return rows.filter((row) => row._row_type === undefined);
+    }, [rows]);
+
+    // --- Row selection hook
+    const {
+      toggleRow,
+      toggleRowIndex,
+      checkAllRows,
+      focusedIndex,
+      onKeyDown: selectionKeyDown,
+      selectedRowIdMap,
+      selectedItems: selectionSelectedItems,
+      idKey: selectionIdKey,
+      selectionApi,
+    } = useRowSelection({
+      items: safeItems,
+      visibleItems,
+      rowsSelectable,
+      enableMultiRowSelection,
+      rowUnselectablePredicate,
+      onSelectionDidChange,
+      initiallySelected,
+      syncWithAppState,
+    });
+
+    // --- Keyboard actions (selectAll, cut, copy, paste, delete)
+    const handleKeyboardActions = useListKeyboardActions({
+      keyBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      selectedItems: selectionApi.getSelectedItems(),
+      selectedRowIdMap,
+      focusedIndex,
+      data: safeItems,
+      idKey: selectionIdKey,
+      rowsSelectable,
+      selectionApi,
+    });
+
+    const clearPreservedScrollPaddingEnd = useCallback(() => {
+      setPreservedScrollPaddingEnd((prev) => (prev === 0 ? prev : 0));
+    }, []);
+
+    // --- Composite keyboard handler combining actions and navigation
+    const compositeKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        const actionHandled = handleKeyboardActions(event);
+        if (!actionHandled) {
+          selectionKeyDown(event);
+        }
+      },
+      [handleKeyboardActions, selectionKeyDown],
+    );
+
+    const handleRootKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        clearPreservedScrollPaddingEnd();
+        if (rowsSelectable) {
+          compositeKeyDown(event);
+        }
+      },
+      [clearPreservedScrollPaddingEnd, compositeKeyDown, rowsSelectable],
+    );
+
+    // --- Build a map from row index (in the `rows` array) to visible item index
+    const rowIndexToVisibleIndex = useMemo(() => {
+      const map: Record<number, number> = {};
+      let visIdx = 0;
+      rows.forEach((row, idx) => {
+        if (row._row_type === undefined) {
+          map[idx] = visIdx;
+          visIdx++;
+        }
+      });
+      return map;
+    }, [rows]);
+
+    // --- Get row ID from row index
+    const getRowId = useCallback(
+      (index: number) => {
+        const row = rows[index];
+        if (!row || row._row_type !== undefined) return undefined;
+        return String(row[idKey]);
+      },
+      [rows, idKey],
+    );
+
+    // --- Dev-only: row identity is load-bearing and its failure is silent.
+    // Duplicate or empty idKey values give virtua's reconciliation two items with one
+    // identity (rows paint over each other once the row set changes size) and collapse
+    // selection state, which is keyed by String(row[idKey]). Neither surfaces an error.
+    // An effect rather than a check inside the rows memo: a memo runs during render, so
+    // it would warn twice under StrictMode and again on re-renders that miss the cache.
+    useEffect(() => {
+      if (!import.meta.env.DEV) return;
+      let emptyCount = 0;
+      const seen = new Set<string>();
+      const duplicated = new Set<string>();
+      for (const row of rows) {
+        // Section headers and footers carry synthetic ids; only real items are keyed by idKey.
+        if (!row || row._row_type !== undefined) continue;
+        const value = row[idKey];
+        if (value === undefined || value === null || value === "") {
+          emptyCount++;
+          continue;
+        }
+        const asString = String(value);
+        if (seen.has(asString)) {
+          duplicated.add(asString);
+        } else {
+          seen.add(asString);
         }
       }
-    },
-    [idKey, rows],
-  );
-
-  const {
-    keepMountedIndexes: renderCacheKeepMountedIndexes,
-    noteVisibleRange: noteRenderCacheVisibleRange,
-    clear: clearRenderCache,
-  } = useVirtualizedRenderCache({
-    enabled: renderCache,
-    maxSize: renderCacheSize,
-    rowCount,
-    getRowId: getRenderCacheRowId,
-  });
-
-  // --- Safe items array for selection operations
-  const safeItems = Array.isArray(items) ? items : EMPTY_ARRAY;
-
-  // --- Get visible items (non-section items from rows) for selection
-  const visibleItems = useMemo(() => {
-    return rows.filter((row) => row._row_type === undefined);
-  }, [rows]);
-
-  // --- Row selection hook
-  const {
-    toggleRow,
-    toggleRowIndex,
-    checkAllRows,
-    focusedIndex,
-    onKeyDown: selectionKeyDown,
-    selectedRowIdMap,
-    selectedItems: selectionSelectedItems,
-    idKey: selectionIdKey,
-    selectionApi,
-  } = useRowSelection({
-    items: safeItems,
-    visibleItems,
-    rowsSelectable,
-    enableMultiRowSelection,
-    rowUnselectablePredicate,
-    onSelectionDidChange,
-    initiallySelected,
-    syncWithAppState,
-  });
-
-  // --- Keyboard actions (selectAll, cut, copy, paste, delete)
-  const handleKeyboardActions = useListKeyboardActions({
-    keyBindings,
-    onSelectAllAction,
-    onCutAction,
-    onCopyAction,
-    onPasteAction,
-    onDeleteAction,
-    selectedItems: selectionApi.getSelectedItems(),
-    selectedRowIdMap,
-    focusedIndex,
-    data: safeItems,
-    idKey: selectionIdKey,
-    rowsSelectable,
-    selectionApi,
-  });
-
-  // --- Composite keyboard handler combining actions and navigation
-  const compositeKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      const actionHandled = handleKeyboardActions(event);
-      if (!actionHandled) {
-        selectionKeyDown(event);
+      const consequence =
+        "Row identity must be unique and non-empty, or virtualized rows will reconcile " +
+        "incorrectly and selection state will be shared between rows.";
+      if (emptyCount > 0) {
+        console.warn(
+          `List: idKey "${idKey}" — ${emptyCount} row(s) have an empty or missing value. ${consequence}`,
+        );
       }
-    },
-    [handleKeyboardActions, selectionKeyDown],
-  );
+      if (duplicated.size > 0) {
+        // Sample rather than enumerate: a systematic duplicate in a large data set
+        // would otherwise produce a console line with thousands of entries.
+        const sample = Array.from(duplicated)
+          .slice(0, 3)
+          .map((v) => `"${v}"`)
+          .join(", ");
+        const more = duplicated.size > 3 ? `, and ${duplicated.size - 3} more` : "";
+        console.warn(
+          `List: idKey "${idKey}" — ${duplicated.size} value(s) are shared by more than one row (${sample}${more}). ${consequence}`,
+        );
+      }
+    }, [rows, idKey]);
 
-  // --- Build a map from row index (in the `rows` array) to visible item index
-  const rowIndexToVisibleIndex = useMemo(() => {
-    const map: Record<number, number> = {};
-    let visIdx = 0;
-    rows.forEach((row, idx) => {
-      if (row._row_type === undefined) {
-        map[idx] = visIdx;
-        visIdx++;
+    const getRowItem = useCallback(
+      (index: number) => {
+        const row = rows[index];
+        if (!row || row._row_type !== undefined) return undefined;
+        return row;
+      },
+      [rows],
+    );
+
+    // --- Handle a click on a list row
+    const onRowClick = useEvent((index: number, event: React.MouseEvent) => {
+      if (!rowsSelectable) return;
+      const row = rows[index];
+      if (!row || row._row_type !== undefined) return;
+
+      // Focus the wrapper to enable keyboard shortcuts
+      parentRef.current?.focus();
+
+      // Map from row index to visible item index for toggleRowIndex
+      const visIdx = rowIndexToVisibleIndex[index];
+      if (visIdx === undefined) return;
+
+      toggleRowIndex(visIdx, {
+        shiftKey: event.shiftKey,
+        metaKey: event.metaKey,
+        ctrlKey: event.ctrlKey,
+      });
+    });
+
+    // --- Handle double-click on a list row
+    const onRowDoubleClick = useEvent((index: number) => {
+      const row = rows[index];
+      if (!row || row._row_type !== undefined) return;
+      if (rowDoubleClick && typeof rowDoubleClick === "function") {
+        try {
+          rowDoubleClick(row);
+        } catch (e) {
+          console.error("Error in rowDoubleClick handler:", e);
+        }
       }
     });
-    return map;
-  }, [rows]);
 
-  // --- Get row ID from row index
-  const getRowId = useCallback(
-    (index: number) => {
-      const row = rows[index];
-      if (!row || row._row_type !== undefined) return undefined;
-      return String(row[idKey]);
-    },
-    [rows, idKey],
-  );
-
-  // --- Dev-only: row identity is load-bearing and its failure is silent.
-  // Duplicate or empty idKey values give virtua's reconciliation two items with one
-  // identity (rows paint over each other once the row set changes size) and collapse
-  // selection state, which is keyed by String(row[idKey]). Neither surfaces an error.
-  // An effect rather than a check inside the rows memo: a memo runs during render, so
-  // it would warn twice under StrictMode and again on re-renders that miss the cache.
-  useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    let emptyCount = 0;
-    const seen = new Set<string>();
-    const duplicated = new Set<string>();
-    for (const row of rows) {
-      // Section headers and footers carry synthetic ids; only real items are keyed by idKey.
-      if (!row || row._row_type !== undefined) continue;
-      const value = row[idKey];
-      if (value === undefined || value === null || value === "") {
-        emptyCount++;
-        continue;
-      }
-      const asString = String(value);
-      if (seen.has(asString)) {
-        duplicated.add(asString);
-      } else {
-        seen.add(asString);
-      }
-    }
-    const consequence =
-      "Row identity must be unique and non-empty, or virtualized rows will reconcile " +
-      "incorrectly and selection state will be shared between rows.";
-    if (emptyCount > 0) {
-      console.warn(
-        `List: idKey "${idKey}" — ${emptyCount} row(s) have an empty or missing value. ${consequence}`,
-      );
-    }
-    if (duplicated.size > 0) {
-      // Sample rather than enumerate: a systematic duplicate in a large data set
-      // would otherwise produce a console line with thousands of entries.
-      const sample = Array.from(duplicated).slice(0, 3).map((v) => `"${v}"`).join(", ");
-      const more = duplicated.size > 3 ? `, and ${duplicated.size - 3} more` : "";
-      console.warn(
-        `List: idKey "${idKey}" — ${duplicated.size} value(s) are shared by more than one row (${sample}${more}). ${consequence}`,
-      );
-    }
-  }, [rows, idKey]);
-
-  const getRowItem = useCallback(
-    (index: number) => {
-      const row = rows[index];
-      if (!row || row._row_type !== undefined) return undefined;
-      return row;
-    },
-    [rows],
-  );
-
-  // --- Handle a click on a list row
-  const onRowClick = useEvent((index: number, event: React.MouseEvent) => {
-    if (!rowsSelectable) return;
-    const row = rows[index];
-    if (!row || row._row_type !== undefined) return;
-
-    // Focus the wrapper to enable keyboard shortcuts
-    parentRef.current?.focus();
-
-    // Map from row index to visible item index for toggleRowIndex
-    const visIdx = rowIndexToVisibleIndex[index];
-    if (visIdx === undefined) return;
-
-    toggleRowIndex(visIdx, {
-      shiftKey: event.shiftKey,
-      metaKey: event.metaKey,
-      ctrlKey: event.ctrlKey,
-    });
-  });
-
-  // --- Handle double-click on a list row
-  const onRowDoubleClick = useEvent((index: number) => {
-    const row = rows[index];
-    if (!row || row._row_type !== undefined) return;
-    if (rowDoubleClick && typeof rowDoubleClick === "function") {
-      try {
-        rowDoubleClick(row);
-      } catch (e) {
-        console.error("Error in rowDoubleClick handler:", e);
-      }
-    }
-  });
-
-  // --- Selection context value for the Item component
-  // Always provide a non-null context so that onDoubleClick is registered regardless of rowsSelectable.
-  // Click-based selection still respects rowsSelectable via the rowsSelectable field.
-  const selectionContextValue = useMemo<ListSelectionContextValue>(() => {
-    return {
+    // --- Selection context value for the Item component
+    // Always provide a non-null context so that onDoubleClick is registered regardless of rowsSelectable.
+    // Click-based selection still respects rowsSelectable via the rowsSelectable field.
+    const selectionContextValue = useMemo<ListSelectionContextValue>(() => {
+      return {
+        rowsSelectable,
+        selectedRowIdMap,
+        focusedIndex: (() => {
+          // Convert focused visible item index to row index
+          for (const [rowIdx, visIdx] of Object.entries(rowIndexToVisibleIndex)) {
+            if (visIdx === focusedIndex) return Number(rowIdx);
+          }
+          return -1;
+        })(),
+        getRowId,
+        getRowItem,
+        onRowClick,
+        onRowDoubleClick,
+        hideSelectionCheckboxes,
+        enableMultiRowSelection,
+        toggleRow,
+        checkAllRows,
+        selectionCheckboxPosition,
+        selectionCheckboxAnchor,
+        selectionCheckboxOffsetX,
+        selectionCheckboxOffsetY,
+        selectionCheckboxSize,
+        rowUnselectablePredicate,
+      };
+    }, [
       rowsSelectable,
       selectedRowIdMap,
-      focusedIndex: (() => {
-        // Convert focused visible item index to row index
-        for (const [rowIdx, visIdx] of Object.entries(rowIndexToVisibleIndex)) {
-          if (visIdx === focusedIndex) return Number(rowIdx);
-        }
-        return -1;
-      })(),
+      focusedIndex,
+      rowIndexToVisibleIndex,
       getRowId,
       getRowItem,
       onRowClick,
@@ -1021,354 +1123,615 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
       selectionCheckboxOffsetY,
       selectionCheckboxSize,
       rowUnselectablePredicate,
-    };
-  }, [
-    rowsSelectable,
-    selectedRowIdMap,
-    focusedIndex,
-    rowIndexToVisibleIndex,
-    getRowId,
-    getRowItem,
-    onRowClick,
-    onRowDoubleClick,
-    hideSelectionCheckboxes,
-    enableMultiRowSelection,
-    toggleRow,
-    checkAllRows,
-    selectionCheckboxPosition,
-    selectionCheckboxAnchor,
-    selectionCheckboxOffsetX,
-    selectionCheckboxOffsetY,
-    selectionCheckboxSize,
-    rowUnselectablePredicate,
-  ]);
+    ]);
 
-  const initiallyScrolledToBottom = useRef(false);
-  useEffect(() => {
-    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
-      initiallyScrolledToBottom.current = true;
-      requestAnimationFrame(() => {
-        programmaticScroll.current = true;
-        virtualizerRef.current?.scrollToIndex(rows.length - 1, {
-          align: "end",
-        });
+    const initiallyScrolledToBottom = useRef(false);
+    useEffect(() => {
+      if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
+        initiallyScrolledToBottom.current = true;
         requestAnimationFrame(() => {
-          programmaticScroll.current = false;
+          programmaticScroll.current = true;
+          virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+            align: "end",
+          });
+          requestAnimationFrame(() => {
+            programmaticScroll.current = false;
+          });
         });
-      });
-    }
-  }, [rows.length, scrollAnchor]);
+      }
+    }, [rows.length, scrollAnchor]);
 
-  useEffect(() => {
-    if (!virtualizerRef.current) return;
-    if (!shouldStickToBottom.current) return;
-    requestAnimationFrame(() => {
-      const v = virtualizerRef.current;
-      if (!v) return;
-      programmaticScroll.current = true;
-      // Scroll to the absolute bottom of the scrollable content rather than to
-      // the last item's end: while a newly appended item is still measuring
-      // (e.g. async Markdown streaming in), aligning to its current end can land
-      // a hair short of the true bottom. scrollTo(scrollSize) clamps to the real
-      // bottom regardless of item boundaries or trailing space.
-      v.scrollTo(v.scrollSize);
-      requestAnimationFrame(() => {
-        programmaticScroll.current = false;
-      });
-    });
-  }, [rows]);
-
-  // Re-assert stick-to-bottom when the content GROWS while we are following.
-  // The effect above fires on `rows` (data) changes, but children that lay out
-  // asynchronously — Markdown, images, fold/unfold — keep growing *after* that
-  // scroll, below the fold. virtua's onScroll fires only on real scroll (not on
-  // content-height growth) and virtua does not auto-stick on append, so without
-  // this the list lands "almost" at the bottom and drifts up as late-measuring
-  // content settles. A ResizeObserver on the content wrapper catches exactly
-  // those size changes; we re-scroll only while shouldStickToBottom is set, so a
-  // user who scrolled up to read is never yanked back down.
-  const hasRows = rows.length > 0;
-  useEffect(() => {
-    if (scrollAnchor !== "bottom") return;
-    if (typeof ResizeObserver === "undefined") return;
-    const container = parentRef.current?.querySelector("[data-list-container]");
-    if (!container) return;
-    const observer = new ResizeObserver(() => {
-      if (!shouldStickToBottom.current) return;
-      if (programmaticScroll.current) return;
-      const v = virtualizerRef.current;
-      if (!v) return;
-      programmaticScroll.current = true;
-      // Absolute bottom (see the [rows] effect above) — robust to a still-
-      // measuring trailing item, which is exactly what the observer catches.
-      v.scrollTo(v.scrollSize);
-      requestAnimationFrame(() => {
-        programmaticScroll.current = false;
-      });
-    });
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [scrollAnchor, hasRows]);
-
-  const isFetchingPrevPage = useRef(false);
-  const tryToFetchPrevPage = useCallback(() => {
-    if (
-      virtualizerRef.current &&
-      typeof virtualizerRef.current.findItemIndex === 'function' &&
-      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset) < 10 &&
-      pageInfo &&
-      pageInfo.hasPrevPage &&
-      !pageInfo.isFetchingPrevPage &&
-      !isFetchingPrevPage.current
-    ) {
-      isFetchingPrevPage.current = true;
-      void (async function doFetch() {
-        try {
-          await requestFetchPrevPage();
-        } finally {
-          isFetchingPrevPage.current = false;
-        }
-      })();
-    }
-  }, [pageInfo, requestFetchPrevPage]);
-
-  const isFetchingNextPage = useRef(false);
-  const tryToFetchNextPage = useCallback(() => {
-    if (
-      virtualizerRef.current &&
-      typeof virtualizerRef.current.findItemIndex === 'function' &&
-      virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset + virtualizerRef.current.viewportSize) + 10 > rows.length &&
-      pageInfo &&
-      pageInfo.hasNextPage &&
-      !pageInfo.isFetchingNextPage &&
-      !isFetchingNextPage.current
-    ) {
-      isFetchingNextPage.current = true;
-      void (async function doFetch() {
-        try {
-          await requestFetchNextPage();
-        } finally {
-          isFetchingNextPage.current = false;
-        }
-      })();
-    }
-  }, [rows.length, pageInfo, requestFetchNextPage]);
-
-  const initiallyFetchedExtraPages = useRef(false);
-  useEffect(() => {
-    if (rows.length && !initiallyFetchedExtraPages.current) {
-      initiallyFetchedExtraPages.current = true;
-      tryToFetchPrevPage();
-    }
-  }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
-
-  // --- Visible-range reporting. Unlike the `scroll` event (user-intent
-  // focused: suppressed during programmatic/auto-follow scrolls), the visible
-  // range reports whenever the set of mounted-visible items ACTUALLY changes,
-  // whatever caused it — user scroll, scrollToBottom(), content growth. A
-  // consumer prioritizing work for on-screen items (the motivating case) cares
-  // about what is visible, not why. Deduped by value so it fires only on a
-  // genuine range shift.
-  const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
-  const computeVisibleRange = useCallback(() => {
-    const v = virtualizerRef.current;
-    if (!v || !rows.length) return null;
-    const startIndex = v.findItemIndex(v.scrollOffset);
-    const endIndex = Math.min(v.findItemIndex(v.scrollOffset + v.viewportSize), rows.length - 1);
-    return { startIndex, endIndex };
-  }, [rows.length]);
-  const reportVisibleRange = useCallback(() => {
-    const range = computeVisibleRange();
-    if (!range) return;
-    noteRenderCacheVisibleRange(range);
-    if (!onVisibleRangeDidChange) return;
-    const last = lastVisibleRange.current;
-    if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
-    lastVisibleRange.current = range;
-    onVisibleRangeDidChange(range);
-  }, [computeVisibleRange, noteRenderCacheVisibleRange, onVisibleRangeDidChange]);
-  useEffect(() => {
-    // Initial range and content-growth shifts (appends move the range even
-    // without a scroll). rAF lets virtua finish its measure/layout pass.
-    if (!rows.length) return;
-    const raf = requestAnimationFrame(reportVisibleRange);
-    return () => cancelAnimationFrame(raf);
-  }, [rows, reportVisibleRange]);
-
-  const lastScrollOffset = useRef(0);
-  const handleVirtuaScroll = useCallback(
-    (offset) => {
+    useEffect(() => {
       if (!virtualizerRef.current) return;
-      // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
-      const atEnd =
-        offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
-      const prevOffset = lastScrollOffset.current;
-      lastScrollOffset.current = offset;
-      const movedTowardTop = offset < prevOffset - 0.5;
-      const offsetChanged = Math.abs(offset - prevOffset) > 0.5;
-      if (scrollAnchor === "bottom" && !programmaticScroll.current) {
-        // Stop following only on a genuine upward user scroll. When appended
-        // content grows below the fold, virtua fires onScroll with the SAME
-        // offset against a larger scrollSize, so atEnd is momentarily false —
-        // that must NOT be read as "the user scrolled up", or follow would die
-        // on every new item. In that case leave the flag unchanged; the
-        // re-stick effect/observer pins us back to the true bottom.
-        if (atEnd) {
-          shouldStickToBottom.current = true;
-        } else if (movedTowardTop) {
-          shouldStickToBottom.current = false;
-        }
-      }
-      // Report scroll state to consumers, but only for genuine user scrolls
-      // (the offset actually moved) and never during our own/auto programmatic
-      // scrolls — so a content-growth tick can't masquerade as the user
-      // leaving the bottom.
-      if (!programmaticScroll.current && offsetChanged) {
-        onScroll?.({
-          scrollTop: offset,
-          scrollHeight: virtualizerRef.current.scrollSize,
-          viewportSize: virtualizerRef.current.viewportSize,
-          atEnd,
-          visibleRange: computeVisibleRange() ?? { startIndex: -1, endIndex: -1 },
-          itemCount: rows.length,
-        });
-      }
-      reportVisibleRange();
-      tryToFetchPrevPage();
-      tryToFetchNextPage();
-    },
-    [scrollAnchor, onScroll, computeVisibleRange, rows.length, reportVisibleRange, tryToFetchNextPage, tryToFetchPrevPage],
-  );
-
-  const runProgrammaticScroll = useEvent((scroll: () => void) => {
-    clearRenderCache();
-    programmaticScroll.current = true;
-    requestAnimationFrame(() => {
-      scroll();
+      if (!shouldStickToBottom.current) return;
       requestAnimationFrame(() => {
+        const v = virtualizerRef.current;
+        if (!v) return;
+        programmaticScroll.current = true;
+        // Scroll to the absolute bottom of the scrollable content rather than to
+        // the last item's end: while a newly appended item is still measuring
+        // (e.g. async Markdown streaming in), aligning to its current end can land
+        // a hair short of the true bottom. scrollTo(scrollSize) clamps to the real
+        // bottom regardless of item boundaries or trailing space.
+        v.scrollTo(v.scrollSize);
         requestAnimationFrame(() => {
           programmaticScroll.current = false;
         });
       });
+    }, [rows]);
+
+    // Re-assert stick-to-bottom when the content GROWS while we are following.
+    // The effect above fires on `rows` (data) changes, but children that lay out
+    // asynchronously — Markdown, images, fold/unfold — keep growing *after* that
+    // scroll, below the fold. virtua's onScroll fires only on real scroll (not on
+    // content-height growth) and virtua does not auto-stick on append, so without
+    // this the list lands "almost" at the bottom and drifts up as late-measuring
+    // content settles. A ResizeObserver on the content wrapper catches exactly
+    // those size changes; we re-scroll only while shouldStickToBottom is set, so a
+    // user who scrolled up to read is never yanked back down.
+    const hasRows = rows.length > 0;
+    useEffect(() => {
+      if (scrollAnchor !== "bottom") return;
+      if (typeof ResizeObserver === "undefined") return;
+      const container = parentRef.current?.querySelector("[data-list-container]");
+      if (!container) return;
+      const observer = new ResizeObserver(() => {
+        if (!shouldStickToBottom.current) return;
+        if (programmaticScroll.current) return;
+        const v = virtualizerRef.current;
+        if (!v) return;
+        programmaticScroll.current = true;
+        // Absolute bottom (see the [rows] effect above) — robust to a still-
+        // measuring trailing item, which is exactly what the observer catches.
+        v.scrollTo(v.scrollSize);
+        requestAnimationFrame(() => {
+          programmaticScroll.current = false;
+        });
+      });
+      observer.observe(container);
+      return () => observer.disconnect();
+    }, [scrollAnchor, hasRows]);
+
+    const isFetchingPrevPage = useRef(false);
+    const tryToFetchPrevPage = useCallback(() => {
+      if (
+        virtualizerRef.current &&
+        typeof virtualizerRef.current.findItemIndex === "function" &&
+        virtualizerRef.current.findItemIndex(virtualizerRef.current.scrollOffset) < 10 &&
+        pageInfo &&
+        pageInfo.hasPrevPage &&
+        !pageInfo.isFetchingPrevPage &&
+        !isFetchingPrevPage.current
+      ) {
+        isFetchingPrevPage.current = true;
+        void (async function doFetch() {
+          try {
+            await requestFetchPrevPage();
+          } finally {
+            isFetchingPrevPage.current = false;
+          }
+        })();
+      }
+    }, [pageInfo, requestFetchPrevPage]);
+
+    const isFetchingNextPage = useRef(false);
+    const tryToFetchNextPage = useCallback(() => {
+      if (
+        virtualizerRef.current &&
+        typeof virtualizerRef.current.findItemIndex === "function" &&
+        virtualizerRef.current.findItemIndex(
+          virtualizerRef.current.scrollOffset + virtualizerRef.current.viewportSize,
+        ) +
+          10 >
+          rows.length &&
+        pageInfo &&
+        pageInfo.hasNextPage &&
+        !pageInfo.isFetchingNextPage &&
+        !isFetchingNextPage.current
+      ) {
+        isFetchingNextPage.current = true;
+        void (async function doFetch() {
+          try {
+            await requestFetchNextPage();
+          } finally {
+            isFetchingNextPage.current = false;
+          }
+        })();
+      }
+    }, [rows.length, pageInfo, requestFetchNextPage]);
+
+    const initiallyFetchedExtraPages = useRef(false);
+    useEffect(() => {
+      if (rows.length && !initiallyFetchedExtraPages.current) {
+        initiallyFetchedExtraPages.current = true;
+        tryToFetchPrevPage();
+      }
+    }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
+
+    // --- Visible-range reporting. Unlike the `scroll` event (user-intent
+    // focused: suppressed during programmatic/auto-follow scrolls), the visible
+    // range reports whenever the set of mounted-visible items ACTUALLY changes,
+    // whatever caused it — user scroll, scrollToBottom(), content growth. A
+    // consumer prioritizing work for on-screen items (the motivating case) cares
+    // about what is visible, not why. Deduped by value so it fires only on a
+    // genuine range shift.
+    const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
+    const computeVisibleRange = useCallback(() => {
+      const v = virtualizerRef.current;
+      if (!v || !rows.length) return null;
+      const startIndex = v.findItemIndex(v.scrollOffset);
+      const endIndex = Math.min(v.findItemIndex(v.scrollOffset + v.viewportSize), rows.length - 1);
+      return { startIndex, endIndex };
+    }, [rows.length]);
+    const reportVisibleRange = useCallback(() => {
+      const range = computeVisibleRange();
+      if (!range) return;
+      noteRenderCacheVisibleRange(range);
+      if (!onVisibleRangeDidChange) return;
+      const last = lastVisibleRange.current;
+      if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
+      lastVisibleRange.current = range;
+      onVisibleRangeDidChange(range);
+    }, [computeVisibleRange, noteRenderCacheVisibleRange, onVisibleRangeDidChange]);
+    useEffect(() => {
+      // Initial range and content-growth shifts (appends move the range even
+      // without a scroll). rAF lets virtua finish its measure/layout pass.
+      if (!rows.length) return;
+      const raf = requestAnimationFrame(reportVisibleRange);
+      return () => cancelAnimationFrame(raf);
+    }, [rows, reportVisibleRange]);
+
+    const lastScrollOffset = useRef(0);
+    const handleVirtuaScroll = useCallback(
+      (offset) => {
+        if (!virtualizerRef.current) return;
+        // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
+        const atEnd =
+          offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+        const prevOffset = lastScrollOffset.current;
+        lastScrollOffset.current = offset;
+        const movedTowardTop = offset < prevOffset - 0.5;
+        const offsetChanged = Math.abs(offset - prevOffset) > 0.5;
+        if (scrollAnchor === "bottom" && !programmaticScroll.current) {
+          // Stop following only on a genuine upward user scroll. When appended
+          // content grows below the fold, virtua fires onScroll with the SAME
+          // offset against a larger scrollSize, so atEnd is momentarily false —
+          // that must NOT be read as "the user scrolled up", or follow would die
+          // on every new item. In that case leave the flag unchanged; the
+          // re-stick effect/observer pins us back to the true bottom.
+          if (atEnd) {
+            shouldStickToBottom.current = true;
+          } else if (movedTowardTop) {
+            shouldStickToBottom.current = false;
+          }
+        }
+        // Report scroll state to consumers, but only for genuine user scrolls
+        // (the offset actually moved) and never during our own/auto programmatic
+        // scrolls — so a content-growth tick can't masquerade as the user
+        // leaving the bottom.
+        if (!programmaticScroll.current && offsetChanged) {
+          onScroll?.({
+            scrollTop: offset,
+            scrollHeight: virtualizerRef.current.scrollSize,
+            viewportSize: virtualizerRef.current.viewportSize,
+            atEnd,
+            visibleRange: computeVisibleRange() ?? { startIndex: -1, endIndex: -1 },
+            itemCount: rows.length,
+          });
+        }
+        reportVisibleRange();
+        tryToFetchPrevPage();
+        tryToFetchNextPage();
+      },
+      [
+        scrollAnchor,
+        onScroll,
+        computeVisibleRange,
+        rows.length,
+        reportVisibleRange,
+        tryToFetchNextPage,
+        tryToFetchPrevPage,
+      ],
+    );
+
+    const runProgrammaticScroll = useEvent((scroll: () => void) => {
+      clearRenderCache();
+      programmaticScroll.current = true;
+      requestAnimationFrame(() => {
+        scroll();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            programmaticScroll.current = false;
+          });
+        });
+      });
     });
-  });
 
-  // Every scroll API re-measures the start margin at call time rather than
-  // reading the cache, which goes stale when content appears above the list
-  // (xmlui-org/xmlui#3765).
-  const scrollToBottom = useEvent(() => {
-    const v = virtualizerRef.current;
-    if (v && rows.length) {
-      // Absolute bottom, not align-end of the last item: aligning to the last
-      // item's currently measured end lands short while late-measuring content
-      // (async Markdown, images) is still growing, and repeated calls keep
-      // landing short of the settled bottom. scrollTo(scrollSize) clamps to
-      // the true bottom regardless of item boundaries — the same call the
-      // scrollAnchor="bottom" internals use for exactly this reason.
-      runProgrammaticScroll(() => v.scrollTo(v.scrollSize + measureStartMargin()));
-    }
-  });
-
-  // scrollToTop and scrollToBottom keep their margin-carrying offsets: their
-  // intent is "the scroll container to its absolute start/end", which spans the
-  // content above the list, not "row 0 to the top of the viewport".
-  const scrollToTop = useEvent(() => {
-    if (rows.length) {
-      runProgrammaticScroll(() =>
-        virtualizerRef.current?.scrollToIndex(0, {
-          align: "start",
-          offset: -measureStartMargin(),
-        }),
-      );
-    }
-  });
-
-  // virtua computes `$getStartSpacerSize() + $getItemOffset(index) + offset`.
-  // The start spacer is kept in sync by `useStartMarginState`; passing the
-  // measured margin again would double-count content that appeared above the
-  // list after mount.
-  const scrollToIndex = useEvent((index) => {
-    runProgrammaticScroll(() => {
-      virtualizerRef.current?.scrollToIndex(index);
+    // Every scroll API re-measures the start margin at call time rather than
+    // reading the cache, which goes stale when content appears above the list
+    // (xmlui-org/xmlui#3765).
+    const scrollToBottom = useEvent(() => {
+      const v = virtualizerRef.current;
+      if (v && rows.length) {
+        // Absolute bottom, not align-end of the last item: aligning to the last
+        // item's currently measured end lands short while late-measuring content
+        // (async Markdown, images) is still growing, and repeated calls keep
+        // landing short of the settled bottom. scrollTo(scrollSize) clamps to
+        // the true bottom regardless of item boundaries — the same call the
+        // scrollAnchor="bottom" internals use for exactly this reason.
+        runProgrammaticScroll(() => v.scrollTo(v.scrollSize + measureStartMargin()));
+      }
     });
-  });
 
-  const scrollToId = useEvent((id) => {
-    const index = rows?.findIndex((row) => row[idKey] === id);
-    if (index >= 0) {
-      scrollToIndex(index);
-    }
-  });
+    // scrollToTop and scrollToBottom keep their margin-carrying offsets: their
+    // intent is "the scroll container to its absolute start/end", which spans the
+    // content above the list, not "row 0 to the top of the viewport".
+    const scrollToTop = useEvent(() => {
+      if (rows.length) {
+        runProgrammaticScroll(() =>
+          virtualizerRef.current?.scrollToIndex(0, {
+            align: "start",
+            offset: -measureStartMargin(),
+          }),
+        );
+      }
+    });
 
-  const getVisibleRange = useEvent(() => {
-    return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
-  });
-  const getItemCount = useEvent(() => rows.length);
+    // virtua computes `$getStartSpacerSize() + $getItemOffset(index) + offset`.
+    // The start spacer is kept in sync by `useStartMarginState`; passing the
+    // measured margin again would double-count content that appeared above the
+    // list after mount.
+    const scrollToIndex = useEvent((index) => {
+      runProgrammaticScroll(() => {
+        virtualizerRef.current?.scrollToIndex(index);
+      });
+    });
 
-  useIsomorphicLayoutEffect(() => {
-    registerComponentApi?.({
-      scrollToBottom,
-      scrollToTop,
-      scrollToIndex,
-      scrollToId,
+    const scrollToId = useEvent((id) => {
+      const index = rows?.findIndex((row) => String(row[idKey]) === String(id));
+      if (index >= 0) {
+        scrollToIndex(index);
+      }
+    });
+
+    const getVisibleRange = useEvent(() => {
+      return computeVisibleRange() ?? { startIndex: -1, endIndex: -1 };
+    });
+    const getItemCount = useEvent(() => rows.length);
+
+    const restorePendingScrollPosition = useCallback(
+      (clearAfterRestore = false) => {
+        const nextScrollPosition = pendingScrollPositionRef.current;
+        const virtualizer = virtualizerRef.current;
+        if (nextScrollPosition === undefined || !virtualizer) {
+          return;
+        }
+
+        clearRenderCache();
+        programmaticScroll.current = true;
+        virtualizer.scrollTo(nextScrollPosition);
+
+        if (clearAfterRestore) {
+          pendingScrollPositionRef.current = undefined;
+        }
+      },
+      [clearRenderCache],
+    );
+
+    const queueScrollPositionRestore = useCallback(
+      (scrollPosition: number | undefined) => {
+        if (scrollPosition === undefined) {
+          return;
+        }
+
+        pendingScrollPositionRef.current = Math.max(0, scrollPosition);
+        restorePendingScrollPosition();
+
+        if (scrollRestoreAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+        }
+
+        scrollRestoreAnimationFrameRef.current = requestAnimationFrame(() => {
+          restorePendingScrollPosition(true);
+          scrollRestoreAnimationFrameRef.current = undefined;
+          requestAnimationFrame(() => {
+            programmaticScroll.current = false;
+          });
+        });
+      },
+      [restorePendingScrollPosition],
+    );
+
+    const preparePreservedScrollRange = useCallback(
+      (
+        options: CollectionDataRefreshOptions | undefined,
+        previousSourceIds: Set<string>,
+        previousScrollMetrics: CollectionScrollMetrics,
+      ) => {
+        if (!isPreserveScrollTarget(options?.scrollTarget)) {
+          setPreservedScrollPaddingEnd(0);
+          return;
+        }
+
+        const dataShrank = currentSourceIds.size < previousSourceIds.size;
+        if (options?.operation !== "delete" && !dataShrank) {
+          setPreservedScrollPaddingEnd(0);
+          return;
+        }
+
+        const currentMetrics = getScrollMetrics(virtualizerRef.current);
+        const viewportSize = currentMetrics.viewportSize || previousScrollMetrics.viewportSize;
+        const currentMaxScrollPosition = Math.max(0, currentMetrics.scrollSize - viewportSize);
+        const neededPadding = Math.ceil(
+          Math.max(0, previousScrollMetrics.scrollPosition - currentMaxScrollPosition),
+        );
+        setPreservedScrollPaddingEnd((prev) => (prev === neededPadding ? prev : neededPadding));
+      },
+      [currentSourceIds],
+    );
+
+    const prepareRefreshScrollTarget = useCallback(
+      (options: CollectionDataRefreshOptions | undefined, previousSourceIds: Set<string>) => {
+        const explicitTarget = options?.scrollTarget;
+        if (explicitTarget === "preserve") {
+          pendingRefreshScrollTargetRef.current = undefined;
+          return;
+        }
+
+        if (isPreserveScrollTarget(explicitTarget)) {
+          pendingRefreshScrollTargetRef.current = shouldInferFirstInserted(options)
+            ? {
+                type: "first-inserted",
+                insertedIds: diffInsertedIds(previousSourceIds, currentSourceIds),
+              }
+            : undefined;
+          if (
+            pendingRefreshScrollTargetRef.current?.type === "first-inserted" &&
+            pendingRefreshScrollTargetRef.current.insertedIds.size === 0
+          ) {
+            pendingRefreshScrollTargetRef.current = undefined;
+          }
+          return;
+        }
+
+        if (explicitTarget === "first-inserted") {
+          const insertedIds = diffInsertedIds(previousSourceIds, currentSourceIds);
+          pendingRefreshScrollTargetRef.current =
+            insertedIds.size > 0 ? { type: "first-inserted", insertedIds } : undefined;
+          return;
+        }
+
+        pendingRefreshScrollTargetRef.current = { type: "row", rowId: explicitTarget };
+      },
+      [currentSourceIds],
+    );
+
+    const captureLatestRefreshState = useCallback(() => {
+      latestSourceIdsRef.current = currentSourceIds;
+      latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
+    }, [currentSourceIds]);
+
+    useIsomorphicLayoutEffect(() => {
+      const dataChanged = previousDataRef.current !== items;
+      const hasCurrentData = items !== undefined && items !== null;
+
+      if (!dataChanged) {
+        if (hasCurrentData) {
+          hasReceivedDataRef.current = true;
+        }
+        captureLatestRefreshState();
+        return;
+      }
+
+      const isInitialDataArrival = !hasReceivedDataRef.current && hasCurrentData;
+      const pendingRefresh = pendingDataRefreshRef.current;
+      const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
+      const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+      const previousScrollMetrics = pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
+
+      pendingDataRefreshRef.current = undefined;
+      previousDataRef.current = items;
+      if (hasCurrentData) {
+        hasReceivedDataRef.current = true;
+      }
+
+      if (isInitialDataArrival) {
+        pendingRefreshScrollTargetRef.current = undefined;
+        setPreservedScrollPaddingEnd(0);
+        captureLatestRefreshState();
+        return;
+      }
+
+      if (shouldPreserve) {
+        preparePreservedScrollRange(
+          pendingRefresh?.options,
+          previousSourceIds,
+          previousScrollMetrics,
+        );
+        prepareRefreshScrollTarget(pendingRefresh?.options, previousSourceIds);
+        if (isPreserveScrollTarget(pendingRefresh?.options?.scrollTarget)) {
+          queueScrollPositionRestore(previousScrollMetrics.scrollPosition);
+        }
+        return;
+      }
+
+      pendingRefreshScrollTargetRef.current = undefined;
+      setPreservedScrollPaddingEnd(0);
+      captureLatestRefreshState();
+    }, [
+      captureLatestRefreshState,
+      dataRefreshMode,
+      items,
+      preparePreservedScrollRange,
+      prepareRefreshScrollTarget,
+      queueScrollPositionRestore,
+    ]);
+
+    useIsomorphicLayoutEffect(() => {
+      const scrollPosition = pendingScrollPositionRef.current;
+      if (scrollPosition === undefined || !virtualizerRef.current) {
+        return;
+      }
+
+      restorePendingScrollPosition();
+    }, [restorePendingScrollPosition, rows.length]);
+
+    const scrollRowIntoViewIfNeeded = useCallback(
+      (rowId: string | number) => {
+        const rowIndex = rows.findIndex(
+          (row) => row?._row_type === undefined && String(row[idKey]) === String(rowId),
+        );
+        const virtualizer = virtualizerRef.current;
+        if (rowIndex < 0 || !virtualizer) {
+          return;
+        }
+
+        const itemOffset = virtualizer.getItemOffset(rowIndex);
+        const itemSize = virtualizer.getItemSize(rowIndex);
+        const viewportStart = virtualizer.scrollOffset;
+        const viewportEnd = viewportStart + virtualizer.viewportSize;
+        const itemEnd = itemOffset + itemSize;
+
+        if (itemOffset >= viewportStart && itemEnd <= viewportEnd) {
+          return;
+        }
+
+        runProgrammaticScroll(() => virtualizer.scrollToIndex(rowIndex, { align: "center" }));
+      },
+      [idKey, rows, runProgrammaticScroll],
+    );
+
+    useEffect(() => {
+      const pendingTarget = pendingRefreshScrollTargetRef.current;
+      if (!pendingTarget) {
+        return;
+      }
+
+      if (targetScrollAnimationFrameRef.current !== undefined) {
+        cancelAnimationFrame(targetScrollAnimationFrameRef.current);
+      }
+
+      targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+        targetScrollAnimationFrameRef.current = requestAnimationFrame(() => {
+          const target = pendingRefreshScrollTargetRef.current;
+          if (!target) {
+            targetScrollAnimationFrameRef.current = undefined;
+            return;
+          }
+
+          const targetRowId =
+            target.type === "row"
+              ? target.rowId
+              : rows.find(
+                  (row) =>
+                    row?._row_type === undefined && target.insertedIds.has(String(row[idKey])),
+                )?.[idKey];
+
+          if (targetRowId !== undefined) {
+            scrollRowIntoViewIfNeeded(targetRowId);
+          }
+
+          pendingRefreshScrollTargetRef.current = undefined;
+          targetScrollAnimationFrameRef.current = undefined;
+        });
+      });
+    }, [idKey, rows, scrollRowIntoViewIfNeeded]);
+
+    useEffect(() => {
+      return () => {
+        if (scrollRestoreAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
+        }
+        if (targetScrollAnimationFrameRef.current !== undefined) {
+          cancelAnimationFrame(targetScrollAnimationFrameRef.current);
+        }
+      };
+    }, []);
+
+    useIsomorphicLayoutEffect(() => {
+      registerComponentApi?.({
+        scrollToBottom,
+        scrollToTop,
+        scrollToIndex,
+        scrollToId,
+        getItemCount,
+        getVisibleRange,
+        preserveStateOnNextDataRefresh: (options?: CollectionDataRefreshOptions) => {
+          pendingDataRefreshRef.current = {
+            sourceIds: new Set(currentSourceIds),
+            scrollMetrics: getScrollMetrics(virtualizerRef.current),
+            options,
+          };
+        },
+        ...selectionApi,
+      });
+    }, [
+      currentSourceIds,
       getItemCount,
       getVisibleRange,
-      ...selectionApi,
-    });
-  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop, getItemCount, getVisibleRange, selectionApi]);
-  // REVIEW: I changed this code line because in the build version rows[index] was undefined
-  // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
-  const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
+      registerComponentApi,
+      scrollToBottom,
+      scrollToId,
+      scrollToIndex,
+      scrollToTop,
+      selectionApi,
+    ]);
+    // REVIEW: I changed this code line because in the build version rows[index] was undefined
+    // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
+    const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
 
-  const { startMargin, measureStartMargin } = useStartMarginState(
-    hasOutsideScroll,
-    parentRef,
-    scrollRef,
-  );
+    const { startMargin, measureStartMargin } = useStartMarginState(
+      hasOutsideScroll,
+      parentRef,
+      scrollRef,
+    );
 
-  return (
-    <ListItemTypeContext.Provider value={rowTypeContextValue}>
-      <ListContext.Provider value={expandContextValue}>
-        <ListSelectionContext.Provider value={selectionContextValue}>
-          <div
-            {...rest}
-            ref={rootRef}
-            style={style}
-            onContextMenu={onContextMenu}
-            tabIndex={rowsSelectable ? 0 : undefined}
-            onKeyDown={rowsSelectable ? compositeKeyDown : undefined}
-            className={classnames(
-              styles.outerListWrapper,
-              {
-                [styles.hasOutsideScroll]: hasOutsideScroll,
-                [styles.stretchToParent]: stretchToParent,
-              },
-              classes?.[COMPONENT_PART_KEY],
-              className,
-            )}
-          >
-            {loading && rows.length === 0 && (
-              <div className={styles.loadingWrapper}>
-                <Spinner delay={loadingDelay} />
-              </div>
-            )}
-            {!loading &&
-              rows.length === 0 &&
-              (emptyListPlaceholder ?? (
-                <div className={styles.noRows}>
-                  <Text>No data available</Text>
+    return (
+      <ListItemTypeContext.Provider value={rowTypeContextValue}>
+        <ListContext.Provider value={expandContextValue}>
+          <ListSelectionContext.Provider value={selectionContextValue}>
+            <div
+              {...rest}
+              ref={rootRef}
+              style={style}
+              onContextMenu={onContextMenu}
+              tabIndex={rowsSelectable ? 0 : undefined}
+              onKeyDown={handleRootKeyDown}
+              onPointerDown={clearPreservedScrollPaddingEnd}
+              onTouchStart={clearPreservedScrollPaddingEnd}
+              onWheel={clearPreservedScrollPaddingEnd}
+              className={classnames(
+                styles.outerListWrapper,
+                {
+                  [styles.hasOutsideScroll]: hasOutsideScroll,
+                  [styles.stretchToParent]: stretchToParent,
+                },
+                classes?.[COMPONENT_PART_KEY],
+                className,
+              )}
+            >
+              {loading && rows.length === 0 && (
+                <div className={styles.loadingWrapper}>
+                  <Spinner delay={loadingDelay} />
                 </div>
-              ))}
-            {rows.length > 0 && (
-              <div
-                className={classnames(styles.innerListWrapper, {
-                  [styles.reverse]: scrollAnchor === "bottom",
-                  [styles.borderCollapse]: borderCollapse,
-                  [styles.sectioned]: groupBy !== undefined,
-                })}
-                data-list-container={true}
-              >
-                {/* key on the resolved scroll viewport: Virtualizer observes its
+              )}
+              {!loading &&
+                rows.length === 0 &&
+                (emptyListPlaceholder ?? (
+                  <div className={styles.noRows}>
+                    <Text>No data available</Text>
+                  </div>
+                ))}
+              {rows.length > 0 && (
+                <div
+                  className={classnames(styles.innerListWrapper, {
+                    [styles.reverse]: scrollAnchor === "bottom",
+                    [styles.borderCollapse]: borderCollapse,
+                    [styles.sectioned]: groupBy !== undefined,
+                  })}
+                  data-list-container={true}
+                >
+                  {/* key on the resolved scroll viewport: Virtualizer observes its
                     viewport in a mount-only layout effect whose microtask reads
                     scrollRef.current once and never revisits it (virtua
                     Virtualizer.tsx, empty dep array). On the first render
@@ -1386,67 +1749,74 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
                     flip discards virtua's measurement cache, which is still
                     better than staying bound to the wrong element.
                     xmlui-org/xmlui#3760 */}
-                <Virtualizer
-                  key={hasOutsideScroll ? "outside-scroll" : "inside-scroll"}
-                  ref={virtualizerRef}
-                  scrollRef={scrollElementRef}
-                  shift={shift}
-                  onScroll={handleVirtuaScroll}
-                  startMargin={startMargin}
-                  keepMounted={renderCacheKeepMountedIndexes}
-                  bufferSize={virtualBufferSize}
-                  item={Item as CustomItemComponent}
-                >
-                  {rows.map((row, rowIndex) => {
-                    const key = row?.[idKey] ?? rowIndex;
-                    const isFirstItem = rowIndex === 0;
-                    const shouldMeasure = isFirstItem && fixedItemSize && row != null;
-                    const isSelected = row._row_type === undefined
-                      ? !!selectedRowIdMap[String(row[idKey])]
-                      : false;
-                    // Render different row types
-                    switch (row._row_type) {
-                      case RowType.SECTION:
-                        return (
-                          <React.Fragment key={key}>
-                            {shouldMeasure ? (
-                              <div ref={firstItemRef}>{sectionRenderer?.(row, key)}</div>
-                            ) : (
-                              sectionRenderer?.(row, key)
-                            )}
-                          </React.Fragment>
-                        );
-                      case RowType.SECTION_FOOTER:
-                        return (
-                          <React.Fragment key={key}>
-                            {shouldMeasure ? (
-                              <div ref={firstItemRef}>{sectionFooterRenderer?.(row, key)}</div>
-                            ) : (
-                              sectionFooterRenderer?.(row, key)
-                            )}
-                          </React.Fragment>
-                        );
-                      default:
-                        return (
-                          <React.Fragment key={key}>
-                            {shouldMeasure ? (
-                              <div ref={firstItemRef}>{itemRenderer(row, key, rowIndex, rowCount, isSelected)}</div>
-                            ) : (
-                              itemRenderer(row, key, rowIndex, rowCount, isSelected)
-                            )}
-                          </React.Fragment>
-                        );
-                    }
-                  })}
-                </Virtualizer>
-              </div>
-            )}
-          </div>
-        </ListSelectionContext.Provider>
-      </ListContext.Provider>
-    </ListItemTypeContext.Provider>
-  );
-}));
+                  <Virtualizer
+                    key={hasOutsideScroll ? "outside-scroll" : "inside-scroll"}
+                    ref={virtualizerRef}
+                    scrollRef={scrollElementRef}
+                    shift={shift}
+                    onScroll={handleVirtuaScroll}
+                    startMargin={startMargin}
+                    keepMounted={renderCacheKeepMountedIndexes}
+                    bufferSize={virtualBufferSize}
+                    item={Item as CustomItemComponent}
+                  >
+                    {rows.map((row, rowIndex) => {
+                      const key = row?.[idKey] ?? rowIndex;
+                      const isFirstItem = rowIndex === 0;
+                      const shouldMeasure = isFirstItem && fixedItemSize && row != null;
+                      const isSelected =
+                        row._row_type === undefined
+                          ? !!selectedRowIdMap[String(row[idKey])]
+                          : false;
+                      // Render different row types
+                      switch (row._row_type) {
+                        case RowType.SECTION:
+                          return (
+                            <React.Fragment key={key}>
+                              {shouldMeasure ? (
+                                <div ref={firstItemRef}>{sectionRenderer?.(row, key)}</div>
+                              ) : (
+                                sectionRenderer?.(row, key)
+                              )}
+                            </React.Fragment>
+                          );
+                        case RowType.SECTION_FOOTER:
+                          return (
+                            <React.Fragment key={key}>
+                              {shouldMeasure ? (
+                                <div ref={firstItemRef}>{sectionFooterRenderer?.(row, key)}</div>
+                              ) : (
+                                sectionFooterRenderer?.(row, key)
+                              )}
+                            </React.Fragment>
+                          );
+                        default:
+                          return (
+                            <React.Fragment key={key}>
+                              {shouldMeasure ? (
+                                <div ref={firstItemRef}>
+                                  {itemRenderer(row, key, rowIndex, rowCount, isSelected)}
+                                </div>
+                              ) : (
+                                itemRenderer(row, key, rowIndex, rowCount, isSelected)
+                              )}
+                            </React.Fragment>
+                          );
+                      }
+                    })}
+                  </Virtualizer>
+                  {preservedScrollPaddingEnd > 0 ? (
+                    <div aria-hidden="true" style={{ height: preservedScrollPaddingEnd }} />
+                  ) : null}
+                </div>
+              )}
+            </div>
+          </ListSelectionContext.Provider>
+        </ListContext.Provider>
+      </ListItemTypeContext.Provider>
+    );
+  }),
+);
 
 /**
  * Checks whether the list wrapper has a real height constraint.
