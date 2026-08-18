@@ -294,6 +294,78 @@ test.describe("Basic Functionality", () => {
       await expect(numberCells.nth(1)).toHaveText("87,5");
     });
 
+    test("uses root App locale for string sorting", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <App locale="hu-HU">
+          <Table
+            data='{[
+              { city: "cica" },
+              { city: "csaba" },
+              { city: "cukor" },
+              { city: "dinnye" }
+            ]}'
+            sortBy="city"
+            sortDirection="ascending"
+            testId="table"
+          >
+            <Column bindTo="city" />
+          </Table>
+        </App>
+      `);
+
+      await expect(page.locator("tbody tr td")).toHaveText(["cica", "cukor", "csaba", "dinnye"]);
+    });
+
+    test("uses root App locale for accented Hungarian string sorting", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <App locale="hu-HU">
+          <Table
+            data='{[
+              { word: "alma" },
+              { word: "árpa" },
+              { word: "barack" },
+              { word: "dió" },
+              { word: "édes" },
+              { word: "fa" },
+              { word: "hal" },
+              { word: "írás" },
+              { word: "játék" },
+              { word: "opera" },
+              { word: "óra" },
+              { word: "ördög" },
+              { word: "ősz" },
+              { word: "patak" }
+            ]}'
+            sortBy="word"
+            sortDirection="ascending"
+            testId="table"
+          >
+            <Column bindTo="word" />
+          </Table>
+        </App>
+      `);
+
+      await expect(page.locator("tbody tr td")).toHaveText([
+        "alma",
+        "árpa",
+        "barack",
+        "dió",
+        "édes",
+        "fa",
+        "hal",
+        "írás",
+        "játék",
+        "opera",
+        "óra",
+        "ördög",
+        "ősz",
+        "patak",
+      ]);
+    });
+
     test("uses idKey and UUID values for inferred id-like display types", async ({
       initTestBed,
       page,
