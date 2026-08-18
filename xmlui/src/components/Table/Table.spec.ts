@@ -5249,6 +5249,7 @@ test.describe("Virtualization", () => {
       <App scrollWholePage="false">
         <Table
           height="400px"
+          renderCache="{false}"
           items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
           testId="table"
         >
@@ -5287,6 +5288,7 @@ test.describe("Virtualization", () => {
       <App scrollWholePage="false">
         <Table
           height="400px"
+          renderCache="{false}"
           items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
           testId="table"
         >
@@ -5312,10 +5314,68 @@ test.describe("Virtualization", () => {
     await page.waitForTimeout(100);
 
     // Now row 600 should be visible
-    await expect(page.locator("td").filter({ hasText: "File #600" }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
 
     // And early rows should no longer be in the DOM
-    await expect(page.locator("td").filter({ hasText: "File #1" })).toHaveCount(0);
+    await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(0);
+  });
+
+  test("retains recently rendered rows by default", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="Name" bindTo="id">
+            <Text value="File #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: /^File #1$/ }).first()).toBeVisible();
+    await page.waitForTimeout(50);
+
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await page.waitForTimeout(100);
+
+    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(1);
+  });
+
+  test("can disable retained virtualized rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App scrollWholePage="false">
+        <Table
+          height="400px"
+          renderCache="{false}"
+          items="{Array.from({length: 600}, (_, i) => ({id: i + 1}))}"
+          testId="table"
+        >
+          <Column header="Name" bindTo="id">
+            <Text value="File #{$item.id}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: /^File #1$/ }).first()).toBeVisible();
+
+    await table.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    await page.waitForTimeout(100);
+
+    await expect(page.locator("td").filter({ hasText: /^File #600$/ }).first()).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: /^File #1$/ })).toHaveCount(0);
   });
 
   test("keeps scroll model stable while visible range display updates during scrolling", async ({
@@ -5569,6 +5629,7 @@ test.describe("Virtualization", () => {
       <App scrollWholePage="false">
         <Table
           height="400px"
+          renderCache="{false}"
           items="{Array.from({length: 100}, (_, i) => ({id: i + 1}))}"
           isPaginated="true"
           pageSize="50"

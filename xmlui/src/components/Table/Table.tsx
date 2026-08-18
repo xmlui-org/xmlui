@@ -129,6 +129,29 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.canResizeColumns,
     },
+    renderCache: {
+      description:
+        `Controls whether the table keeps a bounded set of recently rendered virtualized rows mounted ` +
+        `while they are outside the viewport. Keeping rows mounted reduces remount and measurement ` +
+        `flash when users scroll back through recently viewed content.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.renderCache,
+    },
+    renderCacheSize: {
+      description:
+        `Maximum number of recently rendered virtualized rows to keep mounted when ` +
+        `[\`renderCache\`](#rendercache) is enabled. Larger values can make repeat scrolling smoother ` +
+        `but retain more DOM nodes.`,
+      valueType: "number",
+      defaultValue: defaultProps.renderCacheSize,
+    },
+    virtualBufferSize: {
+      description:
+        `Extra virtualizer buffer, in pixels, to render before and after the viewport. Increase this ` +
+        `when fast scrolling reaches rows that have not been rendered before; unlike ` +
+        `[\`renderCache\`](#rendercache), this prepares never-seen rows near the viewport.`,
+      valueType: "number",
+    },
     idKey: {
       description:
         `This property is used to specify the unique ID property in the data array. ` +
@@ -1028,6 +1051,9 @@ const TableWithColumns = memo(
             columnInference={extractValue.asOptionalString(node.props.columnInference)}
             columnSizing={extractValue.asOptionalString(node.props.columnSizing)}
             canResizeColumns={extractValue.asOptionalBoolean(node.props.canResizeColumns)}
+            renderCache={extractValue.asOptionalBoolean(node.props.renderCache)}
+            renderCacheSize={extractValue.asOptionalNumber(node.props.renderCacheSize)}
+            virtualBufferSize={extractValue.asOptionalNumber(node.props.virtualBufferSize)}
             idKey={idKey}
             hasExplicitColumns={hasExplicitColumns}
             pageSizeOptions={extractValue(node.props.pageSizeOptions)}

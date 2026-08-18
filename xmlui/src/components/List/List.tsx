@@ -81,6 +81,29 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    renderCache: {
+      description:
+        `Controls whether the list keeps a bounded set of recently rendered virtualized rows mounted ` +
+        `while they are outside the viewport. Keeping rows mounted reduces remount and measurement ` +
+        `flash when users scroll back through recently viewed content.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.renderCache,
+    },
+    renderCacheSize: {
+      description:
+        `Maximum number of recently rendered virtualized rows to keep mounted when ` +
+        `[\`renderCache\`](#rendercache) is enabled. Larger values can make repeat scrolling smoother ` +
+        `but retain more DOM nodes.`,
+      valueType: "number",
+      defaultValue: defaultProps.renderCacheSize,
+    },
+    virtualBufferSize: {
+      description:
+        `Extra virtualizer buffer, in pixels, to render before and after the viewport. Increase this ` +
+        `when fast scrolling reaches rows that have not been rendered before; unlike ` +
+        `[\`renderCache\`](#rendercache), this prepares never-seen rows near the viewport.`,
+      valueType: "number",
+    },
     groupBy: {
       description:
         "This property sets which data item property is used to group the list items. " +
@@ -713,6 +736,9 @@ const ListWithSelection = memo(function ListWithSelection({
       defaultGroups={extractValue(node.props.defaultGroups)}
       borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
       fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
+      renderCache={extractValue.asOptionalBoolean(node.props.renderCache)}
+      renderCacheSize={extractValue.asOptionalNumber(node.props.renderCacheSize)}
+      virtualBufferSize={extractValue.asOptionalNumber(node.props.virtualBufferSize)}
       rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
       enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
       initiallySelected={extractValue(node.props.initiallySelected)}

@@ -43,6 +43,7 @@ import {
   useScrollParent,
   useStartMarginState,
 } from "../../components-core/utils/hooks";
+import { useVirtualizedRenderCache } from "../../components-core/utils/virtualized-render-cache";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
@@ -418,6 +419,9 @@ type TableProps = {
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
+  renderCache?: boolean;
+  renderCacheSize?: number;
+  virtualBufferSize?: number;
   renderVersion?: number;
   hideSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxesHeader?: boolean;
@@ -1128,6 +1132,9 @@ export const Table = memo(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      renderCache = defaultProps.renderCache,
+      renderCacheSize = defaultProps.renderCacheSize,
+      virtualBufferSize,
       renderVersion = 0,
       hideSelectionCheckboxesHeader = defaultProps.hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes = defaultProps.alwaysShowSelectionCheckboxes,
@@ -1644,6 +1651,24 @@ export const Table = memo(
 
     // --- Select the set of visible rows whenever the table rows change
     const rows = table.getRowModel().rows;
+    const getRenderCacheRowId = useCallback(
+      (index: number) => {
+        const row = rows[index];
+        return row?.id !== undefined ? `row:${String(row.id)}` : undefined;
+      },
+      [rows],
+    );
+    const {
+      keepMountedIndexes: renderCacheKeepMountedIndexes,
+      noteVisibleRange: noteRenderCacheVisibleRange,
+      clear: clearRenderCache,
+    } = useVirtualizedRenderCache({
+      enabled: renderCache,
+      maxSize: renderCacheSize,
+      rowCount: rows.length,
+      getRowId: getRenderCacheRowId,
+    });
+
     useEffect(() => {
       setVisibleItems(rows.map((row) => row.original));
     }, [rows]);
@@ -2400,20 +2425,21 @@ export const Table = memo(
 
     const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
     const reportVisibleRange = useCallback(() => {
-      if (!onVisibleRangeDidChange) return;
       const range = computeVisibleRange();
       if (!range) return;
+      noteRenderCacheVisibleRange(range);
+      if (!onVisibleRangeDidChange) return;
       const last = lastVisibleRange.current;
       if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
       lastVisibleRange.current = range;
       onVisibleRangeDidChange(range);
-    }, [computeVisibleRange, onVisibleRangeDidChange]);
+    }, [computeVisibleRange, noteRenderCacheVisibleRange, onVisibleRangeDidChange]);
 
     useEffect(() => {
-      if (!onVisibleRangeDidChange) return;
+      if (!rows.length) return;
       const raf = requestAnimationFrame(reportVisibleRange);
       return () => cancelAnimationFrame(raf);
-    }, [onVisibleRangeDidChange, reportVisibleRange, rows]);
+    }, [reportVisibleRange, rows]);
 
     const lastScrollOffset = useRef(0);
     const handleVirtuaScroll = useCallback(
@@ -2443,9 +2469,12 @@ export const Table = memo(
     );
 
     const runProgrammaticScroll = useEvent((scroll: () => void) => {
+      clearRenderCache();
       programmaticScroll.current = true;
-      scroll();
-      scheduleProgrammaticScrollRelease();
+      requestAnimationFrame(() => {
+        scroll();
+        scheduleProgrammaticScrollRelease();
+      });
     });
 
     const scrollToBottom = useEvent(() => {
@@ -2741,6 +2770,8 @@ export const Table = memo(
               scrollRef={scrollElementRef}
               startMargin={startMargin}
               onScroll={handleVirtuaScroll}
+              keepMounted={renderCacheKeepMountedIndexes}
+              bufferSize={virtualBufferSize}
             >
               {rows.map((row) => (
                 <tr key={row.id} data-render-version={rowRenderVersion} />

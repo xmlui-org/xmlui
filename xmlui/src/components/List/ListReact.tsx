@@ -33,6 +33,7 @@ import {
   useScrollParent,
   useStartMarginState,
 } from "../../components-core/utils/hooks";
+import { useVirtualizedRenderCache } from "../../components-core/utils/virtualized-render-cache";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
 import classnames from "classnames";
@@ -245,6 +246,9 @@ type DynamicHeightListProps = {
   registerComponentApi?: RegisterComponentApiFn;
   borderCollapse?: boolean;
   fixedItemSize?: boolean;
+  renderCache?: boolean;
+  renderCacheSize?: number;
+  virtualBufferSize?: number;
   // Selection props
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
@@ -683,6 +687,9 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     registerComponentApi,
     borderCollapse = defaultProps.borderCollapse,
     fixedItemSize,
+    renderCache = defaultProps.renderCache,
+    renderCacheSize = defaultProps.renderCacheSize,
+    virtualBufferSize,
     // Selection props
     rowsSelectable = defaultProps.rowsSelectable,
     enableMultiRowSelection = defaultProps.enableMultiRowSelection,
@@ -785,6 +792,38 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   });
 
   const shift = useShift(rows, idKey);
+  const rowCount = rows?.length ?? 0;
+
+  const getRenderCacheRowId = useCallback(
+    (index: number) => {
+      const row = rows[index];
+      if (!row) return undefined;
+      switch (row._row_type) {
+        case RowType.SECTION:
+          return `section:${String(row.id)}`;
+        case RowType.SECTION_FOOTER:
+          return `section-footer:${String(row.id)}`;
+        default: {
+          const rowId = row[idKey];
+          return rowId === undefined || rowId === null || rowId === ""
+            ? `index:${index}`
+            : `item:${String(rowId)}`;
+        }
+      }
+    },
+    [idKey, rows],
+  );
+
+  const {
+    keepMountedIndexes: renderCacheKeepMountedIndexes,
+    noteVisibleRange: noteRenderCacheVisibleRange,
+    clear: clearRenderCache,
+  } = useVirtualizedRenderCache({
+    enabled: renderCache,
+    maxSize: renderCacheSize,
+    rowCount,
+    getRowId: getRenderCacheRowId,
+  });
 
   // --- Safe items array for selection operations
   const safeItems = Array.isArray(items) ? items : EMPTY_ARRAY;
@@ -1139,21 +1178,22 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     return { startIndex, endIndex };
   }, [rows.length]);
   const reportVisibleRange = useCallback(() => {
-    if (!onVisibleRangeDidChange) return;
     const range = computeVisibleRange();
     if (!range) return;
+    noteRenderCacheVisibleRange(range);
+    if (!onVisibleRangeDidChange) return;
     const last = lastVisibleRange.current;
     if (last && last.startIndex === range.startIndex && last.endIndex === range.endIndex) return;
     lastVisibleRange.current = range;
     onVisibleRangeDidChange(range);
-  }, [onVisibleRangeDidChange, computeVisibleRange]);
+  }, [computeVisibleRange, noteRenderCacheVisibleRange, onVisibleRangeDidChange]);
   useEffect(() => {
     // Initial range and content-growth shifts (appends move the range even
     // without a scroll). rAF lets virtua finish its measure/layout pass.
-    if (!onVisibleRangeDidChange) return;
+    if (!rows.length) return;
     const raf = requestAnimationFrame(reportVisibleRange);
     return () => cancelAnimationFrame(raf);
-  }, [rows, onVisibleRangeDidChange, reportVisibleRange]);
+  }, [rows, reportVisibleRange]);
 
   const lastScrollOffset = useRef(0);
   const handleVirtuaScroll = useCallback(
@@ -1201,11 +1241,14 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   );
 
   const runProgrammaticScroll = useEvent((scroll: () => void) => {
+    clearRenderCache();
     programmaticScroll.current = true;
-    scroll();
     requestAnimationFrame(() => {
+      scroll();
       requestAnimationFrame(() => {
-        programmaticScroll.current = false;
+        requestAnimationFrame(() => {
+          programmaticScroll.current = false;
+        });
       });
     });
   });
@@ -1240,18 +1283,13 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   });
 
-  // virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`.
-  // The current spacer comes from the rendered `startMargin` prop, which can be
-  // stale in the same tick where we re-measure content that appeared above the
-  // list. Pass only the delta between the fresh margin and rendered margin:
-  // before React publishes the fresh prop this fills the missing spacer, and
-  // after it publishes the delta naturally falls back to zero.
+  // virtua computes `$getStartSpacerSize() + $getItemOffset(index) + offset`.
+  // The start spacer is kept in sync by `useStartMarginState`; passing the
+  // measured margin again would double-count content that appeared above the
+  // list after mount.
   const scrollToIndex = useEvent((index) => {
     runProgrammaticScroll(() => {
-      const freshMargin = measureStartMargin();
-      virtualizerRef.current?.scrollToIndex(index, {
-        offset: freshMargin - startMargin,
-      });
+      virtualizerRef.current?.scrollToIndex(index);
     });
   });
 
@@ -1281,8 +1319,6 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
   // REVIEW: I changed this code line because in the build version rows[index] was undefined
   // const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
   const rowTypeContextValue = useCallback((index: number) => rows?.[index]?._row_type, [rows]);
-
-  const rowCount = rows?.length ?? 0;
 
   const { startMargin, measureStartMargin } = useStartMarginState(
     hasOutsideScroll,
@@ -1357,6 +1393,8 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
                   shift={shift}
                   onScroll={handleVirtuaScroll}
                   startMargin={startMargin}
+                  keepMounted={renderCacheKeepMountedIndexes}
+                  bufferSize={virtualBufferSize}
                   item={Item as CustomItemComponent}
                 >
                   {rows.map((row, rowIndex) => {
