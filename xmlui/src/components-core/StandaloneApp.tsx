@@ -2058,7 +2058,11 @@ function useStandalone(
         );
       }
       warnBuiltInComponentNameCollisions(componentsWithCodeBehinds, extensionManager);
-      await warnShadowedLocalComponentFiles(
+      // Advisory only — never block boot on it. Awaiting these probes held
+      // startup hostage to one network round-trip per referenced built-in
+      // tag (~4.5 s of serial 404s on a real deployment, #3787); the app
+      // rendered nothing until the last probe answered.
+      void warnShadowedLocalComponentFiles(
         entryPointWithCodeBehind,
         componentsWithCodeBehinds,
         async (componentName) => {
@@ -2295,22 +2299,27 @@ export async function warnShadowedLocalComponentFiles(
       visitComponent(component.component as ComponentDef, null, visitor, {}, metadataHandler);
     }
 
-    for (const componentName of candidates) {
-      let exists = false;
-      try {
-        exists = await componentFileExists(componentName);
-      } catch {
-        exists = false;
-      }
-      if (exists) {
-        warn(
-          `[xmlui] Local component file "components/${componentName}.${componentFileExtension}" ` +
-            `was not loaded because <${componentName}> already resolves to the built-in ` +
-            `"${componentName}" component. Rename the custom component or reference it with ` +
-            `an app namespace to avoid the collision.`,
-        );
-      }
-    }
+    // Probe all candidates concurrently: each probe is a network request
+    // in the browser, and a serial for-await loop costs sum(RTT) — measured
+    // at ~4.5 s for ~43 built-in tags on a GitHub Pages deployment (#3787).
+    await Promise.all(
+      Array.from(candidates).map(async (componentName) => {
+        let exists = false;
+        try {
+          exists = await componentFileExists(componentName);
+        } catch {
+          exists = false;
+        }
+        if (exists) {
+          warn(
+            `[xmlui] Local component file "components/${componentName}.${componentFileExtension}" ` +
+              `was not loaded because <${componentName}> already resolves to the built-in ` +
+              `"${componentName}" component. Rename the custom component or reference it with ` +
+              `an app namespace to avoid the collision.`,
+          );
+        }
+      }),
+    );
   } finally {
     componentRegistry.destroy();
   }
