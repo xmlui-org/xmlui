@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.14.16
+
+### Patch Changes
+
+- 42f4826: Fix computed member bindings so expressions like `map[key]` re-derive when the key changes.
+- da7efed: Add Tree refresh state preservation for backend-backed data updates.
+
 ## 0.14.15
 
 ### Patch Changes
