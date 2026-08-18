@@ -867,6 +867,51 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     [rows, idKey],
   );
 
+  // --- Dev-only: row identity is load-bearing and its failure is silent.
+  // Duplicate or empty idKey values give virtua's reconciliation two items with one
+  // identity (rows paint over each other once the row set changes size) and collapse
+  // selection state, which is keyed by String(row[idKey]). Neither surfaces an error.
+  // An effect rather than a check inside the rows memo: a memo runs during render, so
+  // it would warn twice under StrictMode and again on re-renders that miss the cache.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    let emptyCount = 0;
+    const seen = new Set<string>();
+    const duplicated = new Set<string>();
+    for (const row of rows) {
+      // Section headers and footers carry synthetic ids; only real items are keyed by idKey.
+      if (!row || row._row_type !== undefined) continue;
+      const value = row[idKey];
+      if (value === undefined || value === null || value === "") {
+        emptyCount++;
+        continue;
+      }
+      const asString = String(value);
+      if (seen.has(asString)) {
+        duplicated.add(asString);
+      } else {
+        seen.add(asString);
+      }
+    }
+    const consequence =
+      "Row identity must be unique and non-empty, or virtualized rows will reconcile " +
+      "incorrectly and selection state will be shared between rows.";
+    if (emptyCount > 0) {
+      console.warn(
+        `List: idKey "${idKey}" — ${emptyCount} row(s) have an empty or missing value. ${consequence}`,
+      );
+    }
+    if (duplicated.size > 0) {
+      // Sample rather than enumerate: a systematic duplicate in a large data set
+      // would otherwise produce a console line with thousands of entries.
+      const sample = Array.from(duplicated).slice(0, 3).map((v) => `"${v}"`).join(", ");
+      const more = duplicated.size > 3 ? `, and ${duplicated.size - 3} more` : "";
+      console.warn(
+        `List: idKey "${idKey}" — ${duplicated.size} value(s) are shared by more than one row (${sample}${more}). ${consequence}`,
+      );
+    }
+  }, [rows, idKey]);
+
   const getRowItem = useCallback(
     (index: number) => {
       const row = rows[index];
@@ -1167,9 +1212,7 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
 
   // Every scroll API re-measures the start margin at call time rather than
   // reading the cache, which goes stale when content appears above the list
-  // (xmlui-org/xmlui#3765). measureStartMargin() also publishes the fresh value,
-  // so virtua's startMargin prop — and therefore store.$getStartSpacerSize(),
-  // which is fed from that prop — converges on the same number.
+  // (xmlui-org/xmlui#3765).
   const scrollToBottom = useEvent(() => {
     const v = virtualizerRef.current;
     if (v && rows.length) {
@@ -1197,18 +1240,18 @@ export const ListNative = memo(forwardRef(function DynamicHeightList2(
     }
   });
 
-  // No offset. virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`,
-  // so passing -startMargin subtracted a quantity virtua adds straight back —
-  // the margin cancelled out of the sum and the call targeted the item's offset
-  // WITHIN the list rather than its position in the scrollable content. Letting
-  // the spacer carry the margin exactly once is what puts the row where the
-  // caller means. The measure call is still needed: the spacer is fed from the
-  // startMargin prop, so a stale cache leaves the spacer short by the same
-  // amount that the offset used to hide.
+  // virtua computes `offset + $getStartSpacerSize() + $getItemOffset(index)`.
+  // The current spacer comes from the rendered `startMargin` prop, which can be
+  // stale in the same tick where we re-measure content that appeared above the
+  // list. Pass only the delta between the fresh margin and rendered margin:
+  // before React publishes the fresh prop this fills the missing spacer, and
+  // after it publishes the delta naturally falls back to zero.
   const scrollToIndex = useEvent((index) => {
     runProgrammaticScroll(() => {
-      measureStartMargin();
-      virtualizerRef.current?.scrollToIndex(index);
+      const freshMargin = measureStartMargin();
+      virtualizerRef.current?.scrollToIndex(index, {
+        offset: freshMargin - startMargin,
+      });
     });
   });
 

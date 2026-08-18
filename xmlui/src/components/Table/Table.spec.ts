@@ -16,7 +16,7 @@
  */
 
 import { expect, test } from "../../testing/fixtures";
-import type { Locator } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 
 // Sample data for testing
@@ -5052,34 +5052,29 @@ test.describe("Virtualization", () => {
         </VStack>
         <Table
           id="table"
-          items="{Array.from({length: 200}, (_, i) => ({id: 'row-' + i, label: 'Row ' + i}))}"
+          items="{Array.from({length: 1000}, (_, i) => ({id: 'row-' + (i + 1), label: 'Row ' + (i + 1)}))}"
           testId="table"
         >
           <Column header="Label" bindTo="label">
-            <Text value="{$item.label}" />
+            <Text height="30px" value="{$item.label}" />
           </Column>
         </Table>
       </VStack>
-      <Button testId="reveal" label="Reveal" onClick="showTop = true" />
+      <Button testId="reveal" label="reveal" onClick="showTop = true" />
       ${button}
     </VStack>
   `;
 
-  const targetRowOffsetFromHeader = (page: any, rowIndex: number) =>
+  const targetRowOffsetFromHeader = (page: Page, rowIndex: number) =>
     page.evaluate((index) => {
-      const scroller = document.querySelector('[data-testid="scroller"]') as HTMLElement;
-      const header = document.querySelector("thead") as HTMLElement;
-      const table = document.querySelector('[data-testid="table"]') as HTMLElement;
-      const row = document.querySelector(`tr[data-index="${index}"]`) as HTMLElement;
-      if (!scroller || !header || !table || !row) {
+      const header = document.querySelector("thead");
+      const target = Array.from(document.querySelectorAll("tbody tr")).find((row) =>
+        row.textContent?.includes(`Row ${index + 1}`),
+      );
+      if (!header || !target) {
         return Number.POSITIVE_INFINITY;
       }
-      const scrollerTop = scroller.getBoundingClientRect().top;
-      const startMargin = table.getBoundingClientRect().top - scrollerTop + scroller.scrollTop;
-      if (startMargin <= 0) {
-        return Number.POSITIVE_INFINITY;
-      }
-      return Math.round(row.getBoundingClientRect().top - header.getBoundingClientRect().bottom);
+      return target.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
     }, rowIndex);
 
   test("scrollToIndex accounts for content revealed above the table (outside-scroll)", async ({
@@ -5087,14 +5082,14 @@ test.describe("Virtualization", () => {
     page,
   }) => {
     await initTestBed(
-      revealAboveTableApp(
-        `<Button testId="act" label="Index" onClick="table.scrollToIndex(50)" />`,
-      ),
+      revealAboveTableApp(`<Button testId="act" label="idx" onClick="table.scrollToIndex(50)" />`),
     );
+    await expect(page.getByTestId("table")).toBeVisible();
 
     await page.getByTestId("reveal").click();
-    await page.getByTestId("act").click();
+    await expect(page.getByTestId("above")).toBeVisible();
 
+    await page.getByTestId("act").click();
     await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeLessThanOrEqual(5);
     await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeGreaterThanOrEqual(-5);
   });
@@ -5105,13 +5100,15 @@ test.describe("Virtualization", () => {
   }) => {
     await initTestBed(
       revealAboveTableApp(
-        `<Button testId="act" label="Id" onClick="table.scrollToId('row-50')" />`,
+        `<Button testId="act" label="id" onClick="table.scrollToId('row-51')" />`,
       ),
     );
+    await expect(page.getByTestId("table")).toBeVisible();
 
     await page.getByTestId("reveal").click();
-    await page.getByTestId("act").click();
+    await expect(page.getByTestId("above")).toBeVisible();
 
+    await page.getByTestId("act").click();
     await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeLessThanOrEqual(5);
     await expect.poll(() => targetRowOffsetFromHeader(page, 50)).toBeGreaterThanOrEqual(-5);
   });

@@ -2416,9 +2416,7 @@ export const Table = memo(
     const scrollToIndex = useEvent((index: number) => {
       runProgrammaticScroll(() => {
         const freshMargin = measureStartMargin();
-        virtualizerRef.current?.scrollToIndex(index, {
-          offset: freshMargin - startMargin,
-        });
+        virtualizerRef.current?.scrollToIndex(index, { offset: freshMargin - startMargin });
       });
     });
 
