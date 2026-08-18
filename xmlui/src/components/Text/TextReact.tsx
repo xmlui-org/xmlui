@@ -116,7 +116,15 @@ type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   registerComponentApi?: RegisterComponentApiFn;
   highlightText?: string | string[];
   highlightActiveIndex?: number;
+  segments?: HighlightTextSegment[];
   [variantSpecificProps: string]: any;
+};
+
+/** One pre-computed span supplied via the `segments` property. */
+export type HighlightTextSegment = {
+  text: string;
+  hit?: boolean;
+  active?: boolean;
 };
 
 import { defaultProps } from "./Text.defaults";
@@ -139,6 +147,7 @@ export const Text = memo(forwardRef(function Text(
     registerComponentApi,
     highlightText,
     highlightActiveIndex,
+    segments,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef: ForwardedRef<HTMLElement>,
@@ -161,6 +170,65 @@ export const Text = memo(forwardRef(function Text(
     typeof highlightActiveIndex === "number" && highlightActiveIndex >= 0
       ? highlightActiveIndex
       : -1;
+
+  // --- Pre-computed spans. For content whose highlights are decided upstream (an FTS5
+  // snippet marks whole tokens, and its excerpt has lost the column provenance needed
+  // to re-derive spans client-side), substring matching is a different answer rather
+  // than an approximation — so the caller supplies the segments and we only render them.
+  const validSegments = useMemo(() => {
+    if (segments == null) return null; // Not "invalid": the data-fed refetch case.
+    const bad = (reason: string) => {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `Text: ignoring the \`segments\` property — ${reason}. Expected an array of ` +
+            `{ text: string, hit?: boolean, active?: boolean }. Falling back to the ` +
+            `component's own content.`,
+        );
+      }
+      return null;
+    };
+    if (!Array.isArray(segments)) return bad(`it is ${typeof segments}, not an array`);
+    for (const seg of segments) {
+      if (seg == null || typeof seg !== "object" || typeof (seg as any).text !== "string") {
+        return bad("one or more entries lack a string `text`");
+      }
+    }
+    return segments as HighlightTextSegment[];
+  }, [segments]);
+
+  const usingSegments = validSegments !== null;
+
+  if (import.meta.env.DEV && usingSegments && highlightText != null) {
+    // Mutually exclusive by intent. A warning rather than an error: `segments` is
+    // typically data-fed, and throwing would take out the row over a transient state.
+    console.warn(
+      "Text: `segments` and `highlightText` are both set. `segments` supplies the " +
+        "content and its own highlights, so `highlightText` is ignored.",
+    );
+  }
+
+  const segmentChildren = useMemo(() => {
+    if (!validSegments) return null;
+    // Per-segment `active` is authoritative when the caller computes it. Only when no
+    // segment claims it do we fall back to counting hits in document order, which is
+    // what makes highlightActiveIndex mean the same thing here as for highlightText.
+    const callerMarkedActive = validSegments.some((seg) => seg.active);
+    let hitOrdinal = 0;
+    return validSegments.map((seg, i) => {
+      if (!seg.hit) return <Fragment key={i}>{seg.text}</Fragment>;
+      const ordinal = hitOrdinal++;
+      const isActive = callerMarkedActive ? !!seg.active : ordinal === activeIndex;
+      return (
+        <mark
+          key={i}
+          className={styles.highlightMark}
+          data-active={isActive ? "true" : undefined}
+        >
+          {seg.text}
+        </mark>
+      );
+    });
+  }, [validSegments, activeIndex]);
 
   const highlightedChildren = useMemo(() => {
     if (needles.length === 0) return children;
@@ -197,12 +265,13 @@ export const Text = memo(forwardRef(function Text(
   }, [children, needles, activeIndex]);
 
   // Bring the active occurrence into view, matching Markdown's behavior so stepping
-  // matches across a mixed list scrolls the same way regardless of row type.
+  // matches across a mixed list scrolls the same way regardless of row type. Segments
+  // qualify on their own: the caller may mark one active without any activeIndex.
   useEffect(() => {
-    if (activeIndex < 0 || needles.length === 0) return;
+    if (!usingSegments && (activeIndex < 0 || needles.length === 0)) return;
     const el = innerRef.current?.querySelector('mark[data-active="true"]') as HTMLElement | null;
     if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
-  }, [activeIndex, needleKey, needles.length]);
+  }, [activeIndex, needleKey, needles.length, usingSegments, segmentChildren]);
 
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
@@ -409,7 +478,7 @@ export const Text = memo(forwardRef(function Text(
           : {}),
       }}
     >
-      {highlightedChildren}
+      {usingSegments ? segmentChildren : highlightedChildren}
     </Element>
   );
 }));

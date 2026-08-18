@@ -350,6 +350,35 @@ Occurrences are counted across all terms in document order, matching `Markdown`.
 
 %-PROP-END
 
+%-PROP-START segments
+
+Renders **pre-computed** highlight spans. Use this instead of [`highlightText`](#highlighttext) when the highlights are decided upstream rather than by matching a term here.
+
+The distinction matters more than it first appears. A full-text search snippet marks whole tokens after its own tokenization, and the excerpt that reaches the client has usually lost the context needed to re-derive those spans. Substring matching over the same text is not an approximation of that result — it disagrees in both directions, marking part of a token where the server marked all of it, and marking inside words where the server did not.
+
+```xmlui-pg copy display name="Example: segments"
+<App>
+  <Text segments="{[
+    { text: 'the ', hit: false },
+    { text: 'ticker', hit: true },
+    { text: ' fires once per ', hit: false },
+    { text: 'second', hit: true, active: true }
+  ]}" />
+</App>
+```
+
+Each entry needs a `text` string. `hit` renders that span highlighted; `active` marks it as the current occurrence, styled with `backgroundColor-markActive-Text` and scrolled into view.
+
+When `segments` is set it supplies the component's content — `value` and any children are not rendered, and `highlightText` is ignored (in a development build, setting both logs a warning). If `segments` is absent or `undefined`, the component renders its normal content, so a data-bound `segments` that is briefly undefined during a refetch degrades quietly rather than blanking the row.
+
+If no segment carries `active`, [`highlightActiveIndex`](#highlightactiveindex) selects which `hit` is active, counting in document order — the same numbering `highlightText` uses, so a find-in-page can step through a list mixing both kinds of row as one sequence.
+
+> [!INFO] `segments` expresses **one kind of span**: whether it matched a search, and whether it is the current match. It is deliberately not a general mechanism for styling arbitrary runs of text. Content that carries other, orthogonal span kinds — added and removed words in a diff, say, which a row may hold *alongside* search hits — needs its own styling and should compose those runs itself. Keeping this property to a single meaning is what lets `hit` and `active` mean the same thing here as they do for `highlightText`.
+>
+> The field set — `text`, `hit`, `active` — is **closed for this release**, and that is a decision rather than an oversight. Should a second span kind ever warrant first-class support, a per-segment variant is the intended extension point; until then, content needing more than one kind of span composes it itself.
+
+%-PROP-END
+
 %-PROP-START overflowMode
 
 Here are a few examples.
