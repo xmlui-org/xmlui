@@ -141,8 +141,12 @@ export const TextMd = createMetadata({
         "upstream rather than by matching a search term here — a full-text search snippet, " +
         "for example, whose marks fall on token boundaries that cannot be reproduced by " +
         "substring matching. Segments with `hit` are rendered as highlighted; `active` marks " +
-        `the current occurrence. When set, \`segments\` supplies the \`${COMP}\`'s content and ` +
-        "`highlightText` is ignored.",
+        "the current occurrence. A segment may instead carry `variant`, naming a non-search " +
+        "span kind (such as a changed word in a diff) styled through " +
+        "`backgroundColor-mark-<variant>-" + COMP + "`. Precedence is `active` > `hit` > " +
+        "`variant`, so a segment that is a hit renders as a hit and its variant is ignored, " +
+        `and only \`hit\` segments are counted by \`highlightActiveIndex\`. When set, ` +
+        `\`segments\` supplies the \`${COMP}\`'s content and \`highlightText\` is ignored.`,
       valueType: "any",
     },
   },

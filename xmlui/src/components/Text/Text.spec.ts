@@ -2549,3 +2549,188 @@ test.describe("segments", () => {
     await expect(page.getByTestId("t").locator("mark")).toHaveCount(0);
   });
 });
+
+// =============================================================================
+// SEGMENT VARIANTS (a second span kind, orthogonal to search hits)
+// =============================================================================
+
+// Mirrors the validation matrix the first consumer committed to running against a
+// real diff surface, so their result and ours speak to the same cases.
+test.describe("segment variants", () => {
+  const devBuild = process.env.PLAYWRIGHT_USE_DEV_SERVER !== "false" && !process.env.CI;
+
+  test("a variant segment renders as a span, not a mark", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Text testId="t" segments="{[
+        {text: 'plain '},
+        {text: 'changed', variant: 'emphasis'},
+        {text: ' tail'}
+      ]}" />
+    `);
+    const t = page.getByTestId("t");
+    await expect(t).toHaveText("plain changed tail");
+    await expect(t.locator("[data-variant='emphasis']")).toHaveText("changed");
+    // The element namespace matters: consumers count marks to find search hits.
+    await expect(t.locator("mark")).toHaveCount(0);
+  });
+
+  test("overlap: a hit that also carries a variant renders as a hit", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Text testId="t" segments="{[
+        {text: 'both', hit: true, active: true, variant: 'emphasis'},
+        {text: ' rest'}
+      ]}" />
+    `);
+    const t = page.getByTestId("t");
+    await expect(t.locator("mark[data-active='true']")).toHaveText("both");
+    await expect(t.locator("[data-variant]")).toHaveCount(0);
+  });
+
+  test("ordinal integrity: variant spans never enter the hit sequence", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Document order is hit(0), variant, hit(1). Index 1 must select the second hit,
+    // not the variant span sitting between them.
+    await initTestBed(`
+      <Text testId="t" highlightActiveIndex="{1}" segments="{[
+        {text: 'one', hit: true},
+        {text: ' mid ', variant: 'emphasis'},
+        {text: 'two', hit: true}
+      ]}" />
+    `);
+    const active = page.getByTestId("t").locator("mark[data-active='true']");
+    await expect(active).toHaveCount(1);
+    await expect(active).toHaveText("two");
+  });
+
+  test("an undeclared variant still renders its text, unstyled", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Text testId="t" segments="{[{text: 'kept', variant: 'nosuchvariant'}]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("kept");
+    await expect(page.getByTestId("t").locator("[data-variant='nosuchvariant']")).toHaveCount(1);
+  });
+
+  // Uses a variant name no other test uses: the warn-once-per-name cache is module
+  // scoped, and the test bed reuses one JS context across tests in a worker, so a
+  // shared name would make this pass or fail depending on test order.
+  test("an undeclared variant warns in dev", async ({ initTestBed, page }) => {
+    test.skip(!devBuild, "The warning is compiled out of production builds");
+    const warnings: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "warning" && msg.text().includes("segment variant")) {
+        warnings.push(msg.text());
+      }
+    });
+    await initTestBed(`
+      <Text testId="t" segments="{[{text: 'kept', variant: 'undeclaredwarncase'}]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("kept");
+    await expect.poll(() => warnings.length).toBeGreaterThan(0);
+    expect(warnings[0]).toContain("undeclaredwarncase");
+  });
+
+  test("literal brackets in segment text stay literal", async ({ initTestBed, page }) => {
+    // Spans arrive from a server that uses [ ] as its own markers; content containing
+    // real brackets must not be re-interpreted on the way through.
+    await initTestBed(`
+      <Text testId="t" segments="{[
+        {text: 'items: [{ id, feedback }]', hit: false},
+        {text: '[approved]', variant: 'emphasis'}
+      ]}" />
+    `);
+    await expect(page.getByTestId("t")).toHaveText("items: [{ id, feedback }][approved]");
+    await expect(page.getByTestId("t").locator("[data-variant]")).toHaveText("[approved]");
+  });
+
+  test("a variant interior to a word does not split the word", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Text testId="t" width="400px" segments="{[
+        {text: 'anti'},
+        {text: 'tick', variant: 'emphasis'},
+        {text: 'erdisestablish'}
+      ]}" />
+    `);
+    const t = page.getByTestId("t");
+    await expect(t).toHaveText("antitickerdisestablish");
+    const spanBox = await t.locator("[data-variant]").boundingBox();
+    const containerBox = await t.boundingBox();
+    expect(containerBox!.height).toBeLessThan(spanBox!.height * 2);
+  });
+});
+
+
+
+test.describe("segment variant theming", () => {
+  const devBuild = process.env.PLAYWRIGHT_USE_DEV_SERVER !== "false" && !process.env.CI;
+
+  // The case the first consumer hit: a variant token given a `$token` value rendered
+  // flat, because inline <Theme> vars reached the DOM unresolved. A literal worked,
+  // which made it look like the variant feature rather than the theme path.
+  test("a variant themed with a $token reference renders that colour", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Theme
+          backgroundColor-mark-diffDel-Text="#ff9999"
+          backgroundColor-mark-diffAdd-Text="$color-success-200">
+          <Text testId="t" segments="{[
+            {text: 'del', variant: 'diffDel'},
+            {text: 'add', variant: 'diffAdd'}
+          ]}" />
+        </Theme>
+      </App>
+    `);
+    await expect(page.getByTestId("t")).toHaveText("deladd");
+    const out = await page.evaluate(() => {
+      const read = (v: string) => {
+        const el = document.querySelector(`[data-variant="${v}"]`) as HTMLElement;
+        return getComputedStyle(el).backgroundColor;
+      };
+      return { del: read("diffDel"), add: read("diffAdd") };
+    });
+    expect(out.del).toEqual("rgb(255, 153, 153)");
+    // The whole point: a themed reference must paint, not compute to nothing.
+    expect(out.add).not.toEqual("rgba(0, 0, 0, 0)");
+    expect(out.add).not.toEqual(out.del);
+  });
+
+  // A broken `$token` reference does not reach the component as a broken value: the
+  // theme layer drops the whole declaration, so it looks identical to never declaring
+  // it. One warning covers both, which is why there is only one.
+  test("a variant referencing an undefined theme variable warns in dev", async ({
+    initTestBed,
+    page,
+  }) => {
+    test.skip(!devBuild, "The warning is compiled out of production builds");
+    const warnings: string[] = [];
+    page.on("console", (m) => {
+      if (m.type() === "warning" && m.text().includes("no usable theme value")) {
+        warnings.push(m.text());
+      }
+    });
+    await initTestBed(`
+      <App>
+        <Theme backgroundColor-mark-brokenref-Text="$no-such-token-exists">
+          <Text testId="t" segments="{[{text: 'x', variant: 'brokenref'}]}" />
+        </Theme>
+      </App>
+    `);
+    await expect(page.getByTestId("t")).toHaveText("x");
+    await expect.poll(() => warnings.length).toBeGreaterThan(0);
+    expect(warnings[0]).toContain("brokenref");
+  });
+});
+

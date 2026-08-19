@@ -24,6 +24,7 @@ import {
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
+import { replaceThemeVarRefs } from "../../components-core/theming/transformThemeVars";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
@@ -175,7 +176,11 @@ export function Theme({
       if (invalidThemeVarNames.has(key)) {
         return;
       }
-      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
+      // Resolve `$token` references the same way theme definitions do. Without this an
+      // app-defined variable given a `$token` value reaches the DOM as that literal
+      // string and computes to nothing — visible only as the declaration silently
+      // doing nothing, since an invalid custom property raises no error.
+      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = replaceThemeVarRefs(value);
     });
 
     const ret = {

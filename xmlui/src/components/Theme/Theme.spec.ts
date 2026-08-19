@@ -649,3 +649,39 @@ test.describe("applyIf Edge Cases", () => {
     expect(parentClass).toContain('themeWrapper');
   });
 });
+
+// =============================================================================
+// TOKEN REFERENCES IN INLINE THEME VARS
+// =============================================================================
+
+test.describe("token references in inline theme vars", () => {
+  // Regression: variables declared on a <Theme> were written to CSS raw, so an
+  // app-defined name given a `$token` value landed as that literal string and computed
+  // to nothing. Registered names appeared to work because the theme-definition path
+  // rewrote them separately. Written against a plain variable rather than any one
+  // feature, because every app-defined variable was affected.
+  test("an app-defined variable resolves a $token value", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App>
+        <Theme app-defined-probe-color="$color-danger-200">
+          <Text testId="t" backgroundColor="$app-defined-probe-color">probe</Text>
+        </Theme>
+      </App>
+    `);
+    await expect(page.getByTestId("t")).toHaveText("probe");
+    const resolved = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="t"]') as HTMLElement;
+      return {
+        declared: getComputedStyle(el).getPropertyValue("--xmlui-app-defined-probe-color").trim(),
+        bg: getComputedStyle(el).backgroundColor,
+      };
+    });
+    // The contract is that the declaration holds usable CSS, not which form it takes:
+    // a known token may arrive fully resolved to its colour, an indirect one as a
+    // var() reference. What must never survive is the literal "$color-danger-200",
+    // which is what reached the DOM before and computed to nothing.
+    expect(resolved.declared.startsWith("$")).toBe(false);
+    expect(resolved.declared.length).toBeGreaterThan(0);
+    expect(resolved.bg).not.toEqual("rgba(0, 0, 0, 0)");
+  });
+});

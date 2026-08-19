@@ -47,6 +47,9 @@ interface CustomVariantCacheEntry {
  */
 const customVariantCache = new Map<string, CustomVariantCacheEntry>();
 
+/** Segment-variant names already warned about, so a long list warns once, not per row. */
+const warnedVariants = new Set<string>();
+
 /**
  * Retrieves a cached custom variant entry if it exists.
  */
@@ -125,6 +128,8 @@ export type HighlightTextSegment = {
   text: string;
   hit?: boolean;
   active?: boolean;
+  /** Names a non-search span kind, styled via `backgroundColor-mark-<variant>-Text`. */
+  variant?: string;
 };
 
 import { defaultProps } from "./Text.defaults";
@@ -215,20 +220,75 @@ export const Text = memo(forwardRef(function Text(
     const callerMarkedActive = validSegments.some((seg) => seg.active);
     let hitOrdinal = 0;
     return validSegments.map((seg, i) => {
-      if (!seg.hit) return <Fragment key={i}>{seg.text}</Fragment>;
-      const ordinal = hitOrdinal++;
-      const isActive = callerMarkedActive ? !!seg.active : ordinal === activeIndex;
-      return (
-        <mark
-          key={i}
-          className={styles.highlightMark}
-          data-active={isActive ? "true" : undefined}
-        >
-          {seg.text}
-        </mark>
-      );
+      // Precedence: active > hit > variant. A segment that is a search hit renders as
+      // one, and its variant is ignored — a span shows one kind at a time.
+      if (seg.hit) {
+        const ordinal = hitOrdinal++;
+        const isActive = callerMarkedActive ? !!seg.active : ordinal === activeIndex;
+        return (
+          <mark
+            key={i}
+            className={styles.highlightMark}
+            data-active={isActive ? "true" : undefined}
+          >
+            {seg.text}
+          </mark>
+        );
+      }
+      // A variant is a different kind of span, not a weaker match, so it is not a
+      // <mark>: consumers count and query marks to find search hits, and putting
+      // variants in that namespace would silently inflate every such count. Note the
+      // ordinal counter is untouched here — variant spans never enter the sequence
+      // highlightActiveIndex walks.
+      if (seg.variant) {
+        return (
+          <span
+            key={i}
+            className={styles.highlightVariant}
+            data-variant={seg.variant}
+            style={{
+              backgroundColor: toCssVar(`$backgroundColor-mark-${seg.variant}-Text`),
+              color: toCssVar(`$textColor-mark-${seg.variant}-Text`),
+            }}
+          >
+            {seg.text}
+          </span>
+        );
+      }
+      return <Fragment key={i}>{seg.text}</Fragment>;
     });
   }, [validSegments, activeIndex]);
+
+  // Dev-only: an undeclared variant renders plain by CSS fallback, which is the right
+  // runtime behavior and a silent one — a typo in a data-driven field looks identical
+  // to a deliberate plain span. Warn once per distinct name rather than per row.
+  useEffect(() => {
+    if (!import.meta.env.DEV || !usingSegments) return;
+    const root = innerRef.current;
+    if (!root) return;
+    const spans = root.querySelectorAll<HTMLElement>("[data-variant]");
+    spans.forEach((el) => {
+      const name = el.dataset.variant;
+      if (!name || warnedVariants.has(name)) return;
+      const token = `--xmlui-backgroundColor-mark-${name}-Text`;
+      // Read from the span itself so scoped theme classes are in scope, not just :root.
+      const declared = getComputedStyle(el).getPropertyValue(token).trim();
+      // Covers both ways a variant renders flat: never declared, and declared with a
+      // reference to an undefined theme variable — the theme layer drops that whole
+      // declaration, so it arrives here as absent rather than as a broken value.
+      if (!declared) {
+        warnedVariants.add(name);
+        console.warn(
+          `Text: segment variant "${name}" has no usable theme value. Define ` +
+            `\`${token.replace("--xmlui-", "")}\` (and optionally ` +
+            `\`textColor-mark-${name}-Text\`) in your theme, or remove the variant. ` +
+            `A declaration that references an undefined theme variable is dropped, so ` +
+            `this fires for a broken \`$token\` reference too. The span renders ` +
+            `unstyled until then.`,
+        );
+      }
+    });
+  }, [usingSegments, segmentChildren]);
 
   const highlightedChildren = useMemo(() => {
     if (needles.length === 0) return children;

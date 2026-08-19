@@ -19145,7 +19145,7 @@ export default {
         "valueType": "number"
       },
       "segments": {
-        "description": "Pre-computed highlight spans, as an array of `{ text, hit, active }` objects. Use this instead of [`highlightText`](#highlighttext) when the highlights are decided upstream rather than by matching a search term here — a full-text search snippet, for example, whose marks fall on token boundaries that cannot be reproduced by substring matching. Segments with `hit` are rendered as highlighted; `active` marks the current occurrence. When set, `segments` supplies the `Text`'s content and `highlightText` is ignored.",
+        "description": "Pre-computed highlight spans, as an array of `{ text, hit, active }` objects. Use this instead of [`highlightText`](#highlighttext) when the highlights are decided upstream rather than by matching a search term here — a full-text search snippet, for example, whose marks fall on token boundaries that cannot be reproduced by substring matching. Segments with `hit` are rendered as highlighted; `active` marks the current occurrence. A segment may instead carry `variant`, naming a non-search span kind (such as a changed word in a diff) styled through `backgroundColor-mark-<variant>-Text`. Precedence is `active` > `hit` > `variant`, so a segment that is a hit renders as a hit and its variant is ignored, and only `hit` segments are counted by `highlightActiveIndex`. When set, `segments` supplies the `Text`'s content and `highlightText` is ignored.",
         "valueType": "any"
       }
     },

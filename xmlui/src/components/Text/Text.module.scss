@@ -445,6 +445,13 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     background-color: $backgroundColor-markActive-Text;
   }
 
+  // Segment variants: a non-search span kind. Colours arrive as inline custom-property
+  // references resolved per variant name, so nothing is declared here — this rule only
+  // matches the mark shape, and stays a plain inline run for the same reason marks do.
+  .highlightVariant {
+    border-radius: 2px;
+  }
+
   .noEllipsis {
     text-overflow: clip;
   }
