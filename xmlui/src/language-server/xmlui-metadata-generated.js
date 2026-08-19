@@ -13367,6 +13367,11 @@ export default {
         "valueType": "boolean",
         "defaultValue": true
       },
+      "skipDirtyConfirmation": {
+        "description": "When `true`, dirty modal dialogs close without showing the unsaved-changes confirmation prompt.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "confirmCloseTitle": {
         "description": "The title shown in the confirmation dialog when a dirty modal dialog is about to close.",
         "valueType": "string",

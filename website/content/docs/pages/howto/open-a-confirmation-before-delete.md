@@ -46,6 +46,8 @@ Before deleting a record or performing an irreversible operation you should ask 
 
 **`confirmTitle` and `confirmMessage` on `APICall` handle confirmation declaratively**: Set these props on an `APICall` and the framework shows the confirmation dialog automatically before executing the request — no script code needed. Use `confirmButtonLabel` and `cancelButtonLabel` to customise the button text.
 
+**`ModalDialog` can confirm dirty closes automatically**: Dirty dialogs and dialogs containing dirty forms prompt before closing by default. For short forms where that extra prompt is unnecessary, set `skipDirtyConfirmation="true"` on the `ModalDialog`.
+
 **The confirmation dialog is modal and blocks interaction**: While the dialog is visible the rest of the UI is dimmed and non-interactive, ensuring the user makes a deliberate choice before the destructive action proceeds.
 
 **Combine with `toast()` for feedback after deletion**: After the confirmed action succeeds, call `toast.success('Task deleted')` to close the loop and reassure the user that the operation completed.
