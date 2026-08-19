@@ -838,6 +838,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Keep Tree data stable during DataSource refetch"
+                            to="/docs/howto/keep-tree-data-stable-during-refetch"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Pre-select a tree node on load"
                             to="/docs/howto/pre-select-a-tree-node-on-load"
                         />
@@ -2070,6 +2075,11 @@
             <Page url="/docs/howto/preserve-tree-state-across-data-refreshes">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/preserve-tree-state-across-data-refreshes.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/keep-tree-data-stable-during-refetch">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/keep-tree-data-stable-during-refetch.md']}"
                 />
             </Page>
             <!-- Hidden pending xmlui-dnd-list extension (https://github.com/rdhyee/xmlui-dnd-list)
