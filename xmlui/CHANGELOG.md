@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.14.17
+
+### Patch Changes
+
+- 2807bff: Add `dataRefreshMode="preserve-state"` and `preserveStateOnNextDataRefresh()` support to List and Table refresh flows.
+- 3d93a37: Add a `skipDirtyConfirmation` prop to `ModalDialog` so dirty dialogs can close without showing the unsaved-changes confirmation prompt.
+- fea5cdd: Fix Table string sorting so it uses the active locale.
+- 39539ed: Add an optional `variant` field to `Text` segments, naming a span kind that is not a search hit — a changed word in a diff, for example — styled through `backgroundColor-mark-<variant>-Text` and `textColor-mark-<variant>-Text`. Precedence is `active` > `hit` > `variant`, variant spans render as `<span data-variant>` rather than `<mark>` so code that counts marks still counts only search hits, and only `hit` segments are counted by `highlightActiveIndex`.
+- 39539ed: Resolve `$token` references in theme variables declared inline on a `<Theme>`. Previously those values were written to CSS unchanged, so an app-defined variable given a value like `$color-danger-200` reached the DOM as that literal string and computed to nothing — silently, since an invalid custom property raises no error. Theme _definitions_ already resolved these; the two paths now share one implementation so they cannot drift again.
+- f5c47a0: Add bounded render caching controls for virtualized List and Table rows to reduce scroll remount flashing.
+
 ## 0.14.16
 
 ### Patch Changes
