@@ -84,7 +84,7 @@ The `ModalDialog` component is also a container such as the [`Card`](/docs/refer
 
 Use `setDirty(true)` when dialog content changes. When a dirty dialog is about to close, `ModalDialog` shows a confirmation prompt using `confirmCloseTitle`, `canCloseMessage`, `confirmCloseLabel`, and `cancelCloseLabel`.
 
-When the dialog hosts a `Form`, form field edits automatically count as dialog dirty state. The `dirtyChanged` event fires whenever this combined dirty state changes, so you can update labels, badges, or commands without polling `getDirty()`. If you define `willClose`, that event controls closing instead: returning an explicit `false` prevents the close and skips the dirty confirmation flow.
+When the dialog hosts a `Form`, form field edits automatically count as dialog dirty state. The `dirtyChanged` event fires whenever this combined dirty state changes, so you can update labels, badges, or commands without polling `getDirty()`. Set `skipDirtyConfirmation="true"` when dirty state should still be tracked but closing should not ask for confirmation. If you define `willClose`, that event controls closing instead: returning an explicit `false` prevents the close and skips the dirty confirmation flow.
 
 ```xmlui-pg name="Prevent Accidental Close" height="520px"
 ---app copy display name="Example: prevent accidental close"
@@ -231,6 +231,16 @@ Toggles whether the dialog encompasses the whole UI (`true`) or not and has a mi
 ---desc
 Click the button to display a full-screen dialog. The icon at the top-right corner of the dialog allows you to close it.
 ```
+
+### `skipDirtyConfirmation` [#skipdirtyconfirmation]
+
+> [!DEF]  default: **false**
+
+When `true`, dirty modal dialogs close without showing the unsaved-changes confirmation prompt.
+
+Set this property to `true` for short or low-risk dialogs where dirty state should still be tracked, but closing the dialog should not show the unsaved-changes confirmation prompt.
+
+See [Preventing Accidental Close](#preventing-accidental-close) for context.
 
 ### `title` [#title]
 

@@ -339,7 +339,7 @@ export default ({ mode = "lib" }) => {
 
   let plugins: PluginOption[] = [];
   if (mode === "metadata") {
-    plugins = [ViteXmlui()];
+    plugins = [ViteXmlui(), stripCssModuleExportsFromCssAssets()];
   } else if (mode === "inspector-parser") {
     plugins = [dtsPlugin() as Plugin];
   } else if (mode === "standalone") {
@@ -405,7 +405,7 @@ export default ({ mode = "lib" }) => {
     },
     build: {
       minify: true,
-      cssMinify: mode === "standalone" ? false : undefined,
+      cssMinify: mode === "standalone" || mode === "metadata" ? false : undefined,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,

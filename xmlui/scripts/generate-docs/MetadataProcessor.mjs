@@ -688,7 +688,7 @@ function copyImports(imports) {
 
 function readFileContents(filePath) {
   if (!fileExists(filePath)) {
-    throw new ErrorWithSeverity(`File ${filePath} does not exist.`, LOGGER_LEVELS.warning);
+    return "";
   }
   if (isDirectory(filePath)) {
     throw new ErrorWithSeverity(

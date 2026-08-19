@@ -37,7 +37,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `initialValue` [#initialvalue]
 
-This property sets the component's initial value.
+This property sets the Slider's initial value. It is not read only at mount: changing `initialValue`, `minValue`, or `maxValue` re-seeds the thumbs into the current range. That re-seeding fires no events, which makes binding all three to a derived value the way to drive a slider whose domain changes at runtime.
 
 ```xmlui-pg name="Slider"
 <Slider initialValue="5" />
@@ -185,7 +185,7 @@ This method sets the focus on the slider component.
 
 ### `setValue` [#setvalue]
 
-This API sets the value of the `Slider`. You can use it to programmatically change the value.
+This API sets the value of the `Slider`. You can use it to programmatically change the value. The new value is clamped against the `minValue` and `maxValue` in effect **at the moment of the call**, so a deferred or debounced call made while those props are changing may clamp against the previous range. The call also fires `didChange` and `didCommit`, exactly as a user adjustment would. To reset a slider whose domain changes at runtime, rebind `initialValue` instead — that re-seeds without firing events.
 
 **Signature**: `setValue(value: number | [number, number] | undefined): void`
 
