@@ -488,6 +488,37 @@ test.describe("Events and Vars", () => {
     await expect(page.getByTestId("content")).not.toBeVisible();
   });
 
+  test("skipDirtyConfirmation lets dirty dialog close without confirmation", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          skipDirtyConfirmation="true"
+          canCloseMessage="Discard your draft?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Text testId="content">content</Text>
+          <Button testId="markDirty" onClick="modal.setDirty(true)">mark dirty</Button>
+          <Button testId="readDirty" onClick="testState = modal.getDirty()">read dirty</Button>
+          <Button testId="apiClose" onClick="modal.close()">close via api</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    await page.getByTestId("markDirty").click();
+    await page.getByTestId("readDirty").click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+
+    await page.getByTestId("apiClose").click();
+    await expect(page.getByText("Discard your draft?")).not.toBeVisible();
+    await expect(page.getByTestId("content")).not.toBeVisible();
+  });
+
   test("clean dialog closes without confirmation", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
@@ -597,6 +628,39 @@ test.describe("Events and Vars", () => {
 
     await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
     await page.getByRole("button", { name: "Discard" }).click();
+    await expect(page.getByTestId("modal")).not.toBeVisible();
+  });
+
+  test("skipDirtyConfirmation lets nested Form dirty state close without confirmation", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="open" onClick="modal.open()">open</Button>
+        <ModalDialog
+          id="modal"
+          testId="modal"
+          skipDirtyConfirmation="true"
+          canCloseMessage="Discard form changes?"
+          confirmCloseLabel="Discard"
+          cancelCloseLabel="Keep Editing">
+          <Form id="profileForm">
+            <FormItem label="Name" bindTo="name" testId="nameField" />
+          </Form>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("open").click();
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Jane");
+
+    await page.getByTestId("modal").getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.getByText("Discard form changes?")).not.toBeVisible();
     await expect(page.getByTestId("modal")).not.toBeVisible();
   });
 

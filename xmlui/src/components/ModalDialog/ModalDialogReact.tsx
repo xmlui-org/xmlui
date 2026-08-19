@@ -67,6 +67,7 @@ type ModalProps = {
   titleTemplate?: ReactNode;
   closeButtonVisible?: boolean;
   closeOnClickAway?: boolean;
+  skipDirtyConfirmation?: boolean;
   confirmCloseTitle?: string;
   canCloseMessage?: string;
   confirmCloseLabel?: string;
@@ -251,6 +252,7 @@ export const ModalDialog = memo(React.forwardRef(
       titleTemplate,
       closeButtonVisible = defaultProps.closeButtonVisible,
       closeOnClickAway = defaultProps.closeOnClickAway,
+      skipDirtyConfirmation = defaultProps.skipDirtyConfirmation,
       className,
       classes,
       onOpen,
@@ -310,7 +312,7 @@ export const ModalDialog = memo(React.forwardRef(
         if (result === false) {
           return false;
         }
-      } else if (getDirty()) {
+      } else if (!skipDirtyConfirmation && getDirty()) {
         const confirmed = await confirmDirtyClose();
         if (confirmed !== true) {
           return false;
