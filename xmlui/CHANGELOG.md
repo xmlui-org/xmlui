@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.14.18
+
+### Patch Changes
+
+- e6ace28: Fix Tree, List, and Table preserve-state refresh handling when the data expression returns fresh object identities or temporarily empty data during refetch.
+
 ## 0.14.17
 
 ### Patch Changes
