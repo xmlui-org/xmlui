@@ -38,6 +38,20 @@ export function diffInsertedIds(previousIds: Set<string>, currentIds: Set<string
   return insertedIds;
 }
 
+export function areSourceIdSetsEqual(left: Set<string>, right: Set<string>): boolean {
+  if (left.size !== right.size) {
+    return false;
+  }
+
+  for (const value of left) {
+    if (!right.has(value)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function shouldInferFirstInserted(options?: CollectionDataRefreshOptions): boolean {
   return options?.operation === "insert" || options?.scrollTarget === "first-inserted";
 }

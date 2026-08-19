@@ -3149,6 +3149,101 @@ test.describe("Data Refresh State Preservation", () => {
     await expect(page.getByRole("cell", { name: "Row 1" })).toBeVisible();
     await expect(page.getByRole("cell", { name: "Row 11" })).not.toBeVisible();
   });
+
+  test("preserves scroll when data expression returns fresh objects", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.items="{Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+        <script>
+          function cloneRows(rows) {
+            return rows.map(row => ({ ...row }));
+          }
+        </script>
+        <Button testId="scroll" label="Scroll" onClick="table.scrollToId('row-70')" />
+        <Button
+          testId="refetch"
+          label="Refetch"
+          onClick="
+            items = [];
+            delay(50);
+            items = Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }));
+          "
+        />
+        <Table
+          id="table"
+          testId="table"
+          height="180px"
+          dataRefreshMode="preserve-state"
+          data="{cloneRows(items)}"
+          rowHeight="32"
+        >
+          <Column header="Name" bindTo="name">
+            <Text value="{$item.name}" />
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByTestId("table")).toBeVisible();
+    await page.getByTestId("scroll").click();
+    await expect(page.getByRole("cell", { name: "Row 70" })).toBeVisible();
+
+    await page.getByTestId("refetch").click();
+
+    await expect(page.getByRole("cell", { name: "Row 70" })).toBeVisible();
+  });
+
+  test("rerenders visible row cells when fresh-object data updates an existing row", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.items="{[
+        { id: 'row-1', name: 'Order 1', owner: 'Field', status: 'Queued' },
+        { id: 'row-2', name: 'Order 2', owner: 'Finance', status: 'Queued' }
+      ]}">
+        <script>
+          function cloneRows(rows) {
+            return rows.map(row => ({ ...row }));
+          }
+        </script>
+        <Button
+          testId="update"
+          label="Update"
+          onClick="
+            items = items.map(item => item.id === 'row-2'
+              ? { ...item, name: 'Order 2 updated', owner: 'Priority desk', status: 'Expedited' }
+              : item);
+          "
+        />
+        <Table
+          id="table"
+          testId="table"
+          dataRefreshMode="preserve-state"
+          data="{cloneRows(items)}"
+        >
+          <Column header="Order" bindTo="name" />
+          <Column header="Owner" bindTo="owner" />
+          <Column header="Status" bindTo="status" />
+        </Table>
+      </App>
+    `);
+
+    await expect(page.getByRole("cell", { name: "Order 2", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Finance", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Queued", exact: true })).toHaveCount(2);
+
+    await page.getByTestId("update").click();
+
+    await expect(page.getByRole("cell", { name: "Order 2 updated", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Priority desk", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Expedited", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Order 2", exact: true })).not.toBeVisible();
+  });
 });
 
 // =============================================================================

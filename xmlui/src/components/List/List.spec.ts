@@ -976,6 +976,53 @@ test.describe("Data Refresh State Preservation", () => {
 
     await expect.poll(testStateDriver.testState).toEqual(["row-3"]);
   });
+
+  test("preserves scroll when data expression returns fresh objects", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.items="{Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }))}">
+        <script>
+          function cloneRows(rows) {
+            return rows.map(row => ({ ...row }));
+          }
+        </script>
+        <Button testId="scroll" label="Scroll" onClick="list.scrollToId('row-70')" />
+        <Button
+          testId="refetch"
+          label="Refetch"
+          onClick="
+            items = [];
+            delay(50);
+            items = Array.from({ length: 80 }, (_, i) => ({ id: 'row-' + (i + 1), name: 'Row ' + (i + 1) }));
+          "
+        />
+        <List
+          id="list"
+          testId="list"
+          height="140px"
+          dataRefreshMode="preserve-state"
+          data="{cloneRows(items)}"
+          fixedItemSize="true"
+        >
+          <HStack height="32px" testId="{$item.id}">
+            <Text value="{$item.name}" />
+          </HStack>
+        </List>
+      </App>
+    `);
+
+    await expect(page.getByTestId("list")).toBeVisible();
+    await page.getByTestId("scroll").click();
+    await expect(page.getByTestId("row-70")).toBeVisible();
+
+    await page.getByTestId("refetch").click();
+
+    await expect(page.getByTestId("row-70")).toBeVisible();
+  });
 });
 
 // =============================================================================

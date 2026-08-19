@@ -3269,6 +3269,73 @@ test.describe("Events", () => {
       await expect(page.getByText("Child A", { exact: true })).not.toBeVisible();
     });
 
+    test("preserves expansion when data expression returns fresh objects", async ({
+      initTestBed,
+      createTreeDriver,
+      createButtonDriver,
+    }) => {
+      const hierarchyData = [
+        {
+          id: 1,
+          name: "Root",
+          children: [
+            {
+              id: 2,
+              name: "Child A",
+              children: [],
+            },
+          ],
+        },
+      ];
+
+      await initTestBed(`
+        <App var.items='{${JSON.stringify(hierarchyData)}}'>
+          <script>
+            function cloneTree(items) {
+              return items.map(item => ({
+                ...item,
+                children: item.children ? cloneTree(item.children) : []
+              }));
+            }
+          </script>
+          <VStack height="220px">
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="hierarchy"
+              dataRefreshMode="preserve-state"
+              data="{cloneTree(items)}"
+            >
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+          <Button testId="expand-root" onClick="treeApi.expandNode(1);" />
+          <Button testId="refetch-empty" onClick='
+            items = [];
+            delay(50);
+            items = ${JSON.stringify(hierarchyData)};
+          ' />
+        </App>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const expandRoot = await createButtonDriver("expand-root");
+      const refetchEmpty = await createButtonDriver("refetch-empty");
+
+      await expect(tree.getByTestId("1")).toBeVisible();
+      await expect(tree.getByTestId("2")).not.toBeVisible();
+
+      await expandRoot.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+
+      await refetchEmpty.click();
+      await expect(tree.getByTestId("2")).toBeVisible();
+    });
+
     test("insert intent scrolls the first inserted visible node into view", async ({
       initTestBed,
       createTreeDriver,

@@ -214,6 +214,8 @@ test.describe("Table refresh after insert, update, and delete", { tag: "@website
     await page.getByRole("button", { name: "Update order 16" }).click();
 
     await expect(page.getByRole("cell", { name: "Order 16 rev 2", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Priority desk", exact: true })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Expedited", exact: true })).toBeVisible();
     await expect(page.getByText("Updated Order 16 rev 2 and kept it in view")).toBeVisible();
   });
 

@@ -36,6 +36,7 @@ import type {
 } from "../../components-core/abstractions/treeAbstractions";
 import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-core/utils/treeUtils";
 import { defaultProps } from "./Tree.defaults";
+import { areSourceIdSetsEqual } from "../../components-core/abstractions/dataRefreshAbstractions";
 
 /**
  * Describes the data attached to a particular tree row
@@ -937,6 +938,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const hasReceivedDataRef = useRef(data !== undefined && data !== null);
   const latestTreeStateRef = useRef<TreeState | undefined>(undefined);
   const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+  const previousRenderedSourceIdsRef = useRef<Set<string>>(currentSourceIds);
   const latestScrollMetricsRef = useRef<TreeScrollMetrics>({
     scrollPosition: 0,
     scrollSize: 0,
@@ -1440,6 +1442,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   }, [currentSourceIds, effectiveSelectedId, isControlledMode, treeItemsById]);
 
   const captureLatestTreeState = useCallback(() => {
+    if (currentSourceIds.size === 0 && latestTreeStateRef.current) {
+      latestScrollMetricsRef.current = getScrollMetrics();
+      return;
+    }
+
     latestTreeStateRef.current = getTreeState();
     latestSourceIdsRef.current = currentSourceIds;
     latestScrollMetricsRef.current = getScrollMetrics();
@@ -1539,6 +1546,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       if (hasCurrentData) {
         hasReceivedDataRef.current = true;
       }
+      previousRenderedSourceIdsRef.current = currentSourceIds;
       captureLatestTreeState();
       return;
     }
@@ -1548,11 +1556,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
     const treeStateToApply = pendingRefresh?.treeState ?? latestTreeStateRef.current;
     const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+    const previousRenderedSourceIds = previousRenderedSourceIdsRef.current;
     const previousScrollMetrics =
       pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
 
     pendingDataRefreshRef.current = undefined;
     previousDataRef.current = data;
+    previousRenderedSourceIdsRef.current = currentSourceIds;
     if (hasCurrentData) {
       hasReceivedDataRef.current = true;
     }
@@ -1565,6 +1575,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     }
 
     if (shouldPreserve && treeStateToApply) {
+      if (!pendingRefresh && areSourceIdSetsEqual(previousRenderedSourceIds, currentSourceIds)) {
+        captureLatestTreeState();
+        return;
+      }
+
       const refreshState = applyExplicitUnloadedNodesToTreeState(treeStateToApply, treeItemsById);
       applyTreeState(refreshState);
       pruneTreeStateForCurrentData();

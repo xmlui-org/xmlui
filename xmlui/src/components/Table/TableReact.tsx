@@ -67,6 +67,7 @@ import { normalizeColumnType, type NormalizedColumnType } from "../Column/column
 import { useLocaleProfile, type LocaleProfile } from "../../components-core/i18n";
 import { Value } from "../Value/ValueReact";
 import {
+  areSourceIdSetsEqual,
   diffInsertedIds,
   getSourceIdSet,
   isPreserveScrollTarget,
@@ -1621,6 +1622,12 @@ export const Table = memo(
       layoutVersionRef.current++;
     }
     const layoutVersion = layoutVersionRef.current;
+    const dataRenderVersionRef = useRef(0);
+    const prevDataRenderVersionSourceRef = useRef(safeData);
+    if (prevDataRenderVersionSourceRef.current !== safeData) {
+      prevDataRenderVersionSourceRef.current = safeData;
+      dataRenderVersionRef.current++;
+    }
 
     const columnPinning = useMemo(() => {
       const left: Array<string> = [];
@@ -1682,6 +1689,7 @@ export const Table = memo(
     const previousDataRef = useRef<any>(data);
     const hasReceivedDataRef = useRef(data !== undefined && data !== null);
     const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+    const previousRenderedSourceIdsRef = useRef<Set<string>>(currentSourceIds);
     const latestScrollMetricsRef = useRef<CollectionScrollMetrics>({
       scrollPosition: 0,
       scrollSize: 0,
@@ -1697,6 +1705,15 @@ export const Table = memo(
     const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
     const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
     const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
+    if (
+      previousDataRef.current !== data &&
+      !pendingDataRefreshRef.current &&
+      dataRefreshMode === "preserve-state" &&
+      previousRenderedSourceIdsRef.current.size > 0
+    ) {
+      latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
+    }
+
     const getRenderCacheRowId = useCallback(
       (index: number) => {
         const row = rows[index];
@@ -1957,7 +1974,11 @@ export const Table = memo(
     // React remounts all <tr> elements, but the effect doesn't re-run (index is the
     // same), so the new DOM nodes are never observed → rows stay visibility:hidden.
     const rowRenderVersion =
-      renderVersion + layoutVersion + typedCellRevision + columnRenderVersionRef.current;
+      renderVersion +
+      layoutVersion +
+      dataRenderVersionRef.current +
+      typedCellRevision +
+      columnRenderVersionRef.current;
     const rowState = {
       focusedIndex,
       rowDisabledPredicate,
@@ -1995,7 +2016,7 @@ export const Table = memo(
     // TableMemoizedCells — analogous to TileGridMemoizedItem.
     // Created ONCE (useMemo([], [])), reads latest cell data from rowsRef via closure.
     // The custom comparator only allows a re-render when:
-    //   • renderVersion changes  (e.g. selectMode toggled → closures must refresh)
+    //   • renderVersion changes  (e.g. selectMode/data/layout changes → closures must refresh)
     //   • rowIndex changes        (row at this slot changed)
     //   • isSelected changes      (the only thing that changes on a click)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2676,6 +2697,10 @@ export const Table = memo(
     }, [effectiveIsPaginated, safeData.length]);
 
     const captureLatestRefreshState = useCallback(() => {
+      if (currentSourceIds.size === 0 && latestSourceIdsRef.current.size > 0) {
+        return;
+      }
+
       latestSourceIdsRef.current = currentSourceIds;
       latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
     }, [currentSourceIds]);
@@ -2688,6 +2713,7 @@ export const Table = memo(
         if (hasCurrentData) {
           hasReceivedDataRef.current = true;
         }
+        previousRenderedSourceIdsRef.current = currentSourceIds;
         captureLatestRefreshState();
         return;
       }
@@ -2696,10 +2722,12 @@ export const Table = memo(
       const pendingRefresh = pendingDataRefreshRef.current;
       const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
       const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+      const previousRenderedSourceIds = previousRenderedSourceIdsRef.current;
       const previousScrollMetrics = pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
 
       pendingDataRefreshRef.current = undefined;
       previousDataRef.current = data;
+      previousRenderedSourceIdsRef.current = currentSourceIds;
       if (hasCurrentData) {
         hasReceivedDataRef.current = true;
       }
@@ -2712,6 +2740,11 @@ export const Table = memo(
       }
 
       if (shouldPreserve) {
+        if (!pendingRefresh && areSourceIdSetsEqual(previousRenderedSourceIds, currentSourceIds)) {
+          captureLatestRefreshState();
+          return;
+        }
+
         clampPaginationForCurrentData();
         preparePreservedScrollRange(
           pendingRefresh?.options,
