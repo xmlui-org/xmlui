@@ -154,6 +154,42 @@ This property indicates whether ellipses should be displayed when the text is cr
 </App>
 ```
 
+### `highlightActiveIndex` [#highlightactiveindex]
+
+Which occurrence (0-based) of `highlightText` is the active match: it is emphasized and scrolled into view. Occurrences are counted **across all terms in document order**, matching `Markdown`, so a find-in-page stepping through a mixed list walks every match as one sequence regardless of which component rendered it. -1 or unset means none. With [`segments`](#segments), counts over the `hit` segments instead.
+
+Selects which occurrence of [`highlightText`](#highlighttext) is the *active* match: it gets `data-active="true"`, is styled with `backgroundColor-markActive-Text`, and is scrolled into view.
+
+Occurrences are counted across all terms in document order, matching `Markdown`. That shared numbering is the point: a find-in-page stepping through a list of mixed `Text` and `Markdown` rows walks every match as one sequence, regardless of which component rendered it.
+
+```xmlui-pg copy display name="Example: highlightActiveIndex"
+<App var.step="{0}">
+  <HStack>
+    <Button label="Previous" onClick="step = Math.max(0, step - 1)" />
+    <Button label="Next" onClick="step = Math.min(2, step + 1)" />
+    <Text value="Match {step + 1} of 3" />
+  </HStack>
+  <Text highlightText="pty" highlightActiveIndex="{step}">
+    The pty ticker, the pty layer, and the pty menu.
+  </Text>
+</App>
+```
+
+### `highlightText` [#highlighttext]
+
+When set, wraps every case-insensitive occurrence in the displayed text in a `<mark>` element (highlighted). Accepts a **string** (a single phrase) or a **string array** (each term highlighted independently). A term shorter than 2 characters, an empty string, or an empty array is a no-op. Matching is identical to `Markdown`'s property of the same name, so a list mixing `Text` and `Markdown` rows highlights consistently.
+
+Wraps matching text in `<mark>` elements, without the caller having to split the string into segments. Matching is identical to [`Markdown`'s property of the same name](/components/Markdown#highlighttext) — case-insensitive, a string treated as one phrase, an array as independent terms, terms under 2 characters ignored — so a list mixing `Text` and `Markdown` rows highlights consistently.
+
+```xmlui-pg copy display name="Example: highlightText"
+<App>
+  <Text highlightText="ticker">The pty ticker fires once per second.</Text>
+  <Text highlightText="{['pty', 'ticker']}">The pty layer and the ticker.</Text>
+</App>
+```
+
+Because the marks are rendered inside the `Text` element itself, a match falling in the middle of a word does not break the word, and styling set on the `Text` applies once rather than needing to be repeated per segment.
+
 ### `inline` [#inline]
 
 > [!DEF]  default: **false**
@@ -344,6 +380,59 @@ This property indicates if linebreaks should be preserved when displaying text.
 
 > **Note**: Remember to use the `value` property of the `Text`.
 > Linebreaks are converted to spaces when nesting the text inside the `Text` component.
+
+### `segments` [#segments]
+
+Pre-computed highlight spans, as an array of `{ text, hit, active }` objects. Use this instead of [`highlightText`](#highlighttext) when the highlights are decided upstream rather than by matching a search term here — a full-text search snippet, for example, whose marks fall on token boundaries that cannot be reproduced by substring matching. Segments with `hit` are rendered as highlighted; `active` marks the current occurrence. A segment may instead carry `variant`, naming a non-search span kind (such as a changed word in a diff) styled through `backgroundColor-mark-<variant>-Text`. Precedence is `active` > `hit` > `variant`, so a segment that is a hit renders as a hit and its variant is ignored, and only `hit` segments are counted by `highlightActiveIndex`. When set, `segments` supplies the `Text`'s content and `highlightText` is ignored.
+
+Renders **pre-computed** highlight spans. Use this instead of [`highlightText`](#highlighttext) when the highlights are decided upstream rather than by matching a term here.
+
+The distinction matters more than it first appears. A full-text search snippet marks whole tokens after its own tokenization, and the excerpt that reaches the client has usually lost the context needed to re-derive those spans. Substring matching over the same text is not an approximation of that result — it disagrees in both directions, marking part of a token where the server marked all of it, and marking inside words where the server did not.
+
+```xmlui-pg copy display name="Example: segments"
+<App>
+  <Text segments="{[
+    { text: 'the ', hit: false },
+    { text: 'ticker', hit: true },
+    { text: ' fires once per ', hit: false },
+    { text: 'second', hit: true, active: true }
+  ]}" />
+</App>
+```
+
+Each entry needs a `text` string. `hit` renders that span highlighted; `active` marks it as the current occurrence, styled with `backgroundColor-markActive-Text` and scrolled into view.
+
+When `segments` is set it supplies the component's content — `value` and any children are not rendered, and `highlightText` is ignored (in a development build, setting both logs a warning). If `segments` is absent or `undefined`, the component renders its normal content, so a data-bound `segments` that is briefly undefined during a refetch degrades quietly rather than blanking the row.
+
+If no segment carries `active`, [`highlightActiveIndex`](#highlightactiveindex) selects which `hit` is active, counting in document order — the same numbering `highlightText` uses, so a find-in-page can step through a list mixing both kinds of row as one sequence.
+
+> [!INFO] Precedence is `active` > `hit` > `variant`: a segment that is a search hit renders as one, and its `variant` is ignored. Only `hit` segments are counted by [`highlightActiveIndex`](#highlightactiveindex), so variant spans never enter the sequence a find-in-page steps through.
+
+### A second span kind: `variant` [#a-second-span-kind-variant]
+
+Some content carries spans that have nothing to do with searching — a word that changed on one side of a diff, say — and a row may hold those *alongside* search hits. Give such a segment a `variant` naming its kind:
+
+```xmlui
+<Text segments="{[
+  { text: 'the ', hit: false },
+  { text: 'quick', variant: 'emphasis' },
+  { text: ' brown ', hit: false },
+  { text: 'fox', hit: true, active: true }
+]}" />
+```
+
+Colours come from your theme, keyed by the variant name:
+
+```
+backgroundColor-mark-emphasis-Text
+textColor-mark-emphasis-Text
+```
+
+Declare those for every variant you use. An undeclared variant renders as plain text — the span is still there, just unstyled — and a development build warns once per name so a typo in a data-driven field does not pass silently.
+
+This is deliberately not a general styling channel: exactly those two properties resolve, keyed by a name you declare in the theme, rather than arbitrary CSS travelling in your data.
+
+> [!INFO] Two namespaces here point in opposite directions, deliberately. In the **DOM**, a hit is a `<mark>` and a variant is a `<span data-variant="…">` — they are different kinds of thing, and code that counts or queries marks to find search hits should not also collect diff spans. In the **theme**, both live under `mark-` (`backgroundColor-mark-Text`, `backgroundColor-markActive-Text`, `backgroundColor-mark-emphasis-Text`) — from a theme author's side they are one family of span styling to keep visually coherent.
 
 ### `value` [#value]
 
@@ -631,6 +720,8 @@ When using custom variants, you can style them using theme variables with the na
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-mark-Text | $color-warn-200 | $color-warn-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-markActive-Text | $color-warn-400 | $color-warn-400 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-code | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-keyboard | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
@@ -716,6 +807,7 @@ When using custom variants, you can style them using theme variables with the na
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Text-paragraph | $space-1 | $space-1 |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-mark-Text | inherit | inherit |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text | $textColor | $textColor |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-code--hover | initial | initial |

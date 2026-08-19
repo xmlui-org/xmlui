@@ -38,7 +38,7 @@ When a `Form` is hosted in a `ModalDialog`, the dialog uses the form dirty state
 </App>
 ```
 
-The next example places the same dirty-tracked Form inside a `ModalDialog`. Editing a bound field marks the Form dirty, the dialog treats that dirty state as its own close guard, and closing the dialog prompts for confirmation until the Form is marked clean.
+The next example places the same dirty-tracked Form inside a `ModalDialog`. Editing a bound field marks the Form dirty, the dialog treats that dirty state as its own close guard, and closing the dialog prompts for confirmation until the Form is marked clean. For short forms where that prompt is unnecessary, set `skipDirtyConfirmation="true"` on the `ModalDialog`.
 
 ```xmlui-pg copy display name="Example: dirty form in a modal dialog" height="520px"
 <App var.formStatus="clean" var.dialogStatus="clean">
