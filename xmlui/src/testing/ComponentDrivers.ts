@@ -727,16 +727,19 @@ export class SelectDriver extends ComponentDriver {
     return this.getByPartName("clearButton");
   }
 
+  get optionList() {
+    return this.page.getByRole("listbox").first();
+  }
+
   async toggleOptionsVisibility() {
     await this.component.click();
   }
 
   async selectLabel(value: string) {
-    await this.component
-      .getByRole("option", { name: value })
-      .or(this.page.getByRole("option", { name: value }))
-      .first()
-      .click({ force: true });
+    const option = this.optionList.getByRole("option", { name: value }).first();
+    await option.waitFor({ state: "visible" });
+    const isDisabled = (await option.getAttribute("aria-disabled")) === "true";
+    await option.click(isDisabled ? { force: true } : undefined);
   }
 
   async selectFirstLabelPostSearh(label: string) {
@@ -749,21 +752,14 @@ export class SelectDriver extends ComponentDriver {
   }
 
   async chooseIndex(index: number) {
-    await this.locator
-      .getByRole("option")
-      .nth(index)
-      .or(this.page.getByRole("option").nth(index))
-      .first()
-      .click();
+    const option = this.optionList.getByRole("option").nth(index);
+    await option.waitFor({ state: "visible" });
+    await option.click();
   }
 
   async selectMultipleLabels(values: string[]) {
     for (const value of values) {
-      await this.component
-        .getByRole("option", { name: value })
-        .or(this.page.getByRole("option", { name: value }))
-        .first()
-        .click();
+      await this.selectLabel(value);
     }
   }
 }
