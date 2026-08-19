@@ -59,6 +59,7 @@ import {
   type SelectionCheckboxAnchor,
 } from "./List.defaults";
 import {
+  areSourceIdSetsEqual,
   diffInsertedIds,
   getSourceIdSet,
   isPreserveScrollTarget,
@@ -846,6 +847,7 @@ export const ListNative = memo(
     const previousDataRef = useRef<any>(items);
     const hasReceivedDataRef = useRef(items !== undefined && items !== null);
     const latestSourceIdsRef = useRef<Set<string>>(currentSourceIds);
+    const previousRenderedSourceIdsRef = useRef<Set<string>>(currentSourceIds);
     const latestScrollMetricsRef = useRef<CollectionScrollMetrics>({
       scrollPosition: 0,
       scrollSize: 0,
@@ -861,6 +863,15 @@ export const ListNative = memo(
     const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
     const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
     const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
+
+    if (
+      previousDataRef.current !== items &&
+      !pendingDataRefreshRef.current &&
+      dataRefreshMode === "preserve-state" &&
+      previousRenderedSourceIdsRef.current.size > 0
+    ) {
+      latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
+    }
 
     const getRenderCacheRowId = useCallback(
       (index: number) => {
@@ -1507,6 +1518,10 @@ export const ListNative = memo(
     );
 
     const captureLatestRefreshState = useCallback(() => {
+      if (currentSourceIds.size === 0 && latestSourceIdsRef.current.size > 0) {
+        return;
+      }
+
       latestSourceIdsRef.current = currentSourceIds;
       latestScrollMetricsRef.current = getScrollMetrics(virtualizerRef.current);
     }, [currentSourceIds]);
@@ -1519,6 +1534,7 @@ export const ListNative = memo(
         if (hasCurrentData) {
           hasReceivedDataRef.current = true;
         }
+        previousRenderedSourceIdsRef.current = currentSourceIds;
         captureLatestRefreshState();
         return;
       }
@@ -1527,10 +1543,12 @@ export const ListNative = memo(
       const pendingRefresh = pendingDataRefreshRef.current;
       const shouldPreserve = !!pendingRefresh || dataRefreshMode === "preserve-state";
       const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
+      const previousRenderedSourceIds = previousRenderedSourceIdsRef.current;
       const previousScrollMetrics = pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
 
       pendingDataRefreshRef.current = undefined;
       previousDataRef.current = items;
+      previousRenderedSourceIdsRef.current = currentSourceIds;
       if (hasCurrentData) {
         hasReceivedDataRef.current = true;
       }
@@ -1543,6 +1561,11 @@ export const ListNative = memo(
       }
 
       if (shouldPreserve) {
+        if (!pendingRefresh && areSourceIdSetsEqual(previousRenderedSourceIds, currentSourceIds)) {
+          captureLatestRefreshState();
+          return;
+        }
+
         preparePreservedScrollRange(
           pendingRefresh?.options,
           previousSourceIds,

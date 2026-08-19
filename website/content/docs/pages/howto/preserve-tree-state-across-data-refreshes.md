@@ -55,6 +55,13 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     }" />
 
   <script>
+    function projectTreeData(nodes) {
+      if (!nodes) {
+        return nodes;
+      }
+      return nodes.map(node => ({ ...node }));
+    }
+
     function addEngineeringTask() {
       projectTree.preserveStateOnNextDataRefresh({ operation: 'insert' });
       insertNode.execute();
@@ -112,7 +119,7 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
       id="projectTree"
       testId="project-tree"
       height="360px"
-      data="{projectNodes}"
+      data="{projectTreeData(projectNodes.value)}"
       dataRefreshMode="reset"
       defaultExpanded="{[1, 2, 3, 4, 6, 10, 21]}"
       selectedValue="{selectedNode}"
@@ -161,7 +168,7 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
 
 ## List
 
-```xmlui-pg copy display height="500px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="List refresh after insert, update, and delete" id="list-refresh-after-insert-update-and-delete"
+```xmlui-pg copy display height="520px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="List refresh after insert, update, and delete" id="list-refresh-after-insert-update-and-delete"
 ---app display
 <App var.selectedTickets="" var.lastListAction="Ready">
   <DataSource
@@ -200,6 +207,13 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     }" />
 
   <script>
+    function ticketListData(tickets) {
+      if (!tickets) {
+        return tickets;
+      }
+      return tickets.map(ticket => ({ ...ticket }));
+    }
+
     function addTicket() {
       ticketList.preserveStateOnNextDataRefresh({ operation: 'insert' });
       insertTicket.execute();
@@ -223,7 +237,11 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     <HStack verticalAlignment="center" gap="$space-2">
       <Button label="Insert ticket" onClick="addTicket()" />
       <Button label="Update ticket 18" onClick="renameTicket()" />
-      <Button label="Delete ticket 28" themeColor="attention" onClick="removeTicket()" />
+      <Button 
+        label="Delete ticket 28" 
+        themeColor="attention" 
+        onClick="removeTicket()" 
+      />
     </HStack>
 
     <Text variant="secondary">{lastListAction}</Text>
@@ -233,11 +251,13 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
       id="ticketList"
       testId="ticket-list"
       height="300px"
-      data="{tickets}"
+      data="{ticketListData(tickets.value)}"
       dataRefreshMode="reset"
       rowsSelectable="true"
       fixedItemSize="true"
-      onSelectionDidChange="(items) => selectedTickets = items.map(item => item.id).join(', ')">
+      onSelectionDidChange="
+        (items) => selectedTickets = items.map(item => item.id).join(', ')
+      ">
       <HStack height="36px" verticalAlignment="center" gap="$space-2">
         <Text>{$item.title}</Text>
         <Badge value="selected" when="{$isSelected}" />
@@ -278,7 +298,7 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
 
 ## Table
 
-```xmlui-pg copy display height="520px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="Table refresh after insert, update, and delete" id="table-refresh-after-insert-update-and-delete"
+```xmlui-pg copy display height="540px" /preserveStateOnNextDataRefresh/ /dataRefreshMode/ name="Table refresh after insert, update, and delete" id="table-refresh-after-insert-update-and-delete"
 ---app display
 <App var.selectedOrders="" var.lastTableAction="Ready">
   <DataSource
@@ -317,6 +337,13 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     }" />
 
   <script>
+    function orderTableData(orders) {
+      if (!orders) {
+        return orders;
+      }
+      return orders.map(order => ({ ...order }));
+    }
+
     function addOrder() {
       orderTable.preserveStateOnNextDataRefresh({ operation: 'insert' });
       insertOrder.execute();
@@ -340,7 +367,11 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     <HStack verticalAlignment="center" gap="$space-2">
       <Button label="Insert order" onClick="addOrder()" />
       <Button label="Update order 16" onClick="renameOrder()" />
-      <Button label="Delete order 18" themeColor="attention" onClick="removeOrder()" />
+      <Button 
+        label="Delete order 18" 
+        themeColor="attention" 
+        onClick="removeOrder()" 
+      />
     </HStack>
 
     <Text variant="secondary">{lastTableAction}</Text>
@@ -350,11 +381,13 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
       id="orderTable"
       testId="order-table"
       height="320px"
-      data="{orders}"
+      data="{orderTableData(orders.value)}"
       dataRefreshMode="reset"
       rowsSelectable="true"
       rowHeight="36"
-      onSelectionDidChange="(items) => selectedOrders = items.map(item => item.id).join(', ')">
+      onSelectionDidChange="
+        (items) => selectedOrders = items.map(item => item.id).join(', ')
+      ">
       <Column header="Order" bindTo="name" canSort="true" />
       <Column header="Owner" bindTo="owner" canSort="true" />
       <Column header="Status" bindTo="status" />
@@ -379,7 +412,7 @@ When a collection is backed by a `DataSource`, a successful insert, update, or d
     "update-order": {
       "url": "/orders/order-16",
       "method": "put",
-      "handler": "$state.orderVersion++; const order = $state.orders.find(order => order.id === 'order-16'); if (!order) { throw Error('Order not found'); } order.name = 'Order 16 rev ' + $state.orderVersion; order.status = 'Ready'; return { ...order };"
+      "handler": "$state.orderVersion++; const order = $state.orders.find(order => order.id === 'order-16'); if (!order) { throw Error('Order not found'); } order.name = 'Order 16 rev ' + $state.orderVersion; order.owner = 'Priority desk'; order.status = 'Expedited'; return { ...order };"
     },
     "delete-order": {
       "url": "/orders/order-18",
