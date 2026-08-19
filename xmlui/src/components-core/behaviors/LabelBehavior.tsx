@@ -1,6 +1,5 @@
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import type { Behavior } from "./Behavior";
-import { hasActiveValidationProp } from "./formValidationBehaviorUtils";
 
 /**
  * Behavior for applying a label to form components using ItemWithLabel.
@@ -86,13 +85,10 @@ export const labelBehavior: Behavior = {
     }
 
     // Don't attach if formBindingBehavior will handle this component
-    // (form-bindable components with bindTo or validation-only props will get label from FormBindingWrapper)
+    // (form-bindable components with bindTo prop will get label from FormBindingWrapper)
     const bindTo = extractValue(node.props?.bindTo, true);
     const hasValueApiPair = !!metadata?.apis?.value && !!metadata?.apis?.setValue;
-    if (
-      ((bindTo || hasActiveValidationProp(context, node)) && hasValueApiPair) ||
-      node.type === "FormItem"
-    ) {
+    if ((bindTo && hasValueApiPair) || node.type === "FormItem") {
       return false;
     }
     return true;

@@ -1536,32 +1536,6 @@ test.describe("Nested DropdownMenu and AutoComplete", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("required blocks empty form submission without bindTo", async ({
-    initTestBed,
-    page,
-    createAutoCompleteDriver,
-  }) => {
-    const { testStateDriver } = await initTestBed(`
-      <Form onSubmit="() => testState = 'submitted'">
-        <AutoComplete testId="input" required="{true}">
-          <Option value="1" label="Option 1" />
-        </AutoComplete>
-        <Button testId="submit" type="submit">Submit</Button>
-      </Form>
-    `);
-
-    await page.getByTestId("submit").click();
-
-    await expect.poll(testStateDriver.testState).toBeNull();
-
-    const driver = await createAutoCompleteDriver("input");
-    await driver.click();
-    await driver.selectLabel("Option 1");
-    await page.getByTestId("submit").click();
-
-    await expect.poll(testStateDriver.testState).toEqual("submitted");
-  });
-
   test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
     initTestBed,
     page,
