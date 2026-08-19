@@ -3,10 +3,6 @@ import { ValidationWrapper } from "../../components/FormItem/ValidationWrapper";
 import type { Behavior } from "./Behavior";
 import type { RequireLabelMode } from "../../components/abstractions";
 import type { FormItemValidations } from "../../components/Form/FormContext";
-import {
-  createBehaviorUnboundFieldId,
-  hasActiveValidationProp,
-} from "./formValidationBehaviorUtils";
 
 export const validationBehavior: Behavior = {
   metadata: {
@@ -142,11 +138,7 @@ export const validationBehavior: Behavior = {
 
     const bindTo = extractValue(node.props?.bindTo, true);
     const isFormItem = node.type === "FormItem";
-    if (
-      !isFormItem &&
-      (bindTo === undefined || bindTo === null) &&
-      !hasActiveValidationProp(context, node)
-    ) {
+    if (!isFormItem && (bindTo === undefined || bindTo === null)) {
       return false;
     }
 
@@ -163,10 +155,7 @@ export const validationBehavior: Behavior = {
     const { extractValue, node: componentNode, lookupEventHandler } = context;
     const renderedNode = node as ReactElement;
 
-    const isFormItem = componentNode.type === "FormItem";
-    const bindTo =
-      extractValue.asOptionalString(componentNode.props?.bindTo) ??
-      (!isFormItem ? createBehaviorUnboundFieldId(componentNode.uid) : undefined);
+    const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const itemIndex =
       (renderedNode.props as any)?.itemIndex ??
       extractValue.asOptionalNumber(componentNode.props?.itemIndex) ??
@@ -262,6 +251,8 @@ export const validationBehavior: Behavior = {
       matchValue,
       matchInvalidMessage,
     };
+
+    const isFormItem = componentNode.type === "FormItem";
 
     return (
       <ValidationWrapper
