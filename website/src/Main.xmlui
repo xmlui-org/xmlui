@@ -699,6 +699,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Share one DataSource fetch across components"
+                            to="/docs/howto/share-one-datasource-fetch-across-components"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Update UI optimistically"
                             to="/docs/howto/update-ui-optimistically"
                         />
