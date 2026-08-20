@@ -61,11 +61,11 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-ToneSwitch | white | white |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch-dark | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch-light | $color-surface-200 | $color-surface-700 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch | $color-surface-300 | $color-surface-700 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch--hover | $color-surface-400 | $color-surface-600 |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-indicator-ToneSwitch | 0 2px 4px rgba(0, 0, 0, 0.1) | 0 2px 4px rgba(0, 0, 0, 0.1) |
-| [color](/docs/styles-and-themes/common-units/#color)-ToneSwitch-dark | $color-surface-0 | $color-surface-0 |
-| [color](/docs/styles-and-themes/common-units/#color)-ToneSwitch-light | $color-text-primary | $color-text-primary |
+| [backgroundColor-indicator-ToneSwitch](/docs/styles-and-themes/common-units/#color) | white | white |
+| [backgroundColor-ToneSwitch-dark](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [backgroundColor-ToneSwitch-light](/docs/styles-and-themes/common-units/#color) | $color-surface-200 | $color-surface-700 |
+| [borderColor-ToneSwitch](/docs/styles-and-themes/common-units/#color) | $color-surface-300 | $color-surface-700 |
+| [borderColor-ToneSwitch--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-400 | $color-surface-600 |
+| [boxShadow-indicator-ToneSwitch](/docs/styles-and-themes/common-units/#boxShadow) | 0 2px 4px rgba(0, 0, 0, 0.1) | 0 2px 4px rgba(0, 0, 0, 0.1) |
+| [color-ToneSwitch-dark](/docs/styles-and-themes/common-units/#color) | $color-surface-0 | $color-surface-0 |
+| [color-ToneSwitch-light](/docs/styles-and-themes/common-units/#color) | $color-text-primary | $color-text-primary |

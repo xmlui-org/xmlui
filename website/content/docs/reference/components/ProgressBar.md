@@ -55,9 +55,9 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ProgressBar | $color-surface-200 | $color-surface-200 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-indicator-ProgressBar | 999em | 999em |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ProgressBar | 999em | 999em |
-| [color](/docs/styles-and-themes/common-units/#color)-indicator-ProgressBar | $color-primary-500 | $color-primary-500 |
-| [color](/docs/styles-and-themes/common-units/#color)-indicator-ProgressBar--complete | $color-success-500 | $color-success-500 |
-| [thickness](/docs/styles-and-themes/common-units/#size-values)-ProgressBar | 0.5em | 0.5em |
+| [backgroundColor-ProgressBar](/docs/styles-and-themes/common-units/#color) | $color-surface-200 | $color-surface-200 |
+| [borderRadius-indicator-ProgressBar](/docs/styles-and-themes/common-units/#border-rounding) | 999em | 999em |
+| [borderRadius-ProgressBar](/docs/styles-and-themes/common-units/#border-rounding) | 999em | 999em |
+| [color-indicator-ProgressBar](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [color-indicator-ProgressBar--complete](/docs/styles-and-themes/common-units/#color) | $color-success-500 | $color-success-500 |
+| [thickness-ProgressBar](/docs/styles-and-themes/common-units/#size-values) | 0.5em | 0.5em |

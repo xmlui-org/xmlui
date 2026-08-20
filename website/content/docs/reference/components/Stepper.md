@@ -84,30 +84,30 @@ Sets the active step by its 0-based index.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper | $color-surface-300 | $color-surface-300 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--active | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--completed | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--error | $color-danger-500 | $color-danger-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Stepper | transparent | transparent |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-connector-Stepper | $borderColor | $borderColor |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-connector-Stepper--completed | $color-primary-500 | $color-primary-500 |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-connector-Stepper | solid | solid |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-connector-Stepper | 1px | 1px |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-description-Stepper | $fontSize-small | $fontSize-small |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-icon-Stepper | $fontSize-small | $fontSize-small |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-Stepper | $fontSize-base | $fontSize-base |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-icon-Stepper | $fontWeight-bold | $fontWeight-bold |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-Stepper | $fontWeight-normal | $fontWeight-normal |
-| [gap](/docs/styles-and-themes/common-units/#size)-Stepper | 0 | 0 |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-content-Stepper | $space-4 0 | $space-4 0 |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-Stepper | 0 | 0 |
-| [size](/docs/styles-and-themes/common-units/#size-values)-icon-Stepper | 28px | 28px |
-| [textColor](/docs/styles-and-themes/common-units/#color)-description-Stepper | $textColor-secondary | $textColor-secondary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper | $color-surface-50 | $color-surface-50 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--active | $color-surface-50 | $color-surface-50 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--completed | $color-surface-50 | $color-surface-50 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-icon-Stepper--error | $color-surface-50 | $color-surface-50 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-Stepper | $textColor-secondary | $textColor-secondary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-Stepper--active | $textColor-primary | $textColor-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-Stepper--completed | $textColor-primary | $textColor-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-Stepper--error | $color-danger-600 | $color-danger-600 |
+| [backgroundColor-icon-Stepper](/docs/styles-and-themes/common-units/#color) | $color-surface-300 | $color-surface-300 |
+| [backgroundColor-icon-Stepper--active](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [backgroundColor-icon-Stepper--completed](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [backgroundColor-icon-Stepper--error](/docs/styles-and-themes/common-units/#color) | $color-danger-500 | $color-danger-500 |
+| [backgroundColor-Stepper](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [borderColor-connector-Stepper](/docs/styles-and-themes/common-units/#color) | $borderColor | $borderColor |
+| [borderColor-connector-Stepper--completed](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [borderStyle-connector-Stepper](/docs/styles-and-themes/common-units/#border-style) | solid | solid |
+| [borderWidth-connector-Stepper](/docs/styles-and-themes/common-units/#size-values) | 1px | 1px |
+| [fontSize-description-Stepper](/docs/styles-and-themes/common-units/#size-values) | $fontSize-small | $fontSize-small |
+| [fontSize-icon-Stepper](/docs/styles-and-themes/common-units/#size-values) | $fontSize-small | $fontSize-small |
+| [fontSize-label-Stepper](/docs/styles-and-themes/common-units/#size-values) | $fontSize-base | $fontSize-base |
+| [fontWeight-icon-Stepper](/docs/styles-and-themes/common-units/#fontWeight) | $fontWeight-bold | $fontWeight-bold |
+| [fontWeight-label-Stepper](/docs/styles-and-themes/common-units/#fontWeight) | $fontWeight-normal | $fontWeight-normal |
+| [gap-Stepper](/docs/styles-and-themes/common-units/#size) | 0 | 0 |
+| [padding-content-Stepper](/docs/styles-and-themes/common-units/#size-values) | $space-4 0 | $space-4 0 |
+| [padding-Stepper](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [size-icon-Stepper](/docs/styles-and-themes/common-units/#size-values) | 28px | 28px |
+| [textColor-description-Stepper](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [textColor-icon-Stepper](/docs/styles-and-themes/common-units/#color) | $color-surface-50 | $color-surface-50 |
+| [textColor-icon-Stepper--active](/docs/styles-and-themes/common-units/#color) | $color-surface-50 | $color-surface-50 |
+| [textColor-icon-Stepper--completed](/docs/styles-and-themes/common-units/#color) | $color-surface-50 | $color-surface-50 |
+| [textColor-icon-Stepper--error](/docs/styles-and-themes/common-units/#color) | $color-surface-50 | $color-surface-50 |
+| [textColor-label-Stepper](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [textColor-label-Stepper--active](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [textColor-label-Stepper--completed](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [textColor-label-Stepper--error](/docs/styles-and-themes/common-units/#color) | $color-danger-600 | $color-danger-600 |

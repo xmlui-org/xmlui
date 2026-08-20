@@ -82,6 +82,6 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Spinner | $color-surface-400 | $color-surface-400 |
-| [size](/docs/styles-and-themes/common-units/#size-values)-Spinner | 2.5em | 2.5em |
-| [thickness](/docs/styles-and-themes/common-units/#size-values)-Spinner | 0.125em | 0.125em |
+| [borderColor-Spinner](/docs/styles-and-themes/common-units/#color) | $color-surface-400 | $color-surface-400 |
+| [size-Spinner](/docs/styles-and-themes/common-units/#size-values) | 2.5em | 2.5em |
+| [thickness-Spinner](/docs/styles-and-themes/common-units/#size-values) | 0.125em | 0.125em |

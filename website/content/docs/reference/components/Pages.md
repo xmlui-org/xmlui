@@ -89,6 +89,6 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [gap](/docs/styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-Pages | $paddingHorizontal-layout | $paddingHorizontal-layout |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Pages | $space-5 | $space-5 |
+| [gap-Pages](/docs/styles-and-themes/common-units/#size) | $space-5 | $space-5 |
+| [paddingHorizontal-Pages](/docs/styles-and-themes/common-units/#size-values) | $paddingHorizontal-layout | $paddingHorizontal-layout |
+| [paddingVertical-Pages](/docs/styles-and-themes/common-units/#size-values) | $space-5 | $space-5 |

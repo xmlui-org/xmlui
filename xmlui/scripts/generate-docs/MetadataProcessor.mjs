@@ -846,31 +846,26 @@ function listThemeVars(component) {
   const defaultThemeVars = component.defaultThemeVars
     ? flattenDefaultThemeVarKeys(component.defaultThemeVars)
     : [];
+  const themeVarKeys = [...defaultThemeVars, ...Object.keys(component.themeVars)];
 
   const allThemeVars = Array.from(
-    new Set([...defaultThemeVars, ...Object.keys(component.themeVars)]),
+    new Set(
+      themeVarKeys
+        .filter(
+          (themeVar) =>
+            !component.limitThemeVarsToComponent ||
+            themeVar.indexOf(component.displayName) !== -1 ||
+            stripBaseThemeVarPrefix(themeVar).indexOf(component.displayName) !== -1,
+        )
+        .map(stripBaseThemeVarPrefix),
+    ),
   );
 
   const varsWithDefaults = allThemeVars
     .sort((a, b) => {
-      // --- Sort by removing the optional base component prefix
-      const partsA = a.split(":");
-      const partsB = b.split(":");
-      const partAValue = partsA.length > 1 ? partsA[1] : partsA[0];
-      const partBValue = partsB.length > 1 ? partsB[1] : partsB[0];
-      return partAValue.localeCompare(partBValue);
+      return a.localeCompare(b);
     })
-    // --- Only list theme vars that contain the component name
-    .filter(
-      (themeVar) =>
-        !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1,
-    )
     .map((themeVar) => {
-      const parts = themeVar.split(":");
-      if (parts.length > 1) {
-        themeVar = parts[1];
-      }
-
       const defaultLightVar =
         component.defaultThemeVars?.["light"]?.[themeVar] ||
         component.defaultThemeVars?.[themeVar] ||
@@ -912,6 +907,11 @@ function listThemeVars(component) {
     );
   }
 
+  function stripBaseThemeVarPrefix(themeVar) {
+    const parts = themeVar.split(":");
+    return parts.length > 1 ? parts[1] : parts[0];
+  }
+
   function provideLinkForThemeVar(themeVar) {
     if (!themeVar) {
       return "";
@@ -927,8 +927,12 @@ function listThemeVars(component) {
       current.length > longest.length ? current : longest,
     );
 
-    const parts = themeVar.split(result);
-    return parts[0] + themeKeywordLinks[result] + parts[1];
+    return `[${themeVar}](${getMarkdownLinkTarget(themeKeywordLinks[result])})`;
+  }
+
+  function getMarkdownLinkTarget(markdownLink) {
+    const match = markdownLink.match(/\]\(([^)]+)\)$/);
+    return match ? match[1] : markdownLink;
   }
 }
 
@@ -954,7 +958,7 @@ function addThemeVarDescriptions(component) {
   return buffer + "\n\n";
 }
 
-// Use this object/map to replace the occurrences of the keys and have them be replaced by links
+// Use this object/map to link theme variable names to the relevant reference sections.
 const themeKeywordLinks = {
   animation: "[animation](/docs/styles-and-themes/layout-props/#animation)",
   animationDuration: "[animationDuration](/docs/styles-and-themes/layout-props/#animationDuration)",

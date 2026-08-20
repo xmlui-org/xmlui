@@ -103,61 +103,61 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [alignment](/docs/styles-and-themes/common-units/#alignment)-content-AppHeader | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AppHeader | $color-surface-raised | $color-surface-raised |
-| [border](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderBottom](/docs/styles-and-themes/common-units/#border)-AppHeader | 1px solid $borderColor | 1px solid $borderColor |
-| [borderBottomColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
-| [borderEndStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
-| [borderHorizontal](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderHorizontalColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderHorizontalStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderHorizontalWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderLeft](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderLeftColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderLeftStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AppHeader | 0px | 0px |
-| [borderRight](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderRightColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderRightStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderRightWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
-| [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderTop](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderTopColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderTopStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderTopWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderVertical](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderVerticalColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
-| [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | *none* | *none* |
-| [height](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $space-14 | $space-14 |
-| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $maxWidth-App | $maxWidth-App |
-| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $maxWidth-content-App | $maxWidth-content-App |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-drawerToggle-AppHeader | $space-0_5 | $space-0_5 |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader |
-| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
-| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $space-4 | $space-4 |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $space-0 | $space-0 |
-| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
-| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
-| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
-| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
-| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
-| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $space-0 | $space-0 |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $space-0 | $space-0 |
-| [size](/docs/styles-and-themes/common-units/#size-values)-drawerToggle-AppHeader | $space-12 | $space-12 |
-| [width](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | *none* | *none* |
+| [alignment-content-AppHeader](/docs/styles-and-themes/common-units/#alignment) | *none* | *none* |
+| [backgroundColor-AppHeader](/docs/styles-and-themes/common-units/#color) | $color-surface-raised | $color-surface-raised |
+| [border-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderBottom-AppHeader](/docs/styles-and-themes/common-units/#border) | 1px solid $borderColor | 1px solid $borderColor |
+| [borderBottomColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderBottomStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderBottomWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderEndEndRadius-AppHeader](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderEndStartRadius-AppHeader](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderHorizontal-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderHorizontalColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderHorizontalStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderHorizontalWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderLeft-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderLeftColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderLeftStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderLeftWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderRadius-AppHeader](/docs/styles-and-themes/common-units/#border-rounding) | 0px | 0px |
+| [borderRight-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderRightColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderRightStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderRightWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderStartEndRadius-AppHeader](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderStartStartRadius-AppHeader](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderTop-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderTopColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderTopStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderTopWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderVertical-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderVerticalColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderVerticalStyle-AppHeader](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderVerticalWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [height-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-14 | $space-14 |
+| [maxWidth-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $maxWidth-App | $maxWidth-App |
+| [maxWidth-content-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $maxWidth-content-App | $maxWidth-content-App |
+| [padding-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader |
+| [padding-drawerToggle-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-0_5 | $space-0_5 |
+| [padding-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader |
+| [paddingBottom-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingBottom-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
+| [paddingHorizontal-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-4 | $space-4 |
+| [paddingHorizontal-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-0 | $space-0 |
+| [paddingLeft-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingLeft-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingRight-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingRight-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingTop-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingTop-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
+| [paddingVertical-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-0 | $space-0 |
+| [paddingVertical-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-0 | $space-0 |
+| [size-drawerToggle-AppHeader](/docs/styles-and-themes/common-units/#size-values) | $space-12 | $space-12 |
+| [width-logo-AppHeader](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]
 

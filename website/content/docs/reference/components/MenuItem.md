@@ -123,18 +123,18 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-MenuItem | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-MenuItem--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-MenuItem--active--hover | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-MenuItem--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuItem | $textColor-primary | $textColor-primary |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuItem--active | $color-primary | $color-primary |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuItem--active--hover | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuItem--disabled | $textColor--disabled | $textColor--disabled |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuItem--hover | inherit | inherit |
-| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-MenuItem | $fontFamily | $fontFamily |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-MenuItem | $fontSize-sm | $fontSize-sm |
-| [gap](/docs/styles-and-themes/common-units/#size)-MenuItem | $space-2 | $space-2 |
-| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-MenuItem | 100% | 100% |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-MenuItem | $space-3 | $space-3 |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-MenuItem | $space-2 | $space-2 |
+| [backgroundColor-MenuItem](/docs/styles-and-themes/common-units/#color) | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
+| [backgroundColor-MenuItem--active](/docs/styles-and-themes/common-units/#color) | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor-MenuItem--active--hover](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [backgroundColor-MenuItem--hover](/docs/styles-and-themes/common-units/#color) | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
+| [color-MenuItem](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [color-MenuItem--active](/docs/styles-and-themes/common-units/#color) | $color-primary | $color-primary |
+| [color-MenuItem--active--hover](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [color-MenuItem--disabled](/docs/styles-and-themes/common-units/#color) | $textColor--disabled | $textColor--disabled |
+| [color-MenuItem--hover](/docs/styles-and-themes/common-units/#color) | inherit | inherit |
+| [fontFamily-MenuItem](/docs/styles-and-themes/common-units/#fontFamily) | $fontFamily | $fontFamily |
+| [fontSize-MenuItem](/docs/styles-and-themes/common-units/#size-values) | $fontSize-sm | $fontSize-sm |
+| [gap-MenuItem](/docs/styles-and-themes/common-units/#size) | $space-2 | $space-2 |
+| [maxWidth-MenuItem](/docs/styles-and-themes/common-units/#size-values) | 100% | 100% |
+| [paddingHorizontal-MenuItem](/docs/styles-and-themes/common-units/#size-values) | $space-3 | $space-3 |
+| [paddingVertical-MenuItem](/docs/styles-and-themes/common-units/#size-values) | $space-2 | $space-2 |

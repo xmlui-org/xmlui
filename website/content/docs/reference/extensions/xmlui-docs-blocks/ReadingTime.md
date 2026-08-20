@@ -45,7 +45,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color](/docs/styles-and-themes/common-units/#color)-ReadingTime | $textColor-secondary | $textColor-secondary |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-ReadingTime | $fontSize-small | $fontSize-small |
-| [gap](/docs/styles-and-themes/common-units/#size)-ReadingTime | 0.375rem | 0.375rem |
-| [size](/docs/styles-and-themes/common-units/#size-values)-icon-ReadingTime | 1em | 1em |
+| [color-ReadingTime](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [fontSize-ReadingTime](/docs/styles-and-themes/common-units/#size-values) | $fontSize-small | $fontSize-small |
+| [gap-ReadingTime](/docs/styles-and-themes/common-units/#size) | 0.375rem | 0.375rem |
+| [size-icon-ReadingTime](/docs/styles-and-themes/common-units/#size-values) | 1em | 1em |

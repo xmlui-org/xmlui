@@ -673,16 +673,16 @@ Removes the item specified by its index from the list held by the FormItem. The 
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-label-formItem | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem | $fontSize-sm | $fontSize-sm |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem--required | $fontSize-sm | $fontSize-sm |
-| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem | normal | normal |
-| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem--required | *none* | *none* |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem | $fontWeight-medium | $fontWeight-medium |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem--required | $fontWeight-medium | $fontWeight-medium |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem--required | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-optionalTag-formItem | $textColor-secondary | $textColor-secondary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-requiredMark-formItem | $color-danger-400 | $color-danger-400 |
-| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-label-formItem | none | none |
-| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-label-formItem--required | *none* | *none* |
+| [fontFamily-label-formItem](/docs/styles-and-themes/common-units/#fontFamily) | *none* | *none* |
+| [fontSize-label-formItem](/docs/styles-and-themes/common-units/#size-values) | $fontSize-sm | $fontSize-sm |
+| [fontSize-label-formItem--required](/docs/styles-and-themes/common-units/#size-values) | $fontSize-sm | $fontSize-sm |
+| [fontStyle-label-formItem](/docs/styles-and-themes/common-units/#fontStyle) | normal | normal |
+| [fontStyle-label-formItem--required](/docs/styles-and-themes/common-units/#fontStyle) | *none* | *none* |
+| [fontWeight-label-formItem](/docs/styles-and-themes/common-units/#fontWeight) | $fontWeight-medium | $fontWeight-medium |
+| [fontWeight-label-formItem--required](/docs/styles-and-themes/common-units/#fontWeight) | $fontWeight-medium | $fontWeight-medium |
+| [textColor-label-formItem](/docs/styles-and-themes/common-units/#color) | $textColor | $textColor |
+| [textColor-label-formItem--required](/docs/styles-and-themes/common-units/#color) | $textColor | $textColor |
+| [textColor-optionalTag-formItem](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [textColor-requiredMark-formItem](/docs/styles-and-themes/common-units/#color) | $color-danger-400 | $color-danger-400 |
+| [textTransform-label-formItem](/docs/styles-and-themes/common-units/#textTransform) | none | none |
+| [textTransform-label-formItem--required](/docs/styles-and-themes/common-units/#textTransform) | *none* | *none* |

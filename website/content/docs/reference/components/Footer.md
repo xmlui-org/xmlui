@@ -36,50 +36,50 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Footer | $backgroundColor-AppHeader | $backgroundColor-AppHeader |
-| [border](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderBottom](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderBottomColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
-| [borderEndStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
-| [borderHorizontal](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderHorizontalColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderHorizontalStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderHorizontalWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderLeft](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderLeftColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderLeftStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderRight](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderRightColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderRightStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderRightWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
-| [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderTop](/docs/styles-and-themes/common-units/#border)-Footer | 1px solid $borderColor | 1px solid $borderColor |
-| [borderTopColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderTopStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderTopWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderVertical](/docs/styles-and-themes/common-units/#border)-Footer | *none* | *none* |
-| [borderVerticalColor](/docs/styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
-| [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Footer | $fontSize-sm | $fontSize-sm |
-| [gap](/docs/styles-and-themes/common-units/#size)-Footer | $space-normal | $space-normal |
-| [height](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [margin](/docs/styles-and-themes/common-units/#size-values)-Footer | 0 auto | 0 auto |
-| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-Footer | $maxWidth-content | $maxWidth-content |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-Footer | $space-2 $space-4 | $space-2 $space-4 |
-| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Footer | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Footer | $textColor-secondary | $textColor-secondary |
-| [verticalAlignment](/docs/styles-and-themes/common-units/#alignment)-Footer | center | center |
+| [backgroundColor-Footer](/docs/styles-and-themes/common-units/#color) | $backgroundColor-AppHeader | $backgroundColor-AppHeader |
+| [border-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderBottom-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderBottomColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderBottomStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderBottomWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderEndEndRadius-Footer](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderEndStartRadius-Footer](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderHorizontal-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderHorizontalColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderHorizontalStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderHorizontalWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderLeft-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderLeftColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderLeftStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderLeftWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderRight-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderRightColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderRightStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderRightWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderStartEndRadius-Footer](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderStartStartRadius-Footer](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [borderStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderTop-Footer](/docs/styles-and-themes/common-units/#border) | 1px solid $borderColor | 1px solid $borderColor |
+| [borderTopColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderTopStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderTopWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderVertical-Footer](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderVerticalColor-Footer](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderVerticalStyle-Footer](/docs/styles-and-themes/common-units/#border-style) | *none* | *none* |
+| [borderVerticalWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [borderWidth-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [fontSize-Footer](/docs/styles-and-themes/common-units/#size-values) | $fontSize-sm | $fontSize-sm |
+| [gap-Footer](/docs/styles-and-themes/common-units/#size) | $space-normal | $space-normal |
+| [height-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [margin-Footer](/docs/styles-and-themes/common-units/#size-values) | 0 auto | 0 auto |
+| [maxWidth-content-Footer](/docs/styles-and-themes/common-units/#size-values) | $maxWidth-content | $maxWidth-content |
+| [padding-Footer](/docs/styles-and-themes/common-units/#size-values) | $space-2 $space-4 | $space-2 $space-4 |
+| [paddingBottom-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingHorizontal-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingLeft-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingRight-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingTop-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingVertical-Footer](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [textColor-Footer](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [verticalAlignment-Footer](/docs/styles-and-themes/common-units/#alignment) | center | center |

@@ -66,4 +66,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [textColor](/docs/styles-and-themes/common-units/#color)-labelList-PieChart | $textColor-primary | $textColor-primary |
+| [textColor-labelList-PieChart](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |

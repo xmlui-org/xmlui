@@ -590,25 +590,25 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
-| [borderBottom](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderLeft](/docs/styles-and-themes/common-units/#border)-content-App | *none* | *none* |
-| [borderRight](/docs/styles-and-themes/common-units/#border)-navPanelWrapper-App | 1px solid $borderColor | 1px solid $borderColor |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-header-App | none | none |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
-| [gap](/docs/styles-and-themes/common-units/#size)-content-App | $space-5 | $space-5 |
-| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
-| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
-| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App--withToc | *none* | *none* |
-| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-drawer-App | 100% | 100% |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-content-App | $space-4 | $space-4 |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-content-App | $space-5 | $space-5 |
+| [backgroundColor-AppHeader](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [backgroundColor-content-App](/docs/styles-and-themes/common-units/#color) | $backgroundColor | $backgroundColor |
+| [backgroundColor-navPanel-App](/docs/styles-and-themes/common-units/#color) | $backgroundColor | $backgroundColor |
+| [borderBottom-AppHeader](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderLeft-content-App](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [borderRight-navPanelWrapper-App](/docs/styles-and-themes/common-units/#border) | 1px solid $borderColor | 1px solid $borderColor |
+| [boxShadow-header-App](/docs/styles-and-themes/common-units/#boxShadow) | none | none |
+| [boxShadow-navPanel-App](/docs/styles-and-themes/common-units/#boxShadow) | none | none |
+| [gap-content-App](/docs/styles-and-themes/common-units/#size) | $space-5 | $space-5 |
+| [maxWidth-App](/docs/styles-and-themes/common-units/#size-values) | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content-App](/docs/styles-and-themes/common-units/#size-values) | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content-App--withToc](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [maxWidth-drawer-App](/docs/styles-and-themes/common-units/#size-values) | 100% | 100% |
+| [paddingHorizontal-content-App](/docs/styles-and-themes/common-units/#size-values) | $space-4 | $space-4 |
+| [paddingVertical-content-App](/docs/styles-and-themes/common-units/#size-values) | $space-5 | $space-5 |
 | right-closeButton-App | $space-2 | $space-2 |
 | top-closeButton-App | $space-2 | $space-2 |
-| [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-App | $space-64 | $space-64 |
-| [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-collapsed-App | 48px | 48px |
+| [width-navPanel-App](/docs/styles-and-themes/common-units/#size-values) | $space-64 | $space-64 |
+| [width-navPanel-collapsed-App](/docs/styles-and-themes/common-units/#size-values) | 48px | 48px |
 
 ### Variable Explanations [#variable-explanations]
 
