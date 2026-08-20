@@ -40,6 +40,8 @@ const App: StandaloneAppDescription = {
 }
 ```
 
+> [!NOTE] **Standalone vs build config**: in standalone / buildless mode, the browser runtime reads `config.json` next to `Main.xmlui`. It does not read a root `xmlui.config.json`; that file is consumed by XMLUI build and analysis tooling, such as `xmlui build` and `xmlui check`. To affect a standalone app at runtime, put settings under `xmluiConfig` in `config.json`.
+
 > [!NOTE] **Component authors** should use `useXmluiConfig()` for framework / runtime settings. It returns the merged read-only view (`xmluiConfig` overlaying `appGlobals`). Use `useAppGlobals()` only for raw application-specific values.
 
 ---
@@ -58,6 +60,10 @@ const App: StandaloneAppDescription = {
 | `blog` | Data consumed by the `Blog` component. |
 | `codeHighlighter` | Syntax highlighter used by markdown and code fences. |
 | `columnCanSortDefault` | Overrides the default sortable behavior for table columns. |
+| `compileBindings` | Legacy compatibility alias for binding compilation. |
+| `compiledScriptSourceMaps` | Emits debug source-map metadata for compiled XMLUI scripts. |
+| `compileEventHandlers` | Legacy compatibility alias for event-handler compilation. |
+| `compileScripts` | Enables compiled XMLUI bindings and event handlers. |
 | `csrfHeaderName` | Overrides the form CSRF header name. |
 | `defaultToOptionalMemberAccess` | Controls optional member access semantics in XMLScript. |
 | `defaultHandlerTimeoutMs` | Sets the ambient async handler timeout. |
@@ -198,6 +204,77 @@ Overrides the default `canSort` value for `Column` components that do not set `c
 ```ts
 xmluiConfig: {
   columnCanSortDefault: false,
+}
+```
+
+---
+
+### `compileScripts`
+
+```ts
+compileScripts?: boolean; // default: false
+```
+
+When `true`, XMLUI compiles supported binding expressions and event handlers to JavaScript before evaluation. This is the preferred app-level switch for script compilation.
+
+```ts
+xmluiConfig: {
+  compileScripts: true,
+}
+```
+
+Use `compileBindings` or `compileEventHandlers` only when you need to control one script path independently. When either compatibility alias is set, it overrides `compileScripts` for that path.
+
+---
+
+### `compileBindings`
+
+```ts
+compileBindings?: boolean; // default: compileScripts ?? false
+```
+
+A compatibility alias for binding expression compilation. If this key is present, it controls binding compilation even when `compileScripts` is also set. For example, this leaves event handlers compiled while keeping bindings interpreted:
+
+```ts
+xmluiConfig: {
+  compileScripts: true,
+  compileBindings: false,
+}
+```
+
+---
+
+### `compileEventHandlers`
+
+```ts
+compileEventHandlers?: boolean; // default: compileScripts ?? false
+```
+
+A compatibility alias for event-handler compilation. If this key is present, it controls event-handler compilation even when `compileScripts` is also set.
+
+```ts
+xmluiConfig: {
+  compileScripts: true,
+  compileEventHandlers: false,
+}
+```
+
+---
+
+### `compiledScriptSourceMaps`
+
+```ts
+compiledScriptSourceMaps?: boolean | "inline" | "external"; // default: false; "external" in dev when script compilation is enabled
+```
+
+Controls whether compiled XMLUI scripts carry source-map/debug-source metadata. Use `"external"` for development tooling, `"inline"` for runtime fallback paths, `true` as an alias for enabled source maps, or `false` to disable source-map metadata.
+
+In development, XMLUI defaults this to `"external"` when binding or event-handler compilation is active. Set it to `false` to turn that default off.
+
+```ts
+xmluiConfig: {
+  compileScripts: true,
+  compiledScriptSourceMaps: false,
 }
 ```
 
