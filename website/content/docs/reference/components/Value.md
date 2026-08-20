@@ -182,4 +182,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Value | $borderColor | $borderColor |
+| [borderColor-Value](/docs/styles-and-themes/common-units/#color) | $borderColor | $borderColor |

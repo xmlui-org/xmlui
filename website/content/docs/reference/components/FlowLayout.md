@@ -198,5 +198,5 @@ Scrolls the FlowLayout container to the top. Works when the FlowLayout has an ex
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | columnGap-FlowLayout | $gap-FlowLayout | $gap-FlowLayout |
-| [gap](/docs/styles-and-themes/common-units/#size)-FlowLayout | $gap-layout | $gap-layout |
+| [gap-FlowLayout](/docs/styles-and-themes/common-units/#size) | $gap-layout | $gap-layout |
 | rowGap-FlowLayout | $gap-FlowLayout | $gap-FlowLayout |

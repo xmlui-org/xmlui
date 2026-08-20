@@ -240,10 +240,10 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DropdownMenu | $color-surface-raised | $color-surface-raised |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DropdownMenu-content | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DropdownMenu | $borderRadius | $borderRadius |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DropdownMenu-content | solid | solid |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DropdownMenu-content | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DropdownMenu | $boxShadow-xl | $boxShadow-xl |
-| [minWidth](/docs/styles-and-themes/common-units/#size-values)-DropdownMenu | 160px | 160px |
+| [backgroundColor-DropdownMenu](/docs/styles-and-themes/common-units/#color) | $color-surface-raised | $color-surface-raised |
+| [borderColor-DropdownMenu-content](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderRadius-DropdownMenu](/docs/styles-and-themes/common-units/#border-rounding) | $borderRadius | $borderRadius |
+| [borderStyle-DropdownMenu-content](/docs/styles-and-themes/common-units/#border-style) | solid | solid |
+| [borderWidth-DropdownMenu-content](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [boxShadow-DropdownMenu](/docs/styles-and-themes/common-units/#boxShadow) | $boxShadow-xl | $boxShadow-xl |
+| [minWidth-DropdownMenu](/docs/styles-and-themes/common-units/#size-values) | 160px | 160px |

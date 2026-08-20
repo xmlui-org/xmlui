@@ -927,8 +927,12 @@ function listThemeVars(component) {
       current.length > longest.length ? current : longest,
     );
 
-    const parts = themeVar.split(result);
-    return parts[0] + themeKeywordLinks[result] + parts[1];
+    return `[${themeVar}](${getMarkdownLinkTarget(themeKeywordLinks[result])})`;
+  }
+
+  function getMarkdownLinkTarget(markdownLink) {
+    const match = markdownLink.match(/\]\(([^)]+)\)$/);
+    return match ? match[1] : markdownLink;
   }
 }
 
@@ -954,7 +958,7 @@ function addThemeVarDescriptions(component) {
   return buffer + "\n\n";
 }
 
-// Use this object/map to replace the occurrences of the keys and have them be replaced by links
+// Use this object/map to link theme variable names to the relevant reference sections.
 const themeKeywordLinks = {
   animation: "[animation](/docs/styles-and-themes/layout-props/#animation)",
   animationDuration: "[animationDuration](/docs/styles-and-themes/layout-props/#animationDuration)",

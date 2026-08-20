@@ -177,6 +177,6 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ResponsiveBar | transparent | transparent |
-| [margin](/docs/styles-and-themes/common-units/#size-values)-ResponsiveBar | 0 | 0 |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-ResponsiveBar | 0 | 0 |
+| [backgroundColor-ResponsiveBar](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [margin-ResponsiveBar](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [padding-ResponsiveBar](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |

@@ -969,16 +969,16 @@ The visual appearance of `TileGrid` can be customized through theme variables. T
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid | transparent | transparent |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--hover | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--selected | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--selected--hover | $color-primary-100 | $color-primary-100 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-item-TileGrid | $borderRadius | $borderRadius |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-checkbox-TileGrid | $fontSize | $fontSize |
-| [offset](/docs/styles-and-themes/common-units/#size-values)Horizontal-checkbox-TileGrid | 4px | 4px |
-| [offset](/docs/styles-and-themes/common-units/#size-values)Vertical-checkbox-TileGrid | 4px | 4px |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--focus | $color-primary-500 | $color-primary-500 |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-item-TileGrid--focus | -2px | -2px |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-item-TileGrid--focus | solid | solid |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-item-TileGrid--focus | 2px | 2px |
+| [backgroundColor-item-TileGrid](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [backgroundColor-item-TileGrid--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
+| [backgroundColor-item-TileGrid--selected](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
+| [backgroundColor-item-TileGrid--selected--hover](/docs/styles-and-themes/common-units/#color) | $color-primary-100 | $color-primary-100 |
+| [borderRadius-item-TileGrid](/docs/styles-and-themes/common-units/#border-rounding) | $borderRadius | $borderRadius |
+| [fontSize-checkbox-TileGrid](/docs/styles-and-themes/common-units/#size-values) | $fontSize | $fontSize |
+| [offsetHorizontal-checkbox-TileGrid](/docs/styles-and-themes/common-units/#size-values) | 4px | 4px |
+| [offsetVertical-checkbox-TileGrid](/docs/styles-and-themes/common-units/#size-values) | 4px | 4px |
+| [outlineColor-item-TileGrid--focus](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [outlineOffset-item-TileGrid--focus](/docs/styles-and-themes/common-units/#size-values) | -2px | -2px |
+| [outlineStyle-item-TileGrid--focus](/docs/styles-and-themes/common-units/#border) | solid | solid |
+| [outlineWidth-item-TileGrid--focus](/docs/styles-and-themes/common-units/#size-values) | 2px | 2px |
 | userSelect-item-TileGrid | none | none |

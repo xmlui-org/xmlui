@@ -215,4 +215,4 @@ Scrolls the Stack container to the top. Works when the Stack has an explicit hei
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [gap](/docs/styles-and-themes/common-units/#size)-Stack | $gap-layout | $gap-layout |
+| [gap-Stack](/docs/styles-and-themes/common-units/#size) | $gap-layout | $gap-layout |

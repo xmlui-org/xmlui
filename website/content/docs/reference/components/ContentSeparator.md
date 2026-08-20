@@ -112,18 +112,18 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ContentSeparator | $color-surface-200 | $color-surface-200 |
+| [backgroundColor-ContentSeparator](/docs/styles-and-themes/common-units/#color) | $color-surface-200 | $color-surface-200 |
 | length-ContentSeparator | 100% | 100% |
-| [marginBottom](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [margin](/docs/styles-and-themes/common-units/#size-values)Horizontal-ContentSeparator | 0 | 0 |
-| [marginLeft](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [marginRight](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [marginTop](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [margin](/docs/styles-and-themes/common-units/#size-values)Vertical-ContentSeparator | 0 | 0 |
-| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | 0 | 0 |
-| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | *none* | *none* |
-| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | 0 | 0 |
-| [thickness](/docs/styles-and-themes/common-units/#size-values)-ContentSeparator | 1px | 1px |
+| [marginBottom-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [marginHorizontal-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [marginLeft-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [marginRight-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [marginTop-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [marginVertical-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [paddingBottom-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingHorizontal-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [paddingLeft-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingRight-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingTop-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [paddingVertical-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
+| [thickness-ContentSeparator](/docs/styles-and-themes/common-units/#size-values) | 1px | 1px |

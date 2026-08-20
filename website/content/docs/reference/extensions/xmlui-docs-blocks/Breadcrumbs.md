@@ -34,8 +34,8 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color](/docs/styles-and-themes/common-units/#color)-Breadcrumbs | $textColor-secondary | $textColor-secondary |
-| [color](/docs/styles-and-themes/common-units/#color)-Breadcrumbs--current | $textColor-primary | $textColor-primary |
-| [color](/docs/styles-and-themes/common-units/#color)-Breadcrumbs--hover | $textColor-primary | $textColor-primary |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Breadcrumbs--current | $fontWeight-bold | $fontWeight-bold |
-| [gap](/docs/styles-and-themes/common-units/#size)-Breadcrumbs | $space-2 | $space-2 |
+| [color-Breadcrumbs](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |
+| [color-Breadcrumbs--current](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [color-Breadcrumbs--hover](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [fontWeight-Breadcrumbs--current](/docs/styles-and-themes/common-units/#fontWeight) | $fontWeight-bold | $fontWeight-bold |
+| [gap-Breadcrumbs](/docs/styles-and-themes/common-units/#size) | $space-2 | $space-2 |

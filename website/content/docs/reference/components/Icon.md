@@ -90,4 +90,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [size](/docs/styles-and-themes/common-units/#size-values)-Icon | 1.2em | 1.2em |
+| [size-Icon](/docs/styles-and-themes/common-units/#size-values) | 1.2em | 1.2em |

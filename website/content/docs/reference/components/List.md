@@ -2412,17 +2412,17 @@ follow your form input styling:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-selectionCheckbox-List | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-selectionCheckbox-List | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-List | $backgroundColor | $backgroundColor |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-List--hover | $color-primary-50 | $color-primary-50 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-List | $color-primary-100 | $color-primary-100 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-List--hover | $color-primary-100 | $color-primary-100 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selectionCheckbox-List | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-checked-selectionCheckbox-List | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-selectionCheckbox-List | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-selectionCheckbox-List | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-selectionCheckbox-List--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-selectionCheckbox-List--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-selectionCheckbox-List--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-selectionCheckbox-List--focus | *none* | *none* |
+| [backgroundColor-checked-selectionCheckbox-List](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [backgroundColor-indicator-selectionCheckbox-List](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [backgroundColor-List](/docs/styles-and-themes/common-units/#color) | $backgroundColor | $backgroundColor |
+| [backgroundColor-row-List--hover](/docs/styles-and-themes/common-units/#color) | $color-primary-50 | $color-primary-50 |
+| [backgroundColor-selected-List](/docs/styles-and-themes/common-units/#color) | $color-primary-100 | $color-primary-100 |
+| [backgroundColor-selected-List--hover](/docs/styles-and-themes/common-units/#color) | $color-primary-100 | $color-primary-100 |
+| [backgroundColor-selectionCheckbox-List](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderColor-checked-selectionCheckbox-List](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderColor-selectionCheckbox-List](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [borderRadius-selectionCheckbox-List](/docs/styles-and-themes/common-units/#border-rounding) | *none* | *none* |
+| [outlineColor-selectionCheckbox-List--focus](/docs/styles-and-themes/common-units/#color) | *none* | *none* |
+| [outlineOffset-selectionCheckbox-List--focus](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [outlineStyle-selectionCheckbox-List--focus](/docs/styles-and-themes/common-units/#border) | *none* | *none* |
+| [outlineWidth-selectionCheckbox-List--focus](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |

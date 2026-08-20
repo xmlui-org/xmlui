@@ -61,7 +61,7 @@ describe("MetadataProcessor", () => {
 
     expect(matchingRows).toHaveLength(1);
     expect(matchingRows[0]).toBe(
-      "| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-FixtureSlider | $color-primary-500 | $color-primary-400 |",
+      "| [backgroundColor-thumb-FixtureSlider](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-400 |",
     );
   });
 
@@ -94,7 +94,43 @@ describe("MetadataProcessor", () => {
     const generated = fs.readFileSync(path.join(folders.outFolder, "FixtureHeading.md"), "utf8");
 
     expect(generated).toContain(
-      "| [textColor](/docs/styles-and-themes/common-units/#color)-H1 | *none* | *none* |",
+      "| [textColor-H1](/docs/styles-and-themes/common-units/#color) | *none* | *none* |",
+    );
+  });
+
+  it("keeps theme variable names contiguous when linking to reference docs", () => {
+    const folders = makeFolders();
+    const processor = new MetadataProcessor(
+      [
+        {
+          displayName: "FixtureButton",
+          status: "stable",
+          description: "Synthetic component for docs generation.",
+          descriptionRef: "",
+          props: {},
+          themeVars: {
+            "fontSize-FixtureButton": {},
+          },
+          defaultThemeVars: {
+            "fontSize-FixtureButton": "$fontSize-sm",
+            light: {},
+            dark: {},
+          },
+        },
+      ],
+      "",
+      folders,
+    );
+
+    processor.processDocfiles();
+
+    const generated = fs.readFileSync(path.join(folders.outFolder, "FixtureButton.md"), "utf8");
+
+    expect(generated).toContain(
+      "| [fontSize-FixtureButton](/docs/styles-and-themes/common-units/#size-values) | $fontSize-sm | $fontSize-sm |",
+    );
+    expect(generated).not.toContain(
+      "[fontSize](/docs/styles-and-themes/common-units/#size-values)-FixtureButton",
     );
   });
 });

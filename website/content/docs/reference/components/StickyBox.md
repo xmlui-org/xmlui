@@ -67,4 +67,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-StickyBox | $backgroundColor | $backgroundColor |
+| [backgroundColor-StickyBox](/docs/styles-and-themes/common-units/#color) | $backgroundColor | $backgroundColor |

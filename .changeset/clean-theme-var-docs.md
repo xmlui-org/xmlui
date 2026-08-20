@@ -2,4 +2,4 @@
 "xmlui": patch
 ---
 
-Fix duplicate generated theme variable rows when SCSS metadata uses base-component prefixes.
+Fix generated theme variable docs so prefixed metadata does not duplicate rows and variable names remain searchable as contiguous link text.

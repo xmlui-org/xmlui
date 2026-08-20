@@ -32,9 +32,9 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color](/docs/styles-and-themes/common-units/#color)-MenuSeparator | $borderColor-dropdown-item | $borderColor-dropdown-item |
-| [height](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | 1px | 1px |
-| [marginBottom](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | $space-1 | $space-1 |
-| [margin](/docs/styles-and-themes/common-units/#size-values)Horizontal-MenuSeparator | 12px | 12px |
-| [marginTop](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | $space-1 | $space-1 |
-| [width](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | 100% | 100% |
+| [color-MenuSeparator](/docs/styles-and-themes/common-units/#color) | $borderColor-dropdown-item | $borderColor-dropdown-item |
+| [height-MenuSeparator](/docs/styles-and-themes/common-units/#size-values) | 1px | 1px |
+| [marginBottom-MenuSeparator](/docs/styles-and-themes/common-units/#size-values) | $space-1 | $space-1 |
+| [marginHorizontal-MenuSeparator](/docs/styles-and-themes/common-units/#size-values) | 12px | 12px |
+| [marginTop-MenuSeparator](/docs/styles-and-themes/common-units/#size-values) | $space-1 | $space-1 |
+| [width-MenuSeparator](/docs/styles-and-themes/common-units/#size-values) | 100% | 100% |

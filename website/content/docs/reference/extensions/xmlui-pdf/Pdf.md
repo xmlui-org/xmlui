@@ -488,20 +488,20 @@ Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-checkbox-Pdf | rgba(220, 255, 220, 0.8) | rgba(220, 255, 220, 0.8) |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-field-Pdf | rgba(255, 255, 255, 0.8) | rgba(255, 255, 255, 0.8) |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-signature-Pdf | rgba(220, 220, 255, 0.8) | rgba(220, 220, 255, 0.8) |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-text-Pdf | rgba(255, 255, 220, 0.8) | rgba(255, 255, 220, 0.8) |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-toolbar-Pdf | #ffffff | #ffffff |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-field-Pdf | transparent | transparent |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-toolbar-Pdf | #dee2e6 | #dee2e6 |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-page-Pdf | $boxShadow-md | $boxShadow-md |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-selected-Pdf | 0 0 0 2px rgba(0, 123, 255, 0.25) | 0 0 0 2px rgba(0, 123, 255, 0.25) |
-| [color](/docs/styles-and-themes/common-units/#color)-delete-Pdf | #dc3545 | #dc3545 |
-| [color](/docs/styles-and-themes/common-units/#color)-resizeHandle-Pdf | #007bff | #007bff |
-| [color](/docs/styles-and-themes/common-units/#color)-selected-Pdf | #007bff | #007bff |
-| [gap](/docs/styles-and-themes/common-units/#size)-pages-Pdf | $space-4 | $space-4 |
-| [size](/docs/styles-and-themes/common-units/#size-values)-Scroller | 10px | 10px |
+| [backgroundColor-checkbox-Pdf](/docs/styles-and-themes/common-units/#color) | rgba(220, 255, 220, 0.8) | rgba(220, 255, 220, 0.8) |
+| [backgroundColor-field-Pdf](/docs/styles-and-themes/common-units/#color) | rgba(255, 255, 255, 0.8) | rgba(255, 255, 255, 0.8) |
+| [backgroundColor-handle-Scroller](/docs/styles-and-themes/common-units/#color) | $color-surface-200 | $color-surface-200 |
+| [backgroundColor-handle-Scroller--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-400 | $color-surface-400 |
+| [backgroundColor-signature-Pdf](/docs/styles-and-themes/common-units/#color) | rgba(220, 220, 255, 0.8) | rgba(220, 220, 255, 0.8) |
+| [backgroundColor-text-Pdf](/docs/styles-and-themes/common-units/#color) | rgba(255, 255, 220, 0.8) | rgba(255, 255, 220, 0.8) |
+| [backgroundColor-toolbar-Pdf](/docs/styles-and-themes/common-units/#color) | #ffffff | #ffffff |
+| [backgroundColor-track-Scroller](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [borderColor-field-Pdf](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [borderColor-toolbar-Pdf](/docs/styles-and-themes/common-units/#color) | #dee2e6 | #dee2e6 |
+| [boxShadow-page-Pdf](/docs/styles-and-themes/common-units/#boxShadow) | $boxShadow-md | $boxShadow-md |
+| [boxShadow-selected-Pdf](/docs/styles-and-themes/common-units/#boxShadow) | 0 0 0 2px rgba(0, 123, 255, 0.25) | 0 0 0 2px rgba(0, 123, 255, 0.25) |
+| [color-delete-Pdf](/docs/styles-and-themes/common-units/#color) | #dc3545 | #dc3545 |
+| [color-resizeHandle-Pdf](/docs/styles-and-themes/common-units/#color) | #007bff | #007bff |
+| [color-selected-Pdf](/docs/styles-and-themes/common-units/#color) | #007bff | #007bff |
+| [gap-pages-Pdf](/docs/styles-and-themes/common-units/#size) | $space-4 | $space-4 |
+| [size-Scroller](/docs/styles-and-themes/common-units/#size-values) | 10px | 10px |

@@ -107,12 +107,12 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $backgroundColor--selected | $color-primary-300 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $backgroundColor | $backgroundColor |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $color-secondary-200 | $color-secondary-200 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-FileUploadDropZone | $borderRadius | $borderRadius |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-FileUploadDropZone | dashed | dashed |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-FileUploadDropZone | 2px | 2px |
-| [opacity](/docs/styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.3 | 0.3 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $color-primary-700 | $color-primary-700 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor-secondary | $textColor-secondary |
+| [backgroundColor-dropping-FileUploadDropZone](/docs/styles-and-themes/common-units/#color) | $backgroundColor--selected | $color-primary-300 |
+| [backgroundColor-FileUploadDropZone](/docs/styles-and-themes/common-units/#color) | $backgroundColor | $backgroundColor |
+| [borderColor-FileUploadDropZone](/docs/styles-and-themes/common-units/#color) | $color-secondary-200 | $color-secondary-200 |
+| [borderRadius-FileUploadDropZone](/docs/styles-and-themes/common-units/#border-rounding) | $borderRadius | $borderRadius |
+| [borderStyle-FileUploadDropZone](/docs/styles-and-themes/common-units/#border-style) | dashed | dashed |
+| [borderWidth-FileUploadDropZone](/docs/styles-and-themes/common-units/#size-values) | 2px | 2px |
+| [opacity-dropping-FileUploadDropZone](/docs/styles-and-themes/common-units/#opacity) | 0.3 | 0.3 |
+| [textColor-dropping-FileUploadDropZone](/docs/styles-and-themes/common-units/#color) | $color-primary-700 | $color-primary-700 |
+| [textColor-FileUploadDropZone](/docs/styles-and-themes/common-units/#color) | $textColor-secondary | $textColor-secondary |

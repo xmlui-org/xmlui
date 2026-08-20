@@ -1112,14 +1112,14 @@ Apply tree state, including per-node state keyed by source node ID and scrollPos
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--hover | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--selected | $color-primary-50 | $color-primary-50 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Tree-row--focus | $color-primary-500 | $color-primary-500 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Tree-row | 4px | 4px |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-Tree--focus | $outlineColor--focus | $outlineColor--focus |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Tree--focus | $outlineOffset--focus | $outlineOffset--focus |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Tree--focus | $outlineStyle--focus | $outlineStyle--focus |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Tree--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Tree | $textColor-primary | $textColor-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Tree--hover | $textColor-primary | $textColor-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Tree--selected | $color-primary-900 | $color-primary-900 |
+| [backgroundColor-Tree-row--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
+| [backgroundColor-Tree-row--selected](/docs/styles-and-themes/common-units/#color) | $color-primary-50 | $color-primary-50 |
+| [borderColor-Tree-row--focus](/docs/styles-and-themes/common-units/#color) | $color-primary-500 | $color-primary-500 |
+| [borderRadius-Tree-row](/docs/styles-and-themes/common-units/#border-rounding) | 4px | 4px |
+| [outlineColor-Tree--focus](/docs/styles-and-themes/common-units/#color) | $outlineColor--focus | $outlineColor--focus |
+| [outlineOffset-Tree--focus](/docs/styles-and-themes/common-units/#size-values) | $outlineOffset--focus | $outlineOffset--focus |
+| [outlineStyle-Tree--focus](/docs/styles-and-themes/common-units/#border) | $outlineStyle--focus | $outlineStyle--focus |
+| [outlineWidth-Tree--focus](/docs/styles-and-themes/common-units/#size-values) | $outlineWidth--focus | $outlineWidth--focus |
+| [textColor-Tree](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [textColor-Tree--hover](/docs/styles-and-themes/common-units/#color) | $textColor-primary | $textColor-primary |
+| [textColor-Tree--selected](/docs/styles-and-themes/common-units/#color) | $color-primary-900 | $color-primary-900 |

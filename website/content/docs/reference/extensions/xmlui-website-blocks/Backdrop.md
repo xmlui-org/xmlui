@@ -42,5 +42,5 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Backdrop | transparent | transparent |
-| [opacity](/docs/styles-and-themes/common-units/#opacity)-Backdrop | 0.1 | 0.1 |
+| [backgroundColor-Backdrop](/docs/styles-and-themes/common-units/#color) | transparent | transparent |
+| [opacity-Backdrop](/docs/styles-and-themes/common-units/#opacity) | 0.1 | 0.1 |
