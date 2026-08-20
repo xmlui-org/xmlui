@@ -2147,6 +2147,10 @@ Use `getVisibleRange()` with `getItemCount()`, or read the same values from the 
 
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
+`scrollToBottom()` scrolls the list's resolved scroll container to its absolute end. When the `List` has its own bounded viewport, such as an explicit `height` or `maxHeight`, that viewport scrolls. In an outside-scroll arrangement, where the `List` has no bounded height and a parent element provides the scrolling viewport, the method scrolls that nearest overflow ancestor instead. It does not scroll an unrelated page or application shell scroller; scroll that outer container directly if it is the one the user sees moving.
+
+`scrollAnchor="bottom"` uses the same bottom target for initial positioning and auto-follow as rows are appended, but it is declarative state, not a replacement for imperative calls. Use `scrollAnchor` when the list should stay pinned to the newest content, and `scrollToBottom()` when a user action or handler should jump to the end once.
+
 ```xmlui-pg copy display name="Example: data API Call" height="400px"
 <App layout="condensed-sticky" scrollWholePage="false">
   <AppHeader>
@@ -2176,6 +2180,10 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
 %-API-END
 
 %-API-START scrollToTop
+
+`scrollToTop()` scrolls the list's resolved scroll container to its absolute start. When the `List` owns its viewport, that means the top of the list. In an outside-scroll arrangement, where a parent element is the scrolling viewport, the call targets that nearest overflow ancestor and scrolls past any content that appears above the `List` inside the same scroller.
+
+`scrollAnchor="top"` is the default initial anchor. It keeps the list positioned from the top during its own layout work, while `scrollToTop()` is the imperative API to jump the active list scroller back to the start. If your UI uses a separate page-level scroller outside the `List`'s resolved scroll parent, call that container's scrolling API instead.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
