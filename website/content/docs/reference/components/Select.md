@@ -612,7 +612,6 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-Select--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
@@ -623,10 +622,7 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--warning--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
 | [border](/docs/styles-and-themes/common-units/#border)-Select | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-Select | *none* | *none* |
@@ -634,19 +630,13 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined | $borderColor-outlined | $borderColor-outlined |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined | $borderColor-outlined | $borderColor-outlined |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--focus | $borderColor-outlined--focus | $borderColor-outlined--focus |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--focus | $borderColor-outlined--focus | $borderColor-outlined--focus |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--hover | $borderColor-outlined--hover | $borderColor-outlined--hover |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--hover | $borderColor-outlined--hover | $borderColor-outlined--hover |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
@@ -663,7 +653,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderLeftStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--success | *none* | *none* |
@@ -675,7 +664,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderRightWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--success | *none* | *none* |
@@ -689,13 +677,10 @@ The component has some parts that can be styled through layout properties and th
 | [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-Select | 1px | 1px |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-Select | 1px | 1px |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--warning | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--error | *none* | *none* |
@@ -713,7 +698,6 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--warning | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-item-Select | $space-7 | $space-7 |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-Select | 2.5rem | 2.5rem |
@@ -759,7 +743,6 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select--warning | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
@@ -767,7 +750,6 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--warning--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select-badge--active | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select-badge--hover | *none* | *none* |

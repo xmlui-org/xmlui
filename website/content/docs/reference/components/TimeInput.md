@@ -329,7 +329,6 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--hover | *none* | *none* |

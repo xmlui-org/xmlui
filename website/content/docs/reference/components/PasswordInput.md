@@ -285,7 +285,6 @@ The component has some parts that can be styled through layout properties and th
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextBox--warning--hover | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-Input | $textColor-subtitle | $textColor-subtitle |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TextBox | $textColor-subtitle | $textColor-subtitle |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-TextBox | $textColor-subtitle | $textColor-subtitle |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TextBox--error | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TextBox--success | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TextBox--warning | *none* | *none* |

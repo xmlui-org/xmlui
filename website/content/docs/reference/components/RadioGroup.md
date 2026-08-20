@@ -232,13 +232,10 @@ The component has some parts that can be styled through layout properties and th
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroup | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--active | *none* | *none* |
@@ -247,17 +244,12 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default--hover | $color-surface-700 | $color-surface-700 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption | 1px | 1px |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption-validation | 2px | 2px |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [gap](/docs/styles-and-themes/common-units/#size)-RadioGroup | $gap-normal | $gap-normal |
 | [gap](/docs/styles-and-themes/common-units/#size)-RadioGroupOption | 0.25em | 0.25em |
@@ -266,7 +258,6 @@ The component has some parts that can be styled through layout properties and th
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--success | *none* | *none* |

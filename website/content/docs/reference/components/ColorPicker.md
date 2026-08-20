@@ -215,6 +215,4 @@ The component has some parts that can be styled through layout properties and th
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--warning--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--warning--hover | *none* | *none* |
 | [height](/docs/styles-and-themes/common-units/#size-values)-ColorPicker | 1.5em | 1.5em |
-| [height](/docs/styles-and-themes/common-units/#size-values)-ColorPicker | 1.5em | 1.5em |
-| [width](/docs/styles-and-themes/common-units/#size-values)-ColorPicker | 3em | 3em |
 | [width](/docs/styles-and-themes/common-units/#size-values)-ColorPicker | 3em | 3em |

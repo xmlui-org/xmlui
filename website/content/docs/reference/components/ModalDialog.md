@@ -379,8 +379,6 @@ The component has some parts that can be styled through layout properties and th
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ModalDialog | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ModalDialog | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-overlay-ModalDialog | $backgroundColor-overlay | $backgroundColor-overlay |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-overlay-ModalDialog | $backgroundColor-overlay | $backgroundColor-overlay |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-ModalDialog | *none* | *none* |
@@ -418,7 +416,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | *none* | *none* |
 | [direction](/docs/styles-and-themes/layout-props#direction)-title-ModalDialog | *none* | *none* |
 | [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-ModalDialog | $fontFamily | $fontFamily |
-| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-ModalDialog | $fontFamily | $fontFamily |
 | [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-title-ModalDialog | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | $fontSize-2xl | $fontSize-2xl |
 | [fontStretch](/docs/styles-and-themes/common-units/#fontStretch)-title-ModalDialog | *none* | *none* |
@@ -429,10 +426,7 @@ The component has some parts that can be styled through layout properties and th
 | [lineBreak](/docs/styles-and-themes/common-units/#line-break)-title-ModalDialog | *none* | *none* |
 | [lineHeight](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | *none* | *none* |
 | [marginBottom](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | 0 | 0 |
-| [marginBottom](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | 0 | 0 |
 | [maxHeight](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 100% | 100% |
-| [maxHeight](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 100% | 100% |
-| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 450px | 450px |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 450px | 450px |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | $space-7 | $space-7 |
@@ -451,7 +445,6 @@ The component has some parts that can be styled through layout properties and th
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-overlay-ModalDialog | *none* | *none* |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-title-ModalDialog | *none* | *none* |
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-title-ModalDialog | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |
 | [textDecorationColor](/docs/styles-and-themes/common-units/#color)-title-ModalDialog | *none* | *none* |

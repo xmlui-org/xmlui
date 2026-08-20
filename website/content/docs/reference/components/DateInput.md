@@ -410,13 +410,11 @@ The component has some parts that can be styled through layout properties and th
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--focus | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--focus | *none* | *none* |
@@ -430,7 +428,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--error | *none* | *none* |
@@ -467,7 +464,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput | *none* | *none* |
 | [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--warning | *none* | *none* |
@@ -479,7 +475,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderVerticalColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--success | *none* | *none* |

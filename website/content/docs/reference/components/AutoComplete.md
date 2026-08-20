@@ -245,7 +245,6 @@ This API allows you to get or set the value of the component. If no value is set
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | transparent | transparent |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | transparent | transparent |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
@@ -255,15 +254,11 @@ This API allows you to get or set the value of the component. If no value is set
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-400 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
 | [border](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderBottom](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
@@ -271,8 +266,6 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
@@ -281,7 +274,6 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
 | [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderEndStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
@@ -299,14 +291,12 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete--warning | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete-badge | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $borderRadius | $borderRadius |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $borderRadius | $borderRadius |
 | [borderRight](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderRightColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderRightStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderRightWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--success | *none* | *none* |
@@ -320,11 +310,9 @@ This API allows you to get or set the value of the component. If no value is set
 | [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--warning | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-AutoComplete | 1px | 1px |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-AutoComplete | 1px | 1px |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--error | *none* | *none* |
@@ -335,12 +323,10 @@ This API allows you to get or set the value of the component. If no value is set
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--warning--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--warning | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-groupHeader-AutoComplete | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete | *none* | *none* |
@@ -376,7 +362,6 @@ This API allows you to get or set the value of the component. If no value is set
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | $space-2 | $space-2 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
-| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--hover | *none* | *none* |
@@ -384,7 +369,6 @@ This API allows you to get or set the value of the component. If no value is set
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | *none* | *none* |
