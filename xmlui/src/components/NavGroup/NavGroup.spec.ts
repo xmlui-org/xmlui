@@ -615,6 +615,87 @@ test.describe("noIndicator property", () => {
   });
 });
 
+test.describe("fitContentWidth property", () => {
+  test("sizes dropdown NavGroup to the widest child", async ({ initTestBed, page }) => {
+    const shortLabel = "Short";
+    const longLabel = "Much Wider Navigation Destination";
+
+    await initTestBed(`
+      <NavGroup label="Menu" fitContentWidth="true">
+        <NavLink label="${shortLabel}" />
+        <NavLink label="${longLabel}" />
+      </NavGroup>
+    `);
+
+    const trigger = page.getByRole("button", { name: "Menu" });
+    await expect(trigger).toBeVisible();
+    const triggerBox = await trigger.boundingBox();
+    await trigger.click();
+
+    const shortItem = page.getByRole("menuitem", { name: shortLabel });
+    const longItem = page.getByRole("menuitem", { name: longLabel });
+    await expect(shortItem).toBeVisible();
+    await expect(longItem).toBeVisible();
+
+    const shortBox = await shortItem.boundingBox();
+    const longBox = await longItem.boundingBox();
+
+    expect(triggerBox).not.toBeNull();
+    expect(shortBox).not.toBeNull();
+    expect(longBox).not.toBeNull();
+    expect(longBox!.width).toBeGreaterThan(triggerBox!.width);
+    expect(Math.abs(shortBox!.width - longBox!.width)).toBeLessThanOrEqual(2);
+  });
+
+  test("wraps and fully displays long child text when capped by maxWidth-fitContent-NavGroup", async ({
+    initTestBed,
+    page,
+  }) => {
+    const longLabel = "Reports for International Operations and Quarterly Financial Forecasting";
+
+    await initTestBed(
+      `
+      <NavGroup label="Menu" fitContentWidth="true">
+        <NavLink label="${longLabel}" />
+      </NavGroup>
+    `,
+      {
+        testThemeVars: {
+          "maxWidth-fitContent-NavGroup": "170px",
+        },
+      },
+    );
+
+    const trigger = page.getByRole("button", { name: "Menu" });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+
+    const longItem = page.getByRole("menuitem", { name: longLabel });
+    await expect(longItem).toBeVisible();
+
+    const metrics = await longItem.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      return {
+        width: rect.width,
+        height: rect.height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        scrollWidth: element.scrollWidth,
+        clientWidth: element.clientWidth,
+        scrollHeight: element.scrollHeight,
+        clientHeight: element.clientHeight,
+        text: element.textContent,
+      };
+    });
+
+    expect(metrics.width).toBeLessThanOrEqual(171);
+    expect(metrics.height).toBeGreaterThan(metrics.lineHeight * 1.5);
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+    expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+    expect(metrics.text).toContain(longLabel);
+  });
+});
+
 // EXPAND ICON ALIGNMENT TESTS
 test.describe("Expand Icon Alignment", () => {
   test("renders with default and 'end' expandIconAlignment", async ({

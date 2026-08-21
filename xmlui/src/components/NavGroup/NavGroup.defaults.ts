@@ -6,4 +6,5 @@ export const defaultProps = {
   noIndicator: false,
   iconAlignment: "center" as "baseline" | "start" | "center" | "end",
   expandIconAlignment: "start" as "start" | "end",
+  fitContentWidth: false,
 };

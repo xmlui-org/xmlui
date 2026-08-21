@@ -63,6 +63,7 @@ type Props = {
   iconVerticalCollapsed?: string;
   iconAlignment?: "baseline" | "start" | "center" | "end";
   expandIconAlignment?: "start" | "end";
+  fitContentWidth?: boolean;
 };
 
 import { defaultProps } from "./NavGroup.defaults";
@@ -86,6 +87,7 @@ export const NavGroup = memo(forwardRef(function NavGroup(
     iconVerticalExpanded,
     iconAlignment = "center",
     expandIconAlignment,
+    fitContentWidth = defaultProps.fitContentWidth,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
@@ -152,6 +154,7 @@ export const NavGroup = memo(forwardRef(function NavGroup(
           noIndicator={noIndicator}
           iconAlignment={iconAlignment}
           expandIconAlignment={effectiveExpandIconAlignment}
+          fitContentWidth={fitContentWidth}
         />
       ) : (
         <DropDownNavGroup
@@ -167,6 +170,7 @@ export const NavGroup = memo(forwardRef(function NavGroup(
           noIndicator={noIndicator}
           expandIconAlignment={effectiveExpandIconAlignment}
           iconAlignment={iconAlignment}
+          fitContentWidth={fitContentWidth}
         />
       )}
     </NavGroupContext.Provider>
@@ -187,6 +191,7 @@ type ExpandableNavGroupProps = {
   noIndicator?: boolean;
   iconAlignment?: "baseline" | "start" | "center" | "end";
   expandIconAlignment?: "start" | "end";
+  fitContentWidth?: boolean;
 };
 
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
@@ -204,6 +209,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     noIndicator = false,
     iconAlignment = "center",
     expandIconAlignment = "start",
+    fitContentWidth = defaultProps.fitContentWidth,
     ...rest
   }: ExpandableNavGroupProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -260,8 +266,10 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <div
-      className={classnames(styles.groupWrapper, classes?.[COMPONENT_PART_KEY], className)}
-      style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
+      className={classnames(styles.groupWrapper, classes?.[COMPONENT_PART_KEY], className, {
+        [styles.fitContentWidth]: fitContentWidth,
+      })}
+      style={expandIconAlignment === "end" && !fitContentWidth ? { width: "100%" } : undefined}
     >
       <NavLink
         {...rest}
@@ -310,6 +318,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     noIndicator = false,
     iconAlignment = "center",
     expandIconAlignment = "start",
+    fitContentWidth = defaultProps.fitContentWidth,
     ...rest
   }: {
     style?: CSSProperties;
@@ -323,6 +332,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     noIndicator?: boolean;
     iconAlignment?: "baseline" | "start" | "center" | "end";
     expandIconAlignment?: "start" | "end";
+    fitContentWidth?: boolean;
   },
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -403,7 +413,9 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
       </Trigger>
       <DropdownMenuPortal container={root}>
         <Content
-          className={styles.dropdownList}
+          className={classnames(styles.dropdownList, {
+            [styles.fitContentWidth]: fitContentWidth,
+          })}
           style={{ display: "flex", flexDirection: "column" }}
           side={"bottom"}
           align={"start"}
