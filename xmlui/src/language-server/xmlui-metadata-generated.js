@@ -21497,6 +21497,13 @@ export default {
           }
         }
       },
+      "selectNodeByIndex": {
+        "description": "Programmatically select a node by its current visible index. The index is 0-based and follows the tree's physical row order after applying the current expanded/collapsed state.",
+        "signature": "selectNodeByIndex(index: number): void",
+        "parameters": {
+          "index": "The 0-based visible row index to select."
+        }
+      },
       "appendNode": {
         "description": "Add a new node to the tree as a child of the specified parent node.",
         "signature": "appendNode(parentNodeId: string | number | null, nodeData: any): void",
