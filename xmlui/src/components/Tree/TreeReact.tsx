@@ -2567,6 +2567,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         }
       },
 
+      selectNodeByIndex: (index: number) => {
+        const node = Number.isInteger(index) ? flatTreeData[index] : undefined;
+        return setSelectedNodeById(node?.key);
+      },
+
       clearSelection,
 
       // Utility methods

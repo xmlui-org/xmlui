@@ -19,6 +19,7 @@ $minWidth-dropdown: createThemeVar("minWidth-dropdown-#{$component}");
 $marginTop-items: createThemeVar("marginTop-items-#{$component}");
 $marginBottom-items: createThemeVar("marginBottom-items-#{$component}");
 $expandIconAlignment: createThemeVar("expandIconAlignment-#{$component}");
+$maxWidth-fitContent: createThemeVar("maxWidth-fitContent-#{$component}");
 
 // Compose level-specific padding variables (level1 to level4) with fallback to base NavGroup
 $themeVars: t.appendThemeVarWithDefault($themeVars, "padding-level1-#{$component}", t.getThemeVar($themeVars, "padding-#{$component}")) !global;
@@ -56,6 +57,28 @@ $themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level4-#{$com
 @layer components {
   .groupWrapper {
     @include t.marginVars($themeVars, $component);
+  }
+
+  .fitContentWidth {
+    width: max-content;
+    max-width: $maxWidth-fitContent;
+
+    :where(a, button) {
+      min-width: 0;
+      max-width: 100%;
+      flex-shrink: 1 !important;
+      white-space: normal !important;
+
+      > * {
+        min-width: 0;
+      }
+    }
+
+    .groupContent,
+    .groupContentInner {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 
   .navLinkPadding {
@@ -116,6 +139,10 @@ $themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level4-#{$com
     &:focus,
     &:focus-visible {
       outline: none;
+    }
+
+    &.fitContentWidth {
+      min-width: 0;
     }
   }
 

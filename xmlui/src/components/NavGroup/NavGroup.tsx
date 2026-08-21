@@ -94,6 +94,14 @@ export const NavGroupMd = createMetadata({
       ],
       defaultValue: defaultProps.expandIconAlignment,
     },
+    fitContentWidth: {
+      description:
+        `This Boolean property controls whether the \`${COMP}\` sizes itself to fit its ` +
+        `widest child item. The resulting width is capped by the ` +
+        `\`maxWidth-fitContent-${COMP}\` theme variable.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.fitContentWidth,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
@@ -106,6 +114,7 @@ export const NavGroupMd = createMetadata({
     [`borderRadius-dropdown-${COMP}`]: "$borderRadius",
     [`boxShadow-dropdown-${COMP}`]: "$boxShadow-spread",
     [`minWidth-dropdown-${COMP}`]: "11em",
+    [`maxWidth-fitContent-${COMP}`]: "100vw",
     [`marginTop-items-${COMP}`]: "0",
     [`marginBottom-items-${COMP}`]: "0",
     [`expandIconAlignment-${COMP}`]: "start",
@@ -133,6 +142,7 @@ export const navGroupComponentRenderer = wrapComponent(COMP, NavGroup, NavGroupM
       iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
       iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
       expandIconAlignment={extractValue(node.props.expandIconAlignment)}
+      fitContentWidth={extractValue.asOptionalBoolean(node.props.fitContentWidth)}
       classes={classes}
     />
   ),

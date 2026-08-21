@@ -177,7 +177,9 @@ You have several options to style the icons representing the expanded or collaps
 Each tree node is selectable by default, unless the node item's data does not have a `selectable` property (or the one specified in `selectedField`).
 A selectable item can be selected by clicking the mouse or pressing the Enter or Space keys when it has focus.
 
-You can set the `selectedValue` property to define the selected tree item, ot use the `selectNode` exposed method for imperative selection.
+You can set the `selectedValue` property to define the selected tree item, or use the `selectNode` exposed method for imperative selection.
+
+You can also use `selectNodeByIndex(index)` to select a node by its current visible row index. The index is zero-based and follows the tree's physical row order after expansion state is applied. For example, when three root nodes are collapsed, the roots are indexed `0`, `1`, and `2`. If the first root expands and reveals four children, that root remains `0`, its children become `1` through `4`, and the second and third roots become `5` and `6`.
 
 ## Item templates
 

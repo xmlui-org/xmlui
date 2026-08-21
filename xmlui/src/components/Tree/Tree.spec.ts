@@ -21,6 +21,24 @@ import {
   multiBranchTreeData,
 } from "./testData";
 
+const visibleIndexTreeData = [
+  { id: "root-1", name: "Root 1", parentId: null },
+  { id: "root-1-child-1", name: "Root 1 Child 1", parentId: "root-1" },
+  { id: "root-1-child-2", name: "Root 1 Child 2", parentId: "root-1" },
+  { id: "root-1-child-3", name: "Root 1 Child 3", parentId: "root-1" },
+  { id: "root-1-child-4", name: "Root 1 Child 4", parentId: "root-1" },
+  { id: "root-2", name: "Root 2", parentId: null },
+  { id: "root-2-child-1", name: "Root 2 Child 1", parentId: "root-2" },
+  { id: "root-2-child-2", name: "Root 2 Child 2", parentId: "root-2" },
+  { id: "root-2-child-3", name: "Root 2 Child 3", parentId: "root-2" },
+  { id: "root-2-child-4", name: "Root 2 Child 4", parentId: "root-2" },
+  { id: "root-3", name: "Root 3", parentId: null },
+  { id: "root-3-child-1", name: "Root 3 Child 1", parentId: "root-3" },
+  { id: "root-3-child-2", name: "Root 3 Child 2", parentId: "root-3" },
+  { id: "root-3-child-3", name: "Root 3 Child 3", parentId: "root-3" },
+  { id: "root-3-child-4", name: "Root 3 Child 4", parentId: "root-3" },
+];
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -3045,6 +3063,95 @@ test.describe("Events", () => {
 
         // Verify we have both selection events with correct previous/new node IDs
         await expect(eventsText).toHaveText('[{"prev":null,"next":1},{"prev":1,"next":2}]');
+      });
+
+      test("selectNodeByIndex() uses collapsed visible row order", async ({
+        initTestBed,
+        createTreeDriver,
+        createButtonDriver,
+      }) => {
+        const { testStateDriver } = await initTestBed(`
+          <Fragment>
+            <VStack height="400px">
+              <Tree id="treeApi" testId="tree"
+                dataFormat="flat"
+                defaultExpanded="none"
+                data='{${JSON.stringify(visibleIndexTreeData)}}'
+                onSelectionDidChange="event => testState = event">
+                <property name="itemTemplate">
+                  <HStack testId="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="select-index-btn" label="Select Visible Index 2" onClick="
+              treeApi.selectNodeByIndex(2);
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const selectIndexButton = await createButtonDriver("select-index-btn");
+
+        await expect(tree.getByTestId("root-1")).toBeVisible();
+        await expect(tree.getByTestId("root-2")).toBeVisible();
+        await expect(tree.getByTestId("root-3")).toBeVisible();
+        await expect(tree.getByTestId("root-1-child-1")).not.toBeVisible();
+
+        await selectIndexButton.click();
+
+        await expect
+          .poll(() => testStateDriver.testState().then((s) => s?.newNode?.id))
+          .toBe("root-3");
+      });
+
+      test("selectNodeByIndex() uses expanded visible row order", async ({
+        page,
+        initTestBed,
+        createTreeDriver,
+        createButtonDriver,
+      }) => {
+        await initTestBed(`
+          <Fragment>
+            <VStack height="400px" var.selectionEvents="{[]}">
+              <Text testId="eventsText">{JSON.stringify(selectionEvents)}</Text>
+              <Tree id="treeApi" testId="tree"
+                dataFormat="flat"
+                defaultExpanded="{['root-1']}"
+                data='{${JSON.stringify(visibleIndexTreeData)}}'
+                onSelectionDidChange="event => {selectionEvents.push(event.newNode?.id || null);}"
+              >
+                <property name="itemTemplate">
+                  <HStack testId="{$item.id}">
+                    <Text value="{$item.name}" />
+                  </HStack>
+                </property>
+              </Tree>
+            </VStack>
+            <Button testId="select-child-btn" label="Select Visible Index 4" onClick="
+              treeApi.selectNodeByIndex(4);
+            " />
+            <Button testId="select-root-btn" label="Select Visible Index 6" onClick="
+              treeApi.selectNodeByIndex(6);
+            " />
+          </Fragment>
+        `);
+
+        const tree = await createTreeDriver("tree");
+        const selectChildButton = await createButtonDriver("select-child-btn");
+        const selectRootButton = await createButtonDriver("select-root-btn");
+
+        await expect(tree.getByTestId("root-1-child-1")).toBeVisible();
+        await expect(tree.getByTestId("root-1-child-4")).toBeVisible();
+        await expect(tree.getByTestId("root-2")).toBeVisible();
+        await expect(tree.getByTestId("root-3")).toBeVisible();
+        await expect(tree.getByTestId("root-2-child-1")).not.toBeVisible();
+
+        await selectChildButton.click();
+        await selectRootButton.click();
+
+        await expect(page.getByTestId("eventsText")).toHaveText('["root-1-child-4","root-3"]');
       });
 
       test("fires when clearSelection() API method is called", async ({

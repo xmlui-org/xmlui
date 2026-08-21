@@ -13657,6 +13657,11 @@ export default {
           }
         ],
         "defaultValue": "start"
+      },
+      "fitContentWidth": {
+        "description": "This Boolean property controls whether the `NavGroup` sizes itself to fit its widest child item. The resulting width is capped by the `maxWidth-fitContent-NavGroup` theme variable.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "themeVars": {
@@ -13681,6 +13686,7 @@ export default {
       "marginTop-items-NavGroup": "var(--xmlui-marginTop-items-NavGroup)",
       "marginBottom-items-NavGroup": "var(--xmlui-marginBottom-items-NavGroup)",
       "expandIconAlignment-NavGroup": "var(--xmlui-expandIconAlignment-NavGroup)",
+      "maxWidth-fitContent-NavGroup": "var(--xmlui-maxWidth-fitContent-NavGroup)",
       "padding-level1-NavGroup": "var(--xmlui-padding-level1-NavGroup, var(--xmlui-padding-NavGroup))",
       "paddingHorizontal-level1-NavGroup": "var(--xmlui-paddingHorizontal-level1-NavGroup, var(--xmlui-paddingHorizontal-NavGroup, var(--xmlui-padding-NavGroup)))",
       "paddingVertical-level1-NavGroup": "var(--xmlui-paddingVertical-level1-NavGroup, var(--xmlui-paddingVertical-NavGroup, var(--xmlui-padding-NavGroup)))",
@@ -13719,6 +13725,7 @@ export default {
       "borderRadius-dropdown-NavGroup": "$borderRadius",
       "boxShadow-dropdown-NavGroup": "$boxShadow-spread",
       "minWidth-dropdown-NavGroup": "11em",
+      "maxWidth-fitContent-NavGroup": "100vw",
       "marginTop-items-NavGroup": "0",
       "marginBottom-items-NavGroup": "0",
       "expandIconAlignment-NavGroup": "start",
@@ -21495,6 +21502,13 @@ export default {
           "parameters": {
             "nodeId": "The ID of the node (source data format)"
           }
+        }
+      },
+      "selectNodeByIndex": {
+        "description": "Programmatically select a node by its current visible index. The index is 0-based and follows the tree's physical row order after applying the current expanded/collapsed state.",
+        "signature": "selectNodeByIndex(index: number): void",
+        "parameters": {
+          "index": "The 0-based visible row index to select."
         }
       },
       "appendNode": {
