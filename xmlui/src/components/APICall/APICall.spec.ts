@@ -866,6 +866,40 @@ test.describe("Cancellation", () => {
 
       await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual(null);
     });
+
+    test("does not show confirmation when bound confirmation props resolve to undefined", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      await initTestBed(
+        `
+        <Fragment var.approved="{false}" var.result="pending">
+          <APICall
+            id="api"
+            url="/api/confirm"
+            method="post"
+            confirmTitle="{approved ? 'Confirm title' : undefined}"
+            confirmMessage="{approved ? 'Confirm message' : undefined}"
+            confirmButtonLabel="{approved ? 'Yes, save' : undefined}"
+            cancelButtonLabel="{approved ? 'No' : undefined}"
+            onSuccess="() => result = 'saved'"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+          <Text testId="result" value="{result}" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: confirmationInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(page.getByTestId("result")).toHaveText("saved");
+    });
   });
 
   // =============================================================================
