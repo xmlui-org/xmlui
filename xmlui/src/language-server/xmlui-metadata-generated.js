@@ -2166,6 +2166,13 @@ export default {
           "error": "The error object containing details about what went wrong with the API request."
         }
       },
+      "cancel": {
+        "description": "This event fires when an in-flight request or deferred polling operation is cancelled with `cancel()`.",
+        "signature": "(reason?: string) => void",
+        "parameters": {
+          "reason": "The optional reason passed to `cancel(reason)`, or `\"user\"` by default."
+        }
+      },
       "statusUpdate": {
         "description": "Fires on each poll when in deferred mode. Passes the status data and current progress.",
         "signature": "(statusData: any, progress: number) => void",
@@ -2201,6 +2208,7 @@ export default {
           "$requestBody",
           "$cookies",
           "$requestHeaders",
+          "$abortSignal",
           "$param",
           "$params"
         ],
@@ -2234,6 +2242,9 @@ export default {
       },
       "$requestHeaders": {
         "description": "Resolved request headers (available in `mockExecute`)"
+      },
+      "$abortSignal": {
+        "description": "AbortSignal for the current request (available in `mockExecute`)"
       },
       "$result": {
         "description": "Response data (available in `completedNotificationMessage`)"
@@ -2281,6 +2292,14 @@ export default {
         "description": "The error from the most recent failed API call execution.",
         "signature": "lastError: any"
       },
+      "cancelled": {
+        "description": "This property indicates whether the most recent API operation was cancelled.",
+        "signature": "get cancelled(): boolean"
+      },
+      "lastCancelReason": {
+        "description": "This property returns the reason passed to the most recent `cancel(reason)` call.",
+        "signature": "get lastCancelReason(): string | undefined"
+      },
       "lastResponseHeaders": {
         "description": "This property retrieves the HTTP response headers from the last successful API call execution, or `undefined` if no successful call has completed yet.",
         "signature": "get lastResponseHeaders(): Record<string, string> | undefined"
@@ -2302,8 +2321,11 @@ export default {
         "signature": "isPolling(): boolean"
       },
       "cancel": {
-        "description": "Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.",
-        "signature": "cancel(): Promise<void>"
+        "description": "Cancel an in-flight API request, active deferred polling, and optionally notify the server through `cancelUrl`.",
+        "signature": "cancel(reason?: string): Promise<boolean>",
+        "parameters": {
+          "reason": "Optional cancellation reason exposed through `onCancel` and `lastCancelReason`."
+        }
       }
     }
   },
@@ -4941,11 +4963,19 @@ export default {
           "$queryParams",
           "$requestBody",
           "$requestHeaders",
-          "$pageParams"
+          "$pageParams",
+          "$abortSignal"
         ],
-        "description": "When defined, this event handler replaces the default fetch logic. The handler receives the resolved request properties as context variables: `$url`, `$method`, `$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). The return value of the handler becomes the data result. Caching, polling, the `loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` method continue to work normally because the handler runs inside the same query function that powers the default fetch.",
+        "description": "When defined, this event handler replaces the default fetch logic. The handler receives the resolved request properties as context variables: `$url`, `$method`, `$queryParams`, `$requestBody`, `$requestHeaders`, `$pageParams` (when paging), and `$abortSignal`. The return value of the handler becomes the data result. Caching, polling, the `loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` method continue to work normally because the handler runs inside the same query function that powers the default fetch.",
         "signature": "fetch(): any",
         "parameters": {}
+      },
+      "cancel": {
+        "description": "This event fires when an in-flight request is cancelled with the `cancel()` method.",
+        "signature": "cancel(reason: string): void",
+        "parameters": {
+          "reason": "The cancellation reason. The default value is `user`."
+        }
       }
     },
     "apis": {
@@ -4968,6 +4998,21 @@ export default {
       "refetch": {
         "description": "This method requests the re-fetch of the data.",
         "signature": "refetch(): void"
+      },
+      "cancel": {
+        "description": "This method cancels the in-flight fetch or refetch operation. It returns `true` when there was an active operation to cancel; otherwise it returns `false`.",
+        "signature": "cancel(reason?: string): Promise<boolean>",
+        "parameters": {
+          "reason": "Optional reason passed to the `cancel` event. Defaults to `user`."
+        }
+      },
+      "cancelled": {
+        "description": "This property indicates whether the most recent fetch was cancelled.",
+        "signature": "get cancelled(): boolean"
+      },
+      "lastCancelReason": {
+        "description": "This property returns the reason from the most recent cancellation.",
+        "signature": "get lastCancelReason(): string | undefined"
       },
       "responseHeaders": {
         "description": "This property retrieves the HTTP response headers from the last successful fetch. Returns an object whose keys are header names and values are header values, or `undefined` if no fetch has completed yet.",

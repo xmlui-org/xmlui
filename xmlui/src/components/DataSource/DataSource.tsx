@@ -175,17 +175,34 @@ export const DataSourceMd = createMetadata({
     },
 
     fetch: {
-      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
+      injectedVars: [
+        "$url",
+        "$method",
+        "$queryParams",
+        "$requestBody",
+        "$requestHeaders",
+        "$pageParams",
+        "$abortSignal",
+      ],
       description:
         "When defined, this event handler replaces the default fetch logic. The handler " +
         "receives the resolved request properties as context variables: `$url`, `$method`, " +
-        "`$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). " +
+        "`$queryParams`, `$requestBody`, `$requestHeaders`, `$pageParams` (when paging), " +
+        "and `$abortSignal`. " +
         "The return value of the handler becomes the data result. Caching, polling, the " +
         "`loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` " +
         "method continue to work normally because the handler runs inside the same query " +
         "function that powers the default fetch.",
       signature: "fetch(): any",
       parameters: {},
+    },
+    cancel: {
+      description:
+        "This event fires when an in-flight request is cancelled with the `cancel()` method.",
+      signature: "cancel(reason: string): void",
+      parameters: {
+        reason: "The cancellation reason. The default value is `user`.",
+      },
     },
   },
   apis: {
@@ -208,6 +225,23 @@ export const DataSourceMd = createMetadata({
     refetch: {
       description: "This method requests the re-fetch of the data.",
       signature: "refetch(): void",
+    },
+    cancel: {
+      description:
+        "This method cancels the in-flight fetch or refetch operation. It returns `true` when " +
+        "there was an active operation to cancel; otherwise it returns `false`.",
+      signature: "cancel(reason?: string): Promise<boolean>",
+      parameters: {
+        reason: "Optional reason passed to the `cancel` event. Defaults to `user`.",
+      },
+    },
+    cancelled: {
+      description: "This property indicates whether the most recent fetch was cancelled.",
+      signature: "get cancelled(): boolean",
+    },
+    lastCancelReason: {
+      description: "This property returns the reason from the most recent cancellation.",
+      signature: "get lastCancelReason(): string | undefined",
     },
     responseHeaders: {
       description:

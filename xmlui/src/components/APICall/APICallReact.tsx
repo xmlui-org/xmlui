@@ -10,6 +10,13 @@ import { Parser } from "../../parsers/scripting/Parser";
 import toast from "react-hot-toast";
 import { getCurrentTrace, pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { defaultProps } from "./APICall.defaults";
+import {
+  DEFAULT_OPERATION_CANCEL_REASON,
+  createCancelledOperationResult,
+  createOperationAbortController,
+  getAbortSignalReason,
+  isAbortError,
+} from "../../components-core/action/operationCancellation";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -21,6 +28,7 @@ interface Props {
   onTimeout?: () => void | Promise<void>;
   onPollingStart?: (initialResult: any) => void | Promise<void>;
   onPollingComplete?: (finalStatus: any, reason: string) => void | Promise<void>;
+  onCancel?: (reason?: string) => void | Promise<void>;
   hasMockExecute?: boolean;
 }
 
@@ -200,7 +208,7 @@ function evaluateCondition(
   }
 }
 
-export const APICallReact = memo(function APICallReact({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout, onPollingStart, onPollingComplete, hasMockExecute }: Props) {
+export const APICallReact = memo(function APICallReact({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout, onPollingStart, onPollingComplete, onCancel, hasMockExecute }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -219,6 +227,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
   const lastResultRef = useRef<any>(null);
   const lastResponseHeadersRef = useRef<Record<string, string> | undefined>(undefined);
   const executionContextRef = useRef<ActionExecutionContext | null>(null);
+  const activeAbortControllerRef = useRef<AbortController | null>(null);
+  const activeCancelReasonRef = useRef<string | undefined>(undefined);
 
   // Initialize state with default values
   useEffect(() => {
@@ -231,6 +241,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         lastResult: undefined,
         lastError: undefined,
         lastResponseHeaders: undefined,
+        cancelled: false,
+        lastCancelReason: undefined,
         // Expose context variables for deferred mode
         ...(deferredMode && { 
           $statusData: deferredStateRef.current.statusData,
@@ -249,6 +261,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         clearTimeout(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
       }
+      activeAbortControllerRef.current?.abort(DEFAULT_OPERATION_CANCEL_REASON);
+      activeAbortControllerRef.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
@@ -296,7 +310,12 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     updateDeferredState(errorState, updateState);
 
     if (updateState) {
-      updateState({ inProgress: false, lastError: new Error("Operation failed") });
+      updateState({
+        inProgress: false,
+        lastError: new Error("Operation failed"),
+        cancelled: false,
+        lastCancelReason: undefined,
+      });
     }
 
     const errorMessage = (node.props as any)?.errorNotificationMessage;
@@ -332,7 +351,12 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
 
     // Mark operation as finished
     if (updateState) {
-      updateState({ inProgress: false, loaded: true });
+      updateState({
+        inProgress: false,
+        loaded: true,
+        cancelled: false,
+        lastCancelReason: undefined,
+      });
     }
     
     // Show completion notification
@@ -358,6 +382,9 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     statusMethod: string,
     result: any
   ) => {
+    const pollAbortController = createOperationAbortController();
+    activeAbortControllerRef.current = pollAbortController;
+    activeCancelReasonRef.current = undefined;
     try {
       const statusData = await callApi(
         executionContext,
@@ -366,6 +393,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
           method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
           uid: uid,
           params: { $result: result },
+          abortSignal: pollAbortController.signal,
         },
         {
           resolveBindingExpressions: false,
@@ -382,7 +410,14 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
       deferredStateRef.current = newState;
       updateDeferredState(newState, updateState);
     } catch (statusError) {
+      if (isAbortError(statusError) || pollAbortController.signal.aborted) {
+        return;
+      }
       console.error("Status request failed:", statusError);
+    } finally {
+      if (activeAbortControllerRef.current === pollAbortController) {
+        activeAbortControllerRef.current = null;
+      }
     }
   });
   
@@ -424,6 +459,9 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     
     // Async polling function
     const pollStatus = async () => {
+      const pollAbortController = createOperationAbortController();
+      activeAbortControllerRef.current = pollAbortController;
+      activeCancelReasonRef.current = undefined;
       try {
         // Check timeout
         const elapsedTime = Date.now() - (deferredStateRef.current.startTime || 0);
@@ -440,6 +478,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
             method: statusMethod as "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect",
             uid: uid,
             params: { $result: result },
+            abortSignal: pollAbortController.signal,
           },
           {
             resolveBindingExpressions: false,
@@ -509,8 +548,15 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         scheduleNextPoll();
 
       } catch (statusError) {
+        if (isAbortError(statusError) || pollAbortController.signal.aborted) {
+          return;
+        }
         console.error("Status request failed:", statusError);
         scheduleNextPoll();
+      } finally {
+        if (activeAbortControllerRef.current === pollAbortController) {
+          activeAbortControllerRef.current = null;
+        }
       }
     };
     
@@ -540,6 +586,9 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
+      const abortController = createOperationAbortController();
+      activeAbortControllerRef.current = abortController;
+      activeCancelReasonRef.current = undefined;
 
       // Store execution context for cancel() method
       executionContextRef.current = executionContext;
@@ -553,7 +602,11 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
           inProgress: true,
           reason: "execute:start",
         });
-        updateState({ inProgress: true });
+        updateState({
+          inProgress: true,
+          cancelled: false,
+          lastCancelReason: undefined,
+        });
         traceApiComponent(executionContext, node, "state:update-dispatched", {
           inProgress: true,
           reason: "execute:start",
@@ -590,6 +643,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
             onSuccess: onSuccess ?? node.events?.success,
             onMockExecute: node.events?.mockExecute,
             onResponseHeaders: (h) => { capturedResponseHeaders = h; lastResponseHeadersRef.current = h; },
+            abortSignal: abortController.signal,
           },
           {
             resolveBindingExpressions: true,
@@ -611,6 +665,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
               lastResult: result,
               lastError: undefined,
               lastResponseHeaders: capturedResponseHeaders,
+              cancelled: false,
+              lastCancelReason: undefined,
             });
             traceApiComponent(executionContext, node, "state:update-dispatched", {
               reason: "callApi:resolved:deferred",
@@ -628,6 +684,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
               lastResult: result,
               lastError: undefined,
               lastResponseHeaders: capturedResponseHeaders,
+              cancelled: false,
+              lastCancelReason: undefined,
             });
             traceApiComponent(executionContext, node, "state:update-dispatched", {
               inProgress: false,
@@ -672,6 +730,21 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         
         return result;
       } catch (error) {
+        if (isAbortError(error) || abortController.signal.aborted) {
+          const reason = getAbortSignalReason(
+            abortController.signal,
+            activeCancelReasonRef.current ?? DEFAULT_OPERATION_CANCEL_REASON,
+          );
+          if (updateState) {
+            updateState({
+              inProgress: false,
+              cancelled: true,
+              lastCancelReason: reason,
+              lastError: undefined,
+            });
+          }
+          return createCancelledOperationResult(reason);
+        }
         // Store error and update state on failure
         if (updateState) {
           traceApiComponent(executionContext, node, "state:update", {
@@ -684,6 +757,8 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
             inProgress: false,
             loaded: true,
             lastError: error,
+            cancelled: false,
+            lastCancelReason: undefined,
           });
           traceApiComponent(executionContext, node, "state:update-dispatched", {
             inProgress: false,
@@ -692,6 +767,10 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
           });
         }
         throw error;
+      } finally {
+        if (activeAbortControllerRef.current === abortController) {
+          activeAbortControllerRef.current = null;
+        }
       }
     },
   );
@@ -759,9 +838,24 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     return deferredStateRef.current.isPolling;
   });
 
-  const cancel = useEvent(async () => {
+  const cancel = useEvent(async (...args: any[]) => {
+    const reason =
+      args.find((arg) => typeof arg === "string" && arg) ?? DEFAULT_OPERATION_CANCEL_REASON;
     // Server-side cancellation support
     const cancelUrl = (node.props as any)?.cancelUrl;
+    const activeAbortController = activeAbortControllerRef.current;
+    const hadActiveRequest =
+      !!activeAbortController && !activeAbortController.signal.aborted;
+    const hadActivePolling = deferredStateRef.current.isPolling || !!pollingIntervalRef.current;
+
+    if (!hadActiveRequest && !hadActivePolling) {
+      return false;
+    }
+
+    activeCancelReasonRef.current = reason;
+    if (hadActiveRequest) {
+      activeAbortController.abort(reason);
+    }
     
     // Stop polling first
     const newState = {
@@ -780,7 +874,9 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     if (updateState) {
       updateState({ 
         inProgress: false,
-        lastError: new Error("Operation cancelled"),
+        lastError: undefined,
+        cancelled: true,
+        lastCancelReason: reason,
         $statusData: newState.statusData,
         $progress: newState.progress,
         $polling: newState.isPolling,
@@ -789,9 +885,15 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         deferredState: { ...newState }
       });
     }
+
+    if (onCancel) {
+      setTimeout(() => {
+        void onCancel(reason);
+      }, 0);
+    }
     
     // If cancelUrl is provided, call the cancel endpoint
-    if (cancelUrl && executionContextRef.current) {
+    if (cancelUrl && executionContextRef.current && lastResultRef.current != null) {
       try {
         const lastResult = lastResultRef.current;
         
@@ -825,6 +927,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
         // Don't throw - cancellation failure shouldn't break the UI
       }
     }
+    return true;
   });
 
   useEffect(() => {

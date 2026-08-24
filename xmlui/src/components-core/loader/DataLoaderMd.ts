@@ -30,8 +30,9 @@ export const DataLoaderMd = createMetadata({
     loaded: { description: "Event to trigger when the data is loaded" },
     error: { description: "This event fires when an error occurs while fetching data" },
     fetch: {
-      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams"],
+      injectedVars: ["$url", "$method", "$queryParams", "$requestBody", "$requestHeaders", "$pageParams", "$abortSignal"],
       description: "When defined, this event handler replaces the default fetch logic",
     },
+    cancel: { description: "This event fires when an in-flight fetch is cancelled" },
   },
 });

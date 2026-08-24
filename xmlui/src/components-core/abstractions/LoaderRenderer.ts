@@ -23,9 +23,10 @@ export interface LoaderRendererDef {
   hints?: ComponentMetadata;
 }
 
-export type LoaderInProgressChangedFn = (isInProgress: boolean) => void;
+export type LoaderInProgressChangedFn = (isInProgress: boolean, resetCancellation?: boolean) => void;
 export type LoaderLoadedFn = (data: any, pageInfo?: any, responseHeaders?: Record<string, string>) => void;
 export type LoaderErrorFn = (error: any) => void;
+export type LoaderCancelledFn = (reason?: string) => void;
 export type TransformResultFn = (data: any) => any;
 
 // The context in which a particular component is rendered
@@ -48,4 +49,5 @@ type RendererContext<TMd extends ComponentMetadata> = {
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  loaderCancelled: LoaderCancelledFn;
 };

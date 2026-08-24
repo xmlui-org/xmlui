@@ -5,6 +5,12 @@ import { invalidateQueries } from "../utils/actionUtils";
 import type { ApiActionOptions, UploadOperationDef } from "../RestApiProxy";
 import RestApiProxy from "../RestApiProxy";
 import { createAction } from "./actions";
+import {
+  createCancelledOperationResult,
+  createOperationAbortError,
+  getAbortSignalReason,
+  isAbortError,
+} from "./operationCancellation";
 
 export interface UploadActionComponent extends ComponentDef {
   props: {
@@ -13,6 +19,7 @@ export interface UploadActionComponent extends ComponentDef {
   events?: {
     error?: string;
     success?: string;
+    cancel?: string;
   };
 }
 
@@ -21,9 +28,18 @@ export type UploadActionParams = {
   params: any;
   chunkSizeInBytes?: number;
   onError?: string;
+  onSuccess?: string;
+  onCancel?: string;
   onProgress?: (...args: any) => void;
+  abortSignal?: AbortSignal;
   omitTransactionId?: boolean;
 } & UploadOperationDef;
+
+function throwIfAborted(abortSignal?: AbortSignal) {
+  if (abortSignal?.aborted) {
+    throw createOperationAbortError();
+  }
+}
 
 async function uploadFile(
   { appContext, state, lookupAction, uid }: ActionExecutionContext,
@@ -42,6 +58,9 @@ async function uploadFile(
     body,
     chunkSizeInBytes,
     onProgress,
+    onSuccess,
+    onCancel,
+    abortSignal,
     fieldName,
     omitTransactionId,
   }: UploadActionParams,
@@ -65,6 +84,7 @@ async function uploadFile(
 
   let result = null;
   try {
+    throwIfAborted(abortSignal);
     const _chunkSizeInBytes = extractParam(stateContext, chunkSizeInBytes, appContext);
     const _onProgress = extractParam(stateContext, onProgress, appContext);
     if (_chunkSizeInBytes !== undefined) {
@@ -72,6 +92,7 @@ async function uploadFile(
       const numberOfChunks = Math.ceil(_file.size / _chunkSizeInBytes);
 
       for (let i = 0; i < numberOfChunks; i++) {
+        throwIfAborted(abortSignal);
         const start = i * _chunkSizeInBytes;
         const chunkEnd = Math.min(start + _chunkSizeInBytes, _file.size);
         const chunk = _file.slice(start, chunkEnd);
@@ -83,16 +104,22 @@ async function uploadFile(
             chunkEnd: chunkEnd,
           },
           params: stateContext,
-          onUploadProgress: (progressEvent) => {
-            const overallTotal = _file.size;
-            const overallLoaded = start + progressEvent.loaded;
-            const overallProgressEvent = {
-              total: overallTotal,
-              loaded: overallLoaded,
-              progress: overallLoaded / overallTotal,
-            };
-            _onProgress?.(overallProgressEvent);
-          },
+          onUploadProgress: _onProgress
+            ? (progressEvent) => {
+                if (abortSignal?.aborted) {
+                  return;
+                }
+                const overallTotal = _file.size;
+                const overallLoaded = start + progressEvent.loaded;
+                const overallProgressEvent = {
+                  total: overallTotal,
+                  loaded: overallLoaded,
+                  progress: overallLoaded / overallTotal,
+                };
+                _onProgress(overallProgressEvent);
+              }
+            : undefined,
+          abortSignal,
           resolveBindingExpressions,
           omitTransactionId,
         });
@@ -102,18 +129,29 @@ async function uploadFile(
         operation,
         params: stateContext,
         onUploadProgress: _onProgress,
+        abortSignal,
         resolveBindingExpressions,
         omitTransactionId,
       });
     }
   } catch (e) {
+    if (isAbortError(e) || abortSignal?.aborted) {
+      const onCancelFn = lookupAction(onCancel, uid, { eventName: "cancel" });
+      const reason = getAbortSignalReason(abortSignal);
+      await onCancelFn?.(reason, stateContext["$param"]);
+      return createCancelledOperationResult(reason);
+    }
     const onErrorFn = lookupAction(onError, uid, { eventName: "error" });
     const result = await onErrorFn?.(e, stateContext["$param"]);
     if (result !== false) {
       throw e;
     }
   }
-  void invalidateQueries(invalidates, appContext, state);
+  const onSuccessFn = lookupAction(onSuccess, uid, { eventName: "success" });
+  const onSuccessResult = await onSuccessFn?.(result, stateContext["$param"]);
+  if (onSuccessResult !== false) {
+    void invalidateQueries(invalidates, appContext, state);
+  }
   return result;
 }
 

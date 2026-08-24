@@ -16,6 +16,7 @@ import { parseRetryAfter } from "./errors/policy";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
 import type { IApiInterceptor } from "./interception/abstractions";
 import { injectTraceparent } from "./audit/correlation";
+import { createOperationAbortError } from "./action/operationCancellation";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -215,7 +216,7 @@ export default class RestApiProxy {
   public apiInstance?: IApiInterceptor;
 
   private createAbortError() {
-    return new DOMException("The operation was aborted.", "AbortError");
+    return createOperationAbortError();
   }
 
   private parseXhrHeaders(rawHeaders: string): Headers {
@@ -449,40 +450,89 @@ export default class RestApiProxy {
 
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsArrayBuffer(chunk?.blob || file);
+      let settled = false;
+
+      const cleanup = () => {
+        abortSignal?.removeEventListener("abort", abortHandler);
+      };
+
+      const rejectWithAbort = () => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        cleanup();
+        reject(this.createAbortError());
+      };
+
+      const abortHandler = () => {
+        if (reader.readyState === FileReader.LOADING) {
+          reader.abort();
+        } else {
+          rejectWithAbort();
+        }
+      };
+
+      if (abortSignal?.aborted) {
+        rejectWithAbort();
+        return;
+      }
+
+      abortSignal?.addEventListener("abort", abortHandler, { once: true });
       reader.onload = async (evt) => {
         try {
+          if (abortSignal?.aborted) {
+            rejectWithAbort();
+            return;
+          }
           if (evt.target === null) {
+            settled = true;
+            cleanup();
             reject();
             return;
           }
-          resolve(
-            await this.executeOperation({
-              operation,
-              contextParams,
-              resolveBindingExpressions,
-              rawBody: evt.target.result,
-              headers: {
-                ...this.extractParam(
-                  resolveBindingExpressions,
-                  operation.headers || {},
-                  contextParams,
-                ),
-                "Content-Type": file.type,
-              },
-              onUploadProgress,
-              abortSignal,
-              transactionId,
-              omitTransactionId,
-            }),
-          );
+          const uploadResult = await this.executeOperation({
+            operation,
+            contextParams,
+            resolveBindingExpressions,
+            rawBody: evt.target.result,
+            headers: {
+              ...this.extractParam(
+                resolveBindingExpressions,
+                operation.headers || {},
+                contextParams,
+              ),
+              "Content-Type": file.type,
+            },
+            onUploadProgress,
+            abortSignal,
+            transactionId,
+            omitTransactionId,
+          });
+          if (!settled) {
+            settled = true;
+            cleanup();
+            resolve(uploadResult);
+          }
         } catch (e) {
-          reject(e);
+          if (!settled) {
+            settled = true;
+            cleanup();
+            reject(e);
+          }
         }
       };
       reader.onerror = () => {
-        reject();
+        if (!settled) {
+          settled = true;
+          cleanup();
+          reject();
+        }
       };
+      reader.onabort = () => {
+        rejectWithAbort();
+      };
+      reader.readAsArrayBuffer(chunk?.blob || file);
     });
   };
 

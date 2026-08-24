@@ -26,6 +26,7 @@ export interface ApiActionComponent extends ComponentDef {
     success: string;
     progress: string;
     error: string;
+    cancel: string;
     beforeRequest: string;
     mockExecute: string;
   };
@@ -262,6 +263,14 @@ export const APICallMd = createMetadata({
         error: "The error object containing details about what went wrong with the API request.",
       },
     },
+    cancel: {
+      description:
+        "This event fires when an in-flight request or deferred polling operation is cancelled with `cancel()`.",
+      signature: "(reason?: string) => void",
+      parameters: {
+        reason: "The optional reason passed to `cancel(reason)`, or `\"user\"` by default.",
+      },
+    },
     statusUpdate: {
       description:
         "Fires on each poll when in deferred mode. Passes the status data and current progress.",
@@ -293,7 +302,7 @@ export const APICallMd = createMetadata({
       parameters: {},
     },
     mockExecute: {
-      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$param", "$params"],
+      injectedVars: ["$pathParams", "$queryParams", "$requestBody", "$cookies", "$requestHeaders", "$abortSignal", "$param", "$params"],
       description:
         "When defined, this event handler replaces the actual API request. " +
         "The handler receives the resolved request properties as context variables: " +
@@ -328,6 +337,9 @@ export const APICallMd = createMetadata({
     },
     $requestHeaders: {
       description: "Resolved request headers (available in `mockExecute`)",
+    },
+    $abortSignal: {
+      description: "AbortSignal for the current request (available in `mockExecute`)",
     },
     $result: {
       description: "Response data (available in `completedNotificationMessage`)",
@@ -381,6 +393,14 @@ export const APICallMd = createMetadata({
       description: "The error from the most recent failed API call execution.",
       signature: "lastError: any",
     },
+    cancelled: {
+      description: "This property indicates whether the most recent API operation was cancelled.",
+      signature: "get cancelled(): boolean",
+    },
+    lastCancelReason: {
+      description: "This property returns the reason passed to the most recent `cancel(reason)` call.",
+      signature: "get lastCancelReason(): string | undefined",
+    },
     lastResponseHeaders: {
       description:
         "This property retrieves the HTTP response headers from the last successful " +
@@ -405,8 +425,11 @@ export const APICallMd = createMetadata({
     },
     cancel: {
       description:
-        "Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.",
-      signature: "cancel(): Promise<void>",
+        "Cancel an in-flight API request, active deferred polling, and optionally notify the server through `cancelUrl`.",
+      signature: "cancel(reason?: string): Promise<boolean>",
+      parameters: {
+        reason: "Optional cancellation reason exposed through `onCancel` and `lastCancelReason`.",
+      },
     },
   },
 });
@@ -425,6 +448,7 @@ export const apiCallRenderer = wrapComponent(COMP, APICallReact, APICallMd, {
         onTimeout={lookupEventHandler("timeout", { schedulerBypass: true })}
         onPollingStart={lookupEventHandler("pollingStart", { schedulerBypass: true })}
         onPollingComplete={lookupEventHandler("pollingComplete", { schedulerBypass: true })}
+        onCancel={lookupEventHandler("cancel", { schedulerBypass: true })}
         hasMockExecute={!!node.events?.mockExecute}
       />
     );
