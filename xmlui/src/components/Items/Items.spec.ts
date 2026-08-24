@@ -37,6 +37,107 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("template-item-1")).toContainText("Second");
   });
 
+  test("re-renders derived item content after PushSource emits replacement data", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).subscribeItemsReplacement = (emit: (value: any) => void) => {
+        emit([
+          { id: "cached-1", title: "Cached first" },
+          { id: "cached-2", title: "Cached second" },
+        ]);
+        (window as any).emitFreshItemsReplacement = () => {
+          emit([
+            { id: "fresh-1", title: "Fresh first" },
+            { id: "fresh-2", title: "Fresh second" },
+          ]);
+        };
+      };
+    });
+
+    await initTestBed(
+      `
+        <Fragment>
+          <script>
+            function processItems(items) {
+              return items.map(item => ({ ...item, display: item.title.toUpperCase() }));
+            }
+
+            function getPagedItems(items) {
+              return items.slice(0, 1);
+            }
+          </script>
+          <PushSource id="items" subscribe="{window.subscribeItemsReplacement}" />
+          <variable name="combinedItems" value="{items.value ?? []}" />
+          <variable name="processedItems" value="{processItems(combinedItems)}" />
+          <Items data="{getPagedItems(processedItems)}">
+            <ItemCard item="{$item}" index="{$itemIndex}" />
+          </Items>
+        </Fragment>
+      `,
+      {
+        components: [
+          `
+            <Component
+              name="ItemCard"
+              var.cardItem="{$props.item}"
+              var.cardIndex="{$props.index}"
+              var.cardDisplay="{cardItem.display}">
+              <Text testId="item-{cardIndex}">{cardDisplay}</Text>
+            </Component>
+          `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("item-0")).toContainText("CACHED FIRST");
+    await page.evaluate(() => (window as any).emitFreshItemsReplacement());
+    await expect(page.getByTestId("item-0")).toContainText("FRESH FIRST");
+  });
+
+  test("remounts item template when PushSource replacement changes item identity", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).subscribeStatefulItemsReplacement = (emit: (value: any) => void) => {
+        emit([{ id: "cached-1", title: "Cached first" }]);
+        (window as any).emitFreshStatefulItemsReplacement = () => {
+          emit([{ id: "fresh-1", title: "Fresh first" }]);
+        };
+      };
+    });
+
+    await initTestBed(
+      `
+        <Fragment>
+          <PushSource id="items" subscribe="{window.subscribeStatefulItemsReplacement}" />
+          <Items data="{items.value ?? []}">
+            <StatefulItem item="{$item}" index="{$itemIndex}" />
+          </Items>
+        </Fragment>
+      `,
+      {
+        components: [
+          `
+            <Component name="StatefulItem" var.mountedTitle="">
+              <Text
+                testId="item-{$props.index}"
+                onInit="mountedTitle = $props.item.title">
+                {mountedTitle}
+              </Text>
+            </Component>
+          `,
+        ],
+      },
+    );
+
+    await expect(page.getByTestId("item-0")).toContainText("Cached first");
+    await page.evaluate(() => (window as any).emitFreshStatefulItemsReplacement());
+    await expect(page.getByTestId("item-0")).toContainText("Fresh first");
+  });
+
   test("renders nothing with empty data array", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack testId="container">

@@ -7,11 +7,21 @@ import { orderedKeys } from "../../components-core/utils/orderedKeys";
 
 type Props = {
   items: any[];
-  renderItem: (contextVars: any, key: number) => ReactNode;
+  renderItem: (contextVars: any, key: string | number) => ReactNode;
   reverse?: boolean;
 };
 
 import { defaultProps } from "./Items.defaults";
+
+function getItemKey(item: any, index: number): string | number {
+  if (item && typeof item === "object") {
+    const itemKey = item.$id ?? item.id ?? item.key;
+    if (itemKey !== undefined && itemKey !== null) {
+      return `${String(itemKey)}:${index}`;
+    }
+  }
+  return index;
+}
 
 export function Items({ items, renderItem, reverse = defaultProps.reverse }: Props) {
   const itemsToRender = useMemo(() => {
@@ -32,8 +42,9 @@ export function Items({ items, renderItem, reverse = defaultProps.reverse }: Pro
   return (
     <>
       {itemsToRender.map((item, index) => {
+        const key = getItemKey(item, index);
         return (
-          <Fragment key={index}>
+          <Fragment key={key}>
             {renderItem?.(
               {
                 $item: item,
@@ -41,7 +52,7 @@ export function Items({ items, renderItem, reverse = defaultProps.reverse }: Pro
                 $isFirst: index === 0,
                 $isLast: index === itemsToRender.length - 1,
               },
-              index,
+              key,
             )}
           </Fragment>
         );
