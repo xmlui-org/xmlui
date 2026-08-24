@@ -102,8 +102,8 @@ export function LoaderComponent({
   );
 
   const memoedLoaderInProgressChanged = useCallback(
-    (isInProgress: boolean) => {
-      dispatch(loaderInProgressChanged(uid, isInProgress));
+    (isInProgress: boolean, resetCancellation?: boolean) => {
+      dispatch(loaderInProgressChanged(uid, isInProgress, resetCancellation));
     },
     [dispatch, uid],
   );
@@ -129,6 +129,13 @@ export function LoaderComponent({
     [dispatch, uid],
   );
 
+  const memoedLoaderCancelled = useCallback(
+    (reason?: string) => {
+      dispatch(loaderCancelled(uid, reason));
+    },
+    [dispatch, uid],
+  );
+
   const renderer = componentRegistry.lookupLoaderRenderer(node.type);
   if (!renderer) {
     console.error(
@@ -145,6 +152,7 @@ export function LoaderComponent({
     loaderIsRefetchingChanged: memoedLoaderIsRefetchingChanged,
     loaderLoaded: memoedLoaderLoaded,
     loaderError: memoedLoaderError,
+    loaderCancelled: memoedLoaderCancelled,
     extractValue: valueExtractor,
     registerComponentApi: memoedRegisterComponentApi,
     lookupAction: memoedLookupAction,
@@ -153,12 +161,13 @@ export function LoaderComponent({
 }
 
 // Signs that a particular loader (`uid`) has just started fetching its data (or executing its operation).
-function loaderInProgressChanged(uid: symbol, isInProgress: boolean) {
+function loaderInProgressChanged(uid: symbol, isInProgress: boolean, resetCancellation?: boolean) {
   return {
     type: ContainerActionKind.LOADER_IN_PROGRESS_CHANGED,
     payload: {
       uid,
       inProgress: isInProgress,
+      resetCancellation,
     },
   };
 }
@@ -188,6 +197,16 @@ function loaderLoaded(
       data,
       pageInfo,
       responseHeaders,
+    },
+  };
+}
+
+function loaderCancelled(uid: symbol, reason?: string) {
+  return {
+    type: ContainerActionKind.LOADER_CANCELLED,
+    payload: {
+      uid,
+      cancelReason: reason,
     },
   };
 }

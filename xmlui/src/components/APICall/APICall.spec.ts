@@ -180,11 +180,84 @@ test.describe("Basic Functionality", () => {
     await button.click();
 
     await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("GET success");
-  });
+});
 
-  // =============================================================================
-  // HTTP METHOD TESTS
-  // =============================================================================
+test.describe("Cancellation", () => {
+  test("cancel() aborts an in-flight execution and fires onCancel", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/slow"
+          method="get"
+          onMockExecute="() => {
+            delay(500);
+            return { message: 'late result' };
+          }"
+          onCancel="(reason) => testState = {
+            event: 'cancel',
+            reason,
+            cancelled: api.cancelled,
+            lastCancelReason: api.lastCancelReason,
+            inProgress: api.inProgress,
+            lastError: api.lastError
+          }"
+          onSuccess="result => testState = { event: 'success', result }"
+          onError="error => testState = { event: 'error', error }"
+        />
+        <Button
+          testId="execute"
+          onClick="api.execute()"
+          label="Execute"
+        />
+        <Button
+          testId="cancel"
+          onClick="testState = { event: 'button', cancelReturned: api.cancel('stop-now') }"
+          label="Cancel"
+        />
+        <Text
+          testId="status"
+          value="{api.cancelled ? 'cancelled:' + api.lastCancelReason : (api.inProgress ? 'loading' : 'idle')}"
+        />
+      </Fragment>
+    `);
+
+    const executeButton = await createButtonDriver("execute");
+    const cancelButton = await createButtonDriver("cancel");
+
+    await executeButton.click();
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await cancelButton.click();
+
+    await expect(page.getByTestId("status")).toHaveText("cancelled:stop-now");
+    await expect.poll(testStateDriver.testState).toEqual({
+      event: "cancel",
+      reason: "stop-now",
+      cancelled: true,
+      lastCancelReason: "stop-now",
+      inProgress: false,
+      lastError: undefined,
+    });
+
+    await page.waitForTimeout(600);
+    await expect.poll(testStateDriver.testState).toEqual({
+      event: "cancel",
+      reason: "stop-now",
+      cancelled: true,
+      lastCancelReason: "stop-now",
+      inProgress: false,
+      lastError: undefined,
+    });
+  });
+});
+
+// =============================================================================
+// HTTP METHOD TESTS
+// =============================================================================
 
   test.describe("HTTP method property", () => {
     const methods = ["get", "post", "put", "delete"];

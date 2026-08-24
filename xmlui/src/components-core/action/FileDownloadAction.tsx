@@ -5,13 +5,22 @@ import RestApiProxy from "../RestApiProxy";
 import { extractParam } from "../utils/extractParam";
 
 import { createAction } from "./actions";
+import {
+  createCancelledOperationResult,
+  createOperationAbortError,
+  getAbortSignalReason,
+  isAbortError,
+} from "./operationCancellation";
 
 export interface DownloadActionComponent extends ComponentDef {
   props: DownloadOperationDef;
+  events?: {
+    cancel?: string;
+  };
 }
 
 async function download(
-  { state, appContext }: ActionExecutionContext,
+  { state, appContext, lookupAction, uid }: ActionExecutionContext,
   {
     params,
     url,
@@ -21,8 +30,12 @@ async function download(
     body,
     fileName,
     headers,
+    onCancel,
+    abortSignal,
   }: {
     params: any;
+    onCancel?: string;
+    abortSignal?: AbortSignal;
   } & DownloadOperationDef,
   { resolveBindingExpressions }: ApiActionOptions = {}
 ) {
@@ -45,6 +58,16 @@ async function download(
   const configHeaders = appContext.xmluiConfig?.headers ?? appContext.appGlobals?.headers;
   const hasOperationHeaders = Object.keys(operationHeaders || {}).length !== 0;
   const hasConfigHeaders = Object.keys(configHeaders || {}).length !== 0;
+  const cancel = async () => {
+    const reason = getAbortSignalReason(abortSignal);
+    const onCancelFn = lookupAction(onCancel, uid, { eventName: "cancel" });
+    await onCancelFn?.(reason, context["$param"]);
+    return createCancelledOperationResult(reason);
+  };
+
+  if (abortSignal?.aborted) {
+    return await cancel();
+  }
 
   if (
     (operation.method && (operation.method as string).toLowerCase() !== "get") ||
@@ -52,17 +75,30 @@ async function download(
     hasConfigHeaders || //if we have any headers for the api, we can't use the iframe trick
     appContext.apiInterceptorContext.isMocked(_url) //if we mock this url, the mock can't work in an iframe, so we must fall back to download it with the restApiProxy
   ) {
-    const file: File = await api.execute({
-      operation,
-      params: context,
-      parseOptions: {
-        asFile: true,
-      },
-      resolveBindingExpressions,
-    });
-    downloadWithAnchor(file);
+    try {
+      const file: File = await api.execute({
+        operation,
+        params: context,
+        parseOptions: {
+          asFile: true,
+        },
+        resolveBindingExpressions,
+        abortSignal,
+      });
+      if (abortSignal?.aborted) {
+        throw createOperationAbortError();
+      }
+      downloadWithAnchor(file);
+    } catch (e) {
+      if (isAbortError(e) || abortSignal?.aborted) {
+        return await cancel();
+      }
+      throw e;
+    }
   } else {
-    downloadInIframe(_url);
+    downloadInIframe(_url, abortSignal, () => {
+      void cancel();
+    });
   }
 }
 
@@ -70,16 +106,35 @@ async function download(
 // we set the iframe source as the download url, this way the browser will ask to download the file, and show a progress bar
 // (we could use an anchor tag with a download attribute, but in this case we can't show progress )
 // we can use it if we don't have to add extra headers to the request in order to download a file (pre-signed urls, or public urls)
-function downloadInIframe(fileUrl: string) {
+function downloadInIframe(fileUrl: string, abortSignal?: AbortSignal, onCancel?: () => void) {
+  if (abortSignal?.aborted) {
+    onCancel?.();
+    return;
+  }
   const iframe = document.createElement("iframe");
+  let cleanupTimeout: ReturnType<typeof setTimeout> | undefined;
+  const cleanup = () => {
+    if (cleanupTimeout) {
+      clearTimeout(cleanupTimeout);
+      cleanupTimeout = undefined;
+    }
+    abortSignal?.removeEventListener("abort", abortHandler);
+    iframe.remove();
+  };
+  const abortHandler = () => {
+    cleanup();
+    onCancel?.();
+  };
+
   iframe.style.display = "none";
   iframe.hidden = true;
   iframe.name = fileUrl;
   iframe.id = `download-iframe_${fileUrl}`;
   iframe.src = fileUrl;
   document.body.appendChild(iframe);
-  setTimeout(() => {
-    iframe.remove();
+  abortSignal?.addEventListener("abort", abortHandler, { once: true });
+  cleanupTimeout = setTimeout(() => {
+    cleanup();
   }, 20000);
 }
 

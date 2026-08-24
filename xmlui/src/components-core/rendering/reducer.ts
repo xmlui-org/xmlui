@@ -58,7 +58,14 @@ export function createContainerReducer(debugView: IDebugViewContext) {
     // --- Apply the action
     switch (action.type) {
       case ContainerActionKind.LOADER_IN_PROGRESS_CHANGED: {
-        state[uid] = { ...state[uid], inProgress: action.payload.inProgress };
+        state[uid] = {
+          ...state[uid],
+          inProgress: action.payload.inProgress,
+          ...(action.payload.resetCancellation && {
+            cancelled: false,
+            lastCancelReason: undefined,
+          }),
+        };
         storeNextValue(state[uid]);
         break;
       }
@@ -86,7 +93,33 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       }
       case ContainerActionKind.LOADER_ERROR: {
         const { error } = action.payload;
-        state[uid] = { ...state[uid], error, inProgress: false, loaded: true };
+        state[uid] = {
+          ...state[uid],
+          error,
+          inProgress: false,
+          loaded: true,
+          cancelled: false,
+          lastCancelReason: undefined,
+        };
+        storeNextValue(state[uid]);
+        break;
+      }
+      case ContainerActionKind.LOADER_CANCELLED: {
+        const currentPageInfo = state[uid]?.pageInfo;
+        state[uid] = {
+          ...state[uid],
+          inProgress: false,
+          isRefetching: false,
+          ...(currentPageInfo && {
+            pageInfo: {
+              ...currentPageInfo,
+              isFetchingPrevPage: false,
+              isFetchingNextPage: false,
+            },
+          }),
+          cancelled: true,
+          lastCancelReason: action.payload.cancelReason,
+        };
         storeNextValue(state[uid]);
         break;
       }

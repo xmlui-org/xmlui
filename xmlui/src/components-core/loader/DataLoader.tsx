@@ -7,6 +7,7 @@ import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
+  LoaderCancelledFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -44,11 +45,13 @@ type LoaderProps = {
   registerComponentApi: RegisterComponentApiFn;
   onLoaded?: (...args: any[]) => void;
   onError?: (...args: any[]) => Promise<boolean>;
+  onCancel?: (...args: any[]) => Promise<void>;
   onFetch?: (context: Record<string, any>) => Promise<any> | any;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  loaderCancelled: LoaderCancelledFn;
   transformResult?: TransformResultFn;
   structuralSharing?: boolean;
 };
@@ -66,11 +69,13 @@ function DataLoader({
   registerComponentApi,
   onLoaded,
   onError,
+  onCancel,
   onFetch,
   loaderInProgressChanged,
   loaderIsRefetchingChanged,
   loaderLoaded,
   loaderError,
+  loaderCancelled,
   transformResult,
   structuralSharing = true,
 }: LoaderProps) {
@@ -243,6 +248,7 @@ function DataLoader({
           $requestBody: resolvedBody,
           $requestHeaders: resolvedHeaders,
           $pageParams: pageParams,
+          $abortSignal: abortSignal,
         });
         return result === undefined ? null : result;
       }
@@ -544,8 +550,8 @@ function DataLoader({
   const loadingToastIdRef = useRef<string | undefined>(undefined);
   // Manages the in-progress toast and delegates to loaderInProgressChanged.
   const handleInProgressChange: LoaderInProgressChangedFn = useCallback(
-    (isInProgress) => {
-      loaderInProgressChanged(isInProgress);
+    (isInProgress, resetCancellation) => {
+      loaderInProgressChanged(isInProgress, resetCancellation);
 
       const inProgressMessage = extractParam(
         stateRef.current.state,
@@ -650,6 +656,19 @@ function DataLoader({
     [appContext, loader.props.errorNotificationMessage, loaderError, onError],
   );
 
+  const handleCancel = useCallback(
+    async (reason?: string) => {
+      loaderCancelled(reason);
+      if (loadingToastIdRef.current) {
+        toast.dismiss(loadingToastIdRef.current);
+      }
+      setTimeout(() => {
+        void onCancel?.(reason);
+      }, 0);
+    },
+    [loaderCancelled, onCancel],
+  );
+
   // --- Mock mode: when mockData prop is set, bypass all network logic and resolve directly
   const hasMockData = loader.props?.mockData !== undefined;
   const mockDataInner = useMemo(() => {
@@ -680,6 +699,7 @@ function DataLoader({
         loaderIsRefetchingChanged={loaderIsRefetchingChanged}
         loaderLoaded={handleLoaded}
         loaderError={handleError}
+        onCancel={handleCancel}
         loaderFn={returnMockData}
         pollIntervalInSeconds={pollIntervalInSeconds}
         registerComponentApi={registerComponentApi}
@@ -700,6 +720,7 @@ function DataLoader({
       loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={handleLoaded}
       loaderError={handleError}
+      onCancel={handleCancel}
       loaderFn={fetchData}
       registerComponentApi={registerComponentApi}
       pollIntervalInSeconds={pollIntervalInSeconds}
@@ -717,6 +738,7 @@ function DataLoader({
       loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={handleLoaded}
       loaderError={handleError}
+      onCancel={handleCancel}
       loaderFn={fetchData}
       pollIntervalInSeconds={pollIntervalInSeconds}
       registerComponentApi={registerComponentApi}
@@ -747,6 +769,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
     loaderInProgressChanged,
     loaderIsRefetchingChanged,
     loaderError,
+    loaderCancelled,
     registerComponentApi,
     lookupAction,
     lookupSyncCallback,
@@ -775,10 +798,12 @@ export const dataLoaderRenderer = createLoaderRenderer(
         loaderIsRefetchingChanged={loaderIsRefetchingChanged}
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
+        loaderCancelled={loaderCancelled}
         registerComponentApi={registerComponentApi}
         transformResult={lookupSyncCallback(loader.props.transformResult)}
         onLoaded={lookupAction(loader.events?.loaded, { eventName: "loaded" })}
         onError={lookupAction(loader.events?.error, { eventName: "error" })}
+        onCancel={lookupAction(loader.events?.cancel, { eventName: "cancel" })}
         onFetch={onFetch}
         structuralSharing={extractValue.asOptionalBoolean(loader.props.structuralSharing)}
       />

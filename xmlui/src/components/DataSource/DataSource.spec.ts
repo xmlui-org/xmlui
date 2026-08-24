@@ -677,6 +677,20 @@ test.describe("onFetch event", () => {
     await expect(page.getByTestId("output")).toHaveText("/api/custom|get|abc");
   });
 
+  test("handler receives the abort signal", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/custom"
+          onFetch="() => $abortSignal.aborted ? 'aborted' : 'active'" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("active");
+  });
+
   test("fires the onLoaded event with the handler result", async ({ initTestBed }) => {
     const { testStateDriver } = await initTestBed(`
       <DataSource id="ds" url="/api/x"
@@ -745,6 +759,242 @@ test.describe("onFetch event", () => {
     `);
 
     await expect(page.getByTestId("output")).toHaveText('["a","b","c"]');
+  });
+});
+
+// =============================================================================
+// CANCELLATION
+// =============================================================================
+
+test.describe("Cancellation", () => {
+  test("cancel() aborts an in-flight initial load and fires onCancel", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/slow"
+          onFetch="() => { delay(2000); return 'late result'; }"
+          onCancel="(reason) => testState = {
+            reason,
+            inProgress: ds.inProgress,
+            cancelled: ds.cancelled,
+            lastCancelReason: ds.lastCancelReason,
+            hasError: !!ds.error
+          }"
+          onError="() => testState = 'error'" />
+        <Button testId="cancel" label="Cancel" onClick="ds.cancel()" />
+        <Text testId="status" value="{ds.cancelled ? 'cancelled:' + ds.lastCancelReason : (ds.inProgress ? 'loading' : 'idle')}" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await page.getByTestId("cancel").click();
+
+    await expect(page.getByTestId("status")).toHaveText("cancelled:user");
+    await expect.poll(() => testStateDriver.testState()).toEqual({
+      reason: "user",
+      inProgress: false,
+      cancelled: true,
+      lastCancelReason: "user",
+      hasError: false,
+    });
+    await expect(page.getByTestId("output")).toHaveText("");
+  });
+
+  test("cancel() preserves the previous value when cancelling a refetch", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/refetch"
+          onCancel="(reason) => testState = {
+            reason,
+            value: ds.value,
+            inProgress: ds.inProgress,
+            isRefetching: ds.isRefetching,
+            cancelled: ds.cancelled
+          }" />
+        <Button testId="refetch" label="Refetch" onClick="ds.refetch()" />
+        <Button testId="cancel" label="Cancel" onClick="ds.cancel('refetch')" />
+        <Text testId="output" value="{ds.value}" />
+        <Text testId="status" value="{ds.cancelled ? 'cancelled:' + ds.lastCancelReason : (ds.inProgress ? 'loading' : 'idle')}" />
+      </Fragment>
+      `,
+      {
+        apiInterceptor: {
+          operations: {
+            "refetch-data": {
+              url: "/api/refetch",
+              method: "get",
+              handler: `
+                $state.calls = ($state.calls || 0) + 1;
+                if ($state.calls === 1) {
+                  return 'first';
+                }
+                delay(2000);
+                return 'second';
+              `,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("first");
+
+    await page.getByTestId("refetch").click();
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await page.getByTestId("cancel").click();
+
+    await expect(page.getByTestId("status")).toHaveText("cancelled:refetch");
+    await expect(page.getByTestId("output")).toHaveText("first");
+    await expect.poll(() => testStateDriver.testState()).toEqual({
+      reason: "refetch",
+      value: "first",
+      inProgress: false,
+      isRefetching: false,
+      cancelled: true,
+    });
+  });
+
+  test("refetch after cancel clears cancellation state and completes", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/retry-after-cancel"
+          onFetch="() => {
+            delay(500);
+            if ($abortSignal.aborted) return 'aborted';
+            return 'loaded';
+          }" />
+        <Button testId="cancel" label="Cancel" onClick="ds.cancel('stop')" />
+        <Button testId="refetch" label="Refetch" onClick="ds.refetch()" />
+        <Text testId="output" value="{ds.value}" />
+        <Text testId="status" value="{ds.cancelled ? 'cancelled:' + ds.lastCancelReason : (ds.inProgress ? 'loading' : 'idle')}" />
+      </Fragment>
+      `,
+    );
+
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await page.getByTestId("cancel").click();
+    await expect(page.getByTestId("status")).toHaveText("cancelled:stop");
+
+    await page.getByTestId("refetch").click();
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await expect(page.getByTestId("output")).toHaveText("loaded", { timeout: 2000 });
+    await expect(page.getByTestId("status")).toHaveText("idle");
+  });
+
+  test("refetch completes even when the result is structurally unchanged", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <Fragment var.loading="{true}" var.loadedCount="{0}">
+        <DataSource
+          id="ds"
+          url="/api/same-result"
+          onFetch="() => {
+            delay(250);
+            return { value: 'same' };
+          }"
+          onLoaded="() => {
+            loading = false;
+            loadedCount = loadedCount + 1;
+          }" />
+        <Button
+          testId="refetch"
+          label="Refetch"
+          enabled="{!loading}"
+          onClick="loading = true; ds.refetch()" />
+        <Text testId="output" value="{ds.value.value}" />
+        <Text testId="status" value="{loading ? 'loading' : 'loaded:' + loadedCount}" />
+      </Fragment>
+      `,
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("same");
+    await expect(page.getByTestId("status")).toHaveText("loaded:1");
+
+    await page.getByTestId("refetch").click();
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await expect(page.getByTestId("status")).toHaveText("loaded:2", { timeout: 2000 });
+
+    await page.getByTestId("refetch").click();
+    await expect(page.getByTestId("status")).toHaveText("loading");
+    await expect(page.getByTestId("status")).toHaveText("loaded:3", { timeout: 2000 });
+  });
+
+  test("cancel() aborts a pageable next-page fetch", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Fragment>
+        <DataSource
+          id="feed"
+          url="/api/feed"
+          queryParams="{{ after: $pageParams ? $pageParams.nextPageParam : 0 }}"
+          nextPageSelector="{$response.length ? $response[$response.length - 1].id : null}"
+          onCancel="(reason) => testState = {
+            reason,
+            ids: feed.value.map(item => item.id),
+            isFetchingNextPage: feed.pageInfo.isFetchingNextPage,
+            cancelled: feed.cancelled
+          }" />
+        <Button testId="next" label="Next" onClick="feed.fetchNextPage()" />
+        <Button testId="cancel" label="Cancel" onClick="feed.cancel('next-page')" />
+        <Text testId="ids" value="{JSON.stringify(feed.value.map(item => item.id))}" />
+        <Text testId="status" value="{feed.cancelled ? 'cancelled:' + feed.lastCancelReason : (feed.pageInfo.isFetchingNextPage ? 'next-loading' : 'idle')}" />
+      </Fragment>
+      `,
+      {
+        apiInterceptor: {
+          operations: {
+            "page-feed": {
+              url: "/api/feed",
+              method: "get",
+              queryParams: { after: "integer" },
+              handler: `
+                const after = Number($queryParams.after || 0);
+                if (after > 0) {
+                  delay(2000);
+                  return [{ id: 2 }];
+                }
+                return [{ id: 1 }];
+              `,
+            },
+          },
+        },
+      },
+    );
+
+    await expect(page.getByTestId("ids")).toHaveText("[1]");
+
+    await page.getByTestId("next").click();
+    await expect(page.getByTestId("status")).toHaveText("next-loading");
+    await page.getByTestId("cancel").click();
+
+    await expect(page.getByTestId("status")).toHaveText("cancelled:next-page");
+    await expect(page.getByTestId("ids")).toHaveText("[1]");
+    await expect.poll(() => testStateDriver.testState()).toEqual({
+      reason: "next-page",
+      ids: [1],
+      isFetchingNextPage: false,
+      cancelled: true,
+    });
   });
 });
 

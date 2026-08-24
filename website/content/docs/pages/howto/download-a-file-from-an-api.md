@@ -78,6 +78,8 @@ When users need to export a report, download an attachment, or save generated co
 
 **POST and authenticated requests are fetched first**: When the method is not GET or global headers are present, the file is downloaded via `fetch`, then offered to the user through a programmatic anchor click.
 
+**Fetch-backed downloads can be cancelled**: `Actions.download()` accepts an `abortSignal` and `onCancel`. For simple iframe-backed GET downloads, cancellation is best effort: XMLUI removes the hidden iframe, but the browser may continue if its native download UI has already taken over.
+
 **You can also use the declarative `FileDownload` element**: Inside an event block, place a `<FileDownload url="..." fileName="..." />` element to configure the download declaratively.
 
 ---

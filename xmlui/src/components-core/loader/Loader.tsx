@@ -19,6 +19,7 @@ import { executeWithPolicy } from "../errors/policy";
 import { useRetryPolicy } from "../errors/RetryPolicyContext";
 import { AppError } from "../errors/app-error";
 import { useFallback } from "../../components/Fallback/FallbackReact";
+import { DEFAULT_OPERATION_CANCEL_REASON, isAbortError } from "../action/operationCancellation";
 
 // Shared state and callback contract for non-visual data loaders.
 type LoaderProps = {
@@ -29,6 +30,7 @@ type LoaderProps = {
   pollIntervalInSeconds?: number;
   registerComponentApi?: RegisterComponentApiFn;
   onLoaded?: (...args: any[]) => void;
+  onCancel?: (reason?: string) => void | Promise<void>;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
@@ -48,6 +50,7 @@ export function Loader({
   pollIntervalInSeconds,
   registerComponentApi,
   onLoaded,
+  onCancel,
   loaderLoaded,
   loaderInProgressChanged,
   loaderIsRefetchingChanged,
@@ -65,13 +68,17 @@ export function Loader({
   // Plan #07 Step 4.1 — when an ancestor `<Fallback>` is present, report
   // success / error so it can switch to its error template.
   const fallback = useFallback();
+  const queryKey = useMemo(
+    () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
+    [appContext, loader.props, queryId, state, uid],
+  );
+  const cancelReasonRef = useRef<string | undefined>(undefined);
+  const onCancelRef = useRef(onCancel);
+  onCancelRef.current = onCancel;
 
   // React Query owns cache reuse, background refetches, and request state.
   const { data, status, isFetching, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: useMemo(
-      () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
-      [appContext, loader.props, queryId, state, uid],
-    ),
+    queryKey,
     structuralSharing,
     // Pause loaders until the optional API interceptor has finished initializing.
     enabled: initialized,
@@ -138,6 +145,9 @@ export function Loader({
   const hasFetchCompletedRef = useRef(false);
 
   useIsomorphicLayoutEffect(() => {
+    if (isFetching && !prevIsFetching) {
+      cancelReasonRef.current = undefined;
+    }
     loaderInProgressChanged(isFetching || isLoading);
     if (prevIsFetching && !isFetching) {
       hasFetchCompletedRef.current = true;
@@ -158,10 +168,12 @@ export function Loader({
 
   useIsomorphicLayoutEffect(() => {
     const hasNewData = status === "success" && data !== prevData;
+    const hasCompletedSuccessfulFetch =
+      status === "success" && prevIsFetching && !isFetching && !cancelReasonRef.current;
     const hasNewCompletedError =
       status === "error" && error !== prevError && hasFetchCompletedRef.current;
 
-    if (hasNewData) {
+    if (hasNewData || hasCompletedSuccessfulFetch) {
       loaderLoaded(data);
       // Clear any previously reported error for this loader.
       fallback?.clearError(uid);
@@ -170,12 +182,26 @@ export function Loader({
       setTimeout(() => {
         onLoaded?.(data, isRefetching);
       }, 0);
-    } else if (hasNewCompletedError) {
+    } else if (hasNewCompletedError && !(cancelReasonRef.current && isAbortError(error))) {
       loaderError(error);
       // Bubble the structured error to the nearest <Fallback>, if any.
       fallback?.reportError(uid, AppError.from(error));
     }
-  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching, fallback, uid]);
+  }, [
+    data,
+    error,
+    isFetching,
+    isRefetching,
+    loaderError,
+    loaderLoaded,
+    onLoaded,
+    prevData,
+    prevError,
+    prevIsFetching,
+    status,
+    fallback,
+    uid,
+  ]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {
@@ -183,9 +209,26 @@ export function Loader({
     };
   }, [loaderLoaded, uid]);
 
+  const cancel = useCallback(
+    async (reason: string = DEFAULT_OPERATION_CANCEL_REASON) => {
+      const activeFetchCount = appContext.queryClient?.isFetching({ queryKey, exact: true }) ?? 0;
+      if (activeFetchCount === 0) {
+        return false;
+      }
+      cancelReasonRef.current = reason;
+      await onCancelRef.current?.(reason);
+      await appContext.queryClient?.cancelQueries({ queryKey, exact: true });
+      return true;
+    },
+    [appContext.queryClient, queryKey],
+  );
+
   useEffect(() => {
     registerComponentApi?.({
+      cancel,
       refetch: (options) => {
+        cancelReasonRef.current = undefined;
+        loaderInProgressChanged(true, true);
         void refetch(options);
       },
       update: async (updater) => {
@@ -224,7 +267,7 @@ export function Loader({
         throw new Error("not implemented");
       },
     });
-  }, [appContext.queryClient, queryId, refetch, registerComponentApi, data]);
+  }, [appContext.queryClient, cancel, loaderInProgressChanged, queryId, refetch, registerComponentApi, data]);
 
   return null;
 }

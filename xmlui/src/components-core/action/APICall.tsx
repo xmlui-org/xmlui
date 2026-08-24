@@ -34,6 +34,12 @@ import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
 import RestApiProxy, { getLastApiStatus } from "../RestApiProxy";
 import { createAction } from "./actions";
 import { createContextVariableError } from "../EngineError";
+import {
+  DEFAULT_OPERATION_CANCEL_REASON,
+  createOperationAbortError,
+  getAbortSignalReason,
+  isAbortError,
+} from "./operationCancellation";
 
 const apiLifecycleHandlerOptions = { schedulerBypass: true };
 
@@ -286,8 +292,10 @@ type APICall = {
   onSuccess?: string | ((...args: any[]) => Promise<any>);
   onProgress?: string;
   onError?: string;
+  onCancel?: string;
   onMockExecute?: string;
   onResponseHeaders?: (headers: Record<string, string>) => void;
+  abortSignal?: AbortSignal;
 } & ApiOperationDef;
 
 export async function callApi(
@@ -313,9 +321,11 @@ export async function callApi(
     throwOnError,
     uid: actionUid,
     onProgress,
+    onCancel,
     omitTransactionId,
     onMockExecute,
     onResponseHeaders,
+    abortSignal,
 
     //operation
     headers,
@@ -437,11 +447,15 @@ export async function callApi(
           $requestBody: resolvedMockBody,
           $cookies: {},
           $requestHeaders: resolvedMockHeaders,
+          $abortSignal: abortSignal,
           $param: stateContext["$param"],
           $params: stateContext["$params"],
         },
       });
       result = await mockFn?.();
+      if (abortSignal?.aborted) {
+        throw createOperationAbortError();
+      }
     } else {
       const operation: ApiOperationDef = {
         headers,
@@ -474,6 +488,7 @@ export async function callApi(
         resolveBindingExpressions,
         onProgress: _onProgress,
         onResponseHeaders,
+        abortSignal,
       });
 
       // Trace API call completion — reuse traceId from start
@@ -571,6 +586,21 @@ export async function callApi(
     });
     return result;
   } catch (e: any) {
+    if (isAbortError(e) || abortSignal?.aborted) {
+      if (optimisticValuesByQueryKeys.size) {
+        await appContext.queryClient!.invalidateQueries();
+      }
+      const onCancelFn = lookupAction(onCancel, uid, {
+        eventName: "cancel",
+        ...apiLifecycleHandlerOptions,
+      });
+      await onCancelFn?.(getAbortSignalReason(abortSignal, DEFAULT_OPERATION_CANCEL_REASON));
+      if (loadingToastId) {
+        toast.dismiss(loadingToastId);
+      }
+      throw e;
+    }
+
     // Trace API call error
     traceApiCall(appContext, "api:error", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,

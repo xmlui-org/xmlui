@@ -57,7 +57,8 @@ export function ApiBoundComponent({
       };
 
       // --- Prepare event handlers
-      const { success, error, progress, beforeRequest, mockExecute } = actionComponent.events || {};
+      const { success, error, cancel, progress, beforeRequest, mockExecute } =
+        actionComponent.events || {};
       switch (type) {
         case "FileUpload": {
           const {
@@ -88,8 +89,10 @@ export function ApiBoundComponent({
               fieldName: ${JSON.stringify(fieldName)},
               params: { ...(actionOptions?.context ?? {}), '$param': eventArgs },
               onError: ${prepareEvent(error)},
+              onCancel: ${prepareEvent(cancel)},
               onSuccess: ${prepareEvent(success)},
               onProgress: eventArgs.onProgress,
+              abortSignal: actionOptions?.context?.$abortSignal || actionOptions?.context?.$cancel?.signal,
               invalidates: ${
                 invalidates === undefined ? undefined : JSON.stringify(invalidates)
               }  }, { resolveBindingExpressions: true });
@@ -109,6 +112,8 @@ export function ApiBoundComponent({
               method: ${JSON.stringify(method)},
               fileName: ${JSON.stringify(fileName)},
               params: { ...(actionOptions?.context ?? {}), '$param': eventArgs },
+              onCancel: ${prepareEvent(cancel)},
+              abortSignal: actionOptions?.context?.$abortSignal || actionOptions?.context?.$cancel?.signal,
             }, { resolveBindingExpressions: true });
           }`;
         }
@@ -158,7 +163,9 @@ export function ApiBoundComponent({
               onProgress: ${prepareEvent(progress)},
               onBeforeRequest: ${prepareEvent(beforeRequest)},
               onSuccess: ${prepareEvent(success)},
+              onCancel: ${prepareEvent(cancel)},
               onMockExecute: ${prepareEvent(mockExecute)},
+              abortSignal: actionOptions?.context?.$abortSignal || actionOptions?.context?.$cancel?.signal,
               updates: ${JSON.stringify(updates)},
               optimisticValue: ${JSON.stringify(optimisticValue)},
               payloadType: ${JSON.stringify(payloadType)},

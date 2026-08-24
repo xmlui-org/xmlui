@@ -30,6 +30,8 @@ function Actions.callApi(options: {
   onSuccess?: string;
   onProgress?: string;
   onError?: string;
+  onCancel?: string;
+  abortSignal?: AbortSignal;
   params: any;
   optimisticValue: any;
   when: string;
@@ -42,6 +44,8 @@ function Actions.callApi(options: {
 ```
 
 This function invokes an API endpoint with the specified options.
+
+Pass `abortSignal` to make the request cancellable from a surrounding operation, such as an event handler `$cancel.signal` or component-managed cancellation. When the signal aborts, XMLUI treats the abort as cancellation: `onCancel` runs, ordinary success/error handlers are skipped, and the returned promise rejects with the abort.
 
 ### `Actions.download`
 
@@ -56,10 +60,14 @@ function Actions.download(options: {
   queryParams?: Record<string, any>;
   headers?: Record<string, any>;
   payloadType?: string;
+  onCancel?: string;
+  abortSignal?: AbortSignal;
 }): Promise<any>;
 ```
 
 This function downloads a file from the specified URL.
+
+For fetch-backed downloads (non-GET requests, requests with headers, global headers, or mocked downloads), `abortSignal` aborts the request. For simple iframe-backed GET downloads, cancellation is best effort: XMLUI removes the hidden iframe and runs `onCancel`, but the browser's native download UI may continue if it has already taken over.
 
 ### `Actions.upload`
 
@@ -79,11 +87,16 @@ function Actions.upload(options: {
   params: any;
   chunkSizeInBytes?: number;
   onError?: string;
+  onSuccess?: string;
+  onCancel?: string;
   onProgress?: (...args: any) => void;
+  abortSignal?: AbortSignal;
 }): Promise<any>;
 ```
 
 This function uploads a file to the specified URL.
+
+Pass `abortSignal` to cancel the upload request. Chunked uploads check the signal before each chunk, and non-form uploads abort the FileReader step as well as the network request. A cancelled upload runs `onCancel` and skips query invalidation.
 
 ## App Namespace
 

@@ -15,6 +15,7 @@ import type {
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
+import { DEFAULT_OPERATION_CANCEL_REASON, isAbortError } from "../action/operationCancellation";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -27,6 +28,7 @@ type PageableLoaderProps = {
   registerComponentApi: RegisterComponentApiFn;
   pollIntervalInSeconds?: number;
   onLoaded?: (...args: any[]) => void;
+  onCancel?: (reason?: string) => void | Promise<void>;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
@@ -43,6 +45,7 @@ export function PageableLoader({
   registerComponentApi,
   pollIntervalInSeconds,
   onLoaded,
+  onCancel,
   loaderInProgressChanged,
   loaderIsRefetchingChanged,
   loaderLoaded,
@@ -57,6 +60,9 @@ export function PageableLoader({
     [appContext, loader.props, queryId, state, uid],
   );
   const queryKeyRef = useRef(queryKey);
+  const cancelReasonRef = useRef<string | undefined>(undefined);
+  const onCancelRef = useRef(onCancel);
+  onCancelRef.current = onCancel;
 
   const getPreviousPageParam = useCallback(
     (firstPage: any) => {
@@ -154,10 +160,14 @@ export function PageableLoader({
 
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
+  const prevIsFetching = usePrevious(isFetching);
 
   useIsomorphicLayoutEffect(() => {
+    if (isFetching && !prevIsFetching) {
+      cancelReasonRef.current = undefined;
+    }
     loaderInProgressChanged(isFetching);
-  }, [isFetching, loaderInProgressChanged]);
+  }, [isFetching, loaderInProgressChanged, prevIsFetching]);
 
   useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);
@@ -175,30 +185,34 @@ export function PageableLoader({
   const prevPageInfo = usePrevious(pageInfo);
 
   useIsomorphicLayoutEffect(() => {
+    const hasCompletedSuccessfulFetch =
+      status === "success" && prevIsFetching && !isFetching && !cancelReasonRef.current;
     const hasNewDataOrPageState =
       status === "success" && (prevData !== data || prevPageInfo !== pageInfo);
     const hasNewError = status === "error" && prevError !== error;
 
-    if (hasNewDataOrPageState) {
+    if (hasNewDataOrPageState || hasCompletedSuccessfulFetch) {
       loaderLoaded(data, pageInfo);
 
       // Run after layout effects so markup handlers can read the updated loader state.
       setTimeout(() => {
         onLoaded?.(data, isRefetching);
       }, 0);
-    } else if (hasNewError) {
+    } else if (hasNewError && !(cancelReasonRef.current && isAbortError(error))) {
       loaderError(error);
     }
   }, [
     data,
     error,
     isRefetching,
+    isFetching,
     loaderError,
     loaderLoaded,
     onLoaded,
     pageInfo,
     prevData,
     prevError,
+    prevIsFetching,
     prevPageInfo,
     status,
   ]);
@@ -218,18 +232,39 @@ export function PageableLoader({
   }, [pollIntervalInSeconds, refetch]);
 
   const fetchPrevPage = useCallback(() => {
+    cancelReasonRef.current = undefined;
+    loaderInProgressChanged(true, true);
     return fetchPreviousPage();
-  }, [fetchPreviousPage]);
+  }, [fetchPreviousPage, loaderInProgressChanged]);
 
   const fetchNextPageFromApi = useCallback(() => {
+    cancelReasonRef.current = undefined;
+    loaderInProgressChanged(true, true);
     return fetchNextPage();
-  }, [fetchNextPage]);
+  }, [fetchNextPage, loaderInProgressChanged]);
+
+  const cancel = useCallback(
+    async (reason: string = DEFAULT_OPERATION_CANCEL_REASON) => {
+      const activeFetchCount = appContext.queryClient?.isFetching({ queryKey, exact: true }) ?? 0;
+      if (activeFetchCount === 0) {
+        return false;
+      }
+      cancelReasonRef.current = reason;
+      await onCancelRef.current?.(reason);
+      await appContext.queryClient?.cancelQueries({ queryKey, exact: true });
+      return true;
+    },
+    [appContext.queryClient, queryKey],
+  );
 
   useEffect(() => {
     registerComponentApi({
+      cancel,
       fetchPrevPage,
       fetchNextPage: fetchNextPageFromApi,
       refetch: (options) => {
+        cancelReasonRef.current = undefined;
+        loaderInProgressChanged(true, true);
         void refetch(options);
       },
       update: async (updater) => {
@@ -300,6 +335,8 @@ export function PageableLoader({
     data,
     fetchNextPageFromApi,
     loader.uid,
+    loaderInProgressChanged,
+    cancel,
     queryId,
     queryKey,
     refetch,

@@ -679,6 +679,21 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Cancel a DataSource request"
+                            to="/docs/howto/cancel-a-datasource-request"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Cancel an API call"
+                            to="/docs/howto/cancel-an-api-call"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Cancel an upload"
+                            to="/docs/howto/cancel-an-upload"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Cancel a deferred API operation"
                             to="/docs/howto/cancel-a-deferred-api-operation"
                         />
