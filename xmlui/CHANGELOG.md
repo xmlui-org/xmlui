@@ -1,5 +1,17 @@
 # xmlui
 
+## 0.14.19
+
+### Patch Changes
+
+- df69ffe: Add cancellable data operations with `cancel()` APIs and `onCancel` events for DataSource and APICall, plus abort-aware upload and download actions.
+- 9cc2635: Fix generated theme variable docs so prefixed metadata does not duplicate rows and variable names remain searchable as contiguous link text.
+- 898ef89: Document `xmluiConfig.compileScripts` and related compiled-script settings.
+- 9730e2f: Fix Items row reuse so pushed replacement data with new item identities remounts item templates instead of preserving stale row-local state.
+- b5a2b99: Document List scroll API behavior with outside scroll containers.
+- 8d9846f: Add a fitContentWidth option to NavGroup for sizing to the widest child with a theme-controlled maximum width.
+- 8d9846f: Add a Tree API method for selecting nodes by their current visible row index.
+
 ## 0.14.18
 
 ### Patch Changes
