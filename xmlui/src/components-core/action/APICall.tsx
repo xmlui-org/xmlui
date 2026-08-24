@@ -343,11 +343,11 @@ export async function callApi(
   if (!shouldKeep(when, stateContext, appContext)) {
     return;
   }
-  if (confirmTitle || confirmMessage || confirmButtonLabel || cancelButtonLabel) {
-    const title = extractParam(stateContext, confirmTitle, appContext);
-    const message = extractParam(stateContext, confirmMessage, appContext);
-    const buttonLabel = extractParam(stateContext, confirmButtonLabel, appContext);
-    const cancelLabel = extractParam(stateContext, cancelButtonLabel, appContext);
+  const title = extractParam(stateContext, confirmTitle, appContext);
+  const message = extractParam(stateContext, confirmMessage, appContext);
+  const buttonLabel = extractParam(stateContext, confirmButtonLabel, appContext);
+  const cancelLabel = extractParam(stateContext, cancelButtonLabel, appContext);
+  if (title || message || buttonLabel || cancelLabel) {
     const dialogCheck = await appContext.confirm(
       title,
       message,
