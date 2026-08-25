@@ -144,6 +144,100 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByRole("status", { name: /loading/i })).toHaveCount(0);
   });
 
+  test("sizes inferred star columns before the first loaded frame", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      if ((window as any).__tableResizeObserverPatched) {
+        return;
+      }
+      (window as any).__tableResizeObserverPatched = true;
+      const NativeResizeObserver = window.ResizeObserver;
+      window.ResizeObserver = class DelayedTableResizeObserver extends NativeResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          super((entries, observer) => {
+            if ((window as any).__delayTableSizingObservers) {
+              window.setTimeout(() => callback(entries, observer), 500);
+            } else {
+              callback(entries, observer);
+            }
+          });
+        }
+      };
+    });
+
+    await initTestBed(`
+      <Fragment var.isLoading="{true}" var.items="{[]}">
+        <Button
+          testId="finish-load"
+          onClick="
+            items = [{
+              id: 1,
+              customer: 'Ada Lovelace',
+              notes: 'Analytical engine notes'
+            }];
+            isLoading = false;
+          "
+        />
+        <Table
+          loading="{isLoading}"
+          loadingDelay="0"
+          data="{items}"
+          width="1000px"
+          testId="table"
+        />
+      </Fragment>
+    `);
+
+    await page.evaluate(() => {
+      const originalQueueMicrotask = window.queueMicrotask;
+      (window as any).__delayTableSizingObservers = true;
+      window.queueMicrotask = (callback) => {
+        window.setTimeout(callback, 500);
+      };
+      (window as any).__restoreQueueMicrotask = () => {
+        (window as any).__delayTableSizingObservers = false;
+        window.queueMicrotask = originalQueueMicrotask;
+        delete (window as any).__restoreQueueMicrotask;
+      };
+    });
+
+    await page.evaluate(() => {
+      (window as any).__tableFirstLoadedWidths = undefined;
+      const startedAt = performance.now();
+      const sampleFirstLoadedFrame = () => {
+        const cells = Array.from(
+          document.querySelectorAll('[data-testid="table"] tbody tr:first-child td'),
+        );
+        if (cells.length > 0) {
+          (window as any).__tableFirstLoadedWidths = cells.map((cell) =>
+            Math.round(cell.getBoundingClientRect().width),
+          );
+          return;
+        }
+        if (performance.now() - startedAt < 1500) {
+          requestAnimationFrame(sampleFirstLoadedFrame);
+        }
+      };
+      requestAnimationFrame(sampleFirstLoadedFrame);
+    });
+
+    try {
+      await page.getByTestId("finish-load").click();
+      await page.waitForFunction(() => !!(window as any).__tableFirstLoadedWidths);
+      await expect(page.locator("td").filter({ hasText: "Ada Lovelace" }).first()).toBeVisible();
+
+      const widths = await page.evaluate(() => (window as any).__tableFirstLoadedWidths);
+
+      expect(widths[0]).toBeLessThan(140);
+      expect(widths[1]).toBeGreaterThan(400);
+      expect(widths[2]).toBeGreaterThan(400);
+    } finally {
+      await page.evaluate(() => (window as any).__restoreQueueMicrotask?.());
+    }
+  });
+
   test.describe("inferred columns", () => {
     test("renders data without explicit Column children", async ({ initTestBed, page }) => {
       await initTestBed(`
