@@ -649,6 +649,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Inline one-use action components"
+                            to="/docs/howto/inline-one-use-action-components"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Track a long-running server task"
                             to="/docs/howto/handle-background-operations"
                         />
