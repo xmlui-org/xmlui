@@ -6481,6 +6481,30 @@ export default {
       "animation-content-ExpandableItem": "ease-out"
     }
   },
+  "Fallback": {
+    "status": "experimental",
+    "description": "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader (`DataSource`, `APICall`) fails or a descendant component throws during render. The error is exposed as the `$error` context variable to the `errorTemplate`. An optional `loadingTemplate` is rendered while the `isLoading` prop is truthy.",
+    "contextVars": {
+      "$error": {
+        "description": "The error captured by this Fallback boundary."
+      }
+    },
+    "props": {
+      "errorTemplate": {
+        "description": "Template to render when a descendant produces an `AppError`. The error is available as `$error` (code, category, message, data).",
+        "valueType": "ComponentDef"
+      },
+      "loadingTemplate": {
+        "description": "Template to render when `isLoading` is `true` and no error has been reported yet.",
+        "valueType": "ComponentDef"
+      },
+      "isLoading": {
+        "description": "When `true`, renders the `loadingTemplate` (if provided) instead of the children.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    }
+  },
   "FileInput": {
     "status": "stable",
     "description": "`FileInput` enables users to select files from their device's file system for upload or processing. It combines a text field displaying selected files with a customizable button that opens the system file browser. Use it for forms, media uploads, and document processing workflows.",
@@ -6862,6 +6886,27 @@ export default {
       "gap-FlowLayout": "$gap-layout",
       "columnGap-FlowLayout": "$gap-FlowLayout",
       "rowGap-FlowLayout": "$gap-FlowLayout"
+    }
+  },
+  "FocusScope": {
+    "status": "stable",
+    "description": "`FocusScope` traps Tab navigation inside its subtree and restores focus when the subtree unmounts. Use it for custom popovers, drawers, and modal surfaces.",
+    "props": {
+      "trap": {
+        "description": "When true, Tab and Shift+Tab cycle inside the scope.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "restore": {
+        "description": "When true, focus returns to the previously focused element on unmount.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "autoFocus": {
+        "description": "When true, the first focusable child receives focus after mount.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
     }
   },
   "Footer": {
@@ -11602,6 +11647,54 @@ export default {
       "size-Icon": "1.2em"
     }
   },
+  "I18n": {
+    "status": "experimental",
+    "description": "`I18n` renders a translated message from the active locale bundle. Variables are passed as props, and translated slot placeholders such as `<link/>` are replaced with matching named XMLUI slots.",
+    "allowArbitraryProps": true,
+    "props": {
+      "key": {
+        "description": "Translation key to resolve from the active locale bundle.",
+        "valueType": "string",
+        "isRequired": true
+      }
+    }
+  },
+  "Locale": {
+    "status": "experimental",
+    "description": "`Locale` creates a scoped locale context for its descendants. It can override the locale ID and locale formatting traits such as decimal and grouping separators.",
+    "nonVisual": true,
+    "props": {
+      "locale": {
+        "description": "BCP-47 locale ID used by descendants for translation and formatting.",
+        "valueType": "string"
+      },
+      "decimalSeparator": {
+        "description": "Override for the decimal separator used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "groupSeparator": {
+        "description": "Override for the grouping separator used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "thousandSeparator": {
+        "description": "Alias for `groupSeparator`. Use this to override the thousands/grouping separator.",
+        "valueType": "string"
+      },
+      "minusSign": {
+        "description": "Override for the minus sign used by descendant number formatting.",
+        "valueType": "string"
+      },
+      "currency": {
+        "description": "Default currency trait for descendants.",
+        "valueType": "string"
+      },
+      "numberingSystem": {
+        "description": "Unicode numbering system identifier forwarded to Intl number formatting when supported.",
+        "valueType": "string"
+      }
+    },
+    "opaque": true
+  },
   "IFrame": {
     "status": "stable",
     "description": "`IFrame` embeds external content from another HTML document into the current page. It provides security controls through sandbox and allow attributes, and supports features like fullscreen display and referrer policy configuration.",
@@ -12502,6 +12595,30 @@ export default {
       "backgroundColor-row-List--hover": "$color-primary-50"
     },
     "isImplicitContainerByDefault": true
+  },
+  "LiveRegion": {
+    "status": "stable",
+    "description": "`LiveRegion` announces dynamic status messages to assistive technologies without changing the visible layout.",
+    "props": {
+      "message": {
+        "description": "The message announced by the live region.",
+        "valueType": "string"
+      },
+      "politeness": {
+        "description": "Controls whether updates are announced politely or assertively.",
+        "valueType": "string",
+        "availableValues": [
+          "polite",
+          "assertive"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "polite"
+      }
+    },
+    "a11y": {
+      "role": "decorative",
+      "requiresAccessibleName": false
+    }
   },
   "Logo": {
     "status": "stable",
@@ -15915,6 +16032,31 @@ export default {
       }
     }
   },
+  "SkipLink": {
+    "status": "stable",
+    "description": "`SkipLink` renders a keyboard-first link that jumps directly to the main content region. It stays visually hidden until focused.",
+    "props": {
+      "target": {
+        "description": "The DOM id, XMLUI component id, or test id of the element to focus and scroll to.",
+        "valueType": "string",
+        "defaultValue": "main"
+      },
+      "label": {
+        "description": "The accessible text shown when the skip link receives focus.",
+        "valueType": "string",
+        "defaultValue": "Skip to main content"
+      }
+    },
+    "a11y": {
+      "role": "link",
+      "accessibleNameProps": [
+        "label",
+        "aria-label",
+        "title"
+      ],
+      "requiresAccessibleName": true
+    }
+  },
   "Slider": {
     "status": "stable",
     "description": "`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.Hover over the component to see the tooltip with the current value. On mobile, tap the thumb to see the tooltip.",
@@ -18999,6 +19141,188 @@ export default {
     },
     "isImplicitContainerByDefault": true
   },
+  "Stepper": {
+    "status": "experimental",
+    "description": "`Stepper` displays a sequence of steps for a multi-step workflow or wizard. Individual steps are declared with [Step](/components/Step) children. Inspired by the Material UI Stepper, it supports horizontal and vertical orientations, an alternative-label layout, and a nonLinear mode that allows users to navigate between steps freely.",
+    "props": {
+      "activeStep": {
+        "description": "The 0-based index of the currently active step. If not set, the first step (index 0) is active. When out of range, it falls back to 0.",
+        "valueType": "number",
+        "defaultValue": 0
+      },
+      "orientation": {
+        "description": "Layout orientation of the stepper. In `horizontal` mode the step headers are laid out in a row above a shared content area; only the active step's content is shown. In `vertical` mode each step renders its own header with the active step's content expanding beneath it.",
+        "valueType": "string",
+        "availableValues": [
+          "horizontal",
+          "vertical"
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "horizontal"
+      },
+      "stackedLabel": {
+        "description": "When `true`, step labels are placed below the step icons instead of next to them. Works in both horizontal and vertical orientations.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "nonLinear": {
+        "description": "When `true`, step headers become clickable so users can jump to any step. Default is `false` (linear navigation via the `next`/`prev` APIs).",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "didChange": {
+        "description": "This event is triggered when value of Stepper has changed.",
+        "signature": "didChange(newValue: any): void",
+        "parameters": {
+          "newValue": "The new value of the component."
+        }
+      }
+    },
+    "apis": {
+      "next": {
+        "description": "Advances to the next step. If the current step is the last, no change occurs.",
+        "signature": "next(): void"
+      },
+      "prev": {
+        "description": "Moves back to the previous step. If the current step is the first, no change occurs.",
+        "signature": "prev(): void"
+      },
+      "reset": {
+        "description": "Resets the stepper back to the first step (index 0).",
+        "signature": "reset(): void"
+      },
+      "setActiveStep": {
+        "description": "Sets the active step by its 0-based index.",
+        "signature": "setActiveStep(index: number): void"
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
+      "padding-Stepper": "var(--xmlui-padding-Stepper)",
+      "gap-Stepper": "var(--xmlui-gap-Stepper)",
+      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
+      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
+      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
+      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
+      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
+      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
+      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
+      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
+      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
+      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
+      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
+      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
+      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
+      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
+      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
+      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
+      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
+      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
+      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
+      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
+      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
+      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
+      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
+      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
+    },
+    "defaultThemeVars": {
+      "backgroundColor-Stepper": "transparent",
+      "padding-Stepper": "0",
+      "gap-Stepper": "0",
+      "size-icon-Stepper": "28px",
+      "fontSize-icon-Stepper": "$fontSize-small",
+      "fontWeight-icon-Stepper": "$fontWeight-bold",
+      "backgroundColor-icon-Stepper": "$color-surface-300",
+      "textColor-icon-Stepper": "$color-surface-50",
+      "backgroundColor-icon-Stepper--active": "$color-primary-500",
+      "textColor-icon-Stepper--active": "$color-surface-50",
+      "backgroundColor-icon-Stepper--completed": "$color-primary-500",
+      "textColor-icon-Stepper--completed": "$color-surface-50",
+      "backgroundColor-icon-Stepper--error": "$color-danger-500",
+      "textColor-icon-Stepper--error": "$color-surface-50",
+      "fontSize-label-Stepper": "$fontSize-base",
+      "fontWeight-label-Stepper": "$fontWeight-normal",
+      "textColor-label-Stepper": "$textColor-secondary",
+      "textColor-label-Stepper--active": "$textColor-primary",
+      "textColor-label-Stepper--completed": "$textColor-primary",
+      "textColor-label-Stepper--error": "$color-danger-600",
+      "fontSize-description-Stepper": "$fontSize-small",
+      "textColor-description-Stepper": "$textColor-secondary",
+      "borderColor-connector-Stepper": "$borderColor",
+      "borderColor-connector-Stepper--completed": "$color-primary-500",
+      "borderWidth-connector-Stepper": "1px",
+      "borderStyle-connector-Stepper": "solid",
+      "padding-content-Stepper": "$space-4 0"
+    },
+    "isImplicitContainerByDefault": true
+  },
+  "Step": {
+    "status": "experimental",
+    "description": "`Step` defines an individual step within a [Stepper](/components/Stepper) component. It provides the step header (label, description, icon) and the content shown when the step is active.",
+    "docFolder": "Stepper",
+    "props": {
+      "label": {
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
+        "valueType": "string"
+      },
+      "description": {
+        "description": "Optional secondary text shown under the step label.",
+        "valueType": "string"
+      },
+      "icon": {
+        "description": "Optional icon name to display in the step indicator instead of the step number.",
+        "valueType": "string"
+      },
+      "error": {
+        "description": "When `true`, the step header is rendered in the error state (red icon and label, with an `!` glyph in place of the step number).",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "completed": {
+        "description": "When `true`, the step header is rendered in the completed state (a checkmark glyph and the completed color). Ignored when `error` is also `true`.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "activated": {
+        "description": "Fires whenever this step becomes the active step.",
+        "signature": "activated(): void",
+        "parameters": {}
+      }
+    },
+    "themeVars": {
+      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
+      "padding-Stepper": "var(--xmlui-padding-Stepper)",
+      "gap-Stepper": "var(--xmlui-gap-Stepper)",
+      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
+      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
+      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
+      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
+      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
+      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
+      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
+      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
+      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
+      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
+      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
+      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
+      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
+      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
+      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
+      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
+      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
+      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
+      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
+      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
+      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
+      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
+      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
+      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
+    }
+  },
   "Text": {
     "status": "stable",
     "description": "The `Text` component displays textual information in a number of optional styles and variants.",
@@ -19403,6 +19727,30 @@ export default {
       "dark": {
         "backgroundColor-Text-marked": "rgb(from $color-primary-400 r g b / 0.4)"
       }
+    }
+  },
+  "Value": {
+    "status": "stable",
+    "description": "`Value` displays a read-only value with optional type-aware formatting. Use it for scalar values, structured values, links, dates, numbers, currencies, images, avatars, icons, JSON, enum labels, and similar display-only output outside tables.",
+    "props": {
+      "value": {
+        "description": "The raw value to display. `Value` formats this value for display only; it does not validate, convert, or mutate the underlying data. Nullish values render empty except with `type=\"json\"`, which displays `null`.",
+        "valueType": "any"
+      },
+      "type": {
+        "description": "A display hint for the value. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common read-only formatting behavior. The type affects display only.",
+        "valueType": "string"
+      },
+      "typeOptions": {
+        "description": "Additional display options for the selected type. Use it for object-shaped configuration, such as enum/status label maps, link labels, image/avatar alt text, locale overrides, and long-text options such as `maxLines`. Values in `typeOptions` override compact options specified in the `type` string.",
+        "valueType": "any"
+      }
+    },
+    "themeVars": {
+      "borderColor-Value": "var(--xmlui-borderColor-Value)"
+    },
+    "defaultThemeVars": {
+      "borderColor-Value": "$borderColor"
     }
   },
   "TextArea": {
@@ -21659,353 +22007,5 @@ export default {
       "outlineOffset-Tree--focus": "$outlineOffset--focus"
     },
     "isImplicitContainerByDefault": true
-  },
-  "Fallback": {
-    "status": "experimental",
-    "description": "`Fallback` is a declarative wrapper that renders an alternative UI when a descendant loader (`DataSource`, `APICall`) fails or a descendant component throws during render. The error is exposed as the `$error` context variable to the `errorTemplate`. An optional `loadingTemplate` is rendered while the `isLoading` prop is truthy.",
-    "contextVars": {
-      "$error": {
-        "description": "The error captured by this Fallback boundary."
-      }
-    },
-    "props": {
-      "errorTemplate": {
-        "description": "Template to render when a descendant produces an `AppError`. The error is available as `$error` (code, category, message, data).",
-        "valueType": "ComponentDef"
-      },
-      "loadingTemplate": {
-        "description": "Template to render when `isLoading` is `true` and no error has been reported yet.",
-        "valueType": "ComponentDef"
-      },
-      "isLoading": {
-        "description": "When `true`, renders the `loadingTemplate` (if provided) instead of the children.",
-        "valueType": "boolean",
-        "defaultValue": false
-      }
-    }
-  },
-  "I18n": {
-    "status": "experimental",
-    "description": "`I18n` renders a translated message from the active locale bundle. Variables are passed as props, and translated slot placeholders such as `<link/>` are replaced with matching named XMLUI slots.",
-    "allowArbitraryProps": true,
-    "props": {
-      "key": {
-        "description": "Translation key to resolve from the active locale bundle.",
-        "valueType": "string",
-        "isRequired": true
-      }
-    }
-  },
-  "Stepper": {
-    "status": "experimental",
-    "description": "`Stepper` displays a sequence of steps for a multi-step workflow or wizard. Individual steps are declared with [Step](/components/Step) children. Inspired by the Material UI Stepper, it supports horizontal and vertical orientations, an alternative-label layout, and a nonLinear mode that allows users to navigate between steps freely.",
-    "props": {
-      "activeStep": {
-        "description": "The 0-based index of the currently active step. If not set, the first step (index 0) is active. When out of range, it falls back to 0.",
-        "valueType": "number",
-        "defaultValue": 0
-      },
-      "orientation": {
-        "description": "Layout orientation of the stepper. In `horizontal` mode the step headers are laid out in a row above a shared content area; only the active step's content is shown. In `vertical` mode each step renders its own header with the active step's content expanding beneath it.",
-        "valueType": "string",
-        "availableValues": [
-          "horizontal",
-          "vertical"
-        ],
-        "isStrictEnum": true,
-        "defaultValue": "horizontal"
-      },
-      "stackedLabel": {
-        "description": "When `true`, step labels are placed below the step icons instead of next to them. Works in both horizontal and vertical orientations.",
-        "valueType": "boolean",
-        "defaultValue": false
-      },
-      "nonLinear": {
-        "description": "When `true`, step headers become clickable so users can jump to any step. Default is `false` (linear navigation via the `next`/`prev` APIs).",
-        "valueType": "boolean",
-        "defaultValue": false
-      }
-    },
-    "events": {
-      "didChange": {
-        "description": "This event is triggered when value of Stepper has changed.",
-        "signature": "didChange(newValue: any): void",
-        "parameters": {
-          "newValue": "The new value of the component."
-        }
-      }
-    },
-    "apis": {
-      "next": {
-        "description": "Advances to the next step. If the current step is the last, no change occurs.",
-        "signature": "next(): void"
-      },
-      "prev": {
-        "description": "Moves back to the previous step. If the current step is the first, no change occurs.",
-        "signature": "prev(): void"
-      },
-      "reset": {
-        "description": "Resets the stepper back to the first step (index 0).",
-        "signature": "reset(): void"
-      },
-      "setActiveStep": {
-        "description": "Sets the active step by its 0-based index.",
-        "signature": "setActiveStep(index: number): void"
-      }
-    },
-    "themeVars": {
-      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
-      "padding-Stepper": "var(--xmlui-padding-Stepper)",
-      "gap-Stepper": "var(--xmlui-gap-Stepper)",
-      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
-      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
-      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
-      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
-      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
-      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
-      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
-      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
-      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
-      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
-      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
-      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
-      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
-      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
-      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
-      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
-      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
-      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
-      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
-      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
-      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
-      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
-      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
-      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
-    },
-    "defaultThemeVars": {
-      "backgroundColor-Stepper": "transparent",
-      "padding-Stepper": "0",
-      "gap-Stepper": "0",
-      "size-icon-Stepper": "28px",
-      "fontSize-icon-Stepper": "$fontSize-small",
-      "fontWeight-icon-Stepper": "$fontWeight-bold",
-      "backgroundColor-icon-Stepper": "$color-surface-300",
-      "textColor-icon-Stepper": "$color-surface-50",
-      "backgroundColor-icon-Stepper--active": "$color-primary-500",
-      "textColor-icon-Stepper--active": "$color-surface-50",
-      "backgroundColor-icon-Stepper--completed": "$color-primary-500",
-      "textColor-icon-Stepper--completed": "$color-surface-50",
-      "backgroundColor-icon-Stepper--error": "$color-danger-500",
-      "textColor-icon-Stepper--error": "$color-surface-50",
-      "fontSize-label-Stepper": "$fontSize-base",
-      "fontWeight-label-Stepper": "$fontWeight-normal",
-      "textColor-label-Stepper": "$textColor-secondary",
-      "textColor-label-Stepper--active": "$textColor-primary",
-      "textColor-label-Stepper--completed": "$textColor-primary",
-      "textColor-label-Stepper--error": "$color-danger-600",
-      "fontSize-description-Stepper": "$fontSize-small",
-      "textColor-description-Stepper": "$textColor-secondary",
-      "borderColor-connector-Stepper": "$borderColor",
-      "borderColor-connector-Stepper--completed": "$color-primary-500",
-      "borderWidth-connector-Stepper": "1px",
-      "borderStyle-connector-Stepper": "solid",
-      "padding-content-Stepper": "$space-4 0"
-    },
-    "isImplicitContainerByDefault": true
-  },
-  "Step": {
-    "status": "experimental",
-    "description": "`Step` defines an individual step within a [Stepper](/components/Stepper) component. It provides the step header (label, description, icon) and the content shown when the step is active.",
-    "docFolder": "Stepper",
-    "props": {
-      "label": {
-        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
-        "valueType": "string"
-      },
-      "description": {
-        "description": "Optional secondary text shown under the step label.",
-        "valueType": "string"
-      },
-      "icon": {
-        "description": "Optional icon name to display in the step indicator instead of the step number.",
-        "valueType": "string"
-      },
-      "error": {
-        "description": "When `true`, the step header is rendered in the error state (red icon and label, with an `!` glyph in place of the step number).",
-        "valueType": "boolean",
-        "defaultValue": false
-      },
-      "completed": {
-        "description": "When `true`, the step header is rendered in the completed state (a checkmark glyph and the completed color). Ignored when `error` is also `true`.",
-        "valueType": "boolean",
-        "defaultValue": false
-      }
-    },
-    "events": {
-      "activated": {
-        "description": "Fires whenever this step becomes the active step.",
-        "signature": "activated(): void",
-        "parameters": {}
-      }
-    },
-    "themeVars": {
-      "backgroundColor-Stepper": "var(--xmlui-backgroundColor-Stepper)",
-      "padding-Stepper": "var(--xmlui-padding-Stepper)",
-      "gap-Stepper": "var(--xmlui-gap-Stepper)",
-      "size-icon-Stepper": "var(--xmlui-size-icon-Stepper)",
-      "fontSize-icon-Stepper": "var(--xmlui-fontSize-icon-Stepper)",
-      "fontWeight-icon-Stepper": "var(--xmlui-fontWeight-icon-Stepper)",
-      "backgroundColor-icon-Stepper": "var(--xmlui-backgroundColor-icon-Stepper)",
-      "textColor-icon-Stepper": "var(--xmlui-textColor-icon-Stepper)",
-      "backgroundColor-icon-Stepper--active": "var(--xmlui-backgroundColor-icon-Stepper--active)",
-      "textColor-icon-Stepper--active": "var(--xmlui-textColor-icon-Stepper--active)",
-      "backgroundColor-icon-Stepper--completed": "var(--xmlui-backgroundColor-icon-Stepper--completed)",
-      "textColor-icon-Stepper--completed": "var(--xmlui-textColor-icon-Stepper--completed)",
-      "backgroundColor-icon-Stepper--error": "var(--xmlui-backgroundColor-icon-Stepper--error)",
-      "textColor-icon-Stepper--error": "var(--xmlui-textColor-icon-Stepper--error)",
-      "fontSize-label-Stepper": "var(--xmlui-fontSize-label-Stepper)",
-      "fontWeight-label-Stepper": "var(--xmlui-fontWeight-label-Stepper)",
-      "textColor-label-Stepper": "var(--xmlui-textColor-label-Stepper)",
-      "textColor-label-Stepper--active": "var(--xmlui-textColor-label-Stepper--active)",
-      "textColor-label-Stepper--completed": "var(--xmlui-textColor-label-Stepper--completed)",
-      "textColor-label-Stepper--error": "var(--xmlui-textColor-label-Stepper--error)",
-      "fontSize-description-Stepper": "var(--xmlui-fontSize-description-Stepper)",
-      "textColor-description-Stepper": "var(--xmlui-textColor-description-Stepper)",
-      "borderColor-connector-Stepper": "var(--xmlui-borderColor-connector-Stepper)",
-      "borderColor-connector-Stepper--completed": "var(--xmlui-borderColor-connector-Stepper--completed)",
-      "borderWidth-connector-Stepper": "var(--xmlui-borderWidth-connector-Stepper)",
-      "borderStyle-connector-Stepper": "var(--xmlui-borderStyle-connector-Stepper)",
-      "padding-content-Stepper": "var(--xmlui-padding-content-Stepper)"
-    }
-  },
-  "FocusScope": {
-    "status": "stable",
-    "description": "`FocusScope` traps Tab navigation inside its subtree and restores focus when the subtree unmounts. Use it for custom popovers, drawers, and modal surfaces.",
-    "props": {
-      "trap": {
-        "description": "When true, Tab and Shift+Tab cycle inside the scope.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
-      "restore": {
-        "description": "When true, focus returns to the previously focused element on unmount.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
-      "autoFocus": {
-        "description": "When true, the first focusable child receives focus after mount.",
-        "valueType": "boolean",
-        "defaultValue": false
-      }
-    }
-  },
-  "LiveRegion": {
-    "status": "stable",
-    "description": "`LiveRegion` announces dynamic status messages to assistive technologies without changing the visible layout.",
-    "props": {
-      "message": {
-        "description": "The message announced by the live region.",
-        "valueType": "string"
-      },
-      "politeness": {
-        "description": "Controls whether updates are announced politely or assertively.",
-        "valueType": "string",
-        "availableValues": [
-          "polite",
-          "assertive"
-        ],
-        "isStrictEnum": true,
-        "defaultValue": "polite"
-      }
-    },
-    "a11y": {
-      "role": "decorative",
-      "requiresAccessibleName": false
-    }
-  },
-  "SkipLink": {
-    "status": "stable",
-    "description": "`SkipLink` renders a keyboard-first link that jumps directly to the main content region. It stays visually hidden until focused.",
-    "props": {
-      "target": {
-        "description": "The DOM id, XMLUI component id, or test id of the element to focus and scroll to.",
-        "valueType": "string",
-        "defaultValue": "main"
-      },
-      "label": {
-        "description": "The accessible text shown when the skip link receives focus.",
-        "valueType": "string",
-        "defaultValue": "Skip to main content"
-      }
-    },
-    "a11y": {
-      "role": "link",
-      "accessibleNameProps": [
-        "label",
-        "aria-label",
-        "title"
-      ],
-      "requiresAccessibleName": true
-    }
-  },
-  "Locale": {
-    "status": "experimental",
-    "description": "`Locale` creates a scoped locale context for its descendants. It can override the locale ID and locale formatting traits such as decimal and grouping separators.",
-    "nonVisual": true,
-    "props": {
-      "locale": {
-        "description": "BCP-47 locale ID used by descendants for translation and formatting.",
-        "valueType": "string"
-      },
-      "decimalSeparator": {
-        "description": "Override for the decimal separator used by descendant number formatting.",
-        "valueType": "string"
-      },
-      "groupSeparator": {
-        "description": "Override for the grouping separator used by descendant number formatting.",
-        "valueType": "string"
-      },
-      "thousandSeparator": {
-        "description": "Alias for `groupSeparator`. Use this to override the thousands/grouping separator.",
-        "valueType": "string"
-      },
-      "minusSign": {
-        "description": "Override for the minus sign used by descendant number formatting.",
-        "valueType": "string"
-      },
-      "currency": {
-        "description": "Default currency trait for descendants.",
-        "valueType": "string"
-      },
-      "numberingSystem": {
-        "description": "Unicode numbering system identifier forwarded to Intl number formatting when supported.",
-        "valueType": "string"
-      }
-    },
-    "opaque": true
-  },
-  "Value": {
-    "status": "stable",
-    "description": "`Value` displays a read-only value with optional type-aware formatting. Use it for scalar values, structured values, links, dates, numbers, currencies, images, avatars, icons, JSON, enum labels, and similar display-only output outside tables.",
-    "props": {
-      "value": {
-        "description": "The raw value to display. `Value` formats this value for display only; it does not validate, convert, or mutate the underlying data. Nullish values render empty except with `type=\"json\"`, which displays `null`.",
-        "valueType": "any"
-      },
-      "type": {
-        "description": "A display hint for the value. Use compact values such as `text`, `email`, `number(8,3)`, `currency(USD)`, `date(short)`, `datetime`, `boolean`, `enum`, `image`, or `json` to select common read-only formatting behavior. The type affects display only.",
-        "valueType": "string"
-      },
-      "typeOptions": {
-        "description": "Additional display options for the selected type. Use it for object-shaped configuration, such as enum/status label maps, link labels, image/avatar alt text, locale overrides, and long-text options such as `maxLines`. Values in `typeOptions` override compact options specified in the `type` string.",
-        "valueType": "any"
-      }
-    },
-    "themeVars": {
-      "borderColor-Value": "var(--xmlui-borderColor-Value)"
-    },
-    "defaultThemeVars": {
-      "borderColor-Value": "$borderColor"
-    }
   }
 };
