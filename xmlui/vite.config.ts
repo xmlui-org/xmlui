@@ -10,6 +10,9 @@ import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import copy from "rollup-plugin-copy";
+import { minify as minifyWithTerser } from "terser";
+import { transform as transformCss } from "lightningcss";
+import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 // @ts-ignore
 import * as packageJson from "./package.json";
 
@@ -69,6 +72,13 @@ const stripCssModuleExports = (cssCode: string) => {
   return stripped;
 };
 
+const minifyStandaloneCss = (cssCode: string) =>
+  transformCss({
+    filename: "xmlui-standalone.css",
+    code: new TextEncoder().encode(stripCssModuleExports(cssCode)),
+    minify: true,
+  }).code.toString();
+
 const createStandaloneLogger = (): Logger => {
   const logger = createLogger();
   const shouldSuppress = (msg: string) =>
@@ -111,8 +121,62 @@ const stripCssModuleExportsFromCssAssets = (): Plugin => ({
   },
 });
 
+const terserSecondPassForStandalone = (): Plugin => ({
+  name: "xmlui-standalone-terser-second-pass",
+  apply: "build",
+  enforce: "post",
+  async generateBundle(_, bundle) {
+    for (const asset of Object.values(bundle)) {
+      if (asset.type !== "chunk" || !asset.fileName.endsWith(".js")) {
+        continue;
+      }
+
+      const result = await minifyWithTerser(asset.code, {
+        compress: {
+          passes: 2,
+        },
+        mangle: true,
+      });
+
+      if (result.code) {
+        asset.code = result.code;
+      }
+    }
+  },
+});
+
+const precompressStandaloneBundle = (): Plugin => ({
+  name: "xmlui-precompress-standalone-bundle",
+  apply: "build",
+  enforce: "post",
+  generateBundle(_, bundle) {
+    for (const asset of Object.values(bundle)) {
+      if (asset.type !== "chunk" || !asset.fileName.endsWith(".js")) {
+        continue;
+      }
+
+      const source = Buffer.from(asset.code);
+      this.emitFile({
+        type: "asset",
+        fileName: `${asset.fileName}.gz`,
+        source: gzipSync(source, { level: 9 }),
+      });
+      this.emitFile({
+        type: "asset",
+        fileName: `${asset.fileName}.br`,
+        source: brotliCompressSync(source, {
+          params: {
+            [constants.BROTLI_PARAM_QUALITY]: 11,
+          },
+        }),
+      });
+    }
+  },
+});
+
 export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  const emitStandaloneSourcemap = process.env.XMLUI_STANDALONE_SOURCEMAP === "true";
   let lib;
   let define;
   const xmluiVersion = `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`;
@@ -350,9 +414,10 @@ export default ({ mode = "lib" }) => {
       ViteXmlui({}),
       stripCssModuleExportsFromCssAssets(),
       cssInjectedByJsPlugin({
-        preRenderCSSCode: stripCssModuleExports,
+        preRenderCSSCode: minifyStandaloneCss,
       }),
-      dtsPlugin(),
+      ...(emitStandaloneSourcemap ? [] : [terserSecondPassForStandalone()]),
+      precompressStandaloneBundle(),
     ] as Plugin[];
   } else {
     plugins = [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dtsPlugin()] as Plugin[];
@@ -409,7 +474,7 @@ export default ({ mode = "lib" }) => {
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,
-      sourcemap: true,
+      sourcemap: mode === "standalone" ? emitStandaloneSourcemap : true,
       rolldownOptions: {
         treeshake: mode === "metadata" ? { moduleSideEffects: false } : undefined,
         external:

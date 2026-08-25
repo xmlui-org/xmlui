@@ -1395,6 +1395,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Serve a compressed standalone app"
+                            to="/docs/howto/serve-a-compressed-standalone-app"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Generate a QR code from user input"
                             to="/docs/howto/generate-a-qr-code-from-user-input"
                         />

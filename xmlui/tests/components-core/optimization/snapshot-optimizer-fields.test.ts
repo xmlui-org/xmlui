@@ -11,9 +11,8 @@ import type { ComponentDef, OptimizerMetadataView } from "../../../src/abstracti
 /**
  * Read the generated snapshot as TEXT and parse a pristine copy.
  *
- * We cannot import it: `metadataRegistry` IS the snapshot object, and importing
- * `collectedComponentMetadata` Object.assigns live values over it. A pristine
- * parse is the only way to assert what the Node/Standalone build-time path sees.
+ * Keep this text-based parse so the test asserts the generated build-time
+ * snapshot exactly as it is emitted on disk.
  */
 function loadPristineSnapshot(): Record<string, OptimizerMetadataView> {
   const here = path.dirname(fileURLToPath(import.meta.url));

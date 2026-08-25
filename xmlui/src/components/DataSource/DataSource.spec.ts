@@ -966,7 +966,7 @@ test.describe("Cancellation", () => {
             "page-feed": {
               url: "/api/feed",
               method: "get",
-              queryParams: { after: "integer" },
+              queryParamTypes: { after: "integer" },
               handler: `
                 const after = Number($queryParams.after || 0);
                 if (after > 0) {
