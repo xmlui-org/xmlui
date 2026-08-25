@@ -451,6 +451,8 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  rowEnter?: (item: any) => void;
+  rowLeave?: (item: any) => void;
   headerUserSelect?: string;
   cellUserSelect?: string;
   userSelectCell?: string;
@@ -1181,6 +1183,8 @@ export const Table = memo(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      rowEnter,
+      rowLeave,
       headerUserSelect,
       cellUserSelect,
       userSelectCell,
@@ -1989,6 +1993,8 @@ export const Table = memo(
       enableMultiRowSelection,
       lookupEventHandler,
       rowDoubleClick,
+      rowEnter,
+      rowLeave,
       striped,
       rowHeight,
       renderVersion: rowRenderVersion,
@@ -2261,6 +2267,38 @@ export const Table = memo(
                   }
                 }
               }}
+              // Hover handlers attach only when the app binds the event. An
+              // unbound table registers no listener at all: row hover fires on
+              // every traverse of a virtualized list, so the unused case must
+              // cost nothing rather than merely returning early.
+              onMouseEnter={
+                rowStateRef.current.rowEnter
+                  ? () => {
+                      const { rowEnter: enter } = rowStateRef.current;
+                      if (enter && typeof enter === "function") {
+                        try {
+                          enter(row.original);
+                        } catch (e) {
+                          console.error("Error in rowEnter handler:", e);
+                        }
+                      }
+                    }
+                  : undefined
+              }
+              onMouseLeave={
+                rowStateRef.current.rowLeave
+                  ? () => {
+                      const { rowLeave: leave } = rowStateRef.current;
+                      if (leave && typeof leave === "function") {
+                        try {
+                          leave(row.original);
+                        } catch (e) {
+                          console.error("Error in rowLeave handler:", e);
+                        }
+                      }
+                    }
+                  : undefined
+              }
               onContextMenu={
                 rowStateRef.current.lookupEventHandler
                   ? (event) => {

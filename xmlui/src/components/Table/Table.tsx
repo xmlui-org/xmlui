@@ -536,6 +536,26 @@ export const TableMd = createMetadata({
         item: "The clicked table row item.",
       },
     },
+    rowEnter: {
+      description:
+        `This event is fired when the pointer enters a table row. The handler receives the ` +
+        `row item as its only argument. Use it with \`rowLeave\` to link the table to another ` +
+        `view — highlighting the matching point on a chart, or showing the hovered record in a ` +
+        `detail panel. Moving between cells of the same row does not re-fire it.`,
+      signature: "rowEnter(item: any): void",
+      parameters: {
+        item: "The hovered table row item.",
+      },
+    },
+    rowLeave: {
+      description:
+        `This event is fired when the pointer leaves a table row. The handler receives the row ` +
+        `item as its only argument. Pair it with \`rowEnter\` to clear whatever that event set.`,
+      signature: "rowLeave(item: any): void",
+      parameters: {
+        item: "The table row item the pointer left.",
+      },
+    },
     scroll: {
       description:
         `This event fires as the user scrolls the table. The handler receives an object ` +
@@ -835,6 +855,12 @@ const TableWithColumns = memo(
       const stableRowDoubleClick = useEvent((...args: any[]) =>
         lookupEventHandler("rowDoubleClick")?.(...args),
       );
+      const stableRowEnter = useEvent((...args: any[]) =>
+        lookupEventHandler("rowEnter")?.(...args),
+      );
+      const stableRowLeave = useEvent((...args: any[]) =>
+        lookupEventHandler("rowLeave")?.(...args),
+      );
       const stableScroll = useEvent((...args: any[]) => lookupEventHandler("scroll")?.(...args));
       const stableVisibleRangeDidChange = useEvent((...args: any[]) =>
         lookupEventHandler("visibleRangeDidChange")?.(...args),
@@ -1100,6 +1126,8 @@ const TableWithColumns = memo(
             onSelectionDidChange={stableSelectionDidChange}
             willSort={stableWillSort}
             rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+            rowEnter={node.events?.rowEnter ? stableRowEnter : undefined}
+            rowLeave={node.events?.rowLeave ? stableRowLeave : undefined}
             onScroll={node.events?.scroll ? stableScroll : undefined}
             onVisibleRangeDidChange={
               node.events?.visibleRangeDidChange ? stableVisibleRangeDidChange : undefined
