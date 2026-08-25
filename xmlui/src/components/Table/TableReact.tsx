@@ -2446,9 +2446,7 @@ export const Table = memo(
     useIsomorphicLayoutEffect(() => {
       // Reset cached width so columns are recalculated when the column set changes
       lastMeasuredWidthRef.current = null;
-      queueMicrotask(() => {
-        recalculateStarSizes();
-      });
+      recalculateStarSizes();
     }, [
       recalculateStarSizes,
       safeColumns,
