@@ -19,6 +19,7 @@
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, join, resolve, relative, extname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse } from "@babel/parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -45,11 +46,6 @@ const isForbidden = (file) =>
   file.endsWith(".module.css") ||
   // Any .tsx file is a React component (JSX) and should never be reached.
   file.endsWith(".tsx");
-
-// Strip TS-style import/export specifiers from a file's source.
-const IMPORT_RE =
-  /(?:^|\n)\s*(?:import|export)(?:\s+type)?\s+(?:[^'"`]*?\sfrom\s+)?["']([^"']+)["']/g;
-const DYNAMIC_IMPORT_RE = /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g;
 
 const RESOLVE_EXTS = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".json"];
 const RESOLVE_INDEX = ["index.ts", "index.tsx", "index.js", "index.jsx"];
@@ -87,11 +83,75 @@ function tryResolve(spec, fromDir) {
 function collectImports(file) {
   const src = readFileSync(file, "utf8");
   const specs = new Set();
-  for (const re of [IMPORT_RE, DYNAMIC_IMPORT_RE]) {
-    let m;
-    while ((m = re.exec(src)) !== null) specs.add(m[1]);
+
+  const ast = parse(src, {
+    sourceType: "module",
+    plugins: ["typescript", "jsx", "importAttributes"],
+  });
+
+  for (const node of ast.program.body) {
+    switch (node.type) {
+      case "ImportDeclaration":
+        if (hasRuntimeImport(node)) {
+          specs.add(node.source.value);
+        }
+        break;
+
+      case "ExportNamedDeclaration":
+        if (node.source && hasRuntimeExport(node)) {
+          specs.add(node.source.value);
+        }
+        break;
+
+      case "ExportAllDeclaration":
+        if (node.exportKind !== "type") {
+          specs.add(node.source.value);
+        }
+        break;
+    }
   }
+
+  collectDynamicImports(ast.program, specs);
   return [...specs];
+}
+
+function hasRuntimeImport(node) {
+  if (node.importKind === "type") return false;
+  if (node.specifiers.length === 0) return true; // Side-effect import.
+  return node.specifiers.some((specifier) => specifier.importKind !== "type");
+}
+
+function hasRuntimeExport(node) {
+  if (node.exportKind === "type") return false;
+  if (node.specifiers.length === 0) return true;
+  return node.specifiers.some((specifier) => specifier.exportKind !== "type");
+}
+
+function collectDynamicImports(node, specs) {
+  if (!node || typeof node !== "object") return;
+
+  if (node.type === "CallExpression" && node.callee?.type === "Import") {
+    const source = node.arguments?.[0];
+    if (source?.type === "StringLiteral") {
+      specs.add(source.value);
+    }
+  }
+
+  if (node.type === "ImportExpression") {
+    const source = node.source;
+    if (source?.type === "StringLiteral") {
+      specs.add(source.value);
+    }
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "loc" || key === "start" || key === "end") continue;
+    if (Array.isArray(value)) {
+      value.forEach((child) => collectDynamicImports(child, specs));
+    } else {
+      collectDynamicImports(value, specs);
+    }
+  }
 }
 
 function walk(entry) {
