@@ -10,7 +10,7 @@
     "gen:rss": "tsx scripts/generate-rss.ts",
     "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
     "build": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
-    "build-ssg": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui ssg && mv dist-ssg/ssg-staticwebapp.config.json dist-ssg/staticwebapp.config.json",
+    "build-ssg": "npm run generate-all-docs -w xmlui && npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui ssg && mv dist-ssg/ssg-staticwebapp.config.json dist-ssg/staticwebapp.config.json",
     "measure:memory": "node scripts/measure-memory.mjs",
     "preview-ssg": "npx preview-ssg ./dist-ssg"
   },

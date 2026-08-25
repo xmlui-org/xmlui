@@ -2109,15 +2109,6 @@ This event is fired when the user double-clicks a table row. The handler receive
 
 This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
 
-````xmlui copy {4}
-<App>
-  <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
-    <Column bindTo="name"/>
-
-%-EVENT-START rowDoubleClick
-
-This event is triggered when a table row is double-clicked. The handler receives the row's data item as its only argument.
-
 ```xmlui copy {4}
 <App>
   <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
@@ -2125,7 +2116,76 @@ This event is triggered when a table row is double-clicked. The handler receives
     <Column bindTo="quantity"/>
   </Table>
 </App>
-````
+```
+
+### `rowEnter` [#rowenter]
+
+This event is fired when the pointer enters a table row. The handler receives the row item as its only argument. Use it with `rowLeave` to link the table to another view — highlighting the matching point on a chart, or showing the hovered record in a detail panel. Moving between cells of the same row does not re-fire it.
+
+**Signature**: `rowEnter(item: any): void`
+
+- `item`: The hovered table row item.
+
+This event fires when the pointer enters a table row. The handler receives the row's data item as its only argument.
+
+Use it with `rowLeave` to link the table to another view: the table already highlights the hovered row for the user, and these events let the rest of the app react to the same hover — a detail panel, a matching point on a chart, a pin on a map.
+
+Moving between cells within one row does not re-fire the event; only entering and leaving the row itself does.
+
+```xmlui copy {4-5}
+<App var.hovered="{null}">
+  <Table
+    data='{[...]}'
+    onRowEnter="(item) => hovered = item"
+    onRowLeave="() => hovered = null">
+    <Column bindTo="name"/>
+  </Table>
+</App>
+```
+
+Hover a row to see the panel follow it:
+
+```xmlui-pg name="Example: rowEnter and rowLeave"
+<App var.hovered="{null}">
+  <HStack gap="$space-4">
+    <Table
+      width="60%"
+      data='{[
+        { id: 0, name: "Apples", quantity: 5, unit: "pieces", category: "fruits" },
+        { id: 1, name: "Bananas", quantity: 6, unit: "pieces", category: "fruits" },
+        { id: 2, name: "Carrots", quantity: 100, unit: "grams", category: "vegetables" },
+        { id: 3, name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables" },
+        { id: 4, name: "Milk", quantity: 10, unit: "liter", category: "dairy" },
+      ]}'
+      onRowEnter="(item) => hovered = item"
+      onRowLeave="() => hovered = null">
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+      <Column bindTo="unit"/>
+    </Table>
+    <Card width="40%">
+      <Text when="{!hovered}" variant="secondary" value="Hover a row." />
+      <Fragment when="{hovered}">
+        <Text variant="strong" value="{hovered.name}" />
+        <Text value="{hovered.quantity} {hovered.unit}" />
+        <Text variant="secondary" value="{hovered.category}" />
+      </Fragment>
+    </Card>
+  </HStack>
+</App>
+```
+
+### `rowLeave` [#rowleave]
+
+This event is fired when the pointer leaves a table row. The handler receives the row item as its only argument. Pair it with `rowEnter` to clear whatever that event set.
+
+**Signature**: `rowLeave(item: any): void`
+
+- `item`: The table row item the pointer left.
+
+This event fires when the pointer leaves a table row. The handler receives the row's data item as its only argument — the row being left, not the one being entered.
+
+Pair it with `rowEnter` to clear whatever that event set. See the [`rowEnter`](#rowenter) example.
 
 ### `scroll` [#scroll]
 
