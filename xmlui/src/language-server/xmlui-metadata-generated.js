@@ -18228,6 +18228,20 @@ export default {
           "item": "The clicked table row item."
         }
       },
+      "rowEnter": {
+        "description": "This event is fired when the pointer enters a table row. The handler receives the row item as its only argument. Use it with `rowLeave` to link the table to another view — highlighting the matching point on a chart, or showing the hovered record in a detail panel. Moving between cells of the same row does not re-fire it.",
+        "signature": "rowEnter(item: any): void",
+        "parameters": {
+          "item": "The hovered table row item."
+        }
+      },
+      "rowLeave": {
+        "description": "This event is fired when the pointer leaves a table row. The handler receives the row item as its only argument. Pair it with `rowEnter` to clear whatever that event set.",
+        "signature": "rowLeave(item: any): void",
+        "parameters": {
+          "item": "The table row item the pointer left."
+        }
+      },
       "scroll": {
         "description": "This event fires as the user scrolls the table. The handler receives an object describing the current scroll state. It is only fired for user-driven scrolls; the table's own programmatic scrolls do not trigger it. Use it together with the `atEnd` flag and the `scrollToBottom()` method to implement follow-newest and read-pause behavior, or with `visibleRange` and `itemCount` to display a visible row range.",
         "signature": "scroll(event: { scrollTop: number, scrollHeight: number, viewportSize: number, atEnd: boolean, visibleRange: { startIndex: number, endIndex: number }, itemCount: number }): void",

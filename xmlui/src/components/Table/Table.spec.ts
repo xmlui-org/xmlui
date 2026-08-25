@@ -7066,3 +7066,91 @@ test.describe("Table in HStack layout", () => {
     expect(vs1Box!.width + vs2Box!.width).toBeGreaterThan(hstackBox!.width * 0.8);
   });
 });
+
+// =============================================================================
+// ROW HOVER EVENTS
+// =============================================================================
+
+test.describe("row hover events", () => {
+  const DATA = `{[
+    { id: 0, name: "Apples", quantity: 5 },
+    { id: 1, name: "Bananas", quantity: 6 }
+  ]}`;
+
+  test("rowEnter fires with the hovered row item", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table data='${DATA}' onRowEnter="(item) => testState = item.name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await page.getByRole("cell", { name: "Bananas" }).hover();
+    await expect.poll(testStateDriver.testState).toEqual("Bananas");
+  });
+
+  test("rowLeave fires with the row that was left", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table data='${DATA}' onRowLeave="(item) => testState = 'left:' + item.name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await page.getByRole("cell", { name: "Apples" }).hover();
+    await page.getByRole("cell", { name: "Bananas" }).hover();
+    await expect.poll(testStateDriver.testState).toEqual("left:Apples");
+  });
+
+  // The obvious way to get this wrong is to put the handlers on cells rather
+  // than the row, which turns every horizontal move into a leave/enter pair.
+  test("moving between cells of the same row does not re-fire", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.enters="{0}">
+        <Table data='${DATA}' onRowEnter="() => { enters = enters + 1; testState = enters; }">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      </Fragment>
+    `);
+
+    await page.getByRole("cell", { name: "Apples" }).hover();
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    // Same row, different cell — no second enter, and no leave in between.
+    await page.getByRole("cell", { name: "5", exact: true }).hover();
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
+  // The zero-cost claim, asserted rather than assumed: row hover fires on every
+  // traverse of a virtualized list, so an unbound table must register no
+  // listener at all rather than attaching one that returns early.
+  test("no hover listener is attached when the events are unbound", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='${DATA}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const row = page.getByRole("row").filter({ hasText: "Apples" });
+    await expect(row).toBeVisible();
+
+    // React records its handlers on the DOM node's internal props bag; an
+    // unattached event is absent from it entirely.
+    const handlers = await row.evaluate((el) => {
+      const key = Object.keys(el).find((k) => k.startsWith("__reactProps$"));
+      const props: any = key ? (el as any)[key] : {};
+      return {
+        onMouseEnter: typeof props?.onMouseEnter,
+        onMouseLeave: typeof props?.onMouseLeave,
+      };
+    });
+
+    expect(handlers.onMouseEnter).toBe("undefined");
+    expect(handlers.onMouseLeave).toBe("undefined");
+  });
+});
