@@ -48,6 +48,7 @@ function StandaloneComponent({ node, children, functions, vars }: RootComponentP
     appContext: undefined,
     lookupAction: noop,
     lookupSyncCallback: noop,
+    lookupSyncAction: noop,
     registerComponentApi: noop,
     renderChild: noop,
     statePartChanged: noop,

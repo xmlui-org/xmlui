@@ -41,6 +41,7 @@ export function renderChild({
   appContext,
   lookupAction,
   lookupSyncCallback,
+  lookupSyncAction,
   registerComponentApi,
   renderChild,
   statePartChanged,
@@ -140,6 +141,7 @@ export function renderChild({
       appContext={appContext}
       lookupAction={lookupAction}
       lookupSyncCallback={lookupSyncCallback}
+      lookupSyncAction={lookupSyncAction}
       registerComponentApi={registerComponentApi}
       renderChild={renderChild}
       layoutContext={layoutContext}

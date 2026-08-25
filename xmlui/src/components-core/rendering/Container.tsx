@@ -277,23 +277,28 @@ export const Container = memo(
     // ========================================================================
     // Create event handler cache functions
 
-    const { getOrCreateEventHandlerFn, getOrCreateSyncCallbackFn, cleanup } =
-      createEventHandlerCache({
-        fnsRef,
-        runCodeAsync,
-        runCodeSync,
-        handlerLogger,
-      });
+    const {
+      getOrCreateEventHandlerFn,
+      getOrCreateSyncCallbackFn,
+      getOrCreateSyncEventHandlerFn,
+      cleanup,
+    } = createEventHandlerCache({
+      fnsRef,
+      runCodeAsync,
+      runCodeSync,
+      handlerLogger,
+    });
 
     // ========================================================================
     // ACTION AND CALLBACK LOOKUP
     // ========================================================================
     // Create action lookup functions
 
-    const { lookupAction, lookupSyncCallback } = createActionLookup({
+    const { lookupAction, lookupSyncCallback, lookupSyncAction } = createActionLookup({
       componentState,
       getOrCreateEventHandlerFn,
       getOrCreateSyncCallbackFn,
+      getOrCreateSyncEventHandlerFn,
     });
 
     // ========================================================================
@@ -345,6 +350,7 @@ export const Container = memo(
       appContext,
       lookupAction,
       lookupSyncCallback,
+      lookupSyncAction,
       registerComponentApi,
       statePartChanged,
       memoedVarsRef,
@@ -390,6 +396,7 @@ export const Container = memo(
         appContext,
         lookupAction,
         lookupSyncCallback,
+        lookupSyncAction,
         cleanup,
       });
     } finally {

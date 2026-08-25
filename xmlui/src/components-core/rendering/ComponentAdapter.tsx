@@ -190,6 +190,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     dispatch,
     lookupAction,
     lookupSyncCallback,
+    lookupSyncAction,
     renderChild,
     registerComponentApi,
     layoutContextRef,
@@ -705,9 +706,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       const hasLegacy = !!safeNode.events?.[legacyName];
       if (!hasCanonical && !hasLegacy) return null;
 
-      return memoedLookupEventHandler((hasCanonical ? phase : legacyName) as any);
+      const eventName = hasCanonical ? phase : legacyName;
+      if (phase === "unmount") {
+        return lookupSyncAction(safeNode.events?.[eventName], uid, { eventName });
+      }
+      return memoedLookupEventHandler(eventName as any);
     },
-    [memoedLookupEventHandler, safeNode.events],
+    [lookupSyncAction, memoedLookupEventHandler, safeNode.events, uid],
   );
 
   lifecycleHandlersRef.current = {
@@ -834,11 +839,17 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
           });
         }
       } catch (err) {
+        const reason =
+          phase === "unmount" &&
+          err instanceof Error &&
+          err.message.includes("Promises (async function calls)")
+            ? "async-onUnmount"
+            : "throw";
         reportLifecycleViolation(
           {
             componentUid: uidName,
             phase,
-            reason: "throw",
+            reason,
             error: err,
             componentType,
             componentLabel,

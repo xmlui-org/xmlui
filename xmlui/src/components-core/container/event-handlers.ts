@@ -845,21 +845,64 @@ export function createEventHandlers(config: EventHandlerConfig) {
   // ========================================================================
 
   const runCodeSync = useCallback(
-    (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
+    (
+      source: string | ParsedEventValue | ArrowExpression,
+      uid: symbol,
+      options: LookupActionOptions | undefined,
+      ...eventArgs: any[]
+    ) => {
+      void uid;
+      void options;
       // Ensure stateRef reflects the latest parent state before reading it.
       refreshStateRef();
+      let rawStatements: Statement[];
+      let parseCacheKey: string | undefined;
+      if (typeof source === "string") {
+        parseCacheKey = source;
+        if (!parsedStatementsRef.current[parseCacheKey]) {
+          parsedStatementsRef.current[parseCacheKey] = parseHandlerCode(source);
+        }
+        rawStatements = parsedStatementsRef.current[parseCacheKey]!;
+      } else if (isParsedEventValue(source)) {
+        parseCacheKey = source.parseId.toString();
+        if (!parsedStatementsRef.current[parseCacheKey]) {
+          parsedStatementsRef.current[parseCacheKey] = source.statements;
+        }
+        rawStatements = parsedStatementsRef.current[parseCacheKey]!;
+      } else {
+        rawStatements = [
+          {
+            type: T_ARROW_EXPRESSION_STATEMENT,
+            expr: source,
+          } as ArrowExpressionStatement,
+        ];
+      }
+
+      let changes: Array<any> = [];
       const evalContext: BindingTreeEvaluationContext = {
-        localContext: createCoWStateProxy({ ...stateRef.current }, () => {}),
         appContext,
         eventArgs,
+        localContext: createCoWStateProxy({ ...stateRef.current }, (changeInfo) => {
+          changes.push(changeInfo);
+        }),
+        onStatementCompleted: () => {
+          if (!changes.length) return;
+          changes.forEach((change) => {
+            statePartChanged(
+              change.pathArray,
+              cloneDeep(change.newValue),
+              change.target,
+              change.action,
+            );
+          });
+          changes = [];
+          evalContext.localContext = createCoWStateProxy({ ...stateRef.current }, (changeInfo) => {
+            changes.push(changeInfo);
+          });
+        },
       };
       try {
-        const arrowStmt = {
-          type: T_ARROW_EXPRESSION_STATEMENT,
-          expr: arrowExpression,
-        } as ArrowExpressionStatement;
-
-        processStatementQueue([arrowStmt], evalContext);
+        processStatementQueue(rawStatements, evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {
           return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
@@ -870,7 +913,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         throw e;
       }
     },
-    [appContext],
+    [appContext, parsedStatementsRef, statePartChanged],
   );
 
   return {
