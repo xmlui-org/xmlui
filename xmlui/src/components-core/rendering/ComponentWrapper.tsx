@@ -27,6 +27,7 @@ export const ComponentWrapper = memo(
       appContext,
       lookupAction,
       lookupSyncCallback,
+      lookupSyncAction,
       registerComponentApi,
       renderChild,
       statePartChanged,
@@ -179,6 +180,7 @@ export const ComponentWrapper = memo(
           appContext={appContext}
           lookupAction={lookupAction}
           lookupSyncCallback={lookupSyncCallback}
+          lookupSyncAction={lookupSyncAction}
           registerComponentApi={registerComponentApi}
           renderChild={renderChild}
           parentRenderContext={parentRenderContext}

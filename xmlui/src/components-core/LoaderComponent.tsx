@@ -7,6 +7,7 @@ import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type {
   LookupAsyncFn,
   LookupAsyncFnInner,
+  LookupSyncEventFnInner,
   LookupSyncFn,
   LookupSyncFnInner,
 } from "../abstractions/ActionDefs";
@@ -27,6 +28,7 @@ interface LoaderRendererContext {
   registerComponentApi: RegisterComponentApiFnInner;
   lookupAction: LookupAsyncFnInner;
   lookupSyncCallback: LookupSyncFnInner;
+  lookupSyncAction: LookupSyncEventFnInner;
   memoedVarsRef: MutableRefObject<MemoedVars>;
   appContext: AppContextObject;
   onUnmount: (uid: symbol) => void;
@@ -38,11 +40,13 @@ export function LoaderComponent({
   dispatch,
   lookupAction,
   lookupSyncCallback,
+  lookupSyncAction,
   registerComponentApi,
   onUnmount,
   appContext,
   memoedVarsRef,
 }: LoaderRendererContext) {
+  void lookupSyncAction;
   const componentRegistry = useComponentRegistry();
   const uid = useMemo(() => Symbol(node.uid), [node.uid]);
 

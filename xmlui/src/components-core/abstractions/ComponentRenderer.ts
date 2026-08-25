@@ -1,7 +1,11 @@
 import type { Dispatch, MutableRefObject, RefObject } from "react";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
-import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/ActionDefs";
+import type {
+  LookupAsyncFnInner,
+  LookupSyncEventFnInner,
+  LookupSyncFnInner,
+} from "../../abstractions/ActionDefs";
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
@@ -21,6 +25,9 @@ export interface InnerRendererContext<T extends ComponentMetadata = ComponentMet
 
   // The function to obtain a synchronous action handler
   lookupSyncCallback: LookupSyncFnInner;
+
+  // The function to obtain a synchronous event handler
+  lookupSyncAction: LookupSyncEventFnInner;
 
   // The function to obtain an async action handler
   lookupAction: LookupAsyncFnInner;

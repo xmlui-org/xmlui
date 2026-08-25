@@ -95,6 +95,7 @@ const createMockProps = (overrides?: Partial<Omit<InnerRendererContext, "layoutC
     dispatch,
     lookupAction: vi.fn().mockReturnValue(undefined),
     lookupSyncCallback: vi.fn().mockReturnValue(undefined),
+    lookupSyncAction: vi.fn().mockReturnValue(undefined),
     renderChild: vi.fn().mockReturnValue(null),
     registerComponentApi: vi.fn(),
     layoutContextRef,
@@ -284,7 +285,7 @@ describe("ComponentAdapter", () => {
 
   it("fires unmount once for when transition and not again on actual unmount", async () => {
     const unmountHandler = vi.fn();
-    const lookupAction = vi.fn((action) =>
+    const lookupSyncAction = vi.fn((action) =>
       action === "unmountAction" ? unmountHandler : undefined,
     );
     const visibleProps = createMockProps({
@@ -292,7 +293,7 @@ describe("ComponentAdapter", () => {
         when: true,
         events: { unmount: "unmountAction" },
       }),
-      lookupAction,
+      lookupSyncAction,
     });
 
     const { rerender, unmount } = render(<ComponentAdapter ref={null} {...(visibleProps as any)} />);
@@ -312,6 +313,36 @@ describe("ComponentAdapter", () => {
 
     unmount();
     expect(unmountHandler).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs unmount handlers through the sync lookup", async () => {
+    const unmountHandler = vi.fn();
+    const lookupAction = vi.fn();
+    const lookupSyncAction = vi.fn((action) =>
+      action === "unmountAction" ? unmountHandler : undefined,
+    );
+    const props = createMockProps({
+      node: createMockNode({
+        when: true,
+        events: { unmount: "unmountAction" },
+      }),
+      lookupAction,
+      lookupSyncAction,
+    });
+
+    const { unmount } = render(<ComponentAdapter ref={null} {...(props as any)} />);
+    unmount();
+
+    await waitFor(() => {
+      expect(unmountHandler).toHaveBeenCalledTimes(1);
+    });
+    expect(lookupSyncAction).toHaveBeenCalledWith(
+      "unmountAction",
+      expect.anything(),
+      expect.objectContaining({ eventName: "unmount" }),
+    );
+    expect(typeof (lookupSyncAction.mock.calls as any)[0][1]).toBe("symbol");
+    expect(lookupAction).not.toHaveBeenCalled();
   });
 
   // ========================================================================

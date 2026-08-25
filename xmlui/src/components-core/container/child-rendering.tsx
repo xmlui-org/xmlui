@@ -17,6 +17,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { RenderChildFn, LayoutContext } from "../../abstractions/RendererDefs";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { LookupSyncEventFnInner } from "../../abstractions/ActionDefs";
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import type { LookupAsyncFnInner } from "./action-lookup";
@@ -47,6 +48,8 @@ export interface ChildRendererConfig {
   lookupAction: LookupAsyncFnInner;
   // Function to lookup sync callbacks
   lookupSyncCallback: LookupSyncFnInner;
+  // Function to lookup sync event handlers
+  lookupSyncAction: LookupSyncEventFnInner;
   // Function to register component APIs
   registerComponentApi: RegisterComponentApiFnInner;
   // Callback when state part changes
@@ -69,6 +72,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
     appContext,
     lookupAction,
     lookupSyncCallback,
+    lookupSyncAction,
     registerComponentApi,
     statePartChanged,
     memoedVarsRef,
@@ -133,6 +137,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
           appContext: childAppContext,
           lookupAction,
           lookupSyncCallback,
+          lookupSyncAction,
           registerComponentApi,
           renderChild: childRenderChild,
           statePartChanged: statePartChanged,
@@ -191,6 +196,7 @@ export function createChildRenderer(config: ChildRendererConfig) {
       appContext,
       lookupAction,
       lookupSyncCallback,
+      lookupSyncAction,
       registerComponentApi,
       statePartChanged,
       memoedVarsRef,

@@ -3,6 +3,7 @@ import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ArrowExpression } from "../components-core/script-runner/ScriptingSourceTree";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
+import type { ParsedEventValue } from "./scripting/Compilation";
 import type {
   EventHandlerDirectiveWarning,
   EventHandlerExecutionMode,
@@ -85,6 +86,14 @@ export type LookupAsyncFn = (
 export type LookupSyncFnInner = (
   action: ArrowExpression | undefined,
   uid: symbol,
+) => SyncFunction | undefined;
+
+// This function resolves an event handler for synchronous execution. It is used
+// by lifecycle cleanup where React cannot await the async event pipeline.
+export type LookupSyncEventFnInner = (
+  action: string | ParsedEventValue | undefined | ArrowExpression,
+  uid: symbol,
+  actionOptions?: LookupActionOptions,
 ) => SyncFunction | undefined;
 
 // This function resolves a sync action by its name and returns the action

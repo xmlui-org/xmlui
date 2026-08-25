@@ -40,7 +40,12 @@ export interface EventHandlerCacheConfig {
     ...eventArgs: any[]
   ) => Promise<any>;
   // Handler for executing sync code
-  runCodeSync: (arrowExpression: ArrowExpression, ...eventArgs: any[]) => any;
+  runCodeSync: (
+    source: string | ParsedEventValue | ArrowExpression,
+    uid: symbol,
+    options: LookupActionOptions | undefined,
+    ...eventArgs: any[]
+  ) => any;
   // Handler logger for source info tracking
   handlerLogger: HandlerLoggerContext;
 }
@@ -139,13 +144,55 @@ export function createEventHandlerCache(config: EventHandlerCacheConfig) {
         fnsRef.current[uid] = fnsRef.current[uid] || {};
         fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
           return (...eventArgs: any[]) => {
-            return runCodeSync(arrowExpression, ...eventArgs);
+            return runCodeSync(arrowExpression, uid, undefined, ...eventArgs);
           };
         });
       }
       return fnsRef.current[uid][fnCacheKey](arrowExpression);
     },
     [runCodeSync],
+  );
+
+  const getOrCreateSyncEventHandlerFn = useEvent(
+    (
+      src: string | ParsedEventValue | ArrowExpression,
+      uid: symbol,
+      options?: LookupActionOptions,
+    ) => {
+      if (Array.isArray(src)) {
+        throw new Error("Multiple event handlers are not supported");
+      }
+
+      let fnCacheKey: string;
+      let handler: (...eventArgs: any[]) => any;
+
+      if (typeof src === "string") {
+        fnCacheKey = `sync-event;${options?.eventName};${src}`;
+      } else if (isParsedEventValue(src)) {
+        fnCacheKey = `sync-event;${options?.eventName};${src.parseId}`;
+      } else if (isArrowExpression(src)) {
+        fnCacheKey = `sync-event;${options?.eventName};${src.statement.nodeId}`;
+      } else if ((src as any).type) {
+        fnCacheKey = `sync-event;${options?.eventName};${JSON.stringify(src)}`;
+      } else {
+        throw new Error("Invalid event handler");
+      }
+
+      handler = (...eventArgs: any[]) => {
+        return runCodeSync(src, uid, options, ...cloneDeep(eventArgs));
+      };
+
+      if (options?.ephemeral || options?.context) {
+        return handler;
+      }
+
+      if (!fnsRef.current[uid]?.[fnCacheKey]) {
+        fnsRef.current[uid] = fnsRef.current[uid] || {};
+        fnsRef.current[uid][fnCacheKey] = handler;
+      }
+
+      return fnsRef.current[uid][fnCacheKey];
+    },
   );
 
   // ========================================================================
@@ -159,6 +206,7 @@ export function createEventHandlerCache(config: EventHandlerCacheConfig) {
   return {
     getOrCreateEventHandlerFn,
     getOrCreateSyncCallbackFn,
+    getOrCreateSyncEventHandlerFn,
     cleanup,
   };
 }

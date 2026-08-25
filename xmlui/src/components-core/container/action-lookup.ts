@@ -48,6 +48,11 @@ export interface ActionLookupConfig {
     arrowExpression: ArrowExpression,
     uid: symbol,
   ) => (...args: any[]) => any;
+  getOrCreateSyncEventHandlerFn: (
+    src: string | ParsedEventValue | ArrowExpression,
+    uid: symbol,
+    options?: LookupActionOptions,
+  ) => (...args: any[]) => any;
 }
 
 /**
@@ -68,7 +73,12 @@ function capitalizeFirstLetter(str: string): string {
  * Creates action lookup functions
  */
 export function createActionLookup(config: ActionLookupConfig) {
-  const { componentState, getOrCreateEventHandlerFn, getOrCreateSyncCallbackFn } = config;
+  const {
+    componentState,
+    getOrCreateEventHandlerFn,
+    getOrCreateSyncCallbackFn,
+    getOrCreateSyncEventHandlerFn,
+  } = config;
 
   // ========================================================================
   // SYNC CALLBACK LOOKUP
@@ -129,8 +139,40 @@ export function createActionLookup(config: ActionLookupConfig) {
     [componentState, getOrCreateEventHandlerFn],
   );
 
+  const lookupSyncAction = useCallback(
+    (
+      action: string | ParsedEventValue | undefined | ArrowExpression,
+      uid: symbol,
+      options?: LookupActionOptions,
+    ) => {
+      let safeAction = action;
+
+      if (!action && uid.description && options?.eventName) {
+        const handlerFnName = `${uid.description}_on${capitalizeFirstLetter(options?.eventName)}`;
+        if (
+          componentState[handlerFnName] &&
+          isArrowExpressionObject(componentState[handlerFnName])
+        ) {
+          safeAction = componentState[handlerFnName] as ArrowExpression;
+        }
+      }
+
+      if (!safeAction) {
+        return undefined;
+      }
+
+      if (typeof safeAction === "function") {
+        return safeAction;
+      }
+
+      return getOrCreateSyncEventHandlerFn(safeAction, uid, options);
+    },
+    [componentState, getOrCreateSyncEventHandlerFn],
+  );
+
   return {
     lookupAction,
     lookupSyncCallback,
+    lookupSyncAction,
   };
 }

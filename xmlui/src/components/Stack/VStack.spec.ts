@@ -40,4 +40,40 @@ test.describe("Basic Functionality", () => {
     const oi2Box = await page.getByTestId("vs-oi2").boundingBox();
     expect(oi2Box!.y).toBeGreaterThan(oi1Box!.y + oi1Box!.height - 1);
   });
+
+  test("runs synchronous onUnmount cleanup without async lifecycle violation", async ({
+    initTestBed,
+    page,
+  }) => {
+    const consoleErrors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        consoleErrors.push(message.text());
+      }
+    });
+
+    await initTestBed(`
+      <Fragment>
+        <VStack
+          testId="cleanup-target"
+          when="{testState !== 'hide'}"
+          onUnmount="window.__xmluiUnmountCleanup()">
+          <Text>Visible</Text>
+        </VStack>
+        <Button label="Hide" onClick="testState = 'hide'" />
+      </Fragment>
+    `);
+    await page.evaluate(() => {
+      (window as any).__xmluiUnmountCount = 0;
+      (window as any).__xmluiUnmountCleanup = () => {
+        (window as any).__xmluiUnmountCount += 1;
+      };
+    });
+
+    await expect(page.getByTestId("cleanup-target")).toBeVisible();
+    await page.getByRole("button", { name: "Hide" }).click();
+
+    await expect.poll(() => page.evaluate(() => (window as any).__xmluiUnmountCount ?? 0)).toBe(1);
+    expect(consoleErrors.some((error) => error.includes("async 'unmount' handler"))).toBe(false);
+  });
 });

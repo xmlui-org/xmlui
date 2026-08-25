@@ -14,6 +14,7 @@ import React, { Fragment, type MutableRefObject, type RefObject } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { LookupSyncEventFnInner } from "../../abstractions/ActionDefs";
 import type { MemoedVars, ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import type { LookupAsyncFnInner } from "../container/action-lookup";
 import type { LookupSyncFnInner } from "../container/action-lookup";
@@ -45,6 +46,8 @@ export interface LoaderRenderContext {
   lookupAction: LookupAsyncFnInner;
   /** Function to lookup sync callback handlers */
   lookupSyncCallback: LookupSyncFnInner;
+  /** Function to lookup sync event handlers */
+  lookupSyncAction: LookupSyncEventFnInner;
   /** Function to cleanup component resources */
   cleanup: ComponentCleanupFn;
   /** Reference to memoized variables */
@@ -72,6 +75,7 @@ export function renderLoaders({
   registerComponentApi,
   lookupAction,
   lookupSyncCallback,
+  lookupSyncAction,
   cleanup,
   memoedVarsRef,
 }: LoaderRenderContext) {
@@ -101,6 +105,7 @@ export function renderLoaders({
       registerComponentApi,
       lookupAction,
       lookupSyncCallback,
+      lookupSyncAction,
       memoedVarsRef,
       cleanup,
     });
@@ -131,6 +136,7 @@ function renderLoader({
   registerComponentApi,
   lookupAction,
   lookupSyncCallback,
+  lookupSyncAction,
   cleanup,
   memoedVarsRef,
 }: {
@@ -141,6 +147,7 @@ function renderLoader({
   registerComponentApi: RegisterComponentApiFnInner;
   lookupAction: LookupAsyncFnInner;
   lookupSyncCallback: LookupSyncFnInner;
+  lookupSyncAction: LookupSyncEventFnInner;
   cleanup: ComponentCleanupFn;
   memoedVarsRef: MutableRefObject<MemoedVars>;
 }) {
@@ -165,6 +172,7 @@ function renderLoader({
       registerComponentApi={registerComponentApi}
       lookupAction={lookupAction}
       lookupSyncCallback={lookupSyncCallback}
+      lookupSyncAction={lookupSyncAction}
       memoedVarsRef={memoedVarsRef}
       appContext={appContext}
     />
