@@ -27,6 +27,7 @@ export interface ContainerAction {
     value?: any;
     byId?: any;
     inProgress?: any;
+    resetCancellation?: any;
     isRefetching?: any;
     loaded?: any;
     pageInfo?: any;

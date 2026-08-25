@@ -17,7 +17,6 @@ import * as fs from "fs/promises";
 import path from "node:path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
-import { getOptimizerMetadata } from "../components-core/optimization/metadataLookup";
 import { coreComponentMetadata } from "../components-core/coreComponentMetadata";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import { analyze } from "../components-core/analyzer/walker";
@@ -37,7 +36,7 @@ import type {
   CompoundComponentDef,
   OptimizerMetadataView,
 } from "../abstractions/ComponentDefs";
-import { metadataRegistry } from "../language-server/metadataRegistry";
+import { generatedMetadataRegistry } from "../language-server/generatedMetadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 import { createDebugSourceUrl } from "../components-core/script-compiler/source";
 import type {
@@ -374,6 +373,14 @@ function collectCompiledArtifacts(value: unknown, artifacts: CompiledScriptArtif
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
 const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
 const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
+const generatedOptimizerMetadataLookup = (
+  type: string,
+): OptimizerMetadataView | undefined => {
+  if (type in coreComponentMetadata) {
+    return coreComponentMetadata[type];
+  }
+  return generatedMetadataRegistry[type];
+};
 
 /**
  * Transform XMLUI files to JS objects.
@@ -390,7 +397,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   const typeContractMode: AnalyzeMode = pluginOptions.typeContracts ?? "warn";
   const typeContractRegistry =
     pluginOptions.typeContractRegistry ??
-    new Map(Object.entries(metadataRegistry) as [string, ComponentMetadata][]);
+    new Map(Object.entries(generatedMetadataRegistry) as [string, ComponentMetadata][]);
   // Dedupe cycle reports across multiple transform calls / HMR within a
   // single dev-server lifetime, so the same cycle is not warned twice.
   const reportedCycles = new Set<string>();
@@ -464,10 +471,10 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   };
 
   // Build optimizer metadata lookup for extension packages.
-  // When optimizerSourceDirs are provided, scan them and merge with the built-in
-  // collectedComponentMetadata. Pass undefined when no extension dirs exist, letting
-  // xmlUiMarkupToComponent use its default (also collectedComponentMetadata-based).
-  let extensionMetadataLookup: ((type: string) => OptimizerMetadataView | undefined) | undefined;
+  // Build-time transforms use the generated metadata snapshot explicitly; the
+  // browser runtime uses the live registry populated by collectedComponentMetadata.
+  let optimizerMetadataLookup: (type: string) => OptimizerMetadataView | undefined =
+    generatedOptimizerMetadataLookup;
   if (pluginOptions.optimizerSourceDirs && pluginOptions.optimizerSourceDirs.length > 0) {
     const extensionMetadata: Record<string, OptimizerMetadataView> = {};
     for (const dir of pluginOptions.optimizerSourceDirs) {
@@ -496,7 +503,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // (extensionMetadata is checked before getOptimizerMetadata). Warn explicitly so
         // a typo like declaring `List` in an extension doesn't quietly override
         // the built-in metadata that real XMLUI markup depends on.
-        if (key in coreComponentMetadata || key in (metadataRegistry as object)) {
+        if (key in coreComponentMetadata || key in (generatedMetadataRegistry as object)) {
           console.warn(
             `[xmlui] optimizerSourceDirs: extension component "${key}" shadows a built-in; the built-in optimizer metadata will be ignored.`,
           );
@@ -505,8 +512,8 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       Object.assign(extensionMetadata, incoming);
     }
     // Merged lookup: extension packages first, then built-in components (including DataLoader).
-    extensionMetadataLookup = (type: string) =>
-      extensionMetadata[type] ?? getOptimizerMetadata(type);
+    optimizerMetadataLookup = (type: string) =>
+      extensionMetadata[type] ?? generatedOptimizerMetadataLookup(type);
   }
 
   async function resolveInlineComponentCodeBehind(
@@ -616,7 +623,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           logCompiledEventHandlerSource: pluginOptions.logCompiledEventHandlerSource,
         };
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
-          xmlUiMarkupToComponent(code, fileId, codeBehind, extensionMetadataLookup, parserOptions);
+          xmlUiMarkupToComponent(code, fileId, codeBehind, optimizerMetadataLookup, parserOptions);
         if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
           await resolveInlineComponentCodeBehind(inlineComponents, normalizedId);
         }

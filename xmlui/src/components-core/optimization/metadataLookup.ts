@@ -1,16 +1,10 @@
 /**
  * Unified optimizer metadata lookup used by the browser runtime and tests.
  *
- * Reads from `metadataRegistry` — the single live registry backed by the
- * generated snapshot and populated at module-load time by
- * `components/collectedComponentMetadata.ts`. Node-safe: this module no longer
- * imports the `.tsx` barrel; tests that mutate `collectedComponentMetadata.X`
- * are mutating `metadataRegistry.X` directly (same object reference), so
- * mutations are observable here as before.
- *
- * `defaultMetadataLookup` in `xmlui-parser.ts` is now a re-export alias of
- * this function — both read from the same registry, resolving the
- * two-function split described in issue #13 of the optimizer-metadata review.
+ * Reads from the live browser-safe metadata registry populated at module-load
+ * time by `components/collectedComponentMetadata.ts`. Build-time Node paths
+ * that need the generated language-server snapshot pass an explicit lookup
+ * into `xmlUiMarkupToComponent` instead of using this browser default.
  */
 import { metadataRegistry } from "../../language-server/metadataRegistry";
 import { coreComponentMetadata } from "../coreComponentMetadata";

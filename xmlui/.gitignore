@@ -30,3 +30,4 @@ scripts/generate-docs/**/*metadata.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.benchmark-results/
