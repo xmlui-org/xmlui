@@ -1269,11 +1269,21 @@ export const ListNative = memo(
     const lastVisibleRange = useRef<{ startIndex: number; endIndex: number } | null>(null);
     const computeVisibleRange = useCallback(() => {
       const v = virtualizerRef.current;
-      if (!v || !rows.length) return null;
+      if (!v || !rows.length || v.viewportSize <= 0) return null;
       const startIndex = v.findItemIndex(v.scrollOffset);
       const endIndex = Math.min(v.findItemIndex(v.scrollOffset + v.viewportSize), rows.length - 1);
       return { startIndex, endIndex };
     }, [rows.length]);
+    const isVisibleRangeMeasured = useCallback((range: { startIndex: number }) => {
+      const v = virtualizerRef.current;
+      const item = parentRef.current?.querySelector(
+        `[data-list-item-type][data-index="${range.startIndex}"]`,
+      ) as HTMLElement | null;
+      if (!v || !item) return false;
+      const itemHeight = item.getBoundingClientRect().height;
+      if (itemHeight <= 0) return false;
+      return Math.abs(v.getItemSize(range.startIndex) - itemHeight) <= 1;
+    }, []);
     const reportVisibleRange = useCallback(() => {
       const range = computeVisibleRange();
       if (!range) return;
@@ -1288,9 +1298,30 @@ export const ListNative = memo(
       // Initial range and content-growth shifts (appends move the range even
       // without a scroll). rAF lets virtua finish its measure/layout pass.
       if (!rows.length) return;
-      const raf = requestAnimationFrame(reportVisibleRange);
-      return () => cancelAnimationFrame(raf);
-    }, [rows, reportVisibleRange]);
+      let raf: number | undefined;
+      let attempts = 0;
+      let previousRange: { startIndex: number; endIndex: number } | null = null;
+      const reportWhenMeasured = () => {
+        const range = computeVisibleRange();
+        const stable =
+          range &&
+          previousRange?.startIndex === range.startIndex &&
+          previousRange.endIndex === range.endIndex;
+        if ((range && stable && isVisibleRangeMeasured(range)) || attempts >= 12) {
+          reportVisibleRange();
+          return;
+        }
+        previousRange = range;
+        attempts++;
+        raf = requestAnimationFrame(reportWhenMeasured);
+      };
+      raf = requestAnimationFrame(reportWhenMeasured);
+      return () => {
+        if (raf !== undefined) {
+          cancelAnimationFrame(raf);
+        }
+      };
+    }, [computeVisibleRange, isVisibleRangeMeasured, rows, reportVisibleRange]);
 
     const lastScrollOffset = useRef(0);
     const handleVirtuaScroll = useCallback(

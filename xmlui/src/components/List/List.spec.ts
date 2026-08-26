@@ -1461,6 +1461,64 @@ test("pageInfo enables pagination", async ({ initTestBed, createListDriver }) =>
 // =============================================================================
 
 test.describe("Virtualization", () => {
+  test("reports the initially visible range after measuring the viewport", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.itemCount="{0}"
+        var.range="{{ startIndex: -1, endIndex: -1 }}">
+        <Text
+          testId="range"
+          variant="strong"
+          value="{range.startIndex < 0
+            ? 'No items'
+            : (range.startIndex + 1) + '-' + (range.endIndex + 1) + ' of ' + itemCount}" />
+        <List
+          id="list"
+          height="*"
+          onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+          onVisibleRangeDidChange="(r) => {
+            range = r;
+            itemCount = list.getItemCount();
+            testState = { eventRange: r, apiRange: list.getVisibleRange() }
+          }"
+          data="{Array.from({ length: 1000 }, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            category: i % 2 === 0 ? 'Even' : 'Odd',
+          }))}"
+          testId="list">
+          <Text value="{$item.name + ' - ' + $item.category}" />
+        </List>
+      </App>
+    `);
+
+    const list = page.getByTestId("list");
+    const range = page.getByTestId("range");
+    await expect(list).toBeVisible();
+    await expect(range).toHaveText(/1-\d+ of 1000/);
+
+    const visibleItemCount = await list.evaluate((el) => {
+      const viewport = el.getBoundingClientRect();
+      const items = Array.from(el.querySelectorAll("[data-list-item-type]"));
+      return items.filter((item) => {
+        const rect = item.getBoundingClientRect();
+        return rect.bottom > viewport.top && rect.top < viewport.bottom;
+      }).length;
+    });
+
+    const reportedEnd = Number((await range.textContent())?.match(/^1-(\d+) of 1000$/)?.[1]);
+    expect(reportedEnd).toBeGreaterThan(1);
+    expect(reportedEnd).toBeLessThanOrEqual(visibleItemCount);
+    await expect.poll(testStateDriver.testState).toEqual({
+      eventRange: { startIndex: 0, endIndex: reportedEnd - 1 },
+      apiRange: { startIndex: 0, endIndex: reportedEnd - 1 },
+    });
+  });
+
   test("only renders visible items when height is constrained with large dataset", async ({
     initTestBed,
     createListDriver,

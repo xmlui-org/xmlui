@@ -5349,6 +5349,67 @@ test.describe("Virtualization", () => {
     await expect(range).toHaveText(/(1[5-9]\d|2[0-5]\d)-\d+ of 1000/);
   });
 
+  test("reports the initially visible range after measuring custom row heights", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App
+        scrollWholePage="false"
+        var.itemCount="{0}"
+        var.range="{{ startIndex: -1, endIndex: -1 }}">
+        <Text
+          testId="range"
+          variant="strong"
+          value="{range.startIndex < 0
+            ? 'No rows'
+            : (range.startIndex + 1) + '-' + (range.endIndex + 1) + ' of ' + itemCount}" />
+        <Table
+          id="table"
+          height="*"
+          onScroll="(e) => { range = e.visibleRange; itemCount = e.itemCount }"
+          onVisibleRangeDidChange="(r) => {
+            range = r;
+            itemCount = table.getItemCount();
+            testState = { eventRange: r, apiRange: table.getVisibleRange() }
+          }"
+          data="{Array.from({ length: 1000 }, (_, i) => ({
+            id: i + 1,
+            name: 'Item ' + (i + 1),
+            quantity: (i % 25) + 1,
+          }))}"
+          testId="table">
+          <Column bindTo="id" width="90px" />
+          <Column bindTo="name" />
+          <Column bindTo="quantity">
+            <Text height="50px">{$cell}</Text>
+          </Column>
+        </Table>
+      </App>
+    `);
+
+    const table = page.getByTestId("table");
+    const range = page.getByTestId("range");
+    await expect(table).toBeVisible();
+    await expect(range).toHaveText(/1-\d+ of 1000/);
+
+    const visibleRowCount = await table.evaluate((el) => {
+      const viewport = el.getBoundingClientRect();
+      const rows = Array.from(el.querySelectorAll("tbody tr"));
+      return rows.filter((row) => {
+        const rect = row.getBoundingClientRect();
+        return rect.bottom > viewport.top && rect.top < viewport.bottom;
+      }).length;
+    });
+
+    const reportedEnd = Number((await range.textContent())?.match(/^1-(\d+) of 1000$/)?.[1]);
+    expect(reportedEnd).toBe(visibleRowCount);
+    await expect.poll(testStateDriver.testState).toEqual({
+      eventRange: { startIndex: 0, endIndex: visibleRowCount - 1 },
+      apiRange: { startIndex: 0, endIndex: visibleRowCount - 1 },
+    });
+  });
+
   test("API reports item count and visible range", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <App scrollWholePage="false">
