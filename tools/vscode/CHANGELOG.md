@@ -1,5 +1,26 @@
 # xmlui-vscode
 
+## 0.14.20
+
+### Patch Changes
+
+- Updated dependencies [af34198]
+- Updated dependencies [af34198]
+- Updated dependencies [af34198]
+- Updated dependencies [ab5d9ec]
+- Updated dependencies [af34198]
+- Updated dependencies [67befd0]
+- Updated dependencies [af34198]
+- Updated dependencies [af34198]
+- Updated dependencies [af34198]
+- Updated dependencies [3d75cc6]
+- Updated dependencies [db1ada0]
+- Updated dependencies [db1ada0]
+- Updated dependencies [a52ee13]
+- Updated dependencies [a9e907d]
+- Updated dependencies [af34198]
+  - xmlui@0.14.20
+
 ## 0.14.19
 
 ### Patch Changes

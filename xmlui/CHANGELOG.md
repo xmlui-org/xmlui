@@ -1,5 +1,25 @@
 # xmlui
 
+## 0.14.20
+
+### Patch Changes
+
+- af34198: Add cancellable data operations with `cancel()` APIs and `onCancel` events for DataSource and APICall, plus abort-aware upload and download actions.
+- af34198: Fix generated theme variable docs so prefixed metadata does not duplicate rows and variable names remain searchable as contiguous link text.
+- af34198: Document `xmluiConfig.compileScripts` and related compiled-script settings.
+- ab5d9ec: Fix APICall confirmation props so dialogs are shown only when the resolved values are truthy.
+- af34198: Fix Items row reuse so pushed replacement data with new item identities remounts item templates instead of preserving stale row-local state.
+- 67befd0: Fix synchronous non-container onUnmount handlers so they run without false async lifecycle violations.
+- af34198: Fix Table and List visible range reporting on initial render so virtualization measurements settle before publishing the range.
+- af34198: Document List scroll API behavior with outside scroll containers.
+- af34198: Add a fitContentWidth option to NavGroup for sizing to the widest child with a theme-controlled maximum width.
+- 3d75cc6: Reduce the default standalone bundle size by minifying injected CSS, omitting standalone sourcemaps by default, skipping standalone declaration generation, and avoiding the generated metadata snapshot in the browser runtime bundle. The standalone build also emits `.gz` and `.br` runtime files for static servers that support precompressed asset negotiation.
+- db1ada0: Add an opt-in `highlightHoveredColumn` prop to Table. When set to `true`, hovering a cell tints its entire column with the `backgroundColor-column-Table--hover` theme variable, using a CSS custom property written directly to the table root on cell hover so a horizontal traverse costs a style write rather than a re-render per cell. The default is `false`: no cell hover handlers are attached and the rendered output is unchanged. Where the hovered row and hovered column intersect, the row highlight wins; pinned columns keep their existing hover background instead of the column tint.
+- db1ada0: Add a `rowClick` event to Table, fired when a table row is clicked. It reports the click without replacing or suppressing selection — pair it with `rowsSelectable` deliberately, and prefer `selectionDidChange` when what you actually care about is the selection. It does not fire for clicks on the selection checkbox or on an interactive control inside a cell.
+- a52ee13: Add `rowEnter` and `rowLeave` events to Table, so an app can react to the row hover it already displays — linking a table to a detail panel, chart, or map. Handlers attach only when the event is bound, so unbound tables are unchanged.
+- a9e907d: Fix Table star-sized columns flashing at their fallback width when dynamically loaded data creates inferred columns.
+- af34198: Add a Tree API method for selecting nodes by their current visible row index.
+
 ## 0.14.19
 
 ### Patch Changes
