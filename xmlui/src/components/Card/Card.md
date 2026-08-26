@@ -1,4 +1,4 @@
-%-desc-START
+%-DESC-START
 
 **Key features:**
 - **Pre-styled elements**: Built-in support for `title`, `subtitle`, and `avatarUrl` properties

@@ -1,4 +1,4 @@
-%-desc-START
+%-DESC-START
 
 **When to use.** `StickyBox` fits app- and page-level chrome whose scroll
 container is the page itself — a persistent navigation bar, or a "Save changes"

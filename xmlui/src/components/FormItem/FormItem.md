@@ -460,8 +460,6 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 %-PROP-END
 
-%-PROP-END
-
 %-EVENT-START validate
 
 In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
