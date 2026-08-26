@@ -8,6 +8,7 @@ import {
   useState,
   useRef,
 } from "react";
+import { flushSync } from "react-dom";
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
@@ -64,6 +65,10 @@ interface TreeRowProps {
   data: RowContext;
   isSelected: boolean;
   isFocused: boolean;
+}
+
+interface SelectionUpdateOptions {
+  syncVisualUpdate?: boolean;
 }
 
 const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
@@ -726,6 +731,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   const [internalSelectedId, setInternalSelectedId] = useState<string | number | undefined>(() => {
     return !onSelectionChanged && selectedValue ? selectedValue : undefined;
   });
+  const [optimisticSelectedId, setOptimisticSelectedId] = useState<
+    { value: string | number | undefined } | undefined
+  >(undefined);
 
   // Internal data state for API methods that modify the tree structure
   const [internalData, setInternalData] = useState<any>(undefined);
@@ -865,11 +873,35 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Determine if we're in controlled mode (has onSelectionChanged handler) or uncontrolled mode
   const isControlledMode = !!onSelectionChanged;
+  const isExternallyControlledSelection = isControlledMode && mappedSelectedId !== undefined;
 
   // Use mapped selectedValue/selectedId if in controlled mode and provided,
   // otherwise use internal state (uncontrolled mode or controlled mode without selectedValue)
-  const effectiveSelectedId =
-    isControlledMode && mappedSelectedId !== undefined ? mappedSelectedId : internalSelectedId;
+  const effectiveSelectedId = isExternallyControlledSelection
+    ? optimisticSelectedId
+      ? optimisticSelectedId.value
+      : mappedSelectedId
+    : internalSelectedId;
+
+  useEffect(() => {
+    if (!optimisticSelectedId) {
+      return;
+    }
+    if (!isExternallyControlledSelection) {
+      setOptimisticSelectedId(undefined);
+      return;
+    }
+
+    const optimisticValue = optimisticSelectedId.value;
+    const controlledValueMatches =
+      optimisticValue === undefined || optimisticValue === null
+        ? mappedSelectedId === undefined || mappedSelectedId === null
+        : String(mappedSelectedId) === String(optimisticValue);
+
+    if (controlledValueMatches) {
+      setOptimisticSelectedId(undefined);
+    }
+  }, [isExternallyControlledSelection, mappedSelectedId, optimisticSelectedId]);
 
   // Initialize expanded IDs based on defaultExpanded and initialTreeState props.
   const [expandedIds, setExpandedIds] = useState<(string | number)[]>(() =>
@@ -1022,7 +1054,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
    * @param nodeId - The node key (source ID) to select, or undefined to clear selection
    */
   const setSelectedNodeById = useCallback(
-    (nodeId: string | number | undefined) => {
+    (nodeId: string | number | undefined, options: SelectionUpdateOptions = {}) => {
       // Find the node if nodeId is provided
       const node = nodeId
         ? Object.values(treeItemsById).find((n) => String(n.key) === String(nodeId))
@@ -1033,15 +1065,26 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Get previous selection for event
       const previousNode = effectiveSelectedId ? findNodeById(effectiveSelectedId) : null;
 
-      // Always update internal state (this provides visual feedback)
-      setInternalSelectedId(nodeKey);
-
-      // Update focused index to match the selected item
-      if (nodeKey) {
-        const nodeIndex = flatTreeData.findIndex((item) => String(item.key) === String(nodeKey));
-        if (nodeIndex >= 0) {
-          setFocusedIndex(nodeIndex);
+      const applySelectionState = () => {
+        // Always update internal state (this provides visual feedback)
+        setInternalSelectedId(nodeKey);
+        if (isExternallyControlledSelection) {
+          setOptimisticSelectedId({ value: nodeKey });
         }
+
+        // Update focused index to match the selected item
+        if (nodeKey) {
+          const nodeIndex = flatTreeData.findIndex((item) => String(item.key) === String(nodeKey));
+          if (nodeIndex >= 0) {
+            setFocusedIndex(nodeIndex);
+          }
+        }
+      };
+
+      if (options.syncVisualUpdate) {
+        flushSync(applySelectionState);
+      } else {
+        applySelectionState();
       }
 
       // Fire selection event if handler is provided
@@ -1055,10 +1098,24 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             } as FlatTreeNode)
           : null;
 
-        onSelectionChanged({
-          previousNode,
-          newNode,
-        });
+        const clearOptimisticSelection = () => {
+          if (isExternallyControlledSelection) {
+            setOptimisticSelectedId(undefined);
+          }
+        };
+
+        try {
+          const result = onSelectionChanged({
+            previousNode,
+            newNode,
+          });
+          if (isExternallyControlledSelection) {
+            void Promise.resolve(result).finally(clearOptimisticSelection);
+          }
+        } catch (error) {
+          clearOptimisticSelection();
+          throw error;
+        }
       }
 
       // Emit selection:change trace event
@@ -1080,7 +1137,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       flatTreeData,
       expandedIds,
       onSelectionChanged,
-      internalSelectedId,
+      isExternallyControlledSelection,
     ],
   );
 
@@ -2258,7 +2315,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           if (currentIndex >= 0) {
             // Handle selection
             if (currentNode!.selectable) {
-              setSelectedNodeById(currentNode!.key);
+              setSelectedNodeById(currentNode!.key, { syncVisualUpdate: true });
               // Ensure focus stays on the current item after selection
               newIndex = currentIndex;
             }
@@ -2296,7 +2353,8 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       itemRenderer,
       itemClickExpands,
       onItemClick,
-      onSelection: (node: FlatTreeNode) => setSelectedNodeById(node.key),
+      onSelection: (node: FlatTreeNode) =>
+        setSelectedNodeById(node.key, { syncVisualUpdate: true }),
       lookupEventHandler,
       onKeyDown: handleKeyDown,
       treeContainerRef,

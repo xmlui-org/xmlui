@@ -2238,6 +2238,93 @@ test.describe("Basic Functionality", () => {
 
 test.describe("Events", () => {
   test.describe("selectionDidChange Event", () => {
+    test("marks a controlled selected node before selectionDidChange refreshes sibling content", async ({
+      initTestBed,
+      createTreeDriver,
+      page,
+    }) => {
+      await initTestBed(`
+        <Fragment var.selectedId="{2}" var.details="{[{ id: 'initial', name: 'Initial details' }]}">
+          <HStack height="400px">
+            <Tree testId="tree"
+              dataFormat="flat"
+              defaultExpanded="all"
+              selectedValue="{selectedId}"
+              data='{${JSON.stringify(flatTreeData)}}'
+              onSelectionDidChange="
+                event => {
+                  details = [{ id: event.newNode.id, name: 'Details ' + event.newNode.id }];
+                  delay(50);
+                  selectedId = event.newNode.id;
+                }
+              ">
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+            <List testId="details" data="{details}">
+              <Text testId="detail:{$item.id}">{$item.name}</Text>
+            </List>
+          </HStack>
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const rowWrapper = tree.getNodeWrapperByTestId("1");
+      const details = page.getByTestId("details");
+      await expect(rowWrapper).toBeVisible();
+      await expect(details).toContainText("Initial details");
+
+      await rowWrapper.evaluate((row) => {
+        (window as any).__treeSelectionOrder = [];
+        const detailsEl = document.querySelector('[data-testid="details"]');
+        const record = (entry: string) => {
+          const order = (window as any).__treeSelectionOrder;
+          if (!order.includes(entry)) {
+            order.push(entry);
+          }
+        };
+        const observer = new MutationObserver((records) => {
+          for (const mutation of records) {
+            if (
+              mutation.target === row &&
+              (mutation.attributeName === "class" || mutation.attributeName === "aria-selected") &&
+              (row.className.includes("selected") || row.getAttribute("aria-selected") === "true")
+            ) {
+              record("tree-selected");
+            }
+            if (
+              detailsEl &&
+              (mutation.target === detailsEl || detailsEl.contains(mutation.target)) &&
+              detailsEl.textContent?.includes("Details 1")
+            ) {
+              record("details-refreshed");
+            }
+          }
+        });
+        observer.observe(document.body, {
+          attributes: true,
+          childList: true,
+          characterData: true,
+          subtree: true,
+        });
+        (window as any).__treeSelectionObserver = observer;
+      });
+
+      await tree.getByTestId("1").click();
+
+      await expect(rowWrapper).toHaveClass(/selected/);
+      await expect(details).toContainText("Details 1");
+
+      const order = await page.evaluate(() => {
+        (window as any).__treeSelectionObserver?.disconnect();
+        return (window as any).__treeSelectionOrder;
+      });
+      expect(order).toEqual(["tree-selected", "details-refreshed"]);
+    });
+
     test("fires when user clicks on a selectable node", async ({
       initTestBed,
       createTreeDriver,
