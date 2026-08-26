@@ -18189,6 +18189,11 @@ export default {
         "description": "When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "highlightHoveredColumn": {
+        "description": "When set to `true`, hovering a table cell tints its entire column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the rendered output is unchanged. Where the hovered row and the hovered column intersect, the row highlight wins. Pinned columns keep their own hover background instead of the column tint.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "events": {
@@ -18224,6 +18229,13 @@ export default {
       "rowDoubleClick": {
         "description": "This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.",
         "signature": "rowDoubleClick(item: any): void",
+        "parameters": {
+          "item": "The clicked table row item."
+        }
+      },
+      "rowClick": {
+        "description": "This event is fired when the user clicks a table row. The handler receives the clicked row item as its only argument. It reports the click without replacing or suppressing selection — pair it with `rowsSelectable` deliberately, and prefer `selectionDidChange` when what you actually care about is the selection. The event does not fire for clicks on the selection checkbox or on an interactive control (such as a button) inside a cell.",
+        "signature": "rowClick(item: any): void",
         "parameters": {
           "item": "The clicked table row item."
         }
@@ -18479,6 +18491,7 @@ export default {
       "borderBottom-last-row-Table": "var(--xmlui-borderBottom-last-row-Table)",
       "backgroundColor-pinnedCell-Table": "var(--xmlui-backgroundColor-pinnedCell-Table)",
       "backgroundColor-pinnedCell-Table--hover": "var(--xmlui-backgroundColor-pinnedCell-Table--hover)",
+      "backgroundColor-column-Table--hover": "var(--xmlui-backgroundColor-column-Table--hover)",
       "Input:borderColor-Checkbox--hover": "var(--xmlui-borderColor-Checkbox--hover)"
     },
     "defaultThemeVars": {
@@ -18516,7 +18529,8 @@ export default {
       "backgroundColor-pinnedCell-Table": "$color-surface-50",
       "backgroundColor-pinnedCell-Table--hover": "$backgroundColor-row-Table--hover",
       "backgroundColor-selectionCell-Table": "$backgroundColor-pinnedCell-Table",
-      "backgroundColor-selectionCell-Table--hover": "$backgroundColor-row-Table--hover"
+      "backgroundColor-selectionCell-Table--hover": "$backgroundColor-row-Table--hover",
+      "backgroundColor-column-Table--hover": "$color-surface-100"
     },
     "isImplicitContainerByDefault": true
   },
