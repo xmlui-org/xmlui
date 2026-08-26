@@ -500,6 +500,16 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.striped,
     },
+    highlightHoveredColumn: {
+      description:
+        `When set to \`true\`, hovering a table cell tints its entire column with the ` +
+        `[\`backgroundColor-column-${COMP}--hover\`](#backgroundcolor-column-table--hover) theme ` +
+        `variable. The default is \`false\`: no cell hover handlers are attached and the rendered ` +
+        `output is unchanged. Where the hovered row and the hovered column intersect, the row ` +
+        `highlight wins. Pinned columns keep their own hover background instead of the column tint.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.highlightHoveredColumn,
+    },
   },
   events: {
     contextMenu: {
@@ -532,6 +542,19 @@ export const TableMd = createMetadata({
     rowDoubleClick: {
       description: `This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.`,
       signature: "rowDoubleClick(item: any): void",
+      parameters: {
+        item: "The clicked table row item.",
+      },
+    },
+    rowClick: {
+      description:
+        `This event is fired when the user clicks a table row. The handler receives the ` +
+        `clicked row item as its only argument. It reports the click without replacing or ` +
+        `suppressing selection — pair it with \`rowsSelectable\` deliberately, and prefer ` +
+        `\`selectionDidChange\` when what you actually care about is the selection. The event ` +
+        `does not fire for clicks on the selection checkbox or on an interactive control ` +
+        `(such as a button) inside a cell.`,
+      signature: "rowClick(item: any): void",
       parameters: {
         item: "The clicked table row item.",
       },
@@ -785,6 +808,7 @@ export const TableMd = createMetadata({
     [`backgroundColor-pinnedCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
     [`backgroundColor-selectionCell-${COMP}`]: "$backgroundColor-pinnedCell-Table",
     [`backgroundColor-selectionCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
+    [`backgroundColor-column-${COMP}--hover`]: "$color-surface-100",
   },
 });
 
@@ -854,6 +878,9 @@ const TableWithColumns = memo(
       );
       const stableRowDoubleClick = useEvent((...args: any[]) =>
         lookupEventHandler("rowDoubleClick")?.(...args),
+      );
+      const stableRowClick = useEvent((...args: any[]) =>
+        lookupEventHandler("rowClick")?.(...args),
       );
       const stableRowEnter = useEvent((...args: any[]) =>
         lookupEventHandler("rowEnter")?.(...args),
@@ -1126,6 +1153,7 @@ const TableWithColumns = memo(
             onSelectionDidChange={stableSelectionDidChange}
             willSort={stableWillSort}
             rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+            rowClick={node.events?.rowClick ? stableRowClick : undefined}
             rowEnter={node.events?.rowEnter ? stableRowEnter : undefined}
             rowLeave={node.events?.rowLeave ? stableRowLeave : undefined}
             onScroll={node.events?.scroll ? stableScroll : undefined}
@@ -1187,6 +1215,9 @@ const TableWithColumns = memo(
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
             striped={extractValue.asOptionalBoolean(node.props.striped)}
+            highlightHoveredColumn={extractValue.asOptionalBoolean(
+              node.props.highlightHoveredColumn,
+            )}
           />
         </>
       );

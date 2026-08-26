@@ -1733,6 +1733,47 @@ You can use these accelerator key names:
 
 %-PROP-END
 
+%-PROP-START highlightHoveredColumn
+
+Column headers already highlight on hover, but by default hovering a cell in the table body only highlights its row — nothing marks which column you are in. On a wide table this makes it easy to lose track of which field you are reading as your eye travels down a column.
+
+Set `highlightHoveredColumn` to `true` to tint the entire hovered column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the table renders exactly as it does today.
+
+Where the hovered row and the hovered column intersect, the row highlight wins — the column tint never competes with or muddies the row's own hover color. Pinned columns keep their existing hover background instead of showing the column tint, since the pointer being elsewhere in the table should not change how a pinned column looks.
+
+```xmlui copy /highlightHoveredColumn="true"/
+<App>
+  <Table data='{[...]}' highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+Hover any cell to see its whole column tinted, and hover a row to see the row highlight take precedence where the two overlap:
+
+```xmlui-pg name="Example: highlightHoveredColumn"
+<App>
+  <Table
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces", category: "fruits" },
+      { id: 1, name: "Bananas", quantity: 6, unit: "pieces", category: "fruits" },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams", category: "vegetables" },
+      { id: 3, name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables" },
+      { id: 4, name: "Milk", quantity: 10, unit: "liter", category: "dairy" }
+    ]}'
+    highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+    <Column bindTo="category"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
 %-EVENT-START sortingDidChange
 
 Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
@@ -1991,6 +2032,23 @@ This event is triggered when a table row is double-clicked. The handler receives
 ```xmlui copy {4}
 <App>
   <Table data='{[...]}' onRowDoubleClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START rowClick
+
+This event is triggered when a table row is clicked. The handler receives the row's data item as its only argument.
+
+`rowClick` reports activation — it does not replace or suppress selection. Row click already runs a selection toggle when `rowsSelectable` is set, and `rowClick` fires alongside that without interfering with it: pair it with `rowsSelectable` deliberately, and prefer [`selectionDidChange`](#selectiondidchange) when what you actually care about is the selection rather than the click itself. `rowClick` does not fire for a click on the selection checkbox, nor for a click on an interactive control (such as a button) inside a cell.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowClick="(item) => console.log(item)">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
   </Table>
