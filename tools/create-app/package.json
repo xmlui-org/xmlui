@@ -30,6 +30,6 @@
     "node": ">=18.12.0"
   },
   "repository": {
-    "url": "https://github.com/xmlui-com/xmlui.git"
+    "url": "https://github.com/xmlui-org/xmlui.git"
   }
 }

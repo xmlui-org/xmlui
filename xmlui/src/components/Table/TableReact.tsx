@@ -2563,7 +2563,7 @@ export const Table = memo(
     const computeVisibleRange = useCallback(() => {
       const v = virtualizerRef.current;
       const rowCount = rowsRef.current.length;
-      if (!v || rowCount === 0) {
+      if (!v || rowCount === 0 || v.viewportSize <= 0) {
         return null;
       }
       const startIndex = v.findItemIndex(v.scrollOffset);
@@ -2585,9 +2585,24 @@ export const Table = memo(
 
     useEffect(() => {
       if (!rows.length) return;
-      const raf = requestAnimationFrame(reportVisibleRange);
-      return () => cancelAnimationFrame(raf);
-    }, [reportVisibleRange, rows]);
+      let raf: number | undefined;
+      let attempts = 0;
+      const reportWhenMeasured = () => {
+        const range = computeVisibleRange();
+        if (range || attempts >= 8) {
+          reportVisibleRange();
+          return;
+        }
+        attempts++;
+        raf = requestAnimationFrame(reportWhenMeasured);
+      };
+      raf = requestAnimationFrame(reportWhenMeasured);
+      return () => {
+        if (raf !== undefined) {
+          cancelAnimationFrame(raf);
+        }
+      };
+    }, [computeVisibleRange, reportVisibleRange, rows]);
 
     const lastScrollOffset = useRef(0);
     const handleVirtuaScroll = useCallback(
