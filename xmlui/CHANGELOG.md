@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.14.21
+
+### Patch Changes
+
+- ee40157: Fix Tree selection visual feedback so controlled selections are marked before selectionDidChange side effects render sibling content.
+
 ## 0.14.20
 
 ### Patch Changes
