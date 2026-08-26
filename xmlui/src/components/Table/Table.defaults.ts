@@ -51,4 +51,5 @@ export const defaultProps = {
   },
   alwaysShowHeader: false,
   striped: false,
+  highlightHoveredColumn: false,
 };

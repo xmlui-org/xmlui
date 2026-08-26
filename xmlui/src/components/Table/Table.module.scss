@@ -50,6 +50,7 @@ $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-Table");
 $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 $backgroundColor-pinnedCell-Table: createThemeVar("backgroundColor-pinnedCell-#{$component}");
 $backgroundColor-pinnedCell-Table--hover: createThemeVar("backgroundColor-pinnedCell-#{$component}--hover");
+$backgroundColor-column-Table--hover: createThemeVar("backgroundColor-column-#{$component}--hover");
 $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover");
 
 @layer components {
@@ -178,6 +179,31 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
   // last column is resized narrower than the table.
   .columnCell {
     border-bottom: $borderBottom-cell-Table;
+  }
+
+  // Column hover highlight (opt-in via highlightHoveredColumn, off by default).
+  // TableReact writes --xmlui-hovered-col-index to the table wrapper on cell
+  // mouseenter, outside React state; each non-pinned cell carries its own static
+  // --xmlui-col-index. Neither is written when the prop is off, so the diff below
+  // falls back to values far enough apart that the mix amount is always 0 and this
+  // rule paints nothing extra. This is a plain, low-specificity `.cell` rule on
+  // purpose: the existing row-hover and selected-row rules below already select
+  // `.cell` through a more specific ancestor chain (e.g. `.row:hover .cell`), so
+  // they already win over this rule at the intersection through specificity alone,
+  // and a pinned cell's own inline `background-color` (see getCommonPinningStyles)
+  // wins over any class rule regardless.
+  .cell {
+    --xmlui-col-diff: calc(var(--xmlui-hovered-col-index, -9999) - var(--xmlui-col-index, -8888));
+    --xmlui-col-diff-abs: max(var(--xmlui-col-diff), calc(var(--xmlui-col-diff) * -1));
+    // 1 when this cell's column is the hovered column, 0 otherwise (never
+    // fractional, since both indexes are integers), consumed as an alpha
+    // channel below rather than blended with color-mix() — a plain alpha on
+    // the theme color keeps the same underlying rgb() triplet regardless of
+    // match state, which matters for anyone reading the computed style.
+    --xmlui-col-hover-amount: clamp(0, calc(1 - var(--xmlui-col-diff-abs)), 1);
+    background-color: rgb(
+      from $backgroundColor-column-Table--hover r g b / var(--xmlui-col-hover-amount, 0)
+    );
   }
 
   .table {

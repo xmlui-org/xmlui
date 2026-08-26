@@ -451,6 +451,7 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  rowClick?: (item: any) => void;
   rowEnter?: (item: any) => void;
   rowLeave?: (item: any) => void;
   headerUserSelect?: string;
@@ -475,6 +476,7 @@ type TableProps = {
   onDeleteAction?: AsyncFunction;
   alwaysShowHeader?: boolean;
   striped?: boolean;
+  highlightHoveredColumn?: boolean;
 };
 
 type PendingDataRefresh = {
@@ -1183,6 +1185,7 @@ export const Table = memo(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      rowClick,
       rowEnter,
       rowLeave,
       headerUserSelect,
@@ -1200,6 +1203,7 @@ export const Table = memo(
       onDeleteAction,
       alwaysShowHeader = defaultProps.alwaysShowHeader,
       striped = defaultProps.striped,
+      highlightHoveredColumn = defaultProps.highlightHoveredColumn,
       ...rest
       // cols
     }: TableProps,
@@ -1993,6 +1997,7 @@ export const Table = memo(
       enableMultiRowSelection,
       lookupEventHandler,
       rowDoubleClick,
+      rowClick,
       rowEnter,
       rowLeave,
       striped,
@@ -2011,12 +2016,14 @@ export const Table = memo(
       cellVerticalAlign,
       localeProfile,
       localeRenderKey,
+      highlightHoveredColumn,
     });
     cellRenderStateRef.current = {
       effectiveUserSelectCell,
       cellVerticalAlign,
       localeProfile,
       localeRenderKey,
+      highlightHoveredColumn,
     };
 
     // TableMemoizedCells — analogous to TileGridMemoizedItem.
@@ -2045,6 +2052,7 @@ export const Table = memo(
             effectiveUserSelectCell: userSelectCell,
             cellVerticalAlign: vertAlign,
             localeProfile: currentLocaleProfile,
+            highlightHoveredColumn: columnHoverEnabled,
           } = cellRenderStateRef.current;
           return (
             <>
@@ -2138,6 +2146,17 @@ export const Table = memo(
                   </div>
                 );
                 const tooltipTemplate = tooltipRenderer?.(sourceRow, rowIndex, i, liveCellValue);
+                // Column hover highlight: opt-in, off by default. When enabled, a non-pinned
+                // cell's mouseenter writes the hovered column's positional index directly to a
+                // CSS custom property on the table wrapper (outside React state), so a
+                // horizontal traverse costs a style write rather than a per-cell re-render.
+                // Table.module.scss reads --xmlui-hovered-col-index against each cell's own
+                // static --xmlui-col-index and paints the tint via a color-mix() background,
+                // which the existing higher-specificity row-hover/selected rules already
+                // override at the intersection — no extra selector or !important needed.
+                // Pinned cells are excluded so they keep their own hover precedence.
+                const isPinnedColumn = !!cell.column.getIsPinned();
+                const columnHoverActive = columnHoverEnabled && !isPinnedColumn;
                 return (
                   <td
                     className={classnames(styles.cell, alignmentClass, columnClassName)}
@@ -2150,7 +2169,18 @@ export const Table = memo(
                         flexShrink: 0,
                         ...getCommonPinningStyles(cell.column),
                         ...styleWithoutWidth,
+                        ...(columnHoverActive ? { "--xmlui-col-index": i } : undefined),
                       } as React.CSSProperties
+                    }
+                    onMouseEnter={
+                      columnHoverActive
+                        ? () => {
+                            wrapperRef.current?.style.setProperty(
+                              "--xmlui-hovered-col-index",
+                              String(i),
+                            );
+                          }
+                        : undefined
                     }
                   >
                     {tooltipTemplate ? (
@@ -2217,9 +2247,6 @@ export const Table = memo(
                 if (event.detail >= 2) {
                   return;
                 }
-                if (!row.getCanSelect()) {
-                  return;
-                }
                 if (event?.defaultPrevented) {
                   return;
                 }
@@ -2235,23 +2262,44 @@ export const Table = memo(
                   return;
                 }
 
-                // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
-                wrapperRef.current?.focus();
-
                 const isSelectColumn =
                   target.closest("td")?.getAttribute("data-column-id") === "select";
 
-                if (isSelectColumn) {
-                  const rs = rowStateRef.current;
-                  if (!rs.enableMultiRowSelection && row.getIsSelected()) {
-                    rs.checkAllRows(false); // Deselect all (which is just this one row)
-                  } else {
-                    rs.toggleRow(row.original, { metaKey: true });
+                // Selection is gated on getCanSelect() (rowsSelectable + the unselectable
+                // predicate); rowClick below is not — it must fire even when the table isn't
+                // selectable at all, which is its main use case ("click a row to open it").
+                if (row.getCanSelect()) {
+                  // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
+                  wrapperRef.current?.focus();
+
+                  if (isSelectColumn) {
+                    const rs = rowStateRef.current;
+                    if (!rs.enableMultiRowSelection && row.getIsSelected()) {
+                      rs.checkAllRows(false); // Deselect all (which is just this one row)
+                    } else {
+                      rs.toggleRow(row.original, { metaKey: true });
+                    }
+                    return;
                   }
-                  return;
+
+                  rowStateRef.current.toggleRow(row.original, event);
                 }
 
-                rowStateRef.current.toggleRow(row.original, event);
+                // rowClick is additive: it reports the click without suppressing or replacing
+                // selection above, and it does not fire for clicks the code already treats as
+                // belonging to something else (the selection checkbox, or the input/button
+                // guards above).
+                if (isSelectColumn) {
+                  return;
+                }
+                const { rowClick } = rowStateRef.current;
+                if (rowClick && typeof rowClick === "function") {
+                  try {
+                    rowClick(row.original);
+                  } catch (e) {
+                    console.error("Error in rowClick handler:", e);
+                  }
+                }
               }}
               onDoubleClick={(event) => {
                 // Prevent browser text selection on double-click
@@ -2967,6 +3015,15 @@ export const Table = memo(
         onPointerDown={clearPreservedScrollPaddingEnd}
         onTouchStart={clearPreservedScrollPaddingEnd}
         onWheel={clearPreservedScrollPaddingEnd}
+        // Clears the column hover highlight when the pointer leaves the whole table rather
+        // than on each cell's mouseleave, so moving between adjacent cells does not flicker.
+        onMouseLeave={
+          highlightHoveredColumn
+            ? () => {
+                wrapperRef.current?.style.removeProperty("--xmlui-hovered-col-index");
+              }
+            : undefined
+        }
         onClick={(e) => {
           const target = e.target as HTMLElement;
 

@@ -7154,3 +7154,256 @@ test.describe("row hover events", () => {
     expect(handlers.onMouseLeave).toBe("undefined");
   });
 });
+
+// =============================================================================
+// ROW CLICK EVENT
+// =============================================================================
+
+test.describe("rowClick event", () => {
+  const DATA = `{[
+    { id: 0, name: "Apples", quantity: 5 },
+    { id: 1, name: "Bananas", quantity: 6 }
+  ]}`;
+
+  test("fires with the correct row item on a plain click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table data='${DATA}' onRowClick="(item) => testState = item.name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await page.getByRole("cell", { name: "Bananas" }).click();
+    await expect.poll(testStateDriver.testState).toEqual("Bananas");
+  });
+
+  // Row click already runs a selection toggle when the click lands on the selection
+  // checkbox; rowClick must not fire for that click, only report it.
+  test("does not fire when the click lands on the selection checkbox", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table
+        data='${DATA}'
+        rowsSelectable="true"
+        alwaysShowSelectionCheckboxes="true"
+        onRowClick="(item) => testState = item.name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    // nth(0) is the header select-all checkbox; nth(1) is the first data row's.
+    const firstCheckbox = page.locator("input[type='checkbox']").nth(1);
+    await firstCheckbox.click();
+
+    // The click did land on the row and toggled selection...
+    await expect(firstCheckbox).toBeChecked();
+    // ...but rowClick did not fire for it.
+    expect(await testStateDriver.testState()).toBeNull();
+  });
+
+  test("does not fire when the click lands on an interactive cell control", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table data='${DATA}' onRowClick="(item) => testState = item.name">
+        <Column bindTo="name">
+          <Button testId="{'button' + $itemIndex}" label="{$cell}" />
+        </Column>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await page.getByTestId("button0").click();
+    expect(await testStateDriver.testState()).toBeNull();
+  });
+
+  test("selection still toggles normally with the event bound", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table
+        data='${DATA}'
+        rowsSelectable="true"
+        toggleSelectionOnClick="true"
+        onRowClick="(item) => testState = item.name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const firstRow = page.locator("tbody tr").first();
+    await firstRow.click();
+
+    const firstCheckbox = page.locator("input[type='checkbox']").nth(1);
+    await expect(firstCheckbox).toBeChecked();
+    await expect.poll(testStateDriver.testState).toEqual("Apples");
+  });
+
+  // Unlike rowEnter/rowLeave (which attach onMouseEnter/onMouseLeave only when bound,
+  // since hover fires on every traverse of a virtualized list), the row's onClick handler
+  // is always attached for double-click detection and selection. What's conditional is
+  // whether it invokes a rowClick callback — verified here by confirming no handler runs
+  // when the event isn't bound.
+  test("no rowClick handler is invoked when the event is unbound", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table data='${DATA}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await page.getByRole("cell", { name: "Apples" }).click();
+    expect(await testStateDriver.testState()).toBeNull();
+  });
+});
+
+// =============================================================================
+// COLUMN HOVER HIGHLIGHT (highlightHoveredColumn)
+// =============================================================================
+
+test.describe("column hover highlight", () => {
+  const DATA = `{[
+    { id: 0, name: "Apples", quantity: 5 },
+    { id: 1, name: "Bananas", quantity: 6 }
+  ]}`;
+
+  // The column tint composites the theme color through a CSS alpha function
+  // (see Table.module.scss) — 0% alpha where the column is not the hovered
+  // one, 100% where it is — so a match can compute-serialize as either legacy
+  // `rgb(r, g, b)` or modern `color(srgb r g b [/ a])` depending on the
+  // browser, and a non-match keeps the same r/g/b channel values with alpha 0
+  // rather than switching to a different color. Parse either form into an
+  // [r, g, b, a] tuple (0-255 channels, 0-1 alpha) so the assertions below
+  // check the actual visible color, not one particular serialization of it.
+  async function backgroundRgba(locator: Locator): Promise<[number, number, number, number]> {
+    const raw = await locator.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const legacy = raw.match(
+      /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/,
+    );
+    if (legacy) {
+      return [
+        Number(legacy[1]),
+        Number(legacy[2]),
+        Number(legacy[3]),
+        legacy[4] !== undefined ? Number(legacy[4]) : 1,
+      ];
+    }
+    const modern = raw.match(
+      /^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)$/,
+    );
+    if (modern) {
+      return [
+        Math.round(Number(modern[1]) * 255),
+        Math.round(Number(modern[2]) * 255),
+        Math.round(Number(modern[3]) * 255),
+        modern[4] !== undefined ? Number(modern[4]) : 1,
+      ];
+    }
+    throw new Error(`Unrecognized computed background-color: ${raw}`);
+  }
+
+  test("hovering a cell tints every cell in its column when enabled", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+        <Table data='${DATA}' highlightHoveredColumn="true">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `,
+      {
+        testThemeVars: { "backgroundColor-column-Table--hover": "rgb(10, 20, 30)" },
+      },
+    );
+
+    // Hover the "quantity" cell in the first row.
+    await page.getByRole("cell", { name: "5", exact: true }).hover();
+
+    // The other row's cell in the SAME column is tinted too...
+    const sameColumnOtherRow = page.getByRole("cell", { name: "6", exact: true });
+    await expect.poll(() => backgroundRgba(sameColumnOtherRow)).toEqual([10, 20, 30, 1]);
+
+    // ...while a cell in a DIFFERENT column is not.
+    const differentColumnCell = page.getByRole("cell", { name: "Apples" });
+    await expect(differentColumnCell).not.toHaveCSS("background-color", "rgb(10, 20, 30)");
+    expect(await backgroundRgba(differentColumnCell)).not.toEqual([10, 20, 30, 1]);
+  });
+
+  test("the row highlight wins where the hovered row and column intersect", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+        <Table data='${DATA}' highlightHoveredColumn="true">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `,
+      {
+        testThemeVars: {
+          "backgroundColor-column-Table--hover": "rgb(10, 20, 30)",
+          "backgroundColor-row-Table--hover": "rgb(200, 100, 50)",
+        },
+      },
+    );
+
+    const hoveredCell = page.getByRole("cell", { name: "5", exact: true });
+    await hoveredCell.hover();
+
+    // The intersecting cell — the one actually under the pointer, whose row AND
+    // column are both hovered — shows the row hover color, not the column tint.
+    // This declaration is untouched by the column-tint alpha function, so it
+    // always serializes as the plain legacy value the theme var was set to.
+    await expect(hoveredCell).toHaveCSS("background-color", "rgb(200, 100, 50)");
+
+    // A cell further down the SAME column, in a row that is not hovered, still
+    // shows the column tint plainly.
+    const sameColumnOtherRow = page.getByRole("cell", { name: "6", exact: true });
+    await expect.poll(() => backgroundRgba(sameColumnOtherRow)).toEqual([10, 20, 30, 1]);
+  });
+
+  // Off by default: rendered output must be unchanged from a table that never
+  // opted in — no cell hover handler attached, and no visible column tint.
+  test("is off by default: no handler attached and no highlight on hover", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+        <Table data='${DATA}'>
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+        </Table>
+      `,
+      {
+        testThemeVars: { "backgroundColor-column-Table--hover": "rgb(10, 20, 30)" },
+      },
+    );
+
+    const hoveredCell = page.getByRole("cell", { name: "5", exact: true });
+    await hoveredCell.hover();
+
+    const sameColumnOtherRow = page.getByRole("cell", { name: "6", exact: true });
+    expect(await backgroundRgba(sameColumnOtherRow)).not.toEqual([10, 20, 30, 1]);
+
+    // React records its handlers on the DOM node's internal props bag; an
+    // unattached event is absent from it entirely.
+    const handlerType = await hoveredCell.evaluate((el) => {
+      const key = Object.keys(el).find((k) => k.startsWith("__reactProps$"));
+      const props: any = key ? (el as any)[key] : {};
+      return typeof props?.onMouseEnter;
+    });
+    expect(handlerType).toBe("undefined");
+  });
+});
