@@ -44,7 +44,7 @@ Set `preserveLinebreaks="true"` on `Text` (or `Link`, or `Heading`) for the comm
 
 `preserveLinebreaks` decides whether whitespace survives. It says nothing about the *font*. A proportional font gives every character a different width, so even with every space and line break intact, columns built from spaces will not line up — `apples` and `kiwi` are different widths, so the numbers after them land in different places. Fixed-width output needs a **second**, independent decision: a monospace font, so every character (including a space) occupies the same width and a column of spaces lines up the way it did when the text was authored.
 
-```xmlui-pg copy display name="Spacing vs monospace: two separate decisions"
+```xmlui-pg copy display name="Spacing vs monospace: two separate decisions" height="420px"
 <App var.report="ID    Name      Qty
 1     apples    12
 22    kiwi      3">
@@ -128,7 +128,7 @@ Both `Text` (composed from `preserveLinebreaks` or `whiteSpace="pre"`, plus `var
 
 **`Text` wins when the content isn't static markup** — when you're composing it from a bound expression, need `Text`-only features like `highlightText` or `segments`, or want the preformatted run inline among other styled `Text` runs rather than as its own block. In that case, reach for `preserveLinebreaks` (or `whiteSpace="pre"` when it must not wrap) plus `variant="mono"` or `"code"`, exactly as shown above.
 
-**A theme-variable "recipe" — a custom `Text` variant that bakes in the whitespace handling — loses**, and not for lack of trying: custom variants only cover the documented text-property allowlist (`fontFamily`, `textColor`, `letterSpacing`, and the rest), and `whiteSpace` isn't on it. A variant can select the monospace font for you, but it can't flip whitespace handling, so you're back to setting `preserveLinebreaks` or `whiteSpace` on the instance regardless — a bespoke variant buys nothing a plain prop doesn't already give you.
+**A theme-variable "recipe" loses.** The idea is a custom `Text` variant that bakes in the whitespace handling, and it fails not for lack of trying: custom variants only cover the documented text-property allowlist (`fontFamily`, `textColor`, `letterSpacing`, and the rest), and `whiteSpace` isn't on it. A variant can select the monospace font for you, but it can't flip whitespace handling, so you're back to setting `preserveLinebreaks` or `whiteSpace` on the instance regardless — a bespoke variant buys nothing a plain prop doesn't already give you.
 
 ## Key points
 
