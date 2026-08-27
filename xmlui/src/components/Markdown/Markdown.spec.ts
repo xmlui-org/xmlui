@@ -46,6 +46,22 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
+  test("comment-only binding expression does not crash surrounding content (#3774)", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    // --- A braced binding whose body is only a comment parses to no
+    // expression at all. Before the fix, evaluating that segment threw
+    // (`Cannot read properties of null (reading 'type')`); the surrounding
+    // "before " / " after" text must still render, proving the crash does
+    // not take down the render tree.
+    await initTestBed(`<Markdown><![CDATA[before \@{ /* note */ } after]]></Markdown>`);
+    const { component } = await createMarkdownDriver();
+    await expect(component).toBeAttached();
+    await expect(component).toContainText("before");
+    await expect(component).toContainText("after");
+  });
+
   test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\@{1+1}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("2");
