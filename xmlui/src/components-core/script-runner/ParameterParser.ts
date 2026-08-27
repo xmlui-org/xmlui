@@ -86,12 +86,25 @@ export function parseParameterString(
         } else {
           const segmentIndex = result.length;
           const exprText = exprSource.substring(0, exprSource.length - tail.length);
-          // --- Successfully parsed expression
-          result.push({
-            type: "expression",
-            value: expr!,
-            compiled: createCompiledBindingArtifact(expr!, exprText, options, segmentIndex, i),
-          });
+          if (expr === null) {
+            // --- The braced section has no expression to evaluate (e.g. it is
+            // empty, whitespace-only, or comment-only — a comment yields no
+            // tokens once whitespace/comment trivia is stripped). Rather than
+            // fabricating an expression segment around a null AST node, keep
+            // the original source text as a literal so downstream consumers
+            // (dependency collection, evaluation) never see a null `value`.
+            result.push({
+              type: "literal",
+              value: exprText,
+            });
+          } else {
+            // --- Successfully parsed expression
+            result.push({
+              type: "expression",
+              value: expr,
+              compiled: createCompiledBindingArtifact(expr, exprText, options, segmentIndex, i),
+            });
+          }
 
           // --- Skip the parsed part of the expression, and start a new literal section
           i = source.length - tail.length;
