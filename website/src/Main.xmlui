@@ -606,6 +606,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Customize a Select's selected value"
+                            to="/docs/howto/customize-a-selects-selected-value"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Present a short list of choices with a RadioGroup"
                             to="/docs/howto/present-choices-with-a-radiogroup"
                         />
