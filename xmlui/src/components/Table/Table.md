@@ -1558,6 +1558,149 @@ Select a column header and set it to descending ordering.
 
 %-PROP-END
 
+%-PROP-START defaultSortDirection
+
+Some columns are only interesting from the top: vote counts, totals, percentages.
+A header click sorts ascending first, so those columns cost an extra click before
+they show anything useful. `defaultSortDirection` moves where the click cycle
+starts.
+
+### The problem
+
+No configuration here. Click **Votes** once and you get the *smallest* count
+first; click again for the largest.
+
+```xmlui copy
+<Table data='{[...]}'>
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: two clicks to see the winner"
+<App>
+  <Table data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'>
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Two clicks to answer "who won". On one table that is a shrug; across a screenful
+of count columns it is the difference between a table you read and a table you
+operate.
+
+### One line fixes the click count
+
+```xmlui copy /defaultSortDirection="descending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: defaultSortDirection on the table" /defaultSortDirection="descending"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    defaultSortDirection="descending">
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Click **Votes** once: biggest first. The cycle still has three states and still
+ends unsorted — descending, ascending, unsorted. Only its starting point moved.
+
+### Opening already sorted
+
+The property above says *which direction*. It never says *which column*, so the
+table still opens unsorted until you click. To arrive sorted, name the column
+with [`sortBy`](#sortby):
+
+```xmlui copy /sortBy="votes"/
+<Table data='{[...]}' sortBy="votes" defaultSortDirection="descending">
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: sortBy with defaultSortDirection" /sortBy="votes"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    sortBy="votes"
+    defaultSortDirection="descending">
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Zero clicks: biggest first on load. `defaultSortDirection` supplies the opening
+direction because no explicit [`sortDirection`](#sortdirection) was given — set
+that instead when the opening order should differ from what clicking produces.
+
+A seeded table is already **at the first stage of the cycle**, so the first click
+advances to the second stage rather than confirming the first. Clicking **Votes**
+here goes to ascending, then to unsorted. That is worth knowing before it
+surprises you: on a seeded column, the first click looks like it reverses the
+sort.
+
+### One column that reads the other way
+
+Names are the case where alphabetical is the natural first read, even in a table
+of counts. A `Column` overrides its table:
+
+```xmlui copy /defaultSortDirection="ascending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: per-column override" /defaultSortDirection="ascending"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    defaultSortDirection="descending">
+    <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Neither column is sorted on load — there is no `sortBy` here. Click **Votes** and
+it goes largest-first; click **Candidate** and it goes A–Z. Resolution is column
+first, then table, then `ascending`.
+
+Switching columns **restarts the cycle** at the new column's own first direction;
+it does not carry the previous column's stage across. Clicking **Votes** then
+**Candidate** gives descending then ascending, each column's own default.
+
+%-PROP-END
+
 %-PROP-START iconNoSort
 
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled
@@ -1775,6 +1918,12 @@ Hover any cell to see its whole column tinted, and hover a row to see the row hi
 %-PROP-END
 
 %-EVENT-START sortingDidChange
+
+When the third click clears sorting, the event fires with an empty column name and
+**the direction that was on screen** — the sort the user was just looking at, not
+the direction a fresh click would produce. A column whose
+[`defaultSortDirection`](#defaultsortdirection) is `descending` therefore reports
+`ascending` when cleared from its second stage.
 
 Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
