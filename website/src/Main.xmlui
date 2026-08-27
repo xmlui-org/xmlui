@@ -1491,6 +1491,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Display preformatted or monospace text"
+                            to="/docs/howto/display-preformatted-text"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Theme DatePicker calendar items"
                             to="/docs/howto/theme-datepicker-calendar-items"
                         />
