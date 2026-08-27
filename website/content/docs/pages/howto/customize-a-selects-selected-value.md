@@ -16,7 +16,7 @@ by default, and nothing in xmlui's Select styling overrides it — so any
 text that wraps inside the trigger inherits that centering. You don't need
 a `valueTemplate` to see it:
 
-```xmlui-pg copy display name="The default: a long label wraps and centers" height="160px"
+```xmlui-pg copy display name="The default: a long label wraps and centers" height="320px"
 ---app display
 <App>
   <VStack width="260px" gap="$space-2" padding="$space-3" borderWidth="1px" borderColor="$color-surface-300">
@@ -49,12 +49,12 @@ and the box does fill the trigger, but the wrapped lines are *still*
 centered, because a `<button>`'s inherited `text-align: center` applies to
 anything inside it that doesn't set its own — a full-width box included.
 
-```xmlui-pg copy display name="A valueTemplate with width and textAlign" height="160px"
+```xmlui-pg copy display name="A valueTemplate with width and textAlign" height="320px"
 ---app display
 <App>
   <VStack width="260px" gap="$space-2" padding="$space-3" borderWidth="1px" borderColor="$color-surface-300">
     <Text variant="strong">width="100%" + textAlign="start"</Text>
-    <Select width="100%" label="Priority">
+    <Select width="100%" label="Priority" initialValue="escalate">
       <property name="valueTemplate">
         <Text testId="full-value" width="100%" textAlign="start" value="{$item.label}" />
       </property>
@@ -65,8 +65,9 @@ anything inside it that doesn't set its own — a full-width box included.
 </App>
 ```
 
-Open the select and choose the long option — the label now wraps flush
-against the trigger's left edge.
+The same long label is selected here as in the first playground, and it now
+wraps flush against the trigger's left edge instead of centering. Compare the
+two triggers directly — same option, same width, one prop pair apart.
 
 ## `$item` and `$itemContext` inside the template
 
