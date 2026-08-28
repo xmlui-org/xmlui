@@ -44,7 +44,7 @@ import { areSourceIdSetsEqual } from "../../components-core/abstractions/dataRef
  */
 interface RowContext {
   nodes: FlatTreeNode[];
-  toggleNode: (node: FlatTreeNode) => void;
+  toggleNode: (node: FlatTreeNode, options?: ToggleNodeOptions) => void;
   itemRenderer: (item: any) => ReactNode;
   itemClickExpands: boolean;
   onItemClick?: (item: FlatTreeNode) => void;
@@ -69,6 +69,10 @@ interface TreeRowProps {
 
 interface SelectionUpdateOptions {
   syncVisualUpdate?: boolean;
+}
+
+interface ToggleNodeOptions {
+  deferEventsUntilPaint?: boolean;
 }
 
 const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
@@ -121,25 +125,19 @@ const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
       if (isLoading) {
         return;
       }
-      toggleNode(treeItem);
+      toggleNode(treeItem, { deferEventsUntilPaint: true });
     },
     [toggleNode, treeItem, isLoading],
   );
 
-  const onGutterMouseDownHandler = useCallback(
-    (e: React.MouseEvent) => {
-      // Handle selection on mouse down in gutter area (for right-click context menu)
-      // Only select, don't toggle expansion
-      if (treeItem.selectable) {
-        onSelection(treeItem);
-        // Ensure tree container maintains focus after mouse selection
-        setTimeout(() => {
-          treeContainerRef.current?.focus({ preventScroll: true });
-        }, 0);
-      }
-    },
-    [onSelection, treeItem, treeContainerRef],
-  );
+  const onGutterMouseDownHandler = useCallback(() => {
+    // Keep focus on the tree when the expand/collapse gutter is clicked, but
+    // do not select the row; selectionDidChange can be expensive and should
+    // not block expansion.
+    setTimeout(() => {
+      treeContainerRef.current?.focus({ preventScroll: true });
+    }, 0);
+  }, [treeContainerRef]);
 
   const onItemMouseDownHandler = useCallback(
     (e: React.MouseEvent) => {
@@ -167,7 +165,7 @@ const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
       // If itemClickExpands is enabled and item has children, also toggle
       // But prevent toggling if node is in loading state
       if (itemClickExpands && treeItem.hasChildren && !isLoading) {
-        toggleNode(treeItem);
+        toggleNode(treeItem, { deferEventsUntilPaint: true });
       }
     },
     [onItemClick, itemClickExpands, treeItem, toggleNode, isLoading],
@@ -883,7 +881,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       : mappedSelectedId
     : internalSelectedId;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!optimisticSelectedId) {
       return;
     }
@@ -963,6 +961,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   // Simplified focus management
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const focusedNodeKeyRef = useRef<string | number | undefined>(undefined);
   const [preservedScrollPaddingEnd, setPreservedScrollPaddingEnd] = useState(0);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VirtualizerHandle>(null);
@@ -982,9 +981,13 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     | { type: "first-inserted"; insertedIds: Set<string> }
     | undefined
   >(undefined);
-  const pendingScrollPositionRef = useRef<number | undefined>(getTreeStateScrollPosition(initialTreeState));
+  const pendingScrollPositionRef = useRef<number | undefined>(
+    getTreeStateScrollPosition(initialTreeState),
+  );
   const scrollRestoreAnimationFrameRef = useRef<number | undefined>(undefined);
   const targetScrollAnimationFrameRef = useRef<number | undefined>(undefined);
+  const afterPaintAnimationFrameRefs = useRef<number[]>([]);
+  const isMountedRef = useRef(true);
 
   // State and ref for measuring first item size when fixedItemSize is enabled
   const firstItemRef = useRef<HTMLDivElement>(null);
@@ -1041,6 +1044,32 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     [flatTreeData],
   );
 
+  const setFocusedNodeByIndex = useCallback(
+    (index: number) => {
+      const nodeKey = index >= 0 ? flatTreeData[index]?.key : undefined;
+      focusedNodeKeyRef.current = nodeKey;
+      setFocusedIndex(nodeKey === undefined ? -1 : index);
+    },
+    [flatTreeData],
+  );
+
+  useLayoutEffect(() => {
+    const focusedNodeKey = focusedNodeKeyRef.current;
+    if (focusedNodeKey === undefined) {
+      return;
+    }
+
+    const nextFocusedIndex = flatTreeData.findIndex(
+      (item) => String(item.key) === String(focusedNodeKey),
+    );
+    if (nextFocusedIndex < 0) {
+      focusedNodeKeyRef.current = undefined;
+    }
+    if (nextFocusedIndex !== focusedIndex) {
+      setFocusedIndex(nextFocusedIndex);
+    }
+  }, [flatTreeData, focusedIndex]);
+
   // Tree validation utilities
   const nodeExists = useCallback(
     (nodeId: string | number): boolean => {
@@ -1064,7 +1093,6 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       // Get previous selection for event
       const previousNode = effectiveSelectedId ? findNodeById(effectiveSelectedId) : null;
-
       const applySelectionState = () => {
         // Always update internal state (this provides visual feedback)
         setInternalSelectedId(nodeKey);
@@ -1076,7 +1104,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         if (nodeKey) {
           const nodeIndex = flatTreeData.findIndex((item) => String(item.key) === String(nodeKey));
           if (nodeIndex >= 0) {
-            setFocusedIndex(nodeIndex);
+            setFocusedNodeByIndex(nodeIndex);
           }
         }
       };
@@ -1138,6 +1166,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       expandedIds,
       onSelectionChanged,
       isExternallyControlledSelection,
+      setFocusedNodeByIndex,
     ],
   );
 
@@ -1470,12 +1499,19 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     setCollapsedTimestamps((prev) => (prev.size === 0 ? prev : new Map()));
     setAutoLoadAfterMap((prev) => (prev.size === 0 ? prev : new Map()));
     setDynamicStateMap((prev) => (prev.size === 0 ? prev : new Map()));
-    setFocusedIndex(-1);
+    setFocusedNodeByIndex(-1);
 
     if (!isControlledMode) {
       setInternalSelectedId(mappedSelectedId);
     }
-  }, [defaultExpanded, isControlledMode, mappedSelectedId, treeData, treeItemsById]);
+  }, [
+    defaultExpanded,
+    isControlledMode,
+    mappedSelectedId,
+    setFocusedNodeByIndex,
+    treeData,
+    treeItemsById,
+  ]);
 
   const pruneTreeStateForCurrentData = useCallback(() => {
     setExpandedIds((prev) => {
@@ -1614,8 +1650,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     const treeStateToApply = pendingRefresh?.treeState ?? latestTreeStateRef.current;
     const previousSourceIds = pendingRefresh?.sourceIds ?? latestSourceIdsRef.current;
     const previousRenderedSourceIds = previousRenderedSourceIdsRef.current;
-    const previousScrollMetrics =
-      pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
+    const previousScrollMetrics = pendingRefresh?.scrollMetrics ?? latestScrollMetricsRef.current;
 
     pendingDataRefreshRef.current = undefined;
     previousDataRef.current = data;
@@ -1759,13 +1794,42 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
   useEffect(() => {
     return () => {
+      isMountedRef.current = false;
       if (scrollRestoreAnimationFrameRef.current !== undefined) {
         cancelAnimationFrame(scrollRestoreAnimationFrameRef.current);
       }
       if (targetScrollAnimationFrameRef.current !== undefined) {
         cancelAnimationFrame(targetScrollAnimationFrameRef.current);
       }
+      afterPaintAnimationFrameRefs.current.forEach((frameId) => {
+        cancelAnimationFrame(frameId);
+      });
+      afterPaintAnimationFrameRefs.current = [];
     };
+  }, []);
+
+  const runAfterNextPaint = useCallback((callback: () => void) => {
+    if (typeof requestAnimationFrame !== "function") {
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          callback();
+        }
+      }, 0);
+      return;
+    }
+
+    const firstFrame = requestAnimationFrame(() => {
+      const secondFrame = requestAnimationFrame(() => {
+        afterPaintAnimationFrameRefs.current = afterPaintAnimationFrameRefs.current.filter(
+          (frameId) => frameId !== firstFrame && frameId !== secondFrame,
+        );
+        if (isMountedRef.current) {
+          callback();
+        }
+      });
+      afterPaintAnimationFrameRefs.current.push(secondFrame);
+    });
+    afterPaintAnimationFrameRefs.current.push(firstFrame);
   }, []);
 
   /**
@@ -1784,7 +1848,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   }, [autoExpandToSelection, effectiveSelectedId, treeItemsById]);
 
   const toggleNode = useCallback(
-    async (node: FlatTreeNode) => {
+    async (node: FlatTreeNode, options: ToggleNodeOptions = {}) => {
+      const fireToggleEvent = (callback: () => void) => {
+        if (options.deferEventsUntilPaint) {
+          runAfterNextPaint(callback);
+        } else {
+          callback();
+        }
+      };
+
       if (!node.isExpanded) {
         // Expanding the node
         setExpandedIds((prev) => [...prev, node.key]);
@@ -1794,7 +1866,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
         // Always fire nodeDidExpand event
         if (onNodeExpanded) {
-          onNodeExpanded({ ...node, isExpanded: true });
+          fireToggleEvent(() => onNodeExpanded({ ...node, isExpanded: true }));
         }
 
         // Check if we need to auto-reload (Step 4: Auto-load feature)
@@ -1834,14 +1906,16 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
         // Step 4: Read per-node autoLoadAfter from data field
         const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
-        const nodeAutoLoadAfter = autoLoadAfterFieldName in node
-          ? (node as any)[autoLoadAfterFieldName]
-          : undefined;
+        const nodeAutoLoadAfter =
+          autoLoadAfterFieldName in node ? (node as any)[autoLoadAfterFieldName] : undefined;
 
         // Priority: setAutoLoadAfter > node data field > component prop
-        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
-          ? explicitAutoLoadAfter
-          : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+        const effectiveAutoLoadAfter =
+          explicitAutoLoadAfter !== undefined
+            ? explicitAutoLoadAfter
+            : nodeAutoLoadAfter !== undefined
+              ? nodeAutoLoadAfter
+              : autoLoadAfter;
 
         const shouldAutoReload =
           isDynamic && // Only auto-reload dynamic nodes
@@ -1850,7 +1924,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           collapsedTime !== undefined && // Node was previously collapsed
           effectiveAutoLoadAfter !== undefined && // Auto-load is configured
           effectiveAutoLoadAfter !== null && // Auto-load is not disabled
-          (Date.now() - collapsedTime) > effectiveAutoLoadAfter; // Threshold exceeded
+          Date.now() - collapsedTime > effectiveAutoLoadAfter; // Threshold exceeded
 
         // Check if we need to load children dynamically
         // Only load if node is marked as dynamic
@@ -2112,12 +2186,14 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           // Check if autoLoadAfter is 0, mark node as unloaded immediately
           const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
           const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
-          const nodeAutoLoadAfter = autoLoadAfterFieldName in node
-            ? (node as any)[autoLoadAfterFieldName]
-            : undefined;
-          const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
-            ? explicitAutoLoadAfter
-            : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+          const nodeAutoLoadAfter =
+            autoLoadAfterFieldName in node ? (node as any)[autoLoadAfterFieldName] : undefined;
+          const effectiveAutoLoadAfter =
+            explicitAutoLoadAfter !== undefined
+              ? explicitAutoLoadAfter
+              : nodeAutoLoadAfter !== undefined
+                ? nodeAutoLoadAfter
+                : autoLoadAfter;
 
           // If autoLoadAfter is 0, immediately mark node as unloaded
           if (effectiveAutoLoadAfter === 0) {
@@ -2177,7 +2253,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
         // Fire nodeDidCollapse event
         if (onNodeCollapsed) {
-          onNodeCollapsed({ ...node, isExpanded: false });
+          fireToggleEvent(() => onNodeCollapsed({ ...node, isExpanded: false }));
         }
       }
     },
@@ -2196,6 +2272,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       autoLoadAfter,
       dynamicStateMap,
       dynamic,
+      runAfterNextPaint,
     ],
   );
 
@@ -2315,7 +2392,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           if (currentIndex >= 0) {
             // Handle selection
             if (currentNode!.selectable) {
-              setSelectedNodeById(currentNode!.key, { syncVisualUpdate: true });
+              setSelectedNodeById(currentNode!.key, {
+                syncVisualUpdate: true,
+              });
               // Ensure focus stays on the current item after selection
               newIndex = currentIndex;
             }
@@ -2330,7 +2409,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       if (handled) {
         e.stopPropagation();
-        setFocusedIndex(newIndex);
+        setFocusedNodeByIndex(newIndex);
       }
     },
     [
@@ -2339,6 +2418,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       flatTreeData,
       toggleNode,
       setSelectedNodeById,
+      setFocusedNodeByIndex,
       onCutAction,
       onCopyAction,
       onPasteAction,
@@ -2354,7 +2434,9 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       itemClickExpands,
       onItemClick,
       onSelection: (node: FlatTreeNode) =>
-        setSelectedNodeById(node.key, { syncVisualUpdate: true }),
+        setSelectedNodeById(node.key, {
+          syncVisualUpdate: true,
+        }),
       lookupEventHandler,
       onKeyDown: handleKeyDown,
       treeContainerRef,
@@ -2546,12 +2628,16 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
             const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
             const nodeData = flatTreeData.find((n) => String(n.key) === String(nodeId));
-            const nodeAutoLoadAfter = nodeData && autoLoadAfterFieldName in nodeData
-              ? (nodeData as any)[autoLoadAfterFieldName]
-              : undefined;
-            const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
-              ? explicitAutoLoadAfter
-              : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
+            const nodeAutoLoadAfter =
+              nodeData && autoLoadAfterFieldName in nodeData
+                ? (nodeData as any)[autoLoadAfterFieldName]
+                : undefined;
+            const effectiveAutoLoadAfter =
+              explicitAutoLoadAfter !== undefined
+                ? explicitAutoLoadAfter
+                : nodeAutoLoadAfter !== undefined
+                  ? nodeAutoLoadAfter
+                  : autoLoadAfter;
 
             // If autoLoadAfter is 0, immediately mark node as unloaded
             if (effectiveAutoLoadAfter === 0) {
@@ -3399,9 +3485,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         }
 
         // Check node data for dynamic field
-        const node = Object.values(treeItemsById).find(
-          (n) => String(n.key) === String(nodeId),
-        );
+        const node = Object.values(treeItemsById).find((n) => String(n.key) === String(nodeId));
         if (node) {
           const dynamicFieldName = fieldConfig.dynamicField || "dynamic";
           // TreeNode has data fields directly copied from source data
@@ -3471,19 +3555,23 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       // Initialize to selected item or first item on focus
       const selectedIndex = findNodeIndexById(effectiveSelectedId);
       const targetIndex = selectedIndex >= 0 ? selectedIndex : 0;
-      setFocusedIndex(targetIndex);
+      setFocusedNodeByIndex(targetIndex);
     }
-  }, [focusedIndex, flatTreeData, effectiveSelectedId]);
+  }, [effectiveSelectedId, findNodeIndexById, flatTreeData, focusedIndex, setFocusedNodeByIndex]);
 
-  const handleTreeBlur = useCallback((e: React.FocusEvent) => {
-    // Check if focus is moving to another element within the tree
-    const isMovingWithinTree = e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node);
+  const handleTreeBlur = useCallback(
+    (e: React.FocusEvent) => {
+      // Check if focus is moving to another element within the tree
+      const isMovingWithinTree =
+        e.relatedTarget && e.currentTarget.contains(e.relatedTarget as Node);
 
-    if (!isMovingWithinTree) {
-      // Clear focus when tree loses focus completely
-      setFocusedIndex(-1);
-    }
-  }, []);
+      if (!isMovingWithinTree) {
+        // Clear focus when tree loses focus completely
+        setFocusedNodeByIndex(-1);
+      }
+    },
+    [setFocusedNodeByIndex],
+  );
 
   return (
     <Scroller
@@ -3518,10 +3606,21 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
           return shouldMeasure ? (
             <div key={node.key} ref={firstItemRef}>
-              <TreeMemoizedRow index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
+              <TreeMemoizedRow
+                index={index}
+                data={itemData}
+                isSelected={isSelected}
+                isFocused={isFocused}
+              />
             </div>
           ) : (
-            <TreeMemoizedRow key={node.key} index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
+            <TreeMemoizedRow
+              key={node.key}
+              index={index}
+              data={itemData}
+              isSelected={isSelected}
+              isFocused={isFocused}
+            />
           );
         })}
       </Virtualizer>

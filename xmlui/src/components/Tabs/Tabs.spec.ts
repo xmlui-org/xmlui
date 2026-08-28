@@ -1592,9 +1592,133 @@ test.describe("regression tests", () => {
                            Math.abs(activeRgb.b - inactiveRgb.b);
     expect(colorDifference).toBeGreaterThan(30);
   });
+
+  test("does not show the first tab while the controlled active tab is loading data", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).__tabsSlowLoadSamples = [];
+      const isVisible = (selector: string) => {
+        const element = document.querySelector(selector) as HTMLElement | null;
+        if (!element) {
+          return false;
+        }
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      };
+      const sample = () => {
+        (window as any).__tabsSlowLoadSamples.push({
+          overviewVisible: isVisible('[data-testid="overview-content"]'),
+          casesLoadingVisible: isVisible('[data-testid="cases-loading"]'),
+          casesLoadedVisible: isVisible('[data-testid="cases-loaded"]'),
+        });
+        if (!(window as any).__tabsStopSlowLoadSampling) {
+          requestAnimationFrame(sample);
+        }
+      };
+      requestAnimationFrame(sample);
+    });
+
+    await initTestBed(`
+      <Tabs activeTab="{1}" keepMounted="true">
+        <TabItem label="Overview">
+          <Text testId="overview-content">Overview content</Text>
+        </TabItem>
+        <TabItem label="Cases">
+          <DataSource id="casesData" url="/api/cases" onFetch="() => { delay(1000); return 'Loaded cases'; }" />
+          <Text testId="cases-loading" when="{!casesData.value}">Loading cases</Text>
+          <Text testId="cases-loaded" when="{casesData.value}">{casesData.value}</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByTestId("cases-loaded")).toHaveText("Loaded cases", {
+      timeout: 3000,
+    });
+    await page.evaluate(() => {
+      (window as any).__tabsStopSlowLoadSampling = true;
+    });
+
+    const samples = await page.evaluate(() => (window as any).__tabsSlowLoadSamples);
+    expect(samples.length).toBeGreaterThan(0);
+    expect(samples).not.toContainEqual(
+      expect.objectContaining({
+        overviewVisible: true,
+      }),
+    );
+    expect(samples).toContainEqual(
+      expect.objectContaining({
+        casesLoadingVisible: true,
+      }),
+    );
+  });
 });
 
 test.describe("TabItem activation events", () => {
+  test("does not activate the first tab during mount when activeTab targets another tab", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).__tabsVisibilitySamples = [];
+      const isVisible = (selector: string) => {
+        const element = document.querySelector(selector) as HTMLElement | null;
+        if (!element) {
+          return false;
+        }
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      };
+      const sample = () => {
+        const overviewVisible = isVisible('[data-testid="overview-content"]');
+        const casesVisible = isVisible('[data-testid="cases-content"]');
+        if (overviewVisible || casesVisible) {
+          (window as any).__tabsVisibilitySamples.push({
+            overviewVisible,
+            casesVisible,
+          });
+        }
+        if ((window as any).__tabsVisibilitySamples.length < 20) {
+          requestAnimationFrame(sample);
+        }
+      };
+      requestAnimationFrame(sample);
+    });
+
+    const { testStateDriver } = await initTestBed(`
+      <Tabs activeTab="{1}" keepMounted="true">
+        <TabItem label="Overview" onActivated="testState = (testState || '') + 'overview;'">
+          <Text testId="overview-content">Overview content</Text>
+        </TabItem>
+        <TabItem label="Cases" onActivated="testState = (testState || '') + 'cases;'">
+          <Text testId="cases-content">Cases content</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByText("Cases content")).toBeVisible();
+    await expect.poll(testStateDriver.testState).toEqual("cases;");
+
+    const samples = await page.evaluate(() => (window as any).__tabsVisibilitySamples);
+    expect(samples).not.toContainEqual({
+      overviewVisible: true,
+      casesVisible: false,
+    });
+  });
+
   test("onDeactivated fires when the active TabItem loses active status", async ({
     initTestBed,
     page,
