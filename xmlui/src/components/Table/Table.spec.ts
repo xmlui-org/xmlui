@@ -2790,6 +2790,40 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("No items found")).toBeVisible();
     });
 
+    test("does not overflow vertically when empty custom template fills available height", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{[]}'
+          height="360px"
+          overflowY="auto"
+          alwaysShowHeader="true"
+          testId="table"
+        >
+          <Column header="Name" bindTo="name"/>
+          <Column header="Quantity" bindTo="quantity"/>
+          <property name="noDataTemplate">
+            <VStack verticalAlignment="center" horizontalAlignment="center" height="100%">
+              <Text>No review items</Text>
+            </VStack>
+          </property>
+        </Table>
+      `);
+
+      const table = page.getByTestId("table");
+      await expect(table).toBeVisible();
+      await expect(page.getByText("No review items")).toBeVisible();
+
+      const metrics = await table.evaluate((el) => ({
+        clientHeight: el.clientHeight,
+        scrollHeight: el.scrollHeight,
+      }));
+
+      expect(metrics.scrollHeight - metrics.clientHeight).toBeLessThanOrEqual(1);
+    });
+
     test("hides no data view when noDataTemplate is empty string", async ({
       initTestBed,
       page,

@@ -72,6 +72,11 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
       flex: 1;
       contain: size;
     }
+
+    &.emptyState {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .clickableHeader {
@@ -397,6 +402,12 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     width: 100%;
     text-align: center;
     margin-top: t.$space-16;
+  }
+
+  .noDataWrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
   }
 
   .pagination {
