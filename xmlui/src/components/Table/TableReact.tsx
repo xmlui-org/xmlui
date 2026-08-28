@@ -3048,6 +3048,7 @@ export const Table = memo(
         className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
           [styles.noScroll]: hasOutsideScroll,
           [styles.stretchToParent]: stretchToParent,
+          [styles.emptyState]: !loading && !hasData,
         })}
         tabIndex={0}
         onKeyDown={handleWrapperKeyDown}
@@ -3283,9 +3284,11 @@ export const Table = memo(
           !loading &&
           !hasData &&
           (noDataRenderer ? (
-            noDataRenderer()
+            <div className={styles.noDataWrapper}>{noDataRenderer()}</div>
           ) : (
-            <div className={styles.noRows}>No data available</div>
+            <div className={styles.noDataWrapper}>
+              <div className={styles.noRows}>No data available</div>
+            </div>
           ))}
 
         {shouldShowPagination &&

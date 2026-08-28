@@ -24,6 +24,7 @@ import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onContextMenu"> & {
   id?: string;
@@ -87,11 +88,11 @@ export const Tabs = memo(forwardRef(function Tabs(
     return tabItems[activeIndex]?.innerId;
   }, [activeIndex, tabItems]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     tabContextValue.setActiveTabId(currentTab);
   }, [currentTab, tabContextValue]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (activeTab !== undefined) {
       setActiveIndex(() => {
         const maxIndex = tabItems.length - 1;

@@ -8,6 +8,7 @@ import styles from "../Tabs/Tabs.module.scss";
 import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 export const TabItemComponent = memo(forwardRef(function TabItemComponent(
   { children, label, headerRenderer, style, id, className, classes, activated, deactivated, ...rest }: Tab,
@@ -17,7 +18,7 @@ export const TabItemComponent = memo(forwardRef(function TabItemComponent(
   const { register, unRegister, activeTabId, getTabItems, keepMounted } = useTabContext();
   const wasActiveRef = useRef(false);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     register({
       label,
       headerRenderer,
@@ -26,7 +27,7 @@ export const TabItemComponent = memo(forwardRef(function TabItemComponent(
     });
   }, [innerId, id, label, headerRenderer, register]);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return () => {
       unRegister(innerId);
     };

@@ -39,6 +39,15 @@ const visibleIndexTreeData = [
   { id: "root-3-child-4", name: "Root 3 Child 4", parentId: "root-3" },
 ];
 
+const focusPreservationTreeData = [
+  { id: "suite-a", name: "Suite A" },
+  { id: "suite-a-1", parentId: "suite-a", name: "Case A.1" },
+  { id: "suite-a-2", parentId: "suite-a", name: "Case A.2" },
+  { id: "suite-b", name: "Suite B" },
+  { id: "suite-b-1", parentId: "suite-b", name: "Case B.1" },
+  { id: "suite-b-2", parentId: "suite-b", name: "Case B.2" },
+];
+
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
@@ -2325,6 +2334,108 @@ test.describe("Events", () => {
       expect(order).toEqual(["tree-selected", "details-refreshed"]);
     });
 
+    test("does not fire selectionDidChange when clicking the expand/collapse gutter", async ({
+      initTestBed,
+      createTreeDriver,
+      page,
+    }) => {
+      await initTestBed(`
+        <Fragment var.selectedId="'proj-root'" var.selectionCount="{0}">
+          <Text testId="selection-count">{selectionCount}</Text>
+          <VStack height="400px">
+            <Tree testId="tree"
+              dataFormat="flat"
+              selectedValue="{selectedId}"
+              data='{${JSON.stringify(multiBranchTreeData)}}'
+              onSelectionDidChange="event => {
+                selectionCount = selectionCount + 1;
+                selectedId = event.newNode.id;
+              }">
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const docRootWrapper = tree.getNodeWrapperByTestId("doc-root");
+      await expect(docRootWrapper).toBeVisible();
+      await expect(tree.getByTestId("doc-reports")).not.toBeVisible();
+
+      await docRootWrapper.locator("[data-tree-expand-icon]").click();
+
+      await expect(tree.getByTestId("doc-reports")).toBeVisible();
+      await expect(page.getByTestId("selection-count")).toHaveText("0");
+
+      await docRootWrapper.locator("[data-tree-expand-icon]").click();
+
+      await expect(tree.getByTestId("doc-reports")).not.toBeVisible();
+      await expect(page.getByTestId("selection-count")).toHaveText("0");
+    });
+
+    test("keeps focus on the same selected node when expanding a branch before it", async ({
+      initTestBed,
+      createTreeDriver,
+      page,
+    }) => {
+      await initTestBed(`
+        <Fragment var.selectedId="{null}" var.details="{[]}">
+          <Text testId="selected">{selectedId ?? 'none'}</Text>
+          <List testId="details" data="{details}">
+            <Text>{$item.name}</Text>
+          </List>
+          <VStack height="400px">
+            <Tree testId="tree"
+              dataFormat="flat"
+              selectedValue="{selectedId}"
+              data='{${JSON.stringify(focusPreservationTreeData)}}'
+              onSelectionDidChange="({ newNode }) => {
+                delay(50);
+                selectedId = newNode.id;
+                details = [
+                  { id: newNode.id + '-1', name: 'Loaded detail 1 for ' + newNode.name },
+                  { id: newNode.id + '-2', name: 'Loaded detail 2 for ' + newNode.name }
+                ];
+              }">
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const suiteAWrapper = tree.getNodeWrapperByTestId("suite-a");
+      const suiteBWrapper = tree.getNodeWrapperByTestId("suite-b");
+
+      await expect(suiteAWrapper).toBeVisible();
+      await expect(suiteBWrapper).toBeVisible();
+      await suiteBWrapper.locator("[data-tree-expand-icon]").click();
+      await expect(tree.getByTestId("suite-b-1")).toBeVisible();
+
+      await tree.getByTestId("suite-b-1").click();
+      const caseB1Wrapper = tree.getNodeWrapperByTestId("suite-b-1");
+      await expect(caseB1Wrapper).toHaveClass(/selected/);
+      await expect(caseB1Wrapper).toHaveClass(/focused/);
+      await expect(page.getByTestId("selected")).toHaveText("suite-b-1");
+      await expect(page.getByTestId("details")).toContainText("Loaded detail 1 for Case B.1");
+
+      await suiteAWrapper.locator("[data-tree-expand-icon]").click();
+      await expect(tree.getByTestId("suite-a-2")).toBeVisible();
+
+      await expect(tree.getNodeWrapperByTestId("suite-a-2")).not.toHaveClass(/focused/);
+      await expect(caseB1Wrapper).toHaveClass(/selected/);
+      await expect(caseB1Wrapper).toHaveClass(/focused/);
+      await expect(page.getByTestId("selected")).toHaveText("suite-b-1");
+    });
+
     test("fires when user clicks on a selectable node", async ({
       initTestBed,
       createTreeDriver,
@@ -2394,6 +2505,100 @@ test.describe("Events", () => {
   });
 
   test.describe("nodeDidExpand Event", () => {
+    test("fires after the expand/collapse visual state is painted", async ({
+      initTestBed,
+      createTreeDriver,
+      page,
+    }) => {
+      await initTestBed(`
+        <Fragment var.expandCount="{0}" var.collapseCount="{0}">
+          <Text testId="expand-count">{expandCount}</Text>
+          <Text testId="collapse-count">{collapseCount}</Text>
+          <VStack height="400px">
+            <Tree testId="tree"
+              dataFormat="flat"
+              data='{${JSON.stringify(multiBranchTreeData)}}'
+              onNodeDidExpand="node => {
+                window.__treeExpandOrder.push('event');
+                expandCount = expandCount + 1;
+              }"
+              onNodeDidCollapse="node => {
+                window.__treeCollapseOrder.push('event');
+                collapseCount = collapseCount + 1;
+              }">
+              <property name="itemTemplate">
+                <HStack testId="{$item.id}">
+                  <Text value="{$item.name}" />
+                </HStack>
+              </property>
+            </Tree>
+          </VStack>
+        </Fragment>
+      `);
+
+      const tree = await createTreeDriver("tree");
+      const docRootWrapper = tree.getNodeWrapperByTestId("doc-root");
+      await expect(docRootWrapper).toBeVisible();
+
+      await page.evaluate(() => {
+        (window as any).__treeExpandOrder = [];
+        const record = (entry: string) => {
+          const order = (window as any).__treeExpandOrder;
+          if (!order.includes(entry)) {
+            order.push(entry);
+          }
+        };
+        const observer = new MutationObserver(() => {
+          if (document.querySelector('[data-testid="doc-reports"]')) {
+            record("expanded-dom");
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        (window as any).__treeExpandObserver = observer;
+      });
+
+      await docRootWrapper.locator("[data-tree-expand-icon]").click();
+
+      await expect
+        .poll(async () => {
+          return page.evaluate(() => (window as any).__treeExpandOrder);
+        })
+        .toEqual(["expanded-dom", "event"]);
+      await page.evaluate(() => {
+        (window as any).__treeExpandObserver?.disconnect();
+      });
+      await expect(page.getByTestId("expand-count")).toHaveText("1");
+
+      await page.evaluate(() => {
+        (window as any).__treeCollapseOrder = [];
+        const record = (entry: string) => {
+          const order = (window as any).__treeCollapseOrder;
+          if (!order.includes(entry)) {
+            order.push(entry);
+          }
+        };
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector('[data-testid="doc-reports"]')) {
+            record("collapsed-dom");
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        (window as any).__treeCollapseObserver = observer;
+      });
+
+      await docRootWrapper.locator("[data-tree-expand-icon]").click();
+
+      await expect
+        .poll(async () => {
+          return page.evaluate(() => (window as any).__treeCollapseOrder);
+        })
+        .toEqual(["collapsed-dom", "event"]);
+      await page.evaluate(() => {
+        (window as any).__treeCollapseObserver?.disconnect();
+      });
+      await expect(page.getByTestId("collapse-count")).toHaveText("1");
+    });
+
     test("fires after successful node expansion", async ({ initTestBed, createTreeDriver }) => {
       const { testStateDriver } = await initTestBed(`
         <VStack height="400px">
@@ -3653,7 +3858,9 @@ test.describe("Events", () => {
       const afterScrollTop = await treeScroller.evaluate(
         (element) => (element as HTMLElement).scrollTop,
       );
-      const scrollEvents = await page.evaluate(() => (window as any).__treeScrollEvents as number[]);
+      const scrollEvents = await page.evaluate(
+        () => (window as any).__treeScrollEvents as number[],
+      );
       const distinctScrollPositions = new Set(scrollEvents.map((position) => Math.round(position)));
       expect(Math.abs(afterScrollTop - beforeScrollTop)).toBeLessThanOrEqual(1);
       expect(distinctScrollPositions.size).toBeLessThanOrEqual(1);
@@ -3811,7 +4018,11 @@ test.describe("Events", () => {
       expect(treeState["999"]).toBeUndefined();
     });
 
-    test("setTreeState restores scroll position", async ({ initTestBed, createButtonDriver, page }) => {
+    test("setTreeState restores scroll position", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
       const tallData = Array.from({ length: 100 }, (_, i) => ({
         id: i + 1,
         name: `Item ${i + 1}`,
