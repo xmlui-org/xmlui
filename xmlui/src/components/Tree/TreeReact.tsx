@@ -881,7 +881,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       : mappedSelectedId
     : internalSelectedId;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!optimisticSelectedId) {
       return;
     }
@@ -1093,6 +1093,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       // Get previous selection for event
       const previousNode = effectiveSelectedId ? findNodeById(effectiveSelectedId) : null;
+
       const applySelectionState = () => {
         // Always update internal state (this provides visual feedback)
         setInternalSelectedId(nodeKey);
@@ -2392,9 +2393,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           if (currentIndex >= 0) {
             // Handle selection
             if (currentNode!.selectable) {
-              setSelectedNodeById(currentNode!.key, {
-                syncVisualUpdate: true,
-              });
+              setSelectedNodeById(currentNode!.key, { syncVisualUpdate: true });
               // Ensure focus stays on the current item after selection
               newIndex = currentIndex;
             }
@@ -2434,9 +2433,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       itemClickExpands,
       onItemClick,
       onSelection: (node: FlatTreeNode) =>
-        setSelectedNodeById(node.key, {
-          syncVisualUpdate: true,
-        }),
+        setSelectedNodeById(node.key, { syncVisualUpdate: true }),
       lookupEventHandler,
       onKeyDown: handleKeyDown,
       treeContainerRef,

@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.14.20",
+  "version": "0.14.21",
   "sideEffects": [
     "**/*.css",
     "src/components-core/analyzer/rules/**/*.ts"
@@ -24,6 +24,7 @@
     "check:metadata-purity": "node scripts/check-metadata-purity.mjs",
     "check:metadata": "tsx scripts/check-metadata-drift.ts",
     "check:metadata-snapshot": "npm run build:xmlui-metadata && npm run gen:langserver-metadata && git diff --exit-code src/language-server/xmlui-metadata-generated.js",
+    "check:reference-drift": "node scripts/check-reference-drift.mjs",
     "check:api-diff": "tsx scripts/api-diff/release-guard.ts",
     "check:css-chunks": "node scripts/inspect-css-chunks.mjs",
     "check:example-tests": "node scripts/check-example-tests.mjs",

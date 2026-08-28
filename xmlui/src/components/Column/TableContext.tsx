@@ -29,6 +29,7 @@ export type OurColumnMetadata = {
   minWidth?: number;
   maxWidth?: number;
   canSort?: boolean;
+  defaultSortDirection?: "ascending" | "descending";
   pinTo?: string;
   canResize?: boolean;
   type?: string;

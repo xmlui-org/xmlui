@@ -414,6 +414,7 @@ type TableProps = {
   rowUnselectablePredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
+  defaultSortDirection?: SortingDirection;
   iconSortAsc?: string;
   iconSortDesc?: string;
   iconNoSort?: string;
@@ -1147,7 +1148,8 @@ export const Table = memo(
       rowDisabledPredicate = defaultIsRowDisabled,
       rowUnselectablePredicate = defaultIsRowUnselectable,
       sortBy,
-      sortingDirection = defaultProps.sortingDirection,
+      sortingDirection,
+      defaultSortDirection = defaultProps.defaultSortDirection,
       iconSortAsc,
       iconSortDesc,
       iconNoSort,
@@ -1352,15 +1354,21 @@ export const Table = memo(
 
     // --- Local or external sorting of data
     const [_sortBy, _setSortBy] = useState(sortBy);
-    const [_sortingDirection, _setSortingDirection] = useState(sortingDirection);
+    // The initial direction when the table opens already sorted via `sortBy`.
+    // An explicit `sortDirection` wins; otherwise `defaultSortDirection` supplies it, so
+    // a table that declares "biggest first" opens that way instead of needing a click.
+    const seedSortingDirection: SortingDirection =
+      sortingDirection ?? defaultSortDirection ?? defaultProps.sortingDirection;
+
+    const [_sortingDirection, _setSortingDirection] = useState(seedSortingDirection);
 
     useIsomorphicLayoutEffect(() => {
       _setSortBy(sortBy);
     }, [sortBy]);
 
     useIsomorphicLayoutEffect(() => {
-      _setSortingDirection(sortingDirection);
-    }, [sortingDirection]);
+      _setSortingDirection(seedSortingDirection);
+    }, [seedSortingDirection]);
 
     const sortedData = useMemo(() => {
       if (!_sortBy) {
@@ -1371,16 +1379,32 @@ export const Table = memo(
 
     const _updateSorting = useCallback(
       async (accessorKey: string) => {
-        let newDirection: SortingDirection = "ascending";
+        // Where the cycle starts for THIS column: its own defaultSortDirection wins,
+        // then the table-level one, then "ascending". The cycle itself is unchanged --
+        // three states, only the starting point moves.
+        const firstDirection: SortingDirection =
+          safeColumns.find((col) => col.accessorKey === accessorKey)?.defaultSortDirection ??
+          defaultSortDirection ??
+          "ascending";
+        const oppositeDirection: SortingDirection =
+          firstDirection === "ascending" ? "descending" : "ascending";
+
+        let newDirection: SortingDirection = firstDirection;
         let newSortBy = accessorKey;
         // The current key is the same as the last -> the user clicked on the same header twice
         if (_sortBy === accessorKey) {
-          // The last sorting direction was ascending -> make it descending
-          if (_sortingDirection === "ascending") {
-            newDirection = "descending";
-            // The last sorting direction was descending -> remove the sorting from the current key
+          // Still on the first direction -> flip to the other one
+          if (_sortingDirection === firstDirection) {
+            newDirection = oppositeDirection;
+            // Already on the second direction -> remove the sorting from the current key
           } else {
             newSortBy = undefined;
+            // Report the direction the user was actually looking at, not the
+            // cycle's starting point. Previously this left newDirection at
+            // firstDirection, so clearing an ascending sort on a descending-first
+            // column announced "descending" -- a direction that had never been on
+            // screen (observed downstream, judell/bram#290).
+            newDirection = _sortingDirection;
           }
         }
 
@@ -1397,7 +1421,7 @@ export const Table = memo(
         // Even if sorting is internal, we can notify other components through this callback
         sortingDidChange?.(newSortBy, newDirection);
       },
-      [_sortBy, willSort, sortingDidChange, _sortingDirection],
+      [_sortBy, willSort, sortingDidChange, _sortingDirection, safeColumns, defaultSortDirection],
     );
 
     // --- Prepare column renderers according to columns defined in the table

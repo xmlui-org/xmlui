@@ -429,6 +429,27 @@ This property is `true` by default and is applied to the underlying control for 
 
 %-PROP-END
 
+%-PROP-START defaultSortDirection
+
+Sets which direction the *first* click on this column's header sorts, overriding
+the Table's own [`defaultSortDirection`](/docs/reference/components/Table#defaultsortdirection).
+
+Use it for the odd column that reads the other way round from the rest of its
+table -- a name column in a table of counts, or a single "biggest first" measure
+among otherwise alphabetical fields.
+
+```xmlui copy /defaultSortDirection="ascending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+When unset, the column inherits the Table's value, then `ascending`. The click
+cycle keeps three states either way; only its starting point moves.
+
+%-PROP-END
+
 %-PROP-START canSort
 
 Columns with `bindTo` are sortable by default. Click on the `Name` or `Quantity` column headers to order the data. The `Unit` column has sorting explicitly disabled with `canSort="false"`.

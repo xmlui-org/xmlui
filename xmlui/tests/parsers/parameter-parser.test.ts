@@ -3,6 +3,7 @@ import { parseParameterString } from "../../src/components-core/script-runner/Pa
 import type { Expression } from "../../src/components-core/script-runner/ScriptingSourceTree";
 import { T_BINARY_EXPRESSION, T_LITERAL } from "../../src/parsers/scripting/ScriptingNodeTypes";
 import { UnsupportedCompiledScriptNodeError } from "../../src/components-core/script-compiler";
+import { collectVariableDependencies } from "../../src/components-core/script-runner/visitors";
 
 describe("parseParameterString", () => {
   it("Empty string works", () => {
@@ -155,5 +156,84 @@ describe("parseParameterString", () => {
     expect((result[1].value as Expression).type).toBe(T_LITERAL);
     expect(result[2].type).toBe("literal");
     expect(result[2].value).toBe("$/");
+  });
+
+  // --- https://github.com/xmlui-org/xmlui/issues/3774
+  // A braced section whose content parses to no expression at all (empty,
+  // whitespace-only, or comment-only — comments are lexer trivia, so they
+  // leave no tokens behind) must not produce an expression segment with a
+  // null `value`. It should be treated as literal source text instead.
+  describe("comment-only / empty expression segments (issue #3774)", () => {
+    it("comment-only braces are parsed as a literal segment, not a null expression", () => {
+      // --- Act
+      const result = parseParameterString("before {/* note */} after");
+
+      // --- Assert: no segment has type "expression" with a null value
+      expect(result.every((segment) => segment.type === "literal")).toBe(true);
+      expect(result.map((s) => s.value).join("")).toContain("before ");
+      expect(result.map((s) => s.value).join("")).toContain(" after");
+      // --- No expression segment was fabricated around the null AST node
+      expect(result.some((segment) => segment.type === "expression")).toBe(false);
+    });
+
+    it("whitespace-only braces are also parsed as a literal segment", () => {
+      // --- Act
+      const result = parseParameterString("{   }");
+
+      // --- Assert
+      expect(result.length).toBe(1);
+      expect(result[0].type).toBe("literal");
+      expect(result[0].value).toBe("   ");
+    });
+
+    it("dependency collection never sees a null expression value (interpreted mode)", () => {
+      // --- Act
+      const result = parseParameterString("before @{ /* note */ } after");
+
+      // --- Assert: every segment is safe to feed into collectVariableDependencies
+      for (const segment of result) {
+        if (segment.type === "expression") {
+          expect(() => collectVariableDependencies(segment.value)).not.toThrow();
+        }
+      }
+      // --- The specific crash reported in #3774: no segment carries a null value
+      expect(result.some((segment) => (segment as any).value === null)).toBe(false);
+    });
+
+    it("comment-only braces do not throw when compiled bindings are requested", () => {
+      // --- Act & Assert
+      expect(() =>
+        parseParameterString("before @{ /* note */ } after", {
+          compileBindings: true,
+          sourceId: "Main.xmlui:comment-only",
+        }),
+      ).not.toThrow();
+
+      const result = parseParameterString("before @{ /* note */ } after", {
+        compileBindings: true,
+        sourceId: "Main.xmlui:comment-only",
+      });
+
+      // --- No expression segment (and therefore no compiled artifact) was
+      // built for the comment-only braces.
+      expect(result.every((segment) => segment.type === "literal")).toBe(true);
+    });
+
+    it("a real expression alongside a comment-only one still compiles correctly", () => {
+      // --- Act
+      const result = parseParameterString("{a+b}{/* note */}", {
+        compileBindings: true,
+        sourceId: "Main.xmlui:mixed",
+      });
+
+      // --- Assert
+      expect(result[0].type).toBe("expression");
+      if (result[0].type === "expression") {
+        expect(result[0].compiled).toMatchObject({
+          dependencies: ["a", "b"],
+        });
+      }
+      expect(result[1].type).toBe("literal");
+    });
   });
 });
