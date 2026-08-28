@@ -1,6 +1,10 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
 import type { TokenType } from "../../parsers/scripting/TokenType";
 import type { ScriptParserErrorMessage } from "../../abstractions/scripting/ScriptParserError";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSourceRange,
+} from "../script-compiler/types";
 
 // --- All binding expression tree node types
 type ScriptNode = Statement | Expression;
@@ -325,6 +329,7 @@ export interface FunctionDeclaration extends ScripNodeBase {
   args: Expression[];
   stmt: BlockStatement;
   async?: boolean;
+  sourceModule?: string;
 }
 
 export interface ImportSpecifier extends ExpressionBase {
@@ -577,12 +582,27 @@ export type CollectedDeclarations = {
   vars: Record<string, CodeDeclaration>;
   functions: Record<string, CodeDeclaration>;
   moduleErrors?: ModuleErrors;
+  warnings?: string[];
   hasInvalidStatements?: boolean;
   hasUnresolvableImports?: boolean;
 };
 
-export type CodeDeclaration = {
+export type CodeDeclarationCompilation = {
   source?: string;
+  compiled?: CompiledScriptArtifact;
+  compiledUnsupported?: boolean;
+  sourceId?: string;
+  sourceRange?: CompiledScriptSourceRange;
+};
+
+export type ParsedCodeDeclaration = CodeDeclarationCompilation & {
   tree: Expression;
   [x: string]: unknown;
 };
+
+export type FunctionCodeDeclaration = ArrowExpression &
+  CodeDeclarationCompilation & {
+    [x: string]: unknown;
+  };
+
+export type CodeDeclaration = ParsedCodeDeclaration | FunctionCodeDeclaration;

@@ -84,6 +84,41 @@ var b = 2;
     expect(cd.script).equal("\nvar a = 1;\nvar b = 2;\n");
   });
 
+  it("does not compile script functions by default", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>function add(a, b) { return a + b; }</script>
+      </Stack>
+    `) as ComponentDef;
+
+    expect((cd.scriptCollected?.functions.add as any).compiled).toBeUndefined();
+  });
+
+  it("compiles script functions when event handler compilation is enabled", () => {
+    const cd = transformSource(
+      `
+        <Stack>
+          <script>function add(a, b) { return a + b; }</script>
+        </Stack>
+      `,
+      123,
+      false,
+      undefined,
+      { compileEventHandlers: true },
+    ) as ComponentDef;
+
+    const add = cd.scriptCollected?.functions.add as any;
+    expect(add.compiled).toMatchObject({
+      target: "event-async",
+      sourceId: "123#function-add",
+      sourceText: "function add(a, b) { return a + b; }",
+    });
+    expect(add.compiled.sources[0]).toMatchObject({
+      id: "123",
+      url: "/@xmlui-source/123",
+    });
+  });
+
   it("Script works with CompoundComponent", () => {
     const cd = transformSource(`
       <Component name="MyComp">

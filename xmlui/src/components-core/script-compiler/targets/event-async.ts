@@ -787,6 +787,14 @@ function emitAfterStatement(
   statement: Statement,
   options?: { checkYield?: boolean },
 ): void {
+  if (options?.checkYield === true) {
+    writer.write(
+      "await runtime.completeStatement(evalContext, undefined);",
+      statement,
+    );
+    writer.write("await runtime.checkpointIfDue(evalContext);", statement);
+    return;
+  }
   if (options?.checkYield === false) {
     return;
   }
@@ -818,6 +826,7 @@ function emitReturnStatement(
     checkYield: statement.expr ? expressionMayYield(statement.expr, context) : false,
   });
   writer.write("await runtime.flushPendingState(evalContext);", statement);
+  writer.write(`runtime.setBlockReturnValue(evalContext, ${returnName}, thread);`, statement);
   writer.write(`return ${returnName};`, statement);
 }
 

@@ -7,6 +7,7 @@ import type {
   Identifier,
   Literal,
   Expression,
+  ParsedCodeDeclaration,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import {
   T_VAR_STATEMENT,
@@ -650,17 +651,18 @@ describe("Parser - var destructuring", () => {
 
     // The temp var's tree should be an identifier referencing "source"
     const tempKey = Object.keys(result.vars).find((k) => k.startsWith("__destr_"))!;
-    expect(result.vars[tempKey].tree).not.equal(undefined);
-    expect(result.vars[tempKey].tree.type).equal(T_IDENTIFIER);
+    const tempVar = result.vars[tempKey] as ParsedCodeDeclaration;
+    expect(tempVar.tree).not.equal(undefined);
+    expect(tempVar.tree.type).equal(T_IDENTIFIER);
 
     // a's tree is a MemberAccessExpression: __destr_N.a
-    const aTree = result.vars.a.tree;
+    const aTree = (result.vars.a as ParsedCodeDeclaration).tree;
     expect(aTree.type).equal(T_MEMBER_ACCESS_EXPRESSION);
     expect((aTree as MemberAccessExpression).member).equal("a");
     expect(((aTree as MemberAccessExpression).obj as Identifier).name).equal(tempKey);
 
     // b's tree is a MemberAccessExpression: __destr_N.b
-    const bTree = result.vars.b.tree;
+    const bTree = (result.vars.b as ParsedCodeDeclaration).tree;
     expect(bTree.type).equal(T_MEMBER_ACCESS_EXPRESSION);
     expect((bTree as MemberAccessExpression).member).equal("b");
   });
@@ -670,15 +672,15 @@ describe("Parser - var destructuring", () => {
     const result = collectCodeBehindFromSource("test-tree", source);
 
     const tempKey = Object.keys(result.vars).find((k) => k.startsWith("__destr_"))!;
-    expect(result.vars[tempKey].tree.type).equal(T_IDENTIFIER);
+    expect((result.vars[tempKey] as ParsedCodeDeclaration).tree.type).equal(T_IDENTIFIER);
 
     // first's tree is __destr_N[0]
-    const firstTree = result.vars.first.tree;
+    const firstTree = (result.vars.first as ParsedCodeDeclaration).tree;
     expect(firstTree.type).equal(T_CALCULATED_MEMBER_ACCESS_EXPRESSION);
     expect(((firstTree as CalculatedMemberAccessExpression).member as Literal).value).equal(0);
 
     // second's tree is __destr_N[1]
-    const secondTree = result.vars.second.tree;
+    const secondTree = (result.vars.second as ParsedCodeDeclaration).tree;
     expect(secondTree.type).equal(T_CALCULATED_MEMBER_ACCESS_EXPRESSION);
     expect(((secondTree as CalculatedMemberAccessExpression).member as Literal).value).equal(1);
   });

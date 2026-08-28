@@ -37,7 +37,7 @@ import { useMemo, type MutableRefObject } from "react";
 import memoizeOne from "memoize-one";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
-import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
+import type { ParsedCodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import { useAppContext } from "../AppContext";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import { isParsedCodeDeclaration } from "../../abstractions/InternalMarkers";
@@ -227,6 +227,6 @@ export function useVars(
  * @param value - Value to check
  * @returns True if value is a CodeDeclaration
  */
-export function isParsedValue(value: any): value is CodeDeclaration {
+export function isParsedValue(value: any): value is ParsedCodeDeclaration {
   return isParsedCodeDeclaration(value);
 }

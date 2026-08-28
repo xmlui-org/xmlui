@@ -6,8 +6,8 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-  CodeDeclaration,
-  Identifier} from "./ScriptingSourceTree";
+  Identifier,
+} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { getIdentifierScope } from "./eval-tree-common";
 import {
@@ -525,8 +525,7 @@ export function depsOfValue(value: unknown, stripRoot = true): string[] {
   try {
     if (value === null || value === undefined) return [];
     if (isParsedValue(value)) {
-      // isParsedValue narrows to CodeDeclaration, which has a typed .tree field.
-      return (collectVariableDependencies((value as CodeDeclaration).tree) ?? []).map(process);
+      return (collectVariableDependencies(value.tree) ?? []).map(process);
     }
     if (typeof value === "object") {
       const obj = value as Record<string, unknown>;
@@ -590,7 +589,7 @@ export function depsOfValueWithReads(
   try {
     if (value === null || value === undefined) return { all: [], reads: [] };
     if (isParsedValue(value)) {
-      const tree = (value as CodeDeclaration).tree;
+      const tree = value.tree;
       const all = (
         collectVariableDependencies(tree, {}, { includeAssignmentTargets: true }) ?? []
       ).map(rootIdentifier);

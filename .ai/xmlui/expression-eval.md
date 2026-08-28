@@ -48,9 +48,13 @@ The JavaScript compiler targets (`components-core/script-compiler`) carry source
 intermediate mappings into Source Map v3.
 
 `xmluiConfig.compileScripts` is the preferred public switch for JavaScript-compiled XMLUI scripts.
-It enables supported binding expression and event-handler compilation. The older
-`compileBindings` and `compileEventHandlers` keys are still accepted as compatibility aliases when a
-caller needs to opt a target in or out independently.
+It enables supported binding expression and event-handler compilation. Event-handler compilation
+also compiles executable script declarations: inline `<script>` functions, `.xmlui.xs` code-behind
+functions, inline component `codeBehind` functions, `Globals.xs` functions, and imported `.xs`
+helpers. Global `var` declarations still compile as binding expressions, so callers that opt in only
+with `compileEventHandlers: true` get compiled declaration functions but interpreted global vars.
+The older `compileBindings` and `compileEventHandlers` keys are still accepted as compatibility
+aliases when a caller needs to opt a target in or out independently.
 
 `xmluiConfig.compiledScriptSourceMaps` controls runtime debug comments for compiled scripts. In
 Vite dev server mode, source maps default to `"external"` whenever script compilation is enabled,
@@ -357,6 +361,8 @@ Attribute values are split into literal and expression segments:
 - `var` → reactive variables; `function` → arrow expressions compiled into container scope
 - Imported functions from other `.xs` files are converted to arrow expressions
 - Functions and vars merged into the container's `localContext` at runtime
+- When event-handler compilation is enabled, supported functions carry compiled JavaScript
+  artifacts and fall back to interpreted execution when compilation is unsupported.
 
 Special files:
 
