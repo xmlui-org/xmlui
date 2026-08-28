@@ -93,6 +93,18 @@ export const ColumnMd = createMetadata({
       defaultValue: defaultProps.canSort,
       valueType: "boolean",
     },
+    defaultSortDirection: {
+      description:
+        "Sets which direction the *first* click on this column's header sorts. " +
+        "Use `descending` for columns where the largest value is the interesting one " +
+        "(counts, totals, percentages), so a single click gives the useful order. " +
+        "The click cycle keeps three states and only its starting point moves: with " +
+        "`descending` it runs descending, ascending, unsorted. When unset, the column " +
+        "inherits the Table's `defaultSortDirection`, then `ascending`.",
+      availableValues: ["ascending", "descending"],
+      valueType: "string",
+      isStrictEnum: true,
+    },
     pinTo: {
       description:
         `This property allows the column to be pinned to ` +
@@ -310,6 +322,12 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         tooltipOptions={extractValue(node.props.tooltipOptions, true)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
         canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
+        defaultSortDirection={
+          extractValue.asOptionalString(node.props.defaultSortDirection) as
+            | "ascending"
+            | "descending"
+            | undefined
+        }
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
         pinTo={extractValue.asOptionalString(node.props.pinTo)}
         type={extractValue.asOptionalString(node.props.type)}

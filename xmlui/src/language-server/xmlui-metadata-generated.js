@@ -4622,6 +4622,15 @@ export default {
         "defaultValue": true,
         "valueType": "boolean"
       },
+      "defaultSortDirection": {
+        "description": "Sets which direction the *first* click on this column's header sorts. Use `descending` for columns where the largest value is the interesting one (counts, totals, percentages), so a single click gives the useful order. The click cycle keeps three states and only its starting point moves: with `descending` it runs descending, ascending, unsorted. When unset, the column inherits the Table's `defaultSortDirection`, then `ascending`.",
+        "availableValues": [
+          "ascending",
+          "descending"
+        ],
+        "valueType": "string",
+        "isStrictEnum": true
+      },
       "pinTo": {
         "description": "This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched. If this property is not set, the column is not pinned to any edge.",
         "availableValues": [
@@ -17939,6 +17948,16 @@ export default {
       "sortDirection": {
         "description": "This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set. By default ascending order is used.",
         "valueType": "string"
+      },
+      "defaultSortDirection": {
+        "description": "Sets which direction the *first* click on a column header sorts. Use `descending` for tables whose interesting rows are the largest ones (counts, totals, percentages), so one click gives the useful order instead of two. The click cycle keeps three states and only its starting point moves: with `descending` it runs descending, ascending, unsorted. Individual `Column` components override this with their own `defaultSortDirection`. It also supplies the initial direction when [`sortBy`](#sortby) is set without an explicit [`sortDirection`](#sortdirection), so a table declared biggest-first opens that way rather than needing a click.",
+        "availableValues": [
+          "ascending",
+          "descending"
+        ],
+        "valueType": "string",
+        "isStrictEnum": true,
+        "defaultValue": "ascending"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",

@@ -310,6 +310,22 @@ export const TableMd = createMetadata({
         "ascending order is used.",
       valueType: "string",
     },
+    defaultSortDirection: {
+      description:
+        "Sets which direction the *first* click on a column header sorts. Use " +
+        "\`descending\` for tables whose interesting rows are the largest ones (counts, " +
+        "totals, percentages), so one click gives the useful order instead of two. The " +
+        "click cycle keeps three states and only its starting point moves: with " +
+        "\`descending\` it runs descending, ascending, unsorted. Individual \`Column\` " +
+        "components override this with their own \`defaultSortDirection\`. It also supplies " +
+        "the initial direction when [\`sortBy\`](#sortby) is set without an explicit " +
+        "[\`sortDirection\`](#sortdirection), so a table declared biggest-first opens that " +
+        "way rather than needing a click.",
+      availableValues: ["ascending", "descending"],
+      valueType: "string",
+      isStrictEnum: true,
+      defaultValue: defaultProps.defaultSortDirection,
+    },
     autoFocus: dAutoFocus(),
     hideHeader: {
       description:
@@ -1145,6 +1161,10 @@ const TableWithColumns = memo(
             rowUnselectablePredicate={stableRowUnselectablePredicate}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
+            defaultSortDirection={extractValue.asOptionalString(
+              node.props?.defaultSortDirection,
+              defaultProps.defaultSortDirection,
+            )}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}

@@ -20,6 +20,7 @@ export const defaultProps = {
   initiallySelected: EMPTY_ARRAY,
   pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as "ascending" | "descending",
+  defaultSortDirection: "ascending" as "ascending" | "descending",
   autoFocus: false,
   hideHeader: false,
   hideNoDataView: false,

@@ -7468,3 +7468,250 @@ test.describe("column hover highlight", () => {
     expect(handlerType).toBe("undefined");
   });
 });
+
+// =============================================================================
+// DEFAULT SORT DIRECTION (#3841)
+// =============================================================================
+
+test.describe("defaultSortDirection", () => {
+  // quantity: Apple 5, Banana 3, Carrot 10, Spinach 2
+  // ascending  -> 2, 3, 5, 10   (Spinach first)
+  // descending -> 10, 5, 3, 2   (Carrot first)
+  const firstQuantityCell = (page: any) => page.locator("td").nth(1);
+
+  const header = (page: any) =>
+    page.getByRole("columnheader").filter({ hasText: "Quantity" }).first();
+
+  test("first click sorts descending when the table sets it", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' defaultSortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+  });
+
+  test("the cycle runs descending, ascending, unsorted", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' defaultSortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("2");
+
+    // Third click clears sorting, restoring source order: Apple(5) first.
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("5");
+  });
+
+  // The regression guard: unset must behave exactly as it did before this prop.
+  test("unset keeps the original ascending, descending, unsorted cycle", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("2");
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("5");
+  });
+
+  test("a column's own value overrides the table's", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' defaultSortDirection="descending">
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true" defaultSortDirection="ascending"/>
+      </Table>
+    `);
+
+    // The column opts back into ascending despite the table-level descending.
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("2");
+  });
+
+  test("a column can opt into descending on an otherwise ascending table", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}'>
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true" defaultSortDirection="descending"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+  });
+
+  test("seeds the initial sort when sortBy is set without sortDirection", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        sortBy="quantity"
+        defaultSortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    // Opens biggest-first without a click -- the surprise this replaced was
+    // "defaultSortDirection does not affect the default sort direction".
+    await expect(firstQuantityCell(page)).toHaveText("10");
+  });
+
+  test("an explicit sortDirection still wins over defaultSortDirection", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        sortBy="quantity"
+        sortDirection="ascending"
+        defaultSortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await expect(firstQuantityCell(page)).toHaveText("2");
+  });
+
+  test("seeding does not disturb the click cycle that follows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        sortBy="quantity"
+        defaultSortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await expect(firstQuantityCell(page)).toHaveText("10");
+    // Already on the first direction, so the next click flips rather than restarting.
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("2");
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("5");
+  });
+
+  // The exact configuration of the docs' per-column override playground: two
+  // sortable columns in ONE table resolving in opposite directions.
+  test("two columns in one table resolve independently", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' defaultSortDirection="descending">
+        <Column bindTo="name" canSort="true" defaultSortDirection="ascending"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    const nameHeader = page.getByRole("columnheader").filter({ hasText: "Name" }).first();
+    const firstNameCell = page.locator("td").nth(0);
+
+    // name overrides to ascending -> A first
+    await nameHeader.click();
+    await expect(firstNameCell).toHaveText("Apple");
+
+    // quantity inherits the table's descending -> largest first
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+  });
+
+  // Downstream specimen (judell/bram#290): clearing an ascending sort on a
+  // descending-first column used to announce "descending" -- a direction that had
+  // never been on screen.
+  test("the clearing click reports the direction that was on screen", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        defaultSortDirection="descending"
+        onSortingDidChange="(by, dir) => testState = (by || 'cleared') + ':' + dir">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    await expect.poll(testStateDriver.testState).toEqual("quantity:descending");
+
+    await header(page).click();
+    await expect.poll(testStateDriver.testState).toEqual("quantity:ascending");
+
+    // The user is looking at ascending, so that is what the clearing click reports.
+    await header(page).click();
+    await expect.poll(testStateDriver.testState).toEqual("cleared:ascending");
+  });
+
+  // Also from #290: switching columns restarts at the NEW column's default rather
+  // than continuing the previous column's cycle.
+  test("switching columns restarts at the new column's default", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' defaultSortDirection="descending">
+        <Column bindTo="name" canSort="true" defaultSortDirection="ascending"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    const nameHeader = page.getByRole("columnheader").filter({ hasText: "Name" }).first();
+
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+    // Switching to name starts at ITS default (ascending), not quantity's next stage.
+    await nameHeader.click();
+    await expect(page.locator("td").nth(0)).toHaveText("Apple");
+    // And back again restarts quantity at descending.
+    await header(page).click();
+    await expect(firstQuantityCell(page)).toHaveText("10");
+  });
+
+  test("willSort receives the resolved direction and can still cancel", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        defaultSortDirection="descending"
+        onWillSort="(by, dir) => { testState = by + ':' + dir; return false; }">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    `);
+
+    await header(page).click();
+    // The handler saw the resolved direction, not the old hardcoded "ascending".
+    await expect.poll(testStateDriver.testState).toEqual("quantity:descending");
+    // Returning false still cancels: source order is untouched.
+    await expect(firstQuantityCell(page)).toHaveText("5");
+  });
+});
