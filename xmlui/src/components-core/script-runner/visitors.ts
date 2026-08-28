@@ -64,10 +64,19 @@ import { isParsedValue } from "../state/variable-resolution";
  *   provides write targets at runtime.
  */
 export function collectVariableDependencies(
-  program: Expression | Statement[],
+  program: Expression | Statement[] | null | undefined,
   referenceTrackedApis: Record<string, any> = {},
   options: { includeAssignmentTargets?: boolean } = {},
 ): string[] {
+  // --- Defense in depth: a null/undefined program (e.g. a parser producing
+  // no AST for an empty, whitespace-only, or comment-only source) has no
+  // variable dependencies. Guard here so callers never have to null-check
+  // before calling in, and a nullable upstream parser result can't crash
+  // dependency collection.
+  if (program == null) {
+    return [];
+  }
+
   // --- We use these variables to keep track of local variable scopes
   const evalContext: BindingTreeEvaluationContext = {};
   const thread = ensureMainThread(evalContext);
