@@ -227,16 +227,19 @@ When `compiledScriptSourceMaps` is enabled on the Vite XMLUI plugin, transformed
 `.xmlui.xs`, and `.xs` files include Source Map v3 metadata with `sources` pointing at
 `/@xmlui-source/...` URLs and `sourcesContent` carrying the original source text. `compileScripts`
 is the preferred public switch for script compilation; the older `compileBindings` and
-`compileEventHandlers` keys remain compatibility aliases.
+`compileEventHandlers` keys remain compatibility aliases. Event-handler compilation covers both
+inline handler expressions and executable script declarations, including inline `<script>`
+functions, code-behind files, `Globals.xs` functions, and imported `.xs` helpers. Binding
+compilation still controls reactive `var` declarations.
 
 `xmlui start` defaults source maps to `"external"` in dev server mode whenever script compilation is
 enabled, unless config explicitly sets `compiledScriptSourceMaps: false`. The dev server registers
 those sources in a virtual source registry and serves both source text and `.map` JSON via the same
 `/@xmlui-source/...` namespace.
 
-This is the preferred debug path for JavaScript-compiled binding expressions and event handlers. The
-runtime `new Function(...)` path can still fall back to inline source maps, but Vite dev server mode
-should prefer external sourcemap URLs.
+This is the preferred debug path for JavaScript-compiled binding expressions, event handlers, and
+script declaration functions. The runtime `new Function(...)` path can still fall back to inline
+source maps, but Vite dev server mode should prefer external sourcemap URLs.
 
 ### Configuration
 

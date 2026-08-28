@@ -3,6 +3,7 @@ import type { Plugin } from "vite";
 import {
   collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
+  type CodeBehindCollectionOptions,
 } from "../parsers/scripting/code-behind-collect";
 import {
   codeBehindFileExtension,
@@ -447,6 +448,30 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     displayName,
     sourceText,
   });
+  const createCodeBehindCollectionOptions = (
+    moduleName: string,
+    sourceText: string,
+    sourceIdPrefix = moduleName,
+    sourceUrl?: string,
+    displayName?: string,
+    sourceOrigin?: CodeBehindCollectionOptions["sourceOrigin"],
+    sources?: CompiledScriptSource[],
+  ): CodeBehindCollectionOptions | undefined => {
+    if (!compileEventHandlers) {
+      return undefined;
+    }
+    const primarySource = sources?.find((source) => source.id === moduleName);
+    return {
+      compileEventHandlers: true,
+      compiledScriptSourceMaps: sourceMapsEnabled() ? pluginOptions.compiledScriptSourceMaps : false,
+      sourceIdPrefix,
+      sourceUrl: sourceUrl ?? primarySource?.url ?? createDebugSourceUrl(sourceIdPrefix),
+      displayName: displayName ?? primarySource?.displayName ?? sourceIdPrefix,
+      sourceText,
+      sources,
+      sourceOrigin,
+    };
+  };
   const registerCompiledArtifacts = (value: unknown) => {
     if (!sourceMapsEnabled()) return;
     for (const artifact of collectCompiledArtifacts(value)) {
@@ -519,6 +544,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   async function resolveInlineComponentCodeBehind(
     inlineComponents: CompoundComponentDef[],
     entrypointFile: string,
+    debugSourcesById?: Map<string, CompiledScriptSource>,
   ) {
     for (const inlineComponent of inlineComponents) {
       if (!inlineComponent.codeBehind) {
@@ -528,9 +554,16 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         path.resolve(path.dirname(entrypointFile), inlineComponent.codeBehind),
       );
       const code = await fs.readFile(codeBehindPath, "utf-8");
+      const codeBehindDebugSource = createDebugSource(codeBehindPath, code);
+      debugSourcesById?.set(codeBehindPath, codeBehindDebugSource);
+      const collectorSources = [codeBehindDebugSource];
       const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
         try {
-          return await fs.readFile(modulePath, "utf-8");
+          const moduleSource = await fs.readFile(modulePath, "utf-8");
+          const moduleDebugSource = createDebugSource(modulePath, moduleSource);
+          debugSourcesById?.set(modulePath, moduleDebugSource);
+          collectorSources.push(moduleDebugSource);
+          return moduleSource;
         } catch (e) {
           throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
         }
@@ -540,6 +573,15 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         codeBehindPath,
         code,
         moduleFetcher,
+        createCodeBehindCollectionOptions(
+          codeBehindPath,
+          code,
+          codeBehindPath,
+          codeBehindDebugSource.url,
+          codeBehindDebugSource.displayName,
+          undefined,
+          collectorSources,
+        ),
       );
       removeCodeBehindTokensFromTree(codeBehind);
       inlineComponent.component = {
@@ -572,6 +614,9 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       if (xmluiExtension.test(id)) {
         // Use path relative to project root as fileId — matches glob keys used by _xsSourceFiles
         const fileId = projectRoot ? normalizedId.slice(projectRoot.length) : normalizedId;
+        const debugSourcesById = new Map<string, CompiledScriptSource>();
+        const rootDebugSource = createDebugSource(fileId, code);
+        debugSourcesById.set(fileId, rootDebugSource);
 
         // --- Extract script content from XMLUI markup using ScriptExtractor
         const scriptResult = ScriptExtractor.extractInlineScript(code);
@@ -579,12 +624,19 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         if (scriptResult) {
           const scriptContent = scriptResult.script;
+          const collectorSources: CompiledScriptSource[] = [
+            { ...rootDebugSource, id: normalizedId },
+          ];
 
           // --- Create a module fetcher for import support
           const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
             // The modulePath parameter is the RESOLVED absolute path
             try {
-              return await fs.readFile(modulePath, "utf-8");
+              const moduleSource = await fs.readFile(modulePath, "utf-8");
+              const moduleDebugSource = createDebugSource(modulePath, moduleSource);
+              debugSourcesById.set(modulePath, moduleDebugSource);
+              collectorSources.push(moduleDebugSource);
+              return moduleSource;
             } catch (e) {
               throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
             }
@@ -595,10 +647,22 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             // Clear caches for fresh parse
             clearAllModuleCaches();
 
+            const scriptContentOffset = code.indexOf(scriptContent);
             codeBehind = await collectCodeBehindFromSourceWithImports(
               normalizedId,
               scriptContent,
               moduleFetcher,
+              createCodeBehindCollectionOptions(
+                normalizedId,
+                scriptContent,
+                fileId,
+                rootDebugSource.url,
+                rootDebugSource.displayName,
+                scriptContentOffset >= 0
+                  ? { offset: scriptContentOffset, sourceText: code }
+                  : undefined,
+                collectorSources,
+              ),
             );
             removeCodeBehindTokensFromTree(codeBehind);
 
@@ -625,7 +689,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
           xmlUiMarkupToComponent(code, fileId, codeBehind, optimizerMetadataLookup, parserOptions);
         if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
-          await resolveInlineComponentCodeBehind(inlineComponents, normalizedId);
+          await resolveInlineComponentCodeBehind(inlineComponents, normalizedId, debugSourcesById);
         }
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
@@ -796,7 +860,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           stripComponentSourceMetadata(inlineComponents);
         }
 
-        const debugSources = [createDebugSource(fileId, code)];
+        const debugSources = Array.from(debugSourcesById.values());
         virtualSources?.registerAll(debugSources);
         const file = {
           component,
@@ -839,13 +903,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         // --- Create a module fetcher for import support
         const debugSourcesById = new Map<string, CompiledScriptSource>();
-        debugSourcesById.set(normalizedId, createDebugSource(normalizedId, code));
+        const rootDebugSource = createDebugSource(normalizedId, code);
+        const collectorSources: CompiledScriptSource[] = [rootDebugSource];
+        debugSourcesById.set(normalizedId, rootDebugSource);
         const moduleFetcher: ModuleFetcher = async (modulePath: string) => {
           // The modulePath parameter is the RESOLVED absolute path, not the original import path
           // So we can just read it directly
           try {
             const moduleSource = await fs.readFile(modulePath, "utf-8");
-            debugSourcesById.set(modulePath, createDebugSource(modulePath, moduleSource));
+            const moduleDebugSource = createDebugSource(modulePath, moduleSource);
+            debugSourcesById.set(modulePath, moduleDebugSource);
+            collectorSources.push(moduleDebugSource);
             return moduleSource;
           } catch (e) {
             throw new Error(`Failed to read module: ${modulePath}. Error: ${e}`);
@@ -857,6 +925,15 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           normalizedId,
           code,
           moduleFetcher,
+          createCodeBehindCollectionOptions(
+            normalizedId,
+            code,
+            normalizedId,
+            rootDebugSource.url,
+            rootDebugSource.displayName,
+            undefined,
+            collectorSources,
+          ),
         );
         removeCodeBehindTokensFromTree(codeBehind);
 

@@ -92,6 +92,14 @@ export const eventAsyncRuntime = {
     await this.checkCancel(evalContext);
   },
 
+  async completeStatement(
+    evalContext: BindingTreeEvaluationContext,
+    statement?: Statement,
+  ): Promise<void> {
+    await evalContext.onStatementCompleted?.(evalContext, statement as Statement);
+    await this.checkCancel(evalContext);
+  },
+
   async maybeYield(): Promise<void> {
     const state = this.ensureYieldState();
     const now = this.now();

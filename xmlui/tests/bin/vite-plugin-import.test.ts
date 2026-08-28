@@ -303,6 +303,91 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       expect(inlineComponent.codeBehindSource).toContain(`var message`);
     });
 
+    it("compiles inline component codeBehind functions when event compilation is enabled", async () => {
+      const dir = await mkdtemp(join(tmpdir(), "xmlui-vite-inline-compile-"));
+      const srcDir = join(dir, "src");
+      await mkdir(srcDir);
+      const codeBehindPath = join(srcDir, "Inline.xs").replace(/\\/g, "/");
+      const codeBehindSource = `function add(a, b) { return a + b; }`;
+      await writeFile(codeBehindPath, codeBehindSource);
+
+      const { result } = await transformXmlui(
+        `
+          <Component name='WithCodeBehind' codeBehind='Inline.xs'>
+            <Text value="{add(2, 3)}" />
+          </Component>
+          <App>
+            <WithCodeBehind />
+          </App>
+        `,
+        join(srcDir, "Main.xmlui"),
+        dir,
+        { compileEventHandlers: true },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const add = mod.default.inlineComponents[0].component.functions.add;
+      expect(add.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: `${codeBehindPath}#function-add`,
+        sourceText: codeBehindSource,
+      });
+      expect(add.compiled.sources[0]).toMatchObject({
+        id: codeBehindPath,
+        sourceText: codeBehindSource,
+      });
+    });
+
+    it("serves inline component codeBehind debug sources and compiled source maps", async () => {
+      const dir = await mkdtemp(join(tmpdir(), "xmlui-vite-inline-debug-"));
+      const srcDir = join(dir, "src");
+      await mkdir(srcDir);
+      const codeBehindPath = join(srcDir, "Inline.xs").replace(/\\/g, "/");
+      const codeBehindSource = `function add(a, b) { return a + b; }`;
+      await writeFile(codeBehindPath, codeBehindSource);
+      const harness = await createPluginHarness(dir, {
+        compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const result = await harness.transform(
+        `
+          <Component name='WithCodeBehind' codeBehind='Inline.xs'>
+            <Text value="{add(2, 3)}" />
+          </Component>
+          <App>
+            <WithCodeBehind />
+          </App>
+        `,
+        join(srcDir, "Main.xmlui"),
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.debugSources).toContainEqual(
+        expect.objectContaining({
+          id: codeBehindPath,
+          url: "/@xmlui-source/src/Inline.xs",
+          sourceText: codeBehindSource,
+        }),
+      );
+
+      const sourceResponse = await harness.request("/@xmlui-source/src/Inline.xs");
+      expect(sourceResponse.nextCalled).toBe(false);
+      expect(sourceResponse.body).toBe(codeBehindSource);
+
+      const compiledSourceId =
+        mod.default.inlineComponents[0].component.functions.add.compiled.sourceId;
+      const compiledMapResponse = await harness.request(
+        `/@xmlui-source/__compiled/${encodeURIComponent(compiledSourceId)}.js.map`,
+      );
+      expect(compiledMapResponse.nextCalled).toBe(false);
+      expect(JSON.parse(compiledMapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/Inline.xs"],
+        sourcesContent: [codeBehindSource],
+      });
+    });
+
     it("serializes empty-app inline component warnings for the browser runtime", async () => {
       const { result, warnings } = await transformXmlui(
         `<Component name='OnlyInline'><Text value="inline" /></Component>`,
@@ -382,6 +467,94 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       expect(mod.default.component.events.click.compiled).toBeUndefined();
     });
 
+    it("does not compile inline script functions by default", async () => {
+      const { result } = await transformXmlui(
+        `<App><script>function add(a, b) { return a + b; }</script></App>`,
+        "/project/src/Main.xmlui",
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.scriptCollected.functions.add.compiled).toBeUndefined();
+    });
+
+    it("serializes compiled inline script functions when event compilation is enabled", async () => {
+      const source = `<App><script>function add(a, b) { return a + b; }</script></App>`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
+        compileEventHandlers: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const add = mod.default.component.scriptCollected.functions.add;
+      expect(add.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/src/Main.xmlui#function-add",
+        sourceText: "function add(a, b) { return a + b; }",
+      });
+      expect(add.compiled.sources[0]).toMatchObject({
+        id: "/src/Main.xmlui",
+        url: "/@xmlui-source/src/Main.xmlui",
+        sourceText: source,
+      });
+      expect(add.compiled.js).toContain("return (async () =>");
+    });
+
+    it("maps multiline inline script function ranges to the original XMLUI source", async () => {
+      const source = `<App>
+  <script>
+    function run(value) {
+      const next = value + 1;
+      return next;
+    }
+  </script>
+</App>`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
+        compileEventHandlers: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const run = mod.default.component.scriptCollected.functions.run;
+      expect(run.compiled.sourceRange).toMatchObject({
+        start: source.indexOf("const next"),
+        end: source.indexOf("return next") + "return next".length,
+        startLine: 4,
+        startColumn: 6,
+        endLine: 5,
+        endColumn: 17,
+      });
+      expect(run.compiled.mappings[0].sourceRange).toMatchObject({
+        start: source.indexOf("const next"),
+        startLine: 4,
+        startColumn: 6,
+      });
+    });
+
+    it("serializes compiled inline script functions with the common compileScripts switch", async () => {
+      const { result } = await transformXmlui(
+        `<App><script>function add(a, b) { return a + b; }</script></App>`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.scriptCollected.functions.add.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: "function add(a, b) { return a + b; }",
+      });
+    });
+
+    it("lets legacy compileEventHandlers disable inline script compilation under compileScripts", async () => {
+      const { result } = await transformXmlui(
+        `<App><script>function add(a, b) { return a + b; }</script></App>`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true, compileEventHandlers: false },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.component.scriptCollected.functions.add.compiled).toBeUndefined();
+    });
+
     it("emits XMLUI transform source maps and debug sources when enabled", async () => {
       const source = `<Button onClick="count = count + 1" />`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
@@ -444,6 +617,51 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         version: 3,
         sources: ["/@xmlui-source/src/Main.xmlui"],
         sourcesContent: [source],
+      });
+    });
+
+    it("serves inline script import debug sources and compiled source maps", async () => {
+      const dir = await mkdtemp(join(tmpdir(), "xmlui-vite-script-debug-"));
+      const srcDir = join(dir, "src");
+      await mkdir(srcDir);
+      const helperPath = join(srcDir, "helpers.xs").replace(/\\/g, "/");
+      const helperSource = `function double(x) { return x * 2; }`;
+      await writeFile(helperPath, helperSource);
+      const source = `<App>
+  <script>
+    import { double } from "./helpers.xs";
+    function run(value) { return double(value); }
+  </script>
+</App>`;
+      const harness = await createPluginHarness(dir, {
+        compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const result = await harness.transform(source, join(srcDir, "Main.xmlui"));
+      const mod = await importGeneratedModule(result.code);
+
+      expect(mod.default.debugSources).toContainEqual(
+        expect.objectContaining({
+          id: helperPath,
+          url: "/@xmlui-source/src/helpers.xs",
+          sourceText: helperSource,
+        }),
+      );
+      const sourceResponse = await harness.request("/@xmlui-source/src/helpers.xs");
+      expect(sourceResponse.nextCalled).toBe(false);
+      expect(sourceResponse.body).toBe(helperSource);
+
+      const compiledSourceId =
+        mod.default.component.scriptCollected.functions.double.compiled.sourceId;
+      const compiledMapResponse = await harness.request(
+        `/@xmlui-source/__compiled/${encodeURIComponent(compiledSourceId)}.js.map`,
+      );
+      expect(compiledMapResponse.nextCalled).toBe(false);
+      expect(JSON.parse(compiledMapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/helpers.xs"],
+        sourcesContent: [helperSource],
       });
     });
 
@@ -514,13 +732,16 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       await mkdir(srcDir);
       const mainPath = join(srcDir, "Main.xmlui.xs").replace(/\\/g, "/");
       const helperPath = join(srcDir, "helpers.xs").replace(/\\/g, "/");
-      await writeFile(helperPath, `function double(x) { return x * 2; }`);
+      const helperSource = `function double(x) { return x * 2; }`;
+      await writeFile(helperPath, helperSource);
       const source = `import { double } from "./helpers.xs";
 function run(value) { return double(value); }`;
-
-      const { result } = await transformXmlui(source, mainPath, dir, {
+      const harness = await createPluginHarness(dir, {
+        compileEventHandlers: true,
         compiledScriptSourceMaps: "external",
       });
+
+      const result = await harness.transform(source, mainPath);
 
       const mod = await importGeneratedModule(result.code);
       expect(result.map.sources).toEqual([
@@ -532,6 +753,117 @@ function run(value) { return double(value); }`;
         helperPath,
       ]);
       expect(mod.default.sourceUrl).toBe("/@xmlui-source/src/Main.xmlui.xs");
+
+      const sourceResponse = await harness.request("/@xmlui-source/src/helpers.xs");
+      expect(sourceResponse.nextCalled).toBe(false);
+      expect(sourceResponse.body).toBe(helperSource);
+
+      const compiledSourceId = mod.default.functions.double.compiled.sourceId;
+      const compiledMapResponse = await harness.request(
+        `/@xmlui-source/__compiled/${encodeURIComponent(compiledSourceId)}.js.map`,
+      );
+      expect(compiledMapResponse.nextCalled).toBe(false);
+      expect(JSON.parse(compiledMapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/helpers.xs"],
+        sourcesContent: [helperSource],
+      });
+    });
+
+    it("does not compile .xmlui.xs functions by default", async () => {
+      const source = `function run(value) { return value + 1; }`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs");
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.functions.run.compiled).toBeUndefined();
+    });
+
+    it("serializes compiled .xmlui.xs functions when event compilation is enabled", async () => {
+      const source = `function run(value) { return value + 1; }`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
+        compileEventHandlers: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const run = mod.default.functions.run;
+      expect(run.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/project/src/Main.xmlui.xs#function-run",
+        sourceText: source,
+      });
+      expect(run.compiled.sources[0]).toMatchObject({
+        id: "/project/src/Main.xmlui.xs",
+        url: "/@xmlui-source/src/Main.xmlui.xs",
+        sourceText: source,
+      });
+    });
+
+    it("serializes compiled .xmlui.xs functions with the common compileScripts switch", async () => {
+      const source = `function run(value) { return value + 1; }`;
+      const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
+        compileScripts: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      expect(mod.default.functions.run.compiled).toMatchObject({
+        target: "event-async",
+        sourceText: source,
+      });
+    });
+
+    it("serializes compiled Globals.xs functions when event compilation is enabled", async () => {
+      const source = `function formatName(value) { return value.toUpperCase(); }`;
+      const { result } = await transformXmlui(source, "/project/src/Globals.xs", "/project", {
+        compileEventHandlers: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const formatName = mod.default.functions.formatName;
+      expect(formatName.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/project/src/Globals.xs#function-formatName",
+        sourceText: source,
+      });
+      expect(formatName.compiled.sources[0]).toMatchObject({
+        id: "/project/src/Globals.xs",
+        url: "/@xmlui-source/src/Globals.xs",
+        sourceText: source,
+      });
+    });
+
+    it("serves Globals.xs debug sources and compiled source maps", async () => {
+      const source = `function formatName(value) { return value.toUpperCase(); }`;
+      const harness = await createPluginHarness("/project", {
+        compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const result = await harness.transform(source, "/project/src/Globals.xs");
+      const mod = await importGeneratedModule(result.code);
+
+      expect(mod.default.debugSources).toEqual([
+        {
+          id: "/project/src/Globals.xs",
+          url: "/@xmlui-source/src/Globals.xs",
+          displayName: "/project/src/Globals.xs",
+          sourceText: source,
+        },
+      ]);
+
+      const sourceResponse = await harness.request("/@xmlui-source/src/Globals.xs");
+      expect(sourceResponse.nextCalled).toBe(false);
+      expect(sourceResponse.body).toBe(source);
+
+      const compiledSourceId = mod.default.functions.formatName.compiled.sourceId;
+      const compiledMapResponse = await harness.request(
+        `/@xmlui-source/__compiled/${encodeURIComponent(compiledSourceId)}.js.map`,
+      );
+      expect(compiledMapResponse.nextCalled).toBe(false);
+      expect(JSON.parse(compiledMapResponse.body)).toMatchObject({
+        version: 3,
+        sources: ["/@xmlui-source/src/Globals.xs"],
+        sourcesContent: [source],
+      });
     });
 
     it("should resolve from vite project root", () => {

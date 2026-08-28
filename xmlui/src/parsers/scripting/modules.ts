@@ -147,6 +147,7 @@ export function parseScriptModule(moduleName: string, source: string): ScriptMod
           addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
           return;
         }
+        func.sourceModule = moduleName;
         functions[func.id.name] = func;
       });
 
@@ -339,6 +340,7 @@ async function doParseModule(
         addErrorMessage(ErrorCodes.funcAlreadyDefined, stmt, func.id.name);
         return;
       }
+      func.sourceModule = moduleName;
       functions[func.id.name] = func;
     });
 

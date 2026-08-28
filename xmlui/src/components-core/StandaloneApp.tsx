@@ -30,6 +30,7 @@ import { Parser } from "../parsers/scripting/Parser";
 import {
   collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
+  type CodeBehindCollectionOptions,
 } from "../parsers/scripting/code-behind-collect";
 import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
 import type { ModuleFetcher } from "../parsers/scripting/types";
@@ -61,6 +62,7 @@ import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 import { computeUsesForTree } from "./optimization/computedUses";
 import { getOptimizerMetadata } from "./optimization/metadataLookup";
+import { createDebugSourceUrl } from "./script-compiler/source";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -97,6 +99,67 @@ function optionalRecordField<K extends string, T extends Record<string, any>>(
   record: T | undefined,
 ): Partial<Record<K, T>> {
   return record ? ({ [key]: record } as Record<K, T>) : {};
+}
+
+type StandaloneScriptParserOptions = XmluiParserOptions & {
+  compiledScriptSourceMaps?: CodeBehindCollectionOptions["compiledScriptSourceMaps"];
+};
+
+function mergeStandaloneXmluiConfig(
+  appGlobals: Record<string, any> | undefined,
+  xmluiConfig: Record<string, any> | undefined,
+): Record<string, any> {
+  const merged: Record<string, any> = { ...(appGlobals ?? {}) };
+  if (xmluiConfig) {
+    for (const key of Object.keys(xmluiConfig)) {
+      if (xmluiConfig[key] !== undefined) {
+        merged[key] = xmluiConfig[key];
+      }
+    }
+  }
+  return merged;
+}
+
+function createStandaloneScriptParserOptions(
+  config?: Pick<StandaloneJsonConfig, "appGlobals" | "xmluiConfig">,
+): StandaloneScriptParserOptions {
+  const xmluiConfig = mergeStandaloneXmluiConfig(config?.appGlobals, config?.xmluiConfig);
+  const compileEventHandlers = xmluiConfig.compileEventHandlers ?? xmluiConfig.compileScripts ?? false;
+  const sourceMapMode = xmluiConfig.compiledScriptSourceMaps;
+  return {
+    compileEventHandlers,
+    ...(sourceMapMode === true || sourceMapMode === "inline" || sourceMapMode === "external"
+      ? { compiledScriptSourceMaps: sourceMapMode }
+      : {}),
+  };
+}
+
+function createStandaloneCodeBehindCollectionOptions(
+  moduleName: string,
+  sourceText: string,
+  parserOptions: StandaloneScriptParserOptions = {},
+  sourceOrigin?: CodeBehindCollectionOptions["sourceOrigin"],
+): CodeBehindCollectionOptions | undefined {
+  if (!parserOptions.compileEventHandlers) {
+    return undefined;
+  }
+  return {
+    compileEventHandlers: true,
+    compiledScriptSourceMaps: parserOptions.compiledScriptSourceMaps,
+    sourceIdPrefix: moduleName,
+    sourceUrl: createDebugSourceUrl(moduleName),
+    displayName: moduleName,
+    sourceText,
+    sources: [
+      {
+        id: moduleName,
+        url: createDebugSourceUrl(moduleName),
+        displayName: moduleName,
+        sourceText: sourceOrigin?.sourceText ?? sourceText,
+      },
+    ],
+    sourceOrigin,
+  };
 }
 
 /**
@@ -585,6 +648,7 @@ async function validateResponseIsNotHtml(response: Response): Promise<Response> 
 async function resolveInlineComponentCodeBehindFromFetch(
   inlineComponents: CompoundComponentDef[],
   entrypointUrl: string,
+  parserOptions: StandaloneScriptParserOptions = {},
 ): Promise<void> {
   for (const inlineComponent of inlineComponents) {
     if (!inlineComponent.codeBehind) {
@@ -605,6 +669,7 @@ async function resolveInlineComponentCodeBehindFromFetch(
         codeBehindUrl,
         code,
         moduleFetcher,
+        createStandaloneCodeBehindCollectionOptions(codeBehindUrl, code, parserOptions),
       );
       removeCodeBehindTokensFromTree(codeBehind);
       inlineComponent.component = {
@@ -632,7 +697,7 @@ async function resolveInlineComponentCodeBehindFromFetch(
 
 async function parseComponentMarkupResponse(
   response: Response,
-  parserOptions: XmluiParserOptions = {},
+  parserOptions: StandaloneScriptParserOptions = {},
 ): Promise<ParsedResponse> {
   const validatedResponse = await validateResponseIsNotHtml(response);
   const code = await validatedResponse.text();
@@ -657,10 +722,17 @@ async function parseComponentMarkupResponse(
       };
 
       // --- Collect code-behind with import support from inline scripts
+      const scriptContentOffset = code.indexOf(scriptContent);
       codeBehind = await collectCodeBehindFromSourceWithImports(
         fileId,
         scriptContent,
         moduleFetcher,
+        createStandaloneCodeBehindCollectionOptions(
+          fileId,
+          scriptContent,
+          parserOptions,
+          scriptContentOffset >= 0 ? { offset: scriptContentOffset, sourceText: code } : undefined,
+        ),
       );
       removeCodeBehindTokensFromTree(codeBehind);
     } catch (e) {
@@ -671,7 +743,7 @@ async function parseComponentMarkupResponse(
   let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
     xmlUiMarkupToComponent(code, fileId, codeBehind, undefined, parserOptions);
   if (parserOptions.role === "entrypoint" && inlineComponents.length > 0) {
-    await resolveInlineComponentCodeBehindFromFetch(inlineComponents, fileId);
+    await resolveInlineComponentCodeBehindFromFetch(inlineComponents, fileId, parserOptions);
   }
   if (warnings.length > 0) {
     console.group(`[xmlui] Warnings in '${fileId}':`);
@@ -707,7 +779,10 @@ async function parseComponentMarkupResponse(
  * the code-behind declarations. Otherwise, it returns a component definition that
  * displays the errors.
  */
-async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
+async function parseCodeBehindResponse(
+  response: Response,
+  parserOptions: StandaloneScriptParserOptions = {},
+): Promise<ParsedResponse> {
   const validatedResponse = await validateResponseIsNotHtml(response);
   const code = await validatedResponse.text();
 
@@ -764,6 +839,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
       response.url,
       code,
       moduleFetcher,
+      createStandaloneCodeBehindCollectionOptions(response.url, code, parserOptions),
     );
     if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
       return {
@@ -1562,11 +1638,20 @@ function useStandalone(
         return;
       }
 
+      // --- Fetch the configuration file (we do not check whether the content is semantically valid)
+      let config: StandaloneJsonConfig = undefined;
+      try {
+        const configResponse = await fetchWithoutCache(prefixPath(CONFIG_FILE));
+        await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
+        config = await configResponse.json();
+      } catch (e) {}
+      const standaloneParserOptions = createStandaloneScriptParserOptions(config);
+
       // --- Fetch the main file
       const entryPointPromise = new Promise(async (resolve) => {
         try {
           const resp = await fetchWithoutCache(prefixPath(MAIN_FILE));
-          resolve(parseComponentMarkupResponse(resp, { role: "entrypoint" }));
+          resolve(parseComponentMarkupResponse(resp, { ...standaloneParserOptions, role: "entrypoint" }));
         } catch (e) {
           resolve({
             component: errReportMessage(`Failed to load the main component (${MAIN_FILE})`),
@@ -1581,7 +1666,7 @@ function useStandalone(
       const globalsPromise = new Promise(async (resolve) => {
         try {
           const resp = await fetchWithoutCache(prefixPath(GLOBALS_FILE));
-          const parsedGlobals = await parseCodeBehindResponse(resp);
+          const parsedGlobals = await parseCodeBehindResponse(resp, standaloneParserOptions);
 
           const globalsXs = parsedGlobals?.codeBehind;
           const extractedGlobals = extractGlobals({
@@ -1599,14 +1684,6 @@ function useStandalone(
           resolve(null);
         }
       }) as any;
-
-      // --- Fetch the configuration file (we do not check whether the content is semantically valid)
-      let config: StandaloneJsonConfig = undefined;
-      try {
-        const configResponse = await fetchWithoutCache(prefixPath(CONFIG_FILE));
-        await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
-        config = await configResponse.json();
-      } catch (e) {}
 
       // --- Fetch the themes according to the configuration
       let themePromises: Promise<ThemeDefinition>[];
@@ -1627,9 +1704,9 @@ function useStandalone(
       const componentPromises = config?.components?.map(async (componentPath) => {
         const value = await fetchWithoutCache(prefixPath(componentPath));
         if (componentPath.endsWith(`.${componentFileExtension}`)) {
-          return await parseComponentMarkupResponse(value);
+          return await parseComponentMarkupResponse(value, standaloneParserOptions);
         } else {
-          return await parseCodeBehindResponse(value);
+          return await parseCodeBehindResponse(value, standaloneParserOptions);
         }
       });
 
@@ -2603,13 +2680,19 @@ export async function collectImportsFromStandaloneSources(
     if (!response.ok) throw new Error(`Failed to fetch module: ${modulePath}`);
     return await response.text();
   };
+  const parserOptions = createStandaloneScriptParserOptions(appDef);
 
   const resolveForComponent = async (comp: ComponentDef | CompoundComponentDef, fileId: string) => {
     const script = comp.script;
     if (script && comp.scriptCollected?.hasUnresolvableImports) {
       try {
         // C4: Sequential execution because this clears global caches
-        const resolved = await collectCodeBehindFromSourceWithImports(fileId, script, moduleFetcher);
+        const resolved = await collectCodeBehindFromSourceWithImports(
+          fileId,
+          script,
+          moduleFetcher,
+          createStandaloneCodeBehindCollectionOptions(fileId, script, parserOptions),
+        );
         removeCodeBehindTokensFromTree(resolved);
 
         // M3: Merge resolved imports. Sync-collected own decls win.

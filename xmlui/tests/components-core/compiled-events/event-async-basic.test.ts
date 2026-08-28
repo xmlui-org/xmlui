@@ -70,6 +70,17 @@ describe("compiled event-async basic statement subset", () => {
     expect(compiled.completed.length).toBe(0);
   });
 
+  it("stores explicit return values in the active block return slot", async () => {
+    const compiled = await runCompiled("return false;");
+    const interpreted = await runInterpreted("return false;");
+
+    expect(compiled.returnValue).toBe(false);
+    expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(false);
+    expect(compiled.evalContext.mainThread?.blocks?.[0].returnValue).toBe(
+      interpreted.evalContext.mainThread?.returnValue,
+    );
+  });
+
   it("executes if/else branches", async () => {
     const source = "if (enabled) { count = count + 10; } else { count = count - 1; }";
     const compiled = await runCompiled(source, { enabled: true, count: 2 });
@@ -161,6 +172,34 @@ describe("compiled event-async basic statement subset", () => {
       eventAsyncRuntime.now = originalNow;
       eventAsyncRuntime.yield = originalYield;
     }
+  });
+
+  it("refreshes state after yielding let declarations before the next statement", async () => {
+    const evalContext = createEvalContext({
+      localContext: {
+        api: {
+          execute: async () => {
+            return { id: 42 };
+          },
+        },
+        testState: undefined,
+      },
+      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      onStatementCompleted: () => {
+        evalContext.localContext.api = {
+          ...evalContext.localContext.api,
+          lastResult: { id: 42 },
+        };
+      },
+    });
+    const artifact = compileEventAsyncStatementSource(
+      "let r = api.execute(); testState = api.lastResult;",
+      "test:event:yielding-let-refresh",
+    );
+
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.testState).toEqual({ id: 42 });
   });
 
   it("suppresses compiled event-loop yields in sync execution mode", async () => {

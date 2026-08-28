@@ -3,7 +3,10 @@ import type {
   CompoundComponentDef,
   ReceivedContextVars,
 } from "../../abstractions/ComponentDefs";
-import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
+import {
+  collectCodeBehindFromSource,
+  type CodeBehindCollectionOptions,
+} from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
 import { collectVariableDependencies } from "../../components-core/script-runner/visitors";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
@@ -1645,7 +1648,11 @@ function transformXmluiNode(
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
-      comp.scriptCollected = collectCodeBehindFromSource(fileId.toString(), scriptContent);
+      comp.scriptCollected = collectCodeBehindFromSource(
+        fileId.toString(),
+        scriptContent,
+        createInlineScriptCollectionOptions(scriptContent, scriptTag.pos + scriptContentPos),
+      );
 
       // --- Merge pre-resolved imports if provided
       if (preResolvedImports) {
@@ -1684,6 +1691,36 @@ function transformXmluiNode(
     if (Object.keys(moduleErrors).length > 0) {
       comp.scriptError = moduleErrors;
     }
+  }
+
+  function createInlineScriptCollectionOptions(
+    scriptContent: string,
+    scriptContentOffset: number,
+  ): CodeBehindCollectionOptions | undefined {
+    if (!parserOptions.compileEventHandlers) {
+      return undefined;
+    }
+    const sourceId = String(fileId);
+    const sourceText = originalGetText(node);
+    return {
+      compileEventHandlers: true,
+      sourceIdPrefix: sourceId,
+      sourceUrl: createDebugSourceUrl(sourceId),
+      displayName: sourceId,
+      sourceText: scriptContent,
+      sources: [
+        {
+          id: sourceId,
+          url: createDebugSourceUrl(sourceId),
+          displayName: sourceId,
+          sourceText,
+        },
+      ],
+      sourceOrigin: {
+        offset: scriptContentOffset,
+        sourceText,
+      },
+    };
   }
 }
 

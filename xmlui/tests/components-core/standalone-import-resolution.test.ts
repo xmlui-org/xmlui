@@ -88,6 +88,62 @@ describe("collectImportsFromStandaloneSources", () => {
     expect(actualComponent.computedUses).toContain("parentVar");
   });
 
+  it("compiles resolved standalone script imports when event compilation is enabled", async () => {
+    const sources = {
+      "/app/components/MyComp.xmlui": `
+        <Component name="MyComp">
+          <Container>
+            <script>
+              import { myFunc } from "./utils.xs";
+            </script>
+            <Text value="{myFunc(3)}"/>
+          </Container>
+        </Component>
+      `,
+      "/app/components/utils.xs": `
+        function myFunc(x) { return x * 2; }
+      `,
+    };
+
+    const compDef = transformSource(sources["/app/components/MyComp.xmlui"]) as CompoundComponentDef;
+    const actualComponent = compDef.component;
+    expect(actualComponent.scriptCollected!.hasUnresolvableImports).toBe(true);
+
+    const appDef: StandaloneAppDescription = {
+      sources,
+      components: [compDef as any],
+      xmluiConfig: { compileEventHandlers: true },
+    };
+    const projectCompilation: ProjectCompilation = {
+      entrypoint: { filename: "/app/Main.xmlui", definition: null as any, dependencies: new Set() },
+      components: [
+        {
+          filename: "/app/components/MyComp.xmlui",
+          markupSource: sources["/app/components/MyComp.xmlui"],
+          definition: compDef as any,
+          dependencies: new Set(),
+        },
+      ],
+      themes: {},
+    };
+    const dummyHandler = {
+      componentRegistered: () => true,
+      getComponentProps: () => ({}),
+      getComponentEvents: () => ({}),
+      acceptArbitraryProps: () => true,
+      getComponentValidator: () => null,
+    };
+
+    const resolvedAny = await collectImportsFromStandaloneSources(appDef, projectCompilation, dummyHandler as any);
+
+    expect(resolvedAny).toBe(true);
+    const myFunc = actualComponent.scriptCollected!.functions.myFunc as any;
+    expect(myFunc.compiled).toMatchObject({
+      target: "event-async",
+      sourceId: "/app/components/utils.xs#function-myFunc",
+    });
+  });
+
   it("§11: resolving imports enables computedGlobalUses for an imported global-reading helper", async () => {
     const sources = {
       "/app/components/MyComp.xmlui": `

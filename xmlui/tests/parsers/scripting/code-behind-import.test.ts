@@ -1,15 +1,49 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { dataToEsm } from "@rollup/pluginutils";
 import {
   collectCodeBehindFromSource,
   collectCodeBehindFromSourceWithImports,
   PARSED_MARK_PROP,
+  removeCodeBehindTokensFromTree,
 } from "../../../src/parsers/scripting/code-behind-collect";
 import {
   T_ARROW_EXPRESSION,
   type ArrowExpression,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import type {
+  CompiledScriptArtifact,
+  CompiledScriptSourceRange,
+} from "../../../src/components-core/script-compiler";
 import type { ModuleFetcher } from "../../../src/parsers/scripting/ModuleResolver";
 import { ModuleResolver } from "../../../src/parsers/scripting/ModuleResolver";
+
+async function importGeneratedModule(code: string) {
+  const encoded = Buffer.from(code).toString("base64");
+  return import(`data:text/javascript;base64,${encoded}#${Math.random()}`);
+}
+
+function fakeCompiledArtifact(sourceId = "/main.xs#function-add"): CompiledScriptArtifact {
+  return {
+    version: 1,
+    target: "event-async",
+    sourceId,
+    displayName: "/main.xs",
+    sourceText: "function add(a, b) { return a + b; }",
+    sources: [
+      {
+        id: sourceId,
+        displayName: "/main.xs",
+        sourceText: "function add(a, b) { return a + b; }",
+      },
+    ],
+    sourceRange: { start: 0, end: 38 },
+    astNodeId: 1,
+    dependencies: [],
+    js: "return (async () => 3)();",
+    mappings: [],
+    diagnostics: [],
+  };
+}
 
 describe("Code-Behind Collection with Imports", () => {
   beforeEach(() => {
@@ -40,7 +74,58 @@ function multiply(a, b) {
       expect(result.functions).toHaveProperty("add");
       expect(result.functions).toHaveProperty("multiply");
       expect(Object.keys(result.functions).length).toBe(2);
+      expect(result.functions.add.compiled).toBeUndefined();
+      expect(result.functions.add.compiledUnsupported).toBeUndefined();
+      expect(result.functions.add.sourceId).toBeUndefined();
+      expect(result.functions.add.sourceRange).toBeUndefined();
       expect(result.moduleErrors).toEqual({});
+    });
+
+    it("preserves declaration compilation metadata through ESM serialization", async () => {
+      const result = collectCodeBehindFromSource(
+        "/main.xs",
+        "function add(a, b) { return a + b; }",
+      );
+      const sourceRange: CompiledScriptSourceRange = { start: 9, end: 36 };
+      result.functions.add.compiled = fakeCompiledArtifact();
+      result.functions.add.compiledUnsupported = false;
+      result.functions.add.source = "function add(a, b) { return a + b; }";
+      result.functions.add.sourceId = "/main.xs#function-add";
+      result.functions.add.sourceRange = sourceRange;
+
+      const mod = await importGeneratedModule(dataToEsm(result));
+      const add = mod.default.functions.add;
+
+      expect(add.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/main.xs#function-add",
+      });
+      expect(add.compiledUnsupported).toBe(false);
+      expect(add.source).toBe("function add(a, b) { return a + b; }");
+      expect(add.sourceId).toBe("/main.xs#function-add");
+      expect(add.sourceRange).toEqual(sourceRange);
+    });
+
+    it("keeps declaration compilation metadata when parser tokens are removed", () => {
+      const result = collectCodeBehindFromSource(
+        "/main.xs",
+        "function add(a, b) { return a + b; }",
+      );
+      const sourceRange: CompiledScriptSourceRange = { start: 9, end: 36 };
+      result.functions.add.compiled = fakeCompiledArtifact();
+      result.functions.add.compiledUnsupported = false;
+      result.functions.add.sourceId = "/main.xs#function-add";
+      result.functions.add.sourceRange = sourceRange;
+
+      removeCodeBehindTokensFromTree(result);
+
+      expect(result.functions.add.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/main.xs#function-add",
+      });
+      expect(result.functions.add.compiledUnsupported).toBe(false);
+      expect(result.functions.add.sourceId).toBe("/main.xs#function-add");
+      expect(result.functions.add.sourceRange).toEqual(sourceRange);
     });
 
     it("should collect vars without imports", () => {
@@ -57,6 +142,50 @@ function getValue() {
       expect(result.vars).toHaveProperty("maxValue");
       expect(result.vars).toHaveProperty("minValue");
       expect(result.functions).toHaveProperty("getValue");
+    });
+
+    it("compiles code-behind functions when requested", () => {
+      const source = "function add(a, b) { return a + b; }";
+
+      const result = collectCodeBehindFromSource("/main.xs", source, {
+        compileEventHandlers: true,
+        sourceIdPrefix: "/src/Main.xmlui.xs",
+        sourceUrl: "/@xmlui-source/src/Main.xmlui.xs",
+        displayName: "/src/Main.xmlui.xs",
+      });
+
+      expect(result.functions.add.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/src/Main.xmlui.xs#function-add",
+        sourceUrl: "/@xmlui-source/src/Main.xmlui.xs",
+        displayName: "/src/Main.xmlui.xs",
+        sourceText: source,
+      });
+      expect(result.functions.add.compiledUnsupported).toBe(false);
+      expect(result.functions.add.source).toBe(source);
+      expect(result.functions.add.sourceId).toBe("/src/Main.xmlui.xs#function-add");
+      expect(result.functions.add.compiled?.js).toContain("return (async () =>");
+      expect(result.functions.add.compiled?.mappings.length).toBeGreaterThan(0);
+      expect(result.warnings ?? []).toEqual([]);
+    });
+
+    it("marks unsupported function compilation and keeps the declaration", () => {
+      const source = "function today() { return new Date(); }";
+
+      const result = collectCodeBehindFromSource("/main.xs", source, {
+        compileEventHandlers: true,
+      });
+
+      expect(result.functions.today).toMatchObject({
+        type: T_ARROW_EXPRESSION,
+        compiledUnsupported: true,
+        sourceId: "/main.xs#function-today",
+      });
+      expect(result.functions.today.compiled).toBeUndefined();
+      expect(result.functions.today.source).toBe(source);
+      expect(result.warnings?.[0]).toContain(
+        "Could not compile code-behind function /main.xs#function-today",
+      );
     });
 
     it("should handle duplicates and collect errors", () => {
@@ -96,6 +225,39 @@ function calculate() { return add(1, 2); }`,
       expect(result.functions).toHaveProperty("add");
       expect(Object.keys(result.functions).length).toBe(2);
       expect(result.moduleErrors).toEqual({});
+    });
+
+    it("compiles imported functions with their defining module source", async () => {
+      const modules: { [key: string]: string } = {
+        "/math.xs": "function inc(value) { return value + 1; }",
+        "/main.xs": `import { inc as addOne } from './math.xs';
+function use(value) { return addOne(value); }`,
+      };
+
+      const result = await collectCodeBehindFromSourceWithImports(
+        "/main.xs",
+        modules["/main.xs"],
+        async (path) => modules[path],
+        { compileEventHandlers: true },
+      );
+
+      expect(result.functions.use.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/main.xs#function-use",
+        sourceText: "function use(value) { return addOne(value); }",
+      });
+      expect(result.functions.addOne.compiled).toMatchObject({
+        target: "event-async",
+        sourceId: "/math.xs#function-inc",
+        sourceText: "function inc(value) { return value + 1; }",
+      });
+      expect(result.functions.addOne.compiled?.sources[0]).toMatchObject({
+        url: "/@xmlui-source/math.xs",
+        displayName: "/math.xs",
+        sourceText: modules["/math.xs"],
+      });
+      expect(result.functions.addOne.sourceId).toBe("/math.xs#function-inc");
+      expect(result.warnings ?? []).toEqual([]);
     });
 
     it("should collect code-behind with multiple imports", async () => {

@@ -40,20 +40,24 @@ export type StandaloneAppDescription = {
    * - `defaultToOptionalMemberAccess` (boolean) — treat all member accesses as optional
    *   (default `true`).
    * - `compileScripts` (boolean, default `false`) — compile supported XMLUI
-   *   binding expressions and event handlers to JavaScript.
+   *   binding expressions, event handlers, and executable script declaration
+   *   functions to JavaScript.
    * - `compileBindings` (boolean, default `undefined`) — legacy compatibility
    *   alias for enabling/disabling binding compilation independently.
    * - `compileEventHandlers` (boolean, default `undefined`) — legacy
    *   compatibility alias for enabling/disabling event-handler compilation
-   *   independently.
+   *   independently. When enabled, this also covers inline `<script>`
+   *   functions, `.xmlui.xs` code-behind functions, `Globals.xs` functions,
+   *   inline component `codeBehind` functions, and imported `.xs` helpers.
    * - `logCompiledEventHandlerSource` (boolean, default `false`) — when
    *   `compileEventHandlers` creates parse-time event artifacts, log the
    *   original handler source and generated JavaScript to the console.
    * - `compiledScriptSourceMaps` (boolean | "inline" | "external", default `false`;
    *   `xmlui start` defaults to `"external"` when script compilation is enabled)
    *   — when enabled, JavaScript-compiled XMLUI scripts carry source-map/debug
-   *   metadata. `"external"` is the preferred dev-server mode; `"inline"` is a
-   *   runtime fallback for environments without a Vite source-map endpoint.
+   *   metadata for compiled bindings, handlers, and declaration functions.
+   *   `"external"` is the preferred dev-server mode; `"inline"` is a runtime
+   *   fallback for environments without a Vite source-map endpoint.
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
    * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
    *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.

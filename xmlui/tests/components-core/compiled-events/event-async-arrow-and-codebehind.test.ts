@@ -154,6 +154,80 @@ describe("compiled event-async arrow and callback calls", () => {
     });
   });
 
+  it("executes compiled code-behind declaration artifacts when enabled", async () => {
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      "/Main.xmlui.xs",
+      "function add(a, b) { return a + b; }",
+      async () => "",
+      { compileEventHandlers: true },
+    );
+    const add = codeBehind.functions.add as any;
+    add.statement.stmts = new Parser("return 99;").parseStatements();
+
+    const { localContext } = await runCompiled("result = add(2, 3);", {
+      add,
+      result: 0,
+    });
+
+    expect(localContext.result).toBe(5);
+  });
+
+  it("falls back to interpreted code-behind declarations when compilation is disabled", async () => {
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      "/Main.xmlui.xs",
+      "function add(a, b) { return a + b; }",
+      async () => "",
+      { compileEventHandlers: true },
+    );
+    const add = codeBehind.functions.add as any;
+    add.statement.stmts = new Parser("return 99;").parseStatements();
+
+    const { localContext } = await runInterpreted("result = add(2, 3);", {
+      add,
+      result: 0,
+    });
+
+    expect(localContext.result).toBe(99);
+  });
+
+  it("falls back to interpreted code-behind declarations when compiledUnsupported is set", async () => {
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      "/Main.xmlui.xs",
+      "function add(a, b) { return a + b; }",
+      async () => "",
+      { compileEventHandlers: true },
+    );
+    const add = codeBehind.functions.add as any;
+    add.compiledUnsupported = true;
+    add.statement.stmts = new Parser("return 99;").parseStatements();
+
+    const { localContext } = await runCompiled("result = add(2, 3);", {
+      add,
+      result: 0,
+    });
+
+    expect(localContext.result).toBe(99);
+  });
+
+  it("falls back to interpreted code-behind declarations when compiled execution reports an unsupported node", async () => {
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      "/Main.xmlui.xs",
+      "function add(a, b) { return a + b; }",
+      async () => "",
+      { compileEventHandlers: true },
+    );
+    const add = codeBehind.functions.add as any;
+    add.compiled.js = `return runtime.unsupported("ForcedNode", "test:event:forced-unsupported");`;
+    add.statement.stmts = new Parser("return 99;").parseStatements();
+
+    const { localContext } = await runCompiled("result = add(2, 3);", {
+      add,
+      result: 0,
+    });
+
+    expect(localContext.result).toBe(99);
+  });
+
   it("calls imported code-behind functions and aliases", async () => {
     const modules: Record<string, string> = {
       "/math.xs": "export function inc(value) { return value + 1; }",
@@ -170,6 +244,33 @@ describe("compiled event-async arrow and callback calls", () => {
       result: 0,
       aliasResult: 0,
     });
+  });
+
+  it("executes compiled imported code-behind declarations", async () => {
+    const modules: Record<string, string> = {
+      "/math.xs": "export function inc(value) { return value + 1; }",
+    };
+    const codeBehind = await collectCodeBehindFromSourceWithImports(
+      "/Main.xmlui.xs",
+      "import { inc as addOne } from './math.xs'; function use(value) { return addOne(value); }",
+      async (path) => modules[path] ?? "",
+      { compileEventHandlers: true },
+    );
+    const use = codeBehind.functions.use as any;
+    const imported = codeBehind.functions.addOne as any;
+    expect(imported).toBeDefined();
+    imported.statement.stmts = new Parser("return 100;").parseStatements();
+    use.statement.stmts = new Parser("return 200;").parseStatements();
+
+    const { localContext } = await runCompiled("result = use(4); aliasResult = addOne(9);", {
+      addOne: imported,
+      use,
+      result: 0,
+      aliasResult: 0,
+    });
+
+    expect(localContext.result).toBe(5);
+    expect(localContext.aliasResult).toBe(10);
   });
 
   it("passes inline arrows to async array map callbacks", async () => {

@@ -72,6 +72,8 @@ import {
 import { ensureMainThread } from "./process-statement-common";
 import { getAsyncProxy } from "./asyncProxy";
 import { isBannedFunction } from "./bannedFunctions";
+import { UnsupportedCompiledScriptNodeError } from "../script-compiler/errors";
+import { executeCompiledEventAsyncArtifact } from "../script-compiler/targets/event-async-executor";
 
 type EvaluatorAsyncFunction = (
   thisStack: any[],
@@ -691,93 +693,109 @@ function createArrowFunctionAsync(
     // --- Create the thread that runs the arrow function
     const workingThread = createArrowWorkingThread(expr, runtimeThread);
 
-    // --- Assign argument values to names
-    const arrowBlock: BlockScope = { vars: {} };
-    workingThread.blocks ??= [];
-    workingThread.blocks.push(arrowBlock);
-    const argSpecs = args[0] as Expression[];
-    let restFound = false;
-    for (let i = 0; i < argSpecs.length; i++) {
-      // --- Turn argument specification into processable variable declarations
-      const argSpec = argSpecs[i];
-      const decl = createArrowArgDeclaration(argSpec);
-      restFound = restFound || argSpec.type === T_SPREAD_EXPRESSION;
-      if (restFound) {
-        // --- Get the rest of the arguments
-        const restArgs = args.slice(i + 3);
-        let argVals: any[] = [];
-        for (const arg of restArgs) {
-          if (arg?._EXPRESSION_) {
-            argVals.push(await evaluator([], arg, callerEvalContext, runtimeThread));
-          } else {
-            argVals.push(arg);
+    try {
+      // --- Assign argument values to names
+      const arrowBlock: BlockScope = { vars: {} };
+      workingThread.blocks ??= [];
+      workingThread.blocks.push(arrowBlock);
+      const argSpecs = args[0] as Expression[];
+      let restFound = false;
+      for (let i = 0; i < argSpecs.length; i++) {
+        // --- Turn argument specification into processable variable declarations
+        const argSpec = argSpecs[i];
+        const decl = createArrowArgDeclaration(argSpec);
+        restFound = restFound || argSpec.type === T_SPREAD_EXPRESSION;
+        if (restFound) {
+          // --- Get the rest of the arguments
+          const restArgs = args.slice(i + 3);
+          let argVals: any[] = [];
+          for (const arg of restArgs) {
+            if (arg?._EXPRESSION_) {
+              argVals.push(await evaluator([], arg, callerEvalContext, runtimeThread));
+            } else {
+              argVals.push(arg);
+            }
+          }
+          await processDeclarationsAsync(
+            arrowBlock,
+            runTimeEvalContext,
+            runtimeThread,
+            [decl],
+            false,
+            true,
+            argVals,
+          );
+        } else {
+          // --- Get the actual value to work with
+          let argVal = args[i + 3];
+          if (argVal?._EXPRESSION_) {
+            argVal = await evaluator([], argVal, callerEvalContext, runtimeThread);
+          }
+          await processDeclarationsAsync(
+            arrowBlock,
+            runTimeEvalContext,
+            runtimeThread,
+            [decl],
+            false,
+            true,
+            argVal,
+          );
+        }
+      }
+
+      // --- Evaluate the arrow expression body
+      let statements: Statement[];
+
+      switch (expr.statement.type) {
+        case T_EMPTY_STATEMENT:
+          statements = [];
+          break;
+        case T_EXPRESSION_STATEMENT:
+          // --- Create a return statement from the expression body
+          statements = [
+            {
+              type: T_RETURN_STATEMENT,
+              expr: expr.statement.expr,
+            } as ReturnStatement,
+          ];
+          break;
+        case T_BLOCK_STATEMENT:
+          statements = expr.statement.stmts;
+          break;
+        default:
+          throw new Error(
+            `Arrow expression with a body of '${expr.statement.type}' is not supported yet.`,
+          );
+      }
+
+      // --- Execute the compiled declaration artifact when available and requested
+      if (
+        runTimeEvalContext.options?.compileEventHandlers &&
+        (expr as any).compiled &&
+        !(expr as any).compiledUnsupported
+      ) {
+        try {
+          return await executeCompiledEventAsyncArtifact(
+            (expr as any).compiled,
+            runTimeEvalContext,
+            workingThread,
+          );
+        } catch (err) {
+          if (!(err instanceof UnsupportedCompiledScriptNodeError)) {
+            throw err;
           }
         }
-        await processDeclarationsAsync(
-          arrowBlock,
-          runTimeEvalContext,
-          runtimeThread,
-          [decl],
-          false,
-          true,
-          argVals,
-        );
-      } else {
-        // --- Get the actual value to work with
-        let argVal = args[i + 3];
-        if (argVal?._EXPRESSION_) {
-          argVal = await evaluator([], argVal, callerEvalContext, runtimeThread);
-        }
-        await processDeclarationsAsync(
-          arrowBlock,
-          runTimeEvalContext,
-          runtimeThread,
-          [decl],
-          false,
-          true,
-          argVal,
-        );
       }
+
+      // --- Process the statement with a new processor
+      await processStatementQueueAsync(statements, runTimeEvalContext, workingThread);
+
+      // --- Return value is in a return value slot
+      return workingThread.returnValue;
+    } finally {
+      // --- Remove the current working thread
+      removeArrowWorkingThread(runtimeThread, workingThread);
     }
-
-    // --- Evaluate the arrow expression body
-    let returnValue: any;
-    let statements: Statement[];
-
-    switch (expr.statement.type) {
-      case T_EMPTY_STATEMENT:
-        statements = [];
-        break;
-      case T_EXPRESSION_STATEMENT:
-        // --- Create a new thread for the call
-        statements = [
-          {
-            type: T_RETURN_STATEMENT,
-            expr: expr.statement.expr,
-          } as ReturnStatement,
-        ];
-        break;
-      case T_BLOCK_STATEMENT:
-        // --- Create a new thread for the call
-        statements = expr.statement.stmts;
-        break;
-      default:
-        throw new Error(
-          `Arrow expression with a body of '${expr.statement.type}' is not supported yet.`,
-        );
-    }
-
-    // --- Process the statement with a new processor
-    await processStatementQueueAsync(statements, runTimeEvalContext, workingThread);
-
-    // --- Return value is in a return value slot
-    returnValue = workingThread.returnValue;
-
-    // --- Remove the current working thread
-    removeArrowWorkingThread(runtimeThread, workingThread);
-
-    // --- Return the function value
-    return returnValue;
   };
 }
 

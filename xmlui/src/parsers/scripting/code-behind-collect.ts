@@ -3,28 +3,55 @@ import {
   T_FUNCTION_DECLARATION,
   T_IMPORT_DECLARATION,
   T_VAR_STATEMENT,
-  type ArrowExpression,
   type CodeDeclaration,
   type CollectedDeclarations,
   type Expression,
+  type FunctionCodeDeclaration,
   type FunctionDeclaration,
   type Statement,
 } from "../../components-core/script-runner/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule, parseScriptModuleAsync, parseScriptModuleWithImports } from "./modules";
+import { isModuleErrors, parseScriptModule } from "./modules";
 import { PARSED_MARK_PROP, ARROW_EXPR_MARK } from "../../abstractions/InternalMarkers";
 import type { ModuleFetcher } from "./types";
 import { clearAllModuleCaches } from "./ModuleCache";
 import { ModuleLoader } from "./ModuleLoader";
+import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
+import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
+import type {
+  CompiledScriptSource,
+  CompiledScriptSourceMapMode,
+  CompiledScriptSourceOrigin,
+} from "../../components-core/script-compiler/types";
 
 // Re-export for backward compatibility
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
+export type CodeBehindCollectionOptions = {
+  compileEventHandlers?: boolean;
+  compiledScriptSourceMaps?: CompiledScriptSourceMapMode;
+  sourceIdPrefix?: string;
+  sourceUrl?: string;
+  displayName?: string;
+  sourceText?: string;
+  sources?: CompiledScriptSource[];
+  sourceOrigin?: CompiledScriptSourceOrigin;
+};
+
+type CollectionContext = {
+  rootModuleName: string;
+  rootSource: string;
+  result: CollectedDeclarations;
+  options?: CodeBehindCollectionOptions;
+  moduleSources: Map<string, string>;
+};
+
 // --- Collect module statements from a parsed module
 export function collectCodeBehindFromSource(
   moduleName: string,
-  source: string
+  source: string,
+  options?: CodeBehindCollectionOptions,
 ): CollectedDeclarations {
   const result: CollectedDeclarations = {
     vars: {},
@@ -35,6 +62,13 @@ export function collectCodeBehindFromSource(
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
+  const context: CollectionContext = {
+    rootModuleName: moduleName,
+    rootSource: source,
+    result,
+    options,
+    moduleSources: new Map([[moduleName, source]]),
+  };
 
   // --- Parse the module (recursively, including imported modules) in restrictive mode
   const parsedModule = parseScriptModule(moduleName, source);
@@ -44,7 +78,7 @@ export function collectCodeBehindFromSource(
 
   // --- Collect statements from the module
   parsedModule.statements.forEach((stmt) => {
-    collectStatementFromModule(stmt, result, collectedFunctions);
+    collectStatementFromModule(stmt, result, collectedFunctions, context);
   });
   return result;
 }
@@ -59,7 +93,8 @@ export function collectCodeBehindFromSource(
 export async function collectCodeBehindFromSourceWithImports(
   moduleName: string,
   source: string,
-  moduleFetcher?: ModuleFetcher
+  moduleFetcher?: ModuleFetcher,
+  options?: CodeBehindCollectionOptions,
 ): Promise<CollectedDeclarations> {
   const result: CollectedDeclarations = {
     vars: {},
@@ -70,18 +105,32 @@ export async function collectCodeBehindFromSourceWithImports(
   };
 
   const collectedFunctions: Record<string, CodeDeclaration> = {};
+  const moduleSources = new Map<string, string>([[moduleName, source]]);
+  const context: CollectionContext = {
+    rootModuleName: moduleName,
+    rootSource: source,
+    result,
+    options,
+    moduleSources,
+  };
 
   // --- If no fetcher provided, fall back to sync version
   if (!moduleFetcher) {
-    return collectCodeBehindFromSource(moduleName, source);
+    return collectCodeBehindFromSource(moduleName, source, options);
   }
+
+  const trackingModuleFetcher: ModuleFetcher = async (modulePath: string) => {
+    const moduleSource = await moduleFetcher(modulePath);
+    moduleSources.set(modulePath, moduleSource);
+    return moduleSource;
+  };
 
   // --- Clear caches for a fresh parse (maintain original behavior)
   clearAllModuleCaches();
 
   // --- Use ModuleLoader for consistent loading
   const loadResult = await ModuleLoader.loadFromSource(moduleName, source, {
-    fetcher: moduleFetcher,
+    fetcher: trackingModuleFetcher,
     allowImports: true,
     skipCache: false, // We just cleared, so cache is empty anyway
   });
@@ -96,7 +145,7 @@ export async function collectCodeBehindFromSourceWithImports(
 
   // --- Collect statements from the module (vars and functions defined in this file)
   parsedModule.statements.forEach((stmt) => {
-    collectStatementFromModule(stmt, result, collectedFunctions);
+    collectStatementFromModule(stmt, result, collectedFunctions, context);
   });
 
   // Since we are in the WithImports version and ModuleLoader succeeded,
@@ -109,15 +158,7 @@ export async function collectCodeBehindFromSourceWithImports(
   // --- Add imported functions to the result (these come from imports)
   Object.entries(parsedModule.functions).forEach(([name, func]) => {
     if (!result.functions[name] && !collectedFunctions[name]) {
-      // Convert FunctionDeclaration to CodeDeclaration format
-      const funcDecl = func as any;
-      const arrow: any = {
-        type: T_ARROW_EXPRESSION,
-        args: funcDecl.args.slice(),
-        statement: funcDecl.stmt,
-        [ARROW_EXPR_MARK]: true,
-        closureContext: [],
-      };
+      const arrow = createFunctionCodeDeclaration(func, context);
 
       collectedFunctions[name] = arrow;
       result.functions[name] = arrow;
@@ -133,7 +174,8 @@ export async function collectCodeBehindFromSourceWithImports(
 function collectStatementFromModule(
   stmt: Statement,
   result: CollectedDeclarations,
-  collectedFunctions: Record<string, CodeDeclaration>
+  collectedFunctions: Record<string, CodeDeclaration>,
+  context: CollectionContext,
 ): void {
   switch (stmt.type) {
     case T_VAR_STATEMENT:
@@ -148,7 +190,7 @@ function collectStatementFromModule(
       });
       break;
     case T_FUNCTION_DECLARATION:
-      addFunctionDeclaration(stmt as FunctionDeclaration, result, collectedFunctions);
+      addFunctionDeclaration(stmt as FunctionDeclaration, result, collectedFunctions, context);
       break;
     case T_IMPORT_DECLARATION:
       result.hasUnresolvableImports = true;
@@ -164,7 +206,8 @@ function collectStatementFromModule(
 function addFunctionDeclaration(
   stmt: FunctionDeclaration,
   result: CollectedDeclarations,
-  collectedFunctions: Record<string, CodeDeclaration>
+  collectedFunctions: Record<string, CodeDeclaration>,
+  context: CollectionContext,
 ): void {
   if (collectedFunctions?.[stmt.id.name] !== undefined) {
     return;
@@ -172,16 +215,110 @@ function addFunctionDeclaration(
   if (stmt.id.name in result.functions) {
     throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
   }
-  const arrow: any = {
+  const arrow = createFunctionCodeDeclaration(stmt, context);
+
+  collectedFunctions[stmt.id.name] = arrow;
+  result.functions[stmt.id.name] = arrow;
+}
+
+function createFunctionCodeDeclaration(
+  stmt: FunctionDeclaration,
+  context: CollectionContext,
+): FunctionCodeDeclaration {
+  const arrow: FunctionCodeDeclaration = {
     type: T_ARROW_EXPRESSION,
+    nodeId: stmt.nodeId,
+    startToken: stmt.startToken,
+    endToken: stmt.endToken,
+    name: stmt.id.name,
     args: stmt.args.slice(),
     statement: stmt.stmt,
     [ARROW_EXPR_MARK]: true,
     closureContext: [],
   };
 
-  collectedFunctions[stmt.id.name] = arrow;
-  result.functions[stmt.id.name] = arrow;
+  attachCompiledFunctionArtifact(arrow, stmt, context);
+  return arrow;
+}
+
+function attachCompiledFunctionArtifact(
+  arrow: FunctionCodeDeclaration,
+  stmt: FunctionDeclaration,
+  context: CollectionContext,
+): void {
+  const options = context.options;
+  if (!options?.compileEventHandlers) {
+    return;
+  }
+
+  const functionName = stmt.id.name;
+  const sourceModule = stmt.sourceModule ?? context.rootModuleName;
+  const optionSource = options.sources?.find((source) => source.id === sourceModule);
+  const moduleSource =
+    context.moduleSources.get(sourceModule) ??
+    optionSource?.sourceText ??
+    (sourceModule === context.rootModuleName
+      ? options.sourceText ?? context.rootSource
+      : undefined) ??
+    context.rootSource;
+  const sourceId = `${
+    sourceModule === context.rootModuleName ? options.sourceIdPrefix ?? sourceModule : sourceModule
+  }#function-${functionName}`;
+  const displayName =
+    optionSource?.displayName ??
+    (sourceModule === context.rootModuleName ? options.displayName ?? sourceModule : sourceModule);
+  const sourceUrl =
+    optionSource?.url ??
+    (sourceModule === context.rootModuleName
+      ? options.sourceUrl ?? createDebugSourceUrl(sourceModule)
+      : createDebugSourceUrl(sourceModule));
+  const sourceOrigin = sourceModule === context.rootModuleName ? options.sourceOrigin : undefined;
+  let sources: CompiledScriptSource[];
+  if (optionSource) {
+    sources = [optionSource];
+  } else if (sourceModule === context.rootModuleName && options.sources) {
+    sources = options.sources;
+  } else {
+    sources = [
+      {
+        id: sourceId,
+        url: sourceUrl,
+        displayName,
+        sourceText: sourceOrigin?.sourceText ?? moduleSource,
+      },
+    ];
+  }
+
+  arrow.source = sliceSourceByTokens(stmt, moduleSource);
+  arrow.sourceId = sourceId;
+
+  try {
+    arrow.compiled = compileEventAsyncStatements(stmt.stmt.stmts, {
+      sourceId,
+      sourceText: arrow.source,
+      sourceUrl,
+      displayName,
+      sources,
+      sourceOrigin,
+    });
+    arrow.compiledUnsupported = false;
+    arrow.sourceRange = arrow.compiled.sourceRange;
+  } catch (error) {
+    arrow.compiledUnsupported = true;
+    (context.result.warnings ??= []).push(
+      `Could not compile code-behind function ${sourceId}; ` +
+        `falling back to interpreted execution. ${(error as Error).message}`,
+    );
+  }
+}
+
+function sliceSourceByTokens(stmt: FunctionDeclaration, source: string): string {
+  const start = stmt.startToken?.startPosition;
+  const end = stmt.endToken?.endPosition;
+  if (start === undefined || end === undefined || start < 0 || end < start) {
+    return source;
+  }
+  return source.slice(start, end);
 }
 
 // --- Remove all code-behind tokens from the tree

@@ -67,9 +67,16 @@ import { ModalDialogDriver } from "./drivers/ModalDialogDriver";
 import { TextBoxDriver } from "./drivers/TextBoxDriver";
 import { NumberBoxDriver } from "./drivers/NumberBoxDriver";
 import { TreeDriver } from "./drivers/TreeDriver";
-import { collectCodeBehindFromSource } from "../parsers/scripting/code-behind-collect";
+import {
+  collectCodeBehindFromSourceWithImports,
+  removeCodeBehindTokensFromTree,
+  type CodeBehindCollectionOptions,
+} from "../parsers/scripting/code-behind-collect";
 import type { XmluiParserOptions } from "../parsers/xmlui-parser/parser";
 import { applyE2eCompileScriptsConfig } from "./compile-scripts-env";
+import type { ModuleFetcher } from "../parsers/scripting/types";
+import { ModuleResolver } from "../parsers/scripting/ModuleResolver";
+import { createDebugSourceUrl } from "../components-core/script-compiler/source";
 export { expect } from "./assertions";
 
 const isCI = process?.env?.CI === "true";
@@ -195,8 +202,10 @@ export type TestBedDescription = Omit<
   "entryPoint" | "components"
 > & {
   testThemeVars?: Record<string, string>;
-  components?: string[];
+  components?: Array<string | ComponentDef | CompoundComponentDef>;
   appGlobals?: Record<string, any>;
+  /** Script source for Main.xmlui.xs — declarations become app-root code-behind */
+  codeBehind?: string;
   /** Script source for Globals.xs — declarations become app-wide globals */
   globalsXs?: string;
   /** @deprecated Use globalsXs instead. Alias kept for backward compatibility. */
@@ -207,6 +216,119 @@ export type TestBedDescription = Omit<
 };
 
 const E2E_BASE_URL = `http://localhost:3211`;
+
+type TestBedScriptParserOptions = XmluiParserOptions & {
+  compiledScriptSourceMaps?: CodeBehindCollectionOptions["compiledScriptSourceMaps"];
+};
+
+function createTestBedScriptParserOptions(
+  description?: TestBedDescription,
+): TestBedScriptParserOptions {
+  const xmluiConfig = description?.xmluiConfig ?? {};
+  const compileEventHandlers =
+    description?.parserOptions?.compileEventHandlers ??
+    xmluiConfig.compileEventHandlers ??
+    xmluiConfig.compileScripts ??
+    false;
+  const sourceMapMode = xmluiConfig.compiledScriptSourceMaps;
+  return {
+    ...description?.parserOptions,
+    compileEventHandlers,
+    ...(sourceMapMode === true || sourceMapMode === "inline" || sourceMapMode === "external"
+      ? { compiledScriptSourceMaps: sourceMapMode }
+      : {}),
+  };
+}
+
+function createTestBedCodeBehindOptions(
+  moduleName: string,
+  sourceText: string,
+  parserOptions: TestBedScriptParserOptions,
+): CodeBehindCollectionOptions | undefined {
+  if (!parserOptions.compileEventHandlers) {
+    return undefined;
+  }
+  return {
+    compileEventHandlers: true,
+    compiledScriptSourceMaps: parserOptions.compiledScriptSourceMaps,
+    sourceIdPrefix: moduleName,
+    sourceUrl: createDebugSourceUrl(moduleName),
+    displayName: moduleName,
+    sourceText,
+    sources: [
+      {
+        id: moduleName,
+        url: createDebugSourceUrl(moduleName),
+        displayName: moduleName,
+        sourceText,
+      },
+    ],
+  };
+}
+
+function createTestBedModuleFetcher(sources?: Record<string, string>): ModuleFetcher {
+  return async (modulePath: string) => {
+    const normalizedPath = modulePath.replace(/\\/g, "/");
+    const moduleSource = sources?.[normalizedPath] ?? sources?.[modulePath];
+    if (moduleSource !== undefined) {
+      return moduleSource;
+    }
+    throw new Error(`No test-bed source registered for module: ${modulePath}`);
+  };
+}
+
+async function collectTestBedCodeBehind(
+  moduleName: string,
+  source: string,
+  parserOptions: TestBedScriptParserOptions,
+  sources?: Record<string, string>,
+) {
+  const codeBehind = await collectCodeBehindFromSourceWithImports(
+    moduleName,
+    source,
+    createTestBedModuleFetcher(sources),
+    createTestBedCodeBehindOptions(moduleName, source, parserOptions),
+  );
+  removeCodeBehindTokensFromTree(codeBehind);
+  return codeBehind;
+}
+
+async function resolveTestBedInlineComponentCodeBehind(
+  components: CompoundComponentDef[],
+  parserOptions: TestBedScriptParserOptions,
+  sources?: Record<string, string>,
+) {
+  for (const component of components) {
+    if (!component.codeBehind) {
+      continue;
+    }
+    const codeBehindPath = ModuleResolver.resolvePath(component.codeBehind, "/src/Main.xmlui");
+    const codeBehindSource = sources?.[codeBehindPath];
+    if (codeBehindSource === undefined) {
+      throw new Error(`No test-bed source registered for codeBehind: ${codeBehindPath}`);
+    }
+    const codeBehind = await collectTestBedCodeBehind(
+      codeBehindPath,
+      codeBehindSource,
+      parserOptions,
+      sources,
+    );
+    component.component = {
+      ...component.component,
+      vars: {
+        ...component.component.vars,
+        ...codeBehind.vars,
+      },
+      functions:
+        codeBehind.functions && Object.keys(codeBehind.functions).length > 0
+          ? codeBehind.functions
+          : component.component.functions,
+      scriptError: codeBehind.moduleErrors,
+    };
+    (component as any).codeBehindSource = codeBehindSource;
+    (component as any).resolvedCodeBehind = codeBehindPath;
+  }
+}
 
 type WorkerFixtures = {
   _sharedContext: BrowserContext;
@@ -325,8 +447,10 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         "icon.txt": "/resources/txt.svg",
         "icon.bell": "/resources/bell.svg",
       };
+      const themedDescription = applyE2eCompileScriptsConfig(mapThemeRelatedVars(description));
+      const parserOptions = createTestBedScriptParserOptions(themedDescription);
       // --- Initialize XMLUI App
-      const markup = description?.noFragmentWrapper
+      const markup = themedDescription?.noFragmentWrapper
         ? source
         : `
           <Fragment var.testState="{null}">
@@ -338,13 +462,21 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
             </Stack>
           </Fragment>
         `;
+      const codeBehind = themedDescription?.codeBehind
+        ? await collectTestBedCodeBehind(
+            "/src/Main.xmlui.xs",
+            themedDescription.codeBehind,
+            parserOptions,
+            themedDescription.sources,
+          )
+        : undefined;
 
       const { errors, warnings, component, inlineComponents } = xmlUiMarkupToComponent(
         markup,
         undefined,
         undefined,
         undefined,
-        description?.parserOptions,
+        parserOptions,
       );
 
       if (warnings.length > 0) {
@@ -362,8 +494,19 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         throw new Error(`(${errors.length}) Errors while parsing Main.xmlui:\n${errText}`);
       }
       const entryPoint = component as ComponentDef;
+      if (codeBehind) {
+        entryPoint.vars = {
+          ...codeBehind.vars,
+          ...entryPoint.vars,
+        };
+        entryPoint.functions =
+          codeBehind.functions && Object.keys(codeBehind.functions).length > 0
+            ? codeBehind.functions
+            : entryPoint.functions;
+        entryPoint.scriptError = codeBehind.moduleErrors;
+      }
 
-      const components = description?.components?.map((c) => {
+      const components = themedDescription.components?.map((c) => {
         const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
         if (erroneousCompoundComponentName) {
           const errorMessages = errors.map((e) => `[${e.code}] ${e.message}`).join("\n");
@@ -373,11 +516,21 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         }
         return component as CompoundComponentDef;
       }) ?? inlineComponents;
+      await resolveTestBedInlineComponentCodeBehind(
+        components,
+        parserOptions,
+        themedDescription.sources,
+      );
 
       let runtime: any;
-      const globalsXsSource = description?.globalsXs ?? description?.mainXs;
+      const globalsXsSource = themedDescription.globalsXs ?? themedDescription.mainXs;
       if (globalsXsSource) {
-        const parsedCodeBehind = collectCodeBehindFromSource("Globals", globalsXsSource);
+        const parsedCodeBehind = await collectTestBedCodeBehind(
+          "/src/Globals.xs",
+          globalsXsSource,
+          parserOptions,
+          themedDescription.sources,
+        );
         const moduleErrors = parsedCodeBehind?.moduleErrors ?? {};
         if (Object.keys(moduleErrors).length > 0) {
           const errText = Object.entries(moduleErrors)
@@ -399,7 +552,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       }
 
       // Add entryPoint to runtime so resolveRuntime can find it
-      if (description?.noFragmentWrapper && entryPoint) {
+      if (themedDescription.noFragmentWrapper && entryPoint) {
         runtime = runtime || {};
         runtime["/src/Main.xmlui"] = {
           default: {
@@ -410,7 +563,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       }
 
       if (source !== "" && entryPoint.children) {
-        const sourceBaseComponent = description?.noFragmentWrapper
+        const sourceBaseComponent = themedDescription.noFragmentWrapper
           ? entryPoint // When no wrapper, entryPoint is the actual source component
           : entryPoint.children[0]; // With wrapper, it's inside Fragment
         const isCompoundComponentRoot =
@@ -429,7 +582,6 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           sourceBaseComponent.children[0].testId = baseComponentTestId;
         }
       }
-      const themedDescription = applyE2eCompileScriptsConfig(mapThemeRelatedVars(description));
 
       // Merge default test resources with any provided resources
       const mergedResources = {
@@ -449,10 +601,10 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const clipboard = new Clipboard(page);
 
       // Normalize extensionIds to array format
-      const extensionIds = description?.extensionIds
-        ? Array.isArray(description.extensionIds)
-          ? description.extensionIds
-          : [description.extensionIds]
+      const extensionIds = themedDescription.extensionIds
+        ? Array.isArray(themedDescription.extensionIds)
+          ? themedDescription.extensionIds
+          : [themedDescription.extensionIds]
         : [];
       if (extensionIds.length > 0) {
         // Extension bundles can be large (notably ECharts) and their first
@@ -538,7 +690,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
 
       const { width, height } = page.viewportSize();
 
-      if (!description?.noFragmentWrapper) {
+      if (!themedDescription.noFragmentWrapper) {
         await page.getByTestId(_markerTestId).waitFor({ state: "attached" });
       }
 
