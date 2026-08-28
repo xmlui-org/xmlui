@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.14.22
+
+### Patch Changes
+
+- c84df35: Compile XMLUI script declaration functions when event-handler compilation is enabled, covering inline script tags, code-behind files, Globals.xs functions, and imported helpers while preserving interpreted fallback.
+
+  Compiled event handlers now also preserve explicit return values and yielding statement boundaries for awaited handlers.
+
+- bf20a6b: Fix a crash on a comment-only (or otherwise content-free) `@{...}` binding expression, e.g. `@{ /* note */ }`. `parseParameterString` now treats a braced section that parses to no expression as literal source text instead of building an expression segment around a `null` AST node, and `collectVariableDependencies` is null-tolerant as a defense-in-depth boundary check. Previously, passing such a segment into dependency collection threw `TypeError: Cannot read properties of null (reading 'type')`, which could take down the surrounding render tree. Refs #3774.
+- f05b635: Fix Table empty-state layout so custom no-data templates with full height do not create an unnecessary vertical scrollbar.
+- afb3469: Add `defaultSortDirection` to Table and Column, so a header click can sort descending first. Columns whose interesting rows are the largest ones — counts, totals, percentages — no longer need two clicks to reach the useful order. The cycle keeps three states and only its starting point moves; a Column's value overrides its Table's, and unset behaviour is unchanged.
+- f05b635: Fix Tabs so controlled initial active tabs are resolved before the browser paints, preventing a flash of the first tab during mount.
+- f05b635: Fix Tree pointer expand/collapse so gutter clicks do not trigger selection, expensive expand/collapse handlers run after the visual toggle paints, and focus stays on the same logical node when expanding a branch changes the visible row order.
+
 ## 0.14.21
 
 ### Patch Changes
