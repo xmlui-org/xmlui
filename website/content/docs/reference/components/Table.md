@@ -570,6 +570,153 @@ For mutation flows where only the next refresh should preserve state, call `pres
 
 Stable, unique `idKey` values are required. If an inserted row is outside the current viewport and is present in the current row model, `operation: "insert"` or `scrollTarget: "first-inserted"` scrolls it into view after reconciliation. For paginated tables, insert targeting does not switch pages.
 
+### `defaultSortDirection` [#defaultsortdirection]
+
+> [!DEF]  default: **"ascending"**
+
+Sets which direction the *first* click on a column header sorts. Use `descending` for tables whose interesting rows are the largest ones (counts, totals, percentages), so one click gives the useful order instead of two. The click cycle keeps three states and only its starting point moves: with `descending` it runs descending, ascending, unsorted. Individual `Column` components override this with their own `defaultSortDirection`. It also supplies the initial direction when [`sortBy`](#sortby) is set without an explicit [`sortDirection`](#sortdirection), so a table declared biggest-first opens that way rather than needing a click.
+
+Available values: `ascending` **(default)**, `descending`
+
+Some columns are only interesting from the top: vote counts, totals, percentages.
+A header click sorts ascending first, so those columns cost an extra click before
+they show anything useful. `defaultSortDirection` moves where the click cycle
+starts.
+
+### The problem [#the-problem]
+
+No configuration here. Click **Votes** once and you get the *smallest* count
+first; click again for the largest.
+
+```xmlui copy
+<Table data='{[...]}'>
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: two clicks to see the winner"
+<App>
+  <Table data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'>
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Two clicks to answer "who won". On one table that is a shrug; across a screenful
+of count columns it is the difference between a table you read and a table you
+operate.
+
+### One line fixes the click count [#one-line-fixes-the-click-count]
+
+```xmlui copy /defaultSortDirection="descending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: defaultSortDirection on the table" /defaultSortDirection="descending"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    defaultSortDirection="descending">
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Click **Votes** once: biggest first. The cycle still has three states and still
+ends unsorted — descending, ascending, unsorted. Only its starting point moved.
+
+### Opening already sorted [#opening-already-sorted]
+
+The property above says *which direction*. It never says *which column*, so the
+table still opens unsorted until you click. To arrive sorted, name the column
+with [`sortBy`](#sortby):
+
+```xmlui copy /sortBy="votes"/
+<Table data='{[...]}' sortBy="votes" defaultSortDirection="descending">
+  <Column bindTo="candidate"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: sortBy with defaultSortDirection" /sortBy="votes"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    sortBy="votes"
+    defaultSortDirection="descending">
+    <Column bindTo="candidate"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Zero clicks: biggest first on load. `defaultSortDirection` supplies the opening
+direction because no explicit [`sortDirection`](#sortdirection) was given — set
+that instead when the opening order should differ from what clicking produces.
+
+A seeded table is already **at the first stage of the cycle**, so the first click
+advances to the second stage rather than confirming the first. Clicking **Votes**
+here goes to ascending, then to unsorted. That is worth knowing before it
+surprises you: on a seeded column, the first click looks like it reverses the
+sort.
+
+### One column that reads the other way [#one-column-that-reads-the-other-way]
+
+Names are the case where alphabetical is the natural first read, even in a table
+of counts. A `Column` overrides its table:
+
+```xmlui copy /defaultSortDirection="ascending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+```xmlui-pg name="Example: per-column override" /defaultSortDirection="ascending"/
+<App>
+  <Table
+    data='{[
+      { id: 1, candidate: "Ada", votes: 4820 },
+      { id: 2, candidate: "Grace", votes: 9137 },
+      { id: 3, candidate: "Alan", votes: 2044 },
+      { id: 4, candidate: "Edsger", votes: 6610 }
+    ]}'
+    defaultSortDirection="descending">
+    <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+    <Column bindTo="votes" canSort="true"/>
+  </Table>
+</App>
+```
+
+Neither column is sorted on load — there is no `sortBy` here. Click **Votes** and
+it goes largest-first; click **Candidate** and it goes A–Z. Resolution is column
+first, then table, then `ascending`.
+
+Switching columns **restarts the cycle** at the new column's own first direction;
+it does not carry the previous column's stage across. Clicking **Votes** then
+**Candidate** gives descending then ascending, each column's own default.
+
 ### `enableMultiRowSelection` [#enablemultirowselection]
 
 > [!DEF]  default: **true**
@@ -898,6 +1045,49 @@ The default value is `false`.
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+### `highlightHoveredColumn` [#highlighthoveredcolumn]
+
+> [!DEF]  default: **false**
+
+When set to `true`, hovering a table cell tints its entire column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the rendered output is unchanged. Where the hovered row and the hovered column intersect, the row highlight wins. Pinned columns keep their own hover background instead of the column tint.
+
+Column headers already highlight on hover, but by default hovering a cell in the table body only highlights its row — nothing marks which column you are in. On a wide table this makes it easy to lose track of which field you are reading as your eye travels down a column.
+
+Set `highlightHoveredColumn` to `true` to tint the entire hovered column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the table renders exactly as it does today.
+
+Where the hovered row and the hovered column intersect, the row highlight wins — the column tint never competes with or muddies the row's own hover color. Pinned columns keep their existing hover background instead of showing the column tint, since the pointer being elsewhere in the table should not change how a pinned column looks.
+
+```xmlui copy /highlightHoveredColumn="true"/
+<App>
+  <Table data='{[...]}' highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+Hover any cell to see its whole column tinted, and hover a row to see the row highlight take precedence where the two overlap:
+
+```xmlui-pg name="Example: highlightHoveredColumn"
+<App>
+  <Table
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces", category: "fruits" },
+      { id: 1, name: "Bananas", quantity: 6, unit: "pieces", category: "fruits" },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams", category: "vegetables" },
+      { id: 3, name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables" },
+      { id: 4, name: "Milk", quantity: 10, unit: "liter", category: "dairy" }
+    ]}'
+    highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+    <Column bindTo="category"/>
   </Table>
 </App>
 ```
@@ -2099,6 +2289,27 @@ This event is triggered when the user presses the paste keyboard shortcut (defau
 - `selectedItems`: Array of selected row items.
 - `selectedIds`: Array of selected row IDs (as strings).
 
+### `rowClick` [#rowclick]
+
+This event is fired when the user clicks a table row. The handler receives the clicked row item as its only argument. It reports the click without replacing or suppressing selection — pair it with `rowsSelectable` deliberately, and prefer `selectionDidChange` when what you actually care about is the selection. The event does not fire for clicks on the selection checkbox or on an interactive control (such as a button) inside a cell.
+
+**Signature**: `rowClick(item: any): void`
+
+- `item`: The clicked table row item.
+
+This event is triggered when a table row is clicked. The handler receives the row's data item as its only argument.
+
+`rowClick` reports activation — it does not replace or suppress selection. Row click already runs a selection toggle when `rowsSelectable` is set, and `rowClick` fires alongside that without interfering with it: pair it with `rowsSelectable` deliberately, and prefer [`selectionDidChange`](#selectiondidchange) when what you actually care about is the selection rather than the click itself. `rowClick` does not fire for a click on the selection checkbox, nor for a click on an interactive control (such as a button) inside a cell.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
 ### `rowDoubleClick` [#rowdoubleclick]
 
 This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.
@@ -2306,6 +2517,12 @@ This event is fired when the table data sorting has changed. It has two argument
 
 - `columnName`: The name of the column being sorted.
 - `sortDirection`: The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.
+
+When the third click clears sorting, the event fires with an empty column name and
+**the direction that was on screen** — the sort the user was just looking at, not
+the direction a fresh click would produce. A column whose
+[`defaultSortDirection`](#defaultsortdirection) is `descending` therefore reports
+`ascending` when cleared from its second stage.
 
 Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
@@ -2720,6 +2937,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor-column-Table--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
 | [backgroundColor-evenRow-Table](/docs/styles-and-themes/common-units/#color) | $backgroundColor-row-Table | $backgroundColor-row-Table |
 | [backgroundColor-heading-Table](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
 | [backgroundColor-heading-Table--active](/docs/styles-and-themes/common-units/#color) | $color-surface-300 | $color-surface-300 |

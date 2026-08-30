@@ -250,6 +250,29 @@ To change the default for all columns in your app, set `columnCanSortDefault` in
 }
 ```
 
+### `defaultSortDirection` [#defaultsortdirection]
+
+Sets which direction the *first* click on this column's header sorts. Use `descending` for columns where the largest value is the interesting one (counts, totals, percentages), so a single click gives the useful order. The click cycle keeps three states and only its starting point moves: with `descending` it runs descending, ascending, unsorted. When unset, the column inherits the Table's `defaultSortDirection`, then `ascending`.
+
+Available values: `ascending`, `descending`
+
+Sets which direction the *first* click on this column's header sorts, overriding
+the Table's own [`defaultSortDirection`](/docs/reference/components/Table#defaultsortdirection).
+
+Use it for the odd column that reads the other way round from the rest of its
+table -- a name column in a table of counts, or a single "biggest first" measure
+among otherwise alphabetical fields.
+
+```xmlui copy /defaultSortDirection="ascending"/
+<Table data='{[...]}' defaultSortDirection="descending">
+  <Column bindTo="candidate" canSort="true" defaultSortDirection="ascending"/>
+  <Column bindTo="votes" canSort="true"/>
+</Table>
+```
+
+When unset, the column inherits the Table's value, then `ascending`. The click
+cycle keeps three states either way; only its starting point moves.
+
 ### `enabled` [#enabled]
 
 > [!DEF]  default: **true**

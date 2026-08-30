@@ -22,6 +22,10 @@ This component supports the following behaviors:
 
 Height of the chart container.
 
+### `maps`
+
+An object of `name → GeoJSON` map definitions. Each entry is passed to `echarts.registerMap(name, geojson)` before the option is applied, so a `map`-type series can reference the name (e.g. `series: [{ type: 'map', map: 'my-region', ... }]`). Entries whose value is empty are skipped, so binding a not-yet-loaded DataSource value is safe: the map registers (and the chart re-renders) when the data arrives. Omitting the property leaves current behavior unchanged.
+
 ### `option`
 
 The ECharts option object. Accepts any valid ECharts configuration. XMLUI theme colors are automatically injected for palette, text, axes, and tooltip unless explicitly overridden in the option.
