@@ -221,7 +221,7 @@ You never need to import date-fns directly in component code or markup.
 ### Comparison Functions
 
 ```xml
-<Badge visible="{isToday(event.date)}" label="Today" />
+<Badge visible="{isToday(event.date)}" value="Today" />
 <Text visible="{!isThisYear(doc.createdAt)}">{formatDate(doc.createdAt)}</Text>
 <Text>{differenceInMinutes(endTime, startTime)} min</Text>
 ```
