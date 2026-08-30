@@ -24,7 +24,7 @@ The `summary` property accepts either a simple text string or a component defini
         <CHStack gap="space-2">
           <Icon name="apps" />
           <Text fontWeight="600">Custom Summary with Icon</Text>
-          <Badge label="New" variant="success" />
+          <Badge value="New" />
         </CHStack>
       </property>
       <Text>

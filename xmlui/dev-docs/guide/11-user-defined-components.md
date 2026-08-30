@@ -17,7 +17,7 @@ Understanding UDCs matters for framework developers because the compound renderi
 
 <!-- Main.xmlui — usage: caller's children flow into the Slot -->
 <ContactCard name="Alice" email="alice@example.com">
-  <Badge label="Admin" />
+  <Badge value="Admin" />
 </ContactCard>
 ```
 
