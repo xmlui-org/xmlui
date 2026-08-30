@@ -10,6 +10,7 @@
 
 **Context variables available during execution:**
 
+- `$abortSignal`: AbortSignal for the current request (available in `mockExecute`)
 - `$attempts`: Number of status polls made in deferred mode
 - `$cookies`: Request cookies (available in `mockExecute`)
 - `$elapsed`: Time elapsed since polling started in milliseconds
@@ -381,6 +382,14 @@ This event fires before the request is sent. Returning an explicit boolean`false
 
 **Signature**: `() => boolean | void`
 
+### `cancel` [#cancel]
+
+This event fires when an in-flight request or deferred polling operation is cancelled with `cancel()`.
+
+**Signature**: `(reason?: string) => void`
+
+- `reason`: The optional reason passed to `cancel(reason)`, or `"user"` by default.
+
 ### `error` [#error]
 
 This event fires when a request results in an error.
@@ -486,9 +495,17 @@ Fires if max polling duration is exceeded in deferred mode.
 
 ### `cancel` [#cancel]
 
-Cancel the deferred operation on the server and stop polling. Requires cancelUrl to be configured.
+Cancel an in-flight API request, active deferred polling, and optionally notify the server through `cancelUrl`.
 
-**Signature**: `cancel(): Promise<void>`
+**Signature**: `cancel(reason?: string): Promise<boolean>`
+
+- `reason`: Optional cancellation reason exposed through `onCancel` and `lastCancelReason`.
+
+### `cancelled` [#cancelled]
+
+This property indicates whether the most recent API operation was cancelled.
+
+**Signature**: `get cancelled(): boolean`
 
 ### `execute` [#execute]
 
@@ -515,6 +532,12 @@ Boolean flag indicating whether the API call is currently in progress.
 Check if polling is currently active in deferred mode.
 
 **Signature**: `isPolling(): boolean`
+
+### `lastCancelReason` [#lastcancelreason]
+
+This property returns the reason passed to the most recent `cancel(reason)` call.
+
+**Signature**: `get lastCancelReason(): string | undefined`
 
 ### `lastError` [#lasterror]
 

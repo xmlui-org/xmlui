@@ -2,6 +2,10 @@
 
 Interactive area chart for showing data trends over time with filled areas under the curve
 
+**Context variables available during execution:**
+
+- `$tooltip`: Context variable available inside tooltipTemplate.
+
 ## Behaviors
 
 This component supports the following behaviors:

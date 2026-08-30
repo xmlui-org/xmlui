@@ -121,6 +121,12 @@ Available values:
 | `start` | Display arrow immediately after the label (default) **(default)** |
 | `end` | Push arrow to the right edge of the NavGroup |
 
+### `fitContentWidth` [#fitcontentwidth]
+
+> [!DEF]  default: **false**
+
+This Boolean property controls whether the `NavGroup` sizes itself to fit its widest child item. The resulting width is capped by the `maxWidth-fitContent-NavGroup` theme variable.
+
 ### `icon` [#icon]
 
 This property defines an optional icon to display along with the `NavGroup` label.
@@ -239,6 +245,7 @@ This component does not expose any methods.
 | [marginTop-items-NavGroup](/docs/styles-and-themes/common-units/#size-values) | 0 | 0 |
 | [marginTop-NavGroup](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
 | [marginVertical-NavGroup](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
+| [maxWidth-fitContent-NavGroup](/docs/styles-and-themes/common-units/#size-values) | 100vw | 100vw |
 | [minWidth-dropdown-NavGroup](/docs/styles-and-themes/common-units/#size-values) | 11em | 11em |
 | [padding-level1-NavGroup](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |
 | [padding-level2-NavGroup](/docs/styles-and-themes/common-units/#size-values) | *none* | *none* |

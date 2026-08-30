@@ -2,6 +2,10 @@
 
 `LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.
 
+**Context variables available during execution:**
+
+- `$tooltip`: Context variable available inside tooltipTemplate.
+
 ## Behaviors
 
 This component supports the following behaviors:
