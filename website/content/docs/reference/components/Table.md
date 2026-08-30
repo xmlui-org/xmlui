@@ -902,6 +902,49 @@ The default value is `false`.
 </App>
 ```
 
+### `highlightHoveredColumn` [#highlighthoveredcolumn]
+
+> [!DEF]  default: **false**
+
+When set to `true`, hovering a table cell tints its entire column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the rendered output is unchanged. Where the hovered row and the hovered column intersect, the row highlight wins. Pinned columns keep their own hover background instead of the column tint.
+
+Column headers already highlight on hover, but by default hovering a cell in the table body only highlights its row — nothing marks which column you are in. On a wide table this makes it easy to lose track of which field you are reading as your eye travels down a column.
+
+Set `highlightHoveredColumn` to `true` to tint the entire hovered column with the [`backgroundColor-column-Table--hover`](#backgroundcolor-column-table--hover) theme variable. The default is `false`: no cell hover handlers are attached and the table renders exactly as it does today.
+
+Where the hovered row and the hovered column intersect, the row highlight wins — the column tint never competes with or muddies the row's own hover color. Pinned columns keep their existing hover background instead of showing the column tint, since the pointer being elsewhere in the table should not change how a pinned column looks.
+
+```xmlui copy /highlightHoveredColumn="true"/
+<App>
+  <Table data='{[...]}' highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+Hover any cell to see its whole column tinted, and hover a row to see the row highlight take precedence where the two overlap:
+
+```xmlui-pg name="Example: highlightHoveredColumn"
+<App>
+  <Table
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces", category: "fruits" },
+      { id: 1, name: "Bananas", quantity: 6, unit: "pieces", category: "fruits" },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams", category: "vegetables" },
+      { id: 3, name: "Spinach", quantity: 1, unit: "bunch", category: "vegetables" },
+      { id: 4, name: "Milk", quantity: 10, unit: "liter", category: "dairy" }
+    ]}'
+    highlightHoveredColumn="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+    <Column bindTo="category"/>
+  </Table>
+</App>
+```
+
 ### `iconNoSort` [#iconnosort]
 
 Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
@@ -2099,6 +2142,27 @@ This event is triggered when the user presses the paste keyboard shortcut (defau
 - `selectedItems`: Array of selected row items.
 - `selectedIds`: Array of selected row IDs (as strings).
 
+### `rowClick` [#rowclick]
+
+This event is fired when the user clicks a table row. The handler receives the clicked row item as its only argument. It reports the click without replacing or suppressing selection — pair it with `rowsSelectable` deliberately, and prefer `selectionDidChange` when what you actually care about is the selection. The event does not fire for clicks on the selection checkbox or on an interactive control (such as a button) inside a cell.
+
+**Signature**: `rowClick(item: any): void`
+
+- `item`: The clicked table row item.
+
+This event is triggered when a table row is clicked. The handler receives the row's data item as its only argument.
+
+`rowClick` reports activation — it does not replace or suppress selection. Row click already runs a selection toggle when `rowsSelectable` is set, and `rowClick` fires alongside that without interfering with it: pair it with `rowsSelectable` deliberately, and prefer [`selectionDidChange`](#selectiondidchange) when what you actually care about is the selection rather than the click itself. `rowClick` does not fire for a click on the selection checkbox, nor for a click on an interactive control (such as a button) inside a cell.
+
+```xmlui copy {4}
+<App>
+  <Table data='{[...]}' onRowClick="(item) => console.log(item)">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
+</App>
+```
+
 ### `rowDoubleClick` [#rowdoubleclick]
 
 This event is fired when the user double-clicks a table row. The handler receives the clicked row item as its only argument.
@@ -2720,6 +2784,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor-column-Table--hover](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
 | [backgroundColor-evenRow-Table](/docs/styles-and-themes/common-units/#color) | $backgroundColor-row-Table | $backgroundColor-row-Table |
 | [backgroundColor-heading-Table](/docs/styles-and-themes/common-units/#color) | $color-surface-100 | $color-surface-100 |
 | [backgroundColor-heading-Table--active](/docs/styles-and-themes/common-units/#color) | $color-surface-300 | $color-surface-300 |
