@@ -35,7 +35,10 @@ A tag list, a button group, or a set of filter chips should display side by side
 </HStack>
 ```
 
-**Children control their own width**: In a wrapping `HStack`, children size themselves unless you set an explicit width. Use a fixed width, a percentage, or star sizing (`width="*"`) depending on the desired behaviour:
+**Widthless children use `fit-content`**: The default `itemWidth` of a
+horizontal Stack is `fit-content`, whether or not `wrapContent` is enabled.
+Each child therefore uses its intrinsic content width unless you set a fixed
+width, a percentage, or star sizing (`width="*"`):
 
 ```xmlui-pg copy display name="Mixed widths in a wrapping HStack"
 ---app display
@@ -79,6 +82,7 @@ A tag list, a button group, or a set of filter chips should display side by side
 ---
 
 **See also**
+- [What width does a Stack child get by default?](/docs/howto/what-width-does-a-stack-child-get-by-default) — the sizing rule behind widthless and star-sized children
 - [HStack component](/docs/reference/components/HStack) — full property reference including `wrapContent` and `itemWidth`
 - [Make a set of equal-width cards](/docs/howto/make-a-set-of-equal-width-cards) — star sizing for equal columns
 - [Force a row break in a wrapping layout](/docs/howto/force-a-row-break-in-a-wrapping-layout) — inserting an explicit line break with SpaceFiller

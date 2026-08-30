@@ -1,14 +1,16 @@
 # Stop a `width="*"` element from collapsing next to a flexible sibling
 
-A `width="*"` child takes the **remaining** space in a stack — the parent's
-size minus the sizes of siblings that have a definite width. The trap: if a
-sibling has **no width**, its *intrinsic* (content) width is subtracted first,
-and if that content is wide or variable, the `width="*"` element gets squeezed
-— sometimes down to a thin strip.
+A `width="*"` child takes the **remaining** space in a stack. In an `HStack`,
+a sibling with no width defaults to `fit-content`, so its intrinsic content
+width is measured first. A short label normally hugs its content and leaves
+the rest of the row to the star-sized child. The trap appears when that
+intrinsic width is large or variable: it can leave the `width="*"` child only
+a thin strip.
 
-The fix is to give the other sibling a **definite width** (a fixed size, or
-`fit-content` so it hugs its content) so the `*` element has a stable, known
-share of the row.
+The fix is to bound the other sibling with a fixed width, `maxWidth`, wrapping,
+or truncation so the `*` element has a stable, known share of the row.
+`width="fit-content"` documents the default for a widthless `HStack` child,
+but by itself does not cap wide intrinsic content.
 
 ```xmlui-pg copy display name="Flexible input beside a fixed button column" height="200px"
 <App>
@@ -23,13 +25,12 @@ share of the row.
 ```
 
 Here the button column is pinned to `8rem`, so the `TextBox` reliably fills
-everything else. Remove the `width="8rem"` and the column's own intrinsic
-width is subtracted first — the field can collapse to a sliver, which is the
-usual "my `width="*"` input shrank to nothing" symptom.
+everything else. Without that bound, the column defaults to its content width;
+if the content becomes wide enough, the field can collapse to a sliver.
 
-**Hug content instead of a fixed size.** When you don't want to hard-code a
-width, `width="fit-content"` makes a container take *only* its content's
-width, leaving the rest of the row for the `*` element:
+**Make content sizing explicit.** `width="fit-content"` says that a container
+should take its content width. That is already the default for a widthless
+child in an `HStack`, but writing it can clarify the intended contract:
 
 ```xmlui /width="fit-content"/
 <HStack width="100%">
@@ -40,11 +41,13 @@ width, leaving the rest of the row for the `*` element:
 
 **Rules of thumb:**
 
-- In a row, give **every** child either a definite width, `fit-content`, or
-  `width="*"` — don't leave a content-sized sibling next to a `*` sibling and
-  expect the `*` to win.
+- A short widthless label beside a `width="*"` sibling is normally safe: the
+  label hugs its content and the star gets the remainder.
+- Bound content whose intrinsic width can grow. `fit-content` makes the sizing
+  intent explicit but does not impose a maximum.
 - `fit-content` = "only as wide as my content." `width="*"` = "the rest."
   A fixed value (`8rem`, `120px`) = exactly that.
-- Same rule applies vertically with `height`. See also
-  [Set the width of an input field in an HStack](/docs/howto/set-width-for-input-fields-in-a-horizontal-layout)
+- The same sizing principle applies vertically with `height`. See also
+  [What width does a Stack child get by default?](/docs/howto/what-width-does-a-stack-child-get-by-default),
+  [Set the width of an input field in an HStack](/docs/howto/set-width-for-input-fields-in-a-horizontal-layout),
   and the star-size explanation in [Layout](/docs/layout).
