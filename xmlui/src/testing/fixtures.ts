@@ -100,7 +100,6 @@ async function getOnlyFirstLocator(page: Page, testId: string) {
 
 class Clipboard {
   private page: Page;
-  private content: string = "";
 
   constructor(page: Page) {
     this.page = page;
@@ -108,17 +107,30 @@ class Clipboard {
 
   init() {
     return () => {
-      window.navigator.clipboard.readText = () => Promise.resolve(this.content);
-      window.navigator.clipboard.read = () => {
+      let content = "";
+      const clipboard = (window.navigator.clipboard ?? {}) as {
+        readText?: () => Promise<string>;
+        read?: () => never;
+        writeText?: (text: string) => Promise<void>;
+        write?: (items: unknown) => never;
+      };
+      clipboard.readText = () => Promise.resolve(content);
+      clipboard.read = () => {
         throw new Error("Clipboard read not implemented in mocked environment");
       };
-      window.navigator.clipboard.writeText = (text) => {
-        this.content = text;
+      clipboard.writeText = (text: string) => {
+        content = text;
         return Promise.resolve(undefined);
       };
-      window.navigator.clipboard.write = (items) => {
+      clipboard.write = (_items: unknown) => {
         throw new Error("Clipboard write not implemented in mocked environment");
       };
+      if (!window.navigator.clipboard) {
+        Object.defineProperty(window.navigator, "clipboard", {
+          configurable: true,
+          value: clipboard,
+        });
+      }
     };
   }
 
@@ -428,7 +440,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
   baseComponentTestId: "test-id-component",
   testStateViewTestId: "test-state-view-testid",
 
-  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use, testInfo) => {
+  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId, browserName }, use, testInfo) => {
     // Each initTestBed call gets a unique marker ID to prevent the fast-path
     // __XMLUI_REINIT__ race: flushSync removes the old testStateViewTestId
     // synchronously in the browser, but Playwright's CDP connection has small
@@ -613,12 +625,33 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         // Loading screen during that time, so give extension-backed tests enough
         // headroom without slowing ordinary no-extension tests.
         testInfo.setTimeout(Math.max(testInfo.timeout, 240_000));
+      } else if (isCI && browserName === "webkit") {
+        // WebKit starts the compiled test bed more slowly on loaded Linux CI
+        // workers. Keep the extra headroom scoped to the @webkit project.
+        testInfo.setTimeout(Math.max(testInfo.timeout, 90_000));
       }
 
       // Check if page already has the app loaded (from a previous test in this worker)
       const isReady = await page
         .evaluate(() => !!(window as any).__XMLUI_READY__)
         .catch(() => false);
+
+      const ensureTestEnvAfterNavigation = async () => {
+        const hasTestEnv = await page.evaluate(() => !!(window as any).TEST_ENV).catch(() => false);
+        if (hasTestEnv) {
+          return;
+        }
+
+        await page.evaluate(
+          async ({ app, extensionIds }) => {
+            (window as any).TEST_ENV = app;
+            (window as any).TEST_RUNTIME = app.runtime;
+            (window as any).TEST_EXTENSION_IDS = extensionIds;
+            await (window as any).__XMLUI_REINIT__?.();
+          },
+          { app: _appDescription, extensionIds },
+        );
+      };
 
       if (isReady && extensionIds.length === 0) {
         // Fast path: update globals and reinit in-page (skip full page navigation).
@@ -665,6 +698,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
             { app: _appDescription, extensionIds },
           );
           await page.goto("/");
+          await ensureTestEnvAfterNavigation();
         }
       } else {
         // Slow path: first test in this worker, or extension-backed tests.
@@ -686,12 +720,16 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           { app: _appDescription, extensionIds },
         );
         await page.goto("/");
+        await ensureTestEnvAfterNavigation();
       }
 
       const { width, height } = page.viewportSize();
 
       if (!themedDescription.noFragmentWrapper) {
-        await page.getByTestId(_markerTestId).waitFor({ state: "attached" });
+        await page.getByTestId(_markerTestId).waitFor({
+          state: "attached",
+          timeout: isCI && browserName === "webkit" ? 60_000 : undefined,
+        });
       }
 
       // Wait for fonts to load, then one animation frame + one macrotask
