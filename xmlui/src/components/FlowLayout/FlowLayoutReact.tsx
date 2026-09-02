@@ -36,6 +36,7 @@ type FlowItemProps = {
   minWidth?: string | number;
   maxWidth?: string | number;
   responsiveWidthProps?: Record<string, any>;
+  inferPercentageWidths?: boolean;
   forceBreak?: boolean;
 };
 
@@ -89,6 +90,7 @@ function buildFlowItemStyleObject(
   responsiveProps: Record<string, any> | undefined,
   columnGap: string,
   isIntrinsicSizing: boolean,
+  inferPercentageWidths: boolean,
 ): StyleObjectType {
   if (isIntrinsicSizing) {
     return { "&": { width: baseWidth } as StyleObjectType };
@@ -156,7 +158,7 @@ function buildFlowItemStyleObject(
         }
       }
     }
-  } else if (isBasePercentage) {
+  } else if (isBasePercentage && inferPercentageWidths) {
     // --- Auto-inferred responsive widths from percentage
     const percNumber = parseFloat(baseStr!);
 
@@ -298,8 +300,17 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
         restProps.responsiveWidthProps,
         _columnGap,
         isIntrinsicSizing,
+        restProps.inferPercentageWidths ?? true,
       ),
-    [resolvedWidth, minWidth, maxWidth, restProps.responsiveWidthProps, _columnGap, isIntrinsicSizing],
+    [
+      resolvedWidth,
+      minWidth,
+      maxWidth,
+      restProps.responsiveWidthProps,
+      _columnGap,
+      isIntrinsicSizing,
+      restProps.inferPercentageWidths,
+    ],
   );
 
   const responsiveClassName = useStyles(responsiveStyleObj);

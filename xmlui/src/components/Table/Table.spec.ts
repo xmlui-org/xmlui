@@ -3876,6 +3876,8 @@ test.describe("Pagination Features", () => {
       `);
 
       const firstCell = page.locator("tbody td").first();
+      await expect(firstCell).toBeVisible();
+
       const cellUserSelect = await firstCell.evaluate((cell) => {
         const inlineStyle = (cell as HTMLElement).style;
         const computedStyle = getComputedStyle(cell);
