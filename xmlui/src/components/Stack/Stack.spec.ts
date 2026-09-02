@@ -823,6 +823,28 @@ test.describe("Layout", () => {
     expect(itemBottom3).toEqual(stackBottom);
   });
 
+  test("HStack wrapContent preserves percentage child width after wrapping", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.setViewportSize({ width: 700, height: PAGE_HEIGHT });
+    await initTestBed(`
+      <HStack testId="stack" wrapContent="true" gap="0">
+        <Card testId="fixed" width="500px" title="Fixed 500 px" />
+        <Card testId="percent" width="30%" title="30 %" />
+        <Card testId="star" width="*" title="Fills rest" />
+      </HStack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: fixedWidth, bottom: fixedBottom } = await getBounds(page.getByTestId("fixed"));
+    const { width: percentWidth, top: percentTop } = await getBounds(page.getByTestId("percent"));
+
+    expect(fixedWidth).toBeCloseTo(500, 0);
+    expect(percentTop).toBeGreaterThanOrEqual(fixedBottom);
+    expect(percentWidth).toBeCloseTo(stackWidth * 0.3, 0);
+  });
+
   test("(horizontal) horizontalAlignment center", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Stack testId="stack" orientation="horizontal" horizontalAlignment="center" gap="0">

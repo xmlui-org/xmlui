@@ -445,6 +445,7 @@ function renderStack({
                 minWidth={minWidth}
                 maxWidth={maxWidth}
                 responsiveWidthProps={responsiveWidthProps}
+                inferPercentageWidths={false}
                 forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
