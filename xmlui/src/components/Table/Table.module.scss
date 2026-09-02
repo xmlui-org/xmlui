@@ -290,6 +290,18 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
           border-right: 0;
         }
       }
+
+      .expandCell {
+        justify-content: center;
+
+        .cellContent {
+          width: 100%;
+          padding-inline: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
     }
 
     .row {
@@ -365,6 +377,10 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
       &.noBottomBorder:last-child {
         border-bottom: none;
       }
+
+      &.expanded {
+        flex-wrap: wrap;
+      }
     }
   }
 
@@ -373,6 +389,45 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
     text-overflow: ellipsis;
     max-width: 100%;
     @include t.paddingVars($themeVars, "cell-#{$component}");
+  }
+
+  .rowExpandButton {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: t.$space-1;
+    color: inherit;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $backgroundColor-row-Table--hover;
+    }
+
+    &:focus-visible {
+      outline-width: $outlineWidth-heading-Table--focus;
+      outline-color: $outlineColor-heading-Table--focus;
+      outline-style: $outlineStyle-heading-Table--focus;
+      outline-offset: $outlineOffset-heading-Table--focus;
+    }
+  }
+
+  .rowDetailCell {
+    display: block;
+    padding: 0;
+    border: 0;
+    background-color: inherit;
+  }
+
+  .rowDetailContent {
+    width: 100%;
+    box-sizing: border-box;
+    @include t.paddingVars($themeVars, "cell-#{$component}");
+    padding-inline-start: $paddingHorizontal-cell-first-Table;
+    padding-inline-end: $paddingHorizontal-cell-last-Table;
   }
 
   .headerWrapper {
