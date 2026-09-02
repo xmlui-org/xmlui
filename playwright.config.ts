@@ -16,6 +16,7 @@ const port = 3211;
 // Default to using dev server unless explicitly set to false
 const useDevServer = process.env.PLAYWRIGHT_USE_DEV_SERVER !== "false";
 const CI = process.env.CI;
+const nonSmokeExcludedTags = /@smoke|@webkit/;
 
 export default defineConfig({
   /* Run tests in files in parallel */
@@ -33,7 +34,6 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     ...devices["Desktop Chrome"],
-    channel: "chromium",
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: `http://localhost:${port}`,
 
@@ -50,22 +50,43 @@ export default defineConfig({
     {
       name: "xmlui-nonsmoke",
       testDir: "./xmlui",
-      grepInvert: /@smoke/,
+      grepInvert: nonSmokeExcludedTags,
+      use: {
+        channel: "chromium",
+      },
     },
     {
       name: "xmlui-smoke",
       testDir: "./xmlui",
       grep: /@smoke/,
+      use: {
+        channel: "chromium",
+      },
+    },
+    {
+      name: "xmlui-webkit-regressions",
+      testDir: "./xmlui",
+      grep: /@webkit/,
+      use: {
+        ...devices["Desktop Safari"],
+        permissions: [],
+      },
     },
     {
       name: "extensions-nonsmoke",
       testDir: "./packages",
-      grepInvert: /@smoke/,
+      grepInvert: nonSmokeExcludedTags,
+      use: {
+        channel: "chromium",
+      },
     },
     {
       name: "extensions-smoke",
       testDir: "./packages",
       grep: /@smoke/,
+      use: {
+        channel: "chromium",
+      },
     },
   ],
 

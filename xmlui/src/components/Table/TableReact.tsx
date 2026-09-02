@@ -2118,8 +2118,16 @@ export const Table = memo(
                   }
                 };
                 const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
+                const effectiveCellUserSelect =
+                  userSelectCell as React.CSSProperties["userSelect"];
+                const effectiveCellWebkitUserSelect =
+                  userSelectCell as React.CSSProperties["WebkitUserSelect"];
+                const cellUserSelectStyle: React.CSSProperties = {
+                  userSelect: effectiveCellUserSelect,
+                  WebkitUserSelect: effectiveCellWebkitUserSelect,
+                };
                 const cellContentStyle: React.CSSProperties = {
-                  userSelect: userSelectCell as React.CSSProperties["userSelect"],
+                  ...cellUserSelectStyle,
                 };
                 if (fillCellContent) {
                   cellContentStyle.width = "100%";
@@ -2193,6 +2201,7 @@ export const Table = memo(
                         flexShrink: 0,
                         ...getCommonPinningStyles(cell.column),
                         ...styleWithoutWidth,
+                        ...cellUserSelectStyle,
                         ...(columnHoverActive ? { "--xmlui-col-index": i } : undefined),
                       } as React.CSSProperties
                     }
@@ -2244,6 +2253,10 @@ export const Table = memo(
           const s = rowStateRef.current;
           const isFirstRow = rowIndex === 0;
           const composedRowRef = useComposedRefs(ref, isFirstRow ? firstRowRef : null);
+          const effectiveRowUserSelect =
+            s.effectiveUserSelectRow as React.CSSProperties["userSelect"];
+          const effectiveRowWebkitUserSelect =
+            s.effectiveUserSelectRow as React.CSSProperties["WebkitUserSelect"];
           return (
             <tr
               data-index={rowIndex}
@@ -2253,7 +2266,8 @@ export const Table = memo(
                 boxSizing: "content-box",
                 minHeight: s.rowHeight,
                 minWidth: "max-content",
-                userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
+                userSelect: effectiveRowUserSelect,
+                WebkitUserSelect: effectiveRowWebkitUserSelect,
               }}
               className={classnames(styles.row, {
                 [styles.selected]: row.getIsSelected(),
@@ -3155,6 +3169,10 @@ export const Table = memo(
                           : cellVerticalAlign === "bottom"
                             ? styles.alignBottom
                             : styles.alignCenter;
+                      const effectiveHeadingUserSelect =
+                        effectiveUserSelectHeading as React.CSSProperties["userSelect"];
+                      const effectiveHeadingWebkitUserSelect =
+                        effectiveUserSelectHeading as React.CSSProperties["WebkitUserSelect"];
                       return (
                         <th
                           key={`${header.id}-${headerIndex}`}
@@ -3187,8 +3205,8 @@ export const Table = memo(
                                 width: headerJustifyContent ? "100%" : undefined,
                                 boxSizing: headerJustifyContent ? "border-box" : undefined,
                                 justifyContent: headerJustifyContent,
-                                userSelect:
-                                  effectiveUserSelectHeading as React.CSSProperties["userSelect"],
+                                userSelect: effectiveHeadingUserSelect,
+                                WebkitUserSelect: effectiveHeadingWebkitUserSelect,
                               }}
                             >
                               {

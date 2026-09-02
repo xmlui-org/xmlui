@@ -338,12 +338,12 @@ type WorkerFixtures = {
 export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
   // Worker-scoped browser context — reused across all tests in a worker
   _sharedContext: [
-    async ({ browser }, use) => {
+    async ({ browser, browserName }, use) => {
       const context = await browser.newContext({
-        ...devices["Desktop Chrome"],
+        ...(browserName === "webkit" ? devices["Desktop Safari"] : devices["Desktop Chrome"]),
         baseURL: E2E_BASE_URL,
         serviceWorkers: "allow",
-        permissions: ["clipboard-read", "clipboard-write"],
+        permissions: browserName === "webkit" ? [] : ["clipboard-read", "clipboard-write"],
       });
       await use(context);
       await context.close();
