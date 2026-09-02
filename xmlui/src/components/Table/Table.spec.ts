@@ -3859,6 +3859,43 @@ test.describe("Pagination Features", () => {
       await expect(firstCell).toHaveCSS("user-select", "none");
     });
 
+    test("userSelectCell covers empty cell surface on row double-click @webkit", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Table
+          data='{${JSON.stringify(sampleData)}}'
+          userSelectCell="none"
+          userSelectRow="text"
+          onRowDoubleClick="(item) => testState = item.name"
+          testId="table">
+          <Column bindTo="name" header="Name"/>
+          <Column bindTo="quantity" header="Quantity"/>
+        </Table>
+      `);
+
+      const firstCell = page.locator("tbody td").first();
+      const cellUserSelect = await firstCell.evaluate((cell) => {
+        const inlineStyle = (cell as HTMLElement).style;
+        const computedStyle = getComputedStyle(cell);
+        return (
+          inlineStyle.userSelect ||
+          inlineStyle.webkitUserSelect ||
+          computedStyle.userSelect ||
+          computedStyle.webkitUserSelect
+        );
+      });
+      expect(cellUserSelect).toBe("none");
+
+      await firstCell.dblclick();
+
+      await expect.poll(testStateDriver.testState).toEqual("Apple");
+      await expect
+        .poll(() => page.evaluate(() => window.getSelection()?.toString() ?? ""))
+        .toEqual("");
+    });
+
     test("userSelectRow controls text selection in rows", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' userSelectRow="text" testId="table">
