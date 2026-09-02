@@ -374,6 +374,12 @@ function buildActionContext(
 // React Table component implementation
 
 type CellVerticalAlign = "top" | "center" | "bottom";
+type RowDetailRenderer = (
+  row: any,
+  rowIndex: number,
+  rowId: string,
+  isExpanded: boolean,
+) => ReactNode;
 
 const END_ALIGNED_COLUMN_TYPES = new Set<NormalizedColumnType["name"]>([
   "number",
@@ -427,6 +433,10 @@ type TableProps = {
   classes?: Record<string, string>;
   uid?: string;
   noDataRenderer?: () => ReactNode;
+  rowDetailRenderer?: RowDetailRenderer;
+  expandedRowIds?: any;
+  initiallyExpandedRowIds?: any;
+  rowExpansionDidChange?: (expandedRowIds: string[], expandedItems: any[]) => void;
   autoFocus?: boolean;
   hideHeader?: boolean;
   hideNoDataView?: boolean;
@@ -566,6 +576,8 @@ function getDefaultTypeMinWidth(
 }
 
 const SELECT_COLUMN_WIDTH = 42;
+const EXPAND_COLUMN_WIDTH = 42;
+const EXPAND_COLUMN_ID = "__row_expand";
 
 const DEFAULT_PAGE_SIZES = [10];
 
@@ -642,6 +654,53 @@ function estimateHeaderWidth(header?: string, canSort?: boolean, canResize?: boo
 
 function estimateHeaderTextWidth(text: string): number {
   return text.length * AVERAGE_HEADER_CHARACTER_WIDTH;
+}
+
+function normalizeExpandedRowIds(value: any): Record<string, true> {
+  if (value == null || value === false) {
+    return {};
+  }
+  if (value instanceof Set) {
+    return Array.from(value).reduce<Record<string, true>>((acc, id) => {
+      acc[String(id)] = true;
+      return acc;
+    }, {});
+  }
+  if (Array.isArray(value)) {
+    return value.reduce<Record<string, true>>((acc, id) => {
+      if (id != null) {
+        acc[String(id)] = true;
+      }
+      return acc;
+    }, {});
+  }
+  if (typeof value === "object") {
+    return Object.entries(value).reduce<Record<string, true>>((acc, [id, expanded]) => {
+      if (expanded) {
+        acc[String(id)] = true;
+      }
+      return acc;
+    }, {});
+  }
+  return { [String(value)]: true };
+}
+
+function areExpandedRowIdMapsEqual(
+  left: Record<string, true>,
+  right: Record<string, true>,
+): boolean {
+  const leftKeys = Object.keys(left);
+  const rightKeys = Object.keys(right);
+  return leftKeys.length === rightKeys.length && leftKeys.every((key) => right[key]);
+}
+
+function getExpandedRowIds(expandedRowIdMap: Record<string, true>): string[] {
+  return Object.keys(expandedRowIdMap);
+}
+
+function getItemRowId(item: any, index: number, idKey: string): string {
+  const idVal = item?.[idKey];
+  return idVal != null ? String(idVal) : String(index);
 }
 
 function getHeaderJustifyContent(
@@ -1160,6 +1219,10 @@ export const Table = memo(
       className,
       classes,
       noDataRenderer,
+      rowDetailRenderer,
+      expandedRowIds,
+      initiallyExpandedRowIds,
+      rowExpansionDidChange,
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
@@ -1227,6 +1290,19 @@ export const Table = memo(
       defaultProps.userSelectHeading;
 
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
+    const isExpansionControlled = expandedRowIds !== undefined;
+    const controlledExpandedRowIdMap = useMemo(
+      () => (isExpansionControlled ? normalizeExpandedRowIds(expandedRowIds) : undefined),
+      [expandedRowIds, isExpansionControlled],
+    );
+    const [uncontrolledExpandedRowIdMap, setUncontrolledExpandedRowIdMap] = useState<
+      Record<string, true>
+    >(() => normalizeExpandedRowIds(initiallyExpandedRowIds));
+    const expandedRowIdMap = controlledExpandedRowIdMap ?? uncontrolledExpandedRowIdMap;
+    const expandedRowIdMapRef = useRef(expandedRowIdMap);
+    expandedRowIdMapRef.current = expandedRowIdMap;
+    const isExpansionControlledRef = useRef(isExpansionControlled);
+    isExpansionControlledRef.current = isExpansionControlled;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = useComposedRefs(wrapperRef, forwardedRef);
     const tableRef = useRef<HTMLTableElement>(null);
@@ -1251,6 +1327,72 @@ export const Table = memo(
       }
       return defaultProps.isPaginated;
     }, [isPaginated, pageSize, safeData.length, effectivePageSize]);
+
+    const currentDataRowIds = useMemo(
+      () => new Set(safeData.map((item, index) => getItemRowId(item, index, inferenceIdKey))),
+      [inferenceIdKey, safeData],
+    );
+
+    useEffect(() => {
+      if (isExpansionControlled) {
+        return;
+      }
+      setUncontrolledExpandedRowIdMap((prev) => {
+        const next: Record<string, true> = {};
+        for (const rowId of Object.keys(prev)) {
+          if (currentDataRowIds.has(rowId)) {
+            next[rowId] = true;
+          }
+        }
+        return areExpandedRowIdMapsEqual(prev, next) ? prev : next;
+      });
+    }, [currentDataRowIds, isExpansionControlled]);
+
+    const emitRowExpansionChange = useEvent((nextExpandedRowIdMap: Record<string, true>) => {
+      if (!rowExpansionDidChange) {
+        return;
+      }
+      const nextExpandedIds = getExpandedRowIds(nextExpandedRowIdMap);
+      const nextExpandedItems = safeData.filter(
+        (item, index) => nextExpandedRowIdMap[getItemRowId(item, index, inferenceIdKey)],
+      );
+      rowExpansionDidChange(nextExpandedIds, nextExpandedItems);
+    });
+
+    const setExpandedRows = useEvent((nextExpandedRowIdMap: Record<string, true>) => {
+      if (areExpandedRowIdMapsEqual(expandedRowIdMapRef.current, nextExpandedRowIdMap)) {
+        return;
+      }
+      if (!isExpansionControlledRef.current) {
+        setUncontrolledExpandedRowIdMap(nextExpandedRowIdMap);
+      }
+      emitRowExpansionChange(nextExpandedRowIdMap);
+    });
+
+    const expandRow = useEvent((rowId: string | number) => {
+      const id = String(rowId);
+      setExpandedRows({ ...expandedRowIdMapRef.current, [id]: true });
+    });
+
+    const collapseRow = useEvent((rowId: string | number) => {
+      const id = String(rowId);
+      const { [id]: _removed, ...rest } = expandedRowIdMapRef.current;
+      setExpandedRows(rest);
+    });
+
+    const toggleRowExpansion = useEvent((rowId: string | number) => {
+      const id = String(rowId);
+      if (expandedRowIdMapRef.current[id]) {
+        collapseRow(id);
+      } else {
+        expandRow(id);
+      }
+    });
+
+    const getCurrentExpandedRowIds = useEvent(() => getExpandedRowIds(expandedRowIdMapRef.current));
+    const isRowExpanded = useEvent((rowId: string | number) => {
+      return !!expandedRowIdMapRef.current[String(rowId)];
+    });
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (hasExplicitColumns || columns.length > 0) {
@@ -1600,13 +1742,68 @@ export const Table = memo(
       alwaysShowSelectionCheckboxes,
     ]);
 
+    const expandColumn: ColumnDef<any> = useMemo(() => {
+      return {
+        id: EXPAND_COLUMN_ID,
+        size: EXPAND_COLUMN_WIDTH,
+        enableResizing: false,
+        enablePinning: true,
+        meta: {
+          pinTo: "left",
+          className: styles.expandCell,
+        },
+        header: () => null,
+        cell: ({ row }: CellContext<any, unknown>) => {
+          const rowId = row.id;
+          const isExpanded = !!expandedRowIdMap[rowId];
+          return (
+            <button
+              type="button"
+              className={styles.rowExpandButton}
+              aria-label={`${isExpanded ? "Collapse" : "Expand"} row ${rowId}`}
+              aria-expanded={isExpanded}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                toggleRowExpansion(rowId);
+              }}
+            >
+              <ThemedIcon
+                name={isExpanded ? "chevrondown" : "chevronright"}
+                fallback={isExpanded ? "chevrondown" : "chevronright"}
+                size="16"
+              />
+            </button>
+          );
+        },
+      };
+    }, [expandedRowIdMap, toggleRowExpansion]);
+
     // --- Prepare column renderers according to columns defined in the table supporting optional row selection
     const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
-      if (hideSelectionCheckboxes) {
-        return columnsWithCustomCell;
+      const utilityColumns: ColumnDef<any>[] = [];
+      if (rowDetailRenderer) {
+        utilityColumns.push(expandColumn);
       }
-      return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
-    }, [rowsSelectable, columnsWithCustomCell, hideSelectionCheckboxes, selectColumn]);
+      if (rowsSelectable && !hideSelectionCheckboxes) {
+        utilityColumns.push(selectColumn);
+      }
+      if (hideSelectionCheckboxes) {
+        return utilityColumns.length > 0
+          ? [...utilityColumns, ...columnsWithCustomCell]
+          : columnsWithCustomCell;
+      }
+      return utilityColumns.length > 0
+        ? [...utilityColumns, ...columnsWithCustomCell]
+        : columnsWithCustomCell;
+    }, [
+      rowDetailRenderer,
+      rowsSelectable,
+      columnsWithCustomCell,
+      hideSelectionCheckboxes,
+      expandColumn,
+      selectColumn,
+    ]);
 
     const columnRenderVersionRef = useRef(0);
     const prevColumnsWithSelectColumnRef = useRef(columnsWithSelectColumn);
@@ -1659,6 +1856,12 @@ export const Table = memo(
     if (prevDataRenderVersionSourceRef.current !== safeData) {
       prevDataRenderVersionSourceRef.current = safeData;
       dataRenderVersionRef.current++;
+    }
+    const expansionRenderVersionRef = useRef(0);
+    const prevExpandedRowIdMapRef = useRef(expandedRowIdMap);
+    if (prevExpandedRowIdMapRef.current !== expandedRowIdMap) {
+      prevExpandedRowIdMapRef.current = expandedRowIdMap;
+      expansionRenderVersionRef.current++;
     }
 
     const columnPinning = useMemo(() => {
@@ -2009,6 +2212,7 @@ export const Table = memo(
       renderVersion +
       layoutVersion +
       dataRenderVersionRef.current +
+      expansionRenderVersionRef.current +
       typedCellRevision +
       columnRenderVersionRef.current;
     const rowState = {
@@ -2026,6 +2230,10 @@ export const Table = memo(
       rowLeave,
       striped,
       rowHeight,
+      rowDetailRenderer,
+      expandedRowIdMap,
+      visibleColumnCount: table.getVisibleFlatColumns().length,
+      totalColumnWidth: table.getTotalSize(),
       renderVersion: rowRenderVersion,
     };
     const rowStateRef = useRef(rowState);
@@ -2257,6 +2465,7 @@ export const Table = memo(
             s.effectiveUserSelectRow as React.CSSProperties["userSelect"];
           const effectiveRowWebkitUserSelect =
             s.effectiveUserSelectRow as React.CSSProperties["WebkitUserSelect"];
+          const isExpanded = !!s.expandedRowIdMap[row.id];
           return (
             <tr
               data-index={rowIndex}
@@ -2276,6 +2485,7 @@ export const Table = memo(
                 [styles.noBottomBorder]: s.noBottomBorder,
                 [styles.evenRow]: s.striped && rowIndex % 2 === 0,
                 [styles.oddRow]: s.striped && rowIndex % 2 !== 0,
+                [styles.expanded]: isExpanded,
               })}
               onClick={(event) => {
                 // On Windows, the second click of a double-click fires onClick before onDoubleClick.
@@ -2412,6 +2622,21 @@ export const Table = memo(
                 renderVersion={s.renderVersion}
                 localeRenderKey={cellRenderStateRef.current.localeRenderKey}
               />
+              {isExpanded && s.rowDetailRenderer ? (
+                <td
+                  className={styles.rowDetailCell}
+                  colSpan={s.visibleColumnCount}
+                  style={{
+                    width: s.totalColumnWidth,
+                    flexBasis: s.totalColumnWidth,
+                    flexShrink: 0,
+                  }}
+                >
+                  <div className={styles.rowDetailContent}>
+                    {s.rowDetailRenderer(row.original, rowIndex, row.id, isExpanded)}
+                  </div>
+                </td>
+              ) : null}
             </tr>
           );
         },
@@ -3008,6 +3233,11 @@ export const Table = memo(
         scrollToId,
         getItemCount,
         getVisibleRange,
+        expandRow,
+        collapseRow,
+        toggleRowExpansion,
+        getExpandedRowIds: getCurrentExpandedRowIds,
+        isRowExpanded,
         preserveStateOnNextDataRefresh: (options?: CollectionDataRefreshOptions) => {
           pendingDataRefreshRef.current = {
             sourceIds: new Set(currentSourceIds),
@@ -3019,14 +3249,19 @@ export const Table = memo(
       });
     }, [
       currentSourceIds,
+      collapseRow,
+      expandRow,
+      getCurrentExpandedRowIds,
       getItemCount,
       getVisibleRange,
+      isRowExpanded,
       registerComponentApi,
       scrollToBottom,
       scrollToId,
       scrollToIndex,
       scrollToTop,
       selectionApi,
+      toggleRowExpansion,
     ]);
 
     const paginationControls = (

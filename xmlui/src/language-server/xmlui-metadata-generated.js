@@ -17772,6 +17772,12 @@ export default {
       },
       "$rowIndex": {
         "description": "Zero-based row index (alias of `$itemIndex`)."
+      },
+      "$rowId": {
+        "description": "The table row ID, derived from `idKey` or the row index."
+      },
+      "$isExpanded": {
+        "description": "Whether the current row detail is expanded."
       }
     },
     "parts": {
@@ -17940,6 +17946,18 @@ export default {
       "noDataTemplate": {
         "description": "A property to customize what to display if the table does not contain any data.",
         "valueType": "ComponentDef"
+      },
+      "rowDetailTemplate": {
+        "description": "Template rendered in a full-width detail area beneath an expanded row. When this property is set, the table adds an expansion control column automatically. The template receives `$item`, `$row`, `$itemIndex`, `$rowIndex`, `$rowId`, and `$isExpanded`.",
+        "valueType": "ComponentDef"
+      },
+      "expandedRowIds": {
+        "description": "Controlled list of expanded row IDs. Pair this with `rowExpansionDidChange` to own row expansion state outside the table.",
+        "valueType": "any"
+      },
+      "initiallyExpandedRowIds": {
+        "description": "Initial list of expanded row IDs for uncontrolled row details. Later changes to this property do not replace the current expansion state.",
+        "valueType": "any"
       },
       "sortBy": {
         "description": "This property is used to determine which data property to sort by. If not defined, the data is not sorted",
@@ -18294,6 +18312,14 @@ export default {
           "selectedItems": "An array of the selected table row items."
         }
       },
+      "rowExpansionDidChange": {
+        "description": "This event is triggered when the set of expanded table rows changes. Use it with `expandedRowIds` for controlled row detail state.",
+        "signature": "rowExpansionDidChange(expandedRowIds: string[], expandedItems: any[]): void",
+        "parameters": {
+          "expandedRowIds": "The row IDs that are currently expanded.",
+          "expandedItems": "The expanded row items in data order."
+        }
+      },
       "selectAllAction": {
         "description": "This event is triggered when the user presses the select all keyboard shortcut (default: Ctrl+A/Cmd+A) and `rowsSelectable` is set to `true`. The component automatically selects all rows before invoking this handler. The handler receives three parameters: the currently focused row (if any), all selected items, and all selected IDs.",
         "signature": "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
@@ -18370,6 +18396,38 @@ export default {
       "getVisibleRange": {
         "description": "This method returns the currently visible row range as an object with `startIndex` and `endIndex` (inclusive, in the table's current row order). Returns `{ startIndex: -1, endIndex: -1 }` when the table is empty or not yet measured. The pull-style counterpart of the `visibleRangeDidChange` event.",
         "signature": "getVisibleRange(): { startIndex: number, endIndex: number }"
+      },
+      "expandRow": {
+        "description": "Expands the row with the specified ID.",
+        "signature": "expandRow(id: string | number): void",
+        "parameters": {
+          "id": "The ID of the row to expand."
+        }
+      },
+      "collapseRow": {
+        "description": "Collapses the row with the specified ID.",
+        "signature": "collapseRow(id: string | number): void",
+        "parameters": {
+          "id": "The ID of the row to collapse."
+        }
+      },
+      "toggleRowExpansion": {
+        "description": "Toggles the expanded state of the row with the specified ID.",
+        "signature": "toggleRowExpansion(id: string | number): void",
+        "parameters": {
+          "id": "The ID of the row to toggle."
+        }
+      },
+      "getExpandedRowIds": {
+        "description": "Returns the IDs of the currently expanded rows.",
+        "signature": "getExpandedRowIds(): string[]"
+      },
+      "isRowExpanded": {
+        "description": "Returns whether the row with the specified ID is expanded.",
+        "signature": "isRowExpanded(id: string | number): boolean",
+        "parameters": {
+          "id": "The ID of the row to inspect."
+        }
       },
       "clearSelection": {
         "description": "This method clears the list of currently selected table rows.",

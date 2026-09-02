@@ -38,6 +38,7 @@ import { createChildLayoutContext } from "../../abstractions/layout-context-util
 import { PositionValues } from "../Pagination/Pagination";
 import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Table";
 
@@ -53,8 +54,9 @@ function hasColumnChild(children: ComponentDef[] | undefined): boolean {
   return !!children?.some((child) => child.type === "Column" || hasColumnChild(child.children));
 }
 
-function hasNestedEventHandlers(children: ComponentDef[] | undefined): boolean {
-  return !!children?.some(
+function hasNestedEventHandlers(children: ComponentDef[] | ComponentDef | undefined): boolean {
+  const childList = Array.isArray(children) ? children : children ? [children] : undefined;
+  return !!childList?.some(
     (child) =>
       (child.events && Object.keys(child.events).length > 0) ||
       hasNestedEventHandlers(child.children),
@@ -74,6 +76,8 @@ export const TableMd = createMetadata({
     $colIndex: { description: "Zero-based index of the current column." },
     $row: { description: "The complete data row object being rendered (alias of `$item`)." },
     $rowIndex: { description: "Zero-based row index (alias of `$itemIndex`)." },
+    $rowId: { description: "The table row ID, derived from `idKey` or the row index." },
+    $isExpanded: { description: "Whether the current row detail is expanded." },
   },
   // NOTE: let's leave it like this for now, we'll expand later when the need arises
   parts: {
@@ -297,6 +301,24 @@ export const TableMd = createMetadata({
     noDataTemplate: dComponent(
       `A property to customize what to display if the table does not contain any data.`,
     ),
+    rowDetailTemplate: dComponent(
+      `Template rendered in a full-width detail area beneath an expanded row. When this ` +
+        `property is set, the table adds an expansion control column automatically. The ` +
+        `template receives \`$item\`, \`$row\`, \`$itemIndex\`, \`$rowIndex\`, \`$rowId\`, ` +
+        `and \`$isExpanded\`.`,
+    ),
+    expandedRowIds: {
+      description:
+        `Controlled list of expanded row IDs. Pair this with \`rowExpansionDidChange\` to ` +
+        `own row expansion state outside the table.`,
+      valueType: "any",
+    },
+    initiallyExpandedRowIds: {
+      description:
+        `Initial list of expanded row IDs for uncontrolled row details. Later changes to this ` +
+        `property do not replace the current expansion state.`,
+      valueType: "any",
+    },
     sortBy: {
       description:
         "This property is used to determine which data property to sort by. If not defined, " +
@@ -635,6 +657,16 @@ export const TableMd = createMetadata({
         selectedItems: "An array of the selected table row items.",
       },
     },
+    rowExpansionDidChange: {
+      description:
+        `This event is triggered when the set of expanded table rows changes. Use it with ` +
+        `\`expandedRowIds\` for controlled row detail state.`,
+      signature: "rowExpansionDidChange(expandedRowIds: string[], expandedItems: any[]): void",
+      parameters: {
+        expandedRowIds: "The row IDs that are currently expanded.",
+        expandedItems: "The expanded row items in data order.",
+      },
+    },
     selectAllAction: {
       description:
         `This event is triggered when the user presses the select all keyboard shortcut ` +
@@ -750,6 +782,38 @@ export const TableMd = createMetadata({
         `The pull-style counterpart of the \`visibleRangeDidChange\` event.`,
       signature: "getVisibleRange(): { startIndex: number, endIndex: number }",
     },
+    expandRow: {
+      description: "Expands the row with the specified ID.",
+      signature: "expandRow(id: string | number): void",
+      parameters: {
+        id: "The ID of the row to expand.",
+      },
+    },
+    collapseRow: {
+      description: "Collapses the row with the specified ID.",
+      signature: "collapseRow(id: string | number): void",
+      parameters: {
+        id: "The ID of the row to collapse.",
+      },
+    },
+    toggleRowExpansion: {
+      description: "Toggles the expanded state of the row with the specified ID.",
+      signature: "toggleRowExpansion(id: string | number): void",
+      parameters: {
+        id: "The ID of the row to toggle.",
+      },
+    },
+    getExpandedRowIds: {
+      description: "Returns the IDs of the currently expanded rows.",
+      signature: "getExpandedRowIds(): string[]",
+    },
+    isRowExpanded: {
+      description: "Returns whether the row with the specified ID is expanded.",
+      signature: "isRowExpanded(id: string | number): boolean",
+      parameters: {
+        id: "The ID of the row to inspect.",
+      },
+    },
     clearSelection: {
       description: `This method clears the list of currently selected table rows.`,
       signature: "clearSelection(): void",
@@ -861,8 +925,10 @@ const TableWithColumns = memo(
       const renderVersionRef = useRef(0);
       const prevRefreshOnRef = useRef(refreshOn);
       const hasEventfulCellContent = useMemo(
-        () => hasNestedEventHandlers(node.children),
-        [node.children],
+        () =>
+          hasNestedEventHandlers(node.children) ||
+          hasNestedEventHandlers(node.props.rowDetailTemplate),
+        [node.children, node.props.rowDetailTemplate],
       );
 
       const shouldForceRefresh =
@@ -888,6 +954,9 @@ const TableWithColumns = memo(
       );
       const stableSelectionDidChange = useEvent((...args: any[]) =>
         lookupEventHandler("selectionDidChange")?.(...args),
+      );
+      const stableRowExpansionDidChange = useEvent((...args: any[]) =>
+        lookupEventHandler("rowExpansionDidChange")?.(...args),
       );
       const stableWillSort = useEvent((...args: any[]) =>
         lookupEventHandler("willSort")?.(...args),
@@ -1111,10 +1180,37 @@ const TableWithColumns = memo(
         () => createChildLayoutContext(layoutContext, { type: "Table" }),
         [layoutContext],
       );
+      const tableRowDetailLayoutContext = useMemo(
+        () => createChildLayoutContext(layoutContext, { type: "TableRowDetail" }),
+        [layoutContext],
+      );
 
       const noDataRenderer = node.props.noDataTemplate
         ? () => renderChild(node.props.noDataTemplate, tableChildLayoutContext)
         : undefined;
+      const stableRowDetailRenderer = useEvent(
+        (row: any, rowIndex: number, rowId: string, isExpanded: boolean) => {
+          const rowDetailTemplate = node.props.rowDetailTemplate;
+          if (!rowDetailTemplate) {
+            return undefined;
+          }
+          return (
+            <MemoizedItem
+              node={rowDetailTemplate}
+              contextVars={{
+                $item: row,
+                $row: row,
+                $itemIndex: rowIndex,
+                $rowIndex: rowIndex,
+                $rowId: rowId,
+                $isExpanded: isExpanded,
+              }}
+              renderChild={renderChild}
+              layoutContext={tableRowDetailLayoutContext}
+            />
+          );
+        },
+      );
 
       const tableContent = (
         <>
@@ -1152,6 +1248,9 @@ const TableWithColumns = memo(
             rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
             registerComponentApi={registerComponentApi}
             noDataRenderer={noDataRenderer}
+            rowDetailRenderer={node.props.rowDetailTemplate ? stableRowDetailRenderer : undefined}
+            expandedRowIds={extractValue(node.props.expandedRowIds)}
+            initiallyExpandedRowIds={extractValue(node.props.initiallyExpandedRowIds)}
             hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
             loading={extractValue.asOptionalBoolean(node.props.loading)}
             loadingDelay={extractValue.asOptionalNumber(node.props.loadingDelay)}
@@ -1171,6 +1270,9 @@ const TableWithColumns = memo(
             lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
             sortingDidChange={stableSortingDidChange}
             onSelectionDidChange={stableSelectionDidChange}
+            rowExpansionDidChange={
+              node.events?.rowExpansionDidChange ? stableRowExpansionDidChange : undefined
+            }
             willSort={stableWillSort}
             rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
             rowClick={node.events?.rowClick ? stableRowClick : undefined}

@@ -2776,6 +2776,99 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("rowDetailTemplate property", () => {
+    const fileData = [
+      { path: "fileA", changes: "+10 -2", sharedWith: "work-1", diff: "diff A" },
+      { path: "fileB", changes: "+4 -0", sharedWith: "work-2", diff: "diff B" },
+    ];
+
+    test("renders controlled per-row details beneath expanded rows", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Fragment var.openIds="{[]}">
+          <Table
+            data='{${JSON.stringify(fileData)}}'
+            idKey="path"
+            expandedRowIds="{openIds}"
+            onRowExpansionDidChange="ids => openIds = ids"
+            testId="table"
+          >
+            <Column bindTo="path" header="File"/>
+            <Column bindTo="changes" header="Changes"/>
+            <Column bindTo="sharedWith" header="Shared with"/>
+            <property name="rowDetailTemplate">
+              <VStack testId="detail-{$rowId}">
+                <Text value="{$rowIndex}: {$item.diff}" />
+              </VStack>
+            </property>
+          </Table>
+        </Fragment>
+      `);
+
+      await expect(page.getByTestId("table")).toBeVisible();
+      const expandFileA = page.getByRole("button", { name: "Expand row fileA" });
+      const expandFileB = page.getByRole("button", { name: "Expand row fileB" });
+
+      await expect(page.getByTestId("detail-fileA")).toHaveCount(0);
+      await expect(page.getByTestId("detail-fileB")).toHaveCount(0);
+
+      await expandFileA.click();
+      await expect(page.getByTestId("detail-fileA")).toContainText("0: diff A");
+      await expect(page.getByTestId("detail-fileB")).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Collapse row fileA" })).toHaveAttribute(
+        "aria-expanded",
+        "true",
+      );
+
+      await expandFileB.click();
+      await expect(page.getByTestId("detail-fileA")).toContainText("0: diff A");
+      await expect(page.getByTestId("detail-fileB")).toContainText("1: diff B");
+      await expect(page.getByRole("button", { name: "Collapse row fileB" })).toHaveAttribute(
+        "aria-expanded",
+        "true",
+      );
+
+      await page.getByRole("button", { name: "Collapse row fileA" }).click();
+      await expect(page.getByTestId("detail-fileA")).toHaveCount(0);
+      await expect(page.getByTestId("detail-fileB")).toContainText("1: diff B");
+    });
+
+    test("supports uncontrolled expansion APIs", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Table
+            id="files"
+            data='{${JSON.stringify(fileData)}}'
+            idKey="path"
+            initiallyExpandedRowIds="{['fileB']}"
+            testId="table"
+          >
+            <Column bindTo="path" header="File"/>
+            <property name="rowDetailTemplate">
+              <Text testId="detail-{$rowId}" value="{$item.diff}" />
+            </property>
+          </Table>
+          <Button testId="expand-a" onClick="files.expandRow('fileA')" />
+          <Button testId="collapse-b" onClick="files.collapseRow('fileB')" />
+          <Button testId="check-expanded" onClick="testState = files.getExpandedRowIds().join(',')" />
+        </Fragment>
+      `);
+
+      await expect(page.getByTestId("detail-fileB")).toContainText("diff B");
+
+      await page.getByTestId("expand-a").click();
+      await expect(page.getByTestId("detail-fileA")).toContainText("diff A");
+
+      await page.getByTestId("collapse-b").click();
+      await expect(page.getByTestId("detail-fileB")).toHaveCount(0);
+
+      await page.getByTestId("check-expanded").click();
+      await expect.poll(testStateDriver.testState).toEqual("fileA");
+    });
+  });
+
   test.describe("noDataTemplate property", () => {
     test("shows custom no data template when data is empty", async ({ initTestBed, page }) => {
       await initTestBed(`
