@@ -126,6 +126,25 @@ export const eventAsyncRuntime = {
     await this.checkCancel(evalContext);
   },
 
+  /**
+   * Commits any pending XMLUI state changes, without checking for cancellation
+   * afterward. Interpreted statement execution always commits a statement's state
+   * changes before it considers cancellation (see `process-statement-async.ts`), so a
+   * native-compiled callback that may be invoked standalone later (e.g. a stored event
+   * subscription handler, invoked after the evalContext it closed over was cancelled)
+   * needs the same guarantee: its own state changes must land even though the
+   * cancellation token that gated the *original* handler run may since have fired.
+   * Unlike `flushPendingState`, this must never throw a cancellation error, since doing
+   * so would surface as an unhandled rejection from unrelated host code (e.g. a
+   * WebSocket message handler or event-emitter subscription) invoking the callback.
+   */
+  async commitPendingState(evalContext: BindingTreeEvaluationContext): Promise<void> {
+    if (evalContext.hasPendingStateChanges?.() !== true) {
+      return;
+    }
+    await evalContext.onStatementCompleted?.(evalContext, undefined as any);
+  },
+
   async yield(): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
   },

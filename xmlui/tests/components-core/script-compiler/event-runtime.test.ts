@@ -32,6 +32,65 @@ describe("event-async runtime helpers", () => {
     expect(value).toEqual([2, 4, 6]);
   });
 
+  describe("commitPendingState", () => {
+    // commitPendingState backs the native-compiled-arrow fix for
+    // https://github.com/xmlui-org/xmlui/issues/3864: a callback arrow compiled to a
+    // real JS function (rather than a lazy XMLUI arrow) may be invoked standalone,
+    // later, detached from the handler run that created it (e.g. a stored event
+    // subscription). Unlike flushPendingState, it must commit pending state without
+    // ever throwing due to cancellation, since the original handler run may have
+    // already been cancelled by the time such a callback fires.
+
+    it("does nothing when there are no pending state changes", async () => {
+      let completed = false;
+      const evalContext = createEvalContext({
+        options: { defaultToOptionalMemberAccess: true },
+      });
+      evalContext.hasPendingStateChanges = () => false;
+      evalContext.onStatementCompleted = () => {
+        completed = true;
+      };
+
+      await eventAsyncRuntime.commitPendingState(evalContext);
+
+      expect(completed).toBe(false);
+    });
+
+    it("commits pending state changes via onStatementCompleted", async () => {
+      let completedWith: unknown;
+      const evalContext = createEvalContext({
+        options: { defaultToOptionalMemberAccess: true },
+      });
+      evalContext.hasPendingStateChanges = () => true;
+      evalContext.onStatementCompleted = (ctx: unknown) => {
+        completedWith = ctx;
+      };
+
+      await eventAsyncRuntime.commitPendingState(evalContext);
+
+      expect(completedWith).toBe(evalContext);
+    });
+
+    it("commits pending state without throwing even when cancellation already fired", async () => {
+      let completed = false;
+      const evalContext = createEvalContext({
+        options: { defaultToOptionalMemberAccess: true },
+        // Duck-typed cancellation token: `checkCancel` (used by the sibling
+        // `flushPendingState`) reads `.cancelled` off this object. `commitPendingState`
+        // must ignore it entirely and still commit.
+        cancellationToken: { cancelled: true } as any,
+      });
+      evalContext.hasPendingStateChanges = () => true;
+      evalContext.onStatementCompleted = () => {
+        completed = true;
+      };
+
+      await expect(eventAsyncRuntime.commitPendingState(evalContext)).resolves.toBeUndefined();
+
+      expect(completed).toBe(true);
+    });
+  });
+
   it("rejects banned functions", async () => {
     await expect(
       eventAsyncRuntime.call(
