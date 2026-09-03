@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.14.23
+
+### Patch Changes
+
+- a426b99: Fix compiled event handlers so inline callback arrows (e.g. the predicate in `items.some(item => ...)`) are compiled to native JS instead of silently falling back to the interpreter, and ensure such compiled callbacks commit pending state correctly when invoked as stored/deferred handlers.
+- c331401: Fix HStack wrapContent so percentage-width children keep their percentage width after wrapping.
+- 32187dd: Fix Table cell selection coverage so double-clicking row cells does not leave a native text-selection artifact in WebKit.
+- affacce: Add expandable row detail templates to Table.
+
 ## 0.14.22
 
 ### Patch Changes
