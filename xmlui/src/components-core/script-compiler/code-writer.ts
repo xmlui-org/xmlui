@@ -6,6 +6,12 @@ import type {
 } from "./types";
 import type { ScripNodeBase } from "../script-runner/ScriptingSourceTree";
 
+export type CompiledScriptCodeWriterMark = {
+  chunkCount: number;
+  length: number;
+  mappingCount: number;
+};
+
 export class CompiledScriptCodeWriter {
   private chunks: string[] = [];
   private mappings: CompiledScriptMapping[] = [];
@@ -34,6 +40,28 @@ export class CompiledScriptCodeWriter {
     } finally {
       this.suppressMappings--;
     }
+  }
+
+  /**
+   * Captures the writer's current position so a subsequent speculative emission can be
+   * discarded with `resetTo` if it turns out to be unsupported.
+   */
+  mark(): CompiledScriptCodeWriterMark {
+    return {
+      chunkCount: this.chunks.length,
+      length: this.length,
+      mappingCount: this.mappings.length,
+    };
+  }
+
+  /**
+   * Discards everything written since `mark` was captured, restoring the writer to that
+   * earlier position. Used to roll back a speculative emission attempt.
+   */
+  resetTo(mark: CompiledScriptCodeWriterMark): void {
+    this.chunks.length = mark.chunkCount;
+    this.length = mark.length;
+    this.mappings.length = mark.mappingCount;
   }
 
   newline(): void {

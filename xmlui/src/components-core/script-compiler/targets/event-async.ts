@@ -79,7 +79,10 @@ import {
 } from "../../script-runner/ScriptingSourceTree";
 import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
-import { throwUnsupportedCompiledScriptNode } from "../errors";
+import {
+  throwUnsupportedCompiledScriptNode,
+  UnsupportedCompiledScriptNodeError,
+} from "../errors";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -1847,8 +1850,16 @@ function emitArgumentArray(
     }
     if (arg.type === T_ARROW_EXPRESSION) {
       if (arrowReferencesCompilerLocals(arg, context)) {
+        // The lazy XMLUI-arrow path evaluates through the interpreter, which has no
+        // access to compiled JS locals, so native compilation is mandatory here. If it
+        // is not supported, the error propagates and the whole handler falls back to
+        // interpreted execution (existing, safe behavior).
         emitNativeArrowExpression(writer, arg, context);
-      } else {
+      } else if (!tryEmitNativeArrowExpression(writer, arg, context)) {
+        // Native compilation is not mandatory, but attempt it anyway so common callback
+        // patterns (e.g. `items.some(item => ...)`) run as compiled JS instead of being
+        // re-interpreted at runtime. Fall back to the always-safe lazy arrow only when
+        // the callback body uses syntax the native emitter cannot handle.
         emitArrowExpression(writer, arg, context);
       }
       return;
@@ -1862,6 +1873,31 @@ function emitArgumentArray(
     writer.write(")");
   });
   writer.write("]");
+}
+
+/**
+ * Speculatively emits `expr` as a native (compiled) arrow function. If the arrow body
+ * contains a construct the native emitter does not support, the partial output is rolled
+ * back and the function returns `false` so the caller can fall back to a different
+ * emission strategy (e.g. a lazy XMLUI arrow) without corrupting the generated code or
+ * failing the whole handler's compilation.
+ */
+function tryEmitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): boolean {
+  const mark = writer.mark();
+  try {
+    emitNativeArrowExpression(writer, expr, context);
+    return true;
+  } catch (error) {
+    if (error instanceof UnsupportedCompiledScriptNodeError) {
+      writer.resetTo(mark);
+      return false;
+    }
+    throw error;
+  }
 }
 
 function arrowReferencesCompilerLocals(expr: ArrowExpression, context: CompilerContext): boolean {
@@ -2005,6 +2041,7 @@ function emitNativeArrowBody(
     case T_EMPTY_STATEMENT:
       writer.write("{", expr.statement);
       args.forEach((arg) => arg.emitBinding(writer));
+      writer.write("await runtime.commitPendingState(evalContext);", expr.statement);
       writer.write("return undefined; }", expr.statement);
       return;
     case T_EXPRESSION_STATEMENT: {
@@ -2016,6 +2053,13 @@ function emitNativeArrowBody(
       emitExpression(writer, expr.statement.expr, context);
       writer.write(");", expr.statement);
       emitAfterStatement(writer, expr.statement);
+      // A native arrow can be invoked as a callback stored for later, deferred
+      // invocation (e.g. an event-subscription handler) rather than only inline
+      // within a `runtime.call`-wrapped iteration. Commit before returning so any
+      // pending XMLUI state changes land even when nothing else downstream will
+      // flush them on this callback's behalf (see `commitPendingState`'s doc comment
+      // for why this must not check cancellation).
+      writer.write("await runtime.commitPendingState(evalContext);", expr.statement);
       writer.write(`return ${returnName};`, expr.statement);
       writer.write("}", expr.statement);
       return;
@@ -2025,6 +2069,10 @@ function emitNativeArrowBody(
       writer.write("{", expr.statement);
       args.forEach((arg) => arg.emitBinding(writer));
       expr.statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
+      // Same reasoning as above: cover the implicit fall-through (no explicit
+      // `return` was hit) so a stored, deferred callback still commits its state
+      // changes once it finishes running.
+      writer.write("await runtime.commitPendingState(evalContext);", expr.statement);
       writer.write("}", expr.statement);
       return;
     }

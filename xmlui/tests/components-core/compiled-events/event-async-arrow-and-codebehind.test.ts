@@ -304,6 +304,7 @@ describe("compiled event-async arrow and callback calls", () => {
       });
     const evalContext = {
       localContext: createLocalContext(),
+      hasPendingStateChanges: () => changes.length > 0,
       onStatementCompleted: () => {
         for (const change of changes) {
           state[change.pathArray[0] as keyof typeof state] = change.newValue;
@@ -434,6 +435,90 @@ describe("compiled event-async arrow and callback calls", () => {
     await expectCompiledParity("result = items.flatMap((item) => [item, item * 10]);", {
       items: [1, 2],
       result: [],
+    });
+  });
+
+  describe("native compilation of inline callback arrows (issue #3864)", () => {
+    // Regression coverage for https://github.com/xmlui-org/xmlui/issues/3864:
+    // a compiled event handler's inline callback arrows (e.g. the predicate in
+    // `rows.some(item => ...)`) were always emitted as lazy `runtime.arrow(...)`
+    // objects whenever they did not reference a compiled local, even though they
+    // could safely run as compiled JS. That silently re-entered the interpreter
+    // (`executeArrowExpression`) for otherwise fully-compiled handlers. These tests
+    // assert on the generated source itself so a regression that reintroduces the
+    // lazy path is caught even if semantic parity happens to hold.
+
+    it("compiles a some() predicate that reads runtime state instead of emitting a lazy arrow", () => {
+      const artifact = compileEventAsyncStatementSource(
+        "result = rows.some(item => item.id === scrollToCaseId);",
+        "test:event:some-native-arrow",
+      );
+
+      expect(artifact.js).not.toContain("runtime.arrow(");
+      expect(artifact.js).toContain("async (item)");
+    });
+
+    it("compiles a filter() predicate that reads runtime state instead of emitting a lazy arrow", () => {
+      const artifact = compileEventAsyncStatementSource(
+        "result = items.filter(item => item.status === wantedStatus);",
+        "test:event:filter-native-arrow",
+      );
+
+      expect(artifact.js).not.toContain("runtime.arrow(");
+      expect(artifact.js).toContain("async (item)");
+    });
+
+    it("compiles a map() callback that reads runtime state instead of emitting a lazy arrow", () => {
+      const artifact = compileEventAsyncStatementSource(
+        "result = items.map(item => item.id);",
+        "test:event:map-native-arrow",
+      );
+
+      expect(artifact.js).not.toContain("runtime.arrow(");
+      expect(artifact.js).toContain("async (item)");
+    });
+
+    it("keeps semantic parity for natively-compiled some/filter/map callbacks reading $props-like state", async () => {
+      await expectCompiledParity(
+        "someResult = rows.some(item => item.id === scrollToCaseId); filterResult = rows.filter(item => item.id === scrollToCaseId); mapResult = rows.map(item => item.id === scrollToCaseId);",
+        {
+          rows: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          scrollToCaseId: 2,
+          someResult: false,
+          filterResult: [],
+          mapResult: [],
+        },
+      );
+    });
+
+    it("still falls back to a lazy arrow when the callback uses syntax the native emitter cannot compile", async () => {
+      // A comma (sequence) expression is not supported by the native expression
+      // emitter, so this callback must fall back to `runtime.arrow(...)` rather than
+      // failing the whole handler's compilation.
+      const source = "result = items.some(item => (item, item.id === target));";
+      const artifact = compileEventAsyncStatementSource(source, "test:event:unsupported-arrow-fallback");
+
+      expect(artifact.js).toContain("runtime.arrow(");
+
+      await expectCompiledParity(source, {
+        items: [{ id: 1 }, { id: 2 }],
+        target: 2,
+        result: false,
+      });
+    });
+
+    it("still requires native compilation (and can fail the handler) when the callback closes over a compiled local", () => {
+      // When the callback references a compiled local (e.g. a `let` declared in the
+      // handler), the lazy interpreted path cannot see that local at all, so native
+      // compilation remains mandatory here — an unsupported construct in such a
+      // callback must still surface as a compile-time error instead of silently
+      // falling back to a lazy arrow that would produce wrong results.
+      expect(() =>
+        compileEventAsyncStatementSource(
+          "let target = 2; result = items.some(item => (item, item.id === target));",
+          "test:event:unsupported-local-referencing-arrow",
+        ),
+      ).toThrow();
     });
   });
 });
