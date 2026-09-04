@@ -1,5 +1,23 @@
 # xmlui
 
+## 0.14.24
+
+### Patch Changes
+
+- 7c7f67a: Fix `Pages`' canonical-URL enforcement corrupting hash-based routing whenever a navigation's query string contained a reserved character (e.g. a raw `/` in a value, as in `?returnTo=/dashboard`). `canonicalise()` rebuilt the query string via `URLSearchParams.toString()`, which always re-encodes using `application/x-www-form-urlencoded` rules even when `urlQueryParamOrder` is left at its default `"preserve"` — so a value like `/dashboard` round-tripped to `%2Fdashboard` and was flagged as "non-canonical" even though nothing was wrong. Combined with the default `onMismatch: "redirect"` (active whenever `strictRouting` isn't explicitly disabled), `Pages` then called `window.history.replaceState(state, "", canonical)` with a bare `pathname?search` string that has no `#`; under hash routing the browser resolved that as an absolute path, stripping the `#` that carries the route and permanently corrupting the URL for every navigation after it (`HashRouter`'s history thereafter only ever writes `location.hash`).
+
+  `canonicalise()` now rebuilds the query string from the original `key=value` pairs (only reordering them when `urlQueryParamOrder: "alphabetical"` is set) instead of re-encoding through `URLSearchParams`, so semantically-unchanged URLs are no longer misdetected as non-canonical. `Pages` now applies a genuine mismatch through the router's own `useNavigate()` instead of a raw `window.history.replaceState` call, so the fix-up correctly targets the hash or the real path depending on the active router mode.
+
+- 3e52aa8: Fix a throwing binding expression on a `Column` property (most notably a reactive `header`) silently dropping the column — or, for `width`/`minWidth`/`maxWidth`, crashing the entire page — instead of failing loudly and locally (xmlui-org/xmlui#3867).
+
+  The root cause: every wrapped component forwards its declared metadata props through a generic extraction loop that runs _before_ the component's own render logic (including `customRender`, e.g. `Column`'s). An exception there — e.g. a `header="{...}"` expression that dereferences a value which hasn't loaded yet — aborted the whole component's render before it could return anything. Since `Column` only registers itself with its parent `Table` from a mount effect, a column that never renders never registers, so it vanished from the table with no indication near the table that anything had gone wrong. Separately, `Table`'s `width`/`minWidth`/`maxWidth` validation threw inside a `useMemo` in the table's own inner render — past the point where XMLUI's per-component error containment applies — so an invalid value could crash far more than the one table.
+  - `wrapComponent`'s and `wrapCompound`'s prop-forwarding loops now catch a throwing binding per-property, log a clear, diagnosable console error identifying the component and the property, and fall back to `undefined` for just that property so the rest of the component keeps rendering.
+  - `Column`'s own `customRender` gained the same per-property guard as defense in depth.
+  - `Table` no longer throws on an invalid `width`/`minWidth`/`maxWidth` value; it logs a diagnosable error and falls back to the default width.
+  - The inner `Table` render is now wrapped in a local error boundary that resets whenever the table's columns or data change, so any remaining render error is contained to the table itself instead of taking down a larger part of the page.
+
+  A reactive `header` (or other Column property) that evaluates successfully continues to work as before — this fix only changes what happens when the binding throws.
+
 ## 0.14.23
 
 ### Patch Changes
