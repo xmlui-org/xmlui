@@ -1,5 +1,10 @@
 # Plan — one switch for script compilation, one for its diagnostics
 
+> **Status: implemented** on this branch. `compileScripts` and `reportCompileFallbacks`
+> are the only compilation keys; the four listed under "What goes away" are removed and
+> report their replacement when seen. Full unit suite green (11,293 tests); targeted E2E
+> green in both modes. The full E2E run is the maintainer's to make.
+
 ## Why
 
 Script compilation is configured today through five keys that read from three different
