@@ -298,7 +298,7 @@ function emitArrowExpressionStatement(
   statement: ArrowExpressionStatement,
   context: CompilerContext,
 ): void {
-  if (statement.expr.async || containsNonSerializableLiteral(statement.expr)) {
+  if (statement.expr.async) {
     throwUnsupportedCompiledScriptNode(statement.expr, context.sourceId);
   }
   emitBeforeStatement(writer, statement);
@@ -311,12 +311,37 @@ function emitArrowExpressionStatement(
   writer.write(`return ${returnName};`, statement);
 }
 
+/**
+ * Emits the invocation of an event handler that was written as an arrow function
+ * (`onClick="(ev) => …"`, `onMount="() => { … }"`), which is the idiomatic form whenever a
+ * handler needs to name its event arguments.
+ *
+ * Native compilation is attempted first, so the handler body becomes real JavaScript. The
+ * lazy `runtime.arrow` fallback below serializes the whole AST into the generated code and
+ * hands it straight back to the tree-walking interpreter at run time, meaning an
+ * arrow-wrapped handler used to get no benefit at all from compilation — it merely paid for
+ * the AST payload. Nested callback arrows already compile natively (see `emitArgumentArray`),
+ * and this brings the outermost arrow in line with them.
+ */
 function emitEventArrowCall(
   writer: CompiledScriptCodeWriter,
   expr: ArrowExpression,
   context: CompilerContext,
 ): void {
-  if (expr.async || containsNonSerializableLiteral(expr)) {
+  if (expr.async) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  if (tryEmitNativeEventArrowCall(writer, expr, context)) {
+    return;
+  }
+  if (arrowReferencesCompilerLocals(expr, context)) {
+    // The lazy path evaluates through the interpreter, which cannot see compiled JS
+    // locals declared by earlier statements of this handler. Emitting it here would
+    // silently resolve those names to something else, so fail compilation instead and
+    // let the whole handler fall back to interpreted execution (existing, safe behavior).
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  if (containsNonSerializableLiteral(expr)) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
   writer.write("await runtime.call(runtime.arrow(", expr);
@@ -325,6 +350,32 @@ function emitEventArrowCall(
     ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread)",
     expr,
   );
+}
+
+/**
+ * Speculatively emits the handler arrow as a natively compiled function invoked with the
+ * handler's event arguments. Rolls the writer back and reports `false` when the body uses a
+ * construct the native emitter cannot handle, so the caller can fall back without leaving
+ * partial output behind (same contract as `tryEmitNativeArrowExpression`).
+ */
+function tryEmitNativeEventArrowCall(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): boolean {
+  const mark = writer.mark();
+  try {
+    writer.write("await runtime.callNativeArrow(", expr);
+    emitNativeArrowExpression(writer, expr, context);
+    writer.write(", evalContext.eventArgs ?? [], evalContext)", expr);
+    return true;
+  } catch (error) {
+    if (error instanceof UnsupportedCompiledScriptNodeError) {
+      writer.resetTo(mark);
+      return false;
+    }
+    throw error;
+  }
 }
 
 function emitExpressionStatement(

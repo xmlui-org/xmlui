@@ -545,6 +545,54 @@ describe("Xmlui transform - child elements", () => {
       expect(warnings).toEqual([]);
     });
 
+    it("compiles arrow-function event handlers instead of re-interpreting them", () => {
+      const warnings: string[] = [];
+      // --- The handler shape reported against v0.14.24: a `Lifecycle` `onMount` written as
+      // --- an arrow function. Its body used to be serialized into `runtime.arrow` and handed
+      // --- back to the interpreter, so compiling the handler bought nothing.
+      const cd = transformSource(
+        `<Lifecycle
+          onMount="() => {
+            if (scrollToCaseId != null && rows.some(item => item.id === scrollToCaseId)) {
+              casesTable.scrollToId(scrollToCaseId);
+              emitEvent('scrolledToCase', scrollToCaseId);
+            }
+          }" />`,
+        0,
+        false,
+        warnings,
+        { compileEventHandlers: true },
+      ) as ComponentDef;
+      const event = (cd.events! as any).mount;
+
+      expect(event.compiledUnsupported).toBe(false);
+      expect(warnings).toEqual([]);
+      // --- No serialized AST handed to the interpreter...
+      expect(event.compiled.js).not.toContain("runtime.arrow(");
+      expect(event.compiled.js).not.toContain("startToken");
+      // --- ...the body is emitted as real JavaScript instead.
+      expect(event.compiled.js).toContain("runtime.callNativeArrow(");
+      expect(event.compiled.js).toMatch(/if \(__xmlui_evt_\d+\)/);
+      expect(event.compiled.js).toContain("scrollToId");
+    });
+
+    it("compiles arrow event handlers that name their event arguments", () => {
+      const cd = transformSource(
+        `<Table onSelectionDidChange="(items) => { selectedItems = items; }" />`,
+        0,
+        false,
+        undefined,
+        { compileEventHandlers: true },
+      ) as ComponentDef;
+      const event = (cd.events! as any).selectionDidChange;
+
+      expect(event.compiledUnsupported).toBe(false);
+      expect(event.compiled.js).not.toContain("runtime.arrow(");
+      // --- The event argument becomes a real JavaScript parameter of the compiled body.
+      expect(event.compiled.js).toContain("(async (items) =>");
+      expect(event.compiled.js).toContain("evalContext.eventArgs ?? []");
+    });
+
     it("does not log parse-time compiled event source by default", () => {
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
