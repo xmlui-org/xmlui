@@ -53,7 +53,7 @@ export async function executeCompiledEventAsyncArtifact(
   eventAsyncRuntime.beginInvocation(evalContext);
   try {
     return await instantiateCompiledScriptArtifact<Promise<any>>(artifact, invocation, {
-      sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+      sourceMapMode: evalContext.options?.sourceMaps,
       generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
       sourceMapUrl: getExternalSourceMapUrl(artifact),
     }).execute({

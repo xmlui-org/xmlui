@@ -4,6 +4,8 @@ type XmluiBooleanLike = boolean | string | undefined | null;
 
 type XmluiAppDefineOptions = {
   buildMode: XmluiBuildMode;
+  /** True for `xmlui start`. Turns on source maps for scripts compiled in the browser. */
+  devServer?: XmluiBooleanLike;
   mockEnabled?: XmluiBooleanLike;
   mockWorkerLocation?: string;
   includeAllComponents?: XmluiBooleanLike;
@@ -16,6 +18,7 @@ type XmluiAppDefineOptions = {
 // pass-throughs in the framework lib build (vite build --mode lib).
 const XMLUI_APP_DEFINE_KEYS = {
   buildMode: "import.meta.env.VITE_XMLUI_BUILD_MODE",
+  devServer: "import.meta.env.VITE_XMLUI_DEV_SERVER",
   mockEnabled: "import.meta.env.VITE_MOCK_ENABLED",
   mockWorkerLocation: "import.meta.env.VITE_MOCK_WORKER_LOCATION",
   includeAllComponents: "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS",
@@ -49,6 +52,7 @@ export function createXmluiAppDefines(
 ): Record<string, string | boolean | number | undefined> {
   const {
     buildMode,
+    devServer,
     mockEnabled,
     mockWorkerLocation,
     includeAllComponents,
@@ -58,6 +62,9 @@ export function createXmluiAppDefines(
 
   return {
     [XMLUI_APP_DEFINE_KEYS.buildMode]: JSON.stringify(buildMode),
+    [XMLUI_APP_DEFINE_KEYS.devServer]: JSON.stringify(
+      String(normalizeXmluiBoolean(devServer, false)),
+    ),
     [XMLUI_APP_DEFINE_KEYS.mockEnabled]: normalizeXmluiBoolean(mockEnabled, false),
     ...(mockWorkerLocation
       ? {

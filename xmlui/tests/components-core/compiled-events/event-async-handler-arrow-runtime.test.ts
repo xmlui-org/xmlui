@@ -44,7 +44,7 @@ async function runCompiledHandler(source: string, localContext: Record<string, a
   const evalContext = createEvalContext({
     localContext,
     eventArgs: [],
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const statements = prepareHandlerStatements(parseHandlerCode(source));
   try {

@@ -773,7 +773,7 @@ function createArrowFunctionAsync(
 
       // --- Execute the compiled declaration artifact when available and requested
       if (
-        runTimeEvalContext.options?.compileEventHandlers &&
+        runTimeEvalContext.options?.compileScripts &&
         (expr as any).compiled &&
         !(expr as any).compiledUnsupported
       ) {

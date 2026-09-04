@@ -205,8 +205,10 @@ export type XmluiFileRole = "component" | "entrypoint";
 
 export type XmluiParserOptions = {
   role?: XmluiFileRole;
-  compileEventHandlers?: boolean;
-  logCompiledEventHandlerSource?: boolean;
+  /** Compile every script in this file — handlers, inline `<script>`, code-behind. */
+  compileScripts?: boolean;
+  /** Report each script block that falls back to interpretation, with a code. */
+  reportCompileFallbacks?: boolean;
 };
 
 export type ParseResult = { node: Node; errors: ParserDiag[] };

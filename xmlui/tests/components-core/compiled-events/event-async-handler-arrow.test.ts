@@ -46,7 +46,7 @@ async function runCompiled(
   const evalContext = createEvalContext({
     localContext,
     eventArgs,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const returnValue = await executeCompiledEventAsyncArtifact(
     compilePreparedHandler(source),

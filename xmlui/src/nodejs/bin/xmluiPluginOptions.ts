@@ -24,16 +24,27 @@ export type XmluiConfigSource = {
   [key: string]: any;
 };
 
+/** The two settings that configure script compilation. */
+const SCRIPT_COMPILATION_KEYS = ["compileScripts", "reportCompileFallbacks"];
+
 /**
- * Settings that turn XMLUI script compilation on. Used to decide whether an
- * app description we failed to load was worth complaining about.
+ * Settings that used to configure compilation. They no longer do anything, so a
+ * project that still carries one is told what to use instead — silence here is what
+ * made the misconfiguration in #3876 expensive to find.
  */
-const SCRIPT_COMPILATION_KEYS = [
-  "compileScripts",
-  "compileBindings",
-  "compileEventHandlers",
-  "compiledScriptSourceMaps",
-  "logCompiledEventHandlerSource",
+const REMOVED_COMPILATION_KEYS: Record<string, string> = {
+  compileBindings: '"compileScripts" now covers bindings, handlers, and code-behind alike',
+  compileEventHandlers: '"compileScripts" now covers bindings, handlers, and code-behind alike',
+  compiledScriptSourceMaps:
+    "source maps are automatic: on under `xmlui start`, off in builds",
+  logCompiledEventHandlerSource:
+    'use "reportCompileFallbacks" for fallback diagnostics, or `xsVerbose` for per-artifact traces',
+};
+
+/** Keys the loader looks for anywhere in a config source, to decide whether to warn. */
+const ALL_COMPILATION_KEYS = [
+  ...SCRIPT_COMPILATION_KEYS,
+  ...Object.keys(REMOVED_COMPILATION_KEYS),
 ];
 
 /**
@@ -61,25 +72,39 @@ export function normalizeXmluiPluginOptions(
   // --- `xmluiConfig` overrides `appGlobals`, and an explicit top-level key in
   // --- `xmlui.config.json` overrides both.
   const setting = (key: string) => config[key] ?? xmluiConfig[key] ?? appGlobals[key];
-  const compileScripts = setting("compileScripts");
-  const compileBindings = setting("compileBindings") ?? compileScripts;
-  const compileEventHandlers = setting("compileEventHandlers") ?? compileScripts;
-  const hasScriptCompilation =
-    compileScripts === true || compileBindings === true || compileEventHandlers === true;
-  const compiledScriptSourceMaps =
-    setting("compiledScriptSourceMaps") ??
-    (options.devServer && hasScriptCompilation ? "external" : undefined);
+  warnAboutRemovedKeys(config, xmluiConfig, appGlobals);
+  const compileScripts = setting("compileScripts") === true;
   return {
     analyze: config.analyze,
     reactiveCycles: config.reactiveCycles,
     accessibility: config.accessibility,
     typeContracts: config.typeContracts,
     compileScripts,
-    compileBindings,
-    compileEventHandlers,
-    compiledScriptSourceMaps,
-    logCompiledEventHandlerSource: setting("logCompiledEventHandlerSource"),
+    reportCompileFallbacks: setting("reportCompileFallbacks") === true,
+    // --- Source maps exist to debug compiled scripts while developing; a build has
+    // --- no use for the payload. Not an app-level setting.
+    ...(compileScripts && options.devServer ? { sourceMaps: "external" as const } : {}),
   };
+}
+
+const reportedRemovedKeys = new Set<string>();
+
+function warnAboutRemovedKeys(...records: Array<Record<string, any>>): void {
+  for (const [key, advice] of Object.entries(REMOVED_COMPILATION_KEYS)) {
+    if (reportedRemovedKeys.has(key)) {
+      continue;
+    }
+    if (!records.some((record) => record?.[key] !== undefined)) {
+      continue;
+    }
+    reportedRemovedKeys.add(key);
+    console.warn(`[xmlui] "${key}" is no longer supported — ${advice}.`);
+  }
+}
+
+/** Test seam: the notices are one-shot per process. */
+export function resetRemovedCompilationKeyNotices(): void {
+  reportedRemovedKeys.clear();
 }
 
 /**
@@ -228,7 +253,7 @@ async function importAppDescriptionThroughVite(cwd: string, file: string): Promi
 }
 
 function mentionsScriptCompilation(rawConfig: string): boolean {
-  return SCRIPT_COMPILATION_KEYS.some((key) => rawConfig.includes(key));
+  return ALL_COMPILATION_KEYS.some((key) => rawConfig.includes(key));
 }
 
 /**
@@ -240,7 +265,7 @@ function hasUnansweredScriptCompilationKey(
   rawConfig: string,
   xmluiConfigFile: XmluiConfigSource | undefined,
 ): boolean {
-  return SCRIPT_COMPILATION_KEYS.some(
+  return ALL_COMPILATION_KEYS.some(
     (key) => rawConfig.includes(key) && !definesSetting(xmluiConfigFile, key),
   );
 }

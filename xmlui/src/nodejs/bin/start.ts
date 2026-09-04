@@ -42,6 +42,7 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
         ...viteConfig.define,
         ...createXmluiAppDefines({
           buildMode: "INLINE_ALL",
+          devServer: true,
           mockEnabled: withMock,
           includeAllComponents: true,
           inspectUserComponents: true,

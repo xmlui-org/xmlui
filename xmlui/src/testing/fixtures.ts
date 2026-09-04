@@ -224,30 +224,36 @@ export type TestBedDescription = Omit<
   mainXs?: string;
   noFragmentWrapper?: boolean;
   parserOptions?: XmluiParserOptions;
+  /**
+   * Source-map payload for compiled scripts. Test-only: apps get source maps from
+   * `xmlui start`, never from configuration.
+   */
+  sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
   extensionIds?: string | string[];
 };
 
 const E2E_BASE_URL = `http://localhost:3211`;
 
 type TestBedScriptParserOptions = XmluiParserOptions & {
-  compiledScriptSourceMaps?: CodeBehindCollectionOptions["compiledScriptSourceMaps"];
+  sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
 };
 
 function createTestBedScriptParserOptions(
   description?: TestBedDescription,
 ): TestBedScriptParserOptions {
   const xmluiConfig = description?.xmluiConfig ?? {};
-  const compileEventHandlers =
-    description?.parserOptions?.compileEventHandlers ??
-    xmluiConfig.compileEventHandlers ??
-    xmluiConfig.compileScripts ??
-    false;
-  const sourceMapMode = xmluiConfig.compiledScriptSourceMaps;
+  const compileScripts =
+    description?.parserOptions?.compileScripts ?? xmluiConfig.compileScripts === true;
+  // --- Tests may ask for source-map payload explicitly; apps cannot.
+  const sourceMaps = description?.sourceMaps;
   return {
     ...description?.parserOptions,
-    compileEventHandlers,
-    ...(sourceMapMode === true || sourceMapMode === "inline" || sourceMapMode === "external"
-      ? { compiledScriptSourceMaps: sourceMapMode }
+    compileScripts,
+    reportCompileFallbacks:
+      description?.parserOptions?.reportCompileFallbacks ??
+      xmluiConfig.reportCompileFallbacks === true,
+    ...(sourceMaps === true || sourceMaps === "inline" || sourceMaps === "external"
+      ? { sourceMaps }
       : {}),
   };
 }
@@ -257,12 +263,13 @@ function createTestBedCodeBehindOptions(
   sourceText: string,
   parserOptions: TestBedScriptParserOptions,
 ): CodeBehindCollectionOptions | undefined {
-  if (!parserOptions.compileEventHandlers) {
+  if (!parserOptions.compileScripts) {
     return undefined;
   }
   return {
-    compileEventHandlers: true,
-    compiledScriptSourceMaps: parserOptions.compiledScriptSourceMaps,
+    compileScripts: true,
+    reportCompileFallbacks: parserOptions.reportCompileFallbacks,
+    sourceMaps: parserOptions.sourceMaps,
     sourceIdPrefix: moduleName,
     sourceUrl: createDebugSourceUrl(moduleName),
     displayName: moduleName,

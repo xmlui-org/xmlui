@@ -630,7 +630,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
         const shouldUseCompiledEventHandler =
-          evalContext.options?.compileEventHandlers &&
+          evalContext.options?.compileScripts &&
           effectiveOptions?.eventName !== "mockExecute" &&
           !parseTimeCompilationUnsupported;
         const compiledEventDiagnosticEnabled = isCompiledEventDiagnosticEnabled(appContext);
@@ -638,7 +638,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           logCompiledEventDiagnostic("dispatch decision", {
             componentUid: componentUidForCoord,
             eventName: eventNameForCoord,
-            runtimeCompileEventHandlers: evalContext.options?.compileEventHandlers === true,
+            runtimeCompileScripts: evalContext.options?.compileScripts === true,
             ignoredMockExecute: effectiveOptions?.eventName === "mockExecute",
             willUseCompiledPath: shouldUseCompiledEventHandler === true,
             sourceKind:
@@ -715,7 +715,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             }
           },
         });
-        if (evalContext.options?.compileEventHandlers) {
+        if (evalContext.options?.compileScripts) {
           evalContext.mainThread ??= {
             childThreads: [],
             blocks: [{ vars: {} }],

@@ -49,7 +49,7 @@ describe("Attribute value parsing", () => {
   it("can attach compiled binding artifacts when requested", () => {
     // --- Act
     const val = parseAttributeValue("hello{myId + 1}", {
-      compileBindings: true,
+      compileScripts: true,
       sourceId: "Main.xmlui:Text.value",
     })!;
 
@@ -69,7 +69,7 @@ describe("Attribute value parsing", () => {
   it("throws unsupported node errors while compiling requested parse artifacts", () => {
     expect(() =>
       parseAttributeValue("{(async () => 1)}", {
-        compileBindings: true,
+        compileScripts: true,
         sourceId: "Main.xmlui:bad",
       }),
     ).toThrow(UnsupportedCompiledScriptNodeError);

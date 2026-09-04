@@ -104,7 +104,7 @@ var b = 2;
       123,
       false,
       undefined,
-      { compileEventHandlers: true },
+      { compileScripts: true },
     ) as ComponentDef;
 
     const add = cd.scriptCollected?.functions.add as any;

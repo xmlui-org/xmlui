@@ -176,7 +176,7 @@ describe("event-async compiled script target", () => {
     const artifact = compileEventAsyncStatementSource("count = count + 1;", "Main.xmlui#event-3");
     const evalContext = {
       localContext: { count: 1 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -191,7 +191,7 @@ describe("event-async compiled script target", () => {
     );
     const evalContext = {
       localContext: { auth: null, result: null },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -207,7 +207,7 @@ describe("event-async compiled script target", () => {
     );
     const evalContext = {
       localContext: { count: 3, user: { name: "Ada" } },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
 
     await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -452,7 +452,7 @@ describe("event-async compiled script target", () => {
     const unsupportedStatements = new Parser("count = await getValue();").parseStatements();
     const evalContext = {
       localContext: { count: 1, enabled: true },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
 
     await executeCompiledEventAsyncHandler(
@@ -471,7 +471,7 @@ describe("event-async compiled script target", () => {
     const unsupportedStatements = new Parser("count = await getValue();").parseStatements();
     const evalContext = {
       localContext: { count: 1, enabled: true },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
 
     await expect(

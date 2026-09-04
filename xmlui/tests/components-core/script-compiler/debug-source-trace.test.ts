@@ -35,10 +35,10 @@ describe("compiled script debug-source trace", () => {
       appContext: {
         xmluiConfig: {
           xsVerbose: true,
-          compiledScriptSourceMaps: "external",
+          sourceMaps: "external",
         },
       },
-      options: { compiledScriptSourceMaps: "external" },
+      options: { sourceMaps: "external" },
     });
 
     emitCompiledScriptDebugSourceTrace(artifact, evalContext);

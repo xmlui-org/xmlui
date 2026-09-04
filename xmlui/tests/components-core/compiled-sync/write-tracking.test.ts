@@ -21,7 +21,7 @@ function runCompiled(source: string, localContext: any): UpdateRecord[] {
     source,
     createEvalContext({
       localContext,
-      options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+      options: { defaultToOptionalMemberAccess: true, compileScripts: true },
       onWillUpdate: (_scope, index, kind) => {
         updates.push({ phase: "will", index, kind });
       },

@@ -11,7 +11,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 async function runCompiled(source: string, localContext: Record<string, any> = {}) {
   const evalContext = createEvalContext({
     localContext,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const artifact = compileEventAsyncStatementSource(source, `test:event:var:${source}`);
   const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -41,7 +41,7 @@ describe("compiled event-async var statements", () => {
     const completed: string[] = [];
     const evalContext = createEvalContext({
       localContext: { result: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
         completed.push("statement");
       },
@@ -80,7 +80,7 @@ describe("compiled event-async var statements", () => {
     const completed: string[] = [];
     const evalContext = createEvalContext({
       localContext: {},
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
         completed.push("statement");
       },

@@ -28,7 +28,7 @@ function evaluate(source: string, xmluiConfig: Record<string, any>, state: Recor
     localContext: state,
     appContext: { xmluiConfig: { ...xmluiConfig, xsVerbose: true } },
     options: createBindingEvalOptions({
-      xmluiConfig: { ...xmluiConfig, compiledScriptSourceMaps: "inline" },
+      xmluiConfig: { ...xmluiConfig, sourceMaps: "inline" },
     } as any),
   } as any);
   return {
@@ -96,10 +96,10 @@ describe("compileScripts routes bindings through the compiled executor", () => {
     expect(compiledTraces).toBe(0);
   });
 
-  it("control: compileBindings: false opts bindings out of the umbrella switch", () => {
+  it("control: a removed per-path key does not turn compilation on", () => {
     const { value, compiledTraces } = evaluate(
       "rows.filter(row => row.id > 1).length",
-      { compileScripts: true, compileBindings: false },
+      { compileBindings: true },
       { rows: ROWS },
     );
 

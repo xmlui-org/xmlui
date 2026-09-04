@@ -87,6 +87,7 @@ import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { getScriptExecutionMode } from "../script-runner/eval-options";
 import {
   collectParsedScriptInventory,
+  collectRemovedCompilationKeyNotices,
   formatParsedScriptInventory,
 } from "../script-compiler/script-inventory";
 
@@ -673,10 +674,12 @@ export function AppContent({
     if (typeof console === "undefined" || !console.log) {
       return;
     }
-    console.log(
-      `[xmlui] App started in ${scriptExecutionMode.mode} script mode ` +
-        `(bindings: ${scriptExecutionMode.bindings}, event handlers: ${scriptExecutionMode.eventHandlers})`,
-    );
+    console.log(`[xmlui] App started in ${scriptExecutionMode.mode} script mode`);
+    // --- An app that still carries a removed compilation key gets told, rather than
+    // --- quietly not compiling (the failure mode of #3876).
+    if (console.warn) {
+      collectRemovedCompilationKeyNotices(xmluiConfig).forEach((notice) => console.warn(notice));
+    }
     // --- The line above reports the requested mode. When compilation is on, follow it
     // --- with what the app definition actually carries, so "compiled" can never again
     // --- hide a build that produced no artifacts at all (issue #3879).
@@ -696,7 +699,7 @@ export function AppContent({
     } catch {
       // --- Reporting must never break app startup.
     }
-  }, [scriptExecutionMode, rootContainer, appComponents]);
+  }, [scriptExecutionMode, rootContainer, appComponents, xmluiConfig]);
 
   useEffect(() => {
     onInit?.();

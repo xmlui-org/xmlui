@@ -40,7 +40,7 @@ describe("parseParameterString", () => {
   it("can attach compiled binding artifacts when requested", () => {
     // --- Act
     const result = parseParameterString("hello{a+b}world", {
-      compileBindings: true,
+      compileScripts: true,
       sourceId: "Main.xmlui:title",
     });
 
@@ -63,7 +63,7 @@ describe("parseParameterString", () => {
   it("tracks computed member keys as compiled binding dependencies", () => {
     // --- Act
     const result = parseParameterString("{readings[dataset].min}", {
-      compileBindings: true,
+      compileScripts: true,
       sourceId: "Main.xmlui:current",
     });
 
@@ -78,7 +78,7 @@ describe("parseParameterString", () => {
   it("throws unsupported node errors while compiling requested parse artifacts", () => {
     expect(() =>
       parseParameterString("{(async () => 1)}", {
-        compileBindings: true,
+        compileScripts: true,
         sourceId: "Main.xmlui:bad",
       }),
     ).toThrow(UnsupportedCompiledScriptNodeError);
@@ -204,13 +204,13 @@ describe("parseParameterString", () => {
       // --- Act & Assert
       expect(() =>
         parseParameterString("before @{ /* note */ } after", {
-          compileBindings: true,
+          compileScripts: true,
           sourceId: "Main.xmlui:comment-only",
         }),
       ).not.toThrow();
 
       const result = parseParameterString("before @{ /* note */ } after", {
-        compileBindings: true,
+        compileScripts: true,
         sourceId: "Main.xmlui:comment-only",
       });
 
@@ -222,7 +222,7 @@ describe("parseParameterString", () => {
     it("a real expression alongside a comment-only one still compiles correctly", () => {
       // --- Act
       const result = parseParameterString("{a+b}{/* note */}", {
-        compileBindings: true,
+        compileScripts: true,
         sourceId: "Main.xmlui:mixed",
       });
 

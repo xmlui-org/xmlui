@@ -9,23 +9,23 @@ type DeclarationParityCase = {
 };
 
 const MODES = [
-  { name: "interpreted", compileEventHandlers: false },
-  { name: "compiled", compileEventHandlers: true },
+  { name: "interpreted", compileScripts: false },
+  { name: "compiled", compileScripts: true },
 ] as const;
 
 function withCompilationMode(
   description: TestBedDescription | undefined,
-  compileEventHandlers: boolean,
+  compileScripts: boolean,
 ): TestBedDescription {
   return {
     ...description,
     parserOptions: {
       ...description?.parserOptions,
-      compileEventHandlers,
+      compileScripts,
     },
     xmluiConfig: {
       ...description?.xmluiConfig,
-      compileEventHandlers,
+      compileScripts,
     },
   };
 }
@@ -40,7 +40,7 @@ async function runParityCase(
   for (const mode of MODES) {
     const { testStateDriver } = await initTestBed(
       testCase.source,
-      withCompilationMode(testCase.description, mode.compileEventHandlers),
+      withCompilationMode(testCase.description, mode.compileScripts),
     );
     const button = page.getByTestId("run");
     await expect(button).toBeVisible();
@@ -109,7 +109,7 @@ async function runCompiledOnlyProof(
         ...description,
         xmluiConfig: {
           ...description?.xmluiConfig,
-          compiledScriptSourceMaps: "inline",
+          sourceMaps: "inline",
         },
       },
       true,

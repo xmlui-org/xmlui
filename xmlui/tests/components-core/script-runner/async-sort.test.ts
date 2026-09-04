@@ -16,7 +16,7 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 async function runInterpreted(source: string, context: Record<string, any> = {}) {
   const evalContext = {
     localContext: { ...context },
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   } as any;
   await processStatementQueueAsync(new Parser(source).parseStatements(), evalContext);
   return evalContext.mainThread?.returnValue;
@@ -26,7 +26,7 @@ async function runCompiled(source: string, context: Record<string, any> = {}) {
   const artifact = compileEventAsyncStatementSource(source, `sort#${source}`);
   const evalContext = {
     localContext: { ...context },
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   } as any;
   return await executeCompiledEventAsyncArtifact(artifact, evalContext);
 }

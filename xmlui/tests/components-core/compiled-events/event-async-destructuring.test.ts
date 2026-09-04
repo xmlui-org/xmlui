@@ -11,7 +11,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 async function runCompiled(source: string, localContext: Record<string, any> = {}) {
   const evalContext = createEvalContext({
     localContext,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const artifact = compileEventAsyncStatementSource(source, `test:event:destructure:${source}`);
   const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);

@@ -322,7 +322,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `,
         join(srcDir, "Main.xmlui"),
         dir,
-        { compileEventHandlers: true, compiledScriptSourceMaps: "external" },
+        { compileScripts: true, sourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -346,8 +346,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const codeBehindSource = `function add(a, b) { return a + b; }`;
       await writeFile(codeBehindPath, codeBehindSource);
       const harness = await createPluginHarness(dir, {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const result = await harness.transform(
@@ -426,7 +426,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<Button onClick="count = count + 1" />`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileEventHandlers: true, compiledScriptSourceMaps: "external" },
+        { compileScripts: true, sourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -444,7 +444,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<Button onClick="count = count + 1" />`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true, compiledScriptSourceMaps: "external" },
+        { compileScripts: true, sourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -455,12 +455,12 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       });
     });
 
-    it("lets legacy compileEventHandlers disable event compilation under compileScripts", async () => {
+    it("compiles nothing when the switch is off", async () => {
       const { result } = await transformXmlui(
         `<Button onClick="count = count + 1" />`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true, compileEventHandlers: false },
+        { compileScripts: false },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -480,8 +480,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     it("serializes compiled inline script functions when event compilation is enabled", async () => {
       const source = `<App><script>function add(a, b) { return a + b; }</script></App>`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -509,8 +509,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
   </script>
 </App>`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -535,7 +535,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<App><script>function add(a, b) { return a + b; }</script></App>`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true, compiledScriptSourceMaps: "external" },
+        { compileScripts: true, sourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -545,12 +545,12 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       });
     });
 
-    it("lets legacy compileEventHandlers disable inline script compilation under compileScripts", async () => {
+    it("compiles no inline script functions when the switch is off", async () => {
       const { result } = await transformXmlui(
         `<App><script>function add(a, b) { return a + b; }</script></App>`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true, compileEventHandlers: false },
+        { compileScripts: false },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -560,8 +560,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     it("emits XMLUI transform source maps and debug sources when enabled", async () => {
       const source = `<Button onClick="count = count + 1" />`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -589,8 +589,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     it("serves virtual XMLUI sources and source maps from the dev middleware", async () => {
       const source = `<Button onClick="count = count + 1" />`;
       const harness = await createPluginHarness("/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const result = await harness.transform(source, "/project/src/Main.xmlui");
@@ -636,8 +636,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
   </script>
 </App>`;
       const harness = await createPluginHarness(dir, {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const result = await harness.transform(source, join(srcDir, "Main.xmlui"));
@@ -692,7 +692,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     it("defaults dev middleware source maps on when legacy compileBindings is enabled", async () => {
       const source = `<Text value="{count + 1}" />`;
       const harness = await createPluginHarness("/project", {
-        compileBindings: true,
+        compileScripts: true,
       });
 
       const result = await harness.transform(source, "/project/src/Main.xmlui");
@@ -730,7 +730,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     it("keeps the debug payload when source maps are requested", async () => {
       const { result } = await transformXmlui(HANDLER_APP, "/project/src/Main.xmlui", "/project", {
         compileScripts: true,
-        compiledScriptSourceMaps: "external",
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -766,7 +766,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         HANDLER_APP,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true, compiledScriptSourceMaps: "external" },
+        { compileScripts: true, sourceMaps: "external" },
       );
 
       expect(lean.code.length).toBeLessThan(withMaps.code.length / 2);
@@ -850,8 +850,8 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const source = `import { double } from "./helpers.xs";
 function run(value) { return double(value); }`;
       const harness = await createPluginHarness(dir, {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const result = await harness.transform(source, mainPath);
@@ -894,8 +894,8 @@ function run(value) { return double(value); }`;
     it("serializes compiled .xmlui.xs functions when event compilation is enabled", async () => {
       const source = `function run(value) { return value + 1; }`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -916,7 +916,7 @@ function run(value) { return double(value); }`;
       const source = `function run(value) { return value + 1; }`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
         compileScripts: true,
-        compiledScriptSourceMaps: "external",
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -929,8 +929,8 @@ function run(value) { return double(value); }`;
     it("serializes compiled Globals.xs functions when event compilation is enabled", async () => {
       const source = `function formatName(value) { return value.toUpperCase(); }`;
       const { result } = await transformXmlui(source, "/project/src/Globals.xs", "/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -950,8 +950,8 @@ function run(value) { return double(value); }`;
     it("serves Globals.xs debug sources and compiled source maps", async () => {
       const source = `function formatName(value) { return value.toUpperCase(); }`;
       const harness = await createPluginHarness("/project", {
-        compileEventHandlers: true,
-        compiledScriptSourceMaps: "external",
+        compileScripts: true,
+        sourceMaps: "external",
       });
 
       const result = await harness.transform(source, "/project/src/Globals.xs");

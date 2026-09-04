@@ -14,7 +14,7 @@ async function runCompiled(source: string, localContext: Record<string, any> = {
   const completed: string[] = [];
   const evalContext = createEvalContext({
     localContext,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     onStatementCompleted: () => {
       completed.push("statement");
     },
@@ -110,7 +110,7 @@ describe("compiled event-async basic statement subset", () => {
         },
       },
       eventArgs: ["alpha"],
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     });
     const artifact = compileEventAsyncStatementSource("selectItem", "test:event:bare");
 
@@ -123,7 +123,7 @@ describe("compiled event-async basic statement subset", () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { count: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
         order.push("completed");
         setTimeout(() => order.push("timer"), 0);
@@ -158,7 +158,7 @@ describe("compiled event-async basic statement subset", () => {
     try {
       const evalContext = createEvalContext({
         localContext: { getValue: () => undefined },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       });
       const artifact = compileEventAsyncStatementSource(
         "getValue(); getValue();",
@@ -184,7 +184,7 @@ describe("compiled event-async basic statement subset", () => {
         },
         testState: undefined,
       },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
         evalContext.localContext.api = {
           ...evalContext.localContext.api,
@@ -217,7 +217,7 @@ describe("compiled event-async basic statement subset", () => {
       const evalContext = createEvalContext({
         localContext: { getValue: () => undefined },
         options: {
-          compileEventHandlers: true,
+          compileScripts: true,
           defaultToOptionalMemberAccess: true,
           handlerExecutionMode: "sync",
         },
@@ -253,7 +253,7 @@ describe("compiled event-async basic statement subset", () => {
     try {
       const evalContext = createEvalContext({
         localContext: {},
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       });
       const artifact = compileEventAsyncStatementSource(
         "let sum = 0; for (let i = 0; i < 3000; i++) { sum += i; } return sum;",
@@ -274,7 +274,7 @@ describe("compiled event-async basic statement subset", () => {
     const boundaries: Array<Record<string, any>> = [];
     const evalContext = createEvalContext({
       localContext: { a: 0, b: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementStarted: (context) => {
         boundaries.push({ phase: "start", a: context.localContext.a, b: context.localContext.b });
       },
@@ -292,7 +292,7 @@ describe("compiled event-async basic statement subset", () => {
   it("lets the next statement observe the refreshed localContext snapshot", async () => {
     const evalContext = createEvalContext({
       localContext: { count: 0, observed: 0 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: (context) => {
         context.localContext = { ...context.localContext, count: 41 };
       },
@@ -311,7 +311,7 @@ describe("compiled event-async basic statement subset", () => {
     const order: string[] = [];
     const evalContext = createEvalContext({
       localContext: { value: 1 },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       onStatementCompleted: () => {
         const index = order.length;
         order.push(`completed:${index}`);
@@ -343,7 +343,7 @@ describe("compiled event-async basic statement subset", () => {
           return 1;
         },
       },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     });
     const artifact = compileEventAsyncStatementSource(
       "getValue(); count = count + 1;",
@@ -376,7 +376,7 @@ describe("compiled event-async basic statement subset", () => {
     );
     const evalContext = createEvalContext({
       localContext,
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
       hasPendingStateChanges: () => pending,
       onStatementCompleted: () => {
         flushCount++;

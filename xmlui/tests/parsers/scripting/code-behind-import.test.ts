@@ -148,7 +148,7 @@ function getValue() {
       const source = "function add(a, b) { return a + b; }";
 
       const result = collectCodeBehindFromSource("/main.xs", source, {
-        compileEventHandlers: true,
+        compileScripts: true,
         sourceIdPrefix: "/src/Main.xmlui.xs",
         sourceUrl: "/@xmlui-source/src/Main.xmlui.xs",
         displayName: "/src/Main.xmlui.xs",
@@ -173,7 +173,7 @@ function getValue() {
       const source = "function today() { return new Date(0); }";
 
       const result = collectCodeBehindFromSource("/main.xs", source, {
-        compileEventHandlers: true,
+        compileScripts: true,
       });
 
       expect(result.functions.today.compiledUnsupported).toBe(false);
@@ -186,7 +186,7 @@ function getValue() {
       const source = "function today() { return await now(); }";
 
       const result = collectCodeBehindFromSource("/main.xs", source, {
-        compileEventHandlers: true,
+        compileScripts: true,
       });
 
       expect(result.functions.today).toMatchObject({
@@ -196,9 +196,25 @@ function getValue() {
       });
       expect(result.functions.today.compiled).toBeUndefined();
       expect(result.functions.today.source).toBe(source);
-      expect(result.warnings?.[0]).toContain(
-        "Could not compile code-behind function /main.xs#function-today",
+      // --- The reason travels with the declaration whether or not anyone asked for
+      // --- reporting, so a fallback is never a bare boolean.
+      expect(result.functions.today.compiledUnsupportedReason).toContain(
+        "compile-unsupported-node",
       );
+      expect(result.warnings ?? []).toEqual([]);
+    });
+
+    it("reports the fallback when asked to", () => {
+      const source = "function today() { return await now(); }";
+
+      const result = collectCodeBehindFromSource("/main.xs", source, {
+        compileScripts: true,
+        reportCompileFallbacks: true,
+      });
+
+      expect(result.warnings?.[0]).toContain("compile-unsupported-node");
+      expect(result.warnings?.[0]).toContain("/main.xs#function-today");
+      expect(result.warnings?.[0]).toContain("await expression");
     });
 
     it("should handle duplicates and collect errors", () => {
@@ -251,7 +267,7 @@ function use(value) { return addOne(value); }`,
         "/main.xs",
         modules["/main.xs"],
         async (path) => modules[path],
-        { compileEventHandlers: true },
+        { compileScripts: true },
       );
 
       expect(result.functions.use.compiled).toMatchObject({

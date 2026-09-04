@@ -27,7 +27,7 @@ export function evaluateCompiledBindingExpressionSource(
   );
   emitCompiledScriptDebugSourceTrace(artifact, evalContext);
   return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime, {
-    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+    sourceMapMode: evalContext.options?.sourceMaps,
     generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
     sourceMapUrl: getExternalSourceMapUrl(artifact),
   }).execute({ evalContext, thread });
@@ -54,7 +54,7 @@ export function evaluateCompiledBinding(
   );
   emitCompiledScriptDebugSourceTrace(artifact, evalContext);
   return instantiateCompiledScriptArtifact(artifact, bindingSyncRuntime, {
-    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+    sourceMapMode: evalContext.options?.sourceMaps,
     generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
     sourceMapUrl: getExternalSourceMapUrl(artifact),
   }).execute({ evalContext, thread });

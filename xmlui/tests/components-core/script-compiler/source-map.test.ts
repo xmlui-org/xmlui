@@ -64,7 +64,7 @@ describe("compiled script source maps", () => {
     const attributeValue = "hello{count + 1}world";
     const valueOffset = fullSource.indexOf(attributeValue);
     const result = parseParameterString(attributeValue, {
-      compileBindings: true,
+      compileScripts: true,
       sourceId: "/src/Main.xmlui:label",
       sourceUrl: createDebugSourceUrl("/src/Main.xmlui"),
       displayName: "/src/Main.xmlui",

@@ -8,7 +8,7 @@ export function emitCompiledScriptDebugSourceTrace(
   artifact: CompiledScriptArtifact,
   evalContext: BindingTreeEvaluationContext,
 ): void {
-  const mode = evalContext.options?.compiledScriptSourceMaps;
+  const mode = evalContext.options?.sourceMaps;
   if (!mode || evalContext.appContext?.xmluiConfig?.xsVerbose !== true) {
     return;
   }
