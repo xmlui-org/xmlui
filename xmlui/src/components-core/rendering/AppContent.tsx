@@ -675,21 +675,22 @@ export function AppContent({
       return;
     }
     console.log(`[xmlui] App started in ${scriptExecutionMode.mode} script mode`);
+    // --- Everything below is a startup fact, not a per-render one.
+    if (scriptInventoryReported.current) {
+      return;
+    }
+    scriptInventoryReported.current = true;
     // --- An app that still carries a removed compilation key gets told, rather than
     // --- quietly not compiling (the failure mode of #3876).
     if (console.warn) {
       collectRemovedCompilationKeyNotices(xmluiConfig).forEach((notice) => console.warn(notice));
     }
-    // --- The line above reports the requested mode. When compilation is on, follow it
-    // --- with what the app definition actually carries, so "compiled" can never again
-    // --- hide a build that produced no artifacts at all (issue #3879).
+    // --- The banner reports the requested mode. When compilation is on, follow it with
+    // --- what the app definition actually carries, so "compiled" can never again hide
+    // --- a build that produced no artifacts at all (issue #3879).
     if (scriptExecutionMode.mode === "interpreted" || !rootContainer) {
       return;
     }
-    if (scriptInventoryReported.current) {
-      return;
-    }
-    scriptInventoryReported.current = true;
     try {
       const inventory = collectParsedScriptInventory([rootContainer, ...(appComponents ?? [])]);
       // --- Informational, not a warning: an app with no build-time artifacts still
