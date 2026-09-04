@@ -27,7 +27,8 @@ artifacts keep project-relative source ids.
 `import.meta.glob` pattern) is now read through Vite's module runner, so `appGlobals.compileScripts`
 works where the docs say it does.
 
-Two interpreter bugs found while checking compiled/interpreted parity are fixed as well:
+Three interpreter bugs found while checking compiled/interpreted parity are fixed as well:
 `Array.prototype.sort(comparator)` was a silent no-op (script callbacks are async and the native
-`sort` coerced the returned promise to `NaN`), and comma-sequence expressions evaluated every
-operand from the pre-sequence state and produced a pending promise as their value.
+`sort` coerced the returned promise to `NaN`), comma-sequence expressions evaluated every operand
+from the pre-sequence state and produced a pending promise as their value, and object-literal
+spread threw on a `null` operand instead of ignoring it as JavaScript does.
