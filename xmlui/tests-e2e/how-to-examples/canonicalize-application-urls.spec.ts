@@ -19,6 +19,7 @@ test.describe("rewrite-a-report-url-to-its-canonical-form", { tag: "@website" },
   );
 
   const appGlobals = {
+    useHashBasedRouting: false,
     urlCase: "lower",
     urlTrailingSlash: "never",
     urlQueryParamOrder: "alphabetical",

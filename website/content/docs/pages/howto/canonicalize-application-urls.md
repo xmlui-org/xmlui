@@ -31,6 +31,7 @@ Canonical URLs prevent duplicate cache keys, inconsistent share links, and route
 ---config
 {
   "xmluiConfig": {
+    "useHashBasedRouting": false,
     "urlCase": "lower",
     "urlTrailingSlash": "never",
     "urlQueryParamOrder": "alphabetical",
@@ -48,6 +49,8 @@ Canonical URLs prevent duplicate cache keys, inconsistent share links, and route
 **Expect diagnostics on mismatches**: A non-canonical incoming URL emits a `non-canonical-url` navigation diagnostic before XMLUI rewrites or redirects it.
 
 **Keep page routes canonical too**: Define routes in the canonical form, such as `/reports`, even if users may arrive with `/Reports/`.
+
+**This example turns off hash-based routing**: XMLUI uses hash-based routing (`#/reports?...`) by default, so the browser's real address (`pathname`/`search`) is always just `/`. A visible, hash-free canonical address like `/reports?a=first&z=last` needs `useHashBasedRouting: false`. Under the default hash routing, canonicalization still applies — it corrects the part after the `#` instead.
 
 ---
 

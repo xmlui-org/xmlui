@@ -1,0 +1,7 @@
+---
+"xmlui": patch
+---
+
+Fix `Pages`' canonical-URL enforcement corrupting hash-based routing whenever a navigation's query string contained a reserved character (e.g. a raw `/` in a value, as in `?returnTo=/dashboard`). `canonicalise()` rebuilt the query string via `URLSearchParams.toString()`, which always re-encodes using `application/x-www-form-urlencoded` rules even when `urlQueryParamOrder` is left at its default `"preserve"` — so a value like `/dashboard` round-tripped to `%2Fdashboard` and was flagged as "non-canonical" even though nothing was wrong. Combined with the default `onMismatch: "redirect"` (active whenever `strictRouting` isn't explicitly disabled), `Pages` then called `window.history.replaceState(state, "", canonical)` with a bare `pathname?search` string that has no `#`; under hash routing the browser resolved that as an absolute path, stripping the `#` that carries the route and permanently corrupting the URL for every navigation after it (`HashRouter`'s history thereafter only ever writes `location.hash`).
+
+`canonicalise()` now rebuilds the query string from the original `key=value` pairs (only reordering them when `urlQueryParamOrder: "alphabetical"` is set) instead of re-encoding through `URLSearchParams`, so semantically-unchanged URLs are no longer misdetected as non-canonical. `Pages` now applies a genuine mismatch through the router's own `useNavigate()` instead of a raw `window.history.replaceState` call, so the fix-up correctly targets the hash or the real path depending on the active router mode.

@@ -258,3 +258,125 @@ test.describe("Programmatic navigation", () => {
     await expect.poll(testStateDriver.testState).toBe("submitted");
   });
 });
+
+// =============================================================================
+// CANONICAL URL ENFORCEMENT — regression coverage for the hash-stripping bug.
+//
+// `Pages` compares the current location against a "canonical" form of itself
+// (case, trailing slash, query param order) and — by default (strictRouting is
+// on unless disabled) — rewrites the URL when they differ. The rewrite used to
+// go through raw `window.history.replaceState(state, "", canonical)`, where
+// `canonical` is a bare "pathname?search" string with no "#". Two bugs
+// compounded:
+//   1. `canonicalise()` rebuilt the query string via `URLSearchParams.toString()`,
+//      which always re-encodes (e.g. "/" -> "%2F"), even under the default
+//      "preserve" order policy — so a query VALUE containing a raw "/" was
+//      flagged as "non-canonical" even though nothing was actually wrong.
+//   2. Because the rewrite used the raw History API instead of the router,
+//      that spurious "fix" replaced the visible pathname/search directly and
+//      dropped the "#" that carries hash-based routing — corrupting the URL,
+//      and — since HashRouter's history thereafter only ever touches
+//      `location.hash` — leaving it corrupted for every subsequent navigation.
+// =============================================================================
+test.describe("Canonical URL enforcement", () => {
+  test("a query value containing '/' does not strip hash routing (single param)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Link to="/about?returnTo=/dashboard">Go</Link>
+          </Page>
+          <Page url="/about">Target</Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.getByRole("link", { name: "Go" }).click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("Target");
+    expect(page.url()).toContain("#/about?returnTo=/dashboard");
+  });
+
+  test("a query value containing '/' plus a second param does not strip hash routing (reported repro)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Link to="/projects/1/cases/5?returnTo=/dashboard&amp;returnLabel=Dashboard">Go</Link>
+          </Page>
+          <Page url="/projects/:pid/cases/:cid">
+            CaseDetail {$routeParams.pid} {$routeParams.cid}
+            <Link to="/contact">Onward</Link>
+          </Page>
+          <Page url="/contact">Contact</Page>
+        </Pages>
+      </App>
+    `);
+
+    await page.getByRole("link", { name: "Go" }).click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("CaseDetail");
+    expect(page.url()).toContain("#/projects/1/cases/5?returnTo=/dashboard&returnLabel=Dashboard");
+
+    // The URL must not be "stuck" — a later plain navigation should still land
+    // under the hash instead of only ever touching a corrupted location.hash.
+    await page.getByRole("link", { name: "Onward" }).click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("Contact");
+    expect(page.url()).toContain("#/contact");
+    expect(page.url()).not.toMatch(/^[^#]*\/contact/); // pathname itself must stay "/"
+  });
+
+  test("still redirects a genuinely non-canonical URL (case policy)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Link to="/ABOUT">Go</Link>
+          </Page>
+          <Page url="/about">Target</Page>
+        </Pages>
+      </App>
+    `,
+      { xmluiConfig: { urlCase: "lower" } },
+    );
+
+    await page.getByRole("link", { name: "Go" }).click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("Target");
+    await expect.poll(() => page.url()).toContain("#/about");
+  });
+
+  test("still reorders query params alphabetically when configured", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <Pages>
+          <Page url="/">
+            Home
+            <Link to="/about?zeta=1&amp;alpha=2">Go</Link>
+          </Page>
+          <Page url="/about">Target</Page>
+        </Pages>
+      </App>
+    `,
+      { xmluiConfig: { urlQueryParamOrder: "alphabetical" } },
+    );
+
+    await page.getByRole("link", { name: "Go" }).click();
+    await expect(page.locator(".xmlui-page-root")).toContainText("Target");
+    await expect.poll(() => page.url()).toContain("#/about?alpha=2&zeta=1");
+  });
+});
