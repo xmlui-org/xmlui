@@ -327,6 +327,42 @@ export const eventAsyncRuntime = {
     return await completePromise(new allowedConstructor(...args));
   },
 
+  // --- Spread operands. Each helper enforces exactly what the interpreter enforces
+  // --- for that position (see `eval-tree-async.ts`), so a spread that throws when
+  // --- interpreted throws with the same message when compiled.
+  spreadArrayItem(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within an array literal expects an array operand.");
+    }
+    return value;
+  },
+
+  spreadCallArg(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within a function invocation expects an array operand.");
+    }
+    return value;
+  },
+
+  spreadNewArg(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within a new expression expects an array operand.");
+    }
+    return value;
+  },
+
+  /**
+   * Object-literal spread. The interpreter copies own entries of arrays and objects
+   * and ignores everything else; `null` and non-objects contribute nothing rather
+   * than throwing.
+   */
+  spreadObjectValue(value: any): Record<string, any> {
+    if (value && typeof value === "object") {
+      return value as Record<string, any>;
+    }
+    return {};
+  },
+
   assignId(
     name: string,
     op: AssignmentSymbols,

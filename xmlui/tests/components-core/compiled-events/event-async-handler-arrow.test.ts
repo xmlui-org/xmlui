@@ -243,17 +243,28 @@ describe("compiled event handlers written as arrow functions", () => {
   });
 
   describe("preserve the interpreted fallback", () => {
-    it("falls back to the lazy arrow when the body uses an unsupported construct", async () => {
-      // --- Spread call arguments are not supported by the native emitter.
+    it("compiles spread call arguments natively", async () => {
+      // --- Spread arguments used to force the lazy-arrow path; they are now emitted
+      // --- natively, with the operand rules the interpreter applies (plan #3879).
       const source = "() => { collect(...items); }";
       const { js } = compileHandler(source);
 
-      expect(usesInterpretedArrow(js)).toBe(true);
-      expect(js).not.toContain("runtime.callNativeArrow(");
+      expect(usesInterpretedArrow(js)).toBe(false);
+      expect(js).toContain("runtime.spreadCallArg(");
 
       const seen: any[] = [];
       await runCompiled(source, { items: [1, 2, 3], collect: (...args: any[]) => seen.push(args) });
       expect(seen).toEqual([[1, 2, 3]]);
+    });
+
+    it("falls back to the lazy arrow when the body uses an unsupported construct", async () => {
+      // --- `await` is not part of XMLScript, so the native emitter refuses it and the
+      // --- callback keeps the lazy (interpreted) arrow path.
+      const source = "() => { collect(await items); }";
+      const { js } = compileHandler(source);
+
+      expect(usesInterpretedArrow(js)).toBe(true);
+      expect(js).not.toContain("runtime.callNativeArrow(");
     });
 
     it("fails compilation rather than emitting a lazy arrow that cannot see compiled locals", () => {
@@ -262,7 +273,7 @@ describe("compiled event handlers written as arrow functions", () => {
       // --- silently resolve `extra` against the interpreter's scope instead, so compilation
       // --- must fail and let the whole handler fall back to interpreted execution.
       expect(() =>
-        compileHandler("const extra = 5; (items) => { collect(extra, ...items); }"),
+        compileHandler("const extra = 5; (items) => { collect(extra, await items); }"),
       ).toThrow(/Unsupported/);
     });
 

@@ -491,20 +491,34 @@ describe("compiled event-async arrow and callback calls", () => {
       );
     });
 
-    it("still falls back to a lazy arrow when the callback uses syntax the native emitter cannot compile", async () => {
-      // A comma (sequence) expression is not supported by the native expression
-      // emitter, so this callback must fall back to `runtime.arrow(...)` rather than
-      // failing the whole handler's compilation.
+    it("compiles a sequence expression in a callback natively", async () => {
+      // Comma (sequence) expressions used to force the lazy `runtime.arrow(...)` path;
+      // the native emitter handles them now (plan #3879).
       const source = "result = items.some(item => (item, item.id === target));";
-      const artifact = compileEventAsyncStatementSource(source, "test:event:unsupported-arrow-fallback");
+      const artifact = compileEventAsyncStatementSource(
+        source,
+        "test:event:sequence-arrow-native",
+      );
 
-      expect(artifact.js).toContain("runtime.arrow(");
+      expect(artifact.js).not.toContain("runtime.arrow(");
 
       await expectCompiledParity(source, {
         items: [{ id: 1 }, { id: 2 }],
         target: 2,
         result: false,
       });
+    });
+
+    it("still falls back to a lazy arrow when the callback uses syntax the native emitter cannot compile", () => {
+      // `await` is not part of XMLScript, so the native emitter refuses the callback
+      // and it keeps the lazy `runtime.arrow(...)` representation rather than failing
+      // the whole handler's compilation.
+      const artifact = compileEventAsyncStatementSource(
+        "result = items.some(item => (await item).id === target);",
+        "test:event:unsupported-arrow-fallback",
+      );
+
+      expect(artifact.js).toContain("runtime.arrow(");
     });
 
     it("still requires native compilation (and can fail the handler) when the callback closes over a compiled local", () => {
@@ -515,7 +529,7 @@ describe("compiled event-async arrow and callback calls", () => {
       // falling back to a lazy arrow that would produce wrong results.
       expect(() =>
         compileEventAsyncStatementSource(
-          "let target = 2; result = items.some(item => (item, item.id === target));",
+          "let target = 2; result = items.some(item => (await item).id === target);",
           "test:event:unsupported-local-referencing-arrow",
         ),
       ).toThrow();

@@ -29,10 +29,16 @@ import {
   parseHandlerCode,
   prepareHandlerStatements,
 } from "../../../src/components-core/utils/statementUtils";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
+import { UnsupportedCompiledScriptNodeError } from "../../../src/components-core/script-compiler";
 
 const interpreterEntries = executeArrowExpression as unknown as ReturnType<typeof vi.fn>;
 
-/** Runs a handler through the compiled pipeline, reporting its observable side effects. */
+/**
+ * Runs a handler the way `container/event-handlers.ts` does: compiled when the target
+ * supports the source, interpreted when compilation reports an unsupported node.
+ * Returns how many times the tree-walking arrow executor was entered.
+ */
 async function runCompiledHandler(source: string, localContext: Record<string, any>) {
   interpreterEntries.mockClear();
   const evalContext = createEvalContext({
@@ -40,11 +46,18 @@ async function runCompiledHandler(source: string, localContext: Record<string, a
     eventArgs: [],
     options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
   });
-  const artifact = compileEventAsyncStatements(
-    prepareHandlerStatements(parseHandlerCode(source)),
-    { sourceId: `test:runtime-proof:${source}` },
-  );
-  await executeCompiledEventAsyncArtifact(artifact, evalContext);
+  const statements = prepareHandlerStatements(parseHandlerCode(source));
+  try {
+    const artifact = compileEventAsyncStatements(statements, {
+      sourceId: `test:runtime-proof:${source}`,
+    });
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+  } catch (error) {
+    if (!(error instanceof UnsupportedCompiledScriptNodeError)) {
+      throw error;
+    }
+    await processStatementQueueAsync(statements, evalContext);
+  }
   return interpreterEntries.mock.calls.length;
 }
 
@@ -86,18 +99,19 @@ describe("arrow event handlers execute as compiled code, not interpreted AST", (
     expect(entries).toBe(0);
   });
 
-  it("control: an unsupported body still falls back to the interpreter", async () => {
-    // --- Spread call arguments are not supported by the native emitter, so this handler
-    // --- keeps the lazy-arrow path. It proves the spy above genuinely detects interpreted
-    // --- execution, so `toBe(0)` in the tests above is a real signal rather than a spy
+  it("control: an arrow inside a data literal still runs through the interpreter", async () => {
+    // --- Callback arguments and arrow-valued declarations are compiled natively, but an
+    // --- arrow stored inside an object literal keeps the lazy representation, so calling
+    // --- it enters the tree-walking executor. This proves the spy genuinely detects
+    // --- interpreted execution, making `toBe(0)` above a real signal rather than a spy
     // --- that was never wired up.
     const seen: any[] = [];
-    const entries = await runCompiledHandler("() => { collect(...items); }", {
-      items: [1, 2, 3],
-      collect: (...args: any[]) => seen.push(args),
-    });
+    const entries = await runCompiledHandler(
+      "() => { const ops = { double: item => item * 2 }; collect(ops.double(21)); }",
+      { collect: (...args: any[]) => seen.push(args) },
+    );
 
-    expect(seen).toEqual([[1, 2, 3]]);
+    expect(seen).toEqual([[42]]);
     expect(entries).toBeGreaterThan(0);
   });
 });
