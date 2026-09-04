@@ -245,6 +245,31 @@ export const eventAsyncRuntime = {
     return result;
   },
 
+  /**
+   * Invokes a natively compiled arrow function — an event handler written in the
+   * `(args) => …` form, whose body the compiler emitted as real JavaScript instead of
+   * handing its AST back to the interpreter through `arrow()`/`call()`.
+   *
+   * The bracketing mirrors what `call()` does for the lazy-arrow path it replaces: the
+   * pending XMLUI state is flushed before the body runs and again once it settles, so a
+   * handler observes (and commits) exactly the same state boundaries either way. There is
+   * no `updateRootName` here because the lazy-arrow call site never passed one — invoking
+   * the handler itself is not an assignment to a tracked container variable — which makes
+   * `notifyEventStateUpdate` a no-op for this path.
+   */
+  async callNativeArrow(
+    fn: (...args: any[]) => any,
+    args: any[],
+    evalContext: BindingTreeEvaluationContext,
+  ): Promise<any> {
+    await this.flushPendingState(evalContext);
+    try {
+      return await completePromise(fn(...args));
+    } finally {
+      await this.flushPendingState(evalContext);
+    }
+  },
+
   async call(
     functionObj: any,
     thisArg: any,
