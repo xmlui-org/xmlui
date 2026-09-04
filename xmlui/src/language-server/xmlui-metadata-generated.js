@@ -6109,7 +6109,34 @@ export default {
         "valueType": "string"
       },
       "to": {
-        "description": "This property defines the URL of the menu item. If this property is defined (and the `click` event does not have an event handler), clicking the menu item navigates to this link.",
+        "description": "This property defines the URL of the menu item. When it is set, the menu item renders as a real link (an `<a>` element with an `href`), so it can be opened in a new tab, copied, and read as a link by assistive technology. If this property is defined (and the `click` event does not have an event handler), clicking the menu item navigates to this link.",
+        "valueType": "string"
+      },
+      "target": {
+        "description": "This property specifies where to open the link represented by the `MenuItem`. It only has an effect when `to` is defined. This property accepts the following values (in accordance with the HTML standard):",
+        "availableValues": [
+          {
+            "value": "_self",
+            "description": "The link will open in the same frame as it was clicked."
+          },
+          {
+            "value": "_blank",
+            "description": "The link will open in a new window or tab."
+          },
+          {
+            "value": "_parent",
+            "description": "The link will open in the parent frame. If no parent, behaves as _self."
+          },
+          {
+            "value": "_top",
+            "description": "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self."
+          },
+          {
+            "value": "_unfencedTop",
+            "description": "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
+          }
+        ],
+        "isStrictEnum": true,
         "valueType": "string"
       },
       "active": {
