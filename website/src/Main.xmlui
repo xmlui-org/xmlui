@@ -729,6 +729,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Consume an APICall's response"
+                            to="/docs/howto/consume-an-apicall-response"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Update UI optimistically"
                             to="/docs/howto/update-ui-optimistically"
                         />
