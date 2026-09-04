@@ -225,6 +225,26 @@ xmluiConfig: {
 
 Use `compileBindings` or `compileEventHandlers` only when you need to control one script path independently. When either compatibility alias is set, it overrides `compileScripts` for that path.
 
+Script compilation happens in two places, and both read this switch:
+
+- **At build time.** `xmlui start` and `xmlui build` compile event handlers, code-behind
+  functions, and `Globals.xs` functions into the emitted modules. The build tooling reads the
+  switch from your app description (`src/config.ts` in Vite mode, `config.json` in standalone
+  mode) under `xmluiConfig` or `appGlobals`, and from `xmlui.config.json`. When the same key is
+  set in both, `xmlui.config.json` wins.
+- **At run time.** Whatever was not compiled during the build is compiled on first use by the
+  browser runtime, which reads the switch from the same merged `xmluiConfig` / `appGlobals` view.
+
+When build-time compilation is on, `xmlui start` and `xmlui build` report what it produced, for
+example `[xmlui] Script compilation: 128 compiled artifact(s) from 130 script block(s) in 24
+file(s)`. A warning is emitted instead when compilation was requested but no artifact came out of
+it, so a misconfigured project is visible from the console.
+
+> [!NOTE] If your app description cannot be loaded by the build tooling (for example, it imports
+> stylesheets or other assets Node cannot evaluate), set the compilation switches in
+> `xmlui.config.json`. The CLI warns when it hits this case in a file that looks like it
+> configures script compilation.
+
 ---
 
 ### `compileBindings`

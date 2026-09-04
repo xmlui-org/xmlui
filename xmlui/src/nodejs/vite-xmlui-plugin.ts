@@ -349,6 +349,48 @@ function createTransformSourceMap(
   };
 }
 
+/**
+ * Counters behind the build-time script compilation summary. `artifacts` counts
+ * the compiled JavaScript artifacts actually emitted, `scripts` the parsed
+ * script blocks that could have carried one, and `unsupported` those where the
+ * compiler bailed out and the runtime falls back to interpretation.
+ */
+type CompiledScriptTally = {
+  files: number;
+  scripts: number;
+  artifacts: number;
+  unsupported: number;
+};
+
+function tallyCompiledScripts(value: unknown, tally: CompiledScriptTally): CompiledScriptTally {
+  if (!value || typeof value !== "object") {
+    return tally;
+  }
+  const maybeArtifact = value as Partial<CompiledScriptArtifact>;
+  if (
+    typeof maybeArtifact.sourceId === "string" &&
+    typeof maybeArtifact.js === "string" &&
+    typeof maybeArtifact.target === "string" &&
+    Array.isArray(maybeArtifact.mappings)
+  ) {
+    tally.artifacts++;
+    return tally;
+  }
+  const maybeParsedScript = value as { __PARSED?: boolean; compiledUnsupported?: boolean };
+  if (maybeParsedScript.__PARSED === true && Array.isArray((value as any).statements)) {
+    tally.scripts++;
+    if (maybeParsedScript.compiledUnsupported === true) {
+      tally.unsupported++;
+    }
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => tallyCompiledScripts(item, tally));
+    return tally;
+  }
+  Object.values(value).forEach((item) => tallyCompiledScripts(item, tally));
+  return tally;
+}
+
 function collectCompiledArtifacts(value: unknown, artifacts: CompiledScriptArtifact[] = []) {
   if (!value || typeof value !== "object") {
     return artifacts;
@@ -471,6 +513,55 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       sources,
       sourceOrigin,
     };
+  };
+  // --- Build-time script compilation accounting. Without it, an app that asks
+  // --- for `compileScripts` but never reaches the compiler (a misplaced or
+  // --- unreadable config) looks exactly like an app that compiled fine.
+  const compiledScriptTally: CompiledScriptTally = {
+    files: 0,
+    scripts: 0,
+    artifacts: 0,
+    unsupported: 0,
+  };
+  let compiledScriptSummaryReported = false;
+  let compiledScriptSummaryTimer: ReturnType<typeof setTimeout> | undefined;
+  const recordCompiledScripts = (value: unknown) => {
+    // --- Nothing left to count once the summary is out; the walk is not free.
+    if (!compileEventHandlers || compiledScriptSummaryReported) return;
+    compiledScriptTally.files++;
+    tallyCompiledScripts(value, compiledScriptTally);
+    if (!devServerMode) return;
+    // --- The dev server transforms lazily, so there is no build end to report
+    // --- at; summarize once the transforms settle.
+    clearTimeout(compiledScriptSummaryTimer);
+    compiledScriptSummaryTimer = setTimeout(() => reportCompiledScriptSummary(), 2000);
+    compiledScriptSummaryTimer.unref?.();
+  };
+  const reportCompiledScriptSummary = (warn?: (message: string) => void) => {
+    if (!compileEventHandlers || compiledScriptSummaryReported) return;
+    compiledScriptSummaryReported = true;
+    clearTimeout(compiledScriptSummaryTimer);
+    const { files, scripts, artifacts, unsupported } = compiledScriptTally;
+    if (artifacts === 0 && scripts > 0) {
+      const message =
+        `[xmlui] Script compilation is enabled but produced no compiled artifacts: ` +
+        `${scripts} script block(s) in ${files} file(s) will run interpreted.`;
+      if (warn) {
+        warn(message);
+      } else {
+        console.warn(message);
+      }
+      return;
+    }
+    const fallbacks =
+      unsupported > 0 ? `, ${unsupported} fell back to interpretation (unsupported construct)` : "";
+    console.log(
+      devServerMode
+        ? `[xmlui] Script compilation is active: ${artifacts} compiled artifact(s) from ` +
+            `${scripts} script block(s) in ${files} file(s) transformed so far${fallbacks}`
+        : `[xmlui] Script compilation: ${artifacts} compiled artifact(s) from ` +
+            `${scripts} script block(s) in ${files} file(s)${fallbacks}`,
+    );
   };
   const registerCompiledArtifacts = (value: unknown) => {
     if (!sourceMapsEnabled()) return;
@@ -871,6 +962,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           warnings,
           ...(sourceMapsEnabled() ? { debugSources } : {}),
         };
+        recordCompiledScripts(file);
         const outputCode = browserWarningLogCode(warnings) + dataToEsm(file);
         const map = sourceMapsEnabled()
           ? createTransformSourceMap(outputCode, fileId, debugSources)
@@ -971,6 +1063,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         const debugSources = Array.from(debugSourcesById.values());
         virtualSources?.registerAll(debugSources);
+        recordCompiledScripts(codeBehind);
         const outputCode = dataToEsm({
           ...codeBehind,
           src: code,
@@ -1033,6 +1126,11 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     },
 
     buildEnd() {
+      // --- In dev-server mode transforms keep trickling in after the
+      // --- dependency-scan build ends, so the summary waits for them instead.
+      if (!devServerMode) {
+        reportCompiledScriptSummary((message) => this.warn(message));
+      }
       if (cyclesMode !== "off" && reactiveCycleRoots.size > 0) {
         let cycleHits: ReturnType<typeof findCycles> | null = null;
         try {

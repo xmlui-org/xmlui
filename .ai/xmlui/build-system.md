@@ -252,6 +252,29 @@ export default defineConfig({
 });
 ```
 
+### Where the CLI reads plugin options from
+
+`loadXmluiPluginOptions()` (`src/nodejs/bin/xmluiPluginOptions.ts`) feeds `xmlui start`,
+`xmlui build`, and `xmlui build-lib`. It merges two sources:
+
+1. the app description — the first of `src/config.{ts,tsx,mts,js,mjs,json}` or `config.json`
+   that exists — reading its `xmluiConfig` and `appGlobals` records;
+2. `xmlui.config.json` at the project root.
+
+Per key, an explicit top-level `xmlui.config.json` entry wins over `xmluiConfig`, which wins
+over `appGlobals` — the same precedence the browser runtime applies (`mergeXmluiConfig` in
+`AppContent`). This is what makes `compileScripts` declared in the app description reach the
+build-time compiler; without it the flag only ever enabled runtime compilation.
+
+App descriptions are ES modules and may import assets Node cannot evaluate (SCSS,
+`import.meta.glob`). A failed load is not fatal: the build continues with `xmlui.config.json`
+alone, and the CLI warns only when the unreadable file mentions a script-compilation key.
+
+The plugin counts the artifacts it emits and reports them (`[xmlui] Script compilation: …`) at
+`buildEnd`, or shortly after the dev server settles. When compilation is enabled but no artifact
+is produced, it warns instead — "requested but never ran" is otherwise indistinguishable from
+"compiled successfully" in the emitted modules.
+
 ---
 
 ## Build Outputs
