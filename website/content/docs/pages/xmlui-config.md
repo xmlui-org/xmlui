@@ -258,8 +258,8 @@ banner:
 
 A block that falls back also carries its reason (`compiledUnsupportedReason`) in the emitted
 module, so the state is checkable from the build output and not only from the console. When
-compilation is requested but nothing was pre-compiled, the startup line says so instead of
-claiming success.
+compilation is requested but nothing was pre-compiled, the build warns and the startup line says
+so — those scripts are compiled on first use instead — rather than claiming success.
 
 ### What compiles
 
