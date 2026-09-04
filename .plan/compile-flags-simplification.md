@@ -37,7 +37,7 @@ Where compilation happens is an implementation detail the app author does not co
   bindings have no build-time artifact to carry — see "Out of scope" for what changing
   that would take.
 
-### 2. `reportCompileFallbacks: boolean` (default `false`) — name to confirm
+### 2. `reportCompileFallbacks: boolean` (default `false`)
 
 When `true`, every script block that could not be compiled is reported with a diagnostic
 code, the construct that stopped compilation, and its source position — at build time in
@@ -49,8 +49,12 @@ many fell back, and point at the flag for detail. Silence about a fallback is wh
 these bugs expensive; noise about every fallback on every build is what makes people turn
 reporting off.
 
-Name candidates (see "Decisions needed"): `reportCompileFallbacks`,
-`logCompileDiagnostics`, `compileDiagnostics`, `verboseCompilation`.
+Shape of a reported fallback:
+
+```
+[xmlui] compile-unsupported-node: /src/Globals.xs#function-roleHint
+        await expression at line 4, column 12 — falling back to interpretation
+```
 
 ### Diagnostic codes
 
@@ -168,14 +172,11 @@ Each step is independently reviewable and leaves the suite green.
   larger than this plan, and independent of the flag surface.
 - Any change to what the compiler *can* compile — that was #3879.
 
-## Decisions needed
+## Decisions taken
 
-1. **Name of the diagnostics flag** — `reportCompileFallbacks` (recommended),
-   `logCompileDiagnostics`, `compileDiagnostics`, or `verboseCompilation`.
-2. **Name of the compilation flag** — keep `compileScripts` (recommended; already the
-   documented umbrella) or rename.
-3. **Removed keys: hard removal with a notice (recommended) or one release of silent
-   acceptance?**
-4. **Base branch** — this branch currently sits on `fix/3879-compiled-script-coverage`
-   (PR #3879), because the diagnostics and config-loading plumbing it simplifies comes
-   from there. If #3879 will not merge, rebase onto `main` and fold the needed pieces in.
+1. **Diagnostics flag:** `reportCompileFallbacks`.
+2. **Compilation flag:** `compileScripts` keeps its name.
+3. **Removed keys:** removed outright, with a one-shot notice naming the replacement
+   wherever one is seen. No dual-name branches survive inside the engine.
+4. **Base branch:** `fix/3879-compiled-script-coverage` (PR #3879). If that PR does not
+   merge, this branch rebases onto `main` and folds in the pieces it depends on.
