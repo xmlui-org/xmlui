@@ -1,4 +1,5 @@
 import {
+  type AnchorHTMLAttributes,
   type CSSProperties,
   forwardRef,
   memo,
@@ -9,6 +10,7 @@ import {
 } from "react";
 import { useEffect, useState, useRef } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { useHref, useLocation } from "react-router-dom";
 import classnames from "classnames";
 
 import styles from "./DropdownMenu.module.scss";
@@ -23,7 +25,11 @@ import type {
   ButtonVariant,
   ButtonThemeColor,
   AlignmentOptions,
+  LinkTarget,
 } from "../abstractions";
+import { isAbsoluteUrl } from "../component-utils";
+import { useAppContext } from "../../components-core/AppContext";
+import { resolveRelativePathname } from "../../components-core/action/NavigateAction";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedButton } from "../Button/Button";
 
@@ -190,6 +196,37 @@ export const DropdownMenu = memo(forwardRef(function DropdownMenu(
   );
 }));
 
+/**
+ * A click the browser should own rather than the app: any non-primary button, or a click held
+ * with a modifier key. These open the anchor's `href` in a new tab or window — the whole point
+ * of rendering a real link — so the app must neither cancel them nor act on them a second time.
+ * Same test as React Router's `shouldProcessLinkClick`, minus the `target` check, which the
+ * caller applies separately because a declared `click` handler outranks it.
+ */
+function isBrowserOwnedClick(event: React.MouseEvent) {
+  return (
+    event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey
+  );
+}
+
+type MenuItemAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+
+/**
+ * The bare anchor a linking `MenuItem` renders. Radix's `asChild` clones the item's own props
+ * (role, tabIndex, data-highlighted, the composed click handler, the ref) onto this element,
+ * so it only has to forward everything it is handed.
+ */
+const MenuItemAnchor = forwardRef(function MenuItemAnchor(
+  { children, ...rest }: MenuItemAnchorProps,
+  ref: React.ForwardedRef<HTMLAnchorElement>,
+) {
+  return (
+    <a {...rest} ref={ref}>
+      {children}
+    </a>
+  );
+});
+
 type MenuItemProps = {
   icon?: ReactNode;
   iconPosition?: IconPosition;
@@ -200,6 +237,12 @@ type MenuItemProps = {
   className?: string;
   classes?: Record<string, string>;
   to?: string;
+  target?: LinkTarget;
+  rel?: string;
+  /** Set when the markup declares a `to`, regardless of what that `to` evaluates to. */
+  isLink?: boolean;
+  /** Set when the markup declares a `click` handler, which takes precedence over `to`. */
+  hasClickHandler?: boolean;
   active?: boolean;
   enabled?: boolean;
   compact?: boolean;
@@ -224,40 +267,139 @@ export const MenuItem = memo(forwardRef(function MenuItem(
     enabled = true,
     compact = false,
     classes,
+    to,
+    target,
+    rel,
+    isLink = false,
+    hasClickHandler = false,
     ...rest
   }: MenuItemProps,
   ref,
 ) {
   const iconToStart = iconPosition === "start";
   const context = useDropdownMenuContext();
+  const { pathname } = useLocation();
+  // `appContext.navigate` is the app's own navigation entry point: it runs the `willNavigate`
+  // guard, lets `didNavigate` fire, and emits the `kind:"navigate"` trace entry. Going through
+  // it directly (rather than looking up a "navigate" action, which resolves the name through
+  // the scripting engine) is what keeps `to` working with compiled event handlers.
+  const appContext = useAppContext();
+
+  const trimmedTo = typeof to === "string" ? to.trim() : "";
+  const absolute = isAbsoluteUrl(trimmedTo);
+
+  // One resolution feeds BOTH the href and the navigation, so the address shown in the status
+  // bar and copied from the context menu is by construction the address a click goes to.
+  // `resolveRelativePathname` resolves against the current location, which is what the
+  // `navigate` action does; React Router resolves relative paths against the router root
+  // instead, which is why a relative `to` used to land on the wrong page.
+  const resolvedTo =
+    trimmedTo && !absolute ? String(resolveRelativePathname(trimmedTo, pathname)) : "";
+  const routerHref = useHref(resolvedTo || "/");
+
+  // A disabled item is deliberately href-less: without an href the anchor is neither focusable
+  // nor followable, which keeps it inert without having to cancel the event (cancelling would
+  // also suppress Radix's own select handling).
+  const href =
+    !isLink || !enabled || !trimmedTo ? undefined : absolute ? trimmedTo : routerHref;
+
+  // `to` navigates only when no `click` handler outranks it, and only for an in-app
+  // destination — an absolute URL is left to the anchor's own navigation.
+  const navigatesOnClick = isLink && !hasClickHandler && !!resolvedTo;
 
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
       if (!enabled) return;
-      onClick(event);
-      // Close the menu after clicking an item
+
+      if (href) {
+        if (isBrowserOwnedClick(event)) {
+          // The browser is about to open the href in a new tab or window. Running the app's
+          // click handler (or its `to` navigation) on top of that would act twice on a single
+          // gesture, so this gesture belongs to the browser alone. Radix still closes the menu.
+          return;
+        }
+        if (hasClickHandler) {
+          // `click` takes precedence over `to`, and that outranks `target` too: an item with
+          // both must run its handler rather than open a tab on a plain click.
+          event.preventDefault();
+        } else if (target && target !== "_self") {
+          // No handler to run, and the anchor is aimed at another frame or tab — let it be.
+          return;
+        } else if (!absolute) {
+          // In-app destination: hand it to the navigate action (see the renderer for why).
+          event.preventDefault();
+        }
+        // An absolute URL with no click handler falls through to the anchor's own navigation:
+        // in-app navigation cannot route outside the app, and used to resolve it to "/".
+      }
+
+      if (navigatesOnClick) {
+        appContext?.navigate?.(resolvedTo);
+      } else {
+        onClick(event);
+      }
+
+      // Close the menu after clicking an item. Note that `preventDefault` above also skips
+      // Radix's own select handling (`composeEventHandlers` checks `defaultPrevented`), so
+      // this call — not Radix — is what closes the menu on a navigating click. Both
+      // `DropdownMenu` and `ContextMenu` drive `open` from this same context.
       context?.closeMenu();
     },
-    [enabled, onClick, context],
+    [
+      enabled,
+      href,
+      target,
+      hasClickHandler,
+      absolute,
+      navigatesOnClick,
+      resolvedTo,
+      appContext,
+      onClick,
+      context,
+    ],
+  );
+
+  const itemClassName = classnames(
+    classes?.[COMPONENT_PART_KEY],
+    className,
+    styles.DropdownMenuItem,
+    {
+      [styles.active]: active,
+      [styles.disabled]: !enabled,
+      [styles.compact]: compact,
+    },
+  );
+
+  const content = (
+    <>
+      {iconToStart && icon}
+      <div className={styles.wrapper}>{label ?? children}</div>
+      {!iconToStart && icon}
+    </>
   );
 
   return (
     <DropdownMenuPrimitive.Item
       {...rest}
+      asChild={isLink}
       style={style}
-      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.DropdownMenuItem, {
-        [styles.active]: active,
-        [styles.disabled]: !enabled,
-        [styles.compact]: compact,
-      })}
+      className={itemClassName}
       ref={ref as any}
       onClick={handleClick}
       role="menuitem"
-      tabIndex={enabled ? 0 : -1}
     >
-      {iconToStart && icon}
-      <div className={styles.wrapper}>{label ?? children}</div>
-      {!iconToStart && icon}
+      {isLink ? (
+        <MenuItemAnchor
+          href={href}
+          target={target}
+          rel={rel}
+          aria-current={active ? "page" : undefined}
+        >
+          {content}
+        </MenuItemAnchor>
+      ) : (
+        content
+      )}
     </DropdownMenuPrimitive.Item>
   );
 }));

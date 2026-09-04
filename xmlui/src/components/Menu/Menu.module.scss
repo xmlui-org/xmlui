@@ -69,6 +69,15 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 @mixin menuItem {
   background-color: $backgroundColor-MenuItem;
   color: $color-MenuItem;
+  // A MenuItem with a `to` renders as a real <a>, which the UA stylesheet would otherwise
+  // underline and recolor once visited. The rest of the mixin already gives the element its
+  // own box (flex, full width, padding), so nothing else has to change for the anchor case.
+  text-decoration: none;
+
+  &:visited {
+    color: $color-MenuItem;
+  }
+
   font-family: $fontFamily-MenuItem;
   display: flex;
   border: 0;
