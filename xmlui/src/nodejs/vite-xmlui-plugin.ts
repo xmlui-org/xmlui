@@ -404,20 +404,26 @@ function stripCompiledArtifactDebugData(value: unknown, projectRoot: string): vo
   if (!value || typeof value !== "object") {
     return;
   }
-  const maybeArtifact = value as Partial<CompiledScriptArtifact>;
+  const maybeArtifact = value as Partial<CompiledScriptArtifact> & {
+    compiled?: unknown;
+    compiledUnsupported?: boolean;
+  };
+  const isArtifact =
+    typeof maybeArtifact.js === "string" &&
+    typeof maybeArtifact.target === "string" &&
+    Array.isArray(maybeArtifact.mappings);
   // --- Code-behind declarations carry a `sourceId` of their own, next to the
-  // --- artifact's; both are absolute module paths at build time.
-  if (typeof maybeArtifact.sourceId === "string") {
+  // --- artifact's; both are absolute module paths at build time. The extra shape
+  // --- checks keep this off a `sourceId` that is merely an app's own prop value.
+  const isCompiledSlot =
+    maybeArtifact.compiled !== undefined || typeof maybeArtifact.compiledUnsupported === "boolean";
+  if (typeof maybeArtifact.sourceId === "string" && (isArtifact || isCompiledSlot)) {
     (value as { sourceId: string }).sourceId = relativizeSourcePath(
       maybeArtifact.sourceId,
       projectRoot,
     );
   }
-  if (
-    typeof maybeArtifact.js === "string" &&
-    typeof maybeArtifact.target === "string" &&
-    Array.isArray(maybeArtifact.mappings)
-  ) {
+  if (isArtifact) {
     const artifact = value as CompiledScriptArtifact;
     artifact.mappings = [];
     artifact.sources = [];

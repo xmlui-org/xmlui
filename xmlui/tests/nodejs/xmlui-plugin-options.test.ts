@@ -267,6 +267,28 @@ describe("Loading XMLUI plugin options from project files", () => {
     });
   });
 
+  it("reads an app description that only Vite can evaluate", async () => {
+    // --- `import.meta.glob` is a Vite transform, so a plain Node import of this file
+    // --- throws `import_meta.glob is not a function`. This is the shape the
+    // --- `getLocalIcons()` pattern in our own app templates produces.
+    const cwd = await createProject({
+      "icons/star.svg": "<svg></svg>",
+      "src/config.ts": [
+        "function getLocalIcons() {",
+        "  return import.meta.glob('/icons/**/*.svg', { import: 'default', eager: true, query: '?raw' });",
+        "}",
+        "const App = { name: 'app', icons: getLocalIcons(), appGlobals: { compileScripts: true } };",
+        "export default App;",
+        "",
+      ].join("\n"),
+    });
+
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
+      compileScripts: true,
+      compileEventHandlers: true,
+    });
+  }, 30000);
+
   it("survives an app description that cannot be loaded", async () => {
     const cwd = await createProject({
       "xmlui.config.json": JSON.stringify({ compileScripts: true }),
