@@ -5,6 +5,7 @@ import { compileBindingSyncExpression } from "../script-compiler/targets/binding
 import {
   createCompiledSources,
   createSegmentSourceOrigin,
+  shouldCompileBindingOption,
   type ParseBindingOptions,
 } from "./ParameterParser";
 
@@ -88,7 +89,7 @@ export function parseAttributeValue(
           // --- Successfully parsed expression, get dependencies
           result.segments.push({
             expr,
-            compiled: options.compileBindings
+            compiled: shouldCompileBindingOption(options)
               ? compileBindingSyncExpression(expr!, {
                   sourceId,
                   sourceText: exprText,

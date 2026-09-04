@@ -8,6 +8,7 @@ import {
   T_BLOCK_STATEMENT,
   T_BREAK_STATEMENT,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
   T_CONST_STATEMENT,
   T_CONTINUE_STATEMENT,
   T_DO_WHILE_STATEMENT,
@@ -23,10 +24,12 @@ import {
   T_LET_STATEMENT,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
+  T_NEW_EXPRESSION,
   T_OBJECT_LITERAL,
   T_POSTFIX_OP_EXPRESSION,
   T_PREFIX_OP_EXPRESSION,
   T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
   T_DESTRUCTURE,
   T_SWITCH_STATEMENT,
@@ -45,6 +48,7 @@ import {
   type BlockStatement,
   type BreakStatement,
   type CalculatedMemberAccessExpression,
+  type ConditionalExpression,
   type ConstStatement,
   type ContinueStatement,
   type DoWhileStatement,
@@ -59,12 +63,14 @@ import {
   type IfStatement,
   type LetStatement,
   type MemberAccessExpression,
+  type NewExpression,
   type ObjectLiteral,
   type ObjectLiteralProp,
   type ObjectDestructure,
   type PostfixOpExpression,
   type PrefixOpExpression,
   type ReturnStatement,
+  type SequenceExpression,
   type Statement,
   type SwitchStatement,
   type TemplateLiteralExpression,
@@ -341,8 +347,9 @@ function emitEventArrowCall(
     // let the whole handler fall back to interpreted execution (existing, safe behavior).
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
-  if (containsNonSerializableLiteral(expr)) {
-    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  const nonSerializable = findNonSerializableLiteral(expr);
+  if (nonSerializable) {
+    throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("await runtime.call(runtime.arrow(", expr);
   writer.write(JSON.stringify(expr), expr);
@@ -469,6 +476,14 @@ function expressionMayYield(expr: Expression, context: CompilerContext): boolean
       return expressionMayYield(expr.expr, context);
     case T_SPREAD_EXPRESSION:
       return expressionMayYield(expr.expr, context);
+    case T_CONDITIONAL_EXPRESSION:
+      return (
+        expressionMayYield(expr.cond, context) ||
+        expressionMayYield(expr.thenE, context) ||
+        expressionMayYield(expr.elseE, context)
+      );
+    case T_SEQUENCE_EXPRESSION:
+      return expr.exprs.some((item) => expressionMayYield(item, context));
     case T_ARROW_EXPRESSION:
     case T_LITERAL:
     case T_IDENTIFIER:
@@ -629,6 +644,16 @@ function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boo
       return (
         isNativeExpressionSafe(expr.left, context) && isNativeExpressionSafe(expr.right, context)
       );
+    case T_CONDITIONAL_EXPRESSION:
+      return (
+        isNativeExpressionSafe(expr.cond, context) &&
+        isNativeExpressionSafe(expr.thenE, context) &&
+        isNativeExpressionSafe(expr.elseE, context)
+      );
+    case T_SEQUENCE_EXPRESSION:
+      return (
+        expr.exprs.length > 0 && expr.exprs.every((item) => isNativeExpressionSafe(item, context))
+      );
     case T_ARRAY_LITERAL:
       return expr.items.every(
         (item) => item.type !== T_SPREAD_EXPRESSION && isNativeExpressionSafe(item, context),
@@ -724,6 +749,23 @@ function emitNativeExpression(
       emitNativeExpression(writer, expr.left, context);
       writer.write(` ${expr.op} `);
       emitNativeExpression(writer, expr.right, context);
+      writer.write(")");
+      return;
+    case T_CONDITIONAL_EXPRESSION:
+      writer.write("(", expr);
+      emitNativeExpression(writer, expr.cond, context);
+      writer.write(" ? ");
+      emitNativeExpression(writer, expr.thenE, context);
+      writer.write(" : ");
+      emitNativeExpression(writer, expr.elseE, context);
+      writer.write(")");
+      return;
+    case T_SEQUENCE_EXPRESSION:
+      writer.write("(", expr);
+      expr.exprs.forEach((item, index) => {
+        if (index > 0) writer.write(", ");
+        emitNativeExpression(writer, item, context);
+      });
       writer.write(")");
       return;
     case T_ARRAY_LITERAL:
@@ -1645,8 +1687,17 @@ function emitExpression(
     case T_BINARY_EXPRESSION:
       emitBinaryExpression(writer, expr, context);
       return;
+    case T_CONDITIONAL_EXPRESSION:
+      emitConditionalExpression(writer, expr, context);
+      return;
+    case T_SEQUENCE_EXPRESSION:
+      emitSequenceExpression(writer, expr, context);
+      return;
     case T_FUNCTION_INVOCATION_EXPRESSION:
       emitFunctionInvocation(writer, expr, context);
+      return;
+    case T_NEW_EXPRESSION:
+      emitNewExpression(writer, expr, context);
       return;
     case T_ARROW_EXPRESSION:
       emitArrowExpression(writer, expr, context);
@@ -1738,6 +1789,99 @@ function emitBinaryExpression(
   writer.write("))", expr);
 }
 
+/**
+ * Conditional (`cond ? a : b`) expression. Both branches are emitted inline so the
+ * untaken one is never evaluated — the same laziness the interpreter has, which
+ * matters when a branch has side effects or would throw.
+ */
+function emitConditionalExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ConditionalExpression,
+  context: CompilerContext,
+): void {
+  writer.write("((await runtime.complete(");
+  emitExpression(writer, expr.cond, context);
+  writer.write(")) ? (await runtime.complete(");
+  emitExpression(writer, expr.thenE, context);
+  writer.write(")) : (await runtime.complete(");
+  emitExpression(writer, expr.elseE, context);
+  writer.write(")))", expr);
+}
+
+/**
+ * Comma-sequence expression: every operand is evaluated left to right, the last one
+ * is the value.
+ */
+function emitSequenceExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: SequenceExpression,
+  context: CompilerContext,
+): void {
+  if (!expr.exprs || expr.exprs.length === 0) {
+    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  writer.write("(");
+  expr.exprs.forEach((item, index) => {
+    if (index > 0) writer.write(", ");
+    writer.write("await runtime.complete(");
+    emitExpression(writer, item, context);
+    writer.write(")");
+  });
+  writer.write(")", expr);
+}
+
+/**
+ * `new X(...)`. The constructor goes through `runtime.construct`, which applies the
+ * same allow-list the interpreter applies, so compilation cannot widen what a script
+ * is permitted to instantiate.
+ */
+function emitNewExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: NewExpression,
+  context: CompilerContext,
+): void {
+  writer.write("(await runtime.construct(await runtime.complete(");
+  emitExpression(writer, expr.callee, context);
+  writer.write("), ");
+  emitNewArgumentArray(writer, expr.arguments, context);
+  writer.write("))", expr);
+}
+
+function emitNewArgumentArray(
+  writer: CompiledScriptCodeWriter,
+  args: Expression[],
+  context: CompilerContext,
+): void {
+  writer.write("[");
+  args.forEach((arg, index) => {
+    if (index > 0) writer.write(", ");
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      emitSpreadOperand(writer, arg as SpreadExpression, "spreadNewArg", context);
+      return;
+    }
+    writer.write("await runtime.complete(");
+    emitExpression(writer, arg, context);
+    writer.write(")");
+  });
+  writer.write("]");
+}
+
+/**
+ * Emits a `...expr` operand. The runtime helper enforces the operand rules the
+ * interpreter enforces (e.g. "expects an array operand"), so a spread that throws
+ * interpreted also throws compiled.
+ */
+function emitSpreadOperand(
+  writer: CompiledScriptCodeWriter,
+  spread: SpreadExpression,
+  helper: "spreadArrayItem" | "spreadCallArg" | "spreadNewArg" | "spreadObjectValue",
+  context: CompilerContext,
+): void {
+  writer.write(`...runtime.${helper}(await runtime.complete(`);
+  emitExpression(writer, spread.expr, context);
+  writer.write("))", spread);
+}
+
 function emitArrayLiteral(
   writer: CompiledScriptCodeWriter,
   expr: ArrayLiteral,
@@ -1747,7 +1891,8 @@ function emitArrayLiteral(
   expr.items.forEach((item, index) => {
     if (index > 0) writer.write(", ");
     if (item.type === T_SPREAD_EXPRESSION) {
-      throwUnsupportedCompiledScriptNode(item, context.sourceId);
+      emitSpreadOperand(writer, item as SpreadExpression, "spreadArrayItem", context);
+      return;
     }
     writer.write("await runtime.complete(");
     emitExpression(writer, item, context);
@@ -1765,7 +1910,8 @@ function emitObjectLiteral(
   expr.props.forEach((prop, index) => {
     if (index > 0) writer.write(", ");
     if (!Array.isArray(prop) && !("kind" in prop)) {
-      throwUnsupportedCompiledScriptNode(prop, context.sourceId);
+      emitSpreadOperand(writer, prop as SpreadExpression, "spreadObjectValue", context);
+      return;
     }
     if (!Array.isArray(prop)) {
       throwUnsupportedCompiledScriptNode(prop.value, context.sourceId);
@@ -1867,7 +2013,8 @@ function emitCompletedArgumentList(
   args.forEach((arg, index) => {
     if (index > 0) writer.write(", ");
     if (arg.type === T_SPREAD_EXPRESSION) {
-      throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+      emitSpreadOperand(writer, arg as SpreadExpression, "spreadCallArg", context);
+      return;
     }
     writer.write("await runtime.complete(");
     emitExpression(writer, arg, context);
@@ -1880,8 +2027,14 @@ function emitArrowExpression(
   expr: ArrowExpression,
   context: CompilerContext,
 ): void {
-  if (expr.async || containsNonSerializableLiteral(expr)) {
+  if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  // --- Report the literal itself, not the arrow that holds it: "unsupported literal
+  // --- at line 4" points at the code to change, "unsupported arrow function" does not.
+  const nonSerializable = findNonSerializableLiteral(expr);
+  if (nonSerializable) {
+    throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("runtime.arrow(");
   writer.write(JSON.stringify(expr), expr);
@@ -1897,7 +2050,8 @@ function emitArgumentArray(
   args.forEach((arg, index) => {
     if (index > 0) writer.write(", ");
     if (arg.type === T_SPREAD_EXPRESSION) {
-      throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+      emitSpreadOperand(writer, arg as SpreadExpression, "spreadCallArg", context);
+      return;
     }
     if (arg.type === T_ARROW_EXPRESSION) {
       if (arrowReferencesCompilerLocals(arg, context)) {
@@ -2400,26 +2554,37 @@ function canSerializeLiteral(value: any): boolean {
   );
 }
 
-function containsNonSerializableLiteral(node: any): boolean {
+/**
+ * Finds the first literal a lazy (interpreted) arrow cannot carry — a regular
+ * expression, for instance, which does not survive `JSON.stringify`. Returns the
+ * literal node so diagnostics can point at it.
+ */
+function findNonSerializableLiteral(node: any): any | undefined {
   if (!node || typeof node !== "object") {
-    return false;
+    return undefined;
   }
   if (node.type === T_LITERAL) {
-    return !canSerializeLiteral(node.value);
+    return canSerializeLiteral(node.value) ? undefined : node;
   }
   for (const [key, value] of Object.entries(node)) {
     if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
       continue;
     }
     if (Array.isArray(value)) {
-      if (value.some((item) => containsNonSerializableLiteral(item))) {
-        return true;
+      for (const item of value) {
+        const found = findNonSerializableLiteral(item);
+        if (found) {
+          return found;
+        }
       }
-    } else if (containsNonSerializableLiteral(value)) {
-      return true;
+      continue;
+    }
+    const found = findNonSerializableLiteral(value);
+    if (found) {
+      return found;
     }
   }
-  return false;
+  return undefined;
 }
 
 function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {

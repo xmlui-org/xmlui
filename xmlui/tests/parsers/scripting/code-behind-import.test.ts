@@ -169,8 +169,21 @@ function getValue() {
       expect(result.warnings ?? []).toEqual([]);
     });
 
+    it("compiles a declaration that constructs an object", () => {
+      const source = "function today() { return new Date(0); }";
+
+      const result = collectCodeBehindFromSource("/main.xs", source, {
+        compileEventHandlers: true,
+      });
+
+      expect(result.functions.today.compiledUnsupported).toBe(false);
+      expect(result.functions.today.compiled?.js).toContain("runtime.construct(");
+      expect(result.warnings ?? []).toEqual([]);
+    });
+
     it("marks unsupported function compilation and keeps the declaration", () => {
-      const source = "function today() { return new Date(); }";
+      // --- `await` is not part of XMLScript, so no compiler target accepts it.
+      const source = "function today() { return await now(); }";
 
       const result = collectCodeBehindFromSource("/main.xs", source, {
         compileEventHandlers: true,

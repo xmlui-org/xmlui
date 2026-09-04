@@ -38,6 +38,30 @@ type EventStatementBoundaryOptions = {
   checkYield?: boolean;
 };
 
+type CompiledInvocationState = { depth: number; settled: boolean };
+
+const INVOCATION_STATE = Symbol.for("xmlui.compiledInvocationState");
+
+function invocationState(evalContext: BindingTreeEvaluationContext): CompiledInvocationState {
+  const holder = evalContext as unknown as Record<symbol, CompiledInvocationState | undefined>;
+  let state = holder[INVOCATION_STATE];
+  if (!state) {
+    state = { depth: 0, settled: false };
+    Object.defineProperty(evalContext, INVOCATION_STATE, {
+      value: state,
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    });
+  }
+  return state;
+}
+
+function isSettledInvocation(evalContext: BindingTreeEvaluationContext): boolean {
+  const holder = evalContext as unknown as Record<symbol, CompiledInvocationState | undefined>;
+  return holder[INVOCATION_STATE]?.settled === true;
+}
+
 export const eventAsyncRuntime = {
   createInvocation(options?: { yieldIntervalMs?: number; suppressYield?: boolean }) {
     const invocation = Object.create(this) as typeof eventAsyncRuntime & {
@@ -167,12 +191,40 @@ export const eventAsyncRuntime = {
   },
 
   async checkCancel(evalContext: BindingTreeEvaluationContext): Promise<void> {
-    const cancelToken = evalContext.localContext?.$cancel;
-    if (cancelToken?.throwIfAborted) {
-      cancelToken.throwIfAborted();
+    // --- `$cancel` belongs to the handler *run*. The dispatcher aborts it in its
+    // --- `finally`, on normal completion as well as supersession, so that
+    // --- `$cancel.onAbort` teardown fires. A callback the handler handed to something
+    // --- that invokes it later (`debounce`, a subscription, a timer) therefore always
+    // --- finds an aborted token — and must not be killed by it. The interpreted path
+    // --- never consulted `$cancel` at all; this keeps the compiled path in step
+    // --- without giving up cancellation while the handler is actually running.
+    if (!isSettledInvocation(evalContext)) {
+      const cancelToken = evalContext.localContext?.$cancel;
+      if (cancelToken?.throwIfAborted) {
+        cancelToken.throwIfAborted();
+      }
     }
     if (evalContext.cancellationToken?.cancelled) {
       throw new HandlerCancelledError("user");
+    }
+  },
+
+  /**
+   * Marks the start of a compiled handler run on this evaluation context. Nested runs
+   * are counted, so an inner one finishing does not release the outer one's
+   * cancellation.
+   */
+  beginInvocation(evalContext: BindingTreeEvaluationContext): void {
+    const state = invocationState(evalContext);
+    state.depth++;
+  },
+
+  /** Marks the end of a compiled handler run — see `checkCancel`. */
+  endInvocation(evalContext: BindingTreeEvaluationContext): void {
+    const state = invocationState(evalContext);
+    state.depth--;
+    if (state.depth <= 0) {
+      state.settled = true;
     }
   },
 
@@ -325,6 +377,42 @@ export const eventAsyncRuntime = {
   async construct(constructorObj: any, args: any[]): Promise<any> {
     const allowedConstructor = getAllowedNewConstructor(constructorObj);
     return await completePromise(new allowedConstructor(...args));
+  },
+
+  // --- Spread operands. Each helper enforces exactly what the interpreter enforces
+  // --- for that position (see `eval-tree-async.ts`), so a spread that throws when
+  // --- interpreted throws with the same message when compiled.
+  spreadArrayItem(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within an array literal expects an array operand.");
+    }
+    return value;
+  },
+
+  spreadCallArg(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within a function invocation expects an array operand.");
+    }
+    return value;
+  },
+
+  spreadNewArg(value: any): any[] {
+    if (!Array.isArray(value)) {
+      throw new Error("Spread operator within a new expression expects an array operand.");
+    }
+    return value;
+  },
+
+  /**
+   * Object-literal spread. The interpreter copies own entries of arrays and objects
+   * and ignores everything else; `null` and non-objects contribute nothing rather
+   * than throwing.
+   */
+  spreadObjectValue(value: any): Record<string, any> {
+    if (value && typeof value === "object") {
+      return value as Record<string, any>;
+    }
+    return {};
   },
 
   assignId(

@@ -257,7 +257,8 @@ test.describe("compiled declaration parity", () => {
       expected: 21,
     },
     {
-      name: "unsupported compiled declaration falls back to interpreted execution",
+      // --- `new` compiles since plan #3879; kept as a parity case for constructors.
+      name: "declaration constructing an object",
       source: `<Button testId="run" onClick="testState = epochYear()">Run</Button>`,
       description: {
         codeBehind: `
@@ -268,6 +269,12 @@ test.describe("compiled declaration parity", () => {
       },
       expected: 1970,
     },
+    // --- There is no longer a construct that a declaration can both fall back on and
+    // --- still execute: since plan #3879 the compiler covers everything the
+    // --- interpreter runs, and what is left (`await`, async arrows) is rejected by
+    // --- both. The fallback path itself is covered by
+    // --- `tests/parsers/scripting/code-behind-import.test.ts` and
+    // --- `tests/components-core/compiled-events/event-async-handler-arrow.test.ts`.
   ];
 
   for (const testCase of cases) {

@@ -415,9 +415,27 @@ describe("event-async compiled script target", () => {
   });
 
   it("throws a structured unsupported error for unsupported nodes", () => {
+    // --- `await` is not part of XMLScript, so no target compiles it.
     expect(() =>
-      compileEventAsyncStatementSource("count = enabled ? 1 : 2;", "Main.xmlui#event-4"),
+      compileEventAsyncStatementSource("count = await getValue();", "Main.xmlui#event-4"),
     ).toThrow(UnsupportedCompiledScriptNodeError);
+  });
+
+  it("compiles conditional, sequence, new, and spread expressions", () => {
+    const sources = [
+      "count = enabled ? 1 : 2;",
+      "count = ((a = 1), (a + 1));",
+      "stamp = new Date(0);",
+      "collect(...items);",
+      "list = [...items, 1];",
+      "merged = { ...base, b: 2 };",
+    ];
+
+    for (const source of sources) {
+      expect(() =>
+        compileEventAsyncStatementSource(source, `Main.xmlui#event-supported:${source}`),
+      ).not.toThrow();
+    }
   });
 
   it("throws a structured unsupported error for non-serializable literals", () => {
@@ -431,7 +449,7 @@ describe("event-async compiled script target", () => {
 
   it("prefers a parse-time artifact over runtime AST compilation", async () => {
     const artifact = compileEventAsyncStatementSource("count = count + 1;", "Main.xmlui#event-5");
-    const unsupportedStatements = new Parser("count = enabled ? 1 : 2;").parseStatements();
+    const unsupportedStatements = new Parser("count = await getValue();").parseStatements();
     const evalContext = {
       localContext: { count: 1, enabled: true },
       options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
@@ -443,14 +461,14 @@ describe("event-async compiled script target", () => {
       undefined,
       artifact,
       "Main.xmlui#event-unsupported",
-      "count = enabled ? 1 : 2;",
+      "count = await getValue();",
     );
 
     expect(evalContext.localContext.count).toBe(2);
   });
 
   it("runtime-compiles and cache keys statement handlers when no artifact exists", async () => {
-    const unsupportedStatements = new Parser("count = enabled ? 1 : 2;").parseStatements();
+    const unsupportedStatements = new Parser("count = await getValue();").parseStatements();
     const evalContext = {
       localContext: { count: 1, enabled: true },
       options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
@@ -463,7 +481,7 @@ describe("event-async compiled script target", () => {
         undefined,
         undefined,
         "Main.xmlui#event-runtime",
-        "count = enabled ? 1 : 2;",
+        "count = await getValue();",
       ),
     ).rejects.toBeInstanceOf(UnsupportedCompiledScriptNodeError);
   });

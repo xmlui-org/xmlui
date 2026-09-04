@@ -267,8 +267,16 @@ over `appGlobals` — the same precedence the browser runtime applies (`mergeXml
 build-time compiler; without it the flag only ever enabled runtime compilation.
 
 App descriptions are ES modules and may import assets Node cannot evaluate (SCSS,
-`import.meta.glob`). A failed load is not fatal: the build continues with `xmlui.config.json`
-alone, and the CLI warns only when the unreadable file mentions a script-compilation key.
+`import.meta.glob`). The loader tries a plain Node import first; when that fails and the file
+mentions a script-compilation key, it retries through Vite's `runnerImport` with the xmlui plugin
+applied and stylesheets stubbed, which resolves `import.meta.glob`, `.xmlui` imports, and
+TypeScript exactly as the browser build does. The Vite retry is gated on that keyword check
+because it evaluates the whole module graph the description pulls in. A failed load is still not
+fatal: the build continues with `xmlui.config.json` alone, and the CLI warns.
+
+`getViteConfig({ devServer })` decides whether dev-only defaults apply. Only `xmlui start` passes
+`true`; it is what turns on `compiledScriptSourceMaps: "external"`. A production build therefore
+emits compiled artifacts without mappings, embedded sources, or absolute developer paths.
 
 The plugin counts the artifacts it emits and reports them (`[xmlui] Script compilation: …`) at
 `buildEnd`, or shortly after the dev server settles. When compilation is enabled but no artifact

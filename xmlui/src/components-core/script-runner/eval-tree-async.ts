@@ -269,7 +269,7 @@ async function evalCalculatedMemberAccessAsync(
   return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
-function evalSequenceAsync(
+async function evalSequenceAsync(
   evaluator: EvaluatorAsyncFunction,
   thisStack: any[],
   expr: SequenceExpression,
@@ -279,15 +279,17 @@ function evalSequenceAsync(
   if (!expr.exprs || expr.exprs.length === 0) {
     throw new Error(`Missing expression sequence`);
   }
-  const result = expr.exprs.map(async (e) => {
-    const value = await evaluator(thisStack, e, evalContext, thread);
-    setExprValue(e, { value }, thread);
+  // --- Strictly left to right: an earlier operand's side effects must be visible
+  // --- to the later ones. Mapping the operands through an async callback started
+  // --- them all from the same state and pushed a pending promise as the value.
+  let lastValue: any;
+  for (const item of expr.exprs) {
+    lastValue = await evaluator(thisStack, item, evalContext, thread);
+    setExprValue(item, { value: lastValue }, thread);
     thisStack.pop();
-    return value;
-  });
-  const lastObj = result[result.length - 1];
-  thisStack.push(lastObj);
-  return lastObj;
+  }
+  thisStack.push(lastValue);
+  return lastValue;
 }
 
 async function evalArrayLiteralAsync(
@@ -337,8 +339,9 @@ async function evalObjectLiteralAsync(
         for (let i = 0; i < spreadItems.length; i++) {
           objectHash[i] = spreadItems[i];
         }
-      } else if (typeof spreadItems === "object") {
-        // --- Spread of a hash object
+      } else if (spreadItems && typeof spreadItems === "object") {
+        // --- Spread of a hash object. `null` contributes nothing, as it does in
+        // --- JavaScript — `Object.entries(null)` would throw.
         for (const [key, value] of Object.entries(spreadItems)) {
           objectHash[key] = value;
         }

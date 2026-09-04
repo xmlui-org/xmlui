@@ -376,10 +376,12 @@ function tallyCompiledScripts(value: unknown, tally: CompiledScriptTally): Compi
     tally.artifacts++;
     return tally;
   }
-  const maybeParsedScript = value as { __PARSED?: boolean; compiledUnsupported?: boolean };
-  if (maybeParsedScript.__PARSED === true && Array.isArray((value as any).statements)) {
+  // --- Every compilable slot carries a boolean `compiledUnsupported`, whether it is an
+  // --- event handler (`__PARSED`) or a code-behind function declaration.
+  const maybeScript = value as { compiledUnsupported?: boolean };
+  if (typeof maybeScript.compiledUnsupported === "boolean") {
     tally.scripts++;
-    if (maybeParsedScript.compiledUnsupported === true) {
+    if (maybeScript.compiledUnsupported) {
       tally.unsupported++;
     }
   }
@@ -389,6 +391,66 @@ function tallyCompiledScripts(value: unknown, tally: CompiledScriptTally): Compi
   }
   Object.values(value).forEach((item) => tallyCompiledScripts(item, tally));
   return tally;
+}
+
+/**
+ * Fields a compiled artifact only needs when source maps are on. `mappings` holds one
+ * entry per emitted token and `sources[].sourceText` the complete original module, so
+ * shipping them in a production build multiplied bundle size and put developer paths
+ * and full script sources into the browser payload for no runtime benefit —
+ * `createCompiledScriptFunctionBody` reads `js` alone when source maps are off.
+ */
+function stripCompiledArtifactDebugData(value: unknown, projectRoot: string): void {
+  if (!value || typeof value !== "object") {
+    return;
+  }
+  const maybeArtifact = value as Partial<CompiledScriptArtifact> & {
+    compiled?: unknown;
+    compiledUnsupported?: boolean;
+  };
+  const isArtifact =
+    typeof maybeArtifact.js === "string" &&
+    typeof maybeArtifact.target === "string" &&
+    Array.isArray(maybeArtifact.mappings);
+  // --- Code-behind declarations carry a `sourceId` of their own, next to the
+  // --- artifact's; both are absolute module paths at build time. The extra shape
+  // --- checks keep this off a `sourceId` that is merely an app's own prop value.
+  const isCompiledSlot =
+    maybeArtifact.compiled !== undefined || typeof maybeArtifact.compiledUnsupported === "boolean";
+  if (typeof maybeArtifact.sourceId === "string" && (isArtifact || isCompiledSlot)) {
+    (value as { sourceId: string }).sourceId = relativizeSourcePath(
+      maybeArtifact.sourceId,
+      projectRoot,
+    );
+  }
+  if (isArtifact) {
+    const artifact = value as CompiledScriptArtifact;
+    artifact.mappings = [];
+    artifact.sources = [];
+    delete artifact.sourceText;
+    delete artifact.sourceUrl;
+    delete artifact.displayName;
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => stripCompiledArtifactDebugData(item, projectRoot));
+    return;
+  }
+  Object.values(value).forEach((item) => stripCompiledArtifactDebugData(item, projectRoot));
+}
+
+/**
+ * Turns an absolute path prefix into a project-relative one so build output does not
+ * carry the developer's directory layout.
+ */
+function relativizeSourcePath(sourcePath: string, projectRoot: string): string {
+  if (!projectRoot) {
+    return sourcePath;
+  }
+  const normalizedRoot = projectRoot.endsWith("/") ? projectRoot : `${projectRoot}/`;
+  return sourcePath.startsWith(normalizedRoot)
+    ? `/${sourcePath.slice(normalizedRoot.length)}`
+    : sourcePath;
 }
 
 function collectCompiledArtifacts(value: unknown, artifacts: CompiledScriptArtifact[] = []) {
@@ -514,6 +576,22 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       sourceOrigin,
     };
   };
+  // --- Code-behind compilation warnings (`Globals.xs`, `.xmlui.xs`, inline
+  // --- `<script>`). The collector records why a declaration function fell back to
+  // --- interpretation; before, that reason was computed and then dropped, which is
+  // --- what made compilation fallbacks look silent.
+  const pendingCodeBehindWarnings: string[] = [];
+  const collectCodeBehindWarnings = (codeBehind: { warnings?: string[] } | undefined) => {
+    if (codeBehind?.warnings?.length) {
+      pendingCodeBehindWarnings.push(...codeBehind.warnings);
+    }
+  };
+  const drainCodeBehindWarnings = (warn: (message: string) => void) => {
+    while (pendingCodeBehindWarnings.length > 0) {
+      warn(`[xmlui] ${pendingCodeBehindWarnings.shift()}`);
+    }
+  };
+
   // --- Build-time script compilation accounting. Without it, an app that asks
   // --- for `compileScripts` but never reaches the compiler (a misplaced or
   // --- unreadable config) looks exactly like an app that compiled fine.
@@ -674,6 +752,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           collectorSources,
         ),
       );
+      collectCodeBehindWarnings(codeBehind);
       removeCodeBehindTokensFromTree(codeBehind);
       inlineComponent.component = {
         ...inlineComponent.component,
@@ -755,6 +834,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
                 collectorSources,
               ),
             );
+            collectCodeBehindWarnings(codeBehind);
             removeCodeBehindTokensFromTree(codeBehind);
 
             // --- Display any module errors or warnings found
@@ -789,6 +869,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         if (warnings.length > 0) {
           warnings.forEach((msg) => this.warn(`[xmlui] ${msg}`));
         }
+        drainCodeBehindWarnings((message) => this.warn(message));
 
         // --- Run static analyzer when not disabled
         if (analyzeMode !== "off") {
@@ -963,6 +1044,9 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           ...(sourceMapsEnabled() ? { debugSources } : {}),
         };
         recordCompiledScripts(file);
+        if (!sourceMapsEnabled()) {
+          stripCompiledArtifactDebugData(file, projectRoot);
+        }
         const outputCode = browserWarningLogCode(warnings) + dataToEsm(file);
         const map = sourceMapsEnabled()
           ? createTransformSourceMap(outputCode, fileId, debugSources)
@@ -1027,7 +1111,9 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             collectorSources,
           ),
         );
+        collectCodeBehindWarnings(codeBehind);
         removeCodeBehindTokensFromTree(codeBehind);
+        drainCodeBehindWarnings((message) => this.warn(message));
 
         // --- Display any module errors as warnings
         if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
@@ -1064,6 +1150,9 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         const debugSources = Array.from(debugSourcesById.values());
         virtualSources?.registerAll(debugSources);
         recordCompiledScripts(codeBehind);
+        if (!sourceMapsEnabled()) {
+          stripCompiledArtifactDebugData(codeBehind, projectRoot);
+        }
         const outputCode = dataToEsm({
           ...codeBehind,
           src: code,

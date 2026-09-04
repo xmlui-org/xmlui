@@ -25,6 +25,10 @@ asyncProxies.set(Array.prototype.flatMap, asyncFlatMap);
 asyncProxies.set(Array.prototype.some, asyncSome);
 asyncProxies.set(Array.prototype.reduce, asyncReduce);
 asyncProxies.set(Array.prototype.reduceRight, asyncReduceRight);
+asyncProxies.set(Array.prototype.sort, asyncSort);
+if ((Array.prototype as any).toSorted) {
+  asyncProxies.set((Array.prototype as any).toSorted, asyncToSorted);
+}
 if (Array.prototype.findLast) {
   asyncProxies.set(Array.prototype.findLast, asyncFindLast);
 }
@@ -94,6 +98,80 @@ async function asyncFindLast(arr: any[], predicate: (...args: any[]) => boolean)
 async function asyncFindLastIndex(arr: any[], predicate: (...args: any[]) => boolean) {
   const results = await Promise.all(arr.map(predicate));
   return arr.findLastIndex((_v, index) => results[index]);
+}
+
+/**
+ * The async implementation of `Array.prototype.sort`.
+ *
+ * XMLScript callbacks are asynchronous, and the native `sort` coerces the promise a
+ * comparator returns to `NaN` — so every comparison compared equal and `sort(cmp)`
+ * silently left the array untouched, while the argument-less `sort()` worked. This
+ * awaits each comparison instead, sorts stably (as the native one does), and writes
+ * the result back in place before returning the same array.
+ */
+async function asyncSort(arr: any[], comparator?: (...args: any[]) => any) {
+  if (typeof comparator !== "function") {
+    return arr.sort(comparator as undefined);
+  }
+  const sorted = await asyncSortedCopy(arr, comparator);
+  for (let i = 0; i < sorted.length; i++) {
+    arr[i] = sorted[i];
+  }
+  return arr;
+}
+
+// The async implementation of Array.prototype.toSorted (leaves the receiver alone)
+async function asyncToSorted(arr: any[], comparator?: (...args: any[]) => any) {
+  if (typeof comparator !== "function") {
+    return (arr as any).toSorted(comparator);
+  }
+  return await asyncSortedCopy(arr, comparator);
+}
+
+/**
+ * Stable merge sort with awaited comparisons. `undefined` entries take no part in the
+ * comparisons and land at the end, as the specified `sort` behaviour requires.
+ */
+async function asyncSortedCopy(arr: any[], comparator: (...args: any[]) => any): Promise<any[]> {
+  const values: any[] = [];
+  let undefinedCount = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === undefined) {
+      undefinedCount++;
+    } else {
+      values.push(arr[i]);
+    }
+  }
+  const sorted = await asyncMergeSort(values, comparator);
+  for (let i = 0; i < undefinedCount; i++) {
+    sorted.push(undefined);
+  }
+  return sorted;
+}
+
+async function asyncMergeSort(values: any[], comparator: (...args: any[]) => any): Promise<any[]> {
+  if (values.length <= 1) {
+    return values;
+  }
+  const middle = values.length >> 1;
+  const left = await asyncMergeSort(values.slice(0, middle), comparator);
+  const right = await asyncMergeSort(values.slice(middle), comparator);
+  const merged: any[] = [];
+  let leftIndex = 0;
+  let rightIndex = 0;
+  while (leftIndex < left.length && rightIndex < right.length) {
+    const order = Number(await comparator(left[leftIndex], right[rightIndex]));
+    // --- `<= 0` (and `NaN`, which compares false) keeps the left element first —
+    // --- that is what makes the merge stable.
+    if (order > 0) {
+      merged.push(right[rightIndex++]);
+    } else {
+      merged.push(left[leftIndex++]);
+    }
+  }
+  while (leftIndex < left.length) merged.push(left[leftIndex++]);
+  while (rightIndex < right.length) merged.push(right[rightIndex++]);
+  return merged;
 }
 
 // The async implementation of Array.prototype.asyncReduce

@@ -16,6 +16,11 @@ export type ComponentRegistryEntry = {
   // Indicates whether this entry represents a compound (user-defined) component
   isCompoundComponent?: boolean;
 
+  // For compound components: the definition this entry was registered from.
+  // Kept so app-level tooling (e.g. the startup script-compilation report) can
+  // inspect the script blocks a user-defined component ships.
+  compoundComponentDef?: CompoundComponentDef;
+
   // For compound components: the UDC sandbox contract parsed from
   // explicit <Prop>/<Event>/<Method>/<Slot> declarations.  Used by analyzer
   // rules (e.g. udc-slot-undeclared) to enforce the declared surface

@@ -18,6 +18,7 @@
     "test:e2e": "playwright test -c ..",
     "test:e2e:compiled-scripts": "cross-env XMLUI_COMPILE_SCRIPTS=true playwright test -c .. --max-failures=25",
     "measure:compiled-bindings": "tsx scripts/measure-compiled-bindings.ts",
+    "measure:compiled-events": "tsx scripts/measure-compiled-events.ts",
     "measure:standalone-size": "node scripts/measure-standalone-size.mjs",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "test:e2e-website-examples": "playwright test -c .. --grep \"@website\"",

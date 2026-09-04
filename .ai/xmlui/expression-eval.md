@@ -72,6 +72,32 @@ deduplicated `kind:"debug-source"` Inspector trace event per artifact/range. The
 metadata only (source URL, original file, target, range, artifact ID, sourcemap mode), not full source
 text.
 
+Artifacts only keep their debug payload (`mappings`, `sources`, `sourceText`, `sourceUrl`,
+`displayName`) when source maps are on. A production build emits `js` alone, with project-relative
+`sourceId`s — `createCompiledScriptFunctionBody` reads nothing else when source maps are off.
+
+## Compiled Script Coverage
+
+Both targets compile the same language surface; the differences below are the whole list.
+
+| Construct | `binding-sync` | `event-async` |
+|---|---|---|
+| literals, identifiers, member and calculated member access | yes | yes |
+| unary / binary / prefix / postfix operators, assignments | yes | yes |
+| conditional (`a ? b : c`) and sequence (`a, b`) expressions | yes | yes |
+| array, object, and template literals, including spread operands | yes | yes |
+| function invocation, `new` expressions | yes | yes |
+| arrow functions | yes | yes — natively for callback arguments and declarations, otherwise as a lazy interpreted arrow |
+| statements (`if`, loops, `switch`, `try`, `throw`, destructuring declarations, nested functions) | n/a (expressions only) | yes |
+| `await` expressions | no — not part of XMLScript | no — not part of XMLScript |
+| regular-expression literals | yes | only outside a lazy arrow: they cannot be serialised into one |
+| `async` arrow functions | no | no |
+
+When a target refuses a node it throws `UnsupportedCompiledScriptNodeError`, naming the construct
+and its source position. The caller records that reason on the emitted block
+(`compiledUnsupportedReason`), emits it as a build warning, and the runtime falls back to
+interpretation for that block only.
+
 ## Reactive Cycle Detection
 
 Reactive bindings are also inspected as a graph. `collectComponentDefGraph()`

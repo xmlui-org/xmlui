@@ -83,11 +83,22 @@ import {
   registerAuditSink as registerAuditSinkImpl,
   registerAuditHeuristic as registerAuditHeuristicImpl,
 } from "../audit";
+import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { getScriptExecutionMode } from "../script-runner/eval-options";
+import {
+  collectParsedScriptInventory,
+  formatParsedScriptInventory,
+} from "../script-compiler/script-inventory";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
   rootContainer: ContainerWrapperDef;
+  /**
+   * The app's user-defined components. They hold most of an app's script blocks and
+   * are not reachable from the entry-point container, so the startup
+   * script-compilation report needs them handed over explicitly.
+   */
+  appComponents?: CompoundComponentDef[];
   routerBaseName: string;
   globalProps?: GlobalProps;
   xmluiConfig?: Record<string, any>;
@@ -123,6 +134,7 @@ function safeDecodeHash(hash: string): string {
  */
 export function AppContent({
   rootContainer,
+  appComponents,
   routerBaseName,
   globalProps,
   xmluiConfig: xmluiConfigRaw,
@@ -655,14 +667,36 @@ export function AppContent({
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const isNestedApp = globalProps?.isNested;
 
+  // --- The artifact report is a startup fact, not a per-render one: log it once.
+  const scriptInventoryReported = useRef(false);
   useEffect(() => {
-    if (typeof console !== "undefined" && console.log) {
-      console.log(
-        `[xmlui] App started in ${scriptExecutionMode.mode} script mode ` +
-          `(bindings: ${scriptExecutionMode.bindings}, event handlers: ${scriptExecutionMode.eventHandlers})`,
-      );
+    if (typeof console === "undefined" || !console.log) {
+      return;
     }
-  }, [scriptExecutionMode]);
+    console.log(
+      `[xmlui] App started in ${scriptExecutionMode.mode} script mode ` +
+        `(bindings: ${scriptExecutionMode.bindings}, event handlers: ${scriptExecutionMode.eventHandlers})`,
+    );
+    // --- The line above reports the requested mode. When compilation is on, follow it
+    // --- with what the app definition actually carries, so "compiled" can never again
+    // --- hide a build that produced no artifacts at all (issue #3879).
+    if (scriptExecutionMode.mode === "interpreted" || !rootContainer) {
+      return;
+    }
+    if (scriptInventoryReported.current) {
+      return;
+    }
+    scriptInventoryReported.current = true;
+    try {
+      const inventory = collectParsedScriptInventory([rootContainer, ...(appComponents ?? [])]);
+      // --- Informational, not a warning: an app with no build-time artifacts still
+      // --- compiles its scripts on first use. The build-side report is the one that
+      // --- warns, because that is where "requested but never ran" is a misconfiguration.
+      console.log(formatParsedScriptInventory(inventory));
+    } catch {
+      // --- Reporting must never break app startup.
+    }
+  }, [scriptExecutionMode, rootContainer, appComponents]);
 
   useEffect(() => {
     onInit?.();

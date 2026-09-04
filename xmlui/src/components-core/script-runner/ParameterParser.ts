@@ -8,6 +8,11 @@ import type {
 import { compileBindingSyncExpression } from "../script-compiler/targets/binding-sync";
 
 export type ParseBindingOptions = {
+  /**
+   * Umbrella switch: compiles binding expressions unless `compileBindings` says
+   * otherwise. Mirrors `xmluiConfig.compileScripts`.
+   */
+  compileScripts?: boolean;
   compileBindings?: boolean;
   sourceId?: string;
   sourceUrl?: string;
@@ -143,6 +148,15 @@ export function parseParameterString(
   return result;
 }
 
+/**
+ * `compileScripts` is the umbrella switch; `compileBindings` remains a per-path
+ * override. Both parse-time call sites read it through here so the umbrella flag
+ * cannot silently miss one of them.
+ */
+export function shouldCompileBindingOption(options: ParseBindingOptions): boolean {
+  return options.compileBindings ?? options.compileScripts ?? false;
+}
+
 function createCompiledBindingArtifact(
   expr: Expression,
   sourceText: string,
@@ -150,7 +164,7 @@ function createCompiledBindingArtifact(
   segmentIndex: number,
   expressionStart: number,
 ): CompiledScriptArtifact | undefined {
-  if (!options.compileBindings) {
+  if (!shouldCompileBindingOption(options)) {
     return undefined;
   }
   const sourceId = `${options.sourceId ?? "inline"}#expr-${segmentIndex}`;

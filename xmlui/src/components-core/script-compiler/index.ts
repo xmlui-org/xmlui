@@ -12,7 +12,12 @@ export {
   createCompiledScriptCache,
   createCompiledScriptCacheKey,
 } from "./cache";
-export { UnsupportedCompiledScriptNodeError, throwUnsupportedCompiledScriptNode } from "./errors";
+export {
+  UnsupportedCompiledScriptNodeError,
+  describeCompiledScriptFallback,
+  throwUnsupportedCompiledScriptNode,
+} from "./errors";
+export { describeScriptNodeType } from "./node-names";
 export { createCompiledScriptMapping, createDebugSourceUrl, sourceRangeFromNode } from "./source";
 export {
   createCompiledScriptGeneratedSourceUrl,

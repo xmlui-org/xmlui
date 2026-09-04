@@ -19,6 +19,7 @@ import { clearAllModuleCaches } from "./ModuleCache";
 import { ModuleLoader } from "./ModuleLoader";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
+import { describeCompiledScriptFallback } from "../../components-core/script-compiler/errors";
 import type {
   CompiledScriptSource,
   CompiledScriptSourceMapMode,
@@ -304,10 +305,12 @@ function attachCompiledFunctionArtifact(
     arrow.compiledUnsupported = false;
     arrow.sourceRange = arrow.compiled.sourceRange;
   } catch (error) {
+    const reason = describeCompiledScriptFallback(error);
     arrow.compiledUnsupported = true;
+    arrow.compiledUnsupportedReason = reason;
     (context.result.warnings ??= []).push(
-      `Could not compile code-behind function ${sourceId}; ` +
-        `falling back to interpreted execution. ${(error as Error).message}`,
+      `Could not compile code-behind function ${sourceId} (${reason}); ` +
+        `falling back to interpreted execution.`,
     );
   }
 }

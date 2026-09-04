@@ -47,6 +47,12 @@ export type ParsedEventValue = {
   source?: string;
   compiled?: CompiledScriptArtifact;
   compiledUnsupported?: boolean;
+  /**
+   * Why compilation was skipped, when `compiledUnsupported` is true: the construct
+   * that stopped it and where it is, e.g.
+   * `"unsupported await expression (node type 119) at line 3, column 14"`.
+   */
+  compiledUnsupportedReason?: string;
   directives?: EventHandlerDirectiveInfo;
 }
 

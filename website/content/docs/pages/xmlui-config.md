@@ -231,19 +231,55 @@ Script compilation happens in two places, and both read this switch:
   functions, and `Globals.xs` functions into the emitted modules. The build tooling reads the
   switch from your app description (`src/config.ts` in Vite mode, `config.json` in standalone
   mode) under `xmluiConfig` or `appGlobals`, and from `xmlui.config.json`. When the same key is
-  set in both, `xmlui.config.json` wins.
-- **At run time.** Whatever was not compiled during the build is compiled on first use by the
-  browser runtime, which reads the switch from the same merged `xmluiConfig` / `appGlobals` view.
+  set in both, `xmlui.config.json` wins. App descriptions that only Vite can evaluate — the
+  `getLocalIcons()` pattern uses `import.meta.glob`, for instance — are loaded through Vite's
+  module runner, so the switch is honoured there too.
+- **At run time.** Binding expressions, and anything the build did not pre-compile, are compiled
+  on first use by the browser runtime, which reads the switch from the same merged
+  `xmluiConfig` / `appGlobals` view. Reactive bindings have no build-time artifacts by design:
+  prop values are parsed lazily in the browser, so `compileScripts` covers them at run time.
 
-When build-time compilation is on, `xmlui start` and `xmlui build` report what it produced, for
-example `[xmlui] Script compilation: 128 compiled artifact(s) from 130 script block(s) in 24
-file(s)`. A warning is emitted instead when compilation was requested but no artifact came out of
-it, so a misconfigured project is visible from the console.
+### What compilation reports
 
-> [!NOTE] If your app description cannot be loaded by the build tooling (for example, it imports
-> stylesheets or other assets Node cannot evaluate), set the compilation switches in
-> `xmlui.config.json`. The CLI warns when it hits this case in a file that looks like it
-> configures script compilation.
+When build-time compilation is on, `xmlui start` and `xmlui build` report what it produced:
+
+```
+[xmlui] Script compilation: 128 compiled artifact(s) from 130 script block(s) in 24 file(s), 2 fell back to interpretation (unsupported construct)
+[xmlui] Could not compile event handler /src/components/List.xmlui#event-4 (unsupported literal (node type 109) at line 12, column 24); falling back to interpreted execution.
+```
+
+At startup the app repeats the effective state in the browser console, under the execution-mode
+banner:
+
+```
+[xmlui] App started in compiled script mode (bindings: compiled, event handlers: compiled)
+[xmlui] Script artifacts: 128 compiled at build time, 2 fell back to interpretation. Fallback reasons: unsupported literal (node type 109) at line 12, column 24.
+```
+
+A block that falls back also carries its reason (`compiledUnsupportedReason`) in the emitted
+module, so the state is checkable from the build output and not only from the console. When
+compilation is requested but nothing was pre-compiled, the build warns and the startup line says
+so — those scripts are compiled on first use instead — rather than claiming success.
+
+### What compiles
+
+Both compiler targets accept the same language surface: literals, identifiers, member access,
+operators and assignments, conditional (`a ? b : c`) and sequence expressions, array / object /
+template literals including spread, function invocation, `new`, and arrow functions. The
+event-handler target additionally compiles statements — `if`, loops, `switch`, `try`, `throw`,
+destructuring declarations, and nested function declarations. Arrow callbacks passed to array
+methods (`.some()`, `.filter()`, `.map()`, `.forEach()`) compile to native JavaScript functions.
+
+Two constructs never compile, because XMLScript does not support them at all: `await` expressions
+and `async` arrow functions. A regular-expression literal compiles unless it sits inside an arrow
+that has to be handed to the interpreter, since it cannot be serialised into one.
+
+Compiled and interpreted execution are expected to agree. If you find a case where they do not,
+that is a bug — please report it.
+
+> [!NOTE] If your app description cannot be loaded by the build tooling at all, set the
+> compilation switches in `xmlui.config.json`. The CLI warns when it hits this case in a file
+> that looks like it configures script compilation.
 
 ---
 

@@ -46,14 +46,23 @@ export async function executeCompiledEventAsyncArtifact(
   });
   await invocation.initialize(evalContext);
   emitCompiledScriptDebugSourceTrace(artifact, evalContext);
-  return await instantiateCompiledScriptArtifact<Promise<any>>(artifact, invocation, {
-    sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
-    generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
-    sourceMapUrl: getExternalSourceMapUrl(artifact),
-  }).execute({
-    evalContext,
-    thread,
-  });
+  // --- Bracket the run so callbacks this handler leaves behind (a `debounce` body, a
+  // --- subscription) can tell they are being invoked after it finished — the
+  // --- dispatcher aborts the run's `$cancel` token on completion. See
+  // --- `eventAsyncRuntime.checkCancel`.
+  eventAsyncRuntime.beginInvocation(evalContext);
+  try {
+    return await instantiateCompiledScriptArtifact<Promise<any>>(artifact, invocation, {
+      sourceMapMode: evalContext.options?.compiledScriptSourceMaps,
+      generatedSourceUrl: getExternalGeneratedSourceUrl(artifact),
+      sourceMapUrl: getExternalSourceMapUrl(artifact),
+    }).execute({
+      evalContext,
+      thread,
+    });
+  } finally {
+    eventAsyncRuntime.endInvocation(evalContext);
+  }
 }
 
 export async function executeCompiledEventAsyncHandler(
