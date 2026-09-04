@@ -196,3 +196,25 @@ jobs:
             --no-update-package-json \
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      # By the time this step runs, the job has already spent several minutes on
+      # build/test/publish steps above, which is comfortably past the runner-queue
+      # window where a fast manual "merge + delete branch" can race the head_ref's
+      # own `pull_request` checks (guard-branches / release-guard / all-tests-fast)
+      # and make them fail with a spurious "workflow file issue" because their ref
+      # disappeared before a runner claimed the job. Deleting the release branch
+      # here — late, and automatically — keeps the branch alive long enough for
+      # those checks to have been dispatched, instead of relying on a human to not
+      # click "Delete branch" too quickly after merging.
+      - name: Delete merged release branch
+        if: >
+          always() &&
+          github.event_name == 'pull_request' &&
+          startsWith(github.event.pull_request.head.ref, 'changeset-release/')
+        run: |
+          branch="${{ github.event.pull_request.head.ref }}"
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${branch}" \
+            && echo "Deleted branch ${branch}" \
+            || echo "Branch ${branch} already gone or could not be deleted (not fatal)"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
