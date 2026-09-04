@@ -10,7 +10,10 @@ import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
  * navigateRouter from AppContent's React context, which resolves relative paths
  * against the router root rather than the currently active page.
  */
-function resolveRelativePathname(pathname: string | number, currentPathname: string): string | number {
+export function resolveRelativePathname(
+  pathname: string | number,
+  currentPathname: string,
+): string | number {
   if (typeof pathname !== "string") return pathname;
   if (pathname.startsWith("/")) return pathname; // already absolute
   if (pathname === ".") return currentPathname; // stay on current page

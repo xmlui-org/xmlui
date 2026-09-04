@@ -4,7 +4,13 @@ import React from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
+import {
+  alignmentOptionMd,
+  buttonThemeMd,
+  buttonVariantMd,
+  iconPositionMd,
+  LinkTargetMd,
+} from "../abstractions";
 import { createMetadata, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
 import {
@@ -180,8 +186,19 @@ export const MenuItemMd = createMetadata({
     label: dLabel(),
     to: {
       description:
-        `This property defines the URL of the menu item. If this property is defined (and the \`click\` ` +
-        `event does not have an event handler), clicking the menu item navigates to this link.`,
+        `This property defines the URL of the menu item. When it is set, the menu item renders ` +
+        `as a real link (an \`<a>\` element with an \`href\`), so it can be opened in a new tab, ` +
+        `copied, and read as a link by assistive technology. If this property is defined (and the ` +
+        `\`click\` event does not have an event handler), clicking the menu item navigates to this link.`,
+      valueType: "string",
+    },
+    target: {
+      description:
+        `This property specifies where to open the link represented by the \`${MICOMP}\`. It only ` +
+        `has an effect when \`to\` is defined. This property accepts the following values (in ` +
+        `accordance with the HTML standard):`,
+      availableValues: LinkTargetMd,
+      isStrictEnum: true,
       valueType: "string",
     },
     active: {
@@ -217,7 +234,9 @@ export const MenuItemMd = createMetadata({
 
 type ThemedMenuItemProps = React.ComponentProps<typeof MenuItem> & { className?: string };
 
-export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemProps>(
+// The ref lands on an <a> for a menu item with `to` and on a <div> otherwise, so it is typed
+// as the common supertype rather than claiming to always be a div.
+export const ThemedMenuItem = React.forwardRef<HTMLElement, ThemedMenuItemProps>(
   function ThemedMenuItem({ className, ...props }: ThemedMenuItemProps, ref) {
     const themeClass = useComponentThemeClass(MenuItemMd);
     return (
@@ -230,26 +249,60 @@ export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemPro
   },
 );
 
+// Component types that render their own interactive element. Nesting one inside a MenuItem
+// that is itself a link produces invalid, unusable markup (an anchor inside an anchor), so
+// we warn instead of letting it fail silently at runtime.
+const INTERACTIVE_CHILD_TYPES = new Set(["Link", "NavLink", "Button", "MenuItem"]);
+
+function findInteractiveChildType(children: any): string | undefined {
+  if (!children) return undefined;
+  const nodes = Array.isArray(children) ? children : [children];
+  for (const child of nodes) {
+    if (!child || typeof child !== "object") continue;
+    if (typeof child.type === "string" && INTERACTIVE_CHILD_TYPES.has(child.type)) {
+      return child.type;
+    }
+    const nested = findInteractiveChildType(child.children);
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
 export const menuItemRenderer = wrapComponent(MICOMP, ThemedMenuItem, MenuItemMd, {
   exclude: ["icon"],
   customRender: (props, context) => {
     const { node, extractValue, renderChild, lookupEventHandler } = context;
-    // Use the auto-traced onClick if a click handler is defined,
-    // otherwise fall back to navigation if `to` is set.
-    let clickHandler = props.onClick;
+    // Whether the item is a link is decided by the MARKUP declaring `to`, not by what `to`
+    // currently evaluates to. A binding that resolves late (`to="{item.url}"`) must not flip
+    // the rendered element type from <div> to <a> mid-life and remount the item, which would
+    // throw focus out of an open menu.
+    const isLink = node.props?.to !== undefined;
+    const to = extractValue.asOptionalString(node.props.to);
+
+    // `click` outranks `to`; the component needs to know which of the two is in play. The
+    // navigation itself is not wired up here: the component calls `appContext.navigate` so
+    // that the `willNavigate` guard, `didNavigate` and the `kind:"navigate"` trace entry all
+    // still see a menu-driven navigation, exactly as they did before `to` became a real link.
     const clickEventHandler = lookupEventHandler("click");
-    const to = extractValue(node.props.to);
-    if (!clickEventHandler && to?.trim()) {
-      const navigateAction = context.lookupAction?.("navigate", { signError: false });
-      clickHandler = () => {
-        navigateAction?.({ pathname: to });
-      };
+
+    if (process.env.NODE_ENV !== "production" && isLink) {
+      const interactiveChild = findInteractiveChildType(node.children);
+      if (interactiveChild) {
+        console.warn(
+          `[${MICOMP}] A '${interactiveChild}' is nested inside a ${MICOMP} that declares 'to'. ` +
+            `Because 'to' makes the ${MICOMP} itself a link, this produces invalid nested ` +
+            `interactive markup. Either drop 'to' from the ${MICOMP} or remove the nested ` +
+            `'${interactiveChild}'.`,
+        );
+      }
     }
 
     return (
       <ThemedMenuItem
         {...props}
-        onClick={clickHandler}
+        to={to}
+        isLink={isLink}
+        hasClickHandler={!!clickEventHandler}
         icon={
           node.props?.icon && (
             <ThemedIcon
