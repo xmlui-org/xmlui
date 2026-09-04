@@ -1655,7 +1655,19 @@ export const Table = memo(
                     );
                     width = parseFloat(remEmMatch[1]) * (isNaN(rootFontSize) ? 16 : rootFontSize);
                   } else {
-                    throw new Error(`Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`);
+                    // --- Do not throw here: this computation runs inside a `useMemo` in the
+                    // --- inner Table render, past the point where XMLUI's per-component error
+                    // --- containment (ComponentAdapter's try/catch) can catch it. A throw here
+                    // --- propagates as a genuinely uncaught render error, which can take down
+                    // --- far more than this one Table (see xmlui-org/xmlui#3867). Instead, we
+                    // --- report the problem loudly to the console and fall back to the default
+                    // --- width so rendering can continue.
+                    console.error(
+                      `[Table] Invalid TableColumnDef '${propName}' value: ${JSON.stringify(resolvedWidth)} ` +
+                        `(column "${col.id ?? col.accessorKey ?? `col_${idx}`}"). Expected a number, a pixel ` +
+                        `value (e.g. "100px"), a rem/em value (e.g. "2rem"), or (when allowed) a star-sized ` +
+                        `value (e.g. "*", "2*"). Falling back to the default width.`,
+                    );
                   }
                 }
               }
