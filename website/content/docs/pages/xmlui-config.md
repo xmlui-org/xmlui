@@ -6,6 +6,12 @@ Application-specific values belong under [`appGlobals`](/docs/app-globals). `app
 
 When the engine looks up a runtime setting, it reads a merged view where `xmluiConfig` overrides the same key in `appGlobals`, and any key not set in `xmluiConfig` falls back to `appGlobals`. This keeps existing apps working while giving new apps a dedicated place for runtime settings.
 
+> [!NOTE] **Removed keys**: `compileBindings`, `compileEventHandlers`,
+> `compiledScriptSourceMaps`, and `logCompiledEventHandlerSource` no longer do anything. Use
+> `compileScripts` for all script compilation and `reportCompileFallbacks` for its diagnostics;
+> source maps follow `xmlui start`. A project that still carries one of the removed keys is told
+> so, once, by the CLI and at app startup.
+
 > [!WARNING] **Deprecation notice**: placing framework / runtime settings under `appGlobals` is still supported today via the fallback mechanism, but this behaviour will be **deprecated in an upcoming minor release**. Move framework settings such as `apiUrl`, `headers`, `notifications`, `prefetchedContent`, `showHeadingAnchors`, `useHashBasedRouting`, `disableInlineStyle`, `xsVerbose`, and the `strict*` family to `xmluiConfig`. Application-specific values remain under [`appGlobals`](/docs/app-globals).
 
 ```ts
@@ -60,11 +66,9 @@ const App: StandaloneAppDescription = {
 | `blog` | Data consumed by the `Blog` component. |
 | `codeHighlighter` | Syntax highlighter used by markdown and code fences. |
 | `columnCanSortDefault` | Overrides the default sortable behavior for table columns. |
-| `compileBindings` | Legacy compatibility alias for binding compilation. |
-| `compiledScriptSourceMaps` | Emits debug source-map metadata for compiled XMLUI scripts. |
-| `compileEventHandlers` | Legacy compatibility alias for event-handler compilation. |
-| `compileScripts` | Enables compiled XMLUI bindings and event handlers. |
+| `compileScripts` | Compiles XMLUI scripts to JavaScript — bindings, handlers, and code-behind alike. |
 | `csrfHeaderName` | Overrides the form CSRF header name. |
+| `reportCompileFallbacks` | Reports each script block that could not be compiled, with a code. |
 | `defaultToOptionalMemberAccess` | Controls optional member access semantics in XMLScript. |
 | `defaultHandlerTimeoutMs` | Sets the ambient async handler timeout. |
 | `defaultLocale` | Sets the fallback locale for i18n. |
@@ -215,7 +219,10 @@ xmluiConfig: {
 compileScripts?: boolean; // default: false
 ```
 
-When `true`, XMLUI compiles supported binding expressions and event handlers to JavaScript before evaluation. This is the preferred app-level switch for script compilation.
+One switch for script compilation. When `true`, XMLUI compiles every script it can to
+JavaScript: binding expressions, event handlers, inline `<script>` functions, `.xmlui.xs`
+code-behind, `Globals.xs`, imported `.xs` helpers, and inline component `codeBehind`. There is
+no per-path variant to set — this key decides for all of them.
 
 ```ts
 xmluiConfig: {
@@ -223,43 +230,39 @@ xmluiConfig: {
 }
 ```
 
-Use `compileBindings` or `compileEventHandlers` only when you need to control one script path independently. When either compatibility alias is set, it overrides `compileScripts` for that path.
+**Where it is read from.** The app description (`src/config.ts` in Vite mode, `config.json` in
+standalone mode) under `xmluiConfig` or `appGlobals`, and `xmlui.config.json` — at its top level
+or nested under either record. When the same key appears in more than one place,
+`xmlui.config.json` wins over `xmluiConfig`, which wins over `appGlobals`. App descriptions that
+only Vite can evaluate — the `getLocalIcons()` pattern uses `import.meta.glob`, for instance —
+are loaded through Vite's module runner, so the switch is honoured there too.
 
-Script compilation happens in two places, and both read this switch:
+**Where compilation happens.** `xmlui start` and `xmlui build` compile handlers, code-behind,
+and script declarations into the emitted modules. Binding expressions compile on first use in
+the browser: prop values are stored as strings and parsed there, so there is no build-time
+artifact to carry. Either way the same switch decides.
 
-- **At build time.** `xmlui start` and `xmlui build` compile event handlers, code-behind
-  functions, and `Globals.xs` functions into the emitted modules. The build tooling reads the
-  switch from your app description (`src/config.ts` in Vite mode, `config.json` in standalone
-  mode) under `xmluiConfig` or `appGlobals`, and from `xmlui.config.json`. When the same key is
-  set in both, `xmlui.config.json` wins. App descriptions that only Vite can evaluate — the
-  `getLocalIcons()` pattern uses `import.meta.glob`, for instance — are loaded through Vite's
-  module runner, so the switch is honoured there too.
-- **At run time.** Binding expressions, and anything the build did not pre-compile, are compiled
-  on first use by the browser runtime, which reads the switch from the same merged
-  `xmluiConfig` / `appGlobals` view. Reactive bindings have no build-time artifacts by design:
-  prop values are parsed lazily in the browser, so `compileScripts` covers them at run time.
+Source maps for compiled scripts are not configurable: `xmlui start` turns them on, builds leave
+them out — the payload is large and a production bundle has no use for it.
 
 ### What compilation reports
 
-When build-time compilation is on, `xmlui start` and `xmlui build` report what it produced:
+`xmlui start` and `xmlui build` always report what compilation produced:
 
 ```
 [xmlui] Script compilation: 128 compiled artifact(s) from 130 script block(s) in 24 file(s), 2 fell back to interpretation (unsupported construct)
-[xmlui] Could not compile event handler /src/components/List.xmlui#event-4 (unsupported literal (node type 109) at line 12, column 24); falling back to interpreted execution.
 ```
 
-At startup the app repeats the effective state in the browser console, under the execution-mode
-banner:
+At startup the app repeats the effective state in the browser console:
 
 ```
-[xmlui] App started in compiled script mode (bindings: compiled, event handlers: compiled)
-[xmlui] Script artifacts: 128 compiled at build time, 2 fell back to interpretation. Fallback reasons: unsupported literal (node type 109) at line 12, column 24.
+[xmlui] App started in compiled script mode
+[xmlui] Script artifacts: 128 compiled at build time, 2 fell back to interpretation. Fallback reasons: compile-unserializable-literal: literal cannot be carried into interpreted execution at line 12, column 24.
 ```
 
-A block that falls back also carries its reason (`compiledUnsupportedReason`) in the emitted
-module, so the state is checkable from the build output and not only from the console. When
-compilation is requested but nothing was pre-compiled, the build warns and the startup line says
-so — those scripts are compiled on first use instead — rather than claiming success.
+Every block that fell back also carries its reason as `compiledUnsupportedReason` in the emitted
+module, so the state is checkable from a built bundle and not only from a console. For per-block
+detail, turn on [`reportCompileFallbacks`](#reportcompilefallbacks).
 
 ### What compiles
 
@@ -277,62 +280,41 @@ that has to be handed to the interpreter, since it cannot be serialised into one
 Compiled and interpreted execution are expected to agree. If you find a case where they do not,
 that is a bug — please report it.
 
-> [!NOTE] If your app description cannot be loaded by the build tooling at all, set the
-> compilation switches in `xmlui.config.json`. The CLI warns when it hits this case in a file
-> that looks like it configures script compilation.
-
 ---
 
-### `compileBindings`
+### `reportCompileFallbacks`
 
 ```ts
-compileBindings?: boolean; // default: compileScripts ?? false
+reportCompileFallbacks?: boolean; // default: false
 ```
 
-A compatibility alias for binding expression compilation. If this key is present, it controls binding compilation even when `compileScripts` is also set. For example, this leaves event handlers compiled while keeping bindings interpreted:
+Reports every script block that could not be compiled — at build time in the CLI output, and at
+run time in the browser console:
+
+```
+[xmlui] compile-unsupported-node: /src/Globals.xs#function-roleHint
+        await expression at line 4, column 12 — falling back to interpretation
+```
 
 ```ts
 xmluiConfig: {
   compileScripts: true,
-  compileBindings: false,
+  reportCompileFallbacks: true,
 }
 ```
 
----
+Each report carries one of these codes:
 
-### `compileEventHandlers`
+| Code | Meaning |
+| --- | --- |
+| `compile-unsupported-node` | the compiler met a construct it cannot emit (`await`, an `async` arrow) |
+| `compile-unserializable-literal` | a literal, typically a regular expression, that cannot be carried into interpreted execution |
+| `compile-runtime-fallback` | a compiled block reported an unsupported construct while running and the interpreter took over |
+| `compile-source-unavailable` | compilation failed for some other reason |
 
-```ts
-compileEventHandlers?: boolean; // default: compileScripts ?? false
-```
-
-A compatibility alias for event-handler compilation. If this key is present, it controls event-handler compilation even when `compileScripts` is also set.
-
-```ts
-xmluiConfig: {
-  compileScripts: true,
-  compileEventHandlers: false,
-}
-```
-
----
-
-### `compiledScriptSourceMaps`
-
-```ts
-compiledScriptSourceMaps?: boolean | "inline" | "external"; // default: false; "external" in dev when script compilation is enabled
-```
-
-Controls whether compiled XMLUI scripts carry source-map/debug-source metadata. Use `"external"` for development tooling, `"inline"` for runtime fallback paths, `true` as an alias for enabled source maps, or `false` to disable source-map metadata.
-
-In development, XMLUI defaults this to `"external"` when binding or event-handler compilation is active. Set it to `false` to turn that default off.
-
-```ts
-xmluiConfig: {
-  compileScripts: true,
-  compiledScriptSourceMaps: false,
-}
-```
+With the flag off, the counts above are still reported and the reason still travels with the
+block — only the per-block console detail is withheld. Fallbacks are also recorded as
+`kind:"compile"` Inspector entries whenever `xsVerbose` is on.
 
 ---
 

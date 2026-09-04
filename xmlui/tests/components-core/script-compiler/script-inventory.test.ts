@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   collectParsedScriptInventory,
+  collectRemovedCompilationKeyNotices,
   formatParsedScriptInventory,
 } from "../../../src/components-core/script-compiler/script-inventory";
 
@@ -75,5 +76,29 @@ describe("parsed script inventory", () => {
 
     expect(summary).toContain("none of the 4 script block(s) carry a build-time artifact");
     expect(summary).toContain("xmlui.config.json");
+  });
+});
+
+describe("removed compilation keys", () => {
+  it("names the replacement for each removed key", () => {
+    const notices = collectRemovedCompilationKeyNotices({
+      compileBindings: true,
+      compiledScriptSourceMaps: "external",
+    });
+
+    expect(notices).toHaveLength(2);
+    expect(notices[0]).toContain('"compileBindings" is no longer supported');
+    expect(notices[0]).toContain("compileScripts");
+    expect(notices[1]).toContain("source maps are automatic");
+  });
+
+  it("stays quiet for a configuration that uses the current keys", () => {
+    expect(
+      collectRemovedCompilationKeyNotices({
+        compileScripts: true,
+        reportCompileFallbacks: true,
+      }),
+    ).toEqual([]);
+    expect(collectRemovedCompilationKeyNotices(undefined)).toEqual([]);
   });
 });
