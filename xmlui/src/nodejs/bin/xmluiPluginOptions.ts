@@ -128,10 +128,12 @@ async function readXmluiConfigFile(cwd: string): Promise<XmluiConfigSource | und
  * settings declared there — script compilation among them — reach the build
  * pipeline as well, not just the browser runtime.
  *
- * The app description may import assets the Node process cannot load (SCSS,
- * `import.meta.glob`, and friends). Such a failure is not fatal: the build goes
- * on with `xmlui.config.json` alone, and we only complain when the unreadable
- * file looks like it was trying to configure script compilation.
+ * The description may use syntax or assets a plain Node import cannot evaluate —
+ * `import.meta.glob`, stylesheets, `.xmlui` imports. Those are retried through Vite's
+ * module runner, but only for settings `xmlui.config.json` has not already answered,
+ * since that retry evaluates the whole module graph the description pulls in. If even
+ * that fails the build goes on with `xmlui.config.json` alone, and we complain only
+ * when the unreadable file looks like it was configuring script compilation.
  */
 async function readAppDescriptionConfig(
   cwd: string,
