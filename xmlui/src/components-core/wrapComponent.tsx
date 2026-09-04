@@ -55,6 +55,49 @@ export function deepConvertSyncCallbacks(value: unknown, lookupSyncCallback: (v:
 }
 
 /**
+ * Extracts one forwarded prop's value according to its declared XMLUI type. A user-authored
+ * binding expression can throw when it is evaluated — e.g. it dereferences a property of a
+ * value that has not loaded yet (see xmlui-org/xmlui#3867). This runs as part of the generic
+ * "forward all remaining node.props" loop shared by every wrapped component, well before that
+ * component's own render logic (including a `customRender` implementation) gets a chance to run
+ * — so an unguarded throw here aborts the ENTIRE component's render, not just the one prop. For
+ * a component that only registers itself with a parent from a mount effect (e.g. Table's
+ * Column), a render that never completes never registers, so the whole component silently
+ * disappears with no indication near the failure of what went wrong.
+ *
+ * We contain the damage to just the offending prop: log a clear, diagnosable error identifying
+ * the component and the prop, and fall back to `undefined` so the rest of the component keeps
+ * rendering with everything else intact.
+ */
+function extractForwardedPropValue(
+  key: string,
+  rawValue: any,
+  kind: "boolean" | "number" | "string" | "generic",
+  extractValue: (value?: any, strict?: boolean) => any,
+  componentType: string,
+  nodeUid?: string,
+): any {
+  try {
+    switch (kind) {
+      case "boolean":
+        return (extractValue as any).asOptionalBoolean(rawValue);
+      case "number":
+        return (extractValue as any).asOptionalNumber(rawValue);
+      case "string":
+        return (extractValue as any).asOptionalString(rawValue);
+      default:
+        return extractValue(rawValue);
+    }
+  } catch (e) {
+    console.error(
+      `[${componentType}${nodeUid ? ` "${nodeUid}"` : ""}] Failed to evaluate prop '${key}': ` +
+        `${(e as Error)?.message ?? e}. Using 'undefined' for '${key}' instead.`,
+    );
+    return undefined;
+  }
+}
+
+/**
  * Generic hover capture for canvas-rendered components.
  * Wraps children in a display:contents div that captures mousemove
  * on canvas elements and emits throttled native:hover trace events.
@@ -943,18 +986,49 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         // forwarding, but a component that declares `required: dRequired()` in
         // its metadata gets it forwarded as a proper boolean here).
         if (booleanSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalBoolean(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "boolean",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (numberSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalNumber(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "number",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (stringSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalString(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "string",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (specialProps.has(key)) {
           // Not an explicitly-typed component prop and in the blocked set → skip.
           continue;
         } else if (config.deepSyncCallbacks?.includes(key)) {
-          props[reactKey] = deepConvertSyncCallbacks(extractValue(rawValue), lookupSyncCallback);
+          props[reactKey] = deepConvertSyncCallbacks(
+            extractForwardedPropValue(key, rawValue, "generic", extractValue, type, node.uid),
+            lookupSyncCallback,
+          );
         } else {
-          props[reactKey] = extractValue(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "generic",
+            extractValue,
+            type,
+            node.uid,
+          );
         }
       }
     }
@@ -1611,17 +1685,48 @@ export function wrapCompound<TMd extends ComponentMetadata>(
 
         // Explicitly-typed props always forward even if also in specialProps.
         if (booleanSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalBoolean(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "boolean",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (numberSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalNumber(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "number",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (stringSet.has(key)) {
-          props[reactKey] = extractValue.asOptionalString(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "string",
+            extractValue,
+            type,
+            node.uid,
+          );
         } else if (specialProps.has(key)) {
           continue;
         } else if (config.deepSyncCallbacks?.includes(key)) {
-          props[reactKey] = deepConvertSyncCallbacks(extractValue(rawValue), lookupSyncCallback);
+          props[reactKey] = deepConvertSyncCallbacks(
+            extractForwardedPropValue(key, rawValue, "generic", extractValue, type, node.uid),
+            lookupSyncCallback,
+          );
         } else {
-          props[reactKey] = extractValue(rawValue);
+          props[reactKey] = extractForwardedPropValue(
+            key,
+            rawValue,
+            "generic",
+            extractValue,
+            type,
+            node.uid,
+          );
         }
       }
     }

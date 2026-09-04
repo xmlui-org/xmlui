@@ -7881,3 +7881,74 @@ test.describe("defaultSortDirection", () => {
     await expect(firstQuantityCell(page)).toHaveText("5");
   });
 });
+
+// =============================================================================
+// ERROR CONTAINMENT (xmlui-org/xmlui#3867)
+//
+// A binding expression in a Column's `header` (or `width`/`minWidth`/`maxWidth`) can throw —
+// e.g. it dereferences an async value that hasn't loaded yet. These tests pin down that such
+// a throw is contained and diagnosable rather than silently dropping the column, or taking
+// down the whole Table.
+// =============================================================================
+
+test.describe("column binding error containment", () => {
+  test("a throwing bound header does not remove the column from the table", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).__xmluiTestThrowingHeader = (items: any) => {
+        // Simulates dereferencing a property on a DataSource value before it has loaded.
+        return items.length > 0 ? "dynamic header" : "empty header";
+      };
+    });
+
+    await initTestBed(`
+      <Table testId="table" data='{${JSON.stringify(sampleData)}}'>
+        <Column bindTo="name" header="Name" width="1*" />
+        <Column bindTo="quantity" header="{window.__xmluiTestThrowingHeader(undefinedVar)}" width="1*" />
+      </Table>
+    `);
+
+    // Both columns are still present: the failing header falls back to the bindTo name
+    // instead of the whole column disappearing.
+    await expect(page.locator("th")).toHaveCount(2);
+    await expect(page.getByRole("columnheader", { name: "Name" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "quantity" })).toBeVisible();
+    // Cell data for the affected column keeps working.
+    await expect(page.locator("td").nth(1)).toHaveText("5");
+  });
+
+  test("a valid reactive bound header still renders (capability is supported)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      (window as any).__xmluiTestDynamicHeader = (items: any) => {
+        return items && items.length > 0 ? "Has rows" : "Empty";
+      };
+    });
+
+    await initTestBed(`
+      <Table testId="table" data='{${JSON.stringify(sampleData)}}'>
+        <Column bindTo="name" header='{window.__xmluiTestDynamicHeader(${JSON.stringify(sampleData)})}' width="1*" />
+      </Table>
+    `);
+
+    await expect(page.getByRole("columnheader", { name: "Has rows" })).toBeVisible();
+  });
+
+  test("an invalid width value does not crash the table", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table testId="table" data='{${JSON.stringify(sampleData)}}'>
+        <Column bindTo="name" width="1*" />
+        <Column bindTo="quantity" width="not-a-valid-width" />
+      </Table>
+    `);
+
+    // The table renders (falling back to a default width) instead of the page dying.
+    await expect(page.getByTestId("table")).toBeVisible();
+    await expect(page.locator("th")).toHaveCount(2);
+    await expect(page.locator("td").nth(1)).toHaveText("5");
+  });
+});

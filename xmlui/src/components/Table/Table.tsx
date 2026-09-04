@@ -39,6 +39,7 @@ import { PositionValues } from "../Pagination/Pagination";
 import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import type { CollectionDataRefreshMode } from "../../components-core/abstractions/dataRefreshAbstractions";
 import { MemoizedItem } from "../container-helpers";
+import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 
 const COMP = "Table";
 
@@ -1076,6 +1077,17 @@ const TableWithColumns = memo(
 
       const hasExplicitColumns = useMemo(() => hasColumnChild(node.children), [node.children]);
 
+      // --- A reset key for the ErrorBoundary guarding the inner <Table>. Column metadata
+      // --- (e.g. a bound `header` or `width`) and `data` can carry expressions that throw
+      // --- deep inside the inner Table's own rendering, past the point where XMLUI's normal
+      // --- per-component error containment applies (see xmlui-org/xmlui#3867). Rather than
+      // --- let such an error propagate and take down an arbitrarily large part of the app, we
+      // --- contain it locally and retry whenever the inputs that could have caused it change.
+      const tableErrorBoundaryResetKey = useMemo(
+        () => ({ columns, data }) as unknown as ComponentDef,
+        [columns, data],
+      );
+
       const selectionContext = useSelectionContext();
 
       // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
@@ -1224,123 +1236,125 @@ const TableWithColumns = memo(
           <TableContext.Provider value={columnRefresherContextValue}>
             {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
-          <Table
-            classes={classes}
-            ref={ref}
-            data={data}
-            columns={columns}
-            columnInference={extractValue.asOptionalString(node.props.columnInference)}
-            columnSizing={extractValue.asOptionalString(node.props.columnSizing)}
-            canResizeColumns={extractValue.asOptionalBoolean(node.props.canResizeColumns)}
-            renderCache={extractValue.asOptionalBoolean(node.props.renderCache)}
-            renderCacheSize={extractValue.asOptionalNumber(node.props.renderCacheSize)}
-            virtualBufferSize={extractValue.asOptionalNumber(node.props.virtualBufferSize)}
-            idKey={idKey}
-            dataRefreshMode={
-              extractValue.asOptionalString(
-                node.props.dataRefreshMode,
-                defaultProps.dataRefreshMode,
-              ) as CollectionDataRefreshMode
-            }
-            hasExplicitColumns={hasExplicitColumns}
-            pageSizeOptions={extractValue(node.props.pageSizeOptions)}
-            pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
-            rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
-            registerComponentApi={registerComponentApi}
-            noDataRenderer={noDataRenderer}
-            rowDetailRenderer={node.props.rowDetailTemplate ? stableRowDetailRenderer : undefined}
-            expandedRowIds={extractValue(node.props.expandedRowIds)}
-            initiallyExpandedRowIds={extractValue(node.props.initiallyExpandedRowIds)}
-            hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
-            loading={extractValue.asOptionalBoolean(node.props.loading)}
-            loadingDelay={extractValue.asOptionalNumber(node.props.loadingDelay)}
-            isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
-            headerHeight={extractValue.asSize(node.props.headerHeight)}
-            rowDisabledPredicate={stableRowDisabledPredicate}
-            rowUnselectablePredicate={stableRowUnselectablePredicate}
-            sortBy={extractValue(node.props?.sortBy)}
-            sortingDirection={extractValue(node.props?.sortDirection)}
-            defaultSortDirection={extractValue.asOptionalString(
-              node.props?.defaultSortDirection,
-              defaultProps.defaultSortDirection,
-            )}
-            iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
-            iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
-            iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-            lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
-            sortingDidChange={stableSortingDidChange}
-            onSelectionDidChange={stableSelectionDidChange}
-            rowExpansionDidChange={
-              node.events?.rowExpansionDidChange ? stableRowExpansionDidChange : undefined
-            }
-            willSort={stableWillSort}
-            rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
-            rowClick={node.events?.rowClick ? stableRowClick : undefined}
-            rowEnter={node.events?.rowEnter ? stableRowEnter : undefined}
-            rowLeave={node.events?.rowLeave ? stableRowLeave : undefined}
-            onScroll={node.events?.scroll ? stableScroll : undefined}
-            onVisibleRangeDidChange={
-              node.events?.visibleRangeDidChange ? stableVisibleRangeDidChange : undefined
-            }
-            onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
-            onCutAction={node.events?.cutAction ? stableCutAction : undefined}
-            onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}
-            onPasteAction={node.events?.pasteAction ? stablePasteAction : undefined}
-            onDeleteAction={node.events?.deleteAction ? stableDeleteAction : undefined}
-            uid={node.uid}
-            autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-            hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
-            enableMultiRowSelection={extractValue.asOptionalBoolean(
-              node.props.enableMultiRowSelection,
-            )}
-            toggleSelectionOnClick={extractValue.asOptionalBoolean(
-              node.props.toggleSelectionOnClick,
-            )}
-            alwaysShowSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
-              node.props.alwaysShowSelectionCheckboxesHeader,
-            )}
-            alwaysShowSortingIndicator={extractValue.asOptionalBoolean(
-              node.props.alwaysShowSortingIndicator,
-            )}
-            noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
-            paginationControlsLocation={extractValue.asOptionalString(
-              node.props.paginationControlsLocation,
-            )}
-            alwaysShowPagination={extractValue.asOptionalBoolean(node.props.alwaysShowPagination)}
-            cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
-            buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
-            pageSizeSelectorPosition={extractValue.asOptionalString(
-              node.props.pageSizeSelectorPosition,
-            )}
-            pageInfoPosition={extractValue.asOptionalString(node.props.pageInfoPosition)}
-            showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
-            showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
-            showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
-            checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
-            initiallySelected={extractValue(node.props.initiallySelected)}
-            syncWithAppState={syncAdapter ?? extractValue(node.props.syncWithAppState)}
-            headerUserSelect={extractValue.asOptionalString(node.props.headerUserSelect)}
-            cellUserSelect={extractValue.asOptionalString(node.props.cellUserSelect)}
-            userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
-            userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
-            userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
-            hideSelectionCheckboxes={extractValue.asOptionalBoolean(
-              node.props.hideSelectionCheckboxes,
-            )}
-            renderVersion={renderVersionRef.current}
-            hideSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
-              node.props.hideSelectionCheckboxesHeader,
-            )}
-            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(
-              node.props.alwaysShowSelectionCheckboxes,
-            )}
-            keyBindings={extractValue(node.props.keyBindings)}
-            alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
-            striped={extractValue.asOptionalBoolean(node.props.striped)}
-            highlightHoveredColumn={extractValue.asOptionalBoolean(
-              node.props.highlightHoveredColumn,
-            )}
-          />
+          <ErrorBoundary node={tableErrorBoundaryResetKey} location="Table">
+            <Table
+              classes={classes}
+              ref={ref}
+              data={data}
+              columns={columns}
+              columnInference={extractValue.asOptionalString(node.props.columnInference)}
+              columnSizing={extractValue.asOptionalString(node.props.columnSizing)}
+              canResizeColumns={extractValue.asOptionalBoolean(node.props.canResizeColumns)}
+              renderCache={extractValue.asOptionalBoolean(node.props.renderCache)}
+              renderCacheSize={extractValue.asOptionalNumber(node.props.renderCacheSize)}
+              virtualBufferSize={extractValue.asOptionalNumber(node.props.virtualBufferSize)}
+              idKey={idKey}
+              dataRefreshMode={
+                extractValue.asOptionalString(
+                  node.props.dataRefreshMode,
+                  defaultProps.dataRefreshMode,
+                ) as CollectionDataRefreshMode
+              }
+              hasExplicitColumns={hasExplicitColumns}
+              pageSizeOptions={extractValue(node.props.pageSizeOptions)}
+              pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
+              rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+              registerComponentApi={registerComponentApi}
+              noDataRenderer={noDataRenderer}
+              rowDetailRenderer={node.props.rowDetailTemplate ? stableRowDetailRenderer : undefined}
+              expandedRowIds={extractValue(node.props.expandedRowIds)}
+              initiallyExpandedRowIds={extractValue(node.props.initiallyExpandedRowIds)}
+              hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
+              loading={extractValue.asOptionalBoolean(node.props.loading)}
+              loadingDelay={extractValue.asOptionalNumber(node.props.loadingDelay)}
+              isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
+              headerHeight={extractValue.asSize(node.props.headerHeight)}
+              rowDisabledPredicate={stableRowDisabledPredicate}
+              rowUnselectablePredicate={stableRowUnselectablePredicate}
+              sortBy={extractValue(node.props?.sortBy)}
+              sortingDirection={extractValue(node.props?.sortDirection)}
+              defaultSortDirection={extractValue.asOptionalString(
+                node.props?.defaultSortDirection,
+                defaultProps.defaultSortDirection,
+              )}
+              iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+              iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+              iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+              lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
+              sortingDidChange={stableSortingDidChange}
+              onSelectionDidChange={stableSelectionDidChange}
+              rowExpansionDidChange={
+                node.events?.rowExpansionDidChange ? stableRowExpansionDidChange : undefined
+              }
+              willSort={stableWillSort}
+              rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+              rowClick={node.events?.rowClick ? stableRowClick : undefined}
+              rowEnter={node.events?.rowEnter ? stableRowEnter : undefined}
+              rowLeave={node.events?.rowLeave ? stableRowLeave : undefined}
+              onScroll={node.events?.scroll ? stableScroll : undefined}
+              onVisibleRangeDidChange={
+                node.events?.visibleRangeDidChange ? stableVisibleRangeDidChange : undefined
+              }
+              onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
+              onCutAction={node.events?.cutAction ? stableCutAction : undefined}
+              onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}
+              onPasteAction={node.events?.pasteAction ? stablePasteAction : undefined}
+              onDeleteAction={node.events?.deleteAction ? stableDeleteAction : undefined}
+              uid={node.uid}
+              autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+              hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
+              enableMultiRowSelection={extractValue.asOptionalBoolean(
+                node.props.enableMultiRowSelection,
+              )}
+              toggleSelectionOnClick={extractValue.asOptionalBoolean(
+                node.props.toggleSelectionOnClick,
+              )}
+              alwaysShowSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
+                node.props.alwaysShowSelectionCheckboxesHeader,
+              )}
+              alwaysShowSortingIndicator={extractValue.asOptionalBoolean(
+                node.props.alwaysShowSortingIndicator,
+              )}
+              noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
+              paginationControlsLocation={extractValue.asOptionalString(
+                node.props.paginationControlsLocation,
+              )}
+              alwaysShowPagination={extractValue.asOptionalBoolean(node.props.alwaysShowPagination)}
+              cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
+              buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
+              pageSizeSelectorPosition={extractValue.asOptionalString(
+                node.props.pageSizeSelectorPosition,
+              )}
+              pageInfoPosition={extractValue.asOptionalString(node.props.pageInfoPosition)}
+              showCurrentPage={extractValue.asOptionalBoolean(node.props.showCurrentPage)}
+              showPageInfo={extractValue.asOptionalBoolean(node.props.showPageInfo)}
+              showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
+              checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
+              initiallySelected={extractValue(node.props.initiallySelected)}
+              syncWithAppState={syncAdapter ?? extractValue(node.props.syncWithAppState)}
+              headerUserSelect={extractValue.asOptionalString(node.props.headerUserSelect)}
+              cellUserSelect={extractValue.asOptionalString(node.props.cellUserSelect)}
+              userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
+              userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
+              userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
+              hideSelectionCheckboxes={extractValue.asOptionalBoolean(
+                node.props.hideSelectionCheckboxes,
+              )}
+              renderVersion={renderVersionRef.current}
+              hideSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
+                node.props.hideSelectionCheckboxesHeader,
+              )}
+              alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(
+                node.props.alwaysShowSelectionCheckboxes,
+              )}
+              keyBindings={extractValue(node.props.keyBindings)}
+              alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
+              striped={extractValue.asOptionalBoolean(node.props.striped)}
+              highlightHoveredColumn={extractValue.asOptionalBoolean(
+                node.props.highlightHoveredColumn,
+              )}
+            />
+          </ErrorBoundary>
         </>
       );
 

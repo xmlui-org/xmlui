@@ -219,15 +219,52 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
       getCurrentState,
     },
   ) => {
+    // --- A binding expression in any of this Column's properties (most notably `header`,
+    // --- which can legitimately be reactive, see xmlui-org/xmlui#3867) may throw when it is
+    // --- evaluated — e.g. it reads a property of a value that has not loaded yet. Such an
+    // --- exception, if left to propagate, aborts this whole customRender call before it can
+    // --- return the <Column> element below. Since Column only registers itself with its
+    // --- parent Table from a mount effect, a column that never renders never registers —
+    // --- so the entire column (not just the failing property) silently vanishes from the
+    // --- table, with no indication near the table that anything went wrong.
+    //
+    // --- `safeExtract` contains that failure to the single offending property: it logs a
+    // --- clear, diagnosable error identifying the column and property, and falls back to a
+    // --- safe default so the column still renders (and keeps working) with everything else
+    // --- intact.
+    const safeExtract = <T,>(propName: string, fn: () => T, fallback: T): T => {
+      try {
+        return fn();
+      } catch (e) {
+        console.error(
+          `[Column${node.uid ? ` "${node.uid}"` : ""}] Failed to evaluate '${propName}': ` +
+            `${(e as Error)?.message ?? e}. Using the default value for '${propName}' instead.`,
+        );
+        return fallback;
+      }
+    };
+
     // Allow config.json to override the default canSort value via xmluiConfig.columnCanSortDefault
     const canSortDefault = appContext?.xmluiConfig?.columnCanSortDefault ?? defaultProps.canSort;
 
     // Convert horizontalAlignment and verticalAlignment to CSS properties for table cells
     // since columns are not flex containers
-    const horizontalAlignment = extractValue.asOptionalString(node.props.horizontalAlignment);
-    const verticalAlignment = extractValue.asOptionalString(node.props.verticalAlignment);
+    const horizontalAlignment = safeExtract(
+      "horizontalAlignment",
+      () => extractValue.asOptionalString(node.props.horizontalAlignment),
+      undefined,
+    );
+    const verticalAlignment = safeExtract(
+      "verticalAlignment",
+      () => extractValue.asOptionalString(node.props.verticalAlignment),
+      undefined,
+    );
 
-    const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
+    const backgroundColor = safeExtract(
+      "backgroundColor",
+      () => extractValue.asOptionalString(node.props.backgroundColor),
+      undefined,
+    );
 
     const style: React.CSSProperties = {};
     if (backgroundColor) {
@@ -314,34 +351,67 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
     return (
       <Column
         style={Object.keys(style).length > 0 ? style : undefined}
-        header={extractValue.asDisplayText(node.props.header)}
-        headerHorizontalAlignment={extractValue.asOptionalString(
-          node.props.headerHorizontalAlignment,
+        header={safeExtract("header", () => extractValue.asDisplayText(node.props.header), undefined)}
+        headerHorizontalAlignment={safeExtract(
+          "headerHorizontalAlignment",
+          () => extractValue.asOptionalString(node.props.headerHorizontalAlignment),
+          undefined,
         )}
         tooltip={node.props.tooltip}
-        tooltipOptions={extractValue(node.props.tooltipOptions, true)}
-        accessorKey={extractValue.asOptionalString(node.props.bindTo)}
-        canSort={extractValue.asOptionalBoolean(node.props.canSort, canSortDefault)}
-        defaultSortDirection={
-          extractValue.asOptionalString(node.props.defaultSortDirection) as
-            | "ascending"
-            | "descending"
-            | undefined
-        }
-        canResize={extractValue.asOptionalBoolean(node.props.canResize)}
-        pinTo={extractValue.asOptionalString(node.props.pinTo)}
-        type={extractValue.asOptionalString(node.props.type)}
-        typeOptions={extractValue(node.props.typeOptions)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        tooltipOptions={safeExtract(
+          "tooltipOptions",
+          () => extractValue(node.props.tooltipOptions, true),
+          undefined,
+        )}
+        accessorKey={safeExtract(
+          "bindTo",
+          () => extractValue.asOptionalString(node.props.bindTo),
+          undefined,
+        )}
+        canSort={safeExtract(
+          "canSort",
+          () => extractValue.asOptionalBoolean(node.props.canSort, canSortDefault),
+          canSortDefault,
+        )}
+        defaultSortDirection={safeExtract(
+          "defaultSortDirection",
+          () =>
+            extractValue.asOptionalString(node.props.defaultSortDirection) as
+              | "ascending"
+              | "descending"
+              | undefined,
+          undefined,
+        )}
+        canResize={safeExtract(
+          "canResize",
+          () => extractValue.asOptionalBoolean(node.props.canResize),
+          undefined,
+        )}
+        pinTo={safeExtract("pinTo", () => extractValue.asOptionalString(node.props.pinTo), undefined)}
+        type={safeExtract("type", () => extractValue.asOptionalString(node.props.type), undefined)}
+        typeOptions={safeExtract("typeOptions", () => extractValue(node.props.typeOptions), undefined)}
+        readOnly={safeExtract(
+          "readOnly",
+          () => extractValue.asOptionalBoolean(node.props.readOnly),
+          undefined,
+        )}
         readOnlyResolver={readOnlyResolver}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
+        enabled={safeExtract(
+          "enabled",
+          () => extractValue.asOptionalBoolean(node.props.enabled, true),
+          true,
+        )}
         enabledResolver={enabledResolver}
         willChange={createTypedCellEventHandler("willChange") ?? props.onWillChange}
         didChange={createTypedCellEventHandler("didChange") ?? props.onDidChange}
-        fillCellContent={hasPercentageWidthCustomCellChild(node.children, extractValue)}
-        width={extractValue(node.props.width)}
-        minWidth={extractValue(node.props.minWidth)}
-        maxWidth={extractValue(node.props.maxWidth)}
+        fillCellContent={safeExtract(
+          "children",
+          () => hasPercentageWidthCustomCellChild(node.children, extractValue),
+          false,
+        )}
+        width={safeExtract("width", () => extractValue(node.props.width), undefined)}
+        minWidth={safeExtract("minWidth", () => extractValue(node.props.minWidth), undefined)}
+        maxWidth={safeExtract("maxWidth", () => extractValue(node.props.maxWidth), undefined)}
         nodeChildren={node.children}
         renderChild={renderChild}
         layoutContext={layoutContext as LayoutContext}
