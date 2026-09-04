@@ -27,6 +27,12 @@ artifacts keep project-relative source ids.
 `import.meta.glob` pattern) is now read through Vite's module runner, so `appGlobals.compileScripts`
 works where the docs say it does.
 
+A handler that hands a callback to `debounce`, a timer, or a subscription has already finished by
+the time that callback runs, and the dispatcher aborts the run's `$cancel` token on completion. The
+compiled runtime consulted that token on every call, so such a callback died with
+`HandlerCancelledError` and its work vanished silently; it now runs, while cancellation during a
+handler run is unchanged.
+
 Three interpreter bugs found while checking compiled/interpreted parity are fixed as well:
 `Array.prototype.sort(comparator)` was a silent no-op (script callbacks are async and the native
 `sort` coerced the returned promise to `NaN`), comma-sequence expressions evaluated every operand
