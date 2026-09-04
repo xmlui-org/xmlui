@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, memo, useEffect, useMemo, useState } from "react";
-import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -230,6 +230,7 @@ export const Pages = memo(function Pages({
     ],
   );
   const location = useLocation();
+  const rrNavigate = useNavigate();
 
   useEffect(() => {
     context?.setScrollRestorationEnabled?.(!!defaultScrollRestoration);
@@ -256,9 +257,16 @@ export const Pages = memo(function Pages({
     };
     pushXsLog({ kind: "navigate", ts: Date.now(), to: canonical, routingDiagnostic: diagnostic });
     if (canonicalPolicy.onMismatch === "redirect" || canonicalPolicy.onMismatch === "rewrite") {
-      window.history.replaceState(window.history.state, "", canonical);
+      // Go through the router's own navigate (not raw `window.history.replaceState`).
+      // `canonical` is a bare "pathname?search#hash" string with no knowledge of the
+      // active router mode; under HashRouter, handing that straight to the History
+      // API replaces the visible pathname/search and strips the "#" that carries the
+      // route, permanently breaking client-side navigation from that point on.
+      // `useNavigate()` resolves it the same way a `<Link>` click would, correctly
+      // for hash- or browser-based routing alike.
+      rrNavigate(canonical, { replace: true });
     }
-  }, [canonicalPolicy, location.hash, location.pathname, location.search, strictRouting]);
+  }, [canonicalPolicy, location.hash, location.pathname, location.search, strictRouting, rrNavigate]);
 
   const compiledRoutes = useMemo(() => {
     return routes.map((child) =>
