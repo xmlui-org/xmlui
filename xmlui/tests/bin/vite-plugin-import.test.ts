@@ -706,6 +706,52 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     });
   });
 
+  describe("Compiled Script Reporting", () => {
+    async function buildWithSummary(code: string, options: Partial<PluginOptions> = {}) {
+      const plugin = viteXmluiPlugin({
+        analyze: "off",
+        reactiveCycles: "off",
+        accessibility: "off",
+        typeContracts: "off",
+        ...options,
+      });
+      (plugin.configResolved as any)?.({ root: "/project" });
+      const ctx = {
+        warn: vi.fn(),
+        error: (message: string) => {
+          throw new Error(String(message));
+        },
+      };
+      const log = vi.spyOn(console, "log").mockImplementation(() => {});
+      try {
+        await (plugin.transform as any).call(ctx, code, "/project/src/Main.xmlui", {});
+        (plugin.buildEnd as any).call(ctx);
+        return { logs: log.mock.calls.map((call) => String(call[0])), warnings: ctx.warn };
+      } finally {
+        log.mockRestore();
+      }
+    }
+
+    it("reports how many compiled artifacts the build produced", async () => {
+      const { logs, warnings } = await buildWithSummary(
+        `<Button onClick="count = count + 1" />`,
+        { compileScripts: true },
+      );
+
+      expect(logs.join("\n")).toMatch(
+        /\[xmlui\] Script compilation: [1-9]\d* compiled artifact\(s\) from [1-9]\d* script block\(s\) in 1 file\(s\)/,
+      );
+      expect(warnings).not.toHaveBeenCalled();
+    });
+
+    it("stays silent about compiled scripts when compilation is off", async () => {
+      const { logs, warnings } = await buildWithSummary(`<Button onClick="count = count + 1" />`);
+
+      expect(logs.join("\n")).not.toContain("Script compilation");
+      expect(warnings).not.toHaveBeenCalled();
+    });
+  });
+
   describe("Vite Plugin File Structure", () => {
     it("should handle .xmlui.xs files", () => {
       const componentBehindFile = "/src/Main.xmlui.xs";

@@ -41,7 +41,10 @@ export type StandaloneAppDescription = {
    *   (default `true`).
    * - `compileScripts` (boolean, default `false`) — compile supported XMLUI
    *   binding expressions, event handlers, and executable script declaration
-   *   functions to JavaScript.
+   *   functions to JavaScript. Read both by the browser runtime and by the build
+   *   tooling (`xmlui start` / `xmlui build`), which pre-compiles event handlers
+   *   into the emitted modules. A `compileScripts` entry in `xmlui.config.json`
+   *   overrides the one declared here.
    * - `compileBindings` (boolean, default `undefined`) — legacy compatibility
    *   alias for enabling/disabling binding compilation independently.
    * - `compileEventHandlers` (boolean, default `undefined`) — legacy
