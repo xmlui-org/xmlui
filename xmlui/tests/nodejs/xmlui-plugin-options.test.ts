@@ -289,6 +289,28 @@ describe("Loading XMLUI plugin options from project files", () => {
     });
   }, 30000);
 
+  it("skips the Vite retry when xmlui.config.json already answers", async () => {
+    // --- The description needs Vite to evaluate, but `xmlui.config.json` settles the
+    // --- only key it mentions, so re-reading it could not change the outcome.
+    const cwd = await createProject({
+      "xmlui.config.json": JSON.stringify({ compileScripts: false }),
+      "src/config.ts": [
+        "const App = { appGlobals: { compileScripts: true, icons: import.meta.glob('/icons/*') } };",
+        "export default App;",
+        "",
+      ].join("\n"),
+    });
+
+    const startedAt = Date.now();
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
+      compileScripts: false,
+      compileEventHandlers: false,
+    });
+    // --- A Vite module-runner import takes hundreds of milliseconds; skipping it is
+    // --- the point of this case.
+    expect(Date.now() - startedAt).toBeLessThan(250);
+  });
+
   it("survives an app description that cannot be loaded", async () => {
     const cwd = await createProject({
       "xmlui.config.json": JSON.stringify({ compileScripts: true }),

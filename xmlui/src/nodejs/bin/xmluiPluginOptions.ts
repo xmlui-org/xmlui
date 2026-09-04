@@ -104,7 +104,7 @@ export async function loadXmluiPluginOptions(
 ): Promise<PluginOptions> {
   const { cwd = process.cwd(), ...normalizeOptions } = options;
   const xmluiConfigFile = await readXmluiConfigFile(cwd);
-  const appDescription = await readAppDescriptionConfig(cwd);
+  const appDescription = await readAppDescriptionConfig(cwd, xmluiConfigFile);
   if (!xmluiConfigFile && !appDescription) {
     return {};
   }
@@ -133,7 +133,10 @@ async function readXmluiConfigFile(cwd: string): Promise<XmluiConfigSource | und
  * on with `xmlui.config.json` alone, and we only complain when the unreadable
  * file looks like it was trying to configure script compilation.
  */
-async function readAppDescriptionConfig(cwd: string): Promise<XmluiConfigSource | undefined> {
+async function readAppDescriptionConfig(
+  cwd: string,
+  xmluiConfigFile: XmluiConfigSource | undefined,
+): Promise<XmluiConfigSource | undefined> {
   for (const segments of APP_DESCRIPTION_FILES) {
     const file = path.join(cwd, ...segments);
     let rawConfig: string;
@@ -156,10 +159,11 @@ async function readAppDescriptionConfig(cwd: string): Promise<XmluiConfigSource 
     } catch (nodeImportError) {
       // --- A plain Node import cannot evaluate Vite-only syntax such as
       // --- `import.meta.glob` (the shape the `getLocalIcons()` pattern in our own app
-      // --- templates uses) or asset imports. Retry through Vite's module runner —
-      // --- but only when the file looks like it configures script compilation, since
-      // --- the retry evaluates the whole module graph the description pulls in.
-      if (!mentionsScriptCompilation(rawConfig)) {
+      // --- templates uses) or asset imports. Retry through Vite's module runner — but
+      // --- only for settings this project has not already answered in
+      // --- `xmlui.config.json`, since the retry evaluates the whole module graph the
+      // --- description pulls in.
+      if (!hasUnansweredScriptCompilationKey(rawConfig, xmluiConfigFile)) {
         return undefined;
       }
       try {
@@ -223,6 +227,31 @@ async function importAppDescriptionThroughVite(cwd: string, file: string): Promi
 
 function mentionsScriptCompilation(rawConfig: string): boolean {
   return SCRIPT_COMPILATION_KEYS.some((key) => rawConfig.includes(key));
+}
+
+/**
+ * True when the app description mentions a script-compilation key that
+ * `xmlui.config.json` does not already settle. `xmlui.config.json` wins per key, so
+ * reading the description again could not change the outcome for keys it defines.
+ */
+function hasUnansweredScriptCompilationKey(
+  rawConfig: string,
+  xmluiConfigFile: XmluiConfigSource | undefined,
+): boolean {
+  return SCRIPT_COMPILATION_KEYS.some(
+    (key) => rawConfig.includes(key) && !definesSetting(xmluiConfigFile, key),
+  );
+}
+
+function definesSetting(config: XmluiConfigSource | undefined, key: string): boolean {
+  if (!config) {
+    return false;
+  }
+  return (
+    config[key] !== undefined ||
+    config.xmluiConfig?.[key] !== undefined ||
+    config.appGlobals?.[key] !== undefined
+  );
 }
 
 function pickConfigSource(appDescription: unknown): XmluiConfigSource | undefined {
