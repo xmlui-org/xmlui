@@ -339,8 +339,9 @@ async function evalObjectLiteralAsync(
         for (let i = 0; i < spreadItems.length; i++) {
           objectHash[i] = spreadItems[i];
         }
-      } else if (typeof spreadItems === "object") {
-        // --- Spread of a hash object
+      } else if (spreadItems && typeof spreadItems === "object") {
+        // --- Spread of a hash object. `null` contributes nothing, as it does in
+        // --- JavaScript — `Object.entries(null)` would throw.
         for (const [key, value] of Object.entries(spreadItems)) {
           objectHash[key] = value;
         }

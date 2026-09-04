@@ -189,6 +189,12 @@ describe("compiled event handlers — spread operands", () => {
     expected: 2020,
   });
 
+  itRunsBothWays("ignores a null object-spread operand", {
+    source: "return { ...missing, a: 1 };",
+    context: { missing: null },
+    expected: { a: 1 },
+  });
+
   it("rejects a non-array spread operand the same way the interpreter does", async () => {
     const source = "return [...value];";
     const context = { value: 42 };
