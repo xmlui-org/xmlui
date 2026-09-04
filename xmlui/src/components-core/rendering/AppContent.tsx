@@ -689,12 +689,10 @@ export function AppContent({
     scriptInventoryReported.current = true;
     try {
       const inventory = collectParsedScriptInventory([rootContainer, ...(appComponents ?? [])]);
-      const summary = formatParsedScriptInventory(inventory);
-      if (inventory.compiled === 0 && inventory.total > 0 && console.warn) {
-        console.warn(summary);
-      } else {
-        console.log(summary);
-      }
+      // --- Informational, not a warning: an app with no build-time artifacts still
+      // --- compiles its scripts on first use. The build-side report is the one that
+      // --- warns, because that is where "requested but never ran" is a misconfiguration.
+      console.log(formatParsedScriptInventory(inventory));
     } catch {
       // --- Reporting must never break app startup.
     }
