@@ -1506,11 +1506,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Truncate long text and expand it on demand"
-                            to="/docs/howto/truncate-text-with-expand-on-demand"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Theme DatePicker calendar items"
                             to="/docs/howto/theme-datepicker-calendar-items"
                         />
