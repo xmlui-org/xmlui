@@ -591,6 +591,8 @@ export type CodeDeclarationCompilation = {
   source?: string;
   compiled?: CompiledScriptArtifact;
   compiledUnsupported?: boolean;
+  /** Why compilation was skipped — see `ParsedEventValue.compiledUnsupportedReason`. */
+  compiledUnsupportedReason?: string;
   sourceId?: string;
   sourceRange?: CompiledScriptSourceRange;
 };

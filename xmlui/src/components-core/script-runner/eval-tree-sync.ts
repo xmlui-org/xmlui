@@ -133,7 +133,9 @@ export function evalBinding(
   evalTrace("eval", () =>
     String((expr as any)?.source ?? "").slice(0, 80) || "type:" + String((expr as any)?.type ?? "?"),
   );
-  if (evalContext.options?.compileBindings && expr.type !== T_ARROW_EXPRESSION) {
+  const compileBindings =
+    evalContext.options?.compileBindings ?? evalContext.options?.compileScripts ?? false;
+  if (compileBindings && expr.type !== T_ARROW_EXPRESSION) {
     const previousArrowInvoker = evalContext.compiledArrowInvoker;
     evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
       executeArrowExpressionSync(

@@ -12,6 +12,12 @@ type ViteConfigData = {
   flatDist?: boolean;
   withRelativeRoot?: boolean;
   flatDistUiPrefix?: string;
+  /**
+   * True only for `xmlui start`. It turns on dev-only defaults — notably compiled
+   * script source maps, whose per-token mappings and embedded original sources have
+   * no place in a production bundle.
+   */
+  devServer?: boolean;
 };
 
 const logger = createLogger();
@@ -77,6 +83,7 @@ export async function getViteConfig({
   flatDist = false,
   withRelativeRoot = false,
   flatDistUiPrefix = "",
+  devServer = false,
 }: ViteConfigData = {}) {
   //TODO finish this (merge smart)
   let overrides: UserConfig = {};
@@ -87,7 +94,7 @@ export async function getViteConfig({
     // console.error(e);
   }
 
-  const xmluiPluginOptions = await loadXmluiPluginOptions({ devServer: true });
+  const xmluiPluginOptions = await loadXmluiPluginOptions({ devServer });
 
   // Single instance shared by the main pipeline and the dep-scanner pipeline.
   // The dep scanner runs a separate Rolldown build that only sees plugins

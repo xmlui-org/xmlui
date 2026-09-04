@@ -111,6 +111,11 @@ class CancellationToken {
 export type EvalTreeOptions = {
   defaultToOptionalMemberAccess?: boolean;
   /**
+   * Umbrella switch for script compilation. Implies both `compileBindings` and
+   * `compileEventHandlers` unless one of those is set explicitly.
+   */
+  compileScripts?: boolean;
+  /**
    * Experimental switch for compiled synchronous binding expressions.
    *
    * Default: `false`. Set via `App.xmluiConfig.compileScripts`; the legacy

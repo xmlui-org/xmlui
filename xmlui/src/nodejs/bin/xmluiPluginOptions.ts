@@ -153,12 +153,76 @@ async function readAppDescriptionConfig(cwd: string): Promise<XmluiConfigSource 
     try {
       const module = await import(pathToFileURL(file).href);
       return pickConfigSource(module?.default ?? module);
-    } catch (error) {
-      warnUnreadableAppDescription(file, rawConfig, error);
-      return undefined;
+    } catch (nodeImportError) {
+      // --- A plain Node import cannot evaluate Vite-only syntax such as
+      // --- `import.meta.glob` (the shape the `getLocalIcons()` pattern in our own app
+      // --- templates uses) or asset imports. Retry through Vite's module runner —
+      // --- but only when the file looks like it configures script compilation, since
+      // --- the retry evaluates the whole module graph the description pulls in.
+      if (!mentionsScriptCompilation(rawConfig)) {
+        return undefined;
+      }
+      try {
+        return pickConfigSource(await importAppDescriptionThroughVite(cwd, file));
+      } catch (viteImportError) {
+        warnUnreadableAppDescription(file, rawConfig, viteImportError ?? nodeImportError);
+        return undefined;
+      }
     }
   }
   return undefined;
+}
+
+/**
+ * Evaluates the app description with Vite's plugin pipeline applied, so
+ * `import.meta.glob`, `.xmlui` imports, and TypeScript all resolve exactly as they do
+ * in the browser build. Stylesheets are stubbed out: an app description never needs
+ * them, and CSS preprocessing is not configured for the module runner environment.
+ */
+async function importAppDescriptionThroughVite(cwd: string, file: string): Promise<unknown> {
+  const { runnerImport } = await import("vite");
+  const { default: viteXmluiPlugin } = await import("../vite-xmlui-plugin");
+  const stubbedStyles = new Set<string>();
+  const stubStyles = {
+    name: "xmlui:app-description-style-stub",
+    enforce: "pre" as const,
+    resolveId(id: string) {
+      if (!/\.(css|scss|sass|less|styl|stylus)(\?.*)?$/.test(id)) {
+        return null;
+      }
+      // --- The stub id must not keep the stylesheet extension, or Vite's CSS
+      // --- transform claims it again.
+      const stubId = `\0xmlui-style-stub-${stubbedStyles.size}.js`;
+      stubbedStyles.add(stubId);
+      return stubId;
+    },
+    load(id: string) {
+      return stubbedStyles.has(id) ? "export default {};" : null;
+    },
+  };
+  const imported = await runnerImport<Record<string, any>>(pathToFileURL(file).href, {
+    root: cwd,
+    configFile: false,
+    logLevel: "silent",
+    plugins: [
+      stubStyles,
+      viteXmluiPlugin({
+        analyze: "off",
+        reactiveCycles: "off",
+        accessibility: "off",
+        typeContracts: "off",
+      }) as any,
+    ],
+    resolve: {
+      extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui", ".xmlui.xs", ".xs"],
+    },
+  });
+  const module = imported.module as Record<string, any>;
+  return module?.default ?? module;
+}
+
+function mentionsScriptCompilation(rawConfig: string): boolean {
+  return SCRIPT_COMPILATION_KEYS.some((key) => rawConfig.includes(key));
 }
 
 function pickConfigSource(appDescription: unknown): XmluiConfigSource | undefined {
@@ -172,7 +236,7 @@ function pickConfigSource(appDescription: unknown): XmluiConfigSource | undefine
 function warnUnreadableAppDescription(file: string, rawConfig: string, error: unknown): void {
   // --- Apps that do not configure script compilation in their description lose
   // --- nothing when we cannot load it, so stay quiet for them.
-  if (!SCRIPT_COMPILATION_KEYS.some((key) => rawConfig.includes(key))) {
+  if (!mentionsScriptCompilation(rawConfig)) {
     return;
   }
   console.warn(

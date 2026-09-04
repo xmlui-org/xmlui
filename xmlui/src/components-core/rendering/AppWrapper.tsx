@@ -268,6 +268,7 @@ export const AppWrapper = ({
                 <AppContent
                   onInit={onInit}
                   rootContainer={node as ContainerWrapperDef}
+                  appComponents={contributes.compoundComponents}
                   routerBaseName={baseName}
                   globalProps={globalProps}
                   xmluiConfig={xmluiConfig}

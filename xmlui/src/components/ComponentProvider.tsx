@@ -953,6 +953,22 @@ export class ComponentRegistry {
   }
 
   /**
+   * The compound component definitions this app registered (as opposed to the
+   * built-in and extension ones). Used by the startup script-compilation report,
+   * which has to look beyond the entry point to see every script block the app
+   * actually ships.
+   */
+  getAppCompoundComponentDefs(): CompoundComponentDef[] {
+    const defs: CompoundComponentDef[] = [];
+    this.pool.get(APP_NS)?.forEach((entry) => {
+      if (entry.compoundComponentDef) {
+        defs.push(entry.compoundComponentDef);
+      }
+    });
+    return defs;
+  }
+
+  /**
    * This method retrieves the registry entry of a component registered
    * with the specified key.
    * @param componentName The unique ID of the component
@@ -1154,6 +1170,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
+      compoundComponentDef,
       metadata: mergedMetadata,
       udcContract: normalizedContract,
     };

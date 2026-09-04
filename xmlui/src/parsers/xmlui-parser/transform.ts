@@ -18,6 +18,7 @@ import type { GetText, XmluiParserOptions } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
+import { describeCompiledScriptFallback } from "../../components-core/script-compiler/errors";
 import { extractEventHandlerDirectives } from "../../components-core/utils/event-handler-directives";
 import { prepareCompiledHandlerStatements } from "../../components-core/utils/statementUtils";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
@@ -1527,6 +1528,7 @@ function transformXmluiNode(
       const sourceId = `${fileId}#event-${parseId}`;
       let compiled: ParsedEventValue["compiled"] | undefined;
       let compiledUnsupported = false;
+      let compiledUnsupportedReason: string | undefined;
       if (parserOptions.compileEventHandlers) {
         try {
           const compileOptions = {
@@ -1558,9 +1560,10 @@ function transformXmluiNode(
           }
         } catch (error) {
           compiledUnsupported = true;
+          compiledUnsupportedReason = describeCompiledScriptFallback(error);
           const message =
-            `Could not compile event handler ${sourceId}; ` +
-            `falling back to interpreted execution. ${(error as Error).message}`;
+            `Could not compile event handler ${sourceId} (${compiledUnsupportedReason}); ` +
+            `falling back to interpreted execution.`;
           if (warnings) {
             warnings.push(message);
           }
@@ -1582,6 +1585,7 @@ function transformXmluiNode(
         source: value,
         compiled,
         compiledUnsupported,
+        ...(compiledUnsupportedReason ? { compiledUnsupportedReason } : {}),
       } as ParsedEventValue;
     } catch {
       if (parser.errors.length > 0) {

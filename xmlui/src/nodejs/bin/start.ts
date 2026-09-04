@@ -31,7 +31,7 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
   }
 
   try {
-    let viteConfig = await getViteConfig({});
+    let viteConfig = await getViteConfig({ devServer: true });
     const server = await createServer({
       ...viteConfig,
       server: {

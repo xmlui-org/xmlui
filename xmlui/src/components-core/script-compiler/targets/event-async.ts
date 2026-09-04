@@ -347,8 +347,9 @@ function emitEventArrowCall(
     // let the whole handler fall back to interpreted execution (existing, safe behavior).
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
-  if (containsNonSerializableLiteral(expr)) {
-    throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  const nonSerializable = findNonSerializableLiteral(expr);
+  if (nonSerializable) {
+    throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("await runtime.call(runtime.arrow(", expr);
   writer.write(JSON.stringify(expr), expr);
@@ -2026,8 +2027,14 @@ function emitArrowExpression(
   expr: ArrowExpression,
   context: CompilerContext,
 ): void {
-  if (expr.async || containsNonSerializableLiteral(expr)) {
+  if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
+  }
+  // --- Report the literal itself, not the arrow that holds it: "unsupported literal
+  // --- at line 4" points at the code to change, "unsupported arrow function" does not.
+  const nonSerializable = findNonSerializableLiteral(expr);
+  if (nonSerializable) {
+    throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("runtime.arrow(");
   writer.write(JSON.stringify(expr), expr);
@@ -2547,26 +2554,37 @@ function canSerializeLiteral(value: any): boolean {
   );
 }
 
-function containsNonSerializableLiteral(node: any): boolean {
+/**
+ * Finds the first literal a lazy (interpreted) arrow cannot carry — a regular
+ * expression, for instance, which does not survive `JSON.stringify`. Returns the
+ * literal node so diagnostics can point at it.
+ */
+function findNonSerializableLiteral(node: any): any | undefined {
   if (!node || typeof node !== "object") {
-    return false;
+    return undefined;
   }
   if (node.type === T_LITERAL) {
-    return !canSerializeLiteral(node.value);
+    return canSerializeLiteral(node.value) ? undefined : node;
   }
   for (const [key, value] of Object.entries(node)) {
     if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
       continue;
     }
     if (Array.isArray(value)) {
-      if (value.some((item) => containsNonSerializableLiteral(item))) {
-        return true;
+      for (const item of value) {
+        const found = findNonSerializableLiteral(item);
+        if (found) {
+          return found;
+        }
       }
-    } else if (containsNonSerializableLiteral(value)) {
-      return true;
+      continue;
+    }
+    const found = findNonSerializableLiteral(value);
+    if (found) {
+      return found;
     }
   }
-  return false;
+  return undefined;
 }
 
 function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {

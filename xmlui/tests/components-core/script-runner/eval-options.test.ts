@@ -8,6 +8,8 @@ import {
 import { Parser } from "../../../src/parsers/scripting/Parser";
 import { extractParam } from "../../../src/components-core/utils/extractParam";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
+import { parseAttributeValue } from "../../../src/components-core/script-runner/AttributeValueParser";
+import { evalBinding } from "../../../src/components-core/script-runner/eval-tree-sync";
 
 describe("binding eval options", () => {
   it("leaves compileBindings disabled by default", () => {
@@ -197,5 +199,36 @@ describe("script execution mode", () => {
       bindings: "compiled",
       eventHandlers: "interpreted",
     });
+  });
+});
+
+describe("compileScripts implies binding compilation at every call site", () => {
+  it("compiles a parsed attribute binding under the umbrella switch", () => {
+    const parsed = parseAttributeValue("{count + 1}", {
+      compileScripts: true,
+      sourceId: "Main.xmlui",
+    });
+
+    expect(parsed.segments[0].compiled).toMatchObject({ target: "binding-sync" });
+  });
+
+  it("lets compileBindings: false opt one path out", () => {
+    const parsed = parseAttributeValue("{count + 1}", {
+      compileScripts: true,
+      compileBindings: false,
+      sourceId: "Main.xmlui",
+    });
+
+    expect(parsed.segments[0].compiled).toBeUndefined();
+  });
+
+  it("evaluates a binding through the compiled path under the umbrella switch", () => {
+    const expr = new Parser("count + 1").parseExpr()!;
+    const evalContext = {
+      localContext: { count: 41 },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
+    } as any;
+
+    expect(evalBinding(expr, evalContext)).toBe(42);
   });
 });

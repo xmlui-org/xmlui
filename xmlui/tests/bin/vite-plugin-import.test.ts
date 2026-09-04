@@ -322,7 +322,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `,
         join(srcDir, "Main.xmlui"),
         dir,
-        { compileEventHandlers: true },
+        { compileEventHandlers: true, compiledScriptSourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -426,7 +426,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<Button onClick="count = count + 1" />`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileEventHandlers: true },
+        { compileEventHandlers: true, compiledScriptSourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -444,7 +444,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<Button onClick="count = count + 1" />`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true },
+        { compileScripts: true, compiledScriptSourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -481,6 +481,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       const source = `<App><script>function add(a, b) { return a + b; }</script></App>`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
         compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -509,6 +510,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
 </App>`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui", "/project", {
         compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -533,7 +535,7 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
         `<App><script>function add(a, b) { return a + b; }</script></App>`,
         "/project/src/Main.xmlui",
         "/project",
-        { compileScripts: true },
+        { compileScripts: true, compiledScriptSourceMaps: "external" },
       );
 
       const mod = await importGeneratedModule(result.code);
@@ -706,6 +708,71 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
     });
   });
 
+  describe("Production artifact hygiene", () => {
+    const HANDLER_APP = `<Button onClick="count = count + 1" />`;
+
+    it("omits source text, developer paths, and mappings when source maps are off", async () => {
+      const { result } = await transformXmlui(HANDLER_APP, "/project/src/Main.xmlui", "/project", {
+        compileScripts: true,
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const compiled = mod.default.component.events.click.compiled;
+
+      expect(compiled.js).toContain("return (async () =>");
+      expect(compiled.sourceText).toBeUndefined();
+      expect(compiled.sourceUrl).toBeUndefined();
+      expect(compiled.displayName).toBeUndefined();
+      expect(compiled.sources).toEqual([]);
+      expect(compiled.mappings).toEqual([]);
+    });
+
+    it("keeps the debug payload when source maps are requested", async () => {
+      const { result } = await transformXmlui(HANDLER_APP, "/project/src/Main.xmlui", "/project", {
+        compileScripts: true,
+        compiledScriptSourceMaps: "external",
+      });
+
+      const mod = await importGeneratedModule(result.code);
+      const compiled = mod.default.component.events.click.compiled;
+
+      expect(compiled.sourceText).toBe("count = count + 1");
+      expect(compiled.mappings.length).toBeGreaterThan(0);
+    });
+
+    it("rewrites absolute artifact source ids to project-relative ones", async () => {
+      const { result } = await transformXmlui(
+        `<App><script>function add(a, b) { return a + b; }</script></App>`,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true },
+      );
+
+      const mod = await importGeneratedModule(result.code);
+      const sourceId = mod.default.component.scriptCollected.functions.add.compiled.sourceId;
+
+      expect(sourceId).toBe("/src/Main.xmlui#function-add");
+      expect(result.code).not.toContain("/project/src/Main.xmlui");
+    });
+
+    it("shrinks the emitted module compared with the source-map build", async () => {
+      const { result: lean } = await transformXmlui(
+        HANDLER_APP,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true },
+      );
+      const { result: withMaps } = await transformXmlui(
+        HANDLER_APP,
+        "/project/src/Main.xmlui",
+        "/project",
+        { compileScripts: true, compiledScriptSourceMaps: "external" },
+      );
+
+      expect(lean.code.length).toBeLessThan(withMaps.code.length / 2);
+    });
+  });
+
   describe("Compiled Script Reporting", () => {
     async function buildWithSummary(code: string, options: Partial<PluginOptions> = {}) {
       const plugin = viteXmluiPlugin({
@@ -828,6 +895,7 @@ function run(value) { return double(value); }`;
       const source = `function run(value) { return value + 1; }`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
         compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -848,6 +916,7 @@ function run(value) { return double(value); }`;
       const source = `function run(value) { return value + 1; }`;
       const { result } = await transformXmlui(source, "/project/src/Main.xmlui.xs", "/project", {
         compileScripts: true,
+        compiledScriptSourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
@@ -861,6 +930,7 @@ function run(value) { return double(value); }`;
       const source = `function formatName(value) { return value.toUpperCase(); }`;
       const { result } = await transformXmlui(source, "/project/src/Globals.xs", "/project", {
         compileEventHandlers: true,
+        compiledScriptSourceMaps: "external",
       });
 
       const mod = await importGeneratedModule(result.code);
