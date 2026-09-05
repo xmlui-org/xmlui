@@ -19,7 +19,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 async function runCompiled(source: string, localContext: Record<string, any> = {}) {
   const evalContext = createEvalContext({
     localContext,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const artifact = compileEventAsyncStatementSource(source, `test:event:arrow:${source}`);
   const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -55,7 +55,7 @@ describe("compiled event-async arrow and callback calls", () => {
     const evalContext = createEvalContext({
       localContext: {},
       eventArgs: ["alpha"],
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     });
     const artifact = compileEventAsyncStatements([statement], {
       sourceId: "test:event:arrow-expression-statement",
@@ -78,7 +78,7 @@ describe("compiled event-async arrow and callback calls", () => {
     const evalContext = createEvalContext({
       localContext: { first: "", second: "" },
       eventArgs: ["alpha"],
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     });
     const artifact = compileEventAsyncStatements([statement], {
       sourceId: "test:event:multi-statement-arrow-expression-statement",
@@ -159,7 +159,7 @@ describe("compiled event-async arrow and callback calls", () => {
       "/Main.xmlui.xs",
       "function add(a, b) { return a + b; }",
       async () => "",
-      { compileEventHandlers: true },
+      { compileScripts: true },
     );
     const add = codeBehind.functions.add as any;
     add.statement.stmts = new Parser("return 99;").parseStatements();
@@ -177,7 +177,7 @@ describe("compiled event-async arrow and callback calls", () => {
       "/Main.xmlui.xs",
       "function add(a, b) { return a + b; }",
       async () => "",
-      { compileEventHandlers: true },
+      { compileScripts: true },
     );
     const add = codeBehind.functions.add as any;
     add.statement.stmts = new Parser("return 99;").parseStatements();
@@ -195,7 +195,7 @@ describe("compiled event-async arrow and callback calls", () => {
       "/Main.xmlui.xs",
       "function add(a, b) { return a + b; }",
       async () => "",
-      { compileEventHandlers: true },
+      { compileScripts: true },
     );
     const add = codeBehind.functions.add as any;
     add.compiledUnsupported = true;
@@ -214,7 +214,7 @@ describe("compiled event-async arrow and callback calls", () => {
       "/Main.xmlui.xs",
       "function add(a, b) { return a + b; }",
       async () => "",
-      { compileEventHandlers: true },
+      { compileScripts: true },
     );
     const add = codeBehind.functions.add as any;
     add.compiled.js = `return runtime.unsupported("ForcedNode", "test:event:forced-unsupported");`;
@@ -254,7 +254,7 @@ describe("compiled event-async arrow and callback calls", () => {
       "/Main.xmlui.xs",
       "import { inc as addOne } from './math.xs'; function use(value) { return addOne(value); }",
       async (path) => modules[path] ?? "",
-      { compileEventHandlers: true },
+      { compileScripts: true },
     );
     const use = codeBehind.functions.use as any;
     const imported = codeBehind.functions.addOne as any;
@@ -312,7 +312,7 @@ describe("compiled event-async arrow and callback calls", () => {
         changes = [];
         evalContext.localContext = createLocalContext();
       },
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
     const artifact = compileEventAsyncStatementSource(
       "subscribe((event) => { value = event.payload; });",
@@ -342,7 +342,7 @@ describe("compiled event-async arrow and callback calls", () => {
         hostObject,
         appContext: { marker: "ctx" },
       }),
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
     const artifact = compileEventAsyncStatementSource(
       "api.execute({ name: 'John' });",
@@ -379,7 +379,7 @@ describe("compiled event-async arrow and callback calls", () => {
         hostObject,
         appContext: { marker: "ctx" },
       }),
-      options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+      options: { compileScripts: true, defaultToOptionalMemberAccess: true },
     } as any;
     const artifact = compileEventAsyncStatementSource(
       "api.execute",

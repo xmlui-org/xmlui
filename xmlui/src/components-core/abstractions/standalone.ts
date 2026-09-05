@@ -39,28 +39,22 @@ export type StandaloneAppDescription = {
    * - `xsVerboseLogBucket` (string) — optional bucket label for trace entries.
    * - `defaultToOptionalMemberAccess` (boolean) — treat all member accesses as optional
    *   (default `true`).
-   * - `compileScripts` (boolean, default `false`) — compile supported XMLUI
-   *   binding expressions, event handlers, and executable script declaration
-   *   functions to JavaScript. Read both by the browser runtime and by the build
-   *   tooling (`xmlui start` / `xmlui build`), which pre-compiles event handlers
-   *   into the emitted modules. A `compileScripts` entry in `xmlui.config.json`
-   *   overrides the one declared here.
-   * - `compileBindings` (boolean, default `undefined`) — legacy compatibility
-   *   alias for enabling/disabling binding compilation independently.
-   * - `compileEventHandlers` (boolean, default `undefined`) — legacy
-   *   compatibility alias for enabling/disabling event-handler compilation
-   *   independently. When enabled, this also covers inline `<script>`
-   *   functions, `.xmlui.xs` code-behind functions, `Globals.xs` functions,
-   *   inline component `codeBehind` functions, and imported `.xs` helpers.
-   * - `logCompiledEventHandlerSource` (boolean, default `false`) — when
-   *   `compileEventHandlers` creates parse-time event artifacts, log the
-   *   original handler source and generated JavaScript to the console.
-   * - `compiledScriptSourceMaps` (boolean | "inline" | "external", default `false`;
-   *   `xmlui start` defaults to `"external"` when script compilation is enabled)
-   *   — when enabled, JavaScript-compiled XMLUI scripts carry source-map/debug
-   *   metadata for compiled bindings, handlers, and declaration functions.
-   *   `"external"` is the preferred dev-server mode; `"inline"` is a runtime
-   *   fallback for environments without a Vite source-map endpoint.
+   * - `compileScripts` (boolean, default `false`) — compile XMLUI scripts to
+   *   JavaScript: binding expressions, event handlers, inline `<script>` functions,
+   *   `.xmlui.xs` code-behind, `Globals.xs`, imported `.xs` helpers, and inline
+   *   component `codeBehind`. One switch covers all of them. Read by the browser
+   *   runtime and by the build tooling (`xmlui start` / `xmlui build`), which
+   *   pre-compiles what it can into the emitted modules; the rest compiles on first
+   *   use in the browser. A `compileScripts` entry in `xmlui.config.json` overrides
+   *   the one declared here.
+   * - `reportCompileFallbacks` (boolean, default `false`) — report every script block
+   *   that could not be compiled, with a diagnostic code
+   *   (`compile-unsupported-node`, `compile-unserializable-literal`,
+   *   `compile-runtime-fallback`, `compile-source-unavailable`), the construct that
+   *   stopped compilation, and its source position. Off, the build and the startup
+   *   line still report how many blocks fell back — only the per-block detail is
+   *   withheld. Source maps for compiled scripts are not configured: `xmlui start`
+   *   turns them on, builds leave them out.
    * - `maxCompoundDepth` (number) — max recursion depth for compound components.
    * - `strictDomSandbox` (boolean | string[], default `false`) — when `true`, any
    *   expression that accesses a banned DOM API throws a `BannedApiError` immediately.
@@ -269,7 +263,7 @@ export type StandaloneAppDescription = {
    * in `appGlobals`). Examples: `disableInlineStyle`, `useHashBasedRouting`,
    * `withXSRFToken`, `logRestApiErrors`, `xsVerbose`, `xsVerboseLogMax`,
    * `syncExecutionTimeout`, `defaultToOptionalMemberAccess`, `compileScripts`,
-   * `compiledScriptSourceMaps`, `logCompiledEventHandlerSource`,
+   * `reportCompileFallbacks`,
    * `applyLayoutProperties`, `lintSeverity`, `searchIndexEnabled`, and the
    * `strict*` family.
    *

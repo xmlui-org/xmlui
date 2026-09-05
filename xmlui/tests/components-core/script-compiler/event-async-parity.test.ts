@@ -35,7 +35,7 @@ function cloneContext(context: Record<string, any>): Record<string, any> {
 function createEvalContext(context: Record<string, any>) {
   return {
     localContext: cloneContext(context),
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   } as any;
 }
 

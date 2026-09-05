@@ -13,7 +13,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 async function runCompiled(source: string, localContext: Record<string, any> = {}) {
   const evalContext = createEvalContext({
     localContext,
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   });
   const artifact = compileEventAsyncStatementSource(source, `test:event:control:${source}`);
   const returnValue = await executeCompiledEventAsyncArtifact(artifact, evalContext);
@@ -103,7 +103,7 @@ describe("compiled event-async control flow", () => {
     await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
       const evalContext = createEvalContext({
         localContext: { count: 0 },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: recordCompletion,
       });
       const artifact = compileEventAsyncStatementSource(
@@ -146,7 +146,7 @@ describe("compiled event-async control flow", () => {
     await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
       const evalContext = createEvalContext({
         localContext: { count: 0 },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: recordCompletion,
       });
       const artifact = compileEventAsyncStatementSource(
@@ -225,7 +225,7 @@ describe("compiled event-async control flow", () => {
     await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
       const evalContext = createEvalContext({
         localContext: { obj: [1, 2, 3], sum: 0 },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: recordCompletion,
       });
       const artifact = compileEventAsyncStatementSource(
@@ -269,7 +269,7 @@ describe("compiled event-async control flow", () => {
     await withYieldProbe(async ({ recordCompletion, yieldedAtCompletion }) => {
       const evalContext = createEvalContext({
         localContext: {},
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: recordCompletion,
       });
       const artifact = compileEventAsyncStatementSource("throw 'boom'", "test:event:throw-yield");
@@ -331,7 +331,7 @@ describe("compiled event-async control flow", () => {
     try {
       const evalContext = createEvalContext({
         localContext: { x: 1, y: 0 },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: () => {
           completions++;
         },
@@ -432,7 +432,7 @@ describe("compiled event-async control flow", () => {
     try {
       const evalContext = createEvalContext({
         localContext: { x: 0 },
-        options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+        options: { compileScripts: true, defaultToOptionalMemberAccess: true },
         onStatementCompleted: () => {
           completions++;
         },

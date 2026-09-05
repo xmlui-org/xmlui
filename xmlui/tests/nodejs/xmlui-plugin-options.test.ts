@@ -1,10 +1,11 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
   loadXmluiPluginOptions,
   mergeXmluiConfigSources,
   normalizeXmluiPluginOptions,
+  resetRemovedCompilationKeyNotices,
 } from "../../src/nodejs/bin/xmluiPluginOptions";
 
 // --- Fixture projects live inside the repo: the dynamic import that reads an
@@ -31,196 +32,101 @@ async function createProject(files: Record<string, string>) {
 }
 
 describe("XMLUI plugin options", () => {
-  it("reads common compiled script options from xmluiConfig", () => {
+  it("reads both compilation switches from xmluiConfig", () => {
     expect(
       normalizeXmluiPluginOptions({
-        xmluiConfig: {
-          compileScripts: true,
-          logCompiledEventHandlerSource: true,
-        },
+        xmluiConfig: { compileScripts: true, reportCompileFallbacks: true },
       }),
-    ).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-      logCompiledEventHandlerSource: true,
-    });
+    ).toMatchObject({ compileScripts: true, reportCompileFallbacks: true });
   });
 
-  it("reads compiled event handler options from xmluiConfig", () => {
+  it("reads both compilation switches from appGlobals", () => {
     expect(
       normalizeXmluiPluginOptions({
-        xmluiConfig: {
-          compileEventHandlers: true,
-          compiledScriptSourceMaps: "external",
-          logCompiledEventHandlerSource: true,
-        },
+        appGlobals: { compileScripts: true, reportCompileFallbacks: true },
       }),
-    ).toMatchObject({
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: "external",
-      logCompiledEventHandlerSource: true,
-    });
-  });
-
-  it("lets top-level compiled event handler options override xmluiConfig", () => {
-    expect(
-      normalizeXmluiPluginOptions({
-        compileEventHandlers: false,
-        compiledScriptSourceMaps: "inline",
-        logCompiledEventHandlerSource: false,
-        xmluiConfig: {
-          compileEventHandlers: true,
-          compiledScriptSourceMaps: "external",
-          logCompiledEventHandlerSource: true,
-        },
-      }),
-    ).toMatchObject({
-      compileEventHandlers: false,
-      compiledScriptSourceMaps: "inline",
-      logCompiledEventHandlerSource: false,
-    });
-  });
-
-  it("enables external compiled script source maps by default for dev server compiled events", () => {
-    expect(
-      normalizeXmluiPluginOptions(
-        {
-          xmluiConfig: {
-            compileEventHandlers: true,
-          },
-        },
-        { devServer: true },
-      ),
-    ).toMatchObject({
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: "external",
-    });
-  });
-
-  it("enables external compiled script source maps by default for dev server compiled scripts", () => {
-    expect(
-      normalizeXmluiPluginOptions(
-        {
-          xmluiConfig: {
-            compileScripts: true,
-          },
-        },
-        { devServer: true },
-      ),
-    ).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: "external",
-    });
-  });
-
-  it("enables external compiled script source maps by default for dev server compiled bindings", () => {
-    expect(
-      normalizeXmluiPluginOptions(
-        {
-          xmluiConfig: {
-            compileBindings: true,
-          },
-        },
-        { devServer: true },
-      ),
-    ).toMatchObject({
-      compileBindings: true,
-      compiledScriptSourceMaps: "external",
-    });
-  });
-
-  it("keeps compiled script source maps opt-in outside the dev server", () => {
-    expect(
-      normalizeXmluiPluginOptions({
-        xmluiConfig: {
-          compileEventHandlers: true,
-        },
-      }).compiledScriptSourceMaps,
-    ).toBeUndefined();
-  });
-
-  it("lets config explicitly disable the dev server source map default", () => {
-    expect(
-      normalizeXmluiPluginOptions(
-        {
-          xmluiConfig: {
-            compileEventHandlers: true,
-            compiledScriptSourceMaps: false,
-          },
-        },
-        { devServer: true },
-      ),
-    ).toMatchObject({
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: false,
-    });
-  });
-});
-
-describe("XMLUI plugin options from the app description", () => {
-  it("reads compiled script options from appGlobals", () => {
-    expect(
-      normalizeXmluiPluginOptions({
-        appGlobals: {
-          compileScripts: true,
-          logCompiledEventHandlerSource: true,
-        },
-      }),
-    ).toMatchObject({
-      compileScripts: true,
-      compileBindings: true,
-      compileEventHandlers: true,
-      logCompiledEventHandlerSource: true,
-    });
+    ).toMatchObject({ compileScripts: true, reportCompileFallbacks: true });
   });
 
   it("lets xmluiConfig override appGlobals", () => {
     expect(
       normalizeXmluiPluginOptions({
         appGlobals: { compileScripts: true },
-        xmluiConfig: { compileEventHandlers: false },
+        xmluiConfig: { compileScripts: false },
       }),
-    ).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: false,
-    });
+    ).toMatchObject({ compileScripts: false });
   });
 
-  it("lets top-level options override appGlobals", () => {
+  it("lets a top-level key override both", () => {
     expect(
       normalizeXmluiPluginOptions({
         compileScripts: false,
+        xmluiConfig: { compileScripts: true },
         appGlobals: { compileScripts: true },
       }),
-    ).toMatchObject({
+    ).toMatchObject({ compileScripts: false });
+  });
+
+  it("keeps compilation off unless asked", () => {
+    expect(normalizeXmluiPluginOptions({})).toMatchObject({
       compileScripts: false,
-      compileEventHandlers: false,
+      reportCompileFallbacks: false,
     });
   });
 
-  it("enables external dev server source maps for appGlobals compiled scripts", () => {
+  it("turns source maps on for the dev server only", () => {
     expect(
-      normalizeXmluiPluginOptions(
-        { appGlobals: { compileScripts: true } },
-        { devServer: true },
-      ),
-    ).toMatchObject({
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: "external",
-    });
+      normalizeXmluiPluginOptions({ xmluiConfig: { compileScripts: true } }, { devServer: true }),
+    ).toMatchObject({ compileScripts: true, sourceMaps: "external" });
+
+    expect(
+      normalizeXmluiPluginOptions({ xmluiConfig: { compileScripts: true } }),
+    ).not.toHaveProperty("sourceMaps");
+  });
+
+  it("does not emit source maps for a dev server that is not compiling", () => {
+    expect(normalizeXmluiPluginOptions({}, { devServer: true })).not.toHaveProperty("sourceMaps");
+  });
+
+  it("names the replacement for a removed key instead of ignoring it", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      resetRemovedCompilationKeyNotices();
+      normalizeXmluiPluginOptions({
+        appGlobals: { compileEventHandlers: true, compiledScriptSourceMaps: "external" },
+      });
+
+      const notices = warn.mock.calls.map((call) => String(call[0]));
+      expect(notices.some((notice) => notice.includes('"compileEventHandlers"'))).toBe(true);
+      expect(notices.some((notice) => notice.includes('"compileScripts"'))).toBe(true);
+      expect(notices.some((notice) => notice.includes('"compiledScriptSourceMaps"'))).toBe(true);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("does not let a removed key turn compilation on", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      resetRemovedCompilationKeyNotices();
+      expect(
+        normalizeXmluiPluginOptions({ xmluiConfig: { compileEventHandlers: true } }),
+      ).toMatchObject({ compileScripts: false });
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it("merges the app description under xmlui.config.json", () => {
     expect(
       mergeXmluiConfigSources(
-        { appGlobals: { compileScripts: true }, xmluiConfig: { compileEventHandlers: true } },
-        { analyze: "off", xmluiConfig: { compileEventHandlers: false } },
+        { appGlobals: { compileScripts: true }, xmluiConfig: { reportCompileFallbacks: true } },
+        { analyze: "off", xmluiConfig: { reportCompileFallbacks: false } },
       ),
     ).toEqual({
       analyze: "off",
       appGlobals: { compileScripts: true },
-      xmluiConfig: { compileEventHandlers: false },
+      xmluiConfig: { reportCompileFallbacks: false },
     });
   });
 });
@@ -230,20 +136,14 @@ describe("Loading XMLUI plugin options from project files", () => {
     const cwd = await createProject({
       "config.json": JSON.stringify({ name: "app", appGlobals: { compileScripts: true } }),
     });
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: true });
   });
 
   it("enables script compilation from xmluiConfig in an app description module", async () => {
     const cwd = await createProject({
       "src/config.mjs": "export default { xmluiConfig: { compileScripts: true } };\n",
     });
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: true });
   });
 
   it("lets xmlui.config.json override the app description", async () => {
@@ -251,10 +151,7 @@ describe("Loading XMLUI plugin options from project files", () => {
       "xmlui.config.json": JSON.stringify({ compileScripts: false }),
       "src/config.json": JSON.stringify({ appGlobals: { compileScripts: true } }),
     });
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: false,
-      compileEventHandlers: false,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: false });
   });
 
   it("keeps script compilation off when no project file asks for it", async () => {
@@ -262,8 +159,8 @@ describe("Loading XMLUI plugin options from project files", () => {
       "src/config.json": JSON.stringify({ name: "app" }),
     });
     expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: undefined,
-      compileEventHandlers: undefined,
+      compileScripts: false,
+      reportCompileFallbacks: false,
     });
   });
 
@@ -283,10 +180,7 @@ describe("Loading XMLUI plugin options from project files", () => {
       ].join("\n"),
     });
 
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: true });
   }, 30000);
 
   it("skips the Vite retry when xmlui.config.json already answers", async () => {
@@ -302,10 +196,7 @@ describe("Loading XMLUI plugin options from project files", () => {
     });
 
     const startedAt = Date.now();
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: false,
-      compileEventHandlers: false,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: false });
     // --- A Vite module-runner import takes hundreds of milliseconds; skipping it is
     // --- the point of this case.
     expect(Date.now() - startedAt).toBeLessThan(250);
@@ -316,9 +207,6 @@ describe("Loading XMLUI plugin options from project files", () => {
       "xmlui.config.json": JSON.stringify({ compileScripts: true }),
       "src/config.js": "import './missing-module.scss';\nexport default {};\n",
     });
-    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({
-      compileScripts: true,
-      compileEventHandlers: true,
-    });
+    expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: true });
   });
 });

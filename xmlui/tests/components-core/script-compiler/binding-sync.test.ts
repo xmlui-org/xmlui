@@ -413,7 +413,7 @@ describe("binding-sync expression compiler", () => {
         "new Date(0)",
         createEvalContext({
           localContext: {},
-          options: { defaultToOptionalMemberAccess: true, compileBindings: false },
+          options: { defaultToOptionalMemberAccess: true, compileScripts: false },
         }),
       ),
     ).toBeInstanceOf(Date);
@@ -425,7 +425,7 @@ describe("binding-sync expression compiler", () => {
         "count + 1",
         createEvalContext({
           localContext: { count: 2 },
-          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+          options: { defaultToOptionalMemberAccess: true, compileScripts: true },
         }),
       ),
     ).toBe(3);
@@ -436,7 +436,7 @@ describe("binding-sync expression compiler", () => {
       "(arg) => { return arg; }",
       createEvalContext({
         localContext: {},
-        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        options: { defaultToOptionalMemberAccess: true, compileScripts: true },
       }),
     );
 
@@ -445,7 +445,7 @@ describe("binding-sync expression compiler", () => {
   });
 
   it("calls XMLUI arrow objects from compiled bindings", () => {
-    const options = { defaultToOptionalMemberAccess: true, compileBindings: true };
+    const options = { defaultToOptionalMemberAccess: true, compileScripts: true };
     const progressFn = evalBindingExpression(
       "(cur, tot) => (Math.floor(1000 * cur / tot)) / 10",
       createEvalContext({ localContext: {}, options }),
@@ -471,7 +471,7 @@ describe("binding-sync expression compiler", () => {
       "{ a: () => { return null; }, b: { c: () => 1 } }",
       createEvalContext({
         localContext: {},
-        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        options: { defaultToOptionalMemberAccess: true, compileScripts: true },
       }),
     );
 
@@ -489,7 +489,7 @@ describe("binding-sync expression compiler", () => {
       "(item) => item.id",
       createEvalContext({
         localContext: {},
-        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        options: { defaultToOptionalMemberAccess: true, compileScripts: true },
       }),
     );
 
@@ -498,7 +498,7 @@ describe("binding-sync expression compiler", () => {
         "items.map(callback)",
         createEvalContext({
           localContext: { items: [{ id: 1 }, { id: 2 }], callback },
-          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+          options: { defaultToOptionalMemberAccess: true, compileScripts: true },
         }),
       ),
     ).toEqual([1, 2]);
@@ -510,7 +510,7 @@ describe("binding-sync expression compiler", () => {
         "(async () => 1)",
         createEvalContext({
           localContext: {},
-          options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+          options: { defaultToOptionalMemberAccess: true, compileScripts: true },
         }),
       ),
     ).toThrow("XMLUI does not support async arrow functions.");
@@ -518,7 +518,7 @@ describe("binding-sync expression compiler", () => {
 
   it("uses compileBindings from app config through extractParam", () => {
     expect(
-      extractParam({ count: 2 }, "{count + 1}", { xmluiConfig: { compileBindings: true } } as any),
+      extractParam({ count: 2 }, "{count + 1}", { xmluiConfig: { compileScripts: true } } as any),
     ).toBe(3);
   });
 
@@ -534,7 +534,7 @@ describe("binding-sync expression compiler", () => {
       "(() => { count += 1; return count; })()",
       createEvalContext({
         localContext: { count: 1, label: "A", user: { name: "Ada" } },
-        options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+        options: { defaultToOptionalMemberAccess: true, compileScripts: true },
         onDidUpdate: (_scope, index) => {
           dirtyRoots.add(String(index));
         },

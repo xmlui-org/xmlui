@@ -434,7 +434,7 @@ describe("Xmlui transform - child elements", () => {
 
     it("implicit events get parse-time compiled artifacts when enabled", () => {
       const cd = transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
-        compileEventHandlers: true,
+        compileScripts: true,
       }) as ComponentDef;
       const event = (cd.events! as any).click;
 
@@ -454,7 +454,7 @@ describe("Xmlui transform - child elements", () => {
         false,
         warnings,
         {
-          compileEventHandlers: true,
+          compileScripts: true,
         },
       ) as ComponentDef;
       const event = (cd.events! as any).click;
@@ -475,7 +475,7 @@ describe("Xmlui transform - child elements", () => {
         false,
         undefined,
         {
-          compileEventHandlers: true,
+          compileScripts: true,
         },
       ) as ComponentDef;
       const event = (cd.events! as any).click;
@@ -495,7 +495,7 @@ describe("Xmlui transform - child elements", () => {
 
     it("parse-time event artifacts are JSON serializable", () => {
       const cd = transformSource("<Stack onClick='count = count + 1' />", 0, false, undefined, {
-        compileEventHandlers: true,
+        compileScripts: true,
       }) as ComponentDef;
       const event = (cd.events! as any).click;
 
@@ -528,7 +528,7 @@ describe("Xmlui transform - child elements", () => {
         false,
         warnings,
         {
-          compileEventHandlers: true,
+          compileScripts: true,
         },
       ) as ComponentDef;
       const event = (cd.events! as any).click;
@@ -561,7 +561,7 @@ describe("Xmlui transform - child elements", () => {
         0,
         false,
         warnings,
-        { compileEventHandlers: true },
+        { compileScripts: true },
       ) as ComponentDef;
       const event = (cd.events! as any).mount;
 
@@ -582,7 +582,7 @@ describe("Xmlui transform - child elements", () => {
         0,
         false,
         undefined,
-        { compileEventHandlers: true },
+        { compileScripts: true },
       ) as ComponentDef;
       const event = (cd.events! as any).selectionDidChange;
 
@@ -600,7 +600,7 @@ describe("Xmlui transform - child elements", () => {
 
       try {
         transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
-          compileEventHandlers: true,
+          compileScripts: true,
         });
 
         expect(logSpy).not.toHaveBeenCalled();
@@ -612,15 +612,15 @@ describe("Xmlui transform - child elements", () => {
       }
     });
 
-    it("does not log parse-time compiled event source while diagnostics are disabled", () => {
+    it("does not print generated JavaScript while compiling", () => {
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
       const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
 
       try {
         transformSource("<Stack onClick='count = count + 1' />", 0, false, undefined, {
-          compileEventHandlers: true,
-          logCompiledEventHandlerSource: true,
+          compileScripts: true,
+          reportCompileFallbacks: true,
         });
 
         expect(logSpy).not.toHaveBeenCalled();
@@ -633,14 +633,14 @@ describe("Xmlui transform - child elements", () => {
       }
     });
 
-    it("does not compile or log event source when only logging is enabled", () => {
+    it("does not compile when only fallback reporting is enabled", () => {
       const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
       const groupSpy = vi.spyOn(console, "groupCollapsed").mockImplementation(() => undefined);
       const groupEndSpy = vi.spyOn(console, "groupEnd").mockImplementation(() => undefined);
 
       try {
         const cd = transformSource("<Stack onClick='doIt' />", 0, false, undefined, {
-          logCompiledEventHandlerSource: true,
+          reportCompileFallbacks: true,
         }) as ComponentDef;
         const event = (cd.events! as any).click;
 

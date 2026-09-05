@@ -224,30 +224,61 @@ export type TestBedDescription = Omit<
   mainXs?: string;
   noFragmentWrapper?: boolean;
   parserOptions?: XmluiParserOptions;
+  /**
+   * Source-map payload for compiled scripts. Test-only: apps get source maps from
+   * `xmlui start`, never from configuration.
+   */
+  sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
   extensionIds?: string | string[];
 };
 
 const E2E_BASE_URL = `http://localhost:3211`;
 
 type TestBedScriptParserOptions = XmluiParserOptions & {
-  compiledScriptSourceMaps?: CodeBehindCollectionOptions["compiledScriptSourceMaps"];
+  sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
 };
+
+/**
+ * Keys a test bed may no longer set, and where the switch lives now. A test that sets one
+ * would otherwise run interpreted while its name claims otherwise — the exact silence this
+ * two-flag surface exists to remove — so the test bed fails loudly instead.
+ */
+const MISPLACED_TEST_BED_KEYS: Record<string, string> = {
+  compileBindings: 'use "compileScripts": it covers bindings, handlers, and code-behind alike',
+  compileEventHandlers:
+    'use "compileScripts": it covers bindings, handlers, and code-behind alike',
+  compiledScriptSourceMaps: 'use the test-bed seam `sourceMaps` on the description itself',
+  logCompiledEventHandlerSource: 'use "reportCompileFallbacks"',
+  sourceMaps: "put `sourceMaps` on the description itself, not in `xmluiConfig`",
+};
+
+function assertNoMisplacedCompilationKeys(xmluiConfig: Record<string, any>): void {
+  for (const [key, advice] of Object.entries(MISPLACED_TEST_BED_KEYS)) {
+    if (xmluiConfig[key] !== undefined) {
+      throw new Error(
+        `TestBedDescription.xmluiConfig."${key}" is not read any more — ${advice}.`,
+      );
+    }
+  }
+}
 
 function createTestBedScriptParserOptions(
   description?: TestBedDescription,
 ): TestBedScriptParserOptions {
   const xmluiConfig = description?.xmluiConfig ?? {};
-  const compileEventHandlers =
-    description?.parserOptions?.compileEventHandlers ??
-    xmluiConfig.compileEventHandlers ??
-    xmluiConfig.compileScripts ??
-    false;
-  const sourceMapMode = xmluiConfig.compiledScriptSourceMaps;
+  assertNoMisplacedCompilationKeys(xmluiConfig);
+  const compileScripts =
+    description?.parserOptions?.compileScripts ?? xmluiConfig.compileScripts === true;
+  // --- Tests may ask for source-map payload explicitly; apps cannot.
+  const sourceMaps = description?.sourceMaps;
   return {
     ...description?.parserOptions,
-    compileEventHandlers,
-    ...(sourceMapMode === true || sourceMapMode === "inline" || sourceMapMode === "external"
-      ? { compiledScriptSourceMaps: sourceMapMode }
+    compileScripts,
+    reportCompileFallbacks:
+      description?.parserOptions?.reportCompileFallbacks ??
+      xmluiConfig.reportCompileFallbacks === true,
+    ...(sourceMaps === true || sourceMaps === "inline" || sourceMaps === "external"
+      ? { sourceMaps }
       : {}),
   };
 }
@@ -257,12 +288,13 @@ function createTestBedCodeBehindOptions(
   sourceText: string,
   parserOptions: TestBedScriptParserOptions,
 ): CodeBehindCollectionOptions | undefined {
-  if (!parserOptions.compileEventHandlers) {
+  if (!parserOptions.compileScripts) {
     return undefined;
   }
   return {
-    compileEventHandlers: true,
-    compiledScriptSourceMaps: parserOptions.compiledScriptSourceMaps,
+    compileScripts: true,
+    reportCompileFallbacks: parserOptions.reportCompileFallbacks,
+    sourceMaps: parserOptions.sourceMaps,
     sourceIdPrefix: moduleName,
     sourceUrl: createDebugSourceUrl(moduleName),
     displayName: moduleName,

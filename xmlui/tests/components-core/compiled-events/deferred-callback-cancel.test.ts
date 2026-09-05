@@ -17,7 +17,7 @@ function createEvalContext(localContext: Record<string, any>) {
   return {
     localContext,
     eventArgs: [],
-    options: { compileEventHandlers: true, defaultToOptionalMemberAccess: true },
+    options: { compileScripts: true, defaultToOptionalMemberAccess: true },
   } as any;
 }
 

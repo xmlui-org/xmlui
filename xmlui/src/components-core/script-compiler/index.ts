@@ -14,9 +14,17 @@ export {
 } from "./cache";
 export {
   UnsupportedCompiledScriptNodeError,
-  describeCompiledScriptFallback,
   throwUnsupportedCompiledScriptNode,
 } from "./errors";
+export {
+  createCompileDiagnostic,
+  describeCompileDiagnostic,
+  formatCompileDiagnostic,
+  reportCompileDiagnostic,
+  type CompileDiagnostic,
+  type CompileDiagnosticCode,
+  type CompileDiagnosticPhase,
+} from "./diagnostics";
 export { describeScriptNodeType } from "./node-names";
 export { createCompiledScriptMapping, createDebugSourceUrl, sourceRangeFromNode } from "./source";
 export {

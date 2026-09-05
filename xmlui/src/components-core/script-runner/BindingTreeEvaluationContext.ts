@@ -111,25 +111,15 @@ class CancellationToken {
 export type EvalTreeOptions = {
   defaultToOptionalMemberAccess?: boolean;
   /**
-   * Umbrella switch for script compilation. Implies both `compileBindings` and
-   * `compileEventHandlers` unless one of those is set explicitly.
+   * Compile every script this evaluation touches — binding expressions, event
+   * handlers, and code-behind declarations alike.
+   *
+   * Default: `false`. Set from `App.xmluiConfig.compileScripts` (or the same key in
+   * `appGlobals`). There is no per-path variant: one switch decides for all of them.
    */
   compileScripts?: boolean;
-  /**
-   * Experimental switch for compiled synchronous binding expressions.
-   *
-   * Default: `false`. Set via `App.xmluiConfig.compileScripts`; the legacy
-   * `compileBindings` key is kept as a compatibility alias.
-   */
-  compileBindings?: boolean;
-  /**
-   * Experimental switch for compiled asynchronous event handlers and
-   * code-behind functions.
-   *
-   * Default: `false`. Set via `App.xmluiConfig.compileScripts`; the legacy
-   * `compileEventHandlers` key is kept as a compatibility alias.
-   */
-  compileEventHandlers?: boolean;
+  /** Report each script block that falls back to interpretation, with a code. */
+  reportCompileFallbacks?: boolean;
   /**
    * Event-handler directive prologue execution mode. The compiled event
    * executor currently uses `"sync"` to suppress cooperative event-loop
@@ -137,12 +127,13 @@ export type EvalTreeOptions = {
    */
   handlerExecutionMode?: EventHandlerExecutionMode;
   /**
-   * Enables source map comments for JavaScript-compiled XMLUI scripts.
+   * Source-map comments for JavaScript-compiled XMLUI scripts. Internal: the CLI sets
+   * it for the dev server and tests set it explicitly; apps do not configure it.
    *
-   * `external` is the preferred dev-server mode; `inline` is a runtime fallback
-   * for environments without a Vite source-map endpoint.
+   * `external` is the preferred dev-server mode; `inline` is a runtime fallback for
+   * environments without a Vite source-map endpoint.
    */
-  compiledScriptSourceMaps?: boolean | "inline" | "external";
+  sourceMaps?: boolean | "inline" | "external";
   /**
    * When `true`, any expression that accesses a banned DOM API throws a
    * `BannedApiError` immediately. When `false` (the default), the access

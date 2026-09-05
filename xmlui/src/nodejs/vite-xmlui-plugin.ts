@@ -135,38 +135,23 @@ export type PluginOptions = {
    */
   optimizerSourceDirs?: string[];
   /**
-   * Compile XMLUI binding expressions and event handlers into JavaScript where
-   * the corresponding compiler target supports it. This is the preferred public
-   * switch; `compileBindings` and `compileEventHandlers` remain as
-   * compatibility aliases.
+   * Compile XMLUI scripts to JavaScript: event handlers, inline `<script>` functions,
+   * code-behind declarations, and — in the browser, on first use — binding
+   * expressions. One switch decides for all of them.
    */
   compileScripts?: boolean;
   /**
-   * Legacy compatibility alias for binding compilation. The Vite plugin does
-   * not compile bindings during transform, but uses this to enable dev-server
-   * source registration when runtime binding compilation is active.
-   *
-   * @deprecated Use `compileScripts` instead.
+   * Report every script block that falls back to interpretation, with a diagnostic
+   * code and source position. The build always counts fallbacks in its summary; this
+   * adds the per-block detail.
    */
-  compileBindings?: boolean;
+  reportCompileFallbacks?: boolean;
   /**
-   * Compile event-handler source into JavaScript artifacts during the build-time
-   * XMLUI transform. When omitted, event handlers remain interpreted.
-   *
-   * @deprecated Use `compileScripts` instead.
+   * Emit source-map/debug-source metadata for compiled scripts. Internal: the CLI
+   * turns it on for `xmlui start` only, since the payload has no value in a build.
+   * `"external"` is the dev-server mode; `"inline"` is reserved for runtime fallbacks.
    */
-  compileEventHandlers?: boolean;
-  /**
-   * Print generated event-handler JavaScript to the console while parsing.
-   * Only has an effect when event-handler compilation is enabled.
-   */
-  logCompiledEventHandlerSource?: boolean;
-  /**
-   * Emit source-map/debug-source metadata for JavaScript-compiled XMLUI scripts.
-   * `"external"` is the preferred dev-server mode; `"inline"` is reserved for
-   * runtime fallback paths.
-   */
-  compiledScriptSourceMaps?: CompiledScriptSourceMapMode;
+  sourceMaps?: CompiledScriptSourceMapMode;
   /**
    * Strip parser source-location metadata from ComponentDef graphs emitted to
    * browser/runtime modules. Build-time analyzers still run before this step.
@@ -531,17 +516,14 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       warnings.map((msg) => `console.warn("[xmlui] " + ${JSON.stringify(msg)});`).join("\n") + "\n"
     );
   };
-  const compileEventHandlers =
-    pluginOptions.compileEventHandlers ?? pluginOptions.compileScripts ?? false;
-  const compileScripts =
-    pluginOptions.compileScripts === true ||
-    pluginOptions.compileBindings === true ||
-    compileEventHandlers;
+  const compileScripts = pluginOptions.compileScripts === true;
+  const reportCompileFallbacks = pluginOptions.reportCompileFallbacks === true;
   const sourceMapsEnabled = () =>
-    pluginOptions.compiledScriptSourceMaps === true ||
-    pluginOptions.compiledScriptSourceMaps === "inline" ||
-    pluginOptions.compiledScriptSourceMaps === "external" ||
-    (pluginOptions.compiledScriptSourceMaps !== false && devServerMode && compileScripts);
+    compileScripts &&
+    (pluginOptions.sourceMaps === true ||
+      pluginOptions.sourceMaps === "inline" ||
+      pluginOptions.sourceMaps === "external" ||
+      (pluginOptions.sourceMaps !== false && devServerMode));
   const createDebugSource = (
     id: string,
     sourceText: string,
@@ -561,13 +543,14 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     sourceOrigin?: CodeBehindCollectionOptions["sourceOrigin"],
     sources?: CompiledScriptSource[],
   ): CodeBehindCollectionOptions | undefined => {
-    if (!compileEventHandlers) {
+    if (!compileScripts) {
       return undefined;
     }
     const primarySource = sources?.find((source) => source.id === moduleName);
     return {
-      compileEventHandlers: true,
-      compiledScriptSourceMaps: sourceMapsEnabled() ? pluginOptions.compiledScriptSourceMaps : false,
+      compileScripts: true,
+      reportCompileFallbacks,
+      sourceMaps: sourceMapsEnabled() ? (pluginOptions.sourceMaps ?? "external") : false,
       sourceIdPrefix,
       sourceUrl: sourceUrl ?? primarySource?.url ?? createDebugSourceUrl(sourceIdPrefix),
       displayName: displayName ?? primarySource?.displayName ?? sourceIdPrefix,
@@ -605,7 +588,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   let compiledScriptSummaryTimer: ReturnType<typeof setTimeout> | undefined;
   const recordCompiledScripts = (value: unknown) => {
     // --- Nothing left to count once the summary is out; the walk is not free.
-    if (!compileEventHandlers || compiledScriptSummaryReported) return;
+    if (!compileScripts || compiledScriptSummaryReported) return;
     compiledScriptTally.files++;
     tallyCompiledScripts(value, compiledScriptTally);
     if (!devServerMode) return;
@@ -616,7 +599,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     compiledScriptSummaryTimer.unref?.();
   };
   const reportCompiledScriptSummary = (warn?: (message: string) => void) => {
-    if (!compileEventHandlers || compiledScriptSummaryReported) return;
+    if (!compileScripts || compiledScriptSummaryReported) return;
     compiledScriptSummaryReported = true;
     clearTimeout(compiledScriptSummaryTimer);
     const { files, scripts, artifacts, unsupported } = compiledScriptTally;
@@ -854,8 +837,8 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         const parserOptions: XmluiParserOptions = {
           ...(isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {}),
-          compileEventHandlers,
-          logCompiledEventHandlerSource: pluginOptions.logCompiledEventHandlerSource,
+          compileScripts,
+          reportCompileFallbacks,
         };
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
           xmlUiMarkupToComponent(code, fileId, codeBehind, optimizerMetadataLookup, parserOptions);

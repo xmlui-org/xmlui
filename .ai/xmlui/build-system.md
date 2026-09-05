@@ -223,19 +223,17 @@ Used when one doesn't utilize the xmlui commands, like `xmlui start`, `xmlui bui
 
 ### Compiled Script Source Maps
 
-When `compiledScriptSourceMaps` is enabled on the Vite XMLUI plugin, transformed `.xmlui`,
-`.xmlui.xs`, and `.xs` files include Source Map v3 metadata with `sources` pointing at
-`/@xmlui-source/...` URLs and `sourcesContent` carrying the original source text. `compileScripts`
-is the preferred public switch for script compilation; the older `compileBindings` and
-`compileEventHandlers` keys remain compatibility aliases. Event-handler compilation covers both
-inline handler expressions and executable script declarations, including inline `<script>`
-functions, code-behind files, `Globals.xs` functions, and imported `.xs` helpers. Binding
-compilation still controls reactive `var` declarations.
+`compileScripts` is the single public switch for script compilation, and `reportCompileFallbacks`
+the switch for its per-block diagnostics. The plugin takes them as `PluginOptions.compileScripts`
+and `PluginOptions.reportCompileFallbacks`; there are no per-path keys.
 
-`xmlui start` defaults source maps to `"external"` in dev server mode whenever script compilation is
-enabled, unless config explicitly sets `compiledScriptSourceMaps: false`. The dev server registers
-those sources in a virtual source registry and serves both source text and `.map` JSON via the same
-`/@xmlui-source/...` namespace.
+When the plugin's internal `sourceMaps` option is on, transformed `.xmlui`, `.xmlui.xs`, and `.xs`
+files include Source Map v3 metadata with `sources` pointing at `/@xmlui-source/...` URLs and
+`sourcesContent` carrying the original source text. Only `xmlui start` turns it on (via
+`getViteConfig({ devServer: true })`); the dev server registers those sources in a virtual source
+registry and serves both source text and `.map` JSON from the same `/@xmlui-source/...` namespace.
+`xmlui start` also defines `import.meta.env.VITE_XMLUI_DEV_SERVER`, which is what gives source maps
+to scripts the browser compiles on first use.
 
 This is the preferred debug path for JavaScript-compiled binding expressions, event handlers, and
 script declaration functions. The runtime `new Function(...)` path can still fall back to inline
@@ -275,8 +273,13 @@ because it evaluates the whole module graph the description pulls in. A failed l
 fatal: the build continues with `xmlui.config.json` alone, and the CLI warns.
 
 `getViteConfig({ devServer })` decides whether dev-only defaults apply. Only `xmlui start` passes
-`true`; it is what turns on `compiledScriptSourceMaps: "external"`. A production build therefore
-emits compiled artifacts without mappings, embedded sources, or absolute developer paths.
+`true`; it is what turns on `sourceMaps: "external"` and the `VITE_XMLUI_DEV_SERVER` define. A
+production build therefore emits compiled artifacts without mappings, embedded sources, or
+absolute developer paths.
+
+A configuration that still carries a removed key (`compileBindings`, `compileEventHandlers`,
+`compiledScriptSourceMaps`, `logCompiledEventHandlerSource`) gets one notice naming the
+replacement — from `normalizeXmluiPluginOptions` at build time and from `AppContent` at startup.
 
 The plugin counts the artifacts it emits and reports them (`[xmlui] Script compilation: …`) at
 `buildEnd`, or shortly after the dev server settles. When compilation is enabled but no artifact

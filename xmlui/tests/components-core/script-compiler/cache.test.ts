@@ -44,7 +44,7 @@ describe("compiled script cache", () => {
       sourceId: "Main.xmlui#expr-1",
       sourceText: "{count}",
       astNodeId: 1,
-      optionsKey: "compileBindings:true",
+      optionsKey: "compileScripts:true",
     };
 
     expect(createCompiledScriptCacheKey(base)).not.toBe(
@@ -57,7 +57,7 @@ describe("compiled script cache", () => {
       createCompiledScriptCacheKey({ ...base, astNodeId: 2 }),
     );
     expect(createCompiledScriptCacheKey(base)).not.toBe(
-      createCompiledScriptCacheKey({ ...base, optionsKey: "compileBindings:false" }),
+      createCompiledScriptCacheKey({ ...base, optionsKey: "compileScripts:false" }),
     );
     expect(createCompiledScriptCacheKey(base)).not.toBe(
       createCompiledScriptCacheKey({ ...base, compilerVersion: 2 }),

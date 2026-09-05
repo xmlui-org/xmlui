@@ -4,14 +4,6 @@ import {
   applyE2eCompileScriptsConfig,
   isE2eCompileScriptsEnabled,
 } from "../../../src/testing/compile-scripts-env";
-import {
-  applyE2eCompileBindingsConfig,
-  isE2eCompileBindingsEnabled,
-} from "../../../src/testing/compile-bindings-env";
-import {
-  applyE2eCompileEventHandlersConfig,
-  isE2eCompileEventHandlersEnabled,
-} from "../../../src/testing/compile-event-handlers-env";
 
 describe("E2E compileScripts environment helper", () => {
   it.each(["1", "true", "TRUE", "yes", "on"])("enables compiled scripts for %s", (value) => {
@@ -25,14 +17,9 @@ describe("E2E compileScripts environment helper", () => {
     },
   );
 
-  it("accepts the legacy compiled bindings env flag as an alias", () => {
-    expect(isE2eCompileScriptsEnabled({ XMLUI_COMPILE_BINDINGS: "true" })).toBe(true);
-    expect(isE2eCompileBindingsEnabled({ XMLUI_COMPILE_SCRIPTS: "true" })).toBe(true);
-  });
-
-  it("accepts the legacy compiled event handlers env flag as an alias", () => {
-    expect(isE2eCompileScriptsEnabled({ XMLUI_COMPILE_EVENT_HANDLERS: "true" })).toBe(true);
-    expect(isE2eCompileEventHandlersEnabled({ XMLUI_COMPILE_SCRIPTS: "true" })).toBe(true);
+  it("ignores the removed per-path env flags", () => {
+    expect(isE2eCompileScriptsEnabled({ XMLUI_COMPILE_BINDINGS: "true" })).toBe(false);
+    expect(isE2eCompileScriptsEnabled({ XMLUI_COMPILE_EVENT_HANDLERS: "true" })).toBe(false);
   });
 
   it("merges compileScripts into xmluiConfig when the env flag is enabled", () => {
@@ -58,19 +45,6 @@ describe("E2E compileScripts environment helper", () => {
       ),
     ).toEqual({
       xmluiConfig: { compileScripts: false },
-    });
-  });
-
-  it("keeps legacy apply helpers compatible", () => {
-    expect(
-      applyE2eCompileBindingsConfig({}, { XMLUI_COMPILE_BINDINGS: "true" }),
-    ).toEqual({
-      xmluiConfig: { compileScripts: true },
-    });
-    expect(
-      applyE2eCompileEventHandlersConfig({}, { XMLUI_COMPILE_EVENT_HANDLERS: "true" }),
-    ).toEqual({
-      xmluiConfig: { compileScripts: true },
     });
   });
 

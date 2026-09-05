@@ -160,6 +160,16 @@ export function instantiateCompiledScriptArtifact<TValue = unknown>(
   };
 }
 
+/**
+ * The body handed to `new Function`, always ending in a `//# sourceURL` line.
+ *
+ * Naming the product is not the same thing as shipping a source map: the URL is one
+ * short, app-relative line built in the browser — it adds nothing to the bundle and
+ * carries no source text — and without it every compiled artifact shows up as
+ * `<anonymous>` in stack traces, profiles, and the debugger, which is precisely where
+ * one needs to know which script block is running. The source-map *payload*, inline or
+ * external, stays behind `sourceMapMode`.
+ */
 export function createCompiledScriptFunctionBody(
   artifact: CompiledScriptArtifact,
   options: CompiledScriptInstantiateOptions = {},
@@ -167,15 +177,11 @@ export function createCompiledScriptFunctionBody(
   const sourceMapMode = options.sourceMapMode;
   const prefix = `"use strict";\n`;
   const body = `${prefix}${artifact.js}`;
-  if (!sourceMapMode) {
-    return body;
-  }
-
   const sourceUrl = options.generatedSourceUrl ?? createCompiledScriptGeneratedSourceUrl(artifact);
   const comments: string[] = [];
   if (sourceMapMode === "external" && options.sourceMapUrl) {
     comments.push(`//# sourceMappingURL=${options.sourceMapUrl}`);
-  } else {
+  } else if (sourceMapMode) {
     comments.push(
       createInlineSourceMapComment(
         createCompiledScriptSourceMap(

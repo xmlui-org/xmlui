@@ -19,7 +19,11 @@ import { clearAllModuleCaches } from "./ModuleCache";
 import { ModuleLoader } from "./ModuleLoader";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
-import { describeCompiledScriptFallback } from "../../components-core/script-compiler/errors";
+import {
+  createCompileDiagnostic,
+  describeCompileDiagnostic,
+  formatCompileDiagnostic,
+} from "../../components-core/script-compiler/diagnostics";
 import type {
   CompiledScriptSource,
   CompiledScriptSourceMapMode,
@@ -30,8 +34,12 @@ import type {
 export { PARSED_MARK_PROP } from "../../abstractions/InternalMarkers";
 
 export type CodeBehindCollectionOptions = {
-  compileEventHandlers?: boolean;
-  compiledScriptSourceMaps?: CompiledScriptSourceMapMode;
+  /** Compile the declarations collected here. Mirrors `xmluiConfig.compileScripts`. */
+  compileScripts?: boolean;
+  /** Report each declaration that falls back to interpretation, with a code. */
+  reportCompileFallbacks?: boolean;
+  /** Internal: source-map payload mode, set by the CLI for the dev server. */
+  sourceMaps?: CompiledScriptSourceMapMode;
   sourceIdPrefix?: string;
   sourceUrl?: string;
   displayName?: string;
@@ -248,7 +256,7 @@ function attachCompiledFunctionArtifact(
   context: CollectionContext,
 ): void {
   const options = context.options;
-  if (!options?.compileEventHandlers) {
+  if (!options?.compileScripts) {
     return;
   }
 
@@ -305,13 +313,14 @@ function attachCompiledFunctionArtifact(
     arrow.compiledUnsupported = false;
     arrow.sourceRange = arrow.compiled.sourceRange;
   } catch (error) {
-    const reason = describeCompiledScriptFallback(error);
+    const diagnostic = createCompileDiagnostic(error, { sourceId });
     arrow.compiledUnsupported = true;
-    arrow.compiledUnsupportedReason = reason;
-    (context.result.warnings ??= []).push(
-      `Could not compile code-behind function ${sourceId} (${reason}); ` +
-        `falling back to interpreted execution.`,
-    );
+    arrow.compiledUnsupportedReason = describeCompileDiagnostic(diagnostic);
+    // --- Detail is reported only on request; the build always counts the fallback in
+    // --- its summary. See `reportCompileFallbacks`.
+    if (options.reportCompileFallbacks) {
+      (context.result.warnings ??= []).push(formatCompileDiagnostic(diagnostic));
+    }
   }
 }
 

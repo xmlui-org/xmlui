@@ -104,3 +104,28 @@ export function formatParsedScriptInventory(inventory: ParsedScriptInventory): s
     inventory.reasons.length > 0 ? ` Fallback reasons: ${inventory.reasons.join("; ")}.` : "";
   return `[xmlui] Script artifacts: ${parts.join(", ")}.${reasons}`;
 }
+
+/**
+ * Configuration keys that used to steer script compilation. They are inert now, so an
+ * app still carrying one is told what replaced it — once per page load, at startup,
+ * next to the compilation report.
+ */
+const REMOVED_COMPILATION_KEYS: Record<string, string> = {
+  compileBindings: '"compileScripts" now covers bindings, handlers, and code-behind alike',
+  compileEventHandlers: '"compileScripts" now covers bindings, handlers, and code-behind alike',
+  compiledScriptSourceMaps: "source maps are automatic: on under `xmlui start`, off in builds",
+  logCompiledEventHandlerSource:
+    'use "reportCompileFallbacks" for fallback diagnostics, or `xsVerbose` for per-artifact traces',
+};
+
+/** The notices an app's configuration has earned, empty when it uses the current keys. */
+export function collectRemovedCompilationKeyNotices(
+  xmluiConfig: Record<string, any> | undefined,
+): string[] {
+  if (!xmluiConfig) {
+    return [];
+  }
+  return Object.entries(REMOVED_COMPILATION_KEYS)
+    .filter(([key]) => xmluiConfig[key] !== undefined)
+    .map(([key, advice]) => `[xmlui] "${key}" is no longer supported — ${advice}.`);
+}

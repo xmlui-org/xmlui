@@ -102,8 +102,14 @@ function optionalRecordField<K extends string, T extends Record<string, any>>(
 }
 
 type StandaloneScriptParserOptions = XmluiParserOptions & {
-  compiledScriptSourceMaps?: CodeBehindCollectionOptions["compiledScriptSourceMaps"];
+  sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
 };
+
+/** True when the app is served by `xmlui start` (see `createXmluiAppDefines`). */
+function isDevServedApp(): boolean {
+  const env = import.meta.env as Record<string, any> | undefined;
+  return env?.VITE_XMLUI_DEV_SERVER === "true" || env?.DEV === true;
+}
 
 function mergeStandaloneXmluiConfig(
   appGlobals: Record<string, any> | undefined,
@@ -124,13 +130,13 @@ function createStandaloneScriptParserOptions(
   config?: Pick<StandaloneJsonConfig, "appGlobals" | "xmluiConfig">,
 ): StandaloneScriptParserOptions {
   const xmluiConfig = mergeStandaloneXmluiConfig(config?.appGlobals, config?.xmluiConfig);
-  const compileEventHandlers = xmluiConfig.compileEventHandlers ?? xmluiConfig.compileScripts ?? false;
-  const sourceMapMode = xmluiConfig.compiledScriptSourceMaps;
+  const compileScripts = xmluiConfig.compileScripts === true;
   return {
-    compileEventHandlers,
-    ...(sourceMapMode === true || sourceMapMode === "inline" || sourceMapMode === "external"
-      ? { compiledScriptSourceMaps: sourceMapMode }
-      : {}),
+    compileScripts,
+    reportCompileFallbacks: xmluiConfig.reportCompileFallbacks === true,
+    // --- Source maps are a dev-server affordance, not an app setting: `xmlui start`
+    // --- marks the app as dev-served and nothing else turns them on.
+    ...(compileScripts && isDevServedApp() ? { sourceMaps: "external" as const } : {}),
   };
 }
 
@@ -140,12 +146,13 @@ function createStandaloneCodeBehindCollectionOptions(
   parserOptions: StandaloneScriptParserOptions = {},
   sourceOrigin?: CodeBehindCollectionOptions["sourceOrigin"],
 ): CodeBehindCollectionOptions | undefined {
-  if (!parserOptions.compileEventHandlers) {
+  if (!parserOptions.compileScripts) {
     return undefined;
   }
   return {
-    compileEventHandlers: true,
-    compiledScriptSourceMaps: parserOptions.compiledScriptSourceMaps,
+    compileScripts: true,
+    reportCompileFallbacks: parserOptions.reportCompileFallbacks,
+    sourceMaps: parserOptions.sourceMaps,
     sourceIdPrefix: moduleName,
     sourceUrl: createDebugSourceUrl(moduleName),
     displayName: moduleName,

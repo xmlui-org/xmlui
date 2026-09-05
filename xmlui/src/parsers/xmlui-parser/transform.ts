@@ -18,7 +18,11 @@ import type { GetText, XmluiParserOptions } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { compileEventAsyncStatements } from "../../components-core/script-compiler/targets/event-async";
 import { createDebugSourceUrl } from "../../components-core/script-compiler/source";
-import { describeCompiledScriptFallback } from "../../components-core/script-compiler/errors";
+import {
+  createCompileDiagnostic,
+  describeCompileDiagnostic,
+  formatCompileDiagnostic,
+} from "../../components-core/script-compiler/diagnostics";
 import { extractEventHandlerDirectives } from "../../components-core/utils/event-handler-directives";
 import { prepareCompiledHandlerStatements } from "../../components-core/utils/statementUtils";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
@@ -36,27 +40,11 @@ const APP_NS_KEY = "app-ns";
 const APP_NS_VALUE = "#app-ns";
 const CORE_NS_KEY = "core-ns";
 export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
-const COMPILED_EVENT_HANDLER_SOURCE_LOGGING_ENABLED = false;
-
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
 interface TransformNode extends Node {
   text?: string;
   originalKind?: SyntaxKind;
-}
-
-function logCompiledEventHandlerSource(sourceId: string, sourceText: string, js: string): void {
-  if (typeof console === "undefined") return;
-  const title = `[xmlui] compiled event handler ${sourceId}`;
-  if (typeof console.groupCollapsed === "function") {
-    console.groupCollapsed(title);
-    console.log("sourceId:", sourceId);
-    console.log("source:", sourceText);
-    console.log("js:", js);
-    console.groupEnd?.();
-    return;
-  }
-  console.log(title, { sourceId, source: sourceText, js });
 }
 
 const HelperNode = {
@@ -1529,7 +1517,7 @@ function transformXmluiNode(
       let compiled: ParsedEventValue["compiled"] | undefined;
       let compiledUnsupported = false;
       let compiledUnsupportedReason: string | undefined;
-      if (parserOptions.compileEventHandlers) {
+      if (parserOptions.compileScripts) {
         try {
           const compileOptions = {
             sourceId,
@@ -1559,22 +1547,15 @@ function transformXmluiNode(
             compiled = compileEventAsyncStatements(preparedStatements, compileOptions);
           }
         } catch (error) {
+          const diagnostic = createCompileDiagnostic(error, { sourceId });
           compiledUnsupported = true;
-          compiledUnsupportedReason = describeCompiledScriptFallback(error);
-          const message =
-            `Could not compile event handler ${sourceId} (${compiledUnsupportedReason}); ` +
-            `falling back to interpreted execution.`;
-          if (warnings) {
-            warnings.push(message);
+          compiledUnsupportedReason = describeCompileDiagnostic(diagnostic);
+          // --- Detail is reported only on request; the build always counts the
+          // --- fallback in its summary. See `reportCompileFallbacks`.
+          if (warnings && parserOptions.reportCompileFallbacks) {
+            warnings.push(formatCompileDiagnostic(diagnostic));
           }
         }
-      }
-      if (
-        COMPILED_EVENT_HANDLER_SOURCE_LOGGING_ENABLED &&
-        compiled &&
-        parserOptions.logCompiledEventHandlerSource
-      ) {
-        logCompiledEventHandlerSource(compiled.sourceId, value, compiled.js);
       }
       return {
         __PARSED: true,
@@ -1701,13 +1682,14 @@ function transformXmluiNode(
     scriptContent: string,
     scriptContentOffset: number,
   ): CodeBehindCollectionOptions | undefined {
-    if (!parserOptions.compileEventHandlers) {
+    if (!parserOptions.compileScripts) {
       return undefined;
     }
     const sourceId = String(fileId);
     const sourceText = originalGetText(node);
     return {
-      compileEventHandlers: true,
+      compileScripts: true,
+      reportCompileFallbacks: parserOptions.reportCompileFallbacks,
       sourceIdPrefix: sourceId,
       sourceUrl: createDebugSourceUrl(sourceId),
       displayName: sourceId,

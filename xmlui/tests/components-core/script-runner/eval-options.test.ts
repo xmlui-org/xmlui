@@ -11,72 +11,57 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 import { parseAttributeValue } from "../../../src/components-core/script-runner/AttributeValueParser";
 import { evalBinding } from "../../../src/components-core/script-runner/eval-tree-sync";
 
+/**
+ * One switch decides for every script path. These cases pin that down: the binding
+ * options and the event options read the same key from the same merged config view,
+ * and neither has an alias that can disagree with the other.
+ */
 describe("binding eval options", () => {
-  it("leaves compileBindings disabled by default", () => {
-    expect(createBindingEvalOptions()).not.toHaveProperty("compileBindings");
+  it("leaves compilation off by default", () => {
+    expect(createBindingEvalOptions()).not.toHaveProperty("compileScripts");
     expect(createBindingEvalOptions({ xmluiConfig: {} } as any)).not.toHaveProperty(
-      "compileBindings",
+      "compileScripts",
     );
     expect(
-      createBindingEvalOptions({ xmluiConfig: { compileBindings: false } } as any),
-    ).not.toHaveProperty("compileBindings");
+      createBindingEvalOptions({ xmluiConfig: { compileScripts: false } } as any),
+    ).not.toHaveProperty("compileScripts");
   });
 
-  it("carries compileBindings when enabled in xmluiConfig", () => {
-    expect(
-      createBindingEvalOptions({ xmluiConfig: { compileBindings: true } } as any),
-    ).toMatchObject({ compileBindings: true });
-  });
-
-  it("uses compileScripts for binding compilation", () => {
+  it("carries compileScripts when enabled in xmluiConfig", () => {
     expect(
       createBindingEvalOptions({ xmluiConfig: { compileScripts: true } } as any),
-    ).toMatchObject({ compileBindings: true, compiledScriptSourceMaps: "external" });
+    ).toMatchObject({ compileScripts: true });
   });
 
-  it("lets legacy compileBindings explicitly disable compileScripts for bindings", () => {
+  it("carries the fallback report switch", () => {
     expect(
       createBindingEvalOptions({
-        xmluiConfig: { compileScripts: true, compileBindings: false },
+        xmluiConfig: { compileScripts: true, reportCompileFallbacks: true },
       } as any),
-    ).not.toHaveProperty("compileBindings");
+    ).toMatchObject({ compileScripts: true, reportCompileFallbacks: true });
   });
 
-  it("carries compiledScriptSourceMaps for binding evaluation", () => {
+  it("does not take source maps from configuration", () => {
+    // --- Source maps follow the dev server, not a config key: an app asking for them
+    // --- through the removed `compiledScriptSourceMaps` gets nothing.
     expect(
       createBindingEvalOptions({
-        xmluiConfig: { compileBindings: true, compiledScriptSourceMaps: "external" },
-      } as any),
-    ).toMatchObject({ compileBindings: true, compiledScriptSourceMaps: "external" });
-  });
-
-  it("defaults binding source maps to external in dev when compiled bindings are enabled", () => {
-    expect(
-      createBindingEvalOptions({
-        xmluiConfig: { compileBindings: true },
-      } as any),
-    ).toMatchObject({ compileBindings: true, compiledScriptSourceMaps: "external" });
-  });
-
-  it("honors explicit false for binding source maps in dev", () => {
-    expect(
-      createBindingEvalOptions({
-        xmluiConfig: { compileBindings: true, compiledScriptSourceMaps: false },
-      } as any),
-    ).not.toHaveProperty("compiledScriptSourceMaps");
+        xmluiConfig: { compileScripts: true, compiledScriptSourceMaps: "inline" },
+      } as any).sourceMaps,
+    ).not.toBe("inline");
   });
 
   it("lets explicit eval option overrides win over xmluiConfig", () => {
     expect(
-      createBindingEvalOptions({ xmluiConfig: { compileBindings: true } } as any, {
-        compileBindings: false,
+      createBindingEvalOptions({ xmluiConfig: { compileScripts: true } } as any, {
+        compileScripts: false,
         strictUdcSandbox: true,
       }),
-    ).toMatchObject({ compileBindings: false, strictUdcSandbox: true });
+    ).toMatchObject({ compileScripts: false, strictUdcSandbox: true });
   });
 
-  it("does not change binding evaluation while the compiler target is absent", () => {
-    const appContext = { xmluiConfig: { compileBindings: true } } as any;
+  it("does not change binding evaluation results", () => {
+    const appContext = { xmluiConfig: { compileScripts: true } } as any;
 
     expect(extractParam({ count: 2 }, "{count + 1}", appContext)).toBe(3);
     expect(extractParam({ count: 2 }, "{count + 1}")).toBe(3);
@@ -84,58 +69,28 @@ describe("binding eval options", () => {
 });
 
 describe("event eval options", () => {
-  it("leaves compileEventHandlers disabled by default", () => {
-    expect(createEventEvalOptions()).not.toHaveProperty("compileEventHandlers");
+  it("leaves compilation off by default", () => {
+    expect(createEventEvalOptions()).not.toHaveProperty("compileScripts");
     expect(createEventEvalOptions({ xmluiConfig: {} } as any)).not.toHaveProperty(
-      "compileEventHandlers",
+      "compileScripts",
     );
     expect(
-      createEventEvalOptions({ xmluiConfig: { compileEventHandlers: false } } as any),
-    ).not.toHaveProperty("compileEventHandlers");
+      createEventEvalOptions({ xmluiConfig: { compileScripts: false } } as any),
+    ).not.toHaveProperty("compileScripts");
   });
 
-  it("carries compileEventHandlers when enabled in xmluiConfig", () => {
-    expect(
-      createEventEvalOptions({ xmluiConfig: { compileEventHandlers: true } } as any),
-    ).toMatchObject({ compileEventHandlers: true });
-  });
-
-  it("uses compileScripts for event handler compilation", () => {
+  it("carries compileScripts when enabled in xmluiConfig", () => {
     expect(
       createEventEvalOptions({ xmluiConfig: { compileScripts: true } } as any),
-    ).toMatchObject({ compileEventHandlers: true, compiledScriptSourceMaps: "external" });
+    ).toMatchObject({ compileScripts: true });
   });
 
-  it("lets legacy compileEventHandlers explicitly disable compileScripts for events", () => {
-    expect(
-      createEventEvalOptions({
-        xmluiConfig: { compileScripts: true, compileEventHandlers: false },
-      } as any),
-    ).not.toHaveProperty("compileEventHandlers");
-  });
+  it("reads the same switch as binding evaluation", () => {
+    const appContext = { xmluiConfig: { compileScripts: true } } as any;
 
-  it("carries compiledScriptSourceMaps for event evaluation", () => {
-    expect(
-      createEventEvalOptions({
-        xmluiConfig: { compileEventHandlers: true, compiledScriptSourceMaps: "inline" },
-      } as any),
-    ).toMatchObject({ compileEventHandlers: true, compiledScriptSourceMaps: "inline" });
-  });
-
-  it("defaults event source maps to external in dev when compiled event handlers are enabled", () => {
-    expect(
-      createEventEvalOptions({
-        xmluiConfig: { compileEventHandlers: true },
-      } as any),
-    ).toMatchObject({ compileEventHandlers: true, compiledScriptSourceMaps: "external" });
-  });
-
-  it("honors explicit false for event source maps in dev", () => {
-    expect(
-      createEventEvalOptions({
-        xmluiConfig: { compileEventHandlers: true, compiledScriptSourceMaps: false },
-      } as any),
-    ).not.toHaveProperty("compiledScriptSourceMaps");
+    expect(createEventEvalOptions(appContext).compileScripts).toBe(
+      createBindingEvalOptions(appContext).compileScripts,
+    );
   });
 
   it("preserves existing async event eval defaults", () => {
@@ -148,21 +103,21 @@ describe("event eval options", () => {
 
   it("lets explicit eval option overrides win over xmluiConfig", () => {
     expect(
-      createEventEvalOptions({ xmluiConfig: { compileEventHandlers: true } } as any, {
-        compileEventHandlers: false,
+      createEventEvalOptions({ xmluiConfig: { compileScripts: true } } as any, {
+        compileScripts: false,
         strictUdcSandbox: true,
       }),
-    ).toMatchObject({ compileEventHandlers: false, strictUdcSandbox: true });
+    ).toMatchObject({ compileScripts: false, strictUdcSandbox: true });
   });
 
-  it("does not change async statement evaluation while the compiler target is absent", async () => {
+  it("does not change async statement evaluation results", async () => {
     const parser = new Parser("count = count + 1;");
     const statements = parser.parseStatements();
     const evalContext = {
       localContext: { count: 2 },
-      appContext: { xmluiConfig: { compileEventHandlers: true } },
+      appContext: { xmluiConfig: { compileScripts: true } },
       options: createEventEvalOptions({
-        xmluiConfig: { compileEventHandlers: true },
+        xmluiConfig: { compileScripts: true },
       } as any),
     };
 
@@ -174,36 +129,24 @@ describe("event eval options", () => {
 
 describe("script execution mode", () => {
   it("reports interpreted mode by default", () => {
-    expect(getScriptExecutionMode()).toEqual({
-      mode: "interpreted",
-      bindings: "interpreted",
-      eventHandlers: "interpreted",
-    });
+    expect(getScriptExecutionMode()).toEqual({ mode: "interpreted" });
   });
 
   it("reports compiled mode when compileScripts is enabled", () => {
     expect(getScriptExecutionMode({ xmluiConfig: { compileScripts: true } } as any)).toEqual({
       mode: "compiled",
-      bindings: "compiled",
-      eventHandlers: "compiled",
     });
   });
 
-  it("reports mixed mode when one script track is explicitly interpreted", () => {
-    expect(
-      getScriptExecutionMode({
-        xmluiConfig: { compileScripts: true, compileEventHandlers: false },
-      } as any),
-    ).toEqual({
-      mode: "mixed",
-      bindings: "compiled",
-      eventHandlers: "interpreted",
+  it("ignores a removed per-path key", () => {
+    expect(getScriptExecutionMode({ xmluiConfig: { compileEventHandlers: true } } as any)).toEqual({
+      mode: "interpreted",
     });
   });
 });
 
-describe("compileScripts implies binding compilation at every call site", () => {
-  it("compiles a parsed attribute binding under the umbrella switch", () => {
+describe("compileScripts reaches every binding call site", () => {
+  it("compiles a parsed attribute binding", () => {
     const parsed = parseAttributeValue("{count + 1}", {
       compileScripts: true,
       sourceId: "Main.xmlui",
@@ -212,17 +155,13 @@ describe("compileScripts implies binding compilation at every call site", () => 
     expect(parsed.segments[0].compiled).toMatchObject({ target: "binding-sync" });
   });
 
-  it("lets compileBindings: false opt one path out", () => {
-    const parsed = parseAttributeValue("{count + 1}", {
-      compileScripts: true,
-      compileBindings: false,
-      sourceId: "Main.xmlui",
-    });
+  it("leaves a parsed attribute binding alone when compilation is off", () => {
+    const parsed = parseAttributeValue("{count + 1}", { sourceId: "Main.xmlui" });
 
     expect(parsed.segments[0].compiled).toBeUndefined();
   });
 
-  it("evaluates a binding through the compiled path under the umbrella switch", () => {
+  it("evaluates a binding through the compiled path", () => {
     const expr = new Parser("count + 1").parseExpr()!;
     const evalContext = {
       localContext: { count: 41 },

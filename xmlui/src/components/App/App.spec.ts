@@ -26,9 +26,8 @@ test.describe("Basic Functionality", () => {
     });
 
     await expect(page.getByTestId("app")).toBeVisible();
-    await expect(await startupLog).toContain(
-      "bindings: compiled, event handlers: compiled",
-    );
+    // --- One switch, one mode: there is no per-path breakdown to report any more.
+    await expect(await startupLog).toBe("[xmlui] App started in compiled script mode");
   });
 
   test("renders with horizontal layout", async ({ initTestBed, page }) => {

@@ -112,7 +112,7 @@ describe("collectImportsFromStandaloneSources", () => {
     const appDef: StandaloneAppDescription = {
       sources,
       components: [compDef as any],
-      xmluiConfig: { compileEventHandlers: true },
+      xmluiConfig: { compileScripts: true },
     };
     const projectCompilation: ProjectCompilation = {
       entrypoint: { filename: "/app/Main.xmlui", definition: null as any, dependencies: new Set() },

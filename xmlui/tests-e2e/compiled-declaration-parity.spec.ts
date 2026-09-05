@@ -9,23 +9,23 @@ type DeclarationParityCase = {
 };
 
 const MODES = [
-  { name: "interpreted", compileEventHandlers: false },
-  { name: "compiled", compileEventHandlers: true },
+  { name: "interpreted", compileScripts: false },
+  { name: "compiled", compileScripts: true },
 ] as const;
 
 function withCompilationMode(
   description: TestBedDescription | undefined,
-  compileEventHandlers: boolean,
+  compileScripts: boolean,
 ): TestBedDescription {
   return {
     ...description,
     parserOptions: {
       ...description?.parserOptions,
-      compileEventHandlers,
+      compileScripts,
     },
     xmluiConfig: {
       ...description?.xmluiConfig,
-      compileEventHandlers,
+      compileScripts,
     },
   };
 }
@@ -40,7 +40,7 @@ async function runParityCase(
   for (const mode of MODES) {
     const { testStateDriver } = await initTestBed(
       testCase.source,
-      withCompilationMode(testCase.description, mode.compileEventHandlers),
+      withCompilationMode(testCase.description, mode.compileScripts),
     );
     const button = page.getByTestId("run");
     await expect(button).toBeVisible();
@@ -105,13 +105,11 @@ async function runCompiledOnlyProof(
   const { testStateDriver } = await initTestBed(
     source,
     withCompilationMode(
-      {
-        ...description,
-        xmluiConfig: {
-          ...description?.xmluiConfig,
-          compiledScriptSourceMaps: "inline",
-        },
-      },
+      // --- No test-only affordance here: the proof reads the `//# sourceURL=` line that
+      // --- every compiled artifact carries, so it holds for a built app exactly as it
+      // --- does under `xmlui start`. Asking for source maps would have made this pass
+      // --- in dev mode alone.
+      { ...description },
       true,
     ),
   );

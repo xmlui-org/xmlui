@@ -9,7 +9,7 @@ function runAndCollectDirtyRoots(source: string, localContext: any): string[] {
     source,
     createEvalContext({
       localContext,
-      options: { defaultToOptionalMemberAccess: true, compileBindings: true },
+      options: { defaultToOptionalMemberAccess: true, compileScripts: true },
       onDidUpdate: (_scope, index) => {
         roots.push(String(index));
       },

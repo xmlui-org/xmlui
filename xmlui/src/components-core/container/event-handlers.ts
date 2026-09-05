@@ -38,6 +38,8 @@ import { createEventEvalOptions } from "../script-runner/eval-options";
 import {
   executeCompiledEventAsyncHandler,
   UnsupportedCompiledScriptNodeError,
+  createCompileDiagnostic,
+  reportCompileDiagnostic,
 } from "../script-compiler";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import {
@@ -630,7 +632,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
         const shouldUseCompiledEventHandler =
-          evalContext.options?.compileEventHandlers &&
+          evalContext.options?.compileScripts &&
           effectiveOptions?.eventName !== "mockExecute" &&
           !parseTimeCompilationUnsupported;
         const compiledEventDiagnosticEnabled = isCompiledEventDiagnosticEnabled(appContext);
@@ -638,7 +640,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
           logCompiledEventDiagnostic("dispatch decision", {
             componentUid: componentUidForCoord,
             eventName: eventNameForCoord,
-            runtimeCompileEventHandlers: evalContext.options?.compileEventHandlers === true,
+            runtimeCompileScripts: evalContext.options?.compileScripts === true,
             ignoredMockExecute: effectiveOptions?.eventName === "mockExecute",
             willUseCompiledPath: shouldUseCompiledEventHandler === true,
             sourceKind:
@@ -668,14 +670,19 @@ export function createEventHandlers(config: EventHandlerConfig) {
               rawEventSource,
             ).catch((error) => {
               if (error instanceof UnsupportedCompiledScriptNodeError) {
-                if (compiledEventDiagnosticEnabled) {
-                  logCompiledEventDiagnostic("compiled path unsupported; falling back", {
-                    componentUid: componentUidForCoord,
-                    eventName: eventNameForCoord,
-                    message: error.message,
-                    parseTimeArtifactSourceId: compiledEventArtifact?.sourceId,
-                  });
-                }
+                // --- The compiled path gave up while running. Report it under the same
+                // --- code family as a build-time fallback, so both look the same to
+                // --- whoever is reading.
+                reportCompileDiagnostic(
+                  createCompileDiagnostic(error, {
+                    sourceId: compiledEventArtifact?.sourceId ?? eventNameForCoord ?? "event",
+                    phase: "runtime",
+                  }),
+                  {
+                    report: evalContext.options?.reportCompileFallbacks === true,
+                    xsLogMax: Number((appContext as any)?.xmluiConfig?.xsVerboseLogMax ?? 200),
+                  },
+                );
                 return interpretedHandler();
               }
               throw error;
@@ -715,7 +722,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
             }
           },
         });
-        if (evalContext.options?.compileEventHandlers) {
+        if (evalContext.options?.compileScripts) {
           evalContext.mainThread ??= {
             childThreads: [],
             blocks: [{ vars: {} }],

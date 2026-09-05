@@ -33,23 +33,6 @@ export function throwUnsupportedCompiledScriptNode(
   );
 }
 
-/**
- * One-line, machine-checkable reason a script block fell back to interpretation:
- * the construct that stopped compilation and where it is. Stored next to
- * `compiledUnsupported` so a fallback is never just a bare boolean, and printed by
- * the build tooling.
- */
-export function describeCompiledScriptFallback(error: unknown): string {
-  if (error instanceof UnsupportedCompiledScriptNodeError) {
-    return (
-      `unsupported ${error.nodeTypeName} (node type ${error.nodeType})` +
-      `${formatSourcePosition(error.sourceRange)}`
-    );
-  }
-  const message = (error as Error)?.message;
-  return message ? `compilation failed: ${message}` : "compilation failed";
-}
-
 function formatSourcePosition(sourceRange?: CompiledScriptSourceRange): string {
   if (sourceRange?.startLine === undefined) {
     return "";

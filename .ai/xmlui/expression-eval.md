@@ -47,30 +47,35 @@ The JavaScript compiler targets (`components-core/script-compiler`) carry source
 `sourceRange`, generated `js`, and generated-offset mappings. The source-map builder converts those
 intermediate mappings into Source Map v3.
 
-`xmluiConfig.compileScripts` is the preferred public switch for JavaScript-compiled XMLUI scripts.
-It enables supported binding expression and event-handler compilation. Event-handler compilation
-also compiles executable script declarations: inline `<script>` functions, `.xmlui.xs` code-behind
-functions, inline component `codeBehind` functions, `Globals.xs` functions, and imported `.xs`
-helpers. Global `var` declarations still compile as binding expressions, so callers that opt in only
-with `compileEventHandlers: true` get compiled declaration functions but interpreted global vars.
-The older `compileBindings` and `compileEventHandlers` keys are still accepted as compatibility
-aliases when a caller needs to opt a target in or out independently.
+`xmluiConfig.compileScripts` is the single switch for JavaScript-compiled XMLUI scripts: binding
+expressions, event handlers, and executable script declarations — inline `<script>` functions,
+`.xmlui.xs` code-behind, inline component `codeBehind`, `Globals.xs`, and imported `.xs` helpers.
+There is no per-path key. It is read from `appGlobals`, `xmluiConfig`, and `xmlui.config.json`
+with that precedence reversed (config file wins), and the same value reaches
+`XmluiParserOptions`, `CodeBehindCollectionOptions`, `EvalTreeOptions`, `ParseBindingOptions`, and
+the Vite plugin unchanged — the drift between those was the whole of #3876 and #3879.
 
-`xmluiConfig.compiledScriptSourceMaps` controls runtime debug comments for compiled scripts. In
-Vite dev server mode, source maps default to `"external"` whenever script compilation is enabled,
-unless config explicitly sets `compiledScriptSourceMaps: false`.
+`xmluiConfig.reportCompileFallbacks` adds per-block reporting on top: each block that could not be
+compiled is printed with a `CompileDiagnosticCode` (`compile-unsupported-node`,
+`compile-unserializable-literal`, `compile-runtime-fallback`, `compile-source-unavailable`), its
+construct, and its position. The code also lands on the emitted block as
+`compiledUnsupportedReason` and as a `kind:"compile"` Inspector entry regardless of the flag; the
+flag only controls the console.
 
-- `"external"` — preferred for Vite dev server. Generated `new Function(...)` bodies receive
-  `sourceURL` and an external `sourceMappingURL` that points at the `/@xmlui-source/...` endpoint.
-- `"inline"` — fallback mode for runtime environments without a dev-server source endpoint.
-- `false` — no debug source-map comments are emitted.
-- unset — dev server compiled-event mode defaults to `"external"`; other modes stay off unless
-  explicitly enabled.
+Source maps are **not** an app-level setting. `xmlui start` sets
+`import.meta.env.VITE_XMLUI_DEV_SERVER`, and that is what enables them:
 
-When `xsVerbose` and `compiledScriptSourceMaps` are both enabled, the compiled executors emit one
-deduplicated `kind:"debug-source"` Inspector trace event per artifact/range. The event contains
-metadata only (source URL, original file, target, range, artifact ID, sourcemap mode), not full source
-text.
+- `"external"` — dev server. Generated `new Function(...)` bodies receive `sourceURL` and an
+  external `sourceMappingURL` pointing at the `/@xmlui-source/...` endpoint.
+- `"inline"` — internal fallback for runtimes without a dev-server source endpoint.
+- off — every build. The payload is large and a bundle has no use for it.
+
+Internally the mode travels as `sourceMaps` on plugin options, code-behind options, and eval
+options; the test bed sets it explicitly through `TestBedDescription.sourceMaps`.
+
+When `xsVerbose` and source maps are both on, the compiled executors emit one deduplicated
+`kind:"debug-source"` Inspector trace event per artifact/range. The event contains metadata only
+(source URL, original file, target, range, artifact ID, sourcemap mode), not full source text.
 
 Artifacts only keep their debug payload (`mappings`, `sources`, `sourceText`, `sourceUrl`,
 `displayName`) when source maps are on. A production build emits `js` alone, with project-relative
