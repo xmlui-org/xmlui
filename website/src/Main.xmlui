@@ -1046,6 +1046,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Use ch when width should track character count"
+                            to="/docs/howto/size-with-font-relative-units"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Make a child fill the remaining vertical space"
                             to="/docs/howto/fill-remaining-vertical-space"
                         />
@@ -1508,6 +1513,11 @@
                             icon="article"
                             label="Display preformatted or monospace text"
                             to="/docs/howto/display-preformatted-text"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Truncate long text and expand it on demand"
+                            to="/docs/howto/truncate-text-with-expand-on-demand"
                         />
                         <NavLink
                             icon="article"
