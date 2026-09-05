@@ -105,14 +105,11 @@ async function runCompiledOnlyProof(
   const { testStateDriver } = await initTestBed(
     source,
     withCompilationMode(
-      {
-        ...description,
-        // --- The proof reads the `//# sourceURL=` comment off each compiled artifact, so
-        // --- it needs the source-map payload. `sourceMaps` is a test-bed seam and sits on
-        // --- the description itself: apps get source maps from `xmlui start`, never from
-        // --- configuration.
-        sourceMaps: "inline",
-      },
+      // --- No test-only affordance here: the proof reads the `//# sourceURL=` line that
+      // --- every compiled artifact carries, so it holds for a built app exactly as it
+      // --- does under `xmlui start`. Asking for source maps would have made this pass
+      // --- in dev mode alone.
+      { ...description },
       true,
     ),
   );
