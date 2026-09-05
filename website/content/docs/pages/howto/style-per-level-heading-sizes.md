@@ -35,6 +35,9 @@ Each heading level (H1–H6) gets its own family of theme variables sharing the 
 </App>
 ```
 
+> [!WARNING]
+> These vars only reach real `Heading`/`H1`–`H6` components and, with the `-markdown` suffix, headings rendered by `<Markdown>`. They do **not** reach text that merely looks like a heading — a `ModalDialog` title, a `Card` title, a form section label. Setting `lineHeight-H2` on a dialog title is accepted and does nothing, silently. See [Find the theme variable for a text](/docs/howto/find-the-theme-variable-for-a-text) for the method that identifies the right var for a component's own title/label/caption parts.
+
 ## Key points
 
 **`textColor-Heading` sets all six levels at once**: Use it as a global override when all headings should share one color. Per-level vars like `textColor-H2` take precedence when both are set, so you can override individual levels without repeating the global.

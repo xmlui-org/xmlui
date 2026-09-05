@@ -1456,6 +1456,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Find the theme variable for a text"
+                            to="/docs/howto/find-the-theme-variable-for-a-text"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Customize Select & AutoComplete menus"
                             to="/docs/howto/customize-select-and-autocomplete-menus"
                         />
