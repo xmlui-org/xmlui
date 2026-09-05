@@ -238,10 +238,35 @@ type TestBedScriptParserOptions = XmluiParserOptions & {
   sourceMaps?: CodeBehindCollectionOptions["sourceMaps"];
 };
 
+/**
+ * Keys a test bed may no longer set, and where the switch lives now. A test that sets one
+ * would otherwise run interpreted while its name claims otherwise — the exact silence this
+ * two-flag surface exists to remove — so the test bed fails loudly instead.
+ */
+const MISPLACED_TEST_BED_KEYS: Record<string, string> = {
+  compileBindings: 'use "compileScripts": it covers bindings, handlers, and code-behind alike',
+  compileEventHandlers:
+    'use "compileScripts": it covers bindings, handlers, and code-behind alike',
+  compiledScriptSourceMaps: 'use the test-bed seam `sourceMaps` on the description itself',
+  logCompiledEventHandlerSource: 'use "reportCompileFallbacks"',
+  sourceMaps: "put `sourceMaps` on the description itself, not in `xmluiConfig`",
+};
+
+function assertNoMisplacedCompilationKeys(xmluiConfig: Record<string, any>): void {
+  for (const [key, advice] of Object.entries(MISPLACED_TEST_BED_KEYS)) {
+    if (xmluiConfig[key] !== undefined) {
+      throw new Error(
+        `TestBedDescription.xmluiConfig."${key}" is not read any more — ${advice}.`,
+      );
+    }
+  }
+}
+
 function createTestBedScriptParserOptions(
   description?: TestBedDescription,
 ): TestBedScriptParserOptions {
   const xmluiConfig = description?.xmluiConfig ?? {};
+  assertNoMisplacedCompilationKeys(xmluiConfig);
   const compileScripts =
     description?.parserOptions?.compileScripts ?? xmluiConfig.compileScripts === true;
   // --- Tests may ask for source-map payload explicitly; apps cannot.

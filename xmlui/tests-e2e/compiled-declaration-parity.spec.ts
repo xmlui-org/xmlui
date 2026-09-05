@@ -107,10 +107,11 @@ async function runCompiledOnlyProof(
     withCompilationMode(
       {
         ...description,
-        xmluiConfig: {
-          ...description?.xmluiConfig,
-          sourceMaps: "inline",
-        },
+        // --- The proof reads the `//# sourceURL=` comment off each compiled artifact, so
+        // --- it needs the source-map payload. `sourceMaps` is a test-bed seam and sits on
+        // --- the description itself: apps get source maps from `xmlui start`, never from
+        // --- configuration.
+        sourceMaps: "inline",
       },
       true,
     ),
