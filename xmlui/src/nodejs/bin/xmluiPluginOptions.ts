@@ -89,6 +89,7 @@ export function normalizeXmluiPluginOptions(
     typeContracts: config.typeContracts,
     compileScripts,
     reportCompileFallbacks: setting("reportCompileFallbacks") === true,
+    strictCompilation: compileScripts && setting("strictCompilation") === true,
     // --- Source maps exist to debug compiled scripts while developing; a build has
     // --- no use for the payload. Not an app-level setting.
     ...(compileScripts && options.devServer ? { sourceMaps: "external" as const } : {}),

@@ -50,6 +50,14 @@ export type StandaloneAppDescription = {
    *   is cached. A `compileScripts` entry in `xmlui.config.json` overrides the one
    *   declared here — the CLI bakes it into the app, since the browser cannot read
    *   that file itself.
+   * - `strictCompilation` (boolean, default `false`) — treat any script that would run
+   *   interpreted as an error rather than a silent fallback. Catches more than a refused
+   *   construct: it also fires when the compiled path chooses to interpret (a lazy arrow,
+   *   anything on the synchronous statement queue) and when an evaluation context never
+   *   carried the switch at all. Inert without `compileScripts`. `xmlui build` fails with
+   *   every violation at once; `xmlui start` reports and keeps serving. Expect violations
+   *   today — the synchronous statement queue has no compiled target yet, so this is a
+   *   diagnostic tool rather than a production setting.
    * - `reportCompileFallbacks` (boolean, default `false`) — report every script block
    *   that could not be compiled, with a diagnostic code
    *   (`compile-unsupported-node`, `compile-unserializable-literal`,

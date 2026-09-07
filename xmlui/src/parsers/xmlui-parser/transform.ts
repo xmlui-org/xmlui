@@ -1584,6 +1584,13 @@ function transformXmluiNode(
           const diagnostic = createCompileDiagnostic(error, { sourceId, owner });
           compiledUnsupported = true;
           compiledUnsupportedReason = describeCompileDiagnostic(diagnostic);
+          // --- Structured, with the source text, so the build can render a report with
+          // --- the offending line in it. Nothing here reaches the emitted module.
+          parserOptions.onCompileDiagnostic?.({
+            diagnostic,
+            sourceText: value,
+            fileName: String(fileId),
+          });
           // --- Detail is reported only on request; the build always counts the
           // --- fallback in its summary. See `reportCompileFallbacks`.
           if (warnings && parserOptions.reportCompileFallbacks) {

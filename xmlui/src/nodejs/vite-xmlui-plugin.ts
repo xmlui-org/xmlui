@@ -40,6 +40,8 @@ import type {
 import { generatedMetadataRegistry } from "../language-server/generatedMetadataRegistry";
 import { extractOptimizerMetadataFromDir } from "../components-core/optimization/static-extractor";
 import { createDebugSourceUrl } from "../components-core/script-compiler/source";
+import { formatCompileReport } from "../components-core/script-compiler/compile-report";
+import type { CompileDiagnosticNotice } from "../parsers/xmlui-parser/parser";
 import type {
   CompiledScriptArtifact,
   CompiledScriptSource,
@@ -140,6 +142,11 @@ export type PluginOptions = {
    * expressions. One switch decides for all of them.
    */
   compileScripts?: boolean;
+  /**
+   * Fail the build when any script would run interpreted, instead of falling back.
+   * Inert without `compileScripts`. See `.plan/strict-compilation-mode.md`.
+   */
+  strictCompilation?: boolean;
   /**
    * Report every script block that falls back to interpretation, with a diagnostic
    * code and source position. The build always counts fallbacks in its summary; this
@@ -583,6 +590,36 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
   // --- `<script>`). The collector records why a declaration function fell back to
   // --- interpretation; before, that reason was computed and then dropped, which is
   // --- what made compilation fallbacks look silent.
+  const strictCompilation = compileScripts && pluginOptions.strictCompilation === true;
+  // --- Every script that did not compile, collected across the whole build rather than
+  // --- surfaced one at a time. An author fixing twenty constructs should not need twenty
+  // --- build cycles to find them.
+  const compileViolations: CompileDiagnosticNotice[] = [];
+  const collectCompileDiagnostic = (entry: CompileDiagnosticNotice) => {
+    compileViolations.push(entry);
+  };
+  const reportStrictViolations = (fail: (message: string) => void) => {
+    if (!strictCompilation || compileViolations.length === 0) return;
+    // --- Sorted by file, then by position, so the list reads like the code does.
+    const ordered = [...compileViolations].sort((a, b) => {
+      const byFile = (a.fileName ?? "").localeCompare(b.fileName ?? "");
+      if (byFile !== 0) return byFile;
+      return (a.diagnostic.line ?? 0) - (b.diagnostic.line ?? 0);
+    });
+    const reports = ordered.map((entry) =>
+      formatCompileReport(entry.diagnostic as any, {
+        sourceText: entry.sourceText,
+        fileName: entry.fileName,
+        strict: true,
+      }),
+    );
+    const files = new Set(ordered.map((entry) => entry.fileName));
+    fail(
+      `[xmlui] Strict compilation: ${ordered.length} script(s) in ${files.size} file(s) ` +
+        `cannot be compiled.\n\n${reports.join("\n\n")}\n`,
+    );
+  };
+
   const pendingCodeBehindWarnings: string[] = [];
   const collectCodeBehindWarnings = (codeBehind: { warnings?: string[] } | undefined) => {
     if (codeBehind?.warnings?.length) {
@@ -874,6 +911,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           ...(isEntrypointPath(normalizedId) ? { role: "entrypoint" as const } : {}),
           compileScripts,
           reportCompileFallbacks,
+          ...(strictCompilation ? { onCompileDiagnostic: collectCompileDiagnostic } : {}),
         };
         let { component, inlineComponents, errors, warnings, erroneousCompoundComponentName } =
           xmlUiMarkupToComponent(code, fileId, codeBehind, optimizerMetadataLookup, parserOptions);
@@ -1238,6 +1276,17 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       if (!devServerMode) {
         reportCompiledScriptSummary((message) => this.warn(message));
       }
+      // --- Every violation at once, sorted by file. Under `xmlui start` this warns
+      // --- rather than stopping the server: a dev server that refuses to boot over a
+      // --- construct is a worse experience than one that tells you and keeps running,
+      // --- and the build is where the gate belongs.
+      reportStrictViolations((message) => {
+        if (devServerMode) {
+          this.warn(message);
+        } else {
+          this.error(message);
+        }
+      });
       if (cyclesMode !== "off" && reactiveCycleRoots.size > 0) {
         let cycleHits: ReturnType<typeof findCycles> | null = null;
         try {

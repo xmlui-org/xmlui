@@ -283,11 +283,20 @@ bundle; a console line is gone by the time anyone investigates.
 Only event handlers needed this. Code-behind declarations already carried their function
 name (`#function-roleHint`).
 
-2.4 Build-time enforcement: with strict on, the Vite plugin fails the build and prints
-**every** violation, sorted by file — not the first one. An author fixing twenty
-constructs should not need twenty build cycles.
+2.4 ~~Build-time enforcement…~~ **Done.** A structured channel
+(`XmluiParserOptions.onCompileDiagnostic`) carries each diagnostic *with its source text*
+to the plugin, which collects across the whole build and fails at `buildEnd` with every
+violation, sorted by file and position. The channel exists because the report needs the
+diagnostic and the original text together, and the emitted block must not carry the
+latter — that would ship every script twice in every bundle.
 
-*Exit:* strict mode can be switched on and produces an accurate, complete, actionable list.
+`xmlui start` reports and keeps serving rather than refusing to boot: a dev server that
+dies over a construct is worse than one that tells you, and the build is where a gate
+belongs.
+
+*Exit:* strict mode can be switched on and produces an accurate, complete, actionable
+list. **Met.** Documented in `xmlui-config.md` and `standalone.ts`, with the warning that
+it is a diagnostic tool rather than a production setting until Phase 3.
 
 ### Phase 3 — Use the list, then close it
 

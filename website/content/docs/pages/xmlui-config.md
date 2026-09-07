@@ -67,6 +67,7 @@ const App: StandaloneAppDescription = {
 | `codeHighlighter` | Syntax highlighter used by markdown and code fences. |
 | `columnCanSortDefault` | Overrides the default sortable behavior for table columns. |
 | `compileScripts` | Compiles XMLUI scripts to JavaScript — bindings, handlers, and code-behind alike. |
+| `strictCompilation` | Turns any interpreted execution under `compileScripts` into an error. |
 | `csrfHeaderName` | Overrides the form CSRF header name. |
 | `reportCompileFallbacks` | Reports each script block that could not be compiled, with a code. |
 | `defaultToOptionalMemberAccess` | Controls optional member access semantics in XMLScript. |
@@ -257,6 +258,37 @@ the build tooling but not the app.
 
 Source maps for compiled scripts are not configurable: `xmlui start` turns them on, builds leave
 them out — the payload is large and a production bundle has no use for it.
+
+### `strictCompilation`
+
+```ts
+strictCompilation?: boolean; // default: false
+```
+
+When `true`, any script that would run interpreted is an error rather than a silent
+fallback. Inert without `compileScripts` — there would be nothing to be strict about — and
+the CLI says so rather than ignoring the combination.
+
+It catches more than a refused construct. A script can end up interpreted three ways, and
+only the first leaves a trace today:
+
+1. the compiler refused a construct and the caller fell back;
+2. the compiled path chose to interpret — a lazy arrow, or anything routed through the
+   synchronous statement queue, which has no compiled target;
+3. the evaluation context never carried `compileScripts` at all.
+
+So the rule is not "no fallbacks" but "no interpretation", enforced at the interpreter's
+own entry points. An app can report zero fallbacks while running mostly interpreted;
+strict mode is what makes that visible.
+
+`xmlui build` fails and prints **every** violation, sorted by file, so a project adopting
+strict mode does not discover its constructs one build at a time. `xmlui start` reports
+them and keeps serving.
+
+> [!WARNING] Expect violations today. The synchronous statement queue has no compiled
+> target, so `Table` `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat` and
+> every sync callback prop will be flagged. Strict mode is currently a diagnostic tool for
+> finding what does not compile, not a production setting.
 
 ### What compilation reports
 
