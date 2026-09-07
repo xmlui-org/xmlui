@@ -1,7 +1,10 @@
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { EvalTreeOptions } from "./BindingTreeEvaluationContext";
 import { readBuildScriptCompilationSettings } from "../script-compiler/build-settings";
-import { setStrictCompilationEnabled } from "../script-compiler/strict-compilation";
+import {
+  setStrictCompilationMode,
+  type StrictCompilationMode,
+} from "../script-compiler/strict-compilation";
 
 type ConfigSource = Pick<AppContextObject, "xmluiConfig"> | undefined;
 
@@ -99,31 +102,45 @@ function isDevServed(): boolean {
 }
 
 /**
- * Whether reaching the interpreter should be an error for this app.
+ * How strictly this app treats reaching the interpreter.
  *
- * Strict compilation without `compileScripts` is meaningless — there would be nothing to
- * be strict about — so it is silently inert rather than turning every app into a wall of
- * violations. The configuration loader complains about the combination separately, where
- * an author can act on it.
+ * Unset and with `compileScripts` on, the default is `"report"`: every interpretation is
+ * named in the console, and nothing fails. That is deliberate. A hard-error default would
+ * break an app the moment it hit any interpretation nobody predicted — and finding out
+ * what nobody predicted is the entire reason to turn this on broadly. One known case
+ * proves the point: an app that declares `compileScripts` only in its app description gets
+ * an interpreted mock backend, so `"error"` by default would fail every mock request.
+ *
+ * `strictCompilation: true` opts into failing; `false` restores silence.
+ *
+ * Meaningless without `compileScripts` — there would be nothing to be strict about — so it
+ * is inert there, and the configuration loader says so rather than ignoring the
+ * combination.
  */
-export function shouldEnforceStrictCompilation(appContext?: ConfigSource): boolean {
+export function resolveStrictCompilationMode(appContext?: ConfigSource): StrictCompilationMode {
   if (!shouldCompileScripts(appContext)) {
-    return false;
+    return "off";
   }
   const fromBuild = readBuildScriptCompilationSettings().strictCompilation;
-  if (fromBuild !== undefined) {
-    return fromBuild;
-  }
-  return appContext?.xmluiConfig?.strictCompilation === true;
+  const declared = fromBuild ?? appContext?.xmluiConfig?.strictCompilation;
+  if (declared === true) return "error";
+  if (declared === false) return "off";
+  if (declared === "report" || declared === "error" || declared === "off") return declared;
+  return "report";
+}
+
+/** Kept for callers that only ask whether violations fail the app. */
+export function shouldEnforceStrictCompilation(appContext?: ConfigSource): boolean {
+  return resolveStrictCompilationMode(appContext) === "error";
 }
 
 /**
- * Arms or disarms the interpreter guard from a resolved configuration.
+ * Sets the interpreter guard's mode from a resolved configuration.
  *
- * Called from the two places an app's `xmluiConfig` is merged, so a context-free call
- * site is covered exactly like a component's binding — which is the whole point of the
- * guard being module-level. See `script-compiler/strict-compilation`.
+ * Called from the two places an app's `xmluiConfig` is merged, so a context-free call site
+ * is covered exactly like a component's binding — which is the whole point of the guard
+ * being module-level. See `script-compiler/strict-compilation`.
  */
 export function applyStrictCompilationSetting(xmluiConfig: Record<string, any> | undefined): void {
-  setStrictCompilationEnabled(shouldEnforceStrictCompilation({ xmluiConfig } as ConfigSource));
+  setStrictCompilationMode(resolveStrictCompilationMode({ xmluiConfig } as ConfigSource));
 }

@@ -1,13 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  getStrictCompilationMode,
   isStrictCompilationEnabled,
   resetStrictCompilationForTests,
   setStrictCompilationEnabled,
+  setStrictCompilationMode,
   StrictCompilationViolationError,
 } from "../../../src/components-core/script-compiler/strict-compilation";
 import {
   applyStrictCompilationSetting,
+  resolveStrictCompilationMode,
   shouldEnforceStrictCompilation,
 } from "../../../src/components-core/script-runner/eval-options";
 import { evalBinding } from "../../../src/components-core/script-runner/eval-tree-sync";
@@ -166,8 +169,99 @@ describe("resolving the setting", () => {
 
   it("arms the module-level guard from a merged config", () => {
     applyStrictCompilationSetting({ compileScripts: true, strictCompilation: true });
-    expect(isStrictCompilationEnabled()).toBe(true);
+    expect(getStrictCompilationMode()).toBe("error");
+    // --- Phase 4.1 changed what "unset" means: with `compileScripts` on it now reports
+    // --- rather than staying silent, so the guard is armed either way. This assertion
+    // --- used to expect it disarmed.
     applyStrictCompilationSetting({ compileScripts: true });
+    expect(getStrictCompilationMode()).toBe("report");
+    expect(isStrictCompilationEnabled()).toBe(true);
+    applyStrictCompilationSetting({ compileScripts: true, strictCompilation: false });
     expect(isStrictCompilationEnabled()).toBe(false);
+  });
+});
+
+/**
+ * Phase 4.1: `strictCompilation` is on by default whenever `compileScripts` is, but in
+ * `"report"` mode rather than `"error"`.
+ *
+ * A hard-error default would break an app the moment it hit any interpretation nobody
+ * predicted — and finding out what nobody predicted is the entire reason to turn this on
+ * broadly. One known case proves it: an app that declares `compileScripts` only in its app
+ * description gets an interpreted mock backend, so failing by default would break every
+ * mock request in it.
+ */
+describe("the default mode", () => {
+  afterEach(() => {
+    resetStrictCompilationForTests();
+    vi.unstubAllEnvs();
+  });
+
+  it("is off entirely without compileScripts", () => {
+    expect(resolveStrictCompilationMode({ xmluiConfig: {} } as any)).toBe("off");
+    expect(resolveStrictCompilationMode({ xmluiConfig: { strictCompilation: true } } as any)).toBe(
+      "off",
+    );
+  });
+
+  it("reports, rather than failing, when compileScripts is on and nothing is declared", () => {
+    expect(resolveStrictCompilationMode({ xmluiConfig: { compileScripts: true } } as any)).toBe(
+      "report",
+    );
+  });
+
+  it("fails only when asked to", () => {
+    expect(
+      resolveStrictCompilationMode({
+        xmluiConfig: { compileScripts: true, strictCompilation: true },
+      } as any),
+    ).toBe("error");
+  });
+
+  it("can be silenced", () => {
+    expect(
+      resolveStrictCompilationMode({
+        xmluiConfig: { compileScripts: true, strictCompilation: false },
+      } as any),
+    ).toBe("off");
+  });
+
+  it("reports each distinct site once, not once per evaluation", () => {
+    // --- These guards sit on per-row, per-render paths. A violation logged on every
+    // --- evaluation would bury the information it exists to surface. One expression can
+    // --- still produce several distinct violations — an outer binding and the arrow it
+    // --- invokes are different sites — so the property is that repeating the evaluation
+    // --- adds nothing, not that the count is one.
+    setStrictCompilationMode("report");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const expr = new Parser("xs.map(x => x)").parseExpr()!;
+      expect(evalBinding(expr, bindingContext(false))).toEqual([1, 2]);
+      const afterFirst = warn.mock.calls.length;
+      expect(afterFirst).toBeGreaterThan(0);
+      for (let i = 0; i < 20; i++) {
+        evalBinding(expr, bindingContext(false));
+      }
+      expect(warn.mock.calls.length).toBe(afterFirst);
+      expect(warn.mock.calls.map(String).join("\n")).toContain("binding expression");
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("keeps running in report mode, and stops in error mode", () => {
+    setStrictCompilationMode("report");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      expect(evalBinding(new Parser("xs.map(x => x)").parseExpr()!, bindingContext(false))).toEqual([
+        1, 2,
+      ]);
+    } finally {
+      warn.mockRestore();
+    }
+    setStrictCompilationMode("error");
+    expect(() =>
+      evalBinding(new Parser("xs.map(x => x)").parseExpr()!, bindingContext(false)),
+    ).toThrow(StrictCompilationViolationError);
   });
 });

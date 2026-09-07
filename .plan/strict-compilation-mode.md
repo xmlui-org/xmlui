@@ -467,8 +467,21 @@ holding across every change in this phase.
 
 ### Phase 4 — Make it the default for compiled apps
 
-4.1 Default `strictCompilation` to `true` whenever `compileScripts` is on, keeping the
-explicit opt-out.
+4.1 ~~Default `strictCompilation` to `true` whenever `compileScripts` is on.~~ **Done, but
+defaulting to `"report"` rather than `"error"`, which is a change to this plan.**
+
+Defaulting to a hard error would break an app the moment it met any interpretation nobody
+predicted — and finding out what nobody predicted is the entire reason to turn it on
+broadly. One known case settles it: an app declaring `compileScripts` only in its app
+description gets an interpreted mock backend (Phase 1.2's recorded limit), so failing by
+default would break every mock request in it.
+
+So the setting is now `boolean | "off" | "report" | "error"`, unset means `"report"` when
+`compileScripts` is on, and `true` still opts into failing. That is what makes 4.2's soak
+possible at all: 4.1 as written would have been the breakage 4.2 exists to avoid.
+
+Each distinct site reports once, not once per evaluation — these guards sit on per-row,
+per-render paths, and a violation logged every time would bury what it exists to surface.
 
 4.2 One release with it on and reporting loudly, to surface constructs no corpus predicted.
 The in-repo corpus demonstrably lacked the constructs that broke; CI evidence alone is not

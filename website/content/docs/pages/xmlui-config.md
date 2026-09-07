@@ -262,12 +262,23 @@ them out — the payload is large and a production bundle has no use for it.
 ### `strictCompilation`
 
 ```ts
-strictCompilation?: boolean; // default: false
+strictCompilation?: boolean | "off" | "report" | "error"; // default: "report" with compileScripts
 ```
 
-When `true`, any script that would run interpreted is an error rather than a silent
-fallback. Inert without `compileScripts` — there would be nothing to be strict about — and
-the CLI says so rather than ignoring the combination.
+Controls what happens when a script would run interpreted. Inert without `compileScripts`
+— there would be nothing to be strict about — and the CLI says so rather than ignoring the
+combination.
+
+| Value | Meaning |
+| --- | --- |
+| unset | **`"report"`** when `compileScripts` is on. Every interpretation is named in the console; nothing fails. |
+| `true` / `"error"` | Interpretation is an error. `xmlui build` fails, and the runtime throws. |
+| `false` / `"off"` | Silent fallbacks, as before. |
+
+Reporting is the default rather than failing on purpose. A hard-error default would break
+an app the moment it met any interpretation nobody predicted — and finding out what nobody
+predicted is the whole reason to have this on. Each distinct site is reported once, not
+once per evaluation, because these guards sit on per-row, per-render paths.
 
 It catches more than a refused construct. A script can end up interpreted three ways, and
 only the first leaves a trace today:
@@ -285,10 +296,11 @@ strict mode is what makes that visible.
 strict mode does not discover its constructs one build at a time. `xmlui start` reports
 them and keeps serving.
 
-> [!WARNING] Expect violations today. The synchronous statement queue has no compiled
-> target, so `Table` `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat` and
-> every sync callback prop will be flagged. Strict mode is currently a diagnostic tool for
-> finding what does not compile, not a production setting.
+> [!NOTE] What still gets reported. The remaining interpretation is narrow: a construct the
+> compiler refuses — today only an `async` arrow — and a mock backend in an app that
+> declares `compileScripts` in its app description rather than in `xmlui.config.json`.
+> Synchronous callbacks, helper functions called from bindings, and arrows stored in data
+> all compile.
 
 ### What compilation reports
 

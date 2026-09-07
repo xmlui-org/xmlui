@@ -54,32 +54,68 @@ export class StrictCompilationViolationError extends Error {
   }
 }
 
-let strictCompilationEnabled = false;
+/**
+ * How loudly a violation is reported.
+ *
+ * `"error"` is the end state. `"report"` exists so the setting can be turned on by default
+ * before it is safe to fail on: a hard error default would break an app the moment it hits
+ * any interpretation nobody predicted, and the whole point of turning it on broadly is to
+ * find out what nobody predicted. Reporting gathers that evidence without the breakage.
+ */
+export type StrictCompilationMode = "off" | "report" | "error";
+
+let strictCompilationMode: StrictCompilationMode = "off";
 
 /**
- * Arms or disarms the guard. Called once from the app's configuration merge, so that a
- * context-free call site — an emulated backend, a hand-built evaluation context — is
- * covered exactly like a component's binding.
+ * Sets the mode. Called once from the app's configuration merge, so that a context-free
+ * call site — an emulated backend, a hand-built evaluation context — is covered exactly
+ * like a component's binding.
  */
+export function setStrictCompilationMode(mode: StrictCompilationMode): void {
+  strictCompilationMode = mode;
+}
+
+/** Back-compatible arming used by tests and by callers that only want the hard mode. */
 export function setStrictCompilationEnabled(enabled: boolean): void {
-  strictCompilationEnabled = enabled;
+  strictCompilationMode = enabled ? "error" : "off";
 }
 
+export function getStrictCompilationMode(): StrictCompilationMode {
+  return strictCompilationMode;
+}
+
+/** True when a violation should be raised or reported at all. */
 export function isStrictCompilationEnabled(): boolean {
-  return strictCompilationEnabled;
+  return strictCompilationMode !== "off";
 }
 
-/** Test seam: strict mode is process-wide, so a test that arms it must disarm it. */
+/** Test seam: the mode is process-wide, so a test that sets it must reset it. */
 export function resetStrictCompilationForTests(): void {
-  strictCompilationEnabled = false;
+  strictCompilationMode = "off";
+  reported.clear();
 }
+
+/** Violations already reported, so a per-row callback does not flood the console. */
+const reported = new Set<string>();
 
 /**
- * The guard itself. Call sites check `isStrictCompilationEnabled()` first so the common
- * path is a boolean read with no argument object allocated.
+ * The guard. Call sites check `isStrictCompilationEnabled()` first so the common path is a
+ * single comparison with no argument object allocated.
+ *
+ * Throws in `"error"`, reports once per distinct site in `"report"`.
  */
-export function throwStrictCompilationViolation(violation: StrictCompilationViolation): never {
-  throw new StrictCompilationViolationError(violation);
+export function throwStrictCompilationViolation(violation: StrictCompilationViolation): void {
+  if (strictCompilationMode === "error") {
+    throw new StrictCompilationViolationError(violation);
+  }
+  const key = `${violation.door}:${violation.sourceId ?? ""}:${violation.sourceText ?? ""}`;
+  if (reported.has(key)) {
+    return;
+  }
+  reported.add(key);
+  if (typeof console !== "undefined" && console.warn) {
+    console.warn(`[xmlui] Strict compilation: ${describeViolation(violation)}`);
+  }
 }
 
 const DOOR_DESCRIPTIONS: Record<StrictCompilationDoor, string> = {
