@@ -32,3 +32,15 @@ The build summary now names what it compiled and what it did not:
 A single undifferentiated total read as complete success while an entire category sat at zero,
 which is what made this expensive to diagnose from the outside. The startup inventory line says
 the same thing in the browser console.
+
+Three more binding sites that dropped the switch now honour it as well. `Globals.xs`
+variable initializers were evaluated through a hand-built context carrying no options,
+and so were `APICall`'s `progressExtractor` and its polling `condition` — the latter two
+on every poll. Nothing downstream re-derived the switch for any of them, unlike a
+component's `var.`. `shouldCompileScripts` also reads the build-resolved setting
+directly now, so a caller that assembles an app context by hand cannot silently fall
+back to the interpreter.
+
+`Globals.xs` *functions* are unaffected by that change and did not need it: code-behind
+collects them as arrow expressions, which binding evaluation routes to the interpreter
+by design — a compiled global function comes from its build-time `#function-` artifact.

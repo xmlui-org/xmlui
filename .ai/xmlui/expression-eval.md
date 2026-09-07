@@ -65,6 +65,19 @@ the build machine and not by the browser, `xmlui start` / `xmlui build` bake wha
 the app as defines; `script-compiler/build-settings.ts` reads them back into the merged
 `xmluiConfig`. See "How `xmlui.config.json` reaches the browser" in `build-system.md`.
 
+Binding evaluation reads the switch through `createBindingEvalOptions`
+(`script-runner/eval-options.ts`). Any site that hand-builds an evaluation context and
+passes its own `options` literal bypasses it and runs interpreted forever — that is how
+`Globals.xs` initializers and `APICall`'s `progressExtractor`/`condition` stayed
+interpreted after #3892 was otherwise fixed. `shouldCompileScripts` now also consults the
+build-resolved setting directly, so a hand-assembled app context still resolves
+correctly, but new call sites should still go through `createBindingEvalOptions`.
+
+Arrow expressions are the documented exception: `evalBinding` skips the compiled path for
+`T_ARROW_EXPRESSION` (`eval-tree-sync.ts:136`), so a code-behind function — collected as
+an arrow by `code-behind-collect.ts` — compiles through its build-time `#function-`
+artifact rather than through binding evaluation.
+
 The parse-time binding-compilation path in `ParameterParser`/`AttributeValueParser`
 (`ParseBindingOptions.compileScripts` → `#expr-…` artifacts) is exercised only by tests: no
 production caller supplies those options, and `evaluateCompiledBinding` recompiles from the AST

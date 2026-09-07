@@ -55,7 +55,11 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { evalBinding } from "./script-runner/eval-tree-sync";
-import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
+import type {
+  BindingTreeEvaluationContext,
+  EvalTreeOptions,
+} from "./script-runner/BindingTreeEvaluationContext";
+import { createBindingEvalOptions } from "./script-runner/eval-options";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
@@ -127,6 +131,24 @@ function mergeStandaloneXmluiConfig(
   // --- Settings stated in `xmlui.config.json` arrive as app defines; they win over the
   // --- app description. See `script-compiler/build-settings`.
   return applyBuildScriptCompilationSettings(merged);
+}
+
+/**
+ * The evaluation options for binding expressions the standalone runtime evaluates
+ * *outside* a container: `Globals.xs` variable initializers and global function
+ * definitions.
+ *
+ * These sites used to hand-build their evaluation context and pass no options at all,
+ * so every global ran interpreted no matter what `compileScripts` said — the same
+ * class of gap as #3892, one layer down. `mergeStandaloneXmluiConfig` already folds in
+ * whatever `xmlui.config.json` stated, so this reads one answer for the whole app.
+ */
+export function createStandaloneBindingEvalOptions(
+  config?: Pick<StandaloneJsonConfig, "appGlobals" | "xmluiConfig">,
+): EvalTreeOptions {
+  return createBindingEvalOptions({
+    xmluiConfig: mergeStandaloneXmluiConfig(config?.appGlobals, config?.xmluiConfig),
+  } as any);
 }
 
 function createStandaloneScriptParserOptions(
@@ -1069,6 +1091,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     entryPointWithCodeBehind = transformMainXsToGlobalTags(
       entryPointWithCodeBehind,
       globalsXs as any,
+      createStandaloneBindingEvalOptions(config),
     );
   }
 
@@ -1305,83 +1328,6 @@ function useStandalone(
     return () => clearTimeout(timer);
   }, [pendingLintToasts]);
 
-  // --- This function extracts the global variables and functions from the combined
-  // --- pre-built Globals.xs module.
-  const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
-    const extractedVars: Record<string, any> = {};
-
-    // Process variables in multiple passes to handle dependencies
-    // Keep processing until no new variables are resolved (fixed-point iteration)
-    const unprocessed = new Map(Object.entries(prebuiltGlobals));
-    let progress = true;
-    let maxIterations = 100; // Prevent infinite loops
-    let iterations = 0;
-
-    while (unprocessed.size > 0 && progress && iterations < maxIterations) {
-      progress = false;
-      iterations++;
-
-      for (const [key, value] of Array.from(unprocessed.entries())) {
-        // The value is a variable definition object with __PARSED__ and tree
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          (value as any).__PARSED__ &&
-          (value as any).tree
-        ) {
-          const tree = (value as any).tree;
-
-          try {
-            // Create an evaluation context with previously extracted variables available
-            const evalContext: BindingTreeEvaluationContext = {
-              mainThread: {
-                childThreads: [],
-                blocks: [{ vars: { ...extractedVars } }], // Include previously evaluated globals
-                loops: [],
-                breakLabelValue: -1,
-              },
-              localContext: extractedVars, // Also include in localContext for variable lookup
-            };
-
-            // Evaluate the expression tree (handles literals, binary expressions, etc.)
-            const evaluatedValue = evalBinding(tree, evalContext);
-            extractedVars[key] = evaluatedValue;
-
-            // IMPORTANT: Store the original tree to enable re-evaluation on global updates (for reactivity)
-            extractedVars[`__tree_${key}`] = tree;
-
-            unprocessed.delete(key);
-            progress = true;
-          } catch (error) {
-            // If evaluation fails, skip for now (may be waiting for dependencies)
-            // It will be retried in the next iteration if another variable gets resolved
-          }
-        } else {
-          // Literal value, not an expression
-          extractedVars[key] = value;
-          unprocessed.delete(key);
-          progress = true;
-        }
-      }
-    }
-
-    // Handle any remaining unprocessed variables (circular dependencies or evaluation errors)
-    for (const [key, value] of unprocessed.entries()) {
-      if (typeof value === "object" && value !== null && (value as any).tree) {
-        try {
-          extractedVars[key] = (value as any).tree.value ?? 0;
-          // Still store the tree for potential re-evaluation
-          extractedVars[`__tree_${key}`] = (value as any).tree;
-        } catch {
-          extractedVars[key] = 0;
-        }
-      } else {
-        extractedVars[key] = value;
-      }
-    }
-
-    return extractedVars;
-  };
 
   // Helper function to re-evaluate globals when dependencies change
   // This enables reactive updates when a global variable is modified
@@ -1389,7 +1335,10 @@ function useStandalone(
   // Full reactivity for dependent globals would require integration with the state management system
   // to automatically re-evaluate when a global is modified (e.g., via count++).
   // For now, dependent globals maintain their initially evaluated values.
-  const reEvaluateGlobals = (globals: Record<string, any>): Record<string, any> => {
+  const reEvaluateGlobals = (
+    globals: Record<string, any>,
+    evalOptions: EvalTreeOptions = {},
+  ): Record<string, any> => {
     const result = { ...globals };
 
     // Find all keys with stored expression trees
@@ -1428,6 +1377,7 @@ function useStandalone(
               breakLabelValue: -1,
             },
             localContext: result,
+            options: evalOptions,
           };
 
           const evaluatedValue = evalBinding(tree, evalContext);
@@ -1450,15 +1400,20 @@ function useStandalone(
     // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
     const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
     const globalsXsData = (globalsXs as any)?.default ?? globalsXs;
-    const extracted = extractGlobals({
-      ...(globalsXsData?.vars || {}),
-      ...(globalsXsData?.functions || {}),
-    });
+    // --- The app definition settles both what the globals may reference and whether
+    // --- their initializers compile, so resolve it before evaluating them.
+    const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+    const extracted = extractGlobals(
+      {
+        ...(globalsXsData?.vars || {}),
+        ...(globalsXsData?.functions || {}),
+      },
+      createStandaloneBindingEvalOptions(appDef ?? undefined),
+    );
 
     // Also include markup globals (global.* attributes) and entry-point functions
     // from the app definition so they are available on the very first render.
     // Without this, child components' onInit handlers fire before globals are in scope.
-    const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
     if (appDef?.entryPoint) {
       const ep = appDef.entryPoint as ComponentDef;
       if (ep.globalVars) {
@@ -1528,6 +1483,7 @@ function useStandalone(
           appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
             globalsXsData,
+            createStandaloneBindingEvalOptions(appDef),
           );
         }
 
@@ -1679,10 +1635,13 @@ function useStandalone(
           const parsedGlobals = await parseCodeBehindResponse(resp, standaloneParserOptions);
 
           const globalsXs = parsedGlobals?.codeBehind;
-          const extractedGlobals = extractGlobals({
-            ...globalsXs?.vars,
-            ...globalsXs?.functions,
-          });
+          const extractedGlobals = extractGlobals(
+            {
+              ...globalsXs?.vars,
+              ...globalsXs?.functions,
+            },
+            createStandaloneBindingEvalOptions(config),
+          );
           // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
           resolve({
             ...parsedGlobals?.codeBehind,
@@ -1851,6 +1810,7 @@ function useStandalone(
         entryPointWithCodeBehind = transformMainXsToGlobalTags(
           entryPointWithCodeBehind,
           loadedGlobals as any,
+          createStandaloneBindingEvalOptions(config),
         );
       }
 
@@ -2466,12 +2426,106 @@ export function startApp(
 }
 
 /**
+ * Extracts the global variables and functions from the combined pre-built `Globals.xs`
+ * module, resolving initializers by fixed-point iteration so a global may reference
+ * another one declared later.
+ *
+ * `evalOptions` carries `compileScripts`. Without it, every global initializer ran
+ * interpreted whatever the app asked for — nothing downstream re-derives the switch for
+ * these, unlike a component's `var.`, which is why the gap outlived #3892.
+ *
+ * Module-level and exported so the compilation wiring is directly testable.
+ */
+export function extractGlobals(
+  prebuiltGlobals: Record<string, any>,
+  evalOptions: EvalTreeOptions = {},
+): Record<string, any> {
+  const extractedVars: Record<string, any> = {};
+
+  // Process variables in multiple passes to handle dependencies
+  // Keep processing until no new variables are resolved (fixed-point iteration)
+  const unprocessed = new Map(Object.entries(prebuiltGlobals));
+  let progress = true;
+  let maxIterations = 100; // Prevent infinite loops
+  let iterations = 0;
+
+  while (unprocessed.size > 0 && progress && iterations < maxIterations) {
+    progress = false;
+    iterations++;
+
+    for (const [key, value] of Array.from(unprocessed.entries())) {
+      // The value is a variable definition object with __PARSED__ and tree
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        (value as any).__PARSED__ &&
+        (value as any).tree
+      ) {
+        const tree = (value as any).tree;
+
+        try {
+          // Create an evaluation context with previously extracted variables available
+          const evalContext: BindingTreeEvaluationContext = {
+            mainThread: {
+              childThreads: [],
+              blocks: [{ vars: { ...extractedVars } }], // Include previously evaluated globals
+              loops: [],
+              breakLabelValue: -1,
+            },
+            localContext: extractedVars, // Also include in localContext for variable lookup
+            // --- Without these a global initializer is pinned to the interpreter
+            // --- regardless of `compileScripts`.
+            options: evalOptions,
+          };
+
+          // Evaluate the expression tree (handles literals, binary expressions, etc.)
+          const evaluatedValue = evalBinding(tree, evalContext);
+          extractedVars[key] = evaluatedValue;
+
+          // IMPORTANT: Store the original tree to enable re-evaluation on global updates (for reactivity)
+          extractedVars[`__tree_${key}`] = tree;
+
+          unprocessed.delete(key);
+          progress = true;
+        } catch (error) {
+          // If evaluation fails, skip for now (may be waiting for dependencies)
+          // It will be retried in the next iteration if another variable gets resolved
+        }
+      } else {
+        // Literal value, not an expression
+        extractedVars[key] = value;
+        unprocessed.delete(key);
+        progress = true;
+      }
+    }
+  }
+
+  // Handle any remaining unprocessed variables (circular dependencies or evaluation errors)
+  for (const [key, value] of unprocessed.entries()) {
+    if (typeof value === "object" && value !== null && (value as any).tree) {
+      try {
+        extractedVars[key] = (value as any).tree.value ?? 0;
+        // Still store the tree for potential re-evaluation
+        extractedVars[`__tree_${key}`] = (value as any).tree;
+      } catch {
+        extractedVars[key] = 0;
+      }
+    } else {
+      extractedVars[key] = value;
+    }
+  }
+
+  return extractedVars;
+}
+
+/**
  * Transform Globals.xs variables into globalVars property to leverage
  * the existing dependency system that works correctly for globalVars
  */
-function transformMainXsToGlobalTags(
+export function transformMainXsToGlobalTags(
   entryPoint: ComponentDef,
   globalsXsDef: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string },
+  evalOptions: EvalTreeOptions = {},
 ): ComponentDef {
   const globalVars: Record<string, any> = {};
 
@@ -2523,6 +2577,13 @@ function transformMainXsToGlobalTags(
               breakLabelValue: -1,
             },
             localContext: {},
+            // --- Carried for consistency with every other binding site. Code-behind
+            // --- functions are collected as arrow expressions, and `evalBinding`
+            // --- routes those to the interpreter by design — a compiled global
+            // --- function comes from its build-time `#function-` artifact, not from
+            // --- here. Passing the options costs nothing and keeps this correct if
+            // --- the arrow exclusion is ever lifted.
+            options: evalOptions,
           };
           const evaluatedFunc = evalBinding((funcDef as any).tree, evalContext);
           functions[funcName] = evaluatedFunc;

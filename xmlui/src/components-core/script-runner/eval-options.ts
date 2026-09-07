@@ -1,5 +1,6 @@
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { EvalTreeOptions } from "./BindingTreeEvaluationContext";
+import { readBuildScriptCompilationSettings } from "../script-compiler/build-settings";
 
 type ConfigSource = Pick<AppContextObject, "xmluiConfig"> | undefined;
 
@@ -56,11 +57,25 @@ export function getScriptExecutionMode(appContext?: ConfigSource): ScriptExecuti
   return { mode: shouldCompileScripts(appContext) ? "compiled" : "interpreted" };
 }
 
+/**
+ * Settings stated in `xmlui.config.json` reach the browser as app defines and are
+ * layered onto the merged `xmluiConfig` (see `mergeXmluiConfig`). Reading them here as
+ * well means a caller that hand-builds an app context — several do — still gets the
+ * right answer instead of silently falling back to the interpreter.
+ */
 export function shouldCompileScripts(appContext?: ConfigSource): boolean {
+  const fromBuild = readBuildScriptCompilationSettings().compileScripts;
+  if (fromBuild !== undefined) {
+    return fromBuild;
+  }
   return appContext?.xmluiConfig?.compileScripts === true;
 }
 
 export function shouldReportCompileFallbacks(appContext?: ConfigSource): boolean {
+  const fromBuild = readBuildScriptCompilationSettings().reportCompileFallbacks;
+  if (fromBuild !== undefined) {
+    return fromBuild;
+  }
   return appContext?.xmluiConfig?.reportCompileFallbacks === true;
 }
 
