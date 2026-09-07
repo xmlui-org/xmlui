@@ -41,7 +41,10 @@ export function formatCompileReport(
   if (location) {
     lines.push(`${INDENT}${location}`);
   }
-  const owner = [context.owner, `source id: ${diagnostic.sourceId}`].filter(Boolean).join("   ");
+  // --- The diagnostic's own owner wins: it was resolved where the handler was parsed.
+  const owner = [diagnostic.owner ?? context.owner, `source id: ${diagnostic.sourceId}`]
+    .filter(Boolean)
+    .join("   ");
   lines.push(`${INDENT}${owner}`);
 
   const snippet = formatSnippet(diagnostic, context);

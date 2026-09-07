@@ -269,9 +269,19 @@ Hints exist only where there is a concrete rewrite. A node type with nothing spe
 say has no hint rather than a filler line — regex and destructuring-assignment dropped off
 the intended list because Phase 1 removed them as gaps entirely.
 
-2.3 Enrich `sourceId`. Carry the component name and prop/event name alongside the
-`#event-N` counter from `transform.ts:1516`, so a violation names `Button onClick` and not
-just an ordinal.
+2.3 ~~Enrich `sourceId`.~~ **Done, by a different route.** The source id format is left
+alone — it feeds `createDebugSourceUrl` and the virtual source registry, so putting a
+component name and a dot into it risks the source-map URLs for a cosmetic gain. Instead
+`CompileDiagnostic` carries an `owner`, resolved at the six `parseEvent` call sites in
+`transform.ts` where the component and attribute are both in scope.
+
+It reports the attribute as the author wrote it — `Button onClick`, not `Button click` —
+so someone grepping their markup for the name in the message finds the line that produced
+it. The owner also travels in `compiledUnsupportedReason`, which is what ships in a built
+bundle; a console line is gone by the time anyone investigates.
+
+Only event handlers needed this. Code-behind declarations already carried their function
+name (`#function-roleHint`).
 
 2.4 Build-time enforcement: with strict on, the Vite plugin fails the build and prints
 **every** violation, sorted by file — not the first one. An author fixing twenty

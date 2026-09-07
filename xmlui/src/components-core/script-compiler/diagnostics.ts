@@ -48,11 +48,17 @@ export type CompileDiagnostic = {
   detail: string;
   /** What to write instead, when the construct has a concrete answer. */
   fix?: string;
+  /**
+   * The handler this belongs to in an app author's terms, e.g. `Button onClick`. The
+   * source id names it for the compiler; this names it for a person.
+   */
+  owner?: string;
 };
 
 type CreateCompileDiagnosticOptions = {
   sourceId: string;
   phase?: CompileDiagnosticPhase;
+  owner?: string;
 };
 
 /**
@@ -62,7 +68,7 @@ type CreateCompileDiagnosticOptions = {
  */
 export function createCompileDiagnostic(
   error: unknown,
-  { sourceId, phase = "build" }: CreateCompileDiagnosticOptions,
+  { sourceId, phase = "build", owner }: CreateCompileDiagnosticOptions,
 ): CompileDiagnostic {
   if (error instanceof UnsupportedCompiledScriptNodeError) {
     const isLiteral = Number(error.nodeType) === T_LITERAL;
@@ -84,12 +90,14 @@ export function createCompileDiagnostic(
       ...(fixHintForNodeType(error.nodeType) === undefined
         ? {}
         : { fix: fixHintForNodeType(error.nodeType) }),
+      ...(owner === undefined ? {} : { owner }),
     };
   }
   return {
     code: "compile-source-unavailable",
     severity: "warn",
     sourceId,
+    ...(owner === undefined ? {} : { owner }),
     detail: (error as Error)?.message ?? "compilation failed",
   };
 }
@@ -114,7 +122,8 @@ export function formatCompileDiagnostic(diagnostic: CompileDiagnostic): string {
  * fallback stays machine-checkable in a built bundle even with reporting turned off.
  */
 export function describeCompileDiagnostic(diagnostic: CompileDiagnostic): string {
-  return `${diagnostic.code}: ${diagnostic.detail}${formatPosition(diagnostic)}`;
+  const owner = diagnostic.owner ? ` (${diagnostic.owner})` : "";
+  return `${diagnostic.code}: ${diagnostic.detail}${formatPosition(diagnostic)}${owner}`;
 }
 
 function positionOf(sourceRange?: CompiledScriptSourceRange): { line?: number; column?: number } {
