@@ -255,10 +255,19 @@ Hot-path cost, measured A/B on member access with the guard removed and restored
 so the cost sits at the edge of what the harness resolves — consistent with one function
 call returning a module boolean, which is what the plan required.
 
-2.2 The error formatter: snippet with caret, owner, fix hint, code, and the escape hatch.
-Add a `fix?: string` field to `CompileDiagnostic` and a per-construct hint table keyed by
-node type — `await`, async arrow, regex literal, destructured param, getter/setter,
-destructuring assignment each get a concrete rewrite.
+2.2 ~~The error formatter…~~ **Done.** `script-compiler/compile-report.ts` renders the
+offending line with a caret under the construct, the owner and file, what to write
+instead, the code, and how to relax it. `CompileDiagnostic` carries `fix?: string`, filled
+from a hint table keyed by node type (`fix-hints.ts`).
+
+Two shapes, not one, and the distinction is the point: a refused construct reads *this
+cannot be compiled*, while a tripwire violation reads *this ran interpreted — no construct
+was refused here, because nothing fell back; this code was never handed to the compiler*.
+Different fix, different owner.
+
+Hints exist only where there is a concrete rewrite. A node type with nothing specific to
+say has no hint rather than a filler line — regex and destructuring-assignment dropped off
+the intended list because Phase 1 removed them as gaps entirely.
 
 2.3 Enrich `sourceId`. Carry the component name and prop/event name alongside the
 `#event-N` counter from `transform.ts:1516`, so a violation names `Button onClick` and not

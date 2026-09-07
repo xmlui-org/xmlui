@@ -1,4 +1,5 @@
 import { UnsupportedCompiledScriptNodeError } from "./errors";
+import { fixHintForNodeType } from "./fix-hints";
 import { T_LITERAL } from "../../parsers/scripting/ScriptingNodeTypes";
 import { createLogEntry, pushXsLog } from "../inspector/inspectorUtils";
 import type { CompiledScriptSourceRange } from "./types";
@@ -45,6 +46,8 @@ export type CompileDiagnostic = {
   column?: number;
   /** What stopped compilation, without the code or the source id. */
   detail: string;
+  /** What to write instead, when the construct has a concrete answer. */
+  fix?: string;
 };
 
 type CreateCompileDiagnosticOptions = {
@@ -78,6 +81,9 @@ export function createCompileDiagnostic(
       detail: isLiteral
         ? `${error.nodeTypeName} cannot be carried into interpreted execution`
         : `${error.nodeTypeName} is not supported by the compiler`,
+      ...(fixHintForNodeType(error.nodeType) === undefined
+        ? {}
+        : { fix: fixHintForNodeType(error.nodeType) }),
     };
   }
   return {
