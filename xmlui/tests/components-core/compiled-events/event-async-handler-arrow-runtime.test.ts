@@ -99,20 +99,4 @@ describe("arrow event handlers execute as compiled code, not interpreted AST", (
     expect(entries).toBe(0);
   });
 
-  it("an arrow inside a data literal now compiles too, rather than being interpreted", async () => {
-    // --- This was a control case asserting the opposite: that an arrow stored in a data
-    // --- literal still reached the interpreter. Native emission used to be attempted only
-    // --- for arrows in *argument* position, so `items.some(x => …)` compiled while
-    // --- `{ onOk: () => save() }` serialized its AST into the bundle and was walked on
-    // --- every call. Position decided whether a callback compiled, which is not a
-    // --- distinction an app author would predict.
-    let called = 0;
-    const entries = await runCompiledHandler(
-      "() => { const handlers = { onOk: () => record() }; handlers.onOk(); }",
-      { record: () => { called++; } },
-    );
-
-    expect(called).toBe(1);
-    expect(entries).toBe(0);
-  });
 });

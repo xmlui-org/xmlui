@@ -2012,9 +2012,6 @@ function emitArrowExpression(
   if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
-  if (tryEmitNativeArrowExpression(writer, expr, context)) {
-    return;
-  }
   emitLazyArrowExpression(writer, expr, context);
 }
 

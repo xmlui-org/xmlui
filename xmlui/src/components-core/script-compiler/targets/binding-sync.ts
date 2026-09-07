@@ -666,16 +666,12 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
   if (context.arrowMode === "value") {
-    // --- An arrow in value position — stored in an object or array, returned from a
-    // --- ternary, assigned to a member — used to go straight to the lazy path below,
-    // --- which serializes the whole AST into the bundle and hands it back to the
-    // --- interpreter on every call. Measured at 2895 characters of generated JavaScript
-    // --- for a 30-character source, against 332 for the same arrow in argument position,
-    // --- and interpreted every time it ran. Try native first; the lazy path stays as the
-    // --- fallback for bodies the emitter cannot express.
-    if (tryEmitNativeArrowExpression(writer, expr, context)) {
-      return;
-    }
+    // --- An arrow in value position keeps the `_ARROW_EXPR_` shape. Emitting a plain
+    // --- JavaScript function here is measurably better on size and speed, and was tried:
+    // --- it breaks the framework contracts that depend on recognising an arrow, from
+    // --- state propagation through `lookupSyncCallback` to the rendering placeholders.
+    // --- The body is still compiled when the arrow is invoked — see `createArrowFunction`
+    // --- in `eval-tree-sync`.
     // --- `serializeAstForJs`, not `JSON.stringify`: the arrow's body is handed to the
     // --- interpreter as data, and a regular expression inside it used to flatten to `{}`
     // --- on the way — the same silent miscompile, one level down.

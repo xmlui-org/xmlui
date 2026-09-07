@@ -143,59 +143,6 @@ describe("the emitted artifact", () => {
   });
 });
 
-/**
- * Phase 3.4: arrows in value position compile natively instead of being handed to the
- * interpreter as serialized AST.
- *
- * This carries the one recorded divergence in the whole effort, and it is deliberate.
- * Everywhere else the interpreter is treated as the reference implementation; here it is
- * provably wrong. `typeof (() => 1)` is `"function"` in JavaScript, and XMLScript follows
- * JavaScript semantics everywhere else — the interpreter reported `"object"`, because an
- * arrow value was an AST node wearing an `_ARROW_EXPR_` marker, and `JSON.stringify` on a
- * data structure holding handlers dumped their entire syntax trees.
- */
-describe("value-position arrows", () => {
-  it("are real functions, not AST objects", async () => {
-    const { evalBinding } = await import("../../../src/components-core/script-runner/eval-tree-sync");
-    const { isArrowExpressionObject } = await import("../../../src/abstractions/InternalMarkers");
-    const evaluate = (compiled: boolean) =>
-      evalBinding(new Parser("({ a: () => 1 })").parseExpr()!, {
-        localContext: {},
-        appContext: { xmluiConfig: {} },
-        options: { defaultToOptionalMemberAccess: true, ...(compiled ? { compileScripts: true } : {}) },
-      } as any);
-
-    const compiled: any = evaluate(true);
-    expect(typeof compiled.a).toBe("function");
-    expect(isArrowExpressionObject(compiled.a)).toBe(false);
-    expect(compiled.a()).toBe(1);
-
-    // --- The divergence, pinned so it cannot change silently in either direction.
-    const interpreted: any = evaluate(false);
-    expect(typeof interpreted.a).toBe("object");
-    expect(isArrowExpressionObject(interpreted.a)).toBe(true);
-  });
-
-  it("stop carrying their syntax tree into the bundle", async () => {
-    const { compileBindingSyncExpressionSource } = await import(
-      "../../../src/components-core/script-compiler/targets/binding-sync"
-    );
-    // --- Measured at 2895 characters of generated JavaScript for this 30-character
-    // --- source before, because the whole AST was serialized inline.
-    const js = compileBindingSyncExpressionSource("({ cmp: (a, b) => a.n - b.n })", "t").js;
-    expect(js).not.toContain("runtime.arrow(");
-    expect(js.length).toBeLessThan(400);
-  });
-
-  it("still fall back for a body the emitter cannot express", () => {
-    // --- The safety net survives: native emission is attempted and rolled back.
-    const artifact = compileStatementSyncStatements(
-      new Parser("return ({ f: (x) => x.map(async y => y) });").parseStatements(),
-      { sourceId: "t" },
-    );
-    expect(artifact.js).toContain("runtime.arrow(");
-  });
-});
 
 /**
  * The last common way into the interpreter from compiled code, and the one the original

@@ -431,18 +431,14 @@ describe("binding-sync expression compiler", () => {
     ).toBe(3);
   });
 
-  it("emits top-level arrow bindings as real functions in compiled mode", () => {
-    // --- This assertion used to pin the opposite, deliberately: `evalBinding` excluded
-    // --- arrows from compilation, so a top-level arrow binding stayed an `_ARROW_EXPR_`
-    // --- AST object. Phase 3.4 made arrows *nested* in value position native and left
-    // --- this one alone, which meant `{(x) => x}` and `{{ f: (x) => x }}` produced
-    // --- different kinds of value — the worst of both.
-    // ---
-    // --- Compiled arrow values are now JavaScript functions throughout: `typeof` is
-    // --- `"function"`, `instanceof Function` holds, `.length` reports arity, they are
-    // --- callable and `.call`-able directly, and `JSON.stringify` skips them instead of
-    // --- serialising a syntax tree. The interpreter still produces AST objects, and only
-    // --- runs when `compileScripts` is off.
+  it("keeps top-level arrow bindings as XMLUI arrow objects in compiled mode", () => {
+    // --- An XMLScript arrow is not a JavaScript function. The `_ARROW_EXPR_` shape is
+    // --- how the framework recognises one and routes it through `lookupSyncCallback`,
+    // --- which supplies state-mutation plumbing, the synchronous calling convention and
+    // --- event arguments — and how rendering contracts show a function as a placeholder
+    // --- rather than its source. Emitting a plain function is smaller and faster, and was
+    // --- tried: it broke ten end-to-end tests across six components. The body still
+    // --- compiles; only the shape is preserved.
     const value = evalBindingExpression(
       "(arg) => { return arg; }",
       createEvalContext({
@@ -451,12 +447,8 @@ describe("binding-sync expression compiler", () => {
       }),
     );
 
-    expect(typeof value).toBe("function");
-    expect(value instanceof Function).toBe(true);
-    expect(value.length).toBe(1);
-    expect(value(7)).toBe(7);
-    expect(JSON.stringify({ value })).toBe("{}");
-    expect(isArrowExpressionObject(value)).toBe(false);
+    expect(isArrowExpressionObject(value)).toBe(true);
+    expect(typeof value).not.toBe("function");
   });
 
   it("calls XMLUI arrow objects from compiled bindings", () => {
@@ -481,19 +473,14 @@ describe("binding-sync expression compiler", () => {
     ).toBe("Progress: 0.5%");
   });
 
-  it("emits nested arrow values as real functions in compiled bindings", () => {
-    // --- This assertion used to pin the opposite: an arrow in value position produced an
-    // --- `_ARROW_EXPR_` object carrying its own AST, which the interpreter then walked on
-    // --- every call. Compiling it natively is a deliberate, recorded divergence from the
-    // --- interpreter, and the one place in this work where the interpreter is not treated
-    // --- as the reference implementation.
-    // ---
-    // --- The reason is that the interpreter is provably wrong here: `typeof (() => 1)` is
-    // --- `"function"` in JavaScript, and XMLScript follows JavaScript semantics
-    // --- everywhere else. It reported `"object"`, and `JSON.stringify` on a data
-    // --- structure holding handlers dumped their entire syntax trees.
-    // ---
-    // --- See `.plan/strict-compilation-mode.md`, Phase 3.4.
+  it("keeps nested arrow values as XMLUI arrow objects in compiled bindings", () => {
+    // --- An XMLScript arrow is not a JavaScript function. The `_ARROW_EXPR_` shape is
+    // --- how the framework recognises one and routes it through `lookupSyncCallback`,
+    // --- which supplies state-mutation plumbing, the synchronous calling convention and
+    // --- event arguments — and how rendering contracts show a function as a placeholder
+    // --- rather than its source. Emitting a plain function is smaller and faster, and was
+    // --- tried: it broke ten end-to-end tests across six components. The body still
+    // --- compiles; only the shape is preserved.
     const value = evalBindingExpression(
       "{ a: () => { return null; }, b: { c: () => 1 } }",
       createEvalContext({
@@ -502,11 +489,8 @@ describe("binding-sync expression compiler", () => {
       }),
     );
 
-    expect(typeof value.a).toBe("function");
-    expect(typeof value.b.c).toBe("function");
-    expect(isArrowExpressionObject(value.a)).toBe(false);
-    expect(value.a()).toBeNull();
-    expect(value.b.c()).toBe(1);
+    expect(isArrowExpressionObject(value.a)).toBe(true);
+    expect(isArrowExpressionObject(value.b.c)).toBe(true);
   });
 
   it("wraps XMLUI arrow arguments when compiled bindings call native JavaScript functions", () => {

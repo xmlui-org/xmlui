@@ -439,14 +439,27 @@ emission for arrows in *argument* position, so `items.some(x => …)` compiled w
 `{ onOk: () => save() }` did not. Position decided whether a callback was compiled, which
 is not a distinction an app author would predict.
 
-**This carries the one recorded divergence in the effort.** An arrow value is no longer an
+**Reverted after end-to-end evidence.** ~~This carries the one recorded divergence in the
+effort.~~ Emitting plain JavaScript functions broke ten end-to-end tests across six
+components. An XMLScript arrow is not a JavaScript function: the `_ARROW_EXPR_` shape is
+how the framework recognises one and routes it through `lookupSyncCallback`, which supplies
+the state-mutation plumbing, the synchronous calling convention and the event arguments —
+and how rendering contracts show a function as `[xmlui function]` or `[object Object]`
+rather than its source. A function stored in a `var` stopped propagating its writes.
+
+The judgement that "the interpreter is provably wrong" was right about JavaScript in
+isolation and wrong about this framework, where the shape carries semantics that JavaScript
+functions do not. The arrow's *body* still compiles through `statement-sync`, which is
+where the performance was; only the shape is preserved. Original note follows:
+
+~~ An arrow value is no longer an
 `_ARROW_EXPR_` AST node: `typeof` is now `"function"` rather than `"object"`,
 `isArrowExpressionObject` is false, and `JSON.stringify` on a data structure holding
 handlers no longer dumps their syntax trees. Everywhere else this work treats the
 interpreter as the reference implementation. Here it is provably wrong —
 `typeof (() => 1)` is `"function"` in JavaScript and XMLScript follows JavaScript
 semantics everywhere else — so the compiled behaviour is the correct one. Pinned in both
-directions by a test so it cannot drift back or further.
+directions by a test so it cannot drift back or further."~~
 
 Three existing tests pinned the old behaviour and now pin the new, including one runtime
 proof that counts interpreter entries: an arrow in a data literal is now executed with

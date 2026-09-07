@@ -139,7 +139,17 @@ export function evalBinding(
   evalTrace("eval", () =>
     String((expr as any)?.source ?? "").slice(0, 80) || "type:" + String((expr as any)?.type ?? "?"),
   );
-  if (evalContext.options?.compileScripts) {
+  // --- Arrows stay out of the compiled binding path, and this exclusion is load-bearing
+  // --- rather than an oversight. An XMLScript arrow is not a JavaScript function: the
+  // --- `_ARROW_EXPR_` shape is how the framework recognises one and routes it through
+  // --- `lookupSyncCallback`, which supplies the state-mutation plumbing, the synchronous
+  // --- calling convention and the event arguments. Emitting a plain function instead
+  // --- bypasses all of it — a function stored in a `var` stops propagating its writes,
+  // --- and rendering contracts that show a function as a placeholder stop matching.
+  // ---
+  // --- The body still compiles: see `createArrowFunction` below, which runs it through
+  // --- the `statement-sync` target while keeping this shape.
+  if (evalContext.options?.compileScripts && expr.type !== T_ARROW_EXPRESSION) {
     const previousArrowInvoker = evalContext.compiledArrowInvoker;
     evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
       executeArrowExpressionSync(
