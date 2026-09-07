@@ -26,6 +26,7 @@ import type {
   Statement,
 } from "../script-runner/ScriptingSourceTree";
 import { UnsupportedCompiledScriptNodeError } from "./errors";
+import { destructureValue } from "./destructure";
 
 const DEFAULT_YIELD_INTERVAL_MS = 100;
 
@@ -286,15 +287,7 @@ export const eventAsyncRuntime = {
   },
 
   destructure(value: any, specs: Array<[string, Array<string | number>]>): Record<string, any> {
-    const result: Record<string, any> = {};
-    for (const [name, path] of specs) {
-      let current = value;
-      for (const member of path) {
-        current = current?.[member];
-      }
-      result[name] = current;
-    }
-    return result;
+    return destructureValue(value, specs);
   },
 
   /**

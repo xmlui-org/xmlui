@@ -90,6 +90,8 @@ import {
   UnsupportedCompiledScriptNodeError,
 } from "../errors";
 import { isJsonSerializableLiteral, regExpToJs, serializeAstForJs } from "../literals";
+import { collectDestructureSpecs, type DestructureSpec } from "../destructure";
+import { assertJsIdentifier } from "../identifiers";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -987,7 +989,7 @@ function emitDestructureDeclaration(
   decl: VarDeclaration,
   context: CompilerContext,
 ): void {
-  const specs = collectDestructureSpecs(decl, context);
+  const specs = collectDestructureSpecs(decl, context.sourceId);
   if (specs.length === 0) {
     throwUnsupportedCompiledScriptNode(decl, context.sourceId);
   }
@@ -1009,52 +1011,9 @@ function emitDestructureDeclaration(
   writer.write(`, ${JSON.stringify(specs)})`);
 }
 
-type DestructureSpec = [name: string, path: Array<string | number>];
 
-function collectDestructureSpecs(
-  decl: Pick<VarDeclaration | Destructure, "aDestr" | "oDestr">,
-  context: CompilerContext,
-): DestructureSpec[] {
-  if (decl.aDestr) {
-    return collectArrayDestructureSpecs(decl.aDestr, [], context);
-  }
-  if (decl.oDestr) {
-    return collectObjectDestructureSpecs(decl.oDestr, [], context);
-  }
-  return [];
-}
 
-function collectArrayDestructureSpecs(
-  destructure: ArrayDestructure[],
-  path: Array<string | number>,
-  context: CompilerContext,
-): DestructureSpec[] {
-  return destructure.flatMap((item, index) => {
-    const itemPath = [...path, index];
-    if (item.id) {
-      assertJsIdentifier({ name: item.id }, context.sourceId);
-      return [[item.id, itemPath] satisfies DestructureSpec];
-    }
-    if (item.aDestr) return collectArrayDestructureSpecs(item.aDestr, itemPath, context);
-    if (item.oDestr) return collectObjectDestructureSpecs(item.oDestr, itemPath, context);
-    return [];
-  });
-}
 
-function collectObjectDestructureSpecs(
-  destructure: ObjectDestructure[],
-  path: Array<string | number>,
-  context: CompilerContext,
-): DestructureSpec[] {
-  return destructure.flatMap((item) => {
-    const itemPath = [...path, item.id];
-    if (item.aDestr) return collectArrayDestructureSpecs(item.aDestr, itemPath, context);
-    if (item.oDestr) return collectObjectDestructureSpecs(item.oDestr, itemPath, context);
-    const name = item.alias ?? item.id;
-    assertJsIdentifier({ name }, context.sourceId);
-    return [[name, itemPath] satisfies DestructureSpec];
-  });
-}
 
 function emitBlockStatement(
   writer: CompiledScriptCodeWriter,
@@ -2200,7 +2159,7 @@ function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): Na
     }
     if (arg.type === T_DESTRUCTURE) {
       const paramName = context.nextTemp();
-      const specs = collectDestructureSpecs(arg as Destructure, context);
+      const specs = collectDestructureSpecs(arg as Destructure, context.sourceId);
       return {
         jsParam: paramName,
         localNames: specs.map(([name]) => name),
@@ -2594,11 +2553,6 @@ function findNonSerializableLiteral(node: any): any | undefined {
   return undefined;
 }
 
-function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {
-  if (!/^[$A-Z_a-z][$\w]*$/.test(expr.name)) {
-    throw new Error(`Cannot compile identifier '${expr.name}' in '${sourceId}'.`);
-  }
-}
 
 function sourceRangeFromStatements(
   statements: Statement[],

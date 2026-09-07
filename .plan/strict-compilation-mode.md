@@ -325,7 +325,25 @@ Not covered by this number: interpretation that nothing refuses — a lazy arrow
 site that never carried the switch. Those need a running app, and the runtime guard reports
 them instead. That is 3.3 and 3.4's territory, and it is where the violations actually are.
 
-3.2 Close the compiler gaps (§3-6), highest frequency first. Each lands with corpus cases.
+3.2 **In progress.** Ordered by severity rather than frequency, because 3.1 showed
+frequency is zero in this repository while severity is not.
+
+- ~~Destructured and rest arrow parameters in `binding-sync`.~~ **Done.** `({ id }) => id`
+  is an ordinary idiom that compiled in a handler and was a *hard error* in a binding — the
+  binding path has no fallback catch, so it crashed rather than running slowly. The
+  collectors are now shared (`script-compiler/destructure.ts`), so the two targets cannot
+  answer differently again, and `assertJsIdentifier` was shared with them
+  (`identifiers.ts`), which incidentally fixed a mis-coded diagnostic: `event-async` threw
+  a plain `Error` for a bad identifier, so it reported `compile-source-unavailable`
+  ("failed for some other reason") instead of naming the construct.
+- Remaining: destructured/rest parameters on named `function` declarations (both targets),
+  object getters/setters, non-`let` for-init, `async` arrows.
+
+The corpus caught two things during this work that a hand-written test would not have: the
+promoted cases failed until `runtime.destructure` was added to the *binding* runtime — only
+the event runtime had it — and a Phase 2.2 report test that used
+`rows.map(({ id }) => id)` as its example of a refusal had to be repointed, because its
+premise no longer held.
 
 3.3 Build the `statement-sync` compiler target (§1) and wire the three call sites,
 including `options: createEventEvalOptions(appContext)` on `runCodeSync`. Perf gate: the

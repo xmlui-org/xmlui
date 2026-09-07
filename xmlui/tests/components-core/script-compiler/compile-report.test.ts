@@ -143,10 +143,13 @@ describe("fix hints", () => {
   });
 
   it("reach the diagnostic, so every consumer gets them", () => {
+    // --- A destructured *named function* parameter, which both targets still refuse.
+    // --- This case used to be `rows.map(({ id }) => id)`; Phase 3.2 taught binding-sync
+    // --- destructured arrow parameters, so that one compiles now.
     const diagnostic = diagnosticFor(
-      () => compileBindingSyncExpressionSource("rows.map(({ id }) => id)", "y#expr-1"),
-      "y#expr-1",
+      () => compileEventAsyncStatementSource("function pick({ a }) { return a; } return pick(o);", "y#fn"),
+      "y#fn",
     );
-    expect(diagnostic.fix).toContain("(row) => row.id");
+    expect(diagnostic.fix).toContain("read its fields in the body");
   });
 });

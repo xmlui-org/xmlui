@@ -29,6 +29,7 @@ import {
   T_PREFIX_OP_EXPRESSION,
   T_RETURN_STATEMENT,
   T_SEQUENCE_EXPRESSION,
+  T_DESTRUCTURE,
   T_SPREAD_EXPRESSION,
   T_SWITCH_STATEMENT,
   T_TEMPLATE_LITERAL_EXPRESSION,
@@ -47,6 +48,8 @@ import {
   type CalculatedMemberAccessExpression,
   type ConditionalExpression,
   type ContinueStatement,
+  type Destructure,
+  type SpreadExpression,
   type ConstStatement,
   type DoWhileStatement,
   type Expression,
@@ -81,6 +84,8 @@ import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
 import { throwUnsupportedCompiledScriptNode } from "../errors";
 import { regExpToJs, serializeAstForJs } from "../literals";
+import { collectDestructureSpecs } from "../destructure";
+import { assertJsIdentifier as assertSharedJsIdentifier } from "../identifiers";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -569,32 +574,102 @@ function emitArrowExpression(
     writer.write(", evalContext, thread)", expr);
     return;
   }
-  const argNames = expr.args.map((arg) => getArrowArgName(arg, context.sourceId));
-  const arrowContext = extendCompilerContext(context, argNames);
+  const args = collectNativeArrowArgs(expr.args, context);
+  const arrowContext = extendCompilerContext(
+    context,
+    args.flatMap((arg) => arg.localNames),
+  );
 
   writer.write("((");
-  writer.write(argNames.join(", "));
+  writer.write(args.map((arg) => arg.jsParam).join(", "));
   writer.write(") => ");
-  emitArrowBody(writer, expr, arrowContext);
+  emitArrowBody(writer, expr, arrowContext, args);
   writer.write(")", expr);
+}
+
+/**
+ * Arrow parameters, including the shapes that used to be refused here.
+ *
+ * `rows.map(({ id }) => id)` is an ordinary idiom, and it compiled in an event handler
+ * while raising a hard error in a binding — the binding path has no fallback catch, so it
+ * was an app-breaking error rather than a slow path. `event-async` already knew how to do
+ * this; the collectors are now shared (`script-compiler/destructure`) so the two cannot
+ * answer differently again.
+ */
+type NativeArrowArg = {
+  /** What goes in the emitted parameter list. */
+  jsParam: string;
+  /** Names the body may reference. */
+  localNames: string[];
+  /** Statements that unpack the parameter, emitted at the top of the body. */
+  emitBinding: (writer: CompiledScriptCodeWriter) => void;
+};
+
+function collectNativeArrowArgs(
+  args: Expression[],
+  context: CompilerContext,
+): NativeArrowArg[] {
+  return args.map((arg) => {
+    if (arg.type === T_IDENTIFIER) {
+      assertJsIdentifier(arg, context.sourceId);
+      return { jsParam: arg.name, localNames: [arg.name], emitBinding: () => {} };
+    }
+    if (arg.type === T_DESTRUCTURE) {
+      const paramName = context.nextTemp();
+      const specs = collectDestructureSpecs(arg as Destructure, context.sourceId);
+      return {
+        jsParam: paramName,
+        localNames: specs.map(([name]) => name),
+        emitBinding: (writer: CompiledScriptCodeWriter) => {
+          writer.write("const { ");
+          specs.forEach(([name], index) => {
+            if (index > 0) writer.write(", ");
+            writer.write(name);
+          });
+          writer.write(` } = runtime.destructure(${paramName}, ${JSON.stringify(specs)});`);
+        },
+      };
+    }
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      const spread = arg as SpreadExpression;
+      if (spread.expr.type !== T_IDENTIFIER) {
+        throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+      }
+      assertJsIdentifier(spread.expr, context.sourceId);
+      return {
+        jsParam: `...${spread.expr.name}`,
+        localNames: [spread.expr.name],
+        emitBinding: () => {},
+      };
+    }
+    throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+  });
 }
 
 function emitArrowBody(
   writer: CompiledScriptCodeWriter,
   expr: ArrowExpression,
   context: CompilerContext,
+  args: NativeArrowArg[] = [],
 ): void {
+  // --- Destructured parameters unpack first, so the body sees the names it declared.
+  const emitBindings = () => args.forEach((arg) => arg.emitBinding(writer));
   switch (expr.statement.type) {
     case T_EMPTY_STATEMENT:
-      writer.write("{ return undefined; }", expr.statement);
+      writer.write("{ ");
+      emitBindings();
+      writer.write("return undefined; }", expr.statement);
       return;
     case T_EXPRESSION_STATEMENT:
-      writer.write("{ return ");
+      writer.write("{ ");
+      emitBindings();
+      writer.write("return ");
       emitExpression(writer, expr.statement.expr, context);
       writer.write("; }", expr.statement);
       return;
     case T_BLOCK_STATEMENT:
       writer.write("{ runtime.checkTimeout(evalContext); ");
+      emitBindings();
       const blockContext = extendCompilerContext(context, collectBlockLocalNames(expr.statement));
       expr.statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
       writer.write("}", expr.statement);

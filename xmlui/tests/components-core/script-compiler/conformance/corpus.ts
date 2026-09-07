@@ -67,8 +67,11 @@ export const CORPUS: CorpusCase[] = [
   { name: "arrow as a callback", kind: "binding", source: "xs.map(x => x * 2)", context: { xs: [1, 2] }, expected: [2, 4] },
   { name: "arrow with a block body", kind: "binding", source: "xs.filter(x => { return x > 1; })", context: { xs: [1, 2] }, expected: [2] },
   { name: "arrow in value position, then called", kind: "binding", source: "({ f: (x) => x + 1 }).f(1)", expected: 2 },
-  { name: "destructured arrow parameter", kind: "binding", source: "xs.map(({ id }) => id)", context: { xs: [{ id: 1 }] }, knownFallback: "destructuring pattern" },
-  { name: "rest arrow parameter", kind: "binding", source: "call((...a) => a.length)", context: { call: (f: any) => f(1, 2) }, knownFallback: "spread expression" },
+  { name: "destructured arrow parameter", kind: "binding", source: "xs.map(({ id }) => id)", context: { xs: [{ id: 1 }] }, expected: [1] },
+  { name: "nested destructured arrow parameter", kind: "binding", source: "xs.map(({ a: { b } }) => b)", context: { xs: [{ a: { b: 2 } }] }, expected: [2] },
+  { name: "array destructured arrow parameter", kind: "binding", source: "xs.map(([first]) => first)", context: { xs: [[7, 8]] }, expected: [7] },
+  { name: "aliased destructured arrow parameter", kind: "binding", source: "xs.map(({ id: key }) => key)", context: { xs: [{ id: 3 }] }, expected: [3] },
+  { name: "rest arrow parameter", kind: "binding", source: "call((...a) => a.length)", context: { call: (f: any) => f(1, 2) }, expected: 2 },
   { name: "async arrow", kind: "binding", source: "xs.map(async x => x)", context: { xs: [1] }, knownFallback: "arrow function" },
 
   // --- Assignment and update -------------------------------------------------------
