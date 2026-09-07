@@ -632,17 +632,24 @@ export function createEventHandlers(config: EventHandlerConfig) {
         const preparedUsesOriginalStatements = preparedStatements === statements;
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
+        // --- `mockExecute` used to be excluded here, with no reason recorded anywhere:
+        // --- not in the commit that added it, not in its plan notes, not in a comment.
+        // --- The likely motive was that it is the one handler whose *return value* is
+        // --- load-bearing — it replaces an API response — and the original compilation
+        // --- experiment predated the normalisation a few lines below, which copies a
+        // --- compiled handler's result onto `mainThread.returnValue` so both paths read
+        // --- alike. Checked against the shapes a real one takes: literal returns,
+        // --- injected context vars (`$queryParams`, `$requestBody`, `$requestHeaders`,
+        // --- `$cookies`), branching, the arrow form, and an awaited delegate. Compiled
+        // --- and interpreted agree on all of them.
         const shouldUseCompiledEventHandler =
-          evalContext.options?.compileScripts &&
-          effectiveOptions?.eventName !== "mockExecute" &&
-          !parseTimeCompilationUnsupported;
+          evalContext.options?.compileScripts && !parseTimeCompilationUnsupported;
         const compiledEventDiagnosticEnabled = isCompiledEventDiagnosticEnabled(appContext);
         if (compiledEventDiagnosticEnabled) {
           logCompiledEventDiagnostic("dispatch decision", {
             componentUid: componentUidForCoord,
             eventName: eventNameForCoord,
             runtimeCompileScripts: evalContext.options?.compileScripts === true,
-            ignoredMockExecute: effectiveOptions?.eventName === "mockExecute",
             willUseCompiledPath: shouldUseCompiledEventHandler === true,
             sourceKind:
               typeof source === "string"

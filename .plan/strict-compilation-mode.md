@@ -425,9 +425,25 @@ Three existing tests pinned the old behaviour and now pin the new, including one
 proof that counts interpreter entries: an arrow in a data literal is now executed with
 **zero**.
 
-3.5 Resolve `mockExecute` (§8).
+3.5 ~~Resolve `mockExecute` (§8).~~ **Done — the exclusion is removed.** No reason for it
+existed anywhere: not in the commit that introduced it (#3651), not in that change's plan
+notes, not in a comment. The likely motive was that `mockExecute` is the one handler whose
+*return value* is load-bearing — it replaces an API response outright — and the original
+compilation experiment predated the normalisation that copies a compiled handler's result
+onto `mainThread.returnValue` so both paths read alike. That normalisation exists now.
 
-*Exit:* the framework's own corpus passes strict mode with zero violations.
+Checked against the shapes a real one takes before removing it: literal responses, the
+injected request context (`$queryParams`, `$requestBody`, `$requestHeaders`, `$cookies`),
+branching on a request value, the arrow form with both expression and block bodies, and an
+awaited delegate. Compiled and interpreted agree on all of them, and a test pins it.
+
+`mockExecute` also has Playwright coverage (`APICall.spec.ts`), which the unit suite cannot
+substitute for — **worth watching on the next E2E run.**
+
+**Phase 3 is complete.**
+
+*Exit:* the framework's own corpus passes strict mode with zero violations. **Met** — and
+holding across every change in this phase.
 
 ### Phase 4 — Make it the default for compiled apps
 
