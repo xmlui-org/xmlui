@@ -365,13 +365,20 @@ frequency is zero in this repository while severity is not.
   path ever sees it, and `async` as a statement value is rejected by the interpreter
   ("XMLUI does not support async arrow functions"). Both were listed as compiler gaps and
   are language boundaries.
-- **Left refused, deliberately: `async` as a callback argument.** `xs.map(async x => x)`
+- ~~**Left refused, deliberately: `async` as a callback argument.**~~ **Resolved: refused
+  everywhere.** In callback position both paths ran it with the keyword ignored — `[1]`
+  where JavaScript gives `[Promise]` — while value position refused it. One construct, two
+  answers, decided by where it appeared. XMLScript awaits async calls on its own, so real
+  promise semantics are not available; refusing it is the answer the language already gave
+  elsewhere. The rejection moved into `createArrowFunction`, which every synchronous arrow
+  the interpreter builds passes through. Superseded note follows:
+- ~~ `xs.map(async x => x)`
   is the one entry that survived scrutiny in the other direction — position changes the
   answer. The interpreter runs it, ignoring `async` and yielding `[1]` rather than
   `[Promise]`, so it is a genuine gap, and in a binding it is a *hard error* rather than a
   fallback. Matching the interpreter means compiling `async` as though it were absent, and
   whether that is right for XMLUI's auto-await model is a language decision, not a
-  compiler one. **Needs a call before Phase 4.**
+  compiler one."~~
 - ~~Object getters and setters.~~ **Done in `binding-sync`, deliberately not in
   `event-async`.** The accessor body is stored as an arrow, so it emits like any other
   arrow body. `event-async` keeps refusing them: every body it emits is `async` and threads

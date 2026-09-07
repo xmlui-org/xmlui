@@ -104,10 +104,10 @@ describe("conformance: known gaps still refuse to compile", () => {
   it("reports the current gap inventory", () => {
     // --- Not an assertion so much as a published number: Phase 3 closes these, and this
     // --- is where the count comes from.
-    // --- One entry. Phase 3.2 closed every parameter-shape gap; non-`let` for-init
-    // --- turned out to be a parser boundary rather than a compiler gap, so the plan's
-    // --- list shrank rather than being worked through. What remains needs a language
-    // --- decision, not a compiler change — see the corpus comment.
-    expect(KNOWN_FALLBACKS.map((entry) => entry.name)).toEqual(["async arrow as a callback"]);
+    // --- Empty. Every construct the corpus covers either compiles or is refused by both
+    // --- paths alike. The last entry, `async` in callback position, was resolved as a
+    // --- language boundary rather than a compiler gap: it is now refused everywhere
+    // --- instead of running with the keyword ignored in one position only.
+    expect(KNOWN_FALLBACKS.map((entry) => entry.name)).toEqual([]);
   });
 });

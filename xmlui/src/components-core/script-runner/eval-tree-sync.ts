@@ -139,7 +139,7 @@ export function evalBinding(
   evalTrace("eval", () =>
     String((expr as any)?.source ?? "").slice(0, 80) || "type:" + String((expr as any)?.type ?? "?"),
   );
-  if (evalContext.options?.compileScripts && expr.type !== T_ARROW_EXPRESSION) {
+  if (evalContext.options?.compileScripts) {
     const previousArrowInvoker = evalContext.compiledArrowInvoker;
     evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
       executeArrowExpressionSync(
@@ -715,6 +715,16 @@ function evalNewExpression(
 }
 
 function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression): Function {
+  // --- `evalArrow` rejects `async` for an arrow in value position, but one arriving as a
+  // --- *callback argument* reached this factory directly and ran with the keyword quietly
+  // --- ignored: `xs.map(async x => x)` produced `[1]` where JavaScript gives `[Promise]`.
+  // --- One construct, two answers, decided by where it appeared. XMLScript awaits async
+  // --- calls on its own, so real promise semantics are not on the table; refusing it is
+  // --- the answer the language already gave everywhere else. Placed here because every
+  // --- synchronous arrow the interpreter builds comes through this function.
+  if (expr.async) {
+    throw new Error("XMLUI does not support async arrow functions.");
+  }
   // --- Use this function, it evaluates the arrow function
   return (...args: any[]) => {
     // --- Prepare the variables to pass

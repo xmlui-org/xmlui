@@ -431,7 +431,18 @@ describe("binding-sync expression compiler", () => {
     ).toBe(3);
   });
 
-  it("keeps top-level arrow bindings as XMLUI arrow objects in compiled mode", () => {
+  it("emits top-level arrow bindings as real functions in compiled mode", () => {
+    // --- This assertion used to pin the opposite, deliberately: `evalBinding` excluded
+    // --- arrows from compilation, so a top-level arrow binding stayed an `_ARROW_EXPR_`
+    // --- AST object. Phase 3.4 made arrows *nested* in value position native and left
+    // --- this one alone, which meant `{(x) => x}` and `{{ f: (x) => x }}` produced
+    // --- different kinds of value — the worst of both.
+    // ---
+    // --- Compiled arrow values are now JavaScript functions throughout: `typeof` is
+    // --- `"function"`, `instanceof Function` holds, `.length` reports arity, they are
+    // --- callable and `.call`-able directly, and `JSON.stringify` skips them instead of
+    // --- serialising a syntax tree. The interpreter still produces AST objects, and only
+    // --- runs when `compileScripts` is off.
     const value = evalBindingExpression(
       "(arg) => { return arg; }",
       createEvalContext({
@@ -440,8 +451,12 @@ describe("binding-sync expression compiler", () => {
       }),
     );
 
-    expect(isArrowExpressionObject(value)).toBe(true);
-    expect(typeof value).not.toBe("function");
+    expect(typeof value).toBe("function");
+    expect(value instanceof Function).toBe(true);
+    expect(value.length).toBe(1);
+    expect(value(7)).toBe(7);
+    expect(JSON.stringify({ value })).toBe("{}");
+    expect(isArrowExpressionObject(value)).toBe(false);
   });
 
   it("calls XMLUI arrow objects from compiled bindings", () => {

@@ -216,8 +216,8 @@ describe("declaration functions called from a binding", () => {
       collectCodeBehindFromSource(
         "Globals.xs",
         "function applyFilters(rows, q) { return rows.filter(r => r.name.includes(q)); }\n" +
-          "function tally(rows) { let s = 0; for (const r of rows) { s += r.n; } return s; }\n" +
-          "function usesAsync(xs) { return xs.map(async y => y); }",
+          "function tally(rows) { let s = 0; for (const r of rows) { s += r.n; } return s; }",
+
         { compileScripts: true } as any,
       ) as any
     ).functions;
@@ -254,10 +254,26 @@ describe("declaration functions called from a binding", () => {
   });
 
   it("falls back rather than crashing when the body cannot compile", async () => {
-    // --- The synchronous binding path has no fallback catch of its own, so a construct
-    // --- the emitter refuses inside a helper would otherwise surface as a raw compiler
-    // --- exception and take the app down. `async` is the one construct left in that
-    // --- category.
-    await expect(evaluate("usesAsync(xs)", { xs: [1] }, true)).resolves.toHaveLength(1);
+    // --- The safety net, forced rather than provoked. No construct currently reaches it:
+    // --- what the emitter refuses, the language now refuses too, so the corpus has no
+    // --- remaining fallback case. It still has to work, because the next unsupported
+    // --- construct should make a binding slow rather than fatal — the synchronous binding
+    // --- path had no catch at all until Phase 4, and a refusal took the app down.
+    const executor = await import(
+      "../../../src/components-core/script-compiler/targets/binding-sync-executor"
+    );
+    const { UnsupportedCompiledScriptNodeError } = await import(
+      "../../../src/components-core/script-compiler/errors"
+    );
+    const spy = vi
+      .spyOn(executor, "executeCompiledStatementSync")
+      .mockImplementation(() => {
+        throw new UnsupportedCompiledScriptNodeError("115", "forced");
+      });
+    try {
+      await expect(evaluate("tally(rows)", { rows: [{ n: 4 }] }, true)).resolves.toBe(4);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

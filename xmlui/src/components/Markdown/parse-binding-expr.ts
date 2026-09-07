@@ -60,6 +60,17 @@ function splitByCodeFences(text: string): Array<{ content: string; isCodeFence: 
  * @param extractValue The function to resolve binding expressions
  * @returns the parsed text with resolved binding expressions
  */
+/**
+ * How a function renders inside a binding expression. A user-visible contract, covered by
+ * the Markdown smoke tests.
+ *
+ * Module scope on purpose: the helpers below sit after `parseBindingExpression`'s own
+ * `return`, so a `const` declared beside them would still be in its temporal dead zone
+ * when they run — and the `try`/`catch` around extraction would swallow the error and
+ * render the raw `@{...}` text instead.
+ */
+const FUNCTION_PLACEHOLDER = "[xmlui function]";
+
 export function parseBindingExpression(text: string, extractValue: ValueExtractor) {
   const segments = splitByCodeFences(text);
   return segments
@@ -97,13 +108,22 @@ export function parseBindingExpression(text: string, extractValue: ValueExtracto
       return null;
     } else if (extracted === undefined || typeof extracted === "undefined") {
       return undefined;
+    } else if (typeof extracted === "function") {
+      // --- A compiled arrow is a real JavaScript function rather than an AST object, so
+      // --- the check below never sees it and `JSON.stringify` would drop it silently.
+      // --- The contract is that a function renders as a placeholder, whatever shape the
+      // --- engine happens to give it.
+      return FUNCTION_PLACEHOLDER;
     } else if (typeof extracted === "object") {
       const arrowFuncResult = parseArrowFunc(extracted as Record<string, unknown>);
       if (arrowFuncResult) {
         return arrowFuncResult;
       }
       if (Array.isArray(extracted)) {
-        return extracted;
+        // --- Map the elements rather than returning the array whole: a function inside an
+        // --- array is the same contract as a function inside an object, and returning it
+        // --- unmapped rendered its syntax tree.
+        return extracted.map((item) => mapByType(item));
       }
       return Object.fromEntries(
         Object.entries(extracted).map(([key, value]) => {
@@ -121,7 +141,7 @@ export function parseBindingExpression(text: string, extractValue: ValueExtracto
       extracted.type === T_ARROW_EXPRESSION &&
       isArrowExpressionObject(extracted)
     ) {
-      return "[xmlui function]";
+      return FUNCTION_PLACEHOLDER;
     }
     return "";
   }

@@ -89,7 +89,13 @@ export const CORPUS: CorpusCase[] = [
   // --- interpreter means compiling `async` as though it were absent, and whether that is
   // --- the right semantics for XMLUI's auto-await model is a language decision, not a
   // --- compiler one.
-  { name: "async arrow as a callback", kind: "binding", source: "xs.map(async x => x)", context: { xs: [1] }, knownFallback: "arrow function" },
+  // --- Now rejected by both paths, in every position. It used to run in callback
+  // --- position with the keyword quietly ignored — `[1]` where JavaScript gives
+  // --- `[Promise]` — while being refused in value position. One construct, two answers,
+  // --- decided by where it appeared. XMLScript awaits async calls on its own, so real
+  // --- promise semantics are not available; refusing it is the answer the language
+  // --- already gave everywhere else.
+  { name: "async arrow as a callback", kind: "binding", source: "xs.map(async x => x)", context: { xs: [1] }, expectThrows: true },
   { name: "async arrow as a value", kind: "statement", source: "const f = async () => 1; return f;", expectThrows: true },
 
   // --- Assignment and update -------------------------------------------------------
