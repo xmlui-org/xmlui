@@ -1995,6 +1995,15 @@ function emitCompletedArgumentList(
   });
 }
 
+/**
+ * An arrow in value position — stored in an object or array, returned from a ternary.
+ *
+ * Native emission is attempted first. It was already attempted for arrows in *argument*
+ * position (`emitArgumentArray`), so `items.some(x => …)` compiled while
+ * `const handlers = { onOk: () => save() }` serialized its whole AST into the bundle and
+ * handed it back to the interpreter on every call. Position decided whether a callback was
+ * compiled, which is not a distinction an app author would predict.
+ */
 function emitArrowExpression(
   writer: CompiledScriptCodeWriter,
   expr: ArrowExpression,
@@ -2003,6 +2012,22 @@ function emitArrowExpression(
   if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
+  if (tryEmitNativeArrowExpression(writer, expr, context)) {
+    return;
+  }
+  emitLazyArrowExpression(writer, expr, context);
+}
+
+/**
+ * The fallback: the arrow's AST, serialized into the emitted module for the interpreter to
+ * walk at call time. Only reached when the body contains something the native emitter
+ * cannot express.
+ */
+function emitLazyArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
   // --- Report the literal itself, not the arrow that holds it: "unsupported literal
   // --- at line 4" points at the code to change, "unsupported arrow function" does not.
   const nonSerializable = findNonSerializableLiteral(expr);
@@ -2037,8 +2062,9 @@ function emitArgumentArray(
         // Native compilation is not mandatory, but attempt it anyway so common callback
         // patterns (e.g. `items.some(item => ...)`) run as compiled JS instead of being
         // re-interpreted at runtime. Fall back to the always-safe lazy arrow only when
-        // the callback body uses syntax the native emitter cannot handle.
-        emitArrowExpression(writer, arg, context);
+        // the callback body uses syntax the native emitter cannot handle. Straight to the
+        // lazy emitter — native was just tried and refused.
+        emitLazyArrowExpression(writer, arg, context);
       }
       return;
     }

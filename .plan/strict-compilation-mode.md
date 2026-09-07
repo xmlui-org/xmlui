@@ -399,9 +399,31 @@ expression is a real parsed node and carries an id; where nothing stable exists,
 artifact is not cached at all, because sharing one between unrelated scripts is worse than
 compiling twice.
 
-3.4 Compile value-position arrows natively (§2), removing the `runtime.arrow` path and the
-serialized-AST payload — measured at 2895 chars of generated JS for a 30-char source,
-against 332 for the same arrow in argument position.
+3.4 ~~Compile value-position arrows natively.~~ **Done, in both targets.** Native emission
+is attempted first and the writer rolls back to the lazy path only for a body the emitter
+cannot express. Codegen for the measured case went **2895 → 148 characters**, now smaller
+than the same arrow in argument position, and the body runs compiled rather than being
+walked on every call. Over the conformance corpus plus a set of realistic shapes, **1 of
+70** sources still emits `runtime.arrow` — an arrow containing an `async` arrow, the one
+construct still refused.
+
+Both targets had the same gap and `event-async`'s was subtler: it already tried native
+emission for arrows in *argument* position, so `items.some(x => …)` compiled while
+`{ onOk: () => save() }` did not. Position decided whether a callback was compiled, which
+is not a distinction an app author would predict.
+
+**This carries the one recorded divergence in the effort.** An arrow value is no longer an
+`_ARROW_EXPR_` AST node: `typeof` is now `"function"` rather than `"object"`,
+`isArrowExpressionObject` is false, and `JSON.stringify` on a data structure holding
+handlers no longer dumps their syntax trees. Everywhere else this work treats the
+interpreter as the reference implementation. Here it is provably wrong —
+`typeof (() => 1)` is `"function"` in JavaScript and XMLScript follows JavaScript
+semantics everywhere else — so the compiled behaviour is the correct one. Pinned in both
+directions by a test so it cannot drift back or further.
+
+Three existing tests pinned the old behaviour and now pin the new, including one runtime
+proof that counts interpreter entries: an arrow in a data literal is now executed with
+**zero**.
 
 3.5 Resolve `mockExecute` (§8).
 

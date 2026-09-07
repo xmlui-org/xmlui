@@ -107,15 +107,33 @@ describe("what the violation carries", () => {
   });
 
   it("names the arrow door when an arrow body is about to be walked", () => {
-    // --- A lazy arrow: compiled binding evaluation hands the body back to the
-    // --- interpreter, which is invisible to every existing diagnostic.
+    // --- This case used to be `({ f: (x) => x + 1 }).f(1)`, a lazy arrow that compiled
+    // --- binding evaluation handed back to the interpreter. Phase 3.4 emits those
+    // --- natively, so it no longer reaches a door at all — which is the point of that
+    // --- change.
+    // ---
+    // --- What still does: an arrow whose *body* holds something the emitter refuses.
+    // --- Native emission is attempted and rolled back, the lazy path takes over, and
+    // --- calling it enters the interpreter. `async` is the only construct left in that
+    // --- category, which is why this shape is contrived — there is nothing ordinary left
+    // --- that reaches this door.
     setStrictCompilationEnabled(true);
     try {
-      evalBinding(new Parser("({ f: (x) => x + 1 }).f(1)").parseExpr()!, bindingContext(true));
+      evalBinding(
+        new Parser("({ f: (x) => x.map(async y => y) }).f(xs)").parseExpr()!,
+        { ...bindingContext(true), localContext: { xs: [1] } },
+      );
       expect.unreachable("the guard should have fired");
     } catch (error) {
       expect((error as StrictCompilationViolationError).violation.door).toBe("arrow");
     }
+  });
+
+  it("a value-position arrow no longer reaches a door", () => {
+    // --- The complement, and the reason the case above had to move: an arrow stored in
+    // --- an object used to be interpreted on every call, and now is not.
+    setStrictCompilationEnabled(true);
+    expect(evalBinding(new Parser("({ f: (x) => x + 1 }).f(1)").parseExpr()!, bindingContext(true))).toBe(2);
   });
 });
 

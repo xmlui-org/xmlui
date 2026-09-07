@@ -466,7 +466,19 @@ describe("binding-sync expression compiler", () => {
     ).toBe("Progress: 0.5%");
   });
 
-  it("keeps nested arrow values as XMLUI arrow objects in compiled bindings", () => {
+  it("emits nested arrow values as real functions in compiled bindings", () => {
+    // --- This assertion used to pin the opposite: an arrow in value position produced an
+    // --- `_ARROW_EXPR_` object carrying its own AST, which the interpreter then walked on
+    // --- every call. Compiling it natively is a deliberate, recorded divergence from the
+    // --- interpreter, and the one place in this work where the interpreter is not treated
+    // --- as the reference implementation.
+    // ---
+    // --- The reason is that the interpreter is provably wrong here: `typeof (() => 1)` is
+    // --- `"function"` in JavaScript, and XMLScript follows JavaScript semantics
+    // --- everywhere else. It reported `"object"`, and `JSON.stringify` on a data
+    // --- structure holding handlers dumped their entire syntax trees.
+    // ---
+    // --- See `.plan/strict-compilation-mode.md`, Phase 3.4.
     const value = evalBindingExpression(
       "{ a: () => { return null; }, b: { c: () => 1 } }",
       createEvalContext({
@@ -475,13 +487,11 @@ describe("binding-sync expression compiler", () => {
       }),
     );
 
-    expect(isArrowExpressionObject(value.a)).toBe(true);
-    expect(isArrowExpressionObject(value.b.c)).toBe(true);
-    expect(
-      JSON.stringify(value, (_key, val) =>
-        isArrowExpressionObject(val) ? "[xmlui function]" : val,
-      ),
-    ).toBe('{"a":"[xmlui function]","b":{"c":"[xmlui function]"}}');
+    expect(typeof value.a).toBe("function");
+    expect(typeof value.b.c).toBe("function");
+    expect(isArrowExpressionObject(value.a)).toBe(false);
+    expect(value.a()).toBeNull();
+    expect(value.b.c()).toBe(1);
   });
 
   it("wraps XMLUI arrow arguments when compiled bindings call native JavaScript functions", () => {

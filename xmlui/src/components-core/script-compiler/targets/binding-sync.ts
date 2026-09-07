@@ -85,7 +85,10 @@ import {
 import { collectVariableDependencies } from "../../script-runner/visitors";
 import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
-import { throwUnsupportedCompiledScriptNode } from "../errors";
+import {
+  throwUnsupportedCompiledScriptNode,
+  UnsupportedCompiledScriptNodeError,
+} from "../errors";
 import { regExpToJs, serializeAstForJs } from "../literals";
 import { collectDestructureSpecs } from "../destructure";
 import { assertJsIdentifier as assertSharedJsIdentifier } from "../identifiers";
@@ -663,6 +666,16 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
   if (context.arrowMode === "value") {
+    // --- An arrow in value position — stored in an object or array, returned from a
+    // --- ternary, assigned to a member — used to go straight to the lazy path below,
+    // --- which serializes the whole AST into the bundle and hands it back to the
+    // --- interpreter on every call. Measured at 2895 characters of generated JavaScript
+    // --- for a 30-character source, against 332 for the same arrow in argument position,
+    // --- and interpreted every time it ran. Try native first; the lazy path stays as the
+    // --- fallback for bodies the emitter cannot express.
+    if (tryEmitNativeArrowExpression(writer, expr, context)) {
+      return;
+    }
     // --- `serializeAstForJs`, not `JSON.stringify`: the arrow's body is handed to the
     // --- interpreter as data, and a regular expression inside it used to flatten to `{}`
     // --- on the way — the same silent miscompile, one level down.
@@ -671,6 +684,46 @@ function emitArrowExpression(
     writer.write(", evalContext, thread)", expr);
     return;
   }
+  emitNativeArrowExpression(writer, expr, context);
+}
+
+/**
+ * Emits an arrow in value position as real JavaScript, rolling the writer back if the
+ * body turns out to contain something the emitter cannot express.
+ *
+ * Native emission is not merely faster here, it is more capable: the lazy path hands the
+ * body to the interpreter, which cannot see JavaScript locals the compiled code declared,
+ * so an arrow closing over one had to be refused outright. A native arrow closes over them
+ * the way JavaScript does.
+ *
+ * Identifier resolution is unchanged. Names the compiler does not know as locals still
+ * emit `runtime.id(name, evalContext, thread)`, and `evalContext` and `thread` are
+ * closed over lexically — which is what the lazy path was capturing explicitly through
+ * `obtainClosures`.
+ */
+function tryEmitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): boolean {
+  const mark = writer.mark();
+  try {
+    emitNativeArrowExpression(writer, expr, context);
+    return true;
+  } catch (error) {
+    if (error instanceof UnsupportedCompiledScriptNodeError) {
+      writer.resetTo(mark);
+      return false;
+    }
+    throw error;
+  }
+}
+
+function emitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
   const args = collectNativeArrowArgs(expr.args, context);
   const arrowContext = extendCompilerContext(
     context,
