@@ -79,6 +79,13 @@ type UEBuildOptions = {
   withMock?: boolean;
   withHostingMetaFiles?: boolean;
   withRelativeRoot?: boolean;
+  /**
+   * Directory (relative to the current working directory) the build writes into.
+   * Defaults to "dist". Callers that only need the build output as an intermediate
+   * artifact should pass a private directory so they do not clobber -- or race with
+   * another process over -- the project's public `dist/`.
+   */
+  outDir?: string;
 };
 
 export const build = async ({
@@ -87,6 +94,7 @@ export const build = async ({
   withMock = false,
   withHostingMetaFiles = false,
   withRelativeRoot = false,
+  outDir = "dist",
 }: UEBuildOptions) => {
   const flatDistUiPrefix = "ui_";
   console.log("Building with options:", {
@@ -95,14 +103,22 @@ export const build = async ({
     withMock,
     withHostingMetaFiles,
     withRelativeRoot,
+    outDir,
+  });
+
+  const viteConfig = await getViteConfig({
+    flatDist,
+    withRelativeRoot,
+    flatDistUiPrefix,
   });
 
   await viteBuild({
-    ...(await getViteConfig({
-      flatDist,
-      withRelativeRoot,
-      flatDistUiPrefix,
-    })),
+    ...viteConfig,
+    build: {
+      ...viteConfig.build,
+      outDir,
+      emptyOutDir: true,
+    },
     define: {
       ...createXmluiAppDefines({
         buildMode,
@@ -251,7 +267,7 @@ export const build = async ({
   if (buildMode === "INLINE_ALL") {
     return;
   }
-  const distPath = "/dist";
+  const distPath = outDir;
   const themesFolder = flatDist ? "" : "themes";
   const themesFolderPath = flatDist ? distPath : path.join(distPath, themesFolder);
 
