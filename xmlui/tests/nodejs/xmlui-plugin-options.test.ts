@@ -2,11 +2,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  loadXmluiBuildSettings,
   loadXmluiPluginOptions,
   mergeXmluiConfigSources,
   normalizeXmluiPluginOptions,
   resetRemovedCompilationKeyNotices,
+  resolveRuntimeScriptCompilationSettings,
 } from "../../src/nodejs/bin/xmluiPluginOptions";
+import { createXmluiScriptCompilationDefines } from "../../src/nodejs/bin/xmluiEnv";
 
 // --- Fixture projects live inside the repo: the dynamic import that reads an
 // --- app description module must be resolvable by the test runner as well.
@@ -208,5 +211,79 @@ describe("Loading XMLUI plugin options from project files", () => {
       "src/config.js": "import './missing-module.scss';\nexport default {};\n",
     });
     expect(await loadXmluiPluginOptions({ cwd })).toMatchObject({ compileScripts: true });
+  });
+});
+
+/**
+ * Regression guard for #3892: `xmlui.config.json` is read on the build machine, but
+ * binding expressions compile in the *browser* — so whatever that file states has to be
+ * baked into the app, or every binding runs interpreted no matter what the file says.
+ */
+describe("script compilation settings handed to the browser", () => {
+  it("states nothing when there is no xmlui.config.json", () => {
+    expect(resolveRuntimeScriptCompilationSettings(undefined)).toEqual({});
+  });
+
+  it("states nothing when the file is silent about compilation", () => {
+    expect(resolveRuntimeScriptCompilationSettings({ analyze: "off" })).toEqual({});
+  });
+
+  it("reads a top-level key", () => {
+    expect(
+      resolveRuntimeScriptCompilationSettings({
+        compileScripts: true,
+        reportCompileFallbacks: true,
+      }),
+    ).toEqual({ compileScripts: true, reportCompileFallbacks: true });
+  });
+
+  it("reads the same keys from xmluiConfig and appGlobals", () => {
+    expect(
+      resolveRuntimeScriptCompilationSettings({ xmluiConfig: { compileScripts: true } }),
+    ).toEqual({ compileScripts: true });
+    expect(
+      resolveRuntimeScriptCompilationSettings({ appGlobals: { compileScripts: true } }),
+    ).toEqual({ compileScripts: true });
+  });
+
+  it("keeps an explicit `false` — it has to win over the app description", () => {
+    expect(resolveRuntimeScriptCompilationSettings({ compileScripts: false })).toEqual({
+      compileScripts: false,
+    });
+  });
+
+  it("carries what the file states out of the loader, next to the plugin options", async () => {
+    const cwd = await createProject({
+      "xmlui.config.json": JSON.stringify({ compileScripts: true }),
+    });
+    await expect(loadXmluiBuildSettings({ cwd })).resolves.toMatchObject({
+      pluginOptions: { compileScripts: true },
+      runtimeScriptCompilation: { compileScripts: true },
+    });
+  });
+
+  it("states nothing to the browser when only the app description asks for it", async () => {
+    // --- The description already reaches the browser on its own; re-stating it as a
+    // --- define would only add a second source of truth.
+    const cwd = await createProject({
+      "src/config.json": JSON.stringify({ appGlobals: { compileScripts: true } }),
+    });
+    await expect(loadXmluiBuildSettings({ cwd })).resolves.toMatchObject({
+      pluginOptions: { compileScripts: true },
+      runtimeScriptCompilation: {},
+    });
+  });
+
+  it("emits app defines only for stated settings", () => {
+    expect(createXmluiScriptCompilationDefines({})).toEqual({});
+    expect(createXmluiScriptCompilationDefines({ compileScripts: true })).toEqual({
+      "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS": '"true"',
+    });
+    expect(
+      createXmluiScriptCompilationDefines({ compileScripts: false, reportCompileFallbacks: true }),
+    ).toEqual({
+      "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS": '"false"',
+      "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS": '"true"',
+    });
   });
 });

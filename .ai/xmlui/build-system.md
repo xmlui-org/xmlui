@@ -225,7 +225,10 @@ Used when one doesn't utilize the xmlui commands, like `xmlui start`, `xmlui bui
 
 `compileScripts` is the single public switch for script compilation, and `reportCompileFallbacks`
 the switch for its per-block diagnostics. The plugin takes them as `PluginOptions.compileScripts`
-and `PluginOptions.reportCompileFallbacks`; there are no per-path keys.
+and `PluginOptions.reportCompileFallbacks`; there are no per-path keys. The plugin compiles event
+handlers and script declaration functions only — bindings are not compiled here, and the build
+summary says so, naming the kinds it did compile so a category at zero cannot hide inside a
+single total.
 
 When the plugin's internal `sourceMaps` option is on, transformed `.xmlui`, `.xmlui.xs`, and `.xs`
 files include Source Map v3 metadata with `sources` pointing at `/@xmlui-source/...` URLs and
@@ -263,6 +266,29 @@ Per key, an explicit top-level `xmlui.config.json` entry wins over `xmluiConfig`
 over `appGlobals` — the same precedence the browser runtime applies (`mergeXmluiConfig` in
 `AppContent`). This is what makes `compileScripts` declared in the app description reach the
 build-time compiler; without it the flag only ever enabled runtime compilation.
+
+### How `xmlui.config.json` reaches the browser
+
+`xmlui.config.json` lives on the build machine; the browser never sees it. That matters because
+the browser is where **binding expressions** compile — prop values are parsed lazily there, so a
+binding has no build-time artifact and the runtime switch is the whole story for it. An app that
+set `compileScripts` only in `xmlui.config.json` therefore got build-time artifacts for handlers
+and declarations and then ran fully interpreted, because compiled-handler dispatch
+(`container/event-handlers.ts`) and compiled binding evaluation (`script-runner/eval-tree-sync.ts`)
+are both gated on `evalContext.options.compileScripts`, which came from the app description alone.
+
+`loadXmluiBuildSettings()` returns, next to the plugin options, the script-compilation settings the
+config **file** states (`resolveRuntimeScriptCompilationSettings`). `getViteConfig` turns those
+into app defines via `createXmluiScriptCompilationDefines`
+(`import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS`, `…_REPORT_COMPILE_FALLBACKS`), and both `xmlui start`
+and `xmlui build` spread `viteConfig.define` into their own. On the runtime side
+`components-core/script-compiler/build-settings.ts` reads them back and
+`applyBuildScriptCompilationSettings` layers them onto the merged `xmluiConfig`, in
+`mergeXmluiConfig` (`AppContext`) and `mergeStandaloneXmluiConfig` (`StandaloneApp`).
+
+The values are tri-state: absent means the file said nothing and the app description keeps
+deciding; `false` means the file turned the switch off and wins over the description. Only stated
+settings are emitted, so an app configured through its description alone is untouched.
 
 App descriptions are ES modules and may import assets Node cannot evaluate (SCSS,
 `import.meta.glob`). The loader tries a plain Node import first; when that fails and the file

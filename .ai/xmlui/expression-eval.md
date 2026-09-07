@@ -55,6 +55,34 @@ with that precedence reversed (config file wins), and the same value reaches
 `XmluiParserOptions`, `CodeBehindCollectionOptions`, `EvalTreeOptions`, `ParseBindingOptions`, and
 the Vite plugin unchanged — the drift between those was the whole of #3876 and #3879.
 
+Where each kind compiles differs, and this is the part that bit in #3892. Handlers and script
+declarations get build-time artifacts from the Vite plugin. **Binding expressions never do**:
+prop values are stored as strings and parsed lazily in the browser, so `evalBinding`
+(`script-runner/eval-tree-sync.ts`) compiles each one on first evaluation and `bindingSyncCache`
+(`script-compiler/targets/binding-sync-executor.ts`) keys it by AST node id. Counting `compiled:`
+objects in a bundle therefore says nothing about bindings. Since `xmlui.config.json` is read on
+the build machine and not by the browser, `xmlui start` / `xmlui build` bake what it states into
+the app as defines; `script-compiler/build-settings.ts` reads them back into the merged
+`xmluiConfig`. See "How `xmlui.config.json` reaches the browser" in `build-system.md`.
+
+Binding evaluation reads the switch through `createBindingEvalOptions`
+(`script-runner/eval-options.ts`). Any site that hand-builds an evaluation context and
+passes its own `options` literal bypasses it and runs interpreted forever — that is how
+`Globals.xs` initializers and `APICall`'s `progressExtractor`/`condition` stayed
+interpreted after #3892 was otherwise fixed. `shouldCompileScripts` now also consults the
+build-resolved setting directly, so a hand-assembled app context still resolves
+correctly, but new call sites should still go through `createBindingEvalOptions`.
+
+Arrow expressions are the documented exception: `evalBinding` skips the compiled path for
+`T_ARROW_EXPRESSION` (`eval-tree-sync.ts:136`), so a code-behind function — collected as
+an arrow by `code-behind-collect.ts` — compiles through its build-time `#function-`
+artifact rather than through binding evaluation.
+
+The parse-time binding-compilation path in `ParameterParser`/`AttributeValueParser`
+(`ParseBindingOptions.compileScripts` → `#expr-…` artifacts) is exercised only by tests: no
+production caller supplies those options, and `evaluateCompiledBinding` recompiles from the AST
+into its own cache regardless.
+
 `xmluiConfig.reportCompileFallbacks` adds per-block reporting on top: each block that could not be
 compiled is printed with a `CompileDiagnosticCode` (`compile-unsupported-node`,
 `compile-unserializable-literal`, `compile-runtime-fallback`, `compile-source-unavailable`), its

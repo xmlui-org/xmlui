@@ -17,6 +17,7 @@ import {
   getAbortSignalReason,
   isAbortError,
 } from "../../components-core/action/operationCancellation";
+import { createBindingEvalOptions } from "../../components-core/script-runner/eval-options";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;
@@ -141,7 +142,8 @@ function updateDeferredState(
   });
 }
 
-function extractProgress(
+// --- Exported so the compilation wiring below stays under test.
+export function extractProgress(
   statusData: any,
   progressExtractor: string | undefined,
   executionContext: ActionExecutionContext,
@@ -166,9 +168,12 @@ function extractProgress(
     const extractedValue = evalBinding(expr, {
       localContext: contextForProgress,
       appContext: executionContext.appContext,
-      options: {
+      // --- Read `compileScripts` off the app context like every other binding site;
+      // --- hand-built options used to drop it, pinning this expression to the
+      // --- interpreter no matter what the app asked for.
+      options: createBindingEvalOptions(executionContext.appContext, {
         defaultToOptionalMemberAccess: true,
-      },
+      }),
     });
     
     if (extractedValue !== undefined && extractedValue !== null) {
@@ -181,7 +186,8 @@ function extractProgress(
   return 0;
 }
 
-function evaluateCondition(
+// --- Exported so the compilation wiring below stays under test.
+export function evaluateCondition(
   conditionExpr: string | undefined,
   statusData: any,
   progress: number,
@@ -199,7 +205,9 @@ function evaluateCondition(
     const value = evalBinding(ast, {
       localContext: { $statusData: statusData, $result: result, $progress: progress },
       appContext: executionContext.appContext,
-      options: { defaultToOptionalMemberAccess: true },
+      options: createBindingEvalOptions(executionContext.appContext, {
+        defaultToOptionalMemberAccess: true,
+      }),
     });
     return Boolean(value);
   } catch (error) {

@@ -13,6 +13,15 @@ type XmluiAppDefineOptions = {
   appVersion?: string;
 };
 
+/**
+ * Script-compilation settings `xmlui.config.json` states. Tri-state on purpose:
+ * `undefined` means the file said nothing, so the app description keeps deciding.
+ */
+export type XmluiScriptCompilationDefineOptions = {
+  compileScripts?: boolean;
+  reportCompileFallbacks?: boolean;
+};
+
 // All application-level env vars that the xmlui CLI sets at app-build time.
 // These map 1-to-1 to import.meta.env references that are preserved as
 // pass-throughs in the framework lib build (vite build --mode lib).
@@ -24,6 +33,8 @@ const XMLUI_APP_DEFINE_KEYS = {
   includeAllComponents: "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS",
   inspectUserComponents: "import.meta.env.VITE_USER_COMPONENTS_Inspect",
   appVersion: "import.meta.env.VITE_APP_VERSION",
+  compileScripts: "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS",
+  reportCompileFallbacks: "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS",
 } as const;
 
 function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boolean {
@@ -80,6 +91,36 @@ export function createXmluiAppDefines(
     ...(appVersion !== undefined
       ? {
           [XMLUI_APP_DEFINE_KEYS.appVersion]: JSON.stringify(appVersion),
+        }
+      : {}),
+  };
+}
+
+/**
+ * Bakes the script-compilation settings `xmlui.config.json` states into the app.
+ *
+ * The browser is what compiles binding expressions — prop values are parsed lazily
+ * there, so bindings have no build-time artifact — but `xmlui.config.json` lives on the
+ * build machine and the browser never sees it. Without these defines, an app that set
+ * `compileScripts` only in that file got its handlers and declarations compiled at build
+ * time and then, at runtime, neither used them nor compiled a single binding.
+ *
+ * Only stated settings are emitted, so an app that configures compilation in its
+ * description alone is left exactly as it was.
+ */
+export function createXmluiScriptCompilationDefines(
+  options: XmluiScriptCompilationDefineOptions = {},
+): Record<string, string> {
+  const { compileScripts, reportCompileFallbacks } = options;
+  return {
+    ...(compileScripts !== undefined
+      ? { [XMLUI_APP_DEFINE_KEYS.compileScripts]: JSON.stringify(String(compileScripts)) }
+      : {}),
+    ...(reportCompileFallbacks !== undefined
+      ? {
+          [XMLUI_APP_DEFINE_KEYS.reportCompileFallbacks]: JSON.stringify(
+            String(reportCompileFallbacks),
+          ),
         }
       : {}),
   };
