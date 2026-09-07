@@ -32,8 +32,9 @@ This is the critical path for the behavior we were debugging:
 3. SSG build flow
 
    - [xmlui/src/nodejs/bin/ssg.ts](/Users/jonudell/xmlui/xmlui/src/nodejs/bin/ssg.ts:636)
-   - builds the app with `buildMode: "INLINE_ALL"`
-   - copies `dist` to `dist-ssg`
+   - builds the app with `buildMode: "INLINE_ALL"` into a private `.xmlui-ssg-dist/`
+     (never the project's `dist/`, which `xmlui build` owns)
+   - copies that build output to `dist-ssg`
    - builds a temporary SSR bundle
    - renders each route via `renderPath(...)`
    - merges the rendered output into the shell HTML via `applyRenderToShell(...)`

@@ -42,6 +42,7 @@ dist
 dist-ssg
 xmlui-optimized-output
 .xmlui-ssg-ssr/
+.xmlui-ssg-dist/
 .xmlui-ssg-entry.tsx
 
 myworkdrive/

@@ -658,7 +658,14 @@ export const ssg = async ({
 
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
-  const distPath = path.resolve(cwd, "dist");
+  // The client build is an intermediate artifact of `ssg`, so it goes into a private
+  // directory rather than the project's public `dist/`. Writing to `dist/` made `ssg` a
+  // second, undeclared writer of a directory that `xmlui build` also owns: two build
+  // tasks running concurrently in the same project would race, one emptying `dist/`
+  // while the other wrote into it (ENOTEMPTY), or -- worse -- silently producing a
+  // half-copied `dist-ssg/`. See https://github.com/xmlui-org/xmlui/issues/3848.
+  const clientBuildDir = ".xmlui-ssg-dist";
+  const clientBuildPath = path.resolve(cwd, clientBuildDir);
   const ssrBuildPath = path.resolve(cwd, ".xmlui-ssg-ssr");
   const ssrBundlePath = path.join(ssrBuildPath, "render.mjs");
   const builtIndexPath = path.join(outPath, "index.html");
@@ -670,20 +677,26 @@ export const ssg = async ({
   await mkdir(outPath, { recursive: true });
 
   log("building project assets");
-  await build({
-    buildMode: "INLINE_ALL",
-    withMock: true,
-    withHostingMetaFiles: false,
-    withRelativeRoot: false,
-    flatDist: false,
-  });
+  await rm(clientBuildPath, { recursive: true, force: true });
+  try {
+    await build({
+      buildMode: "INLINE_ALL",
+      withMock: true,
+      withHostingMetaFiles: false,
+      withRelativeRoot: false,
+      flatDist: false,
+      outDir: clientBuildDir,
+    });
 
-  if (!(await pathExists(distPath))) {
-    throw new Error(`dist folder was not generated: ${distPath}`);
+    if (!(await pathExists(clientBuildPath))) {
+      throw new Error(`client build folder was not generated: ${clientBuildPath}`);
+    }
+
+    log(`copying client build to ${outPath}`);
+    await cp(clientBuildPath, outPath, { recursive: true });
+  } finally {
+    await rm(clientBuildPath, { recursive: true, force: true });
   }
-
-  log(`copying dist to ${outPath}`);
-  await cp(distPath, outPath, { recursive: true });
 
   let shellHtml = await readFile(builtIndexPath, "utf-8");
 
