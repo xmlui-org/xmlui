@@ -18,6 +18,7 @@ import type { IApiInterceptor } from "./interception/abstractions";
 import { injectTraceparent } from "./audit/correlation";
 import { createOperationAbortError } from "./action/operationCancellation";
 import { createEventEvalOptions } from "./script-runner/eval-options";
+import { executeCompiledStatementSync } from "./script-compiler";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -576,6 +577,11 @@ export default class RestApiProxy {
           expr: value,
         } as ArrowExpressionStatement;
 
+        // --- Compiles the whole arrow, control flow included, now that a synchronous
+        // --- statement target exists. Same shape as `runCodeSync`.
+        if (evalContext.options?.compileScripts) {
+          return executeCompiledStatementSync([arrowStmt], evalContext);
+        }
         processStatementQueue([arrowStmt], evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {

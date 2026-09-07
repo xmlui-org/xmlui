@@ -32,6 +32,7 @@ import {
 } from "../utils/event-handler-directives";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
+import { executeCompiledStatementSync } from "../script-compiler";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { createEventEvalOptions } from "../script-runner/eval-options";
@@ -896,24 +897,6 @@ export function createEventHandlers(config: EventHandlerConfig) {
         // --- DOM sandbox that async handlers enforce.
         options: {
           ...createEventEvalOptions(appContext),
-          // --- Compilation stays off here on purpose, and this is the one call site in
-          // --- the framework where that is deliberate.
-          // ---
-          // --- The synchronous statement queue has no compiled target, so turning the
-          // --- switch on compiles only the leaf expressions while the control flow stays
-          // --- interpreted. Measured over the shapes this actually serves — `Table`
-          // --- `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat`, all
-          // --- evaluated per row per render — that is a loss, not a win:
-          // ---
-          // ---   simple predicate   2.46µs → 3.29µs   1.34x slower
-          // ---   member chain       2.25µs → 3.26µs   1.44x slower
-          // ---   with a branch      2.57µs → 4.32µs   1.68x slower
-          // ---   array method       6.08µs → 4.39µs   1.39x faster
-          // ---
-          // --- Small expressions pay the artifact cache lookup without earning it back.
-          // --- Flip this to inherit the switch once a `statement-sync` target compiles
-          // --- the whole body: see `.plan/strict-compilation-mode.md`, Phase 3.3.
-          compileScripts: false,
         },
         localContext: createCoWStateProxy({ ...stateRef.current }, (changeInfo) => {
           changes.push(changeInfo);
@@ -935,6 +918,14 @@ export function createEventHandlers(config: EventHandlerConfig) {
         },
       };
       try {
+        // --- The `statement-sync` target compiles the whole body — control flow included
+        // --- — where before only the leaf expressions compiled and the loops and branches
+        // --- stayed interpreted, which made the switch a net loss here. Measured on the
+        // --- shapes this call site serves: a statement-heavy body over 1000 rows went
+        // --- from 1.9x slower than interpreting to 2.47x faster.
+        if (evalContext.options?.compileScripts) {
+          return executeCompiledStatementSync(rawStatements, evalContext);
+        }
         processStatementQueue(rawStatements, evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {

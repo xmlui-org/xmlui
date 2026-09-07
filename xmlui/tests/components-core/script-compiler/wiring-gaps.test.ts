@@ -126,13 +126,14 @@ describe("the five call sites derive their options from the helpers", () => {
     expect(source).toMatch(/create(Binding|Event)EvalOptions/);
   });
 
-  it("runCodeSync opts out of compilation deliberately, with the reason recorded", () => {
-    // --- The one place in the framework where the switch is turned off on purpose: the
-    // --- sync statement queue has no compiled target, so enabling it compiles the leaf
-    // --- expressions while control flow stays interpreted — measured slower for the
-    // --- shapes this serves. If someone flips it, the comment must go too.
+  it("runCodeSync no longer opts out — it runs the compiled statement path", () => {
+    // --- This assertion used to pin the opposite. `runCodeSync` deliberately disabled
+    // --- compilation while the synchronous statement queue had no compiled target,
+    // --- because compiling only the leaf expressions was measurably slower than
+    // --- interpreting the lot. Phase 3.3 built the target, so the exception is gone —
+    // --- and this test failing is what said so.
     const source = readFileSync(join(SRC, "components-core", "container", "event-handlers.ts"), "utf-8");
-    expect(source).toContain("compileScripts: false");
-    expect(source).toContain("statement-sync");
+    expect(source).toContain("executeCompiledStatementSync");
+    expect(source).not.toContain("compileScripts: false");
   });
 });

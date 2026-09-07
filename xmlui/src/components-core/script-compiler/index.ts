@@ -49,6 +49,7 @@ export {
 export {
   clearBindingSyncCompilerCache,
   evaluateCompiledBinding,
+  executeCompiledStatementSync,
   evaluateCompiledBindingExpressionSource,
 } from "./targets/binding-sync-executor";
 export {

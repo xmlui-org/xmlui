@@ -370,11 +370,34 @@ the event runtime had it — and a Phase 2.2 report test that used
 `rows.map(({ id }) => id)` as its example of a refusal had to be repointed, because its
 premise no longer held.
 
-3.3 Build the `statement-sync` compiler target (§1) and wire the three call sites,
-including `options: createEventEvalOptions(appContext)` on `runCodeSync`. Perf gate: the
-statement-heavy benchmark currently runs **1.9× slower** compiled than interpreted
-(4.93 → 9.59 ms over 1000 rows) precisely because control flow stays interpreted; that must
-reach parity or better.
+3.3 ~~Build the `statement-sync` compiler target and wire the call sites.~~ **Done, and
+far smaller than this plan assumed.** It was budgeted as a second full compiler target
+alongside `event-async`'s 2,612 lines. It is about 60 lines: `binding-sync` *already*
+emitted every synchronous statement form — `if`, all four loops, `switch`, `try`, `throw`,
+`break`/`continue`, declarations, nested functions — because arrow bodies and IIFEs need
+them. What was missing was an entry point taking a `Statement[]` rather than an
+`Expression`. Reading the target before estimating would have caught that.
+
+**Perf gate met and exceeded.** The statement-heavy benchmark went from 1.9× slower to
+**2.47× faster** (3.91 → 1.58 ms over 1000 rows), a ~4.7× swing. Of the four shapes
+`runCodeSync` serves: a branch is 1.44× faster, an array method 1.62× faster, a simple
+predicate parity, and a bare member chain **1.18× slower** — measured repeatedly, ranges
+barely overlapping, so real. That last one is ~0.4 ns per evaluation: for the simplest
+possible expression the compiled path pays a cache lookup and a call without doing less
+work. Immaterial in absolute terms against the wins elsewhere, but recorded rather than
+rounded away.
+
+Wired: `runCodeSync` (its deliberate Phase 1.2 opt-out is gone — the guard test that
+pinned it flipped) and `RestApiProxy`. The third site, arrow bodies in `eval-tree-sync`,
+belongs to 3.4, which removes that path rather than compiling into it.
+
+**A cache-key collision surfaced and was fixed.** A handler written as an arrow is wrapped
+in a *synthetic* statement by the caller, and a synthesized node has no `nodeId` — so every
+arrow handler in an app hashed to the same key, and the first one compiled would have been
+handed to all the rest. One table's row predicate answering for another's. The inner
+expression is a real parsed node and carries an id; where nothing stable exists, the
+artifact is not cached at all, because sharing one between unrelated scripts is worse than
+compiling twice.
 
 3.4 Compile value-position arrows natively (§2), removing the `runtime.arrow` path and the
 serialized-AST payload — measured at 2895 chars of generated JS for a 30-char source,

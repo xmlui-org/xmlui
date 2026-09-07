@@ -18,6 +18,7 @@ import {
   T_FUNCTION_DECLARATION,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_ARROW_EXPRESSION,
+  T_ARROW_EXPRESSION_STATEMENT,
   T_IDENTIFIER,
   T_IF_STATEMENT,
   T_LET_STATEMENT,
@@ -42,6 +43,7 @@ import {
   type ArrayLiteral,
   type AssignmentExpression,
   type ArrowExpression,
+  type ArrowExpressionStatement,
   type BinaryExpression,
   type BlockStatement,
   type BreakStatement,
@@ -141,6 +143,69 @@ export function compileBindingSyncExpression(
     dependencies: collectVariableDependencies(expr),
     js: writer.toString(),
     mappings: writer.getMappings(),
+  });
+}
+
+/**
+ * Compiles a statement list for synchronous execution.
+ *
+ * This is the `statement-sync` target, and it is an entry point rather than a second
+ * compiler: `binding-sync` already emits every synchronous statement form — `if`, the
+ * loops, `switch`, `try`, `throw`, `break`/`continue`, declarations, nested functions —
+ * because arrow bodies and IIFEs need them. What was missing was a way in from a
+ * `Statement[]` rather than from an `Expression`.
+ *
+ * It exists because the synchronous statement queue had no compiled target at all, which
+ * made `compileScripts` a net loss for the shapes it serves. Compiling only the leaf
+ * expressions while control flow stayed interpreted measured 1.3x to 1.7x *slower* than
+ * interpreting the lot — small expressions pay the artifact cache lookup without earning
+ * it back — and those shapes are `Table` `rowDisabledPredicate`, `List` `groupBy` and
+ * `Slider` `valueFormat`, evaluated per row per render.
+ */
+export function compileStatementSyncStatements(
+  statements: Statement[],
+  {
+    sourceId,
+    sourceText,
+    sourceUrl,
+    displayName,
+    sources,
+    sourceOrigin,
+  }: CompileBindingSyncExpressionOptions,
+): CompiledScriptArtifact {
+  const writer = new CompiledScriptCodeWriter(sourceId, sourceOrigin);
+  const context = extendCompilerContext(
+    createCompilerContext(sourceId),
+    collectStatementLocalNames(statements),
+  );
+  writer.write("runtime.start(evalContext);");
+  writer.newline();
+  statements.forEach((statement) => emitStatement(writer, statement, context));
+
+  return createCompiledScriptArtifact({
+    target: "statement-sync",
+    sourceId,
+    sourceUrl,
+    displayName,
+    sourceText,
+    sources,
+    sourceRange: statements[0] ? sourceRangeFromNode(statements[0], sourceOrigin) : undefined,
+    astNodeId: statements[0]?.nodeId,
+    dependencies: [],
+    js: writer.toString(),
+    mappings: writer.getMappings(),
+  });
+}
+
+export function compileStatementSyncSource(
+  sourceText: string,
+  sourceId: string,
+  options: Omit<CompileBindingSyncExpressionOptions, "sourceId" | "sourceText"> = {},
+): CompiledScriptArtifact {
+  return compileStatementSyncStatements(new Parser(sourceText).parseStatements(), {
+    ...options,
+    sourceId,
+    sourceText,
   });
 }
 
@@ -711,6 +776,24 @@ function emitArrowBody(
   }
 }
 
+/**
+ * A handler written as an arrow — `rowDisabledPredicate="{(row) => row.locked}"` — which
+ * the caller wraps in a synthetic statement so the queue can run it.
+ *
+ * This is the shape most synchronous callbacks actually take, so a `statement-sync` target
+ * that refused it would have compiled almost nothing that matters. The arrow is emitted
+ * natively and invoked with the event arguments, rather than handed to the interpreter.
+ */
+function emitArrowExpressionStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ArrowExpressionStatement,
+  context: CompilerContext,
+): void {
+  writer.write("return (", stmt);
+  emitArrowExpression(writer, stmt.expr, withArrowMode(context, "native"));
+  writer.write(")(...(evalContext.eventArgs ?? []));", stmt);
+}
+
 function emitBlockStatement(
   writer: CompiledScriptCodeWriter,
   stmt: BlockStatement,
@@ -722,12 +805,39 @@ function emitBlockStatement(
   writer.write("}", stmt);
 }
 
+/**
+ * Statements that transfer control, where the completion hook has to be emitted *before*
+ * the statement rather than after it — code after a `return` never runs.
+ */
+const TERMINAL_STATEMENTS = new Set<number>([
+  T_RETURN_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_THROW_STATEMENT,
+  T_ARROW_EXPRESSION_STATEMENT,
+]);
+
 function emitStatement(
   writer: CompiledScriptCodeWriter,
   stmt: Statement,
   context: CompilerContext,
 ): void {
   writer.write("runtime.checkTimeout(evalContext);", stmt);
+  const terminal = TERMINAL_STATEMENTS.has(stmt.type as number);
+  if (terminal) {
+    writer.write("runtime.statementCompleted(evalContext);", stmt);
+  }
+  emitStatementBody(writer, stmt, context);
+  if (!terminal) {
+    writer.write("runtime.statementCompleted(evalContext);", stmt);
+  }
+}
+
+function emitStatementBody(
+  writer: CompiledScriptCodeWriter,
+  stmt: Statement,
+  context: CompilerContext,
+): void {
   switch (stmt.type) {
     case T_EMPTY_STATEMENT:
       writer.write(";", stmt);
@@ -735,6 +845,9 @@ function emitStatement(
     case T_EXPRESSION_STATEMENT:
       emitExpression(writer, stmt.expr, context);
       writer.write(";", stmt);
+      return;
+    case T_ARROW_EXPRESSION_STATEMENT:
+      emitArrowExpressionStatement(writer, stmt as ArrowExpressionStatement, context);
       return;
     case T_RETURN_STATEMENT:
       emitReturnStatement(writer, stmt, context);
@@ -1150,8 +1263,12 @@ function emitDestructureItemPattern(
 }
 
 function collectBlockLocalNames(stmt: BlockStatement): string[] {
+  return collectStatementLocalNames(stmt.stmts);
+}
+
+function collectStatementLocalNames(statements: Statement[]): string[] {
   const names: string[] = [];
-  stmt.stmts.forEach((child) => {
+  statements.forEach((child) => {
     if (child.type === T_LET_STATEMENT || child.type === T_CONST_STATEMENT) {
       names.push(...collectDeclarationNames(child.decls));
     } else if (child.type === T_FUNCTION_DECLARATION) {

@@ -57,6 +57,18 @@ export const bindingSyncRuntime = {
     return destructureValue(value, specs);
   },
 
+  /**
+   * Signals that a statement finished, mirroring the interpreter's per-statement hook.
+   *
+   * `runCodeSync` uses it to flush accumulated state changes outward and rebuild its
+   * copy-on-write view. Compiled code that skipped it would still produce the right
+   * values, but a handler's writes would surface at a different moment — the kind of
+   * difference that shows up as a render-ordering bug rather than a wrong answer.
+   */
+  statementCompleted(evalContext: BindingTreeEvaluationContext): void {
+    evalContext?.onStatementCompleted?.(evalContext, undefined as any);
+  },
+
   arrow(
     expr: ArrowExpression,
     evalContext: BindingTreeEvaluationContext,
