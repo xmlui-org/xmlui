@@ -104,12 +104,10 @@ describe("conformance: known gaps still refuse to compile", () => {
   it("reports the current gap inventory", () => {
     // --- Not an assertion so much as a published number: Phase 3 closes these, and this
     // --- is where the count comes from.
-    // --- Two entries left here when binding-sync learned destructured and rest
-    // --- parameters (Phase 3.2). The remaining pair are named-function parameters,
-    // --- which both targets still refuse, and `async` arrows.
-    expect(KNOWN_FALLBACKS.map((entry) => entry.name)).toEqual([
-      "async arrow",
-      "destructured function parameter",
-    ]);
+    // --- One entry. Phase 3.2 closed every parameter-shape gap; non-`let` for-init
+    // --- turned out to be a parser boundary rather than a compiler gap, so the plan's
+    // --- list shrank rather than being worked through. What remains needs a language
+    // --- decision, not a compiler change — see the corpus comment.
+    expect(KNOWN_FALLBACKS.map((entry) => entry.name)).toEqual(["async arrow as a callback"]);
   });
 });

@@ -143,13 +143,14 @@ describe("fix hints", () => {
   });
 
   it("reach the diagnostic, so every consumer gets them", () => {
-    // --- A destructured *named function* parameter, which both targets still refuse.
-    // --- This case used to be `rows.map(({ id }) => id)`; Phase 3.2 taught binding-sync
-    // --- destructured arrow parameters, so that one compiles now.
+    // --- An `async` arrow, the one construct Phase 3.2 left refused on purpose: matching
+    // --- the interpreter means compiling `async` as though it were absent, which is a
+    // --- language decision rather than a compiler one. This example has now moved twice
+    // --- as the gaps closed underneath it.
     const diagnostic = diagnosticFor(
-      () => compileEventAsyncStatementSource("function pick({ a }) { return a; } return pick(o);", "y#fn"),
-      "y#fn",
+      () => compileBindingSyncExpressionSource("xs.map(async x => x)", "y#expr-1"),
+      "y#expr-1",
     );
-    expect(diagnostic.fix).toContain("read its fields in the body");
+    expect(diagnostic.fix).toContain("Drop the `async` keyword");
   });
 });

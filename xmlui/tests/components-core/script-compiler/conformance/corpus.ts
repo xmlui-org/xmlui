@@ -72,7 +72,18 @@ export const CORPUS: CorpusCase[] = [
   { name: "array destructured arrow parameter", kind: "binding", source: "xs.map(([first]) => first)", context: { xs: [[7, 8]] }, expected: [7] },
   { name: "aliased destructured arrow parameter", kind: "binding", source: "xs.map(({ id: key }) => key)", context: { xs: [{ id: 3 }] }, expected: [3] },
   { name: "rest arrow parameter", kind: "binding", source: "call((...a) => a.length)", context: { call: (f: any) => f(1, 2) }, expected: 2 },
-  { name: "async arrow", kind: "binding", source: "xs.map(async x => x)", context: { xs: [1] }, knownFallback: "arrow function" },
+  // --- `async` cuts both ways depending on position, which is why it has been
+  // --- misclassified twice. As a statement value (`const f = async () => 1`) the
+  // --- interpreter rejects it outright — a language boundary. As a callback argument it
+  // --- runs, ignoring `async` and returning `[1]` rather than `[Promise]`.
+  // ---
+  // --- So this is a genuine gap, and in a binding it is a *hard error* rather than a
+  // --- fallback, since that path has no catch. Left refused deliberately: matching the
+  // --- interpreter means compiling `async` as though it were absent, and whether that is
+  // --- the right semantics for XMLUI's auto-await model is a language decision, not a
+  // --- compiler one.
+  { name: "async arrow as a callback", kind: "binding", source: "xs.map(async x => x)", context: { xs: [1] }, knownFallback: "arrow function" },
+  { name: "async arrow as a value", kind: "statement", source: "const f = async () => 1; return f;", expectThrows: true },
 
   // --- Assignment and update -------------------------------------------------------
   { name: "assignment", kind: "statement", source: "n = 5; return n;", context: { n: 0 }, expected: 5 },
@@ -96,7 +107,9 @@ export const CORPUS: CorpusCase[] = [
   { name: "object destructuring declaration", kind: "statement", source: "const { a, b: alias } = o; return a + alias;", context: { o: { a: 1, b: 2 } }, expected: 3 },
   { name: "array destructuring declaration", kind: "statement", source: "const [first, [second]] = xs; return first + second;", context: { xs: [1, [2]] }, expected: 3 },
   { name: "function declaration", kind: "statement", source: "function twice(x) { return x * 2; } return twice(3);", expected: 6 },
-  { name: "destructured function parameter", kind: "statement", source: "function pick({ a }) { return a; } return pick(o);", context: { o: { a: 1 } }, knownFallback: "destructur" },
+  { name: "destructured function parameter", kind: "statement", source: "function pick({ a }) { return a; } return pick(o);", context: { o: { a: 1 } }, expected: 1 },
+  { name: "array destructured function parameter", kind: "statement", source: "function first([a]) { return a; } return first(xs);", context: { xs: [4, 5] }, expected: 4 },
+  { name: "rest function parameter", kind: "statement", source: "function count(...a) { return a.length; } return count(1, 2, 3);", expected: 3 },
 
   // --- Control flow ----------------------------------------------------------------
   { name: "empty statement", kind: "statement", source: ";; return 1;", expected: 1 },

@@ -812,14 +812,19 @@ function emitFunctionDeclaration(
     throwUnsupportedCompiledScriptNode(stmt, context.sourceId);
   }
   assertJsIdentifier(stmt.id, context.sourceId);
-  const argNames = stmt.args.map((arg) => getArrowArgName(arg, context.sourceId));
-  const functionContext = extendCompilerContext(context, [stmt.id.name, ...argNames]);
+  const params = collectNativeArrowArgs(stmt.args, context);
+  const functionContext = extendCompilerContext(context, [
+    stmt.id.name,
+    ...params.flatMap((param) => param.localNames),
+  ]);
   writer.write("function ", stmt);
   writer.write(stmt.id.name, stmt.id);
   writer.write("(");
-  writer.write(argNames.join(", "));
+  writer.write(params.map((param) => param.jsParam).join(", "));
   writer.write(") ");
   writer.write("{ runtime.checkTimeout(evalContext); ");
+  // --- Destructured parameters unpack before the body runs.
+  params.forEach((param) => param.emitBinding(writer));
   const blockContext = extendCompilerContext(functionContext, collectBlockLocalNames(stmt.stmt));
   stmt.stmt.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", stmt.stmt);

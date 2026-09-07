@@ -336,8 +336,25 @@ frequency is zero in this repository while severity is not.
   (`identifiers.ts`), which incidentally fixed a mis-coded diagnostic: `event-async` threw
   a plain `Error` for a bad identifier, so it reported `compile-source-unavailable`
   ("failed for some other reason") instead of naming the construct.
-- Remaining: destructured/rest parameters on named `function` declarations (both targets),
-  object getters/setters, non-`let` for-init, `async` arrows.
+- ~~Destructured and rest parameters on named `function` declarations (both targets).~~
+  **Done.** `function pick({ a }) {}` was refused while `({ a }) => …` compiled — the same
+  pattern, two answers, depending on how the function was spelled. Both targets now route
+  arrow and named-declaration parameters through one collector.
+- **Not gaps.** Probing each entry before implementing removed two: non-`let` for-init
+  (`for (const i = 0; …)`, `for (var i = 0; …)`) is rejected by the *parser*, so neither
+  path ever sees it, and `async` as a statement value is rejected by the interpreter
+  ("XMLUI does not support async arrow functions"). Both were listed as compiler gaps and
+  are language boundaries.
+- **Left refused, deliberately: `async` as a callback argument.** `xs.map(async x => x)`
+  is the one entry that survived scrutiny in the other direction — position changes the
+  answer. The interpreter runs it, ignoring `async` and yielding `[1]` rather than
+  `[Promise]`, so it is a genuine gap, and in a binding it is a *hard error* rather than a
+  fallback. Matching the interpreter means compiling `async` as though it were absent, and
+  whether that is right for XMLUI's auto-await model is a language decision, not a
+  compiler one. **Needs a call before Phase 4.**
+- Remaining: object getters and setters. Verified a real gap — the interpreter evaluates
+  `({ get a() { return n * 2; } }).a` correctly, including the closure; the compiler
+  refuses it.
 
 The corpus caught two things during this work that a hand-written test would not have: the
 promoted cases failed until `runtime.destructure` was added to the *binding* runtime — only

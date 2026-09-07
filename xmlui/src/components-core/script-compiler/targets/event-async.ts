@@ -1467,9 +1467,12 @@ function emitFunctionDeclaration(
   context: CompilerContext,
 ): void {
   assertJsIdentifier(statement.id, context.sourceId);
-  const argNames = statement.args.map((arg) => getSimpleArgName(arg, context.sourceId));
+  const params = getNativeParams(statement.args, context);
   const functionContext = {
-    ...extendCompilerContext(context, [statement.id.name, ...argNames]),
+    ...extendCompilerContext(context, [
+      statement.id.name,
+      ...params.flatMap((param) => param.localNames),
+    ]),
     inFunction: true,
   };
   const blockContext = extendCompilerContext(
@@ -1480,9 +1483,11 @@ function emitFunctionDeclaration(
   writer.write("async function ", statement);
   writer.write(statement.id.name, statement.id);
   writer.write("(");
-  writer.write(argNames.join(", "));
+  writer.write(params.map((param) => param.jsParam).join(", "));
   writer.write(") ");
   writer.write("{", statement.stmt);
+  // --- Destructured parameters unpack before the body runs.
+  params.forEach((param) => param.emitBinding(writer));
   statement.stmt.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", statement.stmt);
 }
@@ -2143,9 +2148,16 @@ type NativeArrowArg = {
   emitBinding(writer: CompiledScriptCodeWriter): void;
 };
 
-function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): NativeArrowArg[] {
+/**
+ * Parameter shapes a natively emitted function can take — arrow or named declaration.
+ *
+ * Named declarations used to go through a simpler path that accepted identifiers only, so
+ * `function pick({ a }) {}` fell back while `({ a }) => …` compiled. Same pattern, two
+ * answers, depending on how the function was spelled.
+ */
+function getNativeParams(args: Expression[], context: CompilerContext): NativeArrowArg[] {
   let restSeen = false;
-  return expr.args.map((arg) => {
+  return args.map((arg) => {
     if (restSeen) {
       throwUnsupportedCompiledScriptNode(arg, context.sourceId);
     }
@@ -2181,6 +2193,10 @@ function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): Na
     }
     throwUnsupportedCompiledScriptNode(arg, context.sourceId);
   });
+}
+
+function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): NativeArrowArg[] {
+  return getNativeParams(expr.args, context);
 }
 
 function emitNativeArrowDestructureBinding(
