@@ -20,7 +20,7 @@ import { DataLoaderQueryKeyGenerator } from "../utils/DataLoaderQueryKeyGenerato
 import { PageableLoader } from "../loader/PageableLoader";
 import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
-import { useShallowCompareMemoize } from "../utils/hooks";
+import { useDeepCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
 import { DataLoaderMd } from "./DataLoaderMd";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
@@ -134,13 +134,22 @@ function DataLoader({
   );
 
   const rawUrl = extractParam(state, loader.props.url, appContext);
-  // The *Inner / useShallowCompareMemoize two-step is used for all request params:
-  // useMemo re-evaluates when state changes; useShallowCompareMemoize suppresses
-  // React Query re-fetches when the value is referentially new but shallowly equal.
+  // The *Inner / useDeepCompareMemoize two-step is used for all request params:
+  // useMemo re-evaluates when state changes; useDeepCompareMemoize suppresses
+  // React Query re-fetches when the value is referentially new but deeply equal.
+  //
+  // Deep (not shallow) comparison is required: request payloads are routinely
+  // nested (`body="{{ sql: '...', params: [] }}"`), and a shallow compare treats
+  // the fresh inner array/object as a change on every render. That churns the
+  // `queryId` identity, which re-runs the loader's `registerComponentApi` effect,
+  // which writes new component-API state, which re-renders — an endless render
+  // loop that starves React's concurrent rendering so router transitions never
+  // commit (the URL changes but the page does not).
+  // Fixes issue #3889: https://github.com/xmlui-org/xmlui/issues/3889
   const rawQueryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);
   }, [appContext, loader.props.queryParams, state]);
-  const rawQueryParams = useShallowCompareMemoize(rawQueryParamsInner);
+  const rawQueryParams = useDeepCompareMemoize(rawQueryParamsInner);
 
   // Normalize URL and query params to handle embedded query parameters
   // This ensures consistent behavior whether params are in URL or queryParams prop
@@ -181,12 +190,12 @@ function DataLoader({
   const bodyInner = useMemo(() => {
     return extractParam(state, loader.props.body, appContext);
   }, [appContext, loader.props.body, state]);
-  const body = useShallowCompareMemoize(bodyInner);
+  const body = useDeepCompareMemoize(bodyInner);
 
   const rawBodyInner = useMemo(() => {
     return extractParam(state, loader.props.rawBody, appContext);
   }, [appContext, loader.props.rawBody, state]);
-  const rawBody = useShallowCompareMemoize(rawBodyInner);
+  const rawBody = useDeepCompareMemoize(rawBodyInner);
 
   const pagingDirection: LoaderDirections | null = useMemo(() => {
     if (loader.props.prevPageSelector && loader.props.nextPageSelector) {
@@ -675,7 +684,7 @@ function DataLoader({
     if (!hasMockData) return undefined;
     return extractParam(state, loader.props.mockData, appContext);
   }, [hasMockData, appContext, loader.props.mockData, state]);
-  const mockDataValue = useShallowCompareMemoize(mockDataInner);
+  const mockDataValue = useDeepCompareMemoize(mockDataInner);
 
   const returnMockData = useCallback(() => {
     return mockDataValue ?? null;
