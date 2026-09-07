@@ -889,6 +889,32 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const evalContext: BindingTreeEvaluationContext = {
         appContext,
         eventArgs,
+        // --- This context carried no options at all, so a synchronous callback silently
+        // --- diverged from every asynchronous handler: no `strictDomSandbox`, no
+        // --- `allowConsole`, and no config-driven `defaultToOptionalMemberAccess`. That
+        // --- is a semantic gap, not just a performance one — a sync callback slipped the
+        // --- DOM sandbox that async handlers enforce.
+        options: {
+          ...createEventEvalOptions(appContext),
+          // --- Compilation stays off here on purpose, and this is the one call site in
+          // --- the framework where that is deliberate.
+          // ---
+          // --- The synchronous statement queue has no compiled target, so turning the
+          // --- switch on compiles only the leaf expressions while the control flow stays
+          // --- interpreted. Measured over the shapes this actually serves — `Table`
+          // --- `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat`, all
+          // --- evaluated per row per render — that is a loss, not a win:
+          // ---
+          // ---   simple predicate   2.46µs → 3.29µs   1.34x slower
+          // ---   member chain       2.25µs → 3.26µs   1.44x slower
+          // ---   with a branch      2.57µs → 4.32µs   1.68x slower
+          // ---   array method       6.08µs → 4.39µs   1.39x faster
+          // ---
+          // --- Small expressions pay the artifact cache lookup without earning it back.
+          // --- Flip this to inherit the switch once a `statement-sync` target compiles
+          // --- the whole body: see `.plan/strict-compilation-mode.md`, Phase 3.3.
+          compileScripts: false,
+        },
         localContext: createCoWStateProxy({ ...stateRef.current }, (changeInfo) => {
           changes.push(changeInfo);
         }),

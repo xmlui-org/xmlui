@@ -14,6 +14,7 @@ import type {
   IDatabase,
   RequestParams,
 } from "./abstractions";
+import { createEventEvalOptions } from "../script-runner/eval-options";
 
 // Use this backend environment as the default
 export const defaultBackendEnvironment: BackendEnvironment = {
@@ -156,6 +157,20 @@ function createEvalContext(
   parts: Partial<BindingTreeEvaluationContext>,
 ): BindingTreeEvaluationContext {
   return {
+    // --- An emulated backend's operation handlers and helpers are ordinary XMLScript and
+    // --- compile like any other. This context is built by hand, far from React, so it
+    // --- never carried the switch and every mock request ran interpreted — and mock
+    // --- backends are often the largest scripts in an app.
+    // ---
+    // --- `undefined` app context on purpose: the synthetic bag passed in below holds date
+    // --- and file helpers, not `xmluiConfig`, so there is nothing to read from it.
+    // --- `createEventEvalOptions` falls back to the settings the build baked in (see
+    // --- `script-compiler/build-settings`), which is what `xmlui.config.json` sets.
+    // ---
+    // --- Known limit: an app that declares `compileScripts` only in its app description
+    // --- (`src/config.ts`) and not in `xmlui.config.json` still gets an interpreted mock
+    // --- backend, because nothing publishes that value to context-free call sites yet.
+    options: createEventEvalOptions(undefined),
     ...{
       mainThread: {
         childThreads: [],

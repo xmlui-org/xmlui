@@ -16,6 +16,8 @@ import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { DEFAULT_OPERATION_CANCEL_REASON, isAbortError } from "../action/operationCancellation";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -55,6 +57,8 @@ export function PageableLoader({
 }: PageableLoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
+  // --- Page selectors are binding expressions and compile like any other.
+  const bindingEvalOptions = useMemo(() => createBindingEvalOptions(appContext), [appContext]);
   const queryKey = useMemo(
     () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
     [appContext, loader.props, queryId, state, uid],
@@ -68,7 +72,7 @@ export function PageableLoader({
     (firstPage: any) => {
       const prevPageSelector = loader.props.prevPageSelector;
       const committedItems = firstPage.filter((item) => !item._optimisticValue);
-      const prevPageParam = extractPageParam(committedItems, prevPageSelector);
+      const prevPageParam = extractPageParam(committedItems, prevPageSelector, bindingEvalOptions);
 
       if (!prevPageParam) {
         return undefined;
@@ -83,7 +87,7 @@ export function PageableLoader({
   const getNextPageParam = useCallback(
     (lastPage: any) => {
       const nextPageSelector = loader.props.nextPageSelector;
-      const nextPageParam = extractPageParam(lastPage, nextPageSelector);
+      const nextPageParam = extractPageParam(lastPage, nextPageSelector, bindingEvalOptions);
 
       if (!nextPageParam) {
         return undefined;
@@ -346,11 +350,24 @@ export function PageableLoader({
   return null;
 }
 
-function extractPageParam(response: any, selector: string | undefined) {
+function extractPageParam(
+  response: any,
+  selector: string | undefined,
+  evalOptions: EvalTreeOptions,
+) {
   if (!selector) {
     return undefined;
   }
 
   const selectorExpression = selector.startsWith("{") ? selector : `{$response.${selector}}`;
-  return extractParam({ $response: response }, selectorExpression);
+  // --- Options only, no `appContext`: a page selector resolves against the response, and
+  // --- widening its scope here would change which expressions resolve.
+  return extractParam(
+    { $response: response },
+    selectorExpression,
+    undefined,
+    false,
+    undefined,
+    evalOptions,
+  );
 }

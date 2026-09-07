@@ -172,9 +172,38 @@ Note for §9 and Phase 3: regular expressions are now off the fallback list enti
 `compile-unserializable-literal` has no remaining producer — nothing the parser builds can
 reach it. The code stays as a guard, but strict mode should not expect to see that code.
 
-1.2 Close the five wiring gaps (§7). Four are one-liners with `appContext` in scope;
-`Backend.ts` needs the build-settings route. One regression test per site, each confirmed
-to fail without its fix.
+1.2 ~~Close the five wiring gaps (§7).~~ **Done, with one correction to this plan.**
+
+`ComponentWrapper` (×2), `PageableLoader` and `RestApiProxy` now derive their options from
+the shared helpers. Three of them pass *options only, no app context*: they resolve loader
+references and page selectors, and widening identifier resolution would change which
+expressions resolve — a behaviour change smuggled into a wiring fix. `Backend.ts` takes
+the build-settings route as planned; the known limit is that an app declaring
+`compileScripts` only in its app description, never in `xmlui.config.json`, still gets an
+interpreted mock backend, because nothing publishes that value to context-free call sites.
+
+**`runCodeSync` is deliberately left uncompiled.** Wiring the switch there was assumed to
+be a pure win. It is not: the sync statement queue has no compiled target, so enabling it
+compiles the leaf expressions while control flow stays interpreted, and for the shapes
+this call site actually serves that is a loss —
+
+| shape | interpreted | compiled | |
+|---|---|---|---|
+| simple predicate | 2.46 µs | 3.29 µs | 1.34× slower |
+| member chain | 2.25 µs | 3.26 µs | 1.44× slower |
+| with a branch | 2.57 µs | 4.32 µs | 1.68× slower |
+| array method | 6.08 µs | 4.39 µs | 1.39× faster |
+
+Small expressions pay the artifact cache lookup without earning it back, and this runs per
+row per render (`Table` `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat`).
+The *semantic* half of the gap is fixed — the context now carries `strictDomSandbox`,
+`allowConsole` and the config-driven `defaultToOptionalMemberAccess`, so a sync callback no
+longer slips the DOM sandbox that async handlers enforce — but `compileScripts` stays
+`false` there until Phase 3.3 lands the `statement-sync` target, with the measurement
+recorded at the call site.
+
+Note this costs the tripwire nothing: `runCodeSync` enters `processStatementQueue`, so
+Phase 2 will flag it either way.
 
 1.3 Extend the differential corpus to cover what the repo's own sources lack — the 114
 in-repo `.xmlui`/`.xs` files contain zero regex literals, zero `await`, zero destructured
