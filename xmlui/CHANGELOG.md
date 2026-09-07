@@ -1,5 +1,88 @@
 # xmlui
 
+## 0.14.27
+
+### Patch Changes
+
+- fd65668: Script compilation is now configured by two flags instead of five.
+
+  `compileScripts` is the single switch: when it is on, XMLUI compiles everything it can —
+  binding expressions, event handlers, inline `<script>` functions, `.xmlui.xs` code-behind,
+  `Globals.xs`, imported `.xs` helpers, and inline component `codeBehind`. It is read from
+  `appGlobals`, `xmluiConfig`, and `xmlui.config.json` (top level or nested), with
+  `xmlui.config.json` winning per key, and the same value now travels unchanged through parser
+  options, code-behind options, eval options, plugin options, the test bed, and the runtime.
+
+  `reportCompileFallbacks` is the new optional diagnostics switch. It prints every script block
+  that could not be compiled, with a code — `compile-unsupported-node`,
+  `compile-unserializable-literal`, `compile-runtime-fallback`, `compile-source-unavailable` — the
+  construct that stopped compilation, and its source position, at build time and at run time. With
+  it off, the build and the startup line still report how many blocks fell back, and the reason
+  still ships with the block as `compiledUnsupportedReason`; only the per-block console detail is
+  withheld.
+
+  Four keys are removed: `compileBindings` and `compileEventHandlers` (use `compileScripts`),
+  `compiledScriptSourceMaps` (source maps follow `xmlui start` and are left out of builds), and
+  `logCompiledEventHandlerSource` (`xsVerbose` already traces every artifact). A project that still
+  carries one is told which replacement to use, once, by the CLI and at app startup — it is never
+  ignored in silence. The `XMLUI_COMPILE_BINDINGS` and `XMLUI_COMPILE_EVENT_HANDLERS` test
+  environment variables collapse into `XMLUI_COMPILE_SCRIPTS`.
+
+  The startup banner drops its per-path breakdown: with one switch there is one mode, so it reads
+  `[xmlui] App started in compiled script mode`.
+
+- 39a0ecc: Compile the expression forms that used to force interpretation, and report what compilation
+  actually did.
+
+  The event-handler compiler refused conditional (`a ? b : c`), sequence, `new`, and spread
+  expressions, so any handler or declaration function containing one silently fell back to
+  interpretation — a ternary inside a `function` declaration was enough. All four now compile, in
+  the async emitter and in the native emitter, so callbacks such as `rows.filter(r => r.tag ? a : b)`
+  stay compiled instead of falling back to a lazy interpreted arrow.
+
+  Fallbacks are no longer silent. Diagnostics name the construct and its source position instead of
+  a raw node number, code-behind compilation warnings reach the build log (they were being dropped),
+  the emitted block carries the reason as `compiledUnsupportedReason`, and the startup banner reports
+  the effective state — how many artifacts were compiled, how many fell back, and why — instead of
+  the requested flags.
+
+  Production builds no longer ship compiled-script debug payload. `getViteConfig` applied the
+  dev-server source-map default to every command, so builds embedded per-token mappings, complete
+  original sources, and absolute developer paths. Those now belong to `xmlui start` only, and build
+  artifacts keep project-relative source ids.
+
+  `compileScripts` is honoured as the umbrella switch at the parse-time binding call sites and in
+  `evalBinding`, and an app description that only Vite can evaluate (the `getLocalIcons()` /
+  `import.meta.glob` pattern) is now read through Vite's module runner, so `appGlobals.compileScripts`
+  works where the docs say it does.
+
+  A handler that hands a callback to `debounce`, a timer, or a subscription has already finished by
+  the time that callback runs, and the dispatcher aborts the run's `$cancel` token on completion. The
+  compiled runtime consulted that token on every call, so such a callback died with
+  `HandlerCancelledError` and its work vanished silently; it now runs, while cancellation during a
+  handler run is unchanged.
+
+  Three interpreter bugs found while checking compiled/interpreted parity are fixed as well:
+  `Array.prototype.sort(comparator)` was a silent no-op (script callbacks are async and the native
+  `sort` coerced the returned promise to `NaN`), comma-sequence expressions evaluated every operand
+  from the pre-sequence state and produced a pending promise as their value, and object-literal
+  spread threw on a `null` operand instead of ignoring it as JavaScript does.
+
+- 5172b63: `xmlui ssg` no longer builds through the project's `dist/`.
+
+  The SSG pipeline needs a client build before it can prerender routes, and it used to produce
+  that build in `dist/` and copy it to `dist-ssg/`. That made `ssg` a second writer of a directory
+  `xmlui build` already owns. Two build tasks running against the same project concurrently would
+  collide: Vite's `emptyDir` would try to clear `dist/` while the other build was writing into it,
+  failing with `ENOTEMPTY: directory not empty` — or, when the timing fell the other way, silently
+  copying a half-written `dist/` into `dist-ssg/` and reporting success.
+
+  The client build now goes to a private `.xmlui-ssg-dist/` next to the existing `.xmlui-ssg-ssr/`,
+  and is removed when the command finishes. `dist-ssg/` is unchanged; `dist/` is left alone.
+
+  `build()` gains an `outDir` option (default `"dist"`) for callers that need the build output as an
+  intermediate artifact rather than as the project's published output.
+
 ## 0.14.26
 
 ### Patch Changes
