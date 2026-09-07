@@ -352,9 +352,17 @@ frequency is zero in this repository while severity is not.
   fallback. Matching the interpreter means compiling `async` as though it were absent, and
   whether that is right for XMLUI's auto-await model is a language decision, not a
   compiler one. **Needs a call before Phase 4.**
-- Remaining: object getters and setters. Verified a real gap — the interpreter evaluates
-  `({ get a() { return n * 2; } }).a` correctly, including the closure; the compiler
-  refuses it.
+- ~~Object getters and setters.~~ **Done in `binding-sync`, deliberately not in
+  `event-async`.** The accessor body is stored as an arrow, so it emits like any other
+  arrow body. `event-async` keeps refusing them: every body it emits is `async` and threads
+  `await runtime.complete(...)` through, and a property accessor cannot be async — it must
+  return a value, not a promise. Compiling one there needs a synchronous emission mode that
+  does not exist. The asymmetry is the right way round: refusing costs little in the event
+  path, which catches and falls back, and cost a crash in the binding path, which does not.
+
+**3.2 is complete.** What the plan listed as four gaps was, on inspection, one real gap
+(parameter shapes, in three forms), two language boundaries, one construct that needs a
+language decision, and one that is fixed on the path where it mattered.
 
 The corpus caught two things during this work that a hand-written test would not have: the
 promoted cases failed until `runtime.destructure` was added to the *binding* runtime — only

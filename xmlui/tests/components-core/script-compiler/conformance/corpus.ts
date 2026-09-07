@@ -62,6 +62,9 @@ export const CORPUS: CorpusCase[] = [
   { name: "spread in array and object", kind: "binding", source: "[[...xs, 4], { ...o, b: 2 }]", context: { xs: [1], o: { a: 1 } }, expected: [[1, 4], { a: 1, b: 2 }] },
   { name: "spread in a call", kind: "binding", source: "Math.max(...xs)", context: { xs: [1, 5, 3] }, expected: 5 },
   { name: "template literal", kind: "binding", source: "`${a}-${a + 1}`", context: { a: 1 }, expected: "1-2" },
+  { name: "object literal getter", kind: "binding", source: "({ get a() { return 1; } }).a", expected: 1 },
+  { name: "object literal getter closing over scope", kind: "binding", source: "({ get a() { return n * 2; } }).a", context: { n: 3 }, expected: 6 },
+  { name: "getter beside a plain property", kind: "binding", source: "({ get a() { return 1; }, b: 2 }).b", expected: 2 },
 
   // --- Arrows ----------------------------------------------------------------------
   { name: "arrow as a callback", kind: "binding", source: "xs.map(x => x * 2)", context: { xs: [1, 2] }, expected: [2, 4] },

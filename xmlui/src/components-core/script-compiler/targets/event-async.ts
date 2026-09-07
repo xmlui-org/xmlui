@@ -1879,6 +1879,14 @@ function emitObjectLiteral(
       return;
     }
     if (!Array.isArray(prop)) {
+      // --- Getters and setters stay refused in this target, unlike `binding-sync` which
+      // --- compiles them. Not an oversight: every body this target emits is `async` and
+      // --- threads `await runtime.complete(...)` through its expressions, and a property
+      // --- accessor cannot be async — it has to return a value, not a promise. Compiling
+      // --- one here would need a synchronous emission mode that does not exist yet.
+      // ---
+      // --- Refusing costs little here. This path catches the refusal and falls back,
+      // --- where the binding path has no catch and would have crashed the app.
       throwUnsupportedCompiledScriptNode(prop.value, context.sourceId);
     }
     emitObjectLiteralProp(writer, prop, context);

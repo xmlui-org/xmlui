@@ -64,6 +64,7 @@ import {
   type MemberAccessExpression,
   type NewExpression,
   type ObjectLiteral,
+  type ObjectLiteralAccessorProp,
   type ObjectLiteralProp,
   type ObjectDestructure,
   type PostfixOpExpression,
@@ -431,11 +432,42 @@ function emitObjectLiteral(
       return;
     }
     if (!Array.isArray(prop)) {
-      throwUnsupportedCompiledScriptNode(prop.value, context.sourceId);
+      emitObjectLiteralAccessor(writer, prop, context);
+      return;
     }
     emitObjectLiteralProp(writer, prop, context);
   });
   writer.write("})", expr);
+}
+
+/**
+ * A getter or setter in an object literal.
+ *
+ * The accessor's body is stored as an arrow expression, so it emits the same way an arrow
+ * parameter list and body do — the only new part is the `get`/`set` prefix and the
+ * computed key. Refusing it here meant a hard error in a binding, because that path has
+ * no fallback catch, while the interpreter evaluated it correctly, closure included.
+ */
+function emitObjectLiteralAccessor(
+  writer: CompiledScriptCodeWriter,
+  prop: ObjectLiteralAccessorProp,
+  context: CompilerContext,
+): void {
+  const params = collectNativeArrowArgs(prop.value.args, context);
+  const accessorContext = extendCompilerContext(
+    context,
+    params.flatMap((param) => param.localNames),
+  );
+  writer.write(`${prop.kind} [`);
+  if (prop.key.type === T_IDENTIFIER) {
+    writer.write(JSON.stringify(prop.key.name), prop.key);
+  } else {
+    emitExpression(writer, prop.key, context);
+  }
+  writer.write("](");
+  writer.write(params.map((param) => param.jsParam).join(", "));
+  writer.write(") ");
+  emitArrowBody(writer, prop.value, accessorContext, params);
 }
 
 function emitObjectLiteralProp(
