@@ -63,6 +63,7 @@ import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storag
 import { computeUsesForTree } from "./optimization/computedUses";
 import { getOptimizerMetadata } from "./optimization/metadataLookup";
 import { createDebugSourceUrl } from "./script-compiler/source";
+import { applyBuildScriptCompilationSettings } from "./script-compiler/build-settings";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -123,7 +124,9 @@ function mergeStandaloneXmluiConfig(
       }
     }
   }
-  return merged;
+  // --- Settings stated in `xmlui.config.json` arrive as app defines; they win over the
+  // --- app description. See `script-compiler/build-settings`.
+  return applyBuildScriptCompilationSettings(merged);
 }
 
 function createStandaloneScriptParserOptions(

@@ -44,9 +44,12 @@ export type StandaloneAppDescription = {
    *   `.xmlui.xs` code-behind, `Globals.xs`, imported `.xs` helpers, and inline
    *   component `codeBehind`. One switch covers all of them. Read by the browser
    *   runtime and by the build tooling (`xmlui start` / `xmlui build`), which
-   *   pre-compiles what it can into the emitted modules; the rest compiles on first
-   *   use in the browser. A `compileScripts` entry in `xmlui.config.json` overrides
-   *   the one declared here.
+   *   pre-compiles handlers and script declarations into the emitted modules.
+   *   Binding expressions are never among those artifacts: prop values are parsed
+   *   lazily in the browser, so each binding compiles there on first evaluation and
+   *   is cached. A `compileScripts` entry in `xmlui.config.json` overrides the one
+   *   declared here — the CLI bakes it into the app, since the browser cannot read
+   *   that file itself.
    * - `reportCompileFallbacks` (boolean, default `false`) — report every script block
    *   that could not be compiled, with a diagnostic code
    *   (`compile-unsupported-node`, `compile-unserializable-literal`,

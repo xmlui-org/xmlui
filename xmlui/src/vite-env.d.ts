@@ -16,6 +16,9 @@ interface ImportMetaEnv {
   // Application-level: mode flags set by xmlui CLI or app's Vite config
   readonly VITE_XMLUI_BUILD_MODE: string;
   readonly VITE_XMLUI_DEV_SERVER: string;
+  // Application-level: script compilation as stated by `xmlui.config.json`
+  readonly VITE_XMLUI_COMPILE_SCRIPTS: string;
+  readonly VITE_XMLUI_REPORT_COMPILE_FALLBACKS: string;
   readonly VITE_XMLUI_DEV_MODE: boolean;
   // Application-level: runtime flags
   readonly VITE_MOCK_ENABLED: boolean | string;

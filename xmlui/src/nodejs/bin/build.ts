@@ -120,6 +120,10 @@ export const build = async ({
       emptyOutDir: true,
     },
     define: {
+      // --- `getViteConfig` puts the script-compilation settings stated in
+      // --- `xmlui.config.json` here; without this spread they never reached the app and
+      // --- the browser compiled no bindings. `xmlui start` already spreads them.
+      ...viteConfig.define,
       ...createXmluiAppDefines({
         buildMode,
         mockEnabled: withMock,

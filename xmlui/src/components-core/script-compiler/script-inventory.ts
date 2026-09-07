@@ -102,7 +102,13 @@ export function formatParsedScriptInventory(inventory: ParsedScriptInventory): s
   }
   const reasons =
     inventory.reasons.length > 0 ? ` Fallback reasons: ${inventory.reasons.join("; ")}.` : "";
-  return `[xmlui] Script artifacts: ${parts.join(", ")}.${reasons}`;
+  // --- The count covers event handlers and declaration functions only. Bindings have
+  // --- no build-time artifact to count — they compile in the browser — and leaving
+  // --- that unsaid is what made this line read as a complete inventory.
+  return (
+    `[xmlui] Script artifacts: ${parts.join(", ")}.${reasons} ` +
+    `Binding expressions are not counted here; they compile on first evaluation.`
+  );
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   type LocaleProfile,
 } from "./i18n";
 import { useLocaleProfile } from "./i18n/LocaleContext";
+import { applyBuildScriptCompilationSettings } from "./script-compiler/build-settings";
 
 /**
  * Stores the object that holds the global functions and methods of xmlui.
@@ -120,7 +121,6 @@ export function mergeXmluiConfig(
   appGlobals: Record<string, any> | undefined,
   xmluiConfig: Record<string, any> | undefined,
 ): Record<string, any> {
-  if (!appGlobals && !xmluiConfig) return EMPTY_GLOBALS;
   const merged: Record<string, any> = { ...(appGlobals ?? {}) };
   if (xmluiConfig) {
     for (const key of Object.keys(xmluiConfig)) {
@@ -130,5 +130,10 @@ export function mergeXmluiConfig(
       }
     }
   }
-  return Object.freeze(merged);
+  // --- `xmlui.config.json` is read by the build tooling, not by the browser, so its
+  // --- script-compilation settings reach us baked in as app defines. They win over the
+  // --- app description, which is the precedence the documentation promises.
+  const withBuildSettings = applyBuildScriptCompilationSettings(merged);
+  if (!appGlobals && !xmluiConfig && withBuildSettings === merged) return EMPTY_GLOBALS;
+  return Object.freeze(withBuildSettings);
 }

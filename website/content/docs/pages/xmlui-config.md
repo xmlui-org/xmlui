@@ -240,7 +240,20 @@ are loaded through Vite's module runner, so the switch is honoured there too.
 **Where compilation happens.** `xmlui start` and `xmlui build` compile handlers, code-behind,
 and script declarations into the emitted modules. Binding expressions compile on first use in
 the browser: prop values are stored as strings and parsed there, so there is no build-time
-artifact to carry. Either way the same switch decides.
+artifact to carry — a build's artifact count says nothing about bindings, and counting
+`compiled:` objects in a bundle will never find one. Either way the same switch decides.
+
+Because bindings compile in the browser, the browser has to know the setting. `xmlui.config.json`
+lives on the build machine, so `xmlui start` and `xmlui build` bake whatever it states into the
+app; the app description reaches the browser on its own. The one line that tells you which mode
+an app is really running in is the startup line in the browser console:
+
+```
+[xmlui] App started in compiled script mode
+```
+
+If that says `interpreted` while your build reported compiled artifacts, the switch is reaching
+the build tooling but not the app.
 
 Source maps for compiled scripts are not configurable: `xmlui start` turns them on, builds leave
 them out — the payload is large and a production bundle has no use for it.
@@ -250,14 +263,19 @@ them out — the payload is large and a production bundle has no use for it.
 `xmlui start` and `xmlui build` always report what compilation produced:
 
 ```
-[xmlui] Script compilation: 128 compiled artifact(s) from 130 script block(s) in 24 file(s), 2 fell back to interpretation (unsupported construct)
+[xmlui] Script compilation: 128 compiled artifact(s) (74 event handler(s), 54 declaration function(s)) from 130 script block(s) in 24 file(s), 2 fell back to interpretation (unsupported construct)
+[xmlui] Binding expressions (`var.` initializers and attribute bindings) are not compiled here: prop values are parsed lazily in the browser, so each one compiles on its first evaluation and is cached. The app's startup line reports the mode it actually runs in.
 ```
+
+The counts name the kinds on purpose. A single total could read as complete success while a
+whole category sat at zero, and bindings — which never appear in these counts — are the category
+most apps care about most.
 
 At startup the app repeats the effective state in the browser console:
 
 ```
 [xmlui] App started in compiled script mode
-[xmlui] Script artifacts: 128 compiled at build time, 2 fell back to interpretation. Fallback reasons: compile-unserializable-literal: literal cannot be carried into interpreted execution at line 12, column 24.
+[xmlui] Script artifacts: 128 compiled at build time, 2 fell back to interpretation. Fallback reasons: compile-unserializable-literal: literal cannot be carried into interpreted execution at line 12, column 24. Binding expressions are not counted here; they compile on first evaluation.
 ```
 
 Every block that fell back also carries its reason as `compiledUnsupportedReason` in the emitted

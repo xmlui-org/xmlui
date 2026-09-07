@@ -4,7 +4,8 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
-import { loadXmluiPluginOptions } from "./xmluiPluginOptions";
+import { loadXmluiBuildSettings } from "./xmluiPluginOptions";
+import { createXmluiScriptCompilationDefines } from "./xmluiEnv";
 import * as path from "path";
 import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
 
@@ -94,7 +95,8 @@ export async function getViteConfig({
     // console.error(e);
   }
 
-  const xmluiPluginOptions = await loadXmluiPluginOptions({ devServer });
+  const { pluginOptions: xmluiPluginOptions, runtimeScriptCompilation } =
+    await loadXmluiBuildSettings({ devServer });
 
   // Single instance shared by the main pipeline and the dep-scanner pipeline.
   // The dep scanner runs a separate Rolldown build that only sees plugins
@@ -124,7 +126,14 @@ export async function getViteConfig({
     //     }
     //   }
     // },
-    define: overrides.define,
+    // --- `xmlui.config.json` lives on the build machine, so whatever it states about
+    // --- script compilation has to be baked into the app: the browser is what compiles
+    // --- binding expressions, and it cannot read that file. Both `xmlui start` and
+    // --- `xmlui build` spread these into their own `define` block.
+    define: {
+      ...overrides.define,
+      ...createXmluiScriptCompilationDefines(runtimeScriptCompilation),
+    },
     resolve: {
       alias: overrides.resolve?.alias,
       extensions: [

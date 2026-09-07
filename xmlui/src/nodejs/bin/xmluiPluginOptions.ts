@@ -124,19 +124,70 @@ export function mergeXmluiConfigSources(
   };
 }
 
+/**
+ * Script-compilation settings the browser runtime must be told about.
+ *
+ * Only the browser compiles binding expressions (prop values are parsed lazily there,
+ * so they have no build-time artifact), and the browser reads its settings from the app
+ * description — never from `xmlui.config.json`, which lives on the build machine. So
+ * whatever that file states has to be baked into the app as a define; see
+ * `createXmluiAppDefines` and `components-core/script-compiler/build-settings`.
+ *
+ * Keys the file does not state stay `undefined`, leaving the app description in charge.
+ */
+export type RuntimeScriptCompilationSettings = {
+  compileScripts?: boolean;
+  reportCompileFallbacks?: boolean;
+};
+
+export function resolveRuntimeScriptCompilationSettings(
+  xmluiConfigFile: XmluiConfigSource | undefined,
+): RuntimeScriptCompilationSettings {
+  if (!xmluiConfigFile) {
+    return {};
+  }
+  const settings: RuntimeScriptCompilationSettings = {};
+  for (const key of SCRIPT_COMPILATION_KEYS as Array<keyof RuntimeScriptCompilationSettings>) {
+    const stated =
+      xmluiConfigFile[key] ??
+      xmluiConfigFile.xmluiConfig?.[key] ??
+      xmluiConfigFile.appGlobals?.[key];
+    if (stated !== undefined) {
+      settings[key] = stated === true;
+    }
+  }
+  return settings;
+}
+
+export type XmluiBuildSettings = {
+  pluginOptions: PluginOptions;
+  /** What `xmlui.config.json` states, for baking into the app. */
+  runtimeScriptCompilation: RuntimeScriptCompilationSettings;
+};
+
+export async function loadXmluiBuildSettings(
+  options: LoadXmluiPluginOptionsOptions = {},
+): Promise<XmluiBuildSettings> {
+  const { cwd = process.cwd(), ...normalizeOptions } = options;
+  const xmluiConfigFile = await readXmluiConfigFile(cwd);
+  const runtimeScriptCompilation = resolveRuntimeScriptCompilationSettings(xmluiConfigFile);
+  const appDescription = await readAppDescriptionConfig(cwd, xmluiConfigFile);
+  if (!xmluiConfigFile && !appDescription) {
+    return { pluginOptions: {}, runtimeScriptCompilation };
+  }
+  return {
+    pluginOptions: normalizeXmluiPluginOptions(
+      mergeXmluiConfigSources(appDescription, xmluiConfigFile),
+      normalizeOptions,
+    ),
+    runtimeScriptCompilation,
+  };
+}
+
 export async function loadXmluiPluginOptions(
   options: LoadXmluiPluginOptionsOptions = {},
 ): Promise<PluginOptions> {
-  const { cwd = process.cwd(), ...normalizeOptions } = options;
-  const xmluiConfigFile = await readXmluiConfigFile(cwd);
-  const appDescription = await readAppDescriptionConfig(cwd, xmluiConfigFile);
-  if (!xmluiConfigFile && !appDescription) {
-    return {};
-  }
-  return normalizeXmluiPluginOptions(
-    mergeXmluiConfigSources(appDescription, xmluiConfigFile),
-    normalizeOptions,
-  );
+  return (await loadXmluiBuildSettings(options)).pluginOptions;
 }
 
 async function readXmluiConfigFile(cwd: string): Promise<XmluiConfigSource | undefined> {

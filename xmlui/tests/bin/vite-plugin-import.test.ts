@@ -806,9 +806,29 @@ describe("Vite Plugin Import Integration (Built Mode)", () => {
       );
 
       expect(logs.join("\n")).toMatch(
-        /\[xmlui\] Script compilation: [1-9]\d* compiled artifact\(s\) from [1-9]\d* script block\(s\) in 1 file\(s\)/,
+        /\[xmlui\] Script compilation: [1-9]\d* compiled artifact\(s\) \([1-9]\d* event handler\(s\), \d+ declaration function\(s\)\) from [1-9]\d* script block\(s\) in 1 file\(s\)/,
       );
       expect(warnings).not.toHaveBeenCalled();
+    });
+
+    // --- #3892: an undifferentiated total read as complete success while an entire
+    // --- category — binding expressions — sat at zero, uncounted and unmentioned.
+    it("names the kinds it compiled, and says where bindings are compiled instead", async () => {
+      const { logs } = await buildWithSummary(
+        [
+          `<Component name="Demo" var.items="{[]}" var.picked="{items.map(i => i.id)}">`,
+          `  <script>function pick(list) { return (list || []).filter(x => x.on); }</script>`,
+          `  <Button onClick="items = pick(items)" />`,
+          `</Component>`,
+        ].join("\n"),
+        { compileScripts: true },
+      );
+      const summary = logs.join("\n");
+
+      expect(summary).toMatch(/[1-9]\d* event handler\(s\)/);
+      expect(summary).toMatch(/[1-9]\d* declaration function\(s\)/);
+      expect(summary).toContain("Binding expressions");
+      expect(summary).toContain("compiles on its first evaluation");
     });
 
     it("stays silent about compiled scripts when compilation is off", async () => {

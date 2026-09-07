@@ -274,6 +274,11 @@ export default ({ mode = "lib" }) => {
         // --- application-level: mode flags ---
         "import.meta.env.VITE_XMLUI_DEV_MODE": "import.meta.env.DEV",
         "import.meta.env.VITE_XMLUI_BUILD_MODE": "import.meta.env.VITE_XMLUI_BUILD_MODE",
+        // --- Script compilation as `xmlui.config.json` states it. The browser compiles
+        // --- binding expressions, so it has to be told; see `createXmluiScriptCompilationDefines`.
+        "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS": "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS",
+        "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS":
+          "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS",
         // --- application-level: runtime flags ---
         "import.meta.env.VITE_MOCK_ENABLED": "import.meta.env.VITE_MOCK_ENABLED",
         "import.meta.env.VITE_MOCK_WORKER_LOCATION": "import.meta.env.VITE_MOCK_WORKER_LOCATION",

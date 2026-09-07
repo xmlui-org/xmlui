@@ -345,7 +345,22 @@ type CompiledScriptTally = {
   scripts: number;
   artifacts: number;
   unsupported: number;
+  /** Artifacts whose source is an event handler (`sourceId` carries `#event-`). */
+  handlers: number;
+  /** Artifacts whose source is a script declaration function (code-behind, `<script>`). */
+  declarations: number;
 };
+
+/**
+ * Which kind of script an artifact came from. Reporting one undifferentiated count
+ * made an entire category's absence invisible: a build could say "835 compiled
+ * artifact(s)" and read as complete success while it had compiled no binding
+ * expressions at all — because bindings are never compiled here. See
+ * `reportCompiledScriptSummary`.
+ */
+function compiledArtifactKind(sourceId: string): "handler" | "declaration" {
+  return sourceId.includes("#event-") ? "handler" : "declaration";
+}
 
 function tallyCompiledScripts(value: unknown, tally: CompiledScriptTally): CompiledScriptTally {
   if (!value || typeof value !== "object") {
@@ -359,6 +374,11 @@ function tallyCompiledScripts(value: unknown, tally: CompiledScriptTally): Compi
     Array.isArray(maybeArtifact.mappings)
   ) {
     tally.artifacts++;
+    if (compiledArtifactKind(maybeArtifact.sourceId) === "handler") {
+      tally.handlers++;
+    } else {
+      tally.declarations++;
+    }
     return tally;
   }
   // --- Every compilable slot carries a boolean `compiledUnsupported`, whether it is an
@@ -583,6 +603,8 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     scripts: 0,
     artifacts: 0,
     unsupported: 0,
+    handlers: 0,
+    declarations: 0,
   };
   let compiledScriptSummaryReported = false;
   let compiledScriptSummaryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -602,7 +624,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     if (!compileScripts || compiledScriptSummaryReported) return;
     compiledScriptSummaryReported = true;
     clearTimeout(compiledScriptSummaryTimer);
-    const { files, scripts, artifacts, unsupported } = compiledScriptTally;
+    const { files, scripts, artifacts, unsupported, handlers, declarations } = compiledScriptTally;
     if (artifacts === 0 && scripts > 0) {
       const message =
         `[xmlui] Script compilation is enabled but produced no compiled artifacts: ` +
@@ -616,12 +638,25 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
     }
     const fallbacks =
       unsupported > 0 ? `, ${unsupported} fell back to interpretation (unsupported construct)` : "";
+    // --- Name the kinds. A single total let a whole category sit at zero unnoticed,
+    // --- which is what made #3892 expensive to diagnose from the outside.
+    const kinds = `${handlers} event handler(s), ${declarations} declaration function(s)`;
     console.log(
       devServerMode
-        ? `[xmlui] Script compilation is active: ${artifacts} compiled artifact(s) from ` +
-            `${scripts} script block(s) in ${files} file(s) transformed so far${fallbacks}`
-        : `[xmlui] Script compilation: ${artifacts} compiled artifact(s) from ` +
+        ? `[xmlui] Script compilation is active: ${artifacts} compiled artifact(s) ` +
+            `(${kinds}) from ${scripts} script block(s) in ${files} file(s) ` +
+            `transformed so far${fallbacks}`
+        : `[xmlui] Script compilation: ${artifacts} compiled artifact(s) (${kinds}) from ` +
             `${scripts} script block(s) in ${files} file(s)${fallbacks}`,
+    );
+    // --- Bindings are absent from the counts above by design, and saying so here is
+    // --- the difference between "an entire category is broken" and "this is where
+    // --- that category lives".
+    console.log(
+      `[xmlui] Binding expressions (\`var.\` initializers and attribute bindings) are not ` +
+        `compiled here: prop values are parsed lazily in the browser, so each one compiles ` +
+        `on its first evaluation and is cached. The app's startup line reports the mode it ` +
+        `actually runs in.`,
     );
   };
   const registerCompiledArtifacts = (value: unknown) => {
