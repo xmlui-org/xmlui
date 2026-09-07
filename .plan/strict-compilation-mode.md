@@ -163,6 +163,26 @@ problem with a different fix, and worth distinguishing in the text.
 
 ## Phases
 
+### Phase 3.6 — the blocker Phase 4 could not start without
+
+Discovered when checking whether an app could actually *pass* strict mode: calling a
+`Globals.xs` helper or a `<script>` function from a binding still entered the interpreter.
+That is the original report's exact hot path — `var.rows="{applyFilters(cases, query)}"` —
+and it walked the helper's body on every reactive invalidation however much of the app had
+compiled. It is now routed through the `statement-sync` target built in 3.3.
+
+Two fixes fell out of it that the plan had listed elsewhere:
+
+- **The arrow guard was in the wrong place.** Phase 2.1 put it in
+  `executeArrowExpressionSync`, before the function that runs the body. That was correct
+  while every arrow body was interpreted, and wrong the moment one could be compiled: it
+  fired for arrows that go on to compile perfectly well. A guard reporting interpretation
+  has to stand where interpretation happens.
+- **~~0.2 Decide the binding-path fallback policy.~~ Done, and it was needed.** The binding
+  path had no catch, so a construct the emitter refused was an app-breaking exception
+  rather than a slow path. The event path has caught this since compilation was introduced.
+  A test written for the arrow work surfaced it concretely rather than theoretically.
+
 ### Phase 1 — Make compiled mode honest before making it strict
 
 1.1 ~~Fix the regex miscompile (§9).~~ **Done.** Both targets render patterns as

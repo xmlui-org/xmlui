@@ -196,3 +196,68 @@ describe("value-position arrows", () => {
     expect(artifact.js).toContain("runtime.arrow(");
   });
 });
+
+/**
+ * The last common way into the interpreter from compiled code, and the one the original
+ * report was actually about.
+ *
+ * A `Globals.xs` helper or a `<script>` function is stored as an arrow expression, so
+ * calling one from a binding — `var.rows="{applyFilters(cases, query)}"` — walked its body
+ * on every reactive invalidation, however much of the app had compiled. The build-time
+ * artifact on the declaration cannot serve here: it targets `event-async` and returns a
+ * promise, which a synchronous binding cannot accept.
+ */
+describe("declaration functions called from a binding", () => {
+  const collect = async () => {
+    const { collectCodeBehindFromSource } = await import(
+      "../../../src/parsers/scripting/code-behind-collect"
+    );
+    return (
+      collectCodeBehindFromSource(
+        "Globals.xs",
+        "function applyFilters(rows, q) { return rows.filter(r => r.name.includes(q)); }\n" +
+          "function tally(rows) { let s = 0; for (const r of rows) { s += r.n; } return s; }\n" +
+          "function usesAsync(xs) { return xs.map(async y => y); }",
+        { compileScripts: true } as any,
+      ) as any
+    ).functions;
+  };
+
+  const evaluate = async (source: string, localContext: Record<string, any>, compiled: boolean) => {
+    const { evalBinding } = await import("../../../src/components-core/script-runner/eval-tree-sync");
+    return evalBinding(new Parser(source).parseExpr()!, {
+      localContext: { ...localContext, ...(await collect()) },
+      appContext: { xmluiConfig: {} },
+      options: { defaultToOptionalMemberAccess: true, ...(compiled ? { compileScripts: true } : {}) },
+    } as any);
+  };
+
+  it.each([
+    ["a helper filtering rows", "applyFilters(rows, 'a')", { rows: [{ name: "ab" }, { name: "zz" }] }, [{ name: "ab" }]],
+    ["a helper with a loop", "tally(rows)", { rows: [{ n: 1 }, { n: 2 }] }, 3],
+    ["the result used further", "applyFilters(rows, 'a').length", { rows: [{ name: "ab" }] }, 1],
+  ])("%s agrees either way", async (_name, source, localContext, expected) => {
+    await expect(evaluate(source as string, localContext as any, false)).resolves.toEqual(expected);
+    await expect(evaluate(source as string, localContext as any, true)).resolves.toEqual(expected);
+  });
+
+  it("no longer enters the interpreter under strict compilation", async () => {
+    const { setStrictCompilationEnabled, resetStrictCompilationForTests } = await import(
+      "../../../src/components-core/script-compiler/strict-compilation"
+    );
+    setStrictCompilationEnabled(true);
+    try {
+      await expect(evaluate("tally(rows)", { rows: [{ n: 4 }] }, true)).resolves.toBe(4);
+    } finally {
+      resetStrictCompilationForTests();
+    }
+  });
+
+  it("falls back rather than crashing when the body cannot compile", async () => {
+    // --- The synchronous binding path has no fallback catch of its own, so a construct
+    // --- the emitter refuses inside a helper would otherwise surface as a raw compiler
+    // --- exception and take the app down. `async` is the one construct left in that
+    // --- category.
+    await expect(evaluate("usesAsync(xs)", { xs: [1] }, true)).resolves.toHaveLength(1);
+  });
+});
