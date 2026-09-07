@@ -14,8 +14,12 @@ export type CompileDiagnosticCode =
   /** The compiler met a construct it cannot emit (`await`, an `async` arrow, …). */
   | "compile-unsupported-node"
   /**
-   * A literal that cannot be carried into an interpreted arrow — a regular expression,
-   * for instance, which does not survive serialization into the emitted module.
+   * A literal the emitter cannot write into generated JavaScript.
+   *
+   * Regular expressions were the only literal that ever reported this; they are rendered
+   * as `new RegExp(...)` now (see `script-compiler/literals.ts`), so nothing the parser
+   * currently produces reaches it. The code stays as a guard against a future literal
+   * type reaching the emitter unhandled.
    */
   | "compile-unserializable-literal"
   /**

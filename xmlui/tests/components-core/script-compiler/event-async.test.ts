@@ -438,13 +438,17 @@ describe("event-async compiled script target", () => {
     }
   });
 
-  it("throws a structured unsupported error for non-serializable literals", () => {
-    expect(() =>
-      compileEventAsyncStatementSource(
-        "(value) => { if (/[^a-z0-9_]/.test(value)) return 'Invalid'; return null; }",
-        "Main.xmlui#event-regexp",
-      ),
-    ).toThrow(UnsupportedCompiledScriptNodeError);
+  it("compiles a handler arrow containing a regular expression", () => {
+    // --- This used to throw: the emitter asked whether `JSON.stringify` round-trips the
+    // --- literal, and a pattern does not, so any script containing one fell back to
+    // --- interpretation. Both emission paths render a pattern now, so it compiles.
+    // --- See `script-compiler/literals.ts` and `regex-literals.test.ts`.
+    const artifact = compileEventAsyncStatementSource(
+      "(value) => { if (/[^a-z0-9_]/.test(value)) return 'Invalid'; return null; }",
+      "Main.xmlui#event-regexp",
+    );
+
+    expect(artifact.js).toContain('new RegExp("[^a-z0-9_]", "")');
   });
 
   it("prefers a parse-time artifact over runtime AST compilation", async () => {

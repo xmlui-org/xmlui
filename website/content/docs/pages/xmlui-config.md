@@ -326,7 +326,7 @@ Each report carries one of these codes:
 | Code | Meaning |
 | --- | --- |
 | `compile-unsupported-node` | the compiler met a construct it cannot emit (`await`, an `async` arrow) |
-| `compile-unserializable-literal` | a literal, typically a regular expression, that cannot be carried into interpreted execution |
+| `compile-unserializable-literal` | a literal the emitter cannot write into generated JavaScript. Regular expressions used to report this; they compile now |
 | `compile-runtime-fallback` | a compiled block reported an unsupported construct while running and the interpreter took over |
 | `compile-source-unavailable` | compilation failed for some other reason |
 

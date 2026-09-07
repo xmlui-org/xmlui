@@ -80,6 +80,7 @@ import { collectVariableDependencies } from "../../script-runner/visitors";
 import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
 import { throwUnsupportedCompiledScriptNode } from "../errors";
+import { regExpToJs, serializeAstForJs } from "../literals";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -560,8 +561,11 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
   if (context.arrowMode === "value") {
+    // --- `serializeAstForJs`, not `JSON.stringify`: the arrow's body is handed to the
+    // --- interpreter as data, and a regular expression inside it used to flatten to `{}`
+    // --- on the way — the same silent miscompile, one level down.
     writer.write("runtime.arrow(");
-    writer.write(JSON.stringify(expr), expr);
+    writer.write(serializeAstForJs(expr), expr);
     writer.write(", evalContext, thread)", expr);
     return;
   }
@@ -1161,6 +1165,11 @@ function emitWriteExpression(
 }
 
 function literalToJs(value: any): string {
+  // --- The one non-primitive the parser produces. Without this it went through
+  // --- `JSON.stringify` below and became `{}` — a silently wrong answer, not a fallback.
+  if (value instanceof RegExp) {
+    return regExpToJs(value);
+  }
   if (typeof value === "bigint") {
     return `${value.toString()}n`;
   }

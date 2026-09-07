@@ -89,6 +89,7 @@ import {
   throwUnsupportedCompiledScriptNode,
   UnsupportedCompiledScriptNodeError,
 } from "../errors";
+import { isJsonSerializableLiteral, regExpToJs, serializeAstForJs } from "../literals";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -352,7 +353,7 @@ function emitEventArrowCall(
     throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("await runtime.call(runtime.arrow(", expr);
-  writer.write(JSON.stringify(expr), expr);
+  writer.write(serializeAstForJs(expr), expr);
   writer.write(
     ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread)",
     expr,
@@ -635,7 +636,7 @@ function isKnownNonYieldingCall(
 function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boolean {
   switch (expr.type) {
     case T_LITERAL:
-      return canSerializeLiteral(expr.value);
+      return canRenderLiteral(expr.value);
     case T_IDENTIFIER:
       return isNativeIdentifier(expr, context);
     case T_UNARY_EXPRESSION:
@@ -1667,7 +1668,7 @@ function emitExpression(
 ): void {
   switch (expr.type) {
     case T_LITERAL:
-      if (!canSerializeLiteral(expr.value)) {
+      if (!canRenderLiteral(expr.value)) {
         throwUnsupportedCompiledScriptNode(expr, context.sourceId);
       }
       writer.write(literalToJs(expr.value), expr);
@@ -2037,7 +2038,7 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("runtime.arrow(");
-  writer.write(JSON.stringify(expr), expr);
+  writer.write(serializeAstForJs(expr), expr);
   writer.write(", evalContext, thread)", expr);
 }
 
@@ -2523,6 +2524,11 @@ function extendSwitchContext(context: CompilerContext, breakLabel: string): Comp
 }
 
 function literalToJs(value: any): string {
+  // --- The one non-primitive the parser produces; the `default` branch below would
+  // --- flatten it to `{}`.
+  if (value instanceof RegExp) {
+    return regExpToJs(value);
+  }
   switch (typeof value) {
     case "string":
       return JSON.stringify(value);
@@ -2543,15 +2549,16 @@ function literalToJs(value: any): string {
   }
 }
 
-function canSerializeLiteral(value: any): boolean {
-  return (
-    value === null ||
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "bigint" ||
-    typeof value === "boolean" ||
-    typeof value === "undefined"
-  );
+/**
+ * Whether a literal can be written into generated JavaScript at all.
+ *
+ * This used to ask whether `JSON.stringify` round-trips the value, which excluded regular
+ * expressions and made every script containing one fall back to interpretation. Both the
+ * direct and the lazy-arrow paths can now render one (`literalToJs`, `serializeAstForJs`),
+ * so the question is what the emitter can express, not what JSON can carry.
+ */
+function canRenderLiteral(value: any): boolean {
+  return isJsonSerializableLiteral(value) || value instanceof RegExp;
 }
 
 /**
@@ -2564,7 +2571,7 @@ function findNonSerializableLiteral(node: any): any | undefined {
     return undefined;
   }
   if (node.type === T_LITERAL) {
-    return canSerializeLiteral(node.value) ? undefined : node;
+    return canRenderLiteral(node.value) ? undefined : node;
   }
   for (const [key, value] of Object.entries(node)) {
     if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
