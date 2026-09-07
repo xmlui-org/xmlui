@@ -88,9 +88,13 @@ the audit of 2026-09-07:
    *hard error* already, since the binding path has no catch). Port from
    `event-async.ts:2200-2220`.
 4. Both targets: destructured/rest params on named `function` declarations.
-5. Both targets: destructuring assignment, object getters/setters, non-`let` for-init.
-6. `await` and `async` arrows. Recommend rejecting `await` at parse time with a fix-it —
-   the engine auto-awaits, so it is redundant — rather than compiling it.
+5. Both targets: object getters/setters, non-`let` for-init. (Destructuring assignment was
+   listed here and is **not** a gap — the interpreter rejects it too, so it is a language
+   boundary. Corrected in Phase 1.3.)
+6. `async` arrows. (`await` was listed here and is **not** a gap either: the interpreter
+   rejects it outright with "XMLUI does not support the await operator". Nothing to
+   compile, and nothing to reject at parse time beyond what the language already does —
+   though the parser accepting what the interpreter refuses is its own small wart.)
 
 **Wiring gaps — category C**
 
@@ -205,12 +209,35 @@ recorded at the call site.
 Note this costs the tripwire nothing: `runCodeSync` enters `processStatementQueue`, so
 Phase 2 will flag it either way.
 
-1.3 Extend the differential corpus to cover what the repo's own sources lack — the 114
-in-repo `.xmlui`/`.xs` files contain zero regex literals, zero `await`, zero destructured
-arrow params, which is why these bugs survived. Organise coverage by AST node type against
-`ScriptingSourceTree.ts` so gaps are visible rather than counted.
+1.3 ~~Extend the differential corpus…~~ **Done.**
+`tests/components-core/script-compiler/conformance/` — 54 cases, executed by both paths,
+comparing return value *and* resulting local context. Coverage is derived by walking each
+parsed tree, so the corpus cannot drift from what it claims to cover, and is asserted
+against two axes:
 
-*Exit:* compiled and interpreted agree everywhere compilation is attempted.
+- **node type**, read from `ScriptingNodeTypes.ts` rather than restated, with an excuse
+  list for types unreachable by construction — itself guarded, so it cannot become a
+  dumping ground;
+- **literal value kind**, because node-type coverage is *blind to the regex bug*. A
+  pattern is a `T_LITERAL`, indistinguishable from a string to a walk over node types;
+  deleting the regex case loses no node-type coverage at all. Verified both ways: removing
+  it fails the value-kind axis and nothing else.
+
+That blindness is the main lesson for Phase 3.1's inventory — grammar coverage is not
+value coverage, and the bug that started this work lived in the gap between them.
+
+**Three findings corrected the gap list.** `await`, destructuring assignment and `void`
+are rejected by the *interpreter* too — they are language boundaries, not compiler gaps.
+Earlier audits (and §3-6 of this plan) filed the first two as fallbacks, which overstated
+the work. The real remaining list is four items: destructured arrow param, rest arrow
+param, async arrow, destructured named-function param.
+
+Separately: `var` parses as `T_VAR_STATEMENT`, then both paths discard it — the
+declaration binds nothing and the compiled output omits it, so `var a = 1; return a;`
+yields `undefined`. The two agree, so it is not a compilation bug, but it is a language
+wart now pinned by a corpus case.
+
+*Exit:* compiled and interpreted agree everywhere compilation is attempted. **Met.**
 
 ### Phase 2 — Build the tripwire and the diagnostic
 
