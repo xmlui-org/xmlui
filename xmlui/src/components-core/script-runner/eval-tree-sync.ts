@@ -71,6 +71,11 @@ import { evalTrace } from "./eval-trace";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { assertSyncResult, callSyncFunction } from "./sync-runtime";
 import { evaluateCompiledBinding } from "../script-compiler";
+import {
+  isStrictCompilationEnabled,
+  throwStrictCompilationViolation,
+} from "../script-compiler/strict-compilation";
+import { sourceRangeFromNode } from "../script-compiler/source";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -148,6 +153,16 @@ export function evalBinding(
       evalContext.compiledArrowInvoker = previousArrowInvoker;
     }
   }
+  // --- Door 1 of 4. Everything below this line is interpretation, whatever the reason:
+  // --- the switch is off, the context never carried it, or this is an arrow the compiled
+  // --- binding path hands back. See `script-compiler/strict-compilation`.
+  if (isStrictCompilationEnabled()) {
+    throwStrictCompilationViolation({
+      door: "binding",
+      sourceText: (expr as any)?.source,
+      sourceRange: sourceRangeFromNode(expr as any),
+    });
+  }
   return evalBindingExpressionTree(thisStack, expr, evalContext, thread ?? evalContext.mainThread!);
 }
 
@@ -167,6 +182,17 @@ export function executeArrowExpressionSync(
   // --- Just an extra safety check
   if (expr.type !== T_ARROW_EXPRESSION) {
     throw new Error("executeArrowExpression expects an 'ArrowExpression' object.");
+  }
+
+  // --- Door 4 of 4. A compiled global function runs from its build-time `#function-`
+  // --- artifact; reaching here means this arrow has none, so its body is about to be
+  // --- walked. The statement-queue guard would catch it a step later with less to say.
+  if (isStrictCompilationEnabled()) {
+    throwStrictCompilationViolation({
+      door: "arrow",
+      sourceText: (expr as any)?.source,
+      sourceRange: sourceRangeFromNode(expr as any),
+    });
   }
 
   // --- This is the evaluator that an arrow expression uses internally

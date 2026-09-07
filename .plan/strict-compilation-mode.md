@@ -241,7 +241,19 @@ wart now pinned by a corpus case.
 
 ### Phase 2 — Build the tripwire and the diagnostic
 
-2.1 `StrictCompilationViolationError` plus the four entry-point guards. Off by default.
+2.1 ~~`StrictCompilationViolationError` plus the four entry-point guards.~~ **Done.**
+`script-compiler/strict-compilation.ts` holds the flag and the error; the four doors are
+guarded in `eval-tree-sync` (the interpreted branch of `evalBinding`, and the sync arrow
+factory), `process-statement-sync`, `process-statement-async`, and the async arrow factory.
+`strictCompilation` travels the same route as `compileScripts` — `xmlui.config.json` to app
+define to runtime — and is armed from both config merge points, so a context-free call site
+is covered like any binding. It is inert without `compileScripts`, and the config loader
+says so rather than ignoring the combination.
+
+Hot-path cost, measured A/B on member access with the guard removed and restored: median
+1187 ns present against 1144 ns absent, ranges 1179-1284 and 1121-1232. The ranges overlap,
+so the cost sits at the edge of what the harness resolves — consistent with one function
+call returning a module boolean, which is what the plan required.
 
 2.2 The error formatter: snippet with caret, owner, fix hint, code, and the escape hatch.
 Add a `fix?: string` field to `CompileDiagnostic` and a per-construct hint table keyed by

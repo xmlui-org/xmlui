@@ -25,6 +25,7 @@
 export type BuildScriptCompilationSettings = {
   compileScripts?: boolean;
   reportCompileFallbacks?: boolean;
+  strictCompilation?: boolean;
 };
 
 /**
@@ -55,9 +56,11 @@ export function readBuildScriptCompilationSettings(): BuildScriptCompilationSett
   }
   const compileScripts = readFlag(env?.VITE_XMLUI_COMPILE_SCRIPTS);
   const reportCompileFallbacks = readFlag(env?.VITE_XMLUI_REPORT_COMPILE_FALLBACKS);
+  const strictCompilation = readFlag(env?.VITE_XMLUI_STRICT_COMPILATION);
   return {
     ...(compileScripts === undefined ? {} : { compileScripts }),
     ...(reportCompileFallbacks === undefined ? {} : { reportCompileFallbacks }),
+    ...(strictCompilation === undefined ? {} : { strictCompilation }),
   };
 }
 
@@ -70,7 +73,11 @@ export function applyBuildScriptCompilationSettings<T extends Record<string, any
   merged: T,
 ): T {
   const settings = readBuildScriptCompilationSettings();
-  if (settings.compileScripts === undefined && settings.reportCompileFallbacks === undefined) {
+  if (
+    settings.compileScripts === undefined &&
+    settings.reportCompileFallbacks === undefined &&
+    settings.strictCompilation === undefined
+  ) {
     return merged;
   }
   return { ...merged, ...settings };

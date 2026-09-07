@@ -68,6 +68,11 @@ import {
   guard,
 } from "./process-statement-common";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
+import {
+  isStrictCompilationEnabled,
+  throwStrictCompilationViolation,
+} from "../script-compiler/strict-compilation";
+import { sourceRangeFromNode } from "../script-compiler/source";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(
@@ -75,6 +80,16 @@ export async function processStatementQueueAsync(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): Promise<QueueInfo> {
+  // --- Door of 4 into the interpreter. There is no compiled target for this queue yet,
+  // --- so under strict compilation every caller of it is a violation to be closed —
+  // --- which is the point: this is how the list gets built.
+  if (isStrictCompilationEnabled()) {
+    throwStrictCompilationViolation({
+      door: "statement-async",
+      sourceText: (statements[0] as any)?.source,
+      sourceRange: statements[0] ? sourceRangeFromNode(statements[0] as any) : undefined,
+    });
+  }
   if (!thread) {
     // --- Create the main thread for the queue
     thread = ensureMainThread(evalContext);

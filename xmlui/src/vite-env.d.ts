@@ -19,6 +19,7 @@ interface ImportMetaEnv {
   // Application-level: script compilation as stated by `xmlui.config.json`
   readonly VITE_XMLUI_COMPILE_SCRIPTS: string;
   readonly VITE_XMLUI_REPORT_COMPILE_FALLBACKS: string;
+  readonly VITE_XMLUI_STRICT_COMPILATION: string;
   readonly VITE_XMLUI_DEV_MODE: boolean;
   // Application-level: runtime flags
   readonly VITE_MOCK_ENABLED: boolean | string;

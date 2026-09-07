@@ -59,7 +59,10 @@ import type {
   BindingTreeEvaluationContext,
   EvalTreeOptions,
 } from "./script-runner/BindingTreeEvaluationContext";
-import { createBindingEvalOptions } from "./script-runner/eval-options";
+import {
+  applyStrictCompilationSetting,
+  createBindingEvalOptions,
+} from "./script-runner/eval-options";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
@@ -130,7 +133,9 @@ function mergeStandaloneXmluiConfig(
   }
   // --- Settings stated in `xmlui.config.json` arrive as app defines; they win over the
   // --- app description. See `script-compiler/build-settings`.
-  return applyBuildScriptCompilationSettings(merged);
+  const withBuildSettings = applyBuildScriptCompilationSettings(merged);
+  applyStrictCompilationSetting(withBuildSettings);
+  return withBuildSettings;
 }
 
 /**

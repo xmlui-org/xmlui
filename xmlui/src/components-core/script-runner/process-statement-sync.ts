@@ -66,6 +66,11 @@ import type {
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
+import {
+  isStrictCompilationEnabled,
+  throwStrictCompilationViolation,
+} from "../script-compiler/strict-compilation";
+import { sourceRangeFromNode } from "../script-compiler/source";
 
 const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
@@ -75,6 +80,16 @@ export function processStatementQueue(
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
 ): QueueInfo {
+  // --- Door of 4 into the interpreter. There is no compiled target for this queue yet,
+  // --- so under strict compilation every caller of it is a violation to be closed —
+  // --- which is the point: this is how the list gets built.
+  if (isStrictCompilationEnabled()) {
+    throwStrictCompilationViolation({
+      door: "statement-sync",
+      sourceText: (statements[0] as any)?.source,
+      sourceRange: statements[0] ? sourceRangeFromNode(statements[0] as any) : undefined,
+    });
+  }
   if (!thread) {
     // --- Create the main thread for the queue
     thread = ensureMainThread(evalContext);

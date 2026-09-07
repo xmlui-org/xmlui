@@ -25,7 +25,7 @@ export type XmluiConfigSource = {
 };
 
 /** The two settings that configure script compilation. */
-const SCRIPT_COMPILATION_KEYS = ["compileScripts", "reportCompileFallbacks"];
+const SCRIPT_COMPILATION_KEYS = ["compileScripts", "reportCompileFallbacks", "strictCompilation"];
 
 /**
  * Settings that used to configure compilation. They no longer do anything, so a
@@ -74,6 +74,14 @@ export function normalizeXmluiPluginOptions(
   const setting = (key: string) => config[key] ?? xmluiConfig[key] ?? appGlobals[key];
   warnAboutRemovedKeys(config, xmluiConfig, appGlobals);
   const compileScripts = setting("compileScripts") === true;
+  // --- Strict compilation has nothing to be strict about without compilation, and
+  // --- silently ignoring it would hide a misconfiguration exactly the way #3892 did.
+  if (setting("strictCompilation") === true && !compileScripts) {
+    console.warn(
+      `[xmlui] "strictCompilation" has no effect without "compileScripts": there is ` +
+        `nothing to be strict about while scripts run interpreted.`,
+    );
+  }
   return {
     analyze: config.analyze,
     reactiveCycles: config.reactiveCycles,
@@ -138,6 +146,7 @@ export function mergeXmluiConfigSources(
 export type RuntimeScriptCompilationSettings = {
   compileScripts?: boolean;
   reportCompileFallbacks?: boolean;
+  strictCompilation?: boolean;
 };
 
 export function resolveRuntimeScriptCompilationSettings(

@@ -279,6 +279,8 @@ export default ({ mode = "lib" }) => {
         "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS": "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS",
         "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS":
           "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS",
+        "import.meta.env.VITE_XMLUI_STRICT_COMPILATION":
+          "import.meta.env.VITE_XMLUI_STRICT_COMPILATION",
         // --- application-level: runtime flags ---
         "import.meta.env.VITE_MOCK_ENABLED": "import.meta.env.VITE_MOCK_ENABLED",
         "import.meta.env.VITE_MOCK_WORKER_LOCATION": "import.meta.env.VITE_MOCK_WORKER_LOCATION",

@@ -12,6 +12,7 @@ import {
 } from "./i18n";
 import { useLocaleProfile } from "./i18n/LocaleContext";
 import { applyBuildScriptCompilationSettings } from "./script-compiler/build-settings";
+import { applyStrictCompilationSetting } from "./script-runner/eval-options";
 
 /**
  * Stores the object that holds the global functions and methods of xmlui.
@@ -134,6 +135,9 @@ export function mergeXmluiConfig(
   // --- script-compilation settings reach us baked in as app defines. They win over the
   // --- app description, which is the precedence the documentation promises.
   const withBuildSettings = applyBuildScriptCompilationSettings(merged);
+  // --- Arm the interpreter guard from the same merged view every other consumer reads,
+  // --- so a hand-built evaluation context far from React is covered too.
+  applyStrictCompilationSetting(withBuildSettings);
   if (!appGlobals && !xmluiConfig && withBuildSettings === merged) return EMPTY_GLOBALS;
   return Object.freeze(withBuildSettings);
 }
