@@ -32,6 +32,7 @@ import {
 } from "../utils/event-handler-directives";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { processStatementQueue } from "../script-runner/process-statement-sync";
+import { executeCompiledStatementSync } from "../script-compiler";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { createEventEvalOptions } from "../script-runner/eval-options";
@@ -631,17 +632,24 @@ export function createEventHandlers(config: EventHandlerConfig) {
         const preparedUsesOriginalStatements = preparedStatements === statements;
         const interpretedHandler = () =>
           processStatementQueueAsync(preparedStatements, evalContext);
+        // --- `mockExecute` used to be excluded here, with no reason recorded anywhere:
+        // --- not in the commit that added it, not in its plan notes, not in a comment.
+        // --- The likely motive was that it is the one handler whose *return value* is
+        // --- load-bearing — it replaces an API response — and the original compilation
+        // --- experiment predated the normalisation a few lines below, which copies a
+        // --- compiled handler's result onto `mainThread.returnValue` so both paths read
+        // --- alike. Checked against the shapes a real one takes: literal returns,
+        // --- injected context vars (`$queryParams`, `$requestBody`, `$requestHeaders`,
+        // --- `$cookies`), branching, the arrow form, and an awaited delegate. Compiled
+        // --- and interpreted agree on all of them.
         const shouldUseCompiledEventHandler =
-          evalContext.options?.compileScripts &&
-          effectiveOptions?.eventName !== "mockExecute" &&
-          !parseTimeCompilationUnsupported;
+          evalContext.options?.compileScripts && !parseTimeCompilationUnsupported;
         const compiledEventDiagnosticEnabled = isCompiledEventDiagnosticEnabled(appContext);
         if (compiledEventDiagnosticEnabled) {
           logCompiledEventDiagnostic("dispatch decision", {
             componentUid: componentUidForCoord,
             eventName: eventNameForCoord,
             runtimeCompileScripts: evalContext.options?.compileScripts === true,
-            ignoredMockExecute: effectiveOptions?.eventName === "mockExecute",
             willUseCompiledPath: shouldUseCompiledEventHandler === true,
             sourceKind:
               typeof source === "string"
@@ -889,6 +897,14 @@ export function createEventHandlers(config: EventHandlerConfig) {
       const evalContext: BindingTreeEvaluationContext = {
         appContext,
         eventArgs,
+        // --- This context carried no options at all, so a synchronous callback silently
+        // --- diverged from every asynchronous handler: no `strictDomSandbox`, no
+        // --- `allowConsole`, and no config-driven `defaultToOptionalMemberAccess`. That
+        // --- is a semantic gap, not just a performance one — a sync callback slipped the
+        // --- DOM sandbox that async handlers enforce.
+        options: {
+          ...createEventEvalOptions(appContext),
+        },
         localContext: createCoWStateProxy({ ...stateRef.current }, (changeInfo) => {
           changes.push(changeInfo);
         }),
@@ -909,6 +925,14 @@ export function createEventHandlers(config: EventHandlerConfig) {
         },
       };
       try {
+        // --- The `statement-sync` target compiles the whole body — control flow included
+        // --- — where before only the leaf expressions compiled and the loops and branches
+        // --- stayed interpreted, which made the switch a net loss here. Measured on the
+        // --- shapes this call site serves: a statement-heavy body over 1000 rows went
+        // --- from 1.9x slower than interpreting to 2.47x faster.
+        if (evalContext.options?.compileScripts) {
+          return executeCompiledStatementSync(rawStatements, evalContext);
+        }
         processStatementQueue(rawStatements, evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {

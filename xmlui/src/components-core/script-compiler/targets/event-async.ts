@@ -89,6 +89,9 @@ import {
   throwUnsupportedCompiledScriptNode,
   UnsupportedCompiledScriptNodeError,
 } from "../errors";
+import { isJsonSerializableLiteral, regExpToJs, serializeAstForJs } from "../literals";
+import { collectDestructureSpecs, type DestructureSpec } from "../destructure";
+import { assertJsIdentifier } from "../identifiers";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -352,7 +355,7 @@ function emitEventArrowCall(
     throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("await runtime.call(runtime.arrow(", expr);
-  writer.write(JSON.stringify(expr), expr);
+  writer.write(serializeAstForJs(expr), expr);
   writer.write(
     ", evalContext, thread), evalContext.localContext, evalContext.eventArgs ?? [], evalContext, thread)",
     expr,
@@ -635,7 +638,7 @@ function isKnownNonYieldingCall(
 function isNativeExpressionSafe(expr: Expression, context: CompilerContext): boolean {
   switch (expr.type) {
     case T_LITERAL:
-      return canSerializeLiteral(expr.value);
+      return canRenderLiteral(expr.value);
     case T_IDENTIFIER:
       return isNativeIdentifier(expr, context);
     case T_UNARY_EXPRESSION:
@@ -986,7 +989,7 @@ function emitDestructureDeclaration(
   decl: VarDeclaration,
   context: CompilerContext,
 ): void {
-  const specs = collectDestructureSpecs(decl, context);
+  const specs = collectDestructureSpecs(decl, context.sourceId);
   if (specs.length === 0) {
     throwUnsupportedCompiledScriptNode(decl, context.sourceId);
   }
@@ -1008,52 +1011,9 @@ function emitDestructureDeclaration(
   writer.write(`, ${JSON.stringify(specs)})`);
 }
 
-type DestructureSpec = [name: string, path: Array<string | number>];
 
-function collectDestructureSpecs(
-  decl: Pick<VarDeclaration | Destructure, "aDestr" | "oDestr">,
-  context: CompilerContext,
-): DestructureSpec[] {
-  if (decl.aDestr) {
-    return collectArrayDestructureSpecs(decl.aDestr, [], context);
-  }
-  if (decl.oDestr) {
-    return collectObjectDestructureSpecs(decl.oDestr, [], context);
-  }
-  return [];
-}
 
-function collectArrayDestructureSpecs(
-  destructure: ArrayDestructure[],
-  path: Array<string | number>,
-  context: CompilerContext,
-): DestructureSpec[] {
-  return destructure.flatMap((item, index) => {
-    const itemPath = [...path, index];
-    if (item.id) {
-      assertJsIdentifier({ name: item.id }, context.sourceId);
-      return [[item.id, itemPath] satisfies DestructureSpec];
-    }
-    if (item.aDestr) return collectArrayDestructureSpecs(item.aDestr, itemPath, context);
-    if (item.oDestr) return collectObjectDestructureSpecs(item.oDestr, itemPath, context);
-    return [];
-  });
-}
 
-function collectObjectDestructureSpecs(
-  destructure: ObjectDestructure[],
-  path: Array<string | number>,
-  context: CompilerContext,
-): DestructureSpec[] {
-  return destructure.flatMap((item) => {
-    const itemPath = [...path, item.id];
-    if (item.aDestr) return collectArrayDestructureSpecs(item.aDestr, itemPath, context);
-    if (item.oDestr) return collectObjectDestructureSpecs(item.oDestr, itemPath, context);
-    const name = item.alias ?? item.id;
-    assertJsIdentifier({ name }, context.sourceId);
-    return [[name, itemPath] satisfies DestructureSpec];
-  });
-}
 
 function emitBlockStatement(
   writer: CompiledScriptCodeWriter,
@@ -1507,9 +1467,12 @@ function emitFunctionDeclaration(
   context: CompilerContext,
 ): void {
   assertJsIdentifier(statement.id, context.sourceId);
-  const argNames = statement.args.map((arg) => getSimpleArgName(arg, context.sourceId));
+  const params = getNativeParams(statement.args, context);
   const functionContext = {
-    ...extendCompilerContext(context, [statement.id.name, ...argNames]),
+    ...extendCompilerContext(context, [
+      statement.id.name,
+      ...params.flatMap((param) => param.localNames),
+    ]),
     inFunction: true,
   };
   const blockContext = extendCompilerContext(
@@ -1520,9 +1483,11 @@ function emitFunctionDeclaration(
   writer.write("async function ", statement);
   writer.write(statement.id.name, statement.id);
   writer.write("(");
-  writer.write(argNames.join(", "));
+  writer.write(params.map((param) => param.jsParam).join(", "));
   writer.write(") ");
   writer.write("{", statement.stmt);
+  // --- Destructured parameters unpack before the body runs.
+  params.forEach((param) => param.emitBinding(writer));
   statement.stmt.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", statement.stmt);
 }
@@ -1667,7 +1632,7 @@ function emitExpression(
 ): void {
   switch (expr.type) {
     case T_LITERAL:
-      if (!canSerializeLiteral(expr.value)) {
+      if (!canRenderLiteral(expr.value)) {
         throwUnsupportedCompiledScriptNode(expr, context.sourceId);
       }
       writer.write(literalToJs(expr.value), expr);
@@ -1914,6 +1879,14 @@ function emitObjectLiteral(
       return;
     }
     if (!Array.isArray(prop)) {
+      // --- Getters and setters stay refused in this target, unlike `binding-sync` which
+      // --- compiles them. Not an oversight: every body this target emits is `async` and
+      // --- threads `await runtime.complete(...)` through its expressions, and a property
+      // --- accessor cannot be async — it has to return a value, not a promise. Compiling
+      // --- one here would need a synchronous emission mode that does not exist yet.
+      // ---
+      // --- Refusing costs little here. This path catches the refusal and falls back,
+      // --- where the binding path has no catch and would have crashed the app.
       throwUnsupportedCompiledScriptNode(prop.value, context.sourceId);
     }
     emitObjectLiteralProp(writer, prop, context);
@@ -2022,6 +1995,15 @@ function emitCompletedArgumentList(
   });
 }
 
+/**
+ * An arrow in value position — stored in an object or array, returned from a ternary.
+ *
+ * Native emission is attempted first. It was already attempted for arrows in *argument*
+ * position (`emitArgumentArray`), so `items.some(x => …)` compiled while
+ * `const handlers = { onOk: () => save() }` serialized its whole AST into the bundle and
+ * handed it back to the interpreter on every call. Position decided whether a callback was
+ * compiled, which is not a distinction an app author would predict.
+ */
 function emitArrowExpression(
   writer: CompiledScriptCodeWriter,
   expr: ArrowExpression,
@@ -2030,6 +2012,19 @@ function emitArrowExpression(
   if (expr.async) {
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
+  emitLazyArrowExpression(writer, expr, context);
+}
+
+/**
+ * The fallback: the arrow's AST, serialized into the emitted module for the interpreter to
+ * walk at call time. Only reached when the body contains something the native emitter
+ * cannot express.
+ */
+function emitLazyArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
   // --- Report the literal itself, not the arrow that holds it: "unsupported literal
   // --- at line 4" points at the code to change, "unsupported arrow function" does not.
   const nonSerializable = findNonSerializableLiteral(expr);
@@ -2037,7 +2032,7 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(nonSerializable, context.sourceId);
   }
   writer.write("runtime.arrow(");
-  writer.write(JSON.stringify(expr), expr);
+  writer.write(serializeAstForJs(expr), expr);
   writer.write(", evalContext, thread)", expr);
 }
 
@@ -2064,8 +2059,9 @@ function emitArgumentArray(
         // Native compilation is not mandatory, but attempt it anyway so common callback
         // patterns (e.g. `items.some(item => ...)`) run as compiled JS instead of being
         // re-interpreted at runtime. Fall back to the always-safe lazy arrow only when
-        // the callback body uses syntax the native emitter cannot handle.
-        emitArrowExpression(writer, arg, context);
+        // the callback body uses syntax the native emitter cannot handle. Straight to the
+        // lazy emitter — native was just tried and refused.
+        emitLazyArrowExpression(writer, arg, context);
       }
       return;
     }
@@ -2183,9 +2179,16 @@ type NativeArrowArg = {
   emitBinding(writer: CompiledScriptCodeWriter): void;
 };
 
-function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): NativeArrowArg[] {
+/**
+ * Parameter shapes a natively emitted function can take — arrow or named declaration.
+ *
+ * Named declarations used to go through a simpler path that accepted identifiers only, so
+ * `function pick({ a }) {}` fell back while `({ a }) => …` compiled. Same pattern, two
+ * answers, depending on how the function was spelled.
+ */
+function getNativeParams(args: Expression[], context: CompilerContext): NativeArrowArg[] {
   let restSeen = false;
-  return expr.args.map((arg) => {
+  return args.map((arg) => {
     if (restSeen) {
       throwUnsupportedCompiledScriptNode(arg, context.sourceId);
     }
@@ -2199,7 +2202,7 @@ function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): Na
     }
     if (arg.type === T_DESTRUCTURE) {
       const paramName = context.nextTemp();
-      const specs = collectDestructureSpecs(arg as Destructure, context);
+      const specs = collectDestructureSpecs(arg as Destructure, context.sourceId);
       return {
         jsParam: paramName,
         localNames: specs.map(([name]) => name),
@@ -2221,6 +2224,10 @@ function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): Na
     }
     throwUnsupportedCompiledScriptNode(arg, context.sourceId);
   });
+}
+
+function getNativeArrowArgs(expr: ArrowExpression, context: CompilerContext): NativeArrowArg[] {
+  return getNativeParams(expr.args, context);
 }
 
 function emitNativeArrowDestructureBinding(
@@ -2523,6 +2530,11 @@ function extendSwitchContext(context: CompilerContext, breakLabel: string): Comp
 }
 
 function literalToJs(value: any): string {
+  // --- The one non-primitive the parser produces; the `default` branch below would
+  // --- flatten it to `{}`.
+  if (value instanceof RegExp) {
+    return regExpToJs(value);
+  }
   switch (typeof value) {
     case "string":
       return JSON.stringify(value);
@@ -2543,15 +2555,16 @@ function literalToJs(value: any): string {
   }
 }
 
-function canSerializeLiteral(value: any): boolean {
-  return (
-    value === null ||
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "bigint" ||
-    typeof value === "boolean" ||
-    typeof value === "undefined"
-  );
+/**
+ * Whether a literal can be written into generated JavaScript at all.
+ *
+ * This used to ask whether `JSON.stringify` round-trips the value, which excluded regular
+ * expressions and made every script containing one fall back to interpretation. Both the
+ * direct and the lazy-arrow paths can now render one (`literalToJs`, `serializeAstForJs`),
+ * so the question is what the emitter can express, not what JSON can carry.
+ */
+function canRenderLiteral(value: any): boolean {
+  return isJsonSerializableLiteral(value) || value instanceof RegExp;
 }
 
 /**
@@ -2564,7 +2577,7 @@ function findNonSerializableLiteral(node: any): any | undefined {
     return undefined;
   }
   if (node.type === T_LITERAL) {
-    return canSerializeLiteral(node.value) ? undefined : node;
+    return canRenderLiteral(node.value) ? undefined : node;
   }
   for (const [key, value] of Object.entries(node)) {
     if (key === "startToken" || key === "endToken" || key === "source" || key === "parenthesized") {
@@ -2587,11 +2600,6 @@ function findNonSerializableLiteral(node: any): any | undefined {
   return undefined;
 }
 
-function assertJsIdentifier(expr: Pick<Identifier, "name">, sourceId: string): void {
-  if (!/^[$A-Z_a-z][$\w]*$/.test(expr.name)) {
-    throw new Error(`Cannot compile identifier '${expr.name}' in '${sourceId}'.`);
-  }
-}
 
 function sourceRangeFromStatements(
   statements: Statement[],

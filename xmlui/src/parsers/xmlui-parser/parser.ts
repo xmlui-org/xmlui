@@ -209,6 +209,33 @@ export type XmluiParserOptions = {
   compileScripts?: boolean;
   /** Report each script block that falls back to interpretation, with a code. */
   reportCompileFallbacks?: boolean;
+  /**
+   * Structured notification for every script that did not compile.
+   *
+   * The formatted reason travels on the emitted block, but rendering a report an author
+   * can act on needs the diagnostic and the original text together, and the emitted block
+   * must not carry the latter — it would ship the whole script twice in every bundle. So
+   * the build collects these here, where nothing is emitted.
+   */
+  onCompileDiagnostic?: (entry: CompileDiagnosticNotice) => void;
+};
+
+export type CompileDiagnosticNotice = {
+  /** Shaped like `CompileDiagnostic`, kept structural so the parser stays dependency-free. */
+  diagnostic: {
+    code: string;
+    sourceId: string;
+    detail: string;
+    line?: number;
+    column?: number;
+    construct?: string;
+    fix?: string;
+    owner?: string;
+  };
+  /** The script's own text, for quoting the offending line. */
+  sourceText?: string;
+  /** File the script came from. */
+  fileName?: string;
 };
 
 export type ParseResult = { node: Node; errors: ParserDiag[] };

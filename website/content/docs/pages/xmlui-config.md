@@ -67,6 +67,7 @@ const App: StandaloneAppDescription = {
 | `codeHighlighter` | Syntax highlighter used by markdown and code fences. |
 | `columnCanSortDefault` | Overrides the default sortable behavior for table columns. |
 | `compileScripts` | Compiles XMLUI scripts to JavaScript — bindings, handlers, and code-behind alike. |
+| `strictCompilation` | Turns any interpreted execution under `compileScripts` into an error. |
 | `csrfHeaderName` | Overrides the form CSRF header name. |
 | `reportCompileFallbacks` | Reports each script block that could not be compiled, with a code. |
 | `defaultToOptionalMemberAccess` | Controls optional member access semantics in XMLScript. |
@@ -258,6 +259,49 @@ the build tooling but not the app.
 Source maps for compiled scripts are not configurable: `xmlui start` turns them on, builds leave
 them out — the payload is large and a production bundle has no use for it.
 
+### `strictCompilation`
+
+```ts
+strictCompilation?: boolean | "off" | "report" | "error"; // default: "report" with compileScripts
+```
+
+Controls what happens when a script would run interpreted. Inert without `compileScripts`
+— there would be nothing to be strict about — and the CLI says so rather than ignoring the
+combination.
+
+| Value | Meaning |
+| --- | --- |
+| unset | **`"report"`** when `compileScripts` is on. Every interpretation is named in the console; nothing fails. |
+| `true` / `"error"` | Interpretation is an error. `xmlui build` fails, and the runtime throws. |
+| `false` / `"off"` | Silent fallbacks, as before. |
+
+Reporting is the default rather than failing on purpose. A hard-error default would break
+an app the moment it met any interpretation nobody predicted — and finding out what nobody
+predicted is the whole reason to have this on. Each distinct site is reported once, not
+once per evaluation, because these guards sit on per-row, per-render paths.
+
+It catches more than a refused construct. A script can end up interpreted three ways, and
+only the first leaves a trace today:
+
+1. the compiler refused a construct and the caller fell back;
+2. the compiled path chose to interpret — a lazy arrow, or anything routed through the
+   synchronous statement queue, which has no compiled target;
+3. the evaluation context never carried `compileScripts` at all.
+
+So the rule is not "no fallbacks" but "no interpretation", enforced at the interpreter's
+own entry points. An app can report zero fallbacks while running mostly interpreted;
+strict mode is what makes that visible.
+
+`xmlui build` fails and prints **every** violation, sorted by file, so a project adopting
+strict mode does not discover its constructs one build at a time. `xmlui start` reports
+them and keeps serving.
+
+> [!NOTE] What still gets reported. The remaining interpretation is narrow: a construct the
+> compiler refuses — today only an `async` arrow — and a mock backend in an app that
+> declares `compileScripts` in its app description rather than in `xmlui.config.json`.
+> Synchronous callbacks, helper functions called from bindings, and arrows stored in data
+> all compile.
+
 ### What compilation reports
 
 `xmlui start` and `xmlui build` always report what compilation produced:
@@ -326,7 +370,7 @@ Each report carries one of these codes:
 | Code | Meaning |
 | --- | --- |
 | `compile-unsupported-node` | the compiler met a construct it cannot emit (`await`, an `async` arrow) |
-| `compile-unserializable-literal` | a literal, typically a regular expression, that cannot be carried into interpreted execution |
+| `compile-unserializable-literal` | a literal the emitter cannot write into generated JavaScript. Regular expressions used to report this; they compile now |
 | `compile-runtime-fallback` | a compiled block reported an unsupported construct while running and the interpreter took over |
 | `compile-source-unavailable` | compilation failed for some other reason |
 

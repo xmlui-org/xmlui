@@ -173,9 +173,20 @@ export async function completeExprValue(expr: Expression, thread: LogicalThread)
 
 // --- Evaluates a literal value (sync & async context)
 export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThread): any {
-  setExprValue(expr, { value: expr.value }, thread);
-  thisStack.push(expr.value);
-  return expr.value;
+  // --- The parser builds a literal's `RegExp` once and stores it on the AST node, so
+  // --- every evaluation of that node used to hand back the same instance — and a `g` or
+  // --- `y` pattern carried its `lastIndex` from one evaluation to the next.
+  // --- `/a/g.test(s)` evaluated four times returned true, true, true, false. In
+  // --- JavaScript a regular expression literal builds a fresh object each time it is
+  // --- evaluated; the compiled path does that, and now so does this one.
+  const value = expr.value instanceof RegExp ? cloneRegExp(expr.value) : expr.value;
+  setExprValue(expr, { value }, thread);
+  thisStack.push(value);
+  return value;
+}
+
+function cloneRegExp(value: RegExp): RegExp {
+  return new RegExp(value.source, value.flags);
 }
 
 type IdentifierScope = "global" | "app" | "localContext" | "block";

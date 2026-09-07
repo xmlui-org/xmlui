@@ -1,4 +1,5 @@
 import { UnsupportedCompiledScriptNodeError } from "./errors";
+import { fixHintForNodeType } from "./fix-hints";
 import { T_LITERAL } from "../../parsers/scripting/ScriptingNodeTypes";
 import { createLogEntry, pushXsLog } from "../inspector/inspectorUtils";
 import type { CompiledScriptSourceRange } from "./types";
@@ -14,8 +15,12 @@ export type CompileDiagnosticCode =
   /** The compiler met a construct it cannot emit (`await`, an `async` arrow, …). */
   | "compile-unsupported-node"
   /**
-   * A literal that cannot be carried into an interpreted arrow — a regular expression,
-   * for instance, which does not survive serialization into the emitted module.
+   * A literal the emitter cannot write into generated JavaScript.
+   *
+   * Regular expressions were the only literal that ever reported this; they are rendered
+   * as `new RegExp(...)` now (see `script-compiler/literals.ts`), so nothing the parser
+   * currently produces reaches it. The code stays as a guard against a future literal
+   * type reaching the emitter unhandled.
    */
   | "compile-unserializable-literal"
   /**
@@ -41,11 +46,19 @@ export type CompileDiagnostic = {
   column?: number;
   /** What stopped compilation, without the code or the source id. */
   detail: string;
+  /** What to write instead, when the construct has a concrete answer. */
+  fix?: string;
+  /**
+   * The handler this belongs to in an app author's terms, e.g. `Button onClick`. The
+   * source id names it for the compiler; this names it for a person.
+   */
+  owner?: string;
 };
 
 type CreateCompileDiagnosticOptions = {
   sourceId: string;
   phase?: CompileDiagnosticPhase;
+  owner?: string;
 };
 
 /**
@@ -55,7 +68,7 @@ type CreateCompileDiagnosticOptions = {
  */
 export function createCompileDiagnostic(
   error: unknown,
-  { sourceId, phase = "build" }: CreateCompileDiagnosticOptions,
+  { sourceId, phase = "build", owner }: CreateCompileDiagnosticOptions,
 ): CompileDiagnostic {
   if (error instanceof UnsupportedCompiledScriptNodeError) {
     const isLiteral = Number(error.nodeType) === T_LITERAL;
@@ -74,12 +87,17 @@ export function createCompileDiagnostic(
       detail: isLiteral
         ? `${error.nodeTypeName} cannot be carried into interpreted execution`
         : `${error.nodeTypeName} is not supported by the compiler`,
+      ...(fixHintForNodeType(error.nodeType) === undefined
+        ? {}
+        : { fix: fixHintForNodeType(error.nodeType) }),
+      ...(owner === undefined ? {} : { owner }),
     };
   }
   return {
     code: "compile-source-unavailable",
     severity: "warn",
     sourceId,
+    ...(owner === undefined ? {} : { owner }),
     detail: (error as Error)?.message ?? "compilation failed",
   };
 }
@@ -104,7 +122,8 @@ export function formatCompileDiagnostic(diagnostic: CompileDiagnostic): string {
  * fallback stays machine-checkable in a built bundle even with reporting turned off.
  */
 export function describeCompileDiagnostic(diagnostic: CompileDiagnostic): string {
-  return `${diagnostic.code}: ${diagnostic.detail}${formatPosition(diagnostic)}`;
+  const owner = diagnostic.owner ? ` (${diagnostic.owner})` : "";
+  return `${diagnostic.code}: ${diagnostic.detail}${formatPosition(diagnostic)}${owner}`;
 }
 
 function positionOf(sourceRange?: CompiledScriptSourceRange): { line?: number; column?: number } {

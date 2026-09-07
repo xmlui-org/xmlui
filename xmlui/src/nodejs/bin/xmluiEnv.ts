@@ -20,6 +20,7 @@ type XmluiAppDefineOptions = {
 export type XmluiScriptCompilationDefineOptions = {
   compileScripts?: boolean;
   reportCompileFallbacks?: boolean;
+  strictCompilation?: boolean;
 };
 
 // All application-level env vars that the xmlui CLI sets at app-build time.
@@ -35,6 +36,7 @@ const XMLUI_APP_DEFINE_KEYS = {
   appVersion: "import.meta.env.VITE_APP_VERSION",
   compileScripts: "import.meta.env.VITE_XMLUI_COMPILE_SCRIPTS",
   reportCompileFallbacks: "import.meta.env.VITE_XMLUI_REPORT_COMPILE_FALLBACKS",
+  strictCompilation: "import.meta.env.VITE_XMLUI_STRICT_COMPILATION",
 } as const;
 
 function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boolean {
@@ -111,7 +113,7 @@ export function createXmluiAppDefines(
 export function createXmluiScriptCompilationDefines(
   options: XmluiScriptCompilationDefineOptions = {},
 ): Record<string, string> {
-  const { compileScripts, reportCompileFallbacks } = options;
+  const { compileScripts, reportCompileFallbacks, strictCompilation } = options;
   return {
     ...(compileScripts !== undefined
       ? { [XMLUI_APP_DEFINE_KEYS.compileScripts]: JSON.stringify(String(compileScripts)) }
@@ -122,6 +124,9 @@ export function createXmluiScriptCompilationDefines(
             String(reportCompileFallbacks),
           ),
         }
+      : {}),
+    ...(strictCompilation !== undefined
+      ? { [XMLUI_APP_DEFINE_KEYS.strictCompilation]: JSON.stringify(String(strictCompilation)) }
       : {}),
   };
 }

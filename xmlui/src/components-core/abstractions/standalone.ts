@@ -50,6 +50,15 @@ export type StandaloneAppDescription = {
    *   is cached. A `compileScripts` entry in `xmlui.config.json` overrides the one
    *   declared here — the CLI bakes it into the app, since the browser cannot read
    *   that file itself.
+   * - `strictCompilation` (`boolean | "off" | "report" | "error"`, default `"report"`
+   *   whenever `compileScripts` is on) — what happens when a script would run interpreted.
+   *   Catches more than a refused construct: it also fires when the compiled path chooses
+   *   to interpret, and when an evaluation context never carried the switch at all.
+   *   Unset it reports every interpretation once per site and nothing fails; `true` makes
+   *   it an error, failing `xmlui build` with every violation at once; `false` restores
+   *   silent fallbacks. Inert without `compileScripts`. Reporting rather than failing is
+   *   the default because a hard error would break an app on the first interpretation
+   *   nobody predicted, which is precisely what having this on is meant to discover.
    * - `reportCompileFallbacks` (boolean, default `false`) — report every script block
    *   that could not be compiled, with a diagnostic code
    *   (`compile-unsupported-node`, `compile-unserializable-literal`,

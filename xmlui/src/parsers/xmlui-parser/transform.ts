@@ -385,7 +385,11 @@ function transformXmluiNode(
     if (apiAttrs.length > 0) {
       api = {};
       apiAttrs.forEach(({ attrNode, segmented }) => {
-        api![segmented.name] = parseEvent(segmented.value, attrNode.children?.[2]);
+        api![segmented.name] = parseEvent(
+          segmented.value,
+          attrNode.children?.[2],
+          describeEventOwner({ name: compoundName?.value }, `method ${segmented.name}`),
+        );
       });
     }
 
@@ -681,7 +685,11 @@ function transformXmluiNode(
             (name, value, nodeScriptContent) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = parseEvent(value, nodeScriptContent);
+              comp.events[name] = parseEvent(
+                value,
+                nodeScriptContent,
+                describeEventOwner(comp, name),
+              );
             },
           );
           return;
@@ -741,9 +749,10 @@ function transformXmluiNode(
 
             (name) => (isComponent(comp) ? comp.api?.[name] : undefined),
             (name, value, nodeScriptContent) => {
+              const owner = describeEventOwner(comp, `method ${name}`);
               const parsedValue = Array.isArray(value)
-                ? value.map((item) => parseEvent(item, nodeScriptContent))
-                : parseEvent(value, nodeScriptContent);
+                ? value.map((item) => parseEvent(item, nodeScriptContent, owner))
+                : parseEvent(value, nodeScriptContent, owner);
               comp.api ??= {};
               comp.api[name] = parsedValue;
             },
@@ -857,16 +866,28 @@ function transformXmluiNode(
           comp.globalVars[name] = value;
         } else if (startSegment === "method") {
           comp.api ??= {};
-          comp.api[name] = parseEvent(value, attrValueStringNode);
+          comp.api[name] = parseEvent(
+            value,
+            attrValueStringNode,
+            describeEventOwner(comp, `method ${name}`),
+          );
           setAttributeLocation(comp, name, attr);
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEvent(value, attrValueStringNode);
+          comp.events[name] = parseEvent(
+            value,
+            attrValueStringNode,
+            describeEventOwner(comp, name),
+          );
           setAttributeLocation(comp, name, attr);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEvent(value, attrValueStringNode);
+          comp.events[eventName] = parseEvent(
+            value,
+            attrValueStringNode,
+            describeEventOwner(comp, name),
+          );
           setAttributeLocation(comp, eventName, attr);
         } else {
           comp.props ??= {};
@@ -1501,7 +1522,20 @@ function transformXmluiNode(
     }
   }
 
-  function parseEvent(value: any, nodeContainingValue: Node): any {
+  /**
+   * Names the handler a compile diagnostic belongs to, e.g. `Button onClick`.
+   *
+   * The source id is `<file>#event-<counter>`, where the counter is an internal parse
+   * ordinal. It identifies the block for the compiler and tells an app author nothing —
+   * on a file with forty handlers it narrows to forty. Code-behind declarations already
+   * carry their function name (`#function-roleHint`); event handlers did not.
+   */
+  function describeEventOwner(owner: any, member: string): string | undefined {
+    const component = owner?.type ?? owner?.name;
+    return typeof component === "string" ? `${component} ${member}` : member;
+  }
+
+  function parseEvent(value: any, nodeContainingValue: Node, owner?: string): any {
     if (typeof value !== "string") {
       // --- It must be a component definition in the event code
       return value;
@@ -1547,9 +1581,16 @@ function transformXmluiNode(
             compiled = compileEventAsyncStatements(preparedStatements, compileOptions);
           }
         } catch (error) {
-          const diagnostic = createCompileDiagnostic(error, { sourceId });
+          const diagnostic = createCompileDiagnostic(error, { sourceId, owner });
           compiledUnsupported = true;
           compiledUnsupportedReason = describeCompileDiagnostic(diagnostic);
+          // --- Structured, with the source text, so the build can render a report with
+          // --- the offending line in it. Nothing here reaches the emitted module.
+          parserOptions.onCompileDiagnostic?.({
+            diagnostic,
+            sourceText: value,
+            fileName: String(fileId),
+          });
           // --- Detail is reported only on request; the build always counts the
           // --- fallback in its summary. See `reportCompileFallbacks`.
           if (warnings && parserOptions.reportCompileFallbacks) {

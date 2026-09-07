@@ -78,6 +78,19 @@ Arrow expressions are the documented exception: `evalBinding` skips the compiled
 an arrow by `code-behind-collect.ts` — compiles through its build-time `#function-`
 artifact rather than through binding evaluation.
 
+Regular expressions are the only non-primitive literal the parser produces
+(`Parser.parseRegExpLiteral` builds the `RegExp` once, at parse time). Both targets render
+them through `script-compiler/literals.ts`: `literalToJs` emits `new RegExp(source, flags)`
+for direct emission, and `serializeAstForJs` does the same inside the serialized AST that
+the lazy-arrow paths embed. Before that, both went through `JSON.stringify`, which renders
+a pattern as `{}` — in `event-async` a guard turned it into a fallback, and in
+`binding-sync` there was no guard, so `text.replace(/ /g, "-")` silently returned the text
+unchanged.
+
+`evalLiteral` (`eval-tree-common.ts`) clones a pattern per evaluation for the same reason
+the compiled path rebuilds one: the AST holds a single instance, so a `g` or `y` pattern
+used to carry its `lastIndex` from one evaluation of a binding to the next.
+
 The parse-time binding-compilation path in `ParameterParser`/`AttributeValueParser`
 (`ParseBindingOptions.compileScripts` → `#expr-…` artifacts) is exercised only by tests: no
 production caller supplies those options, and `evaluateCompiledBinding` recompiles from the AST

@@ -11,6 +11,8 @@ import { useComponentRegistry } from "../../components/ComponentRegistryContext"
 import { EMPTY_ARRAY } from "../constants";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { extractScopedState, narrowGlobalVars } from "./ContainerUtils";
+import { createBindingEvalOptions } from "../script-runner/eval-options";
+import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationContext";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -46,6 +48,9 @@ export const ComponentWrapper = memo(
     const componentRegistry = useComponentRegistry();
     const { descriptor } = componentRegistry.lookupComponentRenderer(node.type) || {};
     const stableLayoutContext = useRef(layoutContext);
+    // --- These node transforms evaluate binding expressions; without options they could
+    // --- never compile, whatever the app asked for.
+    const bindingEvalOptions = useMemo(() => createBindingEvalOptions(appContext), [appContext]);
 
     // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
@@ -56,11 +61,11 @@ export const ComponentWrapper = memo(
         descriptor?.childrenAsTemplate,
       );
       transformed = transformNodeWithChildDatasource(transformed);
-      transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
+      transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef, bindingEvalOptions);
       transformed = transformNodeWithRawDataProp(transformed);
 
       return transformed;
-    }, [descriptor?.childrenAsTemplate, node, uidInfoRef]);
+    }, [bindingEvalOptions, descriptor?.childrenAsTemplate, node, uidInfoRef]);
 
     // --- String values in the "data" prop are treated as URLs. This boolean
     // --- indicates whether the "data" prop is a string or not.
@@ -81,8 +86,9 @@ export const ComponentWrapper = memo(
         nodeWithTransformedLoaders,
         resolvedDataPropIsString,
         uidInfoRef,
+        bindingEvalOptions,
       );
-    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
+    }, [bindingEvalOptions, nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
     // When the node declares a scope (uses or computedUses), extract only the
     // relevant slice of parent state and stabilise it with a shallow-equal memo.
@@ -317,6 +323,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
 function transformNodeWithDataSourceRefProp(
   node: ComponentDef,
   uidInfoRef: RefObject<Record<string, any>>,
+  evalOptions: EvalTreeOptions,
 ) {
   if (!node.props) {
     return node;
@@ -326,7 +333,17 @@ function transformNodeWithDataSourceRefProp(
   Object.entries(node.props).forEach(([key, value]) => {
     let uidInfoForDatasource: { type: string; uid: any };
     try {
-      uidInfoForDatasource = extractParam(uidInfoRef.current, value);
+      // --- Options only, no `appContext`: this resolves a loader reference and must
+      // --- keep resolving identifiers against exactly the scope it always has. Passing
+      // --- an app context would widen that scope and change which props transform.
+      uidInfoForDatasource = extractParam(
+        uidInfoRef.current,
+        value,
+        undefined,
+        false,
+        undefined,
+        evalOptions,
+      );
     } catch (e) {}
 
     if (uidInfoForDatasource?.type === "loader") {
@@ -353,6 +370,7 @@ function transformNodeWithDataProp(
   node: ComponentDef,
   resolvedDataPropIsString: boolean,
   uidInfoRef: RefObject<Record<string, any>>,
+  evalOptions: EvalTreeOptions,
 ): ComponentDef {
   if (
     !node.props?.__DATA_RESOLVED &&
@@ -362,7 +380,10 @@ function transformNodeWithDataProp(
   ) {
     // --- We skip the transformation if the data property is a binding expression
     // --- for a loader value
-    if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
+    if (
+      extractParam(uidInfoRef.current, node.props.data, undefined, false, undefined, evalOptions) ===
+      "loaderValue"
+    ) {
       return node;
     }
     return {

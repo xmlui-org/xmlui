@@ -74,6 +74,11 @@ import { getAsyncProxy } from "./asyncProxy";
 import { isBannedFunction } from "./bannedFunctions";
 import { UnsupportedCompiledScriptNodeError } from "../script-compiler/errors";
 import { executeCompiledEventAsyncArtifact } from "../script-compiler/targets/event-async-executor";
+import {
+  isStrictCompilationEnabled,
+  throwStrictCompilationViolation,
+} from "../script-compiler/strict-compilation";
+import { sourceRangeFromNode } from "../script-compiler/source";
 
 type EvaluatorAsyncFunction = (
   thisStack: any[],
@@ -788,6 +793,16 @@ function createArrowFunctionAsync(
             throw err;
           }
         }
+      }
+
+      // --- Door 4 of 4, async half. The compiled-artifact branch above did not fire, so
+      // --- this arrow has no artifact and its body is about to be interpreted.
+      if (isStrictCompilationEnabled()) {
+        throwStrictCompilationViolation({
+          door: "arrow",
+          sourceText: (expr as any)?.source,
+          sourceRange: sourceRangeFromNode(expr as any),
+        });
       }
 
       // --- Process the statement with a new processor

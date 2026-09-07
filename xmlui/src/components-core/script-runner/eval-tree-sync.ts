@@ -70,7 +70,13 @@ import { ensureMainThread } from "./process-statement-common";
 import { evalTrace } from "./eval-trace";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { assertSyncResult, callSyncFunction } from "./sync-runtime";
-import { evaluateCompiledBinding } from "../script-compiler";
+import { evaluateCompiledBinding, executeCompiledStatementSync } from "../script-compiler";
+import { UnsupportedCompiledScriptNodeError } from "../script-compiler/errors";
+import {
+  isStrictCompilationEnabled,
+  throwStrictCompilationViolation,
+} from "../script-compiler/strict-compilation";
+import { sourceRangeFromNode } from "../script-compiler/source";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -133,6 +139,16 @@ export function evalBinding(
   evalTrace("eval", () =>
     String((expr as any)?.source ?? "").slice(0, 80) || "type:" + String((expr as any)?.type ?? "?"),
   );
+  // --- Arrows stay out of the compiled binding path, and this exclusion is load-bearing
+  // --- rather than an oversight. An XMLScript arrow is not a JavaScript function: the
+  // --- `_ARROW_EXPR_` shape is how the framework recognises one and routes it through
+  // --- `lookupSyncCallback`, which supplies the state-mutation plumbing, the synchronous
+  // --- calling convention and the event arguments. Emitting a plain function instead
+  // --- bypasses all of it — a function stored in a `var` stops propagating its writes,
+  // --- and rendering contracts that show a function as a placeholder stop matching.
+  // ---
+  // --- The body still compiles: see `createArrowFunction` below, which runs it through
+  // --- the `statement-sync` target while keeping this shape.
   if (evalContext.options?.compileScripts && expr.type !== T_ARROW_EXPRESSION) {
     const previousArrowInvoker = evalContext.compiledArrowInvoker;
     evalContext.compiledArrowInvoker = (arrowExpr, args, arrowEvalContext, arrowThread) =>
@@ -144,9 +160,28 @@ export function evalBinding(
       );
     try {
       return evaluateCompiledBinding(expr, evalContext, thread ?? evalContext.mainThread!);
+    } catch (error) {
+      if (!(error instanceof UnsupportedCompiledScriptNodeError)) {
+        throw error;
+      }
+      // --- The safety net the binding path never had. The event path has caught this
+      // --- since compilation was introduced and falls back; here the error propagated,
+      // --- so a construct the emitter refused was an app-breaking exception rather than
+      // --- a slow path. Falling back keeps the app running, and strict compilation still
+      // --- reports it — at the guard below, as interpretation, which is what it is.
     } finally {
       evalContext.compiledArrowInvoker = previousArrowInvoker;
     }
+  }
+  // --- Door 1 of 4. Everything below this line is interpretation, whatever the reason:
+  // --- the switch is off, the context never carried it, or this is an arrow the compiled
+  // --- binding path hands back. See `script-compiler/strict-compilation`.
+  if (isStrictCompilationEnabled()) {
+    throwStrictCompilationViolation({
+      door: "binding",
+      sourceText: (expr as any)?.source,
+      sourceRange: sourceRangeFromNode(expr as any),
+    });
   }
   return evalBindingExpressionTree(thisStack, expr, evalContext, thread ?? evalContext.mainThread!);
 }
@@ -690,6 +725,16 @@ function evalNewExpression(
 }
 
 function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression): Function {
+  // --- `evalArrow` rejects `async` for an arrow in value position, but one arriving as a
+  // --- *callback argument* reached this factory directly and ran with the keyword quietly
+  // --- ignored: `xs.map(async x => x)` produced `[1]` where JavaScript gives `[Promise]`.
+  // --- One construct, two answers, decided by where it appeared. XMLScript awaits async
+  // --- calls on its own, so real promise semantics are not on the table; refusing it is
+  // --- the answer the language already gave everywhere else. Placed here because every
+  // --- synchronous arrow the interpreter builds comes through this function.
+  if (expr.async) {
+    throw new Error("XMLUI does not support async arrow functions.");
+  }
   // --- Use this function, it evaluates the arrow function
   return (...args: any[]) => {
     // --- Prepare the variables to pass
@@ -778,6 +823,45 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
         throw new Error(
           `Arrow expression with a body of '${expr.statement.type}' is not supported yet.`,
         );
+    }
+
+    // --- The last common way into the interpreter from compiled code, and the one the
+    // --- original report was actually about. A `Globals.xs` helper or a `<script>`
+    // --- function is stored as an arrow expression, so calling one from a binding —
+    // --- `var.rows="{applyFilters(cases, query)}"` — landed here and walked its body on
+    // --- every reactive invalidation, however much of the app had compiled.
+    // ---
+    // --- The build-time artifact on the declaration cannot serve: it targets
+    // --- `event-async` and returns a promise, which a synchronous binding cannot accept.
+    // --- The `statement-sync` target compiles the same body for this context.
+    if (runTimeEvalContext.options?.compileScripts) {
+      try {
+        returnValue = executeCompiledStatementSync(statements, runTimeEvalContext, workingThread);
+        removeArrowWorkingThread(runtimeThread, workingThread);
+        return returnValue;
+      } catch (error) {
+        if (!(error instanceof UnsupportedCompiledScriptNodeError)) {
+          throw error;
+        }
+        // --- Fall through to interpretation. The synchronous binding path has no fallback
+        // --- catch of its own, so without this a construct the emitter refuses inside an
+        // --- arrow body would surface as a raw compiler exception and take the app down.
+        // --- Falling back keeps it running, and under strict compilation the guard below
+        // --- reports it as what it is — interpretation — rather than as a compile error.
+      }
+    }
+
+    // --- Door 4 of 4, and its placement matters. It sat in `executeArrowExpressionSync`
+    // --- before this function was even called, which was correct while every arrow body
+    // --- was interpreted and wrong the moment one could be compiled: it fired for arrows
+    // --- that go on to compile perfectly well. A guard that reports interpretation has to
+    // --- stand where interpretation happens, not where it used to.
+    if (isStrictCompilationEnabled()) {
+      throwStrictCompilationViolation({
+        door: "arrow",
+        sourceText: (expr as any)?.source,
+        sourceRange: sourceRangeFromNode(expr as any),
+      });
     }
 
     // --- Process the statement with a new processor

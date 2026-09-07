@@ -93,12 +93,18 @@ describe("compiled event-async function declarations", () => {
     expect(completed).toEqual(["statement"]);
   });
 
-  it("rejects unsupported function declaration parameter patterns", () => {
-    expect(() =>
-      compileEventAsyncStatementSource(
-        "function getX({ x }) { return x; } result = getX({ x: 1 });",
-        "test:event:function-destructure",
-      ),
-    ).toThrow(UnsupportedCompiledScriptNodeError);
+  it("compiles destructured and rest function declaration parameters", async () => {
+    // --- These used to fall back: a named declaration accepted identifiers only, so
+    // --- `function pick({ a }) {}` was refused while `({ a }) => …` compiled. Same
+    // --- pattern, two answers, depending on how the function was spelled.
+    const artifact = compileEventAsyncStatementSource(
+      "function getX({ x }) { return x; } function count(...a) { return a.length; } " +
+        "result = getX({ x: 1 }) + count(1, 2);",
+      "test:event:function-destructure",
+    );
+    const evalContext = createEvalContext({});
+    await executeCompiledEventAsyncArtifact(artifact, evalContext);
+
+    expect(evalContext.localContext.result).toBe(3);
   });
 });

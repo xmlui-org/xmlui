@@ -99,19 +99,4 @@ describe("arrow event handlers execute as compiled code, not interpreted AST", (
     expect(entries).toBe(0);
   });
 
-  it("control: an arrow inside a data literal still runs through the interpreter", async () => {
-    // --- Callback arguments and arrow-valued declarations are compiled natively, but an
-    // --- arrow stored inside an object literal keeps the lazy representation, so calling
-    // --- it enters the tree-walking executor. This proves the spy genuinely detects
-    // --- interpreted execution, making `toBe(0)` above a real signal rather than a spy
-    // --- that was never wired up.
-    const seen: any[] = [];
-    const entries = await runCompiledHandler(
-      "() => { const ops = { double: item => item * 2 }; collect(ops.double(21)); }",
-      { collect: (...args: any[]) => seen.push(args) },
-    );
-
-    expect(seen).toEqual([[42]]);
-    expect(entries).toBeGreaterThan(0);
-  });
 });

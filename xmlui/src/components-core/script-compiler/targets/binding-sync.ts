@@ -18,6 +18,7 @@ import {
   T_FUNCTION_DECLARATION,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_ARROW_EXPRESSION,
+  T_ARROW_EXPRESSION_STATEMENT,
   T_IDENTIFIER,
   T_IF_STATEMENT,
   T_LET_STATEMENT,
@@ -29,6 +30,7 @@ import {
   T_PREFIX_OP_EXPRESSION,
   T_RETURN_STATEMENT,
   T_SEQUENCE_EXPRESSION,
+  T_DESTRUCTURE,
   T_SPREAD_EXPRESSION,
   T_SWITCH_STATEMENT,
   T_TEMPLATE_LITERAL_EXPRESSION,
@@ -41,12 +43,15 @@ import {
   type ArrayLiteral,
   type AssignmentExpression,
   type ArrowExpression,
+  type ArrowExpressionStatement,
   type BinaryExpression,
   type BlockStatement,
   type BreakStatement,
   type CalculatedMemberAccessExpression,
   type ConditionalExpression,
   type ContinueStatement,
+  type Destructure,
+  type SpreadExpression,
   type ConstStatement,
   type DoWhileStatement,
   type Expression,
@@ -61,6 +66,7 @@ import {
   type MemberAccessExpression,
   type NewExpression,
   type ObjectLiteral,
+  type ObjectLiteralAccessorProp,
   type ObjectLiteralProp,
   type ObjectDestructure,
   type PostfixOpExpression,
@@ -79,7 +85,13 @@ import {
 import { collectVariableDependencies } from "../../script-runner/visitors";
 import { createCompiledScriptArtifact } from "../artifact";
 import { CompiledScriptCodeWriter } from "../code-writer";
-import { throwUnsupportedCompiledScriptNode } from "../errors";
+import {
+  throwUnsupportedCompiledScriptNode,
+  UnsupportedCompiledScriptNodeError,
+} from "../errors";
+import { regExpToJs, serializeAstForJs } from "../literals";
+import { collectDestructureSpecs } from "../destructure";
+import { assertJsIdentifier as assertSharedJsIdentifier } from "../identifiers";
 import { sourceRangeFromNode } from "../source";
 import type {
   CompiledScriptArtifact,
@@ -134,6 +146,69 @@ export function compileBindingSyncExpression(
     dependencies: collectVariableDependencies(expr),
     js: writer.toString(),
     mappings: writer.getMappings(),
+  });
+}
+
+/**
+ * Compiles a statement list for synchronous execution.
+ *
+ * This is the `statement-sync` target, and it is an entry point rather than a second
+ * compiler: `binding-sync` already emits every synchronous statement form — `if`, the
+ * loops, `switch`, `try`, `throw`, `break`/`continue`, declarations, nested functions —
+ * because arrow bodies and IIFEs need them. What was missing was a way in from a
+ * `Statement[]` rather than from an `Expression`.
+ *
+ * It exists because the synchronous statement queue had no compiled target at all, which
+ * made `compileScripts` a net loss for the shapes it serves. Compiling only the leaf
+ * expressions while control flow stayed interpreted measured 1.3x to 1.7x *slower* than
+ * interpreting the lot — small expressions pay the artifact cache lookup without earning
+ * it back — and those shapes are `Table` `rowDisabledPredicate`, `List` `groupBy` and
+ * `Slider` `valueFormat`, evaluated per row per render.
+ */
+export function compileStatementSyncStatements(
+  statements: Statement[],
+  {
+    sourceId,
+    sourceText,
+    sourceUrl,
+    displayName,
+    sources,
+    sourceOrigin,
+  }: CompileBindingSyncExpressionOptions,
+): CompiledScriptArtifact {
+  const writer = new CompiledScriptCodeWriter(sourceId, sourceOrigin);
+  const context = extendCompilerContext(
+    createCompilerContext(sourceId),
+    collectStatementLocalNames(statements),
+  );
+  writer.write("runtime.start(evalContext);");
+  writer.newline();
+  statements.forEach((statement) => emitStatement(writer, statement, context));
+
+  return createCompiledScriptArtifact({
+    target: "statement-sync",
+    sourceId,
+    sourceUrl,
+    displayName,
+    sourceText,
+    sources,
+    sourceRange: statements[0] ? sourceRangeFromNode(statements[0], sourceOrigin) : undefined,
+    astNodeId: statements[0]?.nodeId,
+    dependencies: [],
+    js: writer.toString(),
+    mappings: writer.getMappings(),
+  });
+}
+
+export function compileStatementSyncSource(
+  sourceText: string,
+  sourceId: string,
+  options: Omit<CompileBindingSyncExpressionOptions, "sourceId" | "sourceText"> = {},
+): CompiledScriptArtifact {
+  return compileStatementSyncStatements(new Parser(sourceText).parseStatements(), {
+    ...options,
+    sourceId,
+    sourceText,
   });
 }
 
@@ -425,11 +500,42 @@ function emitObjectLiteral(
       return;
     }
     if (!Array.isArray(prop)) {
-      throwUnsupportedCompiledScriptNode(prop.value, context.sourceId);
+      emitObjectLiteralAccessor(writer, prop, context);
+      return;
     }
     emitObjectLiteralProp(writer, prop, context);
   });
   writer.write("})", expr);
+}
+
+/**
+ * A getter or setter in an object literal.
+ *
+ * The accessor's body is stored as an arrow expression, so it emits the same way an arrow
+ * parameter list and body do — the only new part is the `get`/`set` prefix and the
+ * computed key. Refusing it here meant a hard error in a binding, because that path has
+ * no fallback catch, while the interpreter evaluated it correctly, closure included.
+ */
+function emitObjectLiteralAccessor(
+  writer: CompiledScriptCodeWriter,
+  prop: ObjectLiteralAccessorProp,
+  context: CompilerContext,
+): void {
+  const params = collectNativeArrowArgs(prop.value.args, context);
+  const accessorContext = extendCompilerContext(
+    context,
+    params.flatMap((param) => param.localNames),
+  );
+  writer.write(`${prop.kind} [`);
+  if (prop.key.type === T_IDENTIFIER) {
+    writer.write(JSON.stringify(prop.key.name), prop.key);
+  } else {
+    emitExpression(writer, prop.key, context);
+  }
+  writer.write("](");
+  writer.write(params.map((param) => param.jsParam).join(", "));
+  writer.write(") ");
+  emitArrowBody(writer, prop.value, accessorContext, params);
 }
 
 function emitObjectLiteralProp(
@@ -560,37 +666,156 @@ function emitArrowExpression(
     throwUnsupportedCompiledScriptNode(expr, context.sourceId);
   }
   if (context.arrowMode === "value") {
+    // --- An arrow in value position keeps the `_ARROW_EXPR_` shape. Emitting a plain
+    // --- JavaScript function here is measurably better on size and speed, and was tried:
+    // --- it breaks the framework contracts that depend on recognising an arrow, from
+    // --- state propagation through `lookupSyncCallback` to the rendering placeholders.
+    // --- The body is still compiled when the arrow is invoked — see `createArrowFunction`
+    // --- in `eval-tree-sync`.
+    // --- `serializeAstForJs`, not `JSON.stringify`: the arrow's body is handed to the
+    // --- interpreter as data, and a regular expression inside it used to flatten to `{}`
+    // --- on the way — the same silent miscompile, one level down.
     writer.write("runtime.arrow(");
-    writer.write(JSON.stringify(expr), expr);
+    writer.write(serializeAstForJs(expr), expr);
     writer.write(", evalContext, thread)", expr);
     return;
   }
-  const argNames = expr.args.map((arg) => getArrowArgName(arg, context.sourceId));
-  const arrowContext = extendCompilerContext(context, argNames);
+  emitNativeArrowExpression(writer, expr, context);
+}
+
+/**
+ * Emits an arrow in value position as real JavaScript, rolling the writer back if the
+ * body turns out to contain something the emitter cannot express.
+ *
+ * Native emission is not merely faster here, it is more capable: the lazy path hands the
+ * body to the interpreter, which cannot see JavaScript locals the compiled code declared,
+ * so an arrow closing over one had to be refused outright. A native arrow closes over them
+ * the way JavaScript does.
+ *
+ * Identifier resolution is unchanged. Names the compiler does not know as locals still
+ * emit `runtime.id(name, evalContext, thread)`, and `evalContext` and `thread` are
+ * closed over lexically — which is what the lazy path was capturing explicitly through
+ * `obtainClosures`.
+ */
+function tryEmitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): boolean {
+  const mark = writer.mark();
+  try {
+    emitNativeArrowExpression(writer, expr, context);
+    return true;
+  } catch (error) {
+    if (error instanceof UnsupportedCompiledScriptNodeError) {
+      writer.resetTo(mark);
+      return false;
+    }
+    throw error;
+  }
+}
+
+function emitNativeArrowExpression(
+  writer: CompiledScriptCodeWriter,
+  expr: ArrowExpression,
+  context: CompilerContext,
+): void {
+  const args = collectNativeArrowArgs(expr.args, context);
+  const arrowContext = extendCompilerContext(
+    context,
+    args.flatMap((arg) => arg.localNames),
+  );
 
   writer.write("((");
-  writer.write(argNames.join(", "));
+  writer.write(args.map((arg) => arg.jsParam).join(", "));
   writer.write(") => ");
-  emitArrowBody(writer, expr, arrowContext);
+  emitArrowBody(writer, expr, arrowContext, args);
   writer.write(")", expr);
+}
+
+/**
+ * Arrow parameters, including the shapes that used to be refused here.
+ *
+ * `rows.map(({ id }) => id)` is an ordinary idiom, and it compiled in an event handler
+ * while raising a hard error in a binding — the binding path has no fallback catch, so it
+ * was an app-breaking error rather than a slow path. `event-async` already knew how to do
+ * this; the collectors are now shared (`script-compiler/destructure`) so the two cannot
+ * answer differently again.
+ */
+type NativeArrowArg = {
+  /** What goes in the emitted parameter list. */
+  jsParam: string;
+  /** Names the body may reference. */
+  localNames: string[];
+  /** Statements that unpack the parameter, emitted at the top of the body. */
+  emitBinding: (writer: CompiledScriptCodeWriter) => void;
+};
+
+function collectNativeArrowArgs(
+  args: Expression[],
+  context: CompilerContext,
+): NativeArrowArg[] {
+  return args.map((arg) => {
+    if (arg.type === T_IDENTIFIER) {
+      assertJsIdentifier(arg, context.sourceId);
+      return { jsParam: arg.name, localNames: [arg.name], emitBinding: () => {} };
+    }
+    if (arg.type === T_DESTRUCTURE) {
+      const paramName = context.nextTemp();
+      const specs = collectDestructureSpecs(arg as Destructure, context.sourceId);
+      return {
+        jsParam: paramName,
+        localNames: specs.map(([name]) => name),
+        emitBinding: (writer: CompiledScriptCodeWriter) => {
+          writer.write("const { ");
+          specs.forEach(([name], index) => {
+            if (index > 0) writer.write(", ");
+            writer.write(name);
+          });
+          writer.write(` } = runtime.destructure(${paramName}, ${JSON.stringify(specs)});`);
+        },
+      };
+    }
+    if (arg.type === T_SPREAD_EXPRESSION) {
+      const spread = arg as SpreadExpression;
+      if (spread.expr.type !== T_IDENTIFIER) {
+        throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+      }
+      assertJsIdentifier(spread.expr, context.sourceId);
+      return {
+        jsParam: `...${spread.expr.name}`,
+        localNames: [spread.expr.name],
+        emitBinding: () => {},
+      };
+    }
+    throwUnsupportedCompiledScriptNode(arg, context.sourceId);
+  });
 }
 
 function emitArrowBody(
   writer: CompiledScriptCodeWriter,
   expr: ArrowExpression,
   context: CompilerContext,
+  args: NativeArrowArg[] = [],
 ): void {
+  // --- Destructured parameters unpack first, so the body sees the names it declared.
+  const emitBindings = () => args.forEach((arg) => arg.emitBinding(writer));
   switch (expr.statement.type) {
     case T_EMPTY_STATEMENT:
-      writer.write("{ return undefined; }", expr.statement);
+      writer.write("{ ");
+      emitBindings();
+      writer.write("return undefined; }", expr.statement);
       return;
     case T_EXPRESSION_STATEMENT:
-      writer.write("{ return ");
+      writer.write("{ ");
+      emitBindings();
+      writer.write("return ");
       emitExpression(writer, expr.statement.expr, context);
       writer.write("; }", expr.statement);
       return;
     case T_BLOCK_STATEMENT:
       writer.write("{ runtime.checkTimeout(evalContext); ");
+      emitBindings();
       const blockContext = extendCompilerContext(context, collectBlockLocalNames(expr.statement));
       expr.statement.stmts.forEach((child) => emitStatement(writer, child, blockContext));
       writer.write("}", expr.statement);
@@ -598,6 +823,24 @@ function emitArrowBody(
     default:
       throwUnsupportedCompiledScriptNode(expr.statement, context.sourceId);
   }
+}
+
+/**
+ * A handler written as an arrow — `rowDisabledPredicate="{(row) => row.locked}"` — which
+ * the caller wraps in a synthetic statement so the queue can run it.
+ *
+ * This is the shape most synchronous callbacks actually take, so a `statement-sync` target
+ * that refused it would have compiled almost nothing that matters. The arrow is emitted
+ * natively and invoked with the event arguments, rather than handed to the interpreter.
+ */
+function emitArrowExpressionStatement(
+  writer: CompiledScriptCodeWriter,
+  stmt: ArrowExpressionStatement,
+  context: CompilerContext,
+): void {
+  writer.write("return (", stmt);
+  emitArrowExpression(writer, stmt.expr, withArrowMode(context, "native"));
+  writer.write(")(...(evalContext.eventArgs ?? []));", stmt);
 }
 
 function emitBlockStatement(
@@ -611,12 +854,39 @@ function emitBlockStatement(
   writer.write("}", stmt);
 }
 
+/**
+ * Statements that transfer control, where the completion hook has to be emitted *before*
+ * the statement rather than after it — code after a `return` never runs.
+ */
+const TERMINAL_STATEMENTS = new Set<number>([
+  T_RETURN_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_THROW_STATEMENT,
+  T_ARROW_EXPRESSION_STATEMENT,
+]);
+
 function emitStatement(
   writer: CompiledScriptCodeWriter,
   stmt: Statement,
   context: CompilerContext,
 ): void {
   writer.write("runtime.checkTimeout(evalContext);", stmt);
+  const terminal = TERMINAL_STATEMENTS.has(stmt.type as number);
+  if (terminal) {
+    writer.write("runtime.statementCompleted(evalContext);", stmt);
+  }
+  emitStatementBody(writer, stmt, context);
+  if (!terminal) {
+    writer.write("runtime.statementCompleted(evalContext);", stmt);
+  }
+}
+
+function emitStatementBody(
+  writer: CompiledScriptCodeWriter,
+  stmt: Statement,
+  context: CompilerContext,
+): void {
   switch (stmt.type) {
     case T_EMPTY_STATEMENT:
       writer.write(";", stmt);
@@ -624,6 +894,9 @@ function emitStatement(
     case T_EXPRESSION_STATEMENT:
       emitExpression(writer, stmt.expr, context);
       writer.write(";", stmt);
+      return;
+    case T_ARROW_EXPRESSION_STATEMENT:
+      emitArrowExpressionStatement(writer, stmt as ArrowExpressionStatement, context);
       return;
     case T_RETURN_STATEMENT:
       emitReturnStatement(writer, stmt, context);
@@ -733,14 +1006,19 @@ function emitFunctionDeclaration(
     throwUnsupportedCompiledScriptNode(stmt, context.sourceId);
   }
   assertJsIdentifier(stmt.id, context.sourceId);
-  const argNames = stmt.args.map((arg) => getArrowArgName(arg, context.sourceId));
-  const functionContext = extendCompilerContext(context, [stmt.id.name, ...argNames]);
+  const params = collectNativeArrowArgs(stmt.args, context);
+  const functionContext = extendCompilerContext(context, [
+    stmt.id.name,
+    ...params.flatMap((param) => param.localNames),
+  ]);
   writer.write("function ", stmt);
   writer.write(stmt.id.name, stmt.id);
   writer.write("(");
-  writer.write(argNames.join(", "));
+  writer.write(params.map((param) => param.jsParam).join(", "));
   writer.write(") ");
   writer.write("{ runtime.checkTimeout(evalContext); ");
+  // --- Destructured parameters unpack before the body runs.
+  params.forEach((param) => param.emitBinding(writer));
   const blockContext = extendCompilerContext(functionContext, collectBlockLocalNames(stmt.stmt));
   stmt.stmt.stmts.forEach((child) => emitStatement(writer, child, blockContext));
   writer.write("}", stmt.stmt);
@@ -1034,8 +1312,12 @@ function emitDestructureItemPattern(
 }
 
 function collectBlockLocalNames(stmt: BlockStatement): string[] {
+  return collectStatementLocalNames(stmt.stmts);
+}
+
+function collectStatementLocalNames(statements: Statement[]): string[] {
   const names: string[] = [];
-  stmt.stmts.forEach((child) => {
+  statements.forEach((child) => {
     if (child.type === T_LET_STATEMENT || child.type === T_CONST_STATEMENT) {
       names.push(...collectDeclarationNames(child.decls));
     } else if (child.type === T_FUNCTION_DECLARATION) {
@@ -1161,6 +1443,11 @@ function emitWriteExpression(
 }
 
 function literalToJs(value: any): string {
+  // --- The one non-primitive the parser produces. Without this it went through
+  // --- `JSON.stringify` below and became `{}` — a silently wrong answer, not a fallback.
+  if (value instanceof RegExp) {
+    return regExpToJs(value);
+  }
   if (typeof value === "bigint") {
     return `${value.toString()}n`;
   }

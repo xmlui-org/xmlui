@@ -1,7 +1,17 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 
-export type CompiledScriptTarget = "binding-sync" | "event-async";
+export type CompiledScriptTarget =
+  /** A single binding expression, evaluated synchronously. */
+  | "binding-sync"
+  /**
+   * A statement list evaluated synchronously — sync callbacks, arrow bodies, and request
+   * parameters. Shares `binding-sync`'s emitter: the difference between an expression and
+   * a statement list is the entry point, not the code generated for either.
+   */
+  | "statement-sync"
+  /** A statement list evaluated asynchronously — event handlers and declarations. */
+  | "event-async";
 
 export type CompiledScriptSourceMapMode = boolean | "inline" | "external";
 

@@ -21,6 +21,7 @@ import {
   getIdentifierScope,
   obtainClosures,
 } from "../script-runner/eval-tree-common";
+import { destructureValue } from "./destructure";
 
 const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
@@ -46,6 +47,26 @@ export const bindingSyncRuntime = {
 
   member(obj: any, member: string | number, evalContext: BindingTreeEvaluationContext): any {
     return readSyncMember(obj, member, evalContext);
+  },
+
+  /**
+   * Unpacks a destructured arrow parameter. Shared with the event runtime, which had the
+   * only copy while a destructured parameter was still a hard error in a binding.
+   */
+  destructure(value: any, specs: Array<[string, Array<string | number>]>): Record<string, any> {
+    return destructureValue(value, specs);
+  },
+
+  /**
+   * Signals that a statement finished, mirroring the interpreter's per-statement hook.
+   *
+   * `runCodeSync` uses it to flush accumulated state changes outward and rebuild its
+   * copy-on-write view. Compiled code that skipped it would still produce the right
+   * values, but a handler's writes would surface at a different moment — the kind of
+   * difference that shows up as a render-ordering bug rather than a wrong answer.
+   */
+  statementCompleted(evalContext: BindingTreeEvaluationContext): void {
+    evalContext?.onStatementCompleted?.(evalContext, undefined as any);
   },
 
   arrow(

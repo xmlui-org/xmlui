@@ -17,6 +17,8 @@ import { processStatementQueue } from "./script-runner/process-statement-sync";
 import type { IApiInterceptor } from "./interception/abstractions";
 import { injectTraceparent } from "./audit/correlation";
 import { createOperationAbortError } from "./action/operationCancellation";
+import { createEventEvalOptions } from "./script-runner/eval-options";
+import { executeCompiledStatementSync } from "./script-compiler";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -565,6 +567,9 @@ export default class RestApiProxy {
       //TODO illesg review, this whole processstatement is because of the chunked uploads (headers as function)
       const evalContext: BindingTreeEvaluationContext = {
         eventArgs: [localContext],
+        // --- Same switch every other binding site reads. Without it an arrow-valued
+        // --- request parameter was pinned to the interpreter whatever the app asked for.
+        options: createEventEvalOptions(this.appContext),
       };
       try {
         const arrowStmt = {
@@ -572,6 +577,11 @@ export default class RestApiProxy {
           expr: value,
         } as ArrowExpressionStatement;
 
+        // --- Compiles the whole arrow, control flow included, now that a synchronous
+        // --- statement target exists. Same shape as `runCodeSync`.
+        if (evalContext.options?.compileScripts) {
+          return executeCompiledStatementSync([arrowStmt], evalContext);
+        }
         processStatementQueue([arrowStmt], evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {
