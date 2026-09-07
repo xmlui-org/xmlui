@@ -300,9 +300,30 @@ it is a diagnostic tool rather than a production setting until Phase 3.
 
 ### Phase 3 — Use the list, then close it
 
-3.1 Run strict mode over the docs corpus, all 118 component e2e specs, and the test apps.
-Publish the resulting violation inventory — this is the real "what does not compile"
-answer, replacing the audit's estimates with counts.
+3.1 ~~Run strict mode over the corpus and publish the inventory.~~ **Done.**
+`scripts/strict-compilation-inventory.ts`, wired as `npm run check:strict-compilation`,
+with `--fail` to gate CI.
+
+**Result: 0 violations** across 103 `.xmlui` files, 11 `.xs` files and 321 documentation
+examples. Confirmed independently: the repository contains zero occurrences of all four
+remaining gap constructs.
+
+The instrument was verified before the number was believed — a zero from a broken detector
+is worse than no measurement. Planting a file with an `await` handler and a destructured
+arrow param initially surfaced **one of two**: binding expressions are never compiled at
+build time, so an inventory built from the build's own diagnostics is blind to every `var.`
+initializer and every attribute binding, which is most of an app. The script now compiles
+bindings explicitly, the way the browser would on first evaluation, and catches both.
+
+**This reprioritises Phase 3.** The compiler gaps in 3.2 cost this repository nothing, so
+the remaining work is structural: 3.3 and 3.4. The caveat is that a clean repo is not a
+clean ecosystem — `({ id }) => id` is an ordinary JS idiom, and an external app is far more
+likely to use one than these 103 files were. 3.2 still matters; it just cannot be validated
+here, and it is not what is holding strict mode back.
+
+Not covered by this number: interpretation that nothing refuses — a lazy arrow, or a call
+site that never carried the switch. Those need a running app, and the runtime guard reports
+them instead. That is 3.3 and 3.4's territory, and it is where the violations actually are.
 
 3.2 Close the compiler gaps (§3-6), highest frequency first. Each lands with corpus cases.
 
