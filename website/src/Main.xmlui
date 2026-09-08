@@ -840,6 +840,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Correlate a Table with another view"
+                            to="/docs/howto/correlate-a-table-with-another-view"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Auto-size column widths with star"
                             to="/docs/howto/auto-size-column-widths-with-star"
                         />
