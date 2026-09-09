@@ -2867,6 +2867,40 @@ test.describe("Basic Functionality", () => {
       await page.getByTestId("check-expanded").click();
       await expect.poll(testStateDriver.testState).toEqual("fileA");
     });
+
+    test("renders the detail below the row cells, not beside them", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Table
+          data='{${JSON.stringify(fileData)}}'
+          idKey="path"
+          initiallyExpandedRowIds="{['fileB']}"
+          testId="table"
+        >
+          <Column bindTo="path" header="File" width="100px"/>
+          <Column bindTo="changes" header="Changes" width="90px"/>
+          <property name="rowDetailTemplate">
+            <VStack testId="detail-{$rowId}">
+              <Text value="{$item.diff}" />
+            </VStack>
+          </property>
+        </Table>
+      `);
+
+      const detail = page.getByTestId("detail-fileB");
+      await expect(detail).toBeVisible();
+
+      const detailBox = (await detail.boundingBox())!;
+      const cellBox = (await page.getByText("fileB", { exact: true }).boundingBox())!;
+
+      // --- The detail belongs in a full-width area *beneath* its row. Rendering it as
+      // --- another flex item inside the cell row puts it to the right of the last cell
+      // --- (and off-screen entirely once the columns overflow horizontally).
+      expect(detailBox.y).toBeGreaterThanOrEqual(cellBox.y + cellBox.height);
+      expect(detailBox.x).toBeLessThanOrEqual(cellBox.x);
+    });
   });
 
   test.describe("noDataTemplate property", () => {
