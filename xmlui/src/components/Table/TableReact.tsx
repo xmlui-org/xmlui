@@ -2486,7 +2486,14 @@ export const Table = memo(
                 ...style,
                 boxSizing: "content-box",
                 minHeight: s.rowHeight,
-                minWidth: "max-content",
+                // --- `max-content` keeps a row from shrinking below its cells while the
+                // --- table scrolls horizontally. An expanded row wraps its detail onto a
+                // --- second line (see `.expanded { flex-wrap: wrap }`), and `max-content`
+                // --- on a wrapping flex container is measured as if every item shared one
+                // --- line — which reserves room for the detail beside the cells and so
+                // --- prevents the very wrap it needs. Pin the floor to the cells' own
+                // --- width instead; it is what `max-content` resolves to for those cells.
+                minWidth: isExpanded ? s.totalColumnWidth : "max-content",
                 userSelect: effectiveRowUserSelect,
                 WebkitUserSelect: effectiveRowWebkitUserSelect,
               }}
@@ -2639,8 +2646,12 @@ export const Table = memo(
                   className={styles.rowDetailCell}
                   colSpan={s.visibleColumnCount}
                   style={{
-                    width: s.totalColumnWidth,
-                    flexBasis: s.totalColumnWidth,
+                    // --- A full-width basis is what pushes the detail onto its own line:
+                    // --- it cannot share a line with the cells at any container width.
+                    // --- Sizing it to the column total instead would let a container wide
+                    // --- enough for both fit it beside them.
+                    width: "100%",
+                    flexBasis: "100%",
                     flexShrink: 0,
                   }}
                 >
