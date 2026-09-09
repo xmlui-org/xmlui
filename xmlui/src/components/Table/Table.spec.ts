@@ -7986,3 +7986,53 @@ test.describe("column binding error containment", () => {
     await expect(page.locator("td").nth(1)).toHaveText("5");
   });
 });
+
+// =============================================================================
+// SORTING ROWS WITHOUT AN ID FIELD (#3887)
+// =============================================================================
+
+test.describe("sorting data without an id field", () => {
+  // No `id` anywhere: the natural shape of CSV-sourced rows.
+  const idlessData = [
+    { name: "b-item", quantity: 5 },
+    { name: "a-item", quantity: 3 },
+    { name: "c-item", quantity: 10 },
+  ];
+
+  const nameHeader = (page: any) =>
+    page.getByRole("columnheader").filter({ hasText: "name" }).first();
+
+  const firstNameCell = (page: any) => page.locator("td").nth(0);
+
+  test("click-to-sort reorders rows that carry no id", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(idlessData)}}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await expect(firstNameCell(page)).toHaveText("b-item");
+
+    await nameHeader(page).click();
+    await expect(firstNameCell(page)).toHaveText("a-item");
+
+    await nameHeader(page).click();
+    await expect(firstNameCell(page)).toHaveText("c-item");
+
+    // Third click clears the sort and restores source order.
+    await nameHeader(page).click();
+    await expect(firstNameCell(page)).toHaveText("b-item");
+  });
+
+  test("sortBy seeds the initial order on id-less rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(idlessData)}}' sortBy="name">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    await expect(firstNameCell(page)).toHaveText("a-item");
+  });
+});
