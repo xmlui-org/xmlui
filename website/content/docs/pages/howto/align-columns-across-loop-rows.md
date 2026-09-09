@@ -29,7 +29,8 @@ width computed from the longest path; the second is left widthless and truncates
     { path: 'README.md' },
     { path: 'app/tools/components/Worklist.xmlui' }
   ]}"
-  var.pathPx="{files.reduce((widest, file) => Math.max(widest, file.path.length), 0) * 8 + 24}">
+  var.pathPx="{files.reduce((widest, file) 
+    => Math.max(widest, file.path.length), 0) * 8 + 24}">
   <Table data="{files}">
     <Column bindTo="path" header="Derived width" width="{pathPx}px" />
     <Column bindTo="path" header="No width (1*)" />
@@ -91,7 +92,11 @@ glyph:
   }">
   <VStack gap="$space-1">
     <HStack gap="$space-3">
-      <Text width="{pathChars}ch" variant="mono" fontWeight="$fontWeight-bold" value="File" />
+      <Text 
+        width="{pathChars}ch" 
+        variant="mono" 
+        fontWeight="$fontWeight-bold" value="File" 
+      />
       <Text width="90px" variant="strong" value="Changes" />
     </HStack>
     <Items data="{files}">
