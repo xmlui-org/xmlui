@@ -124,3 +124,5 @@ When the value is a string, it is interpreted as a URL that returns JSON:
    <Text>{$item.name}: {$item.lineStatuses[0].statusSeverityDescription}</Text>
 </List>
 ```
+
+For a URL that doesn't return JSON — a served CSV or plain text file — use an explicit [`DataSource`](/docs/reference/components/DataSource#datatype) with `dataType` set instead of relying on the string-as-URL shorthand. See [Load a served CSV into a table](/docs/howto/load-a-served-csv-into-a-table).

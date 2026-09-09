@@ -734,6 +734,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Load a served CSV into a table"
+                            to="/docs/howto/load-a-served-csv-into-a-table"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Update UI optimistically"
                             to="/docs/howto/update-ui-optimistically"
                         />

@@ -1,0 +1,7 @@
+id,name,price,category,inStock
+1,Widget,9.99,Tools,true
+2,Gadget,19.99,Electronics,true
+3,Doohickey,4.99,Misc,false
+4,Thingamajig,14.99,Tools,true
+5,Whatsit,24.99,Electronics,true
+6,Gizmo,7.99,Misc,true
