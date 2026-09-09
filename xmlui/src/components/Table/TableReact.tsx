@@ -1913,7 +1913,20 @@ export const Table = memo(
       getRowId: useCallback(
         (originalRow: any, index: number) => {
           const idVal = originalRow[idKey];
-          return idVal != null ? String(idVal) : String(index);
+          if (idVal != null) {
+            return String(idVal);
+          }
+          // --- The `index` handed in here is the row's position in the *sorted* array, so
+          // --- using it would hand every row the same id before and after a sort: the key
+          // --- list never changes, React reorders nothing, and the positionally-memoized
+          // --- cells keep painting their pre-sort content -- click-to-sort looks dead on
+          // --- id-less data (#3887). `order` is the row's 1-based position in the source
+          // --- data (stamped in `dataWithOrder`), so it is stable under sorting and paging,
+          // --- and it matches the index-based fallback `getItemRowId`/`getSourceIdSet`
+          // --- already use over `safeData`.
+          const sourceIndex =
+            typeof originalRow?.order === "number" ? originalRow.order - 1 : index;
+          return String(sourceIndex);
         },
         [idKey],
       ),
