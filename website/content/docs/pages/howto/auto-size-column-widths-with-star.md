@@ -79,7 +79,7 @@ Click between the container-width presets below to watch the columns reflow. The
 
 **`minWidth` and `maxWidth` constrain star columns**: Add `minWidth="120px"` to prevent a star column from shrinking below a readable size, or `maxWidth="400px"` to cap its growth. The Project column in the example uses `minWidth="120px"`; at the 600px preset it stops contracting and the Description column absorbs the rest of the squeeze.
 
-**Omitting `width` defaults to auto-sizing**: A column without an explicit `width` auto-sizes to its content. This can cause inconsistent widths — prefer star sizing when you want predictable proportional distribution.
+**Omitting `width` defaults to `1*`, not to content sizing**: A column without an explicit `width` behaves exactly as if you had written `width="*"` — it takes one share of the remaining space. It does not measure its cells, so a column of long values truncates while a column of short ones sits half empty. `Column` has no content-derived sizing mode; when a column must fit its longest value, compute the width from your data and pass it as pixels or `rem`.
 
 ---
 

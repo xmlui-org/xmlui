@@ -868,6 +868,11 @@
                     <NavGroup label="Lists, Trees & Iteration">
                         <NavLink
                             icon="article"
+                            label="Align columns across loop rows"
+                            to="/docs/howto/align-columns-across-loop-rows"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Build a grouped list with headers"
                             to="/docs/howto/group-items-in-list-by-a-property"
                         />
