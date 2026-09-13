@@ -9,6 +9,7 @@ import { defaultProps } from "./Tabs.defaults";
 import { createMetadata, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 
 const COMP = "Tabs";
 
@@ -156,8 +157,23 @@ export const tabsComponentRenderer = wrapComponent(COMP, Tabs, TabsMd, {
   events: [],
   customRender(
     _props,
-    { extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler },
+    {
+      extractValue,
+      node,
+      renderChild,
+      classes,
+      registerComponentApi,
+      lookupEventHandler,
+      layoutContext,
+    },
   ) {
+    // --- Tab panels are not stack items: they are flex items of the tabs container and
+    // --- are expected to take up the space the tab list leaves for them. We establish an
+    // --- unoriented layout boundary here so the generic "stack items never shrink" rule
+    // --- does not pin a panel to its intrinsic content size. Without this, fill-height
+    // --- children (such as a Splitter with `height="100%"`) overflow the tabs box and get
+    // --- clipped unless the TabItem carries an explicit height.
+    const tabsLayoutContext = createChildLayoutContext(layoutContext, { type: "Stack" });
     return (
       <Tabs
         id={node?.uid}
@@ -185,7 +201,7 @@ export const tabsComponentRenderer = wrapComponent(COMP, Tabs, TabsMd, {
         onContextMenu={lookupEventHandler("contextMenu")}
         registerComponentApi={registerComponentApi}
       >
-        {renderChild(node.children)}
+        {renderChild(node.children, tabsLayoutContext)}
       </Tabs>
     );
   },

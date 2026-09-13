@@ -165,6 +165,19 @@ $paddingTop-TabItem: createThemeVar("paddingTop-TabItem");
     flex-grow: 1;
     outline: none;
     padding-top: var(--paddingTop-TabItem, #{$paddingTop-TabItem});
+
+    // --- The tab panel is a flex item of the tabs container. Without resetting the
+    // --- automatic minimum size, the panel's intrinsic content height (or width, in
+    // --- vertical orientation) keeps it from shrinking into the space the container
+    // --- offers. That would break fill-height children (such as a Splitter using
+    // --- `height: 100%`), which would otherwise need an explicit height on TabItem.
+    &[data-orientation="horizontal"] {
+      min-height: 0;
+    }
+
+    &[data-orientation="vertical"] {
+      min-width: 0;
+    }
   }
 
   // Accordion view styles

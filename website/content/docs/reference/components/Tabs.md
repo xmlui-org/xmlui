@@ -32,6 +32,33 @@ The component accepts only [TabItem](/docs/reference/components/TabItem) compone
 </App>
 ```
 
+## Fill-height Tab Content [#fill-height-tab-content]
+
+The active tab panel takes up the space the tab headers leave within `Tabs`. When `Tabs` itself has a bounded height, children that fill their parent (such as a `Splitter` with `height="100%"`) work without setting any height on `TabItem`:
+
+```xmlui-pg copy display name="Example: fill-height tab content" height="320px"
+<App scrollWholePage="false">
+  <Tabs height="100%">
+    <TabItem label="Comparison">
+      <VSplitter height="100%" initialPrimarySize="40%">
+        <VStack backgroundColor="$color-primary-100" height="100%">
+          <Text>Top panel</Text>
+        </VStack>
+        <VStack backgroundColor="$color-secondary-100" height="100%">
+          <Text>Bottom panel</Text>
+        </VStack>
+      </VSplitter>
+    </TabItem>
+    <TabItem label="Details">
+      <Text>Details content</Text>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
+> [!INFO]
+> The height chain still has to be bounded above `Tabs`. If `Tabs` has no bounded height (for example, inside a page that scrolls as a whole), its panel takes its natural height and a `height="100%"` child has nothing to fill.
+
 ## Dynamic Tabs [#dynamic-tabs]
 
 You can create `TabItem` children dynamically:

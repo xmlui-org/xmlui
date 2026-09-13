@@ -71,6 +71,21 @@ A notes app shows a list on the left and the selected note on the right. The use
 
 **`scrollWholePage="false"` + explicit `height` are required**: `Splitter` fills its available height. Without `scrollWholePage="false"` the content area has natural height and `height="100%"` on the `Splitter` resolves to zero. Set `height="100%"` on the `Splitter` after opting out of whole-page scroll.
 
+**Nesting inside another container**: The rule is the same wherever the `Splitter` sits — the container it fills must be height-bounded. Inside a `Tabs` panel, bound the `Tabs`; no height is needed on `TabItem`:
+
+```xmlui
+<App scrollWholePage="false">
+  <Tabs height="100%">
+    <TabItem label="Comparison">
+      <VSplitter height="100%" initialPrimarySize="40%">
+        <VStack height="100%">…</VStack>
+        <VStack height="100%">…</VStack>
+      </VSplitter>
+    </TabItem>
+  </Tabs>
+</App>
+```
+
 **`floating` drag handle**: When `floating="true"`, the drag handle overlays both panels without shrinking them — ideal for a collapsible side panel that should open and close over the main content:
 
 ```xmlui
