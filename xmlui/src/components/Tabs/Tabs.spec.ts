@@ -2088,3 +2088,69 @@ test.describe("gap prop and paddingTop-TabItem theme variable", () => {
     await expect(panel).toHaveCSS("padding-top", "32px");
   });
 });
+
+// =============================================================================
+// FILL-HEIGHT CONTENT
+// =============================================================================
+
+test.describe("fill-height tab content", () => {
+  // --- Regression test for #3900: a Splitter (or any fill-height child) inside a
+  // --- TabItem collapsed because the tab panel could not shrink to the space the
+  // --- tabs container offered. It only worked with an explicit TabItem height.
+  const TALL_CONTENT = Array.from({ length: 30 }, (_, i) => `<Text>Line ${i}</Text>`).join("");
+
+  test("keeps a fill-height child inside the tabs box without an explicit TabItem height", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tabs height="*" testId="tabs">
+          <TabItem label="Comparison">
+            <VSplitter height="100%" initialPrimarySize="40%" testId="splitter">
+              <VStack height="100%" testId="primary">${TALL_CONTENT}</VStack>
+              <VStack height="100%" testId="secondary">${TALL_CONTENT}</VStack>
+            </VSplitter>
+          </TabItem>
+        </Tabs>
+      </VStack>
+    `);
+
+    const tabsBounds = await getBounds(page.getByTestId("tabs"));
+    const splitterBounds = await getBounds(page.getByTestId("splitter"));
+
+    // --- The splitter must fit into the tabs box instead of overflowing it
+    expect(splitterBounds.height).toBeGreaterThan(0);
+    expect(splitterBounds.height).toBeLessThanOrEqual(tabsBounds.height);
+
+    // --- Both panels must be visible within the tabs box
+    const primaryBounds = await getBounds(page.getByTestId("primary"));
+    const secondaryBounds = await getBounds(page.getByTestId("secondary"));
+    expect(primaryBounds.height).toBeGreaterThan(0);
+    expect(secondaryBounds.height).toBeGreaterThan(0);
+    expect(secondaryBounds.bottom).toBeLessThanOrEqual(tabsBounds.bottom + 1);
+  });
+
+  test("matches the layout obtained with an explicit TabItem height", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack height="400px">
+        <Tabs height="*" testId="tabs">
+          <TabItem label="Comparison" height="100%">
+            <VSplitter height="100%" initialPrimarySize="40%" testId="splitter">
+              <VStack height="100%" testId="primary">${TALL_CONTENT}</VStack>
+              <VStack height="100%" testId="secondary">${TALL_CONTENT}</VStack>
+            </VSplitter>
+          </TabItem>
+        </Tabs>
+      </VStack>
+    `);
+
+    const tabsBounds = await getBounds(page.getByTestId("tabs"));
+    const splitterBounds = await getBounds(page.getByTestId("splitter"));
+    expect(splitterBounds.height).toBeGreaterThan(0);
+    expect(splitterBounds.height).toBeLessThanOrEqual(tabsBounds.height);
+  });
+});
