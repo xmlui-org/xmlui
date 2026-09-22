@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>virtua RO isolation fixture</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: system-ui, sans-serif; }
+      /* Match the xmlui List control test: a fixed-height scroller whose rows
+         size to their content (~27px for a single line of text). */
+      #scroller { height: 300px; overflow-y: auto; }
+      .row { padding: 4px 8px; font-size: 14px; line-height: 19px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.jsx"></script>
+  </body>
+</html>
