@@ -3215,3 +3215,120 @@ test.describe("idKey uniqueness diagnostic", () => {
     expect(warnings).toEqual([]);
   });
 });
+
+// =============================================================================
+// RESIZEOBSERVER FEEDBACK (xmlui-org/xmlui#3830)
+// =============================================================================
+
+test.describe("ResizeObserver feedback", () => {
+  // #3830 reports "ResizeObserver loop completed with undelivered notifications"
+  // firing on a route hosting a virtualized transcript List — a same-frame layout
+  // feedback loop in row measurement. Every burst captured downstream is the
+  // "remount sweep" shape: 53-134 rows observed for the FIRST time in one burst,
+  // i.e. new DOM nodes, not re-measures of known ones.
+  //
+  // This reproduces the pattern that produces those bursts — wholesale data
+  // replacement with fresh item identities — to localise whether the remount
+  // originates in xmlui's List or in the consumer's data pattern.
+  //
+  // The browser reports this as an ERROR EVENT, not console.error, so it is
+  // collected via page.on("pageerror"). A test watching only console output
+  // reports a false clean.
+  test("wholesale data replacement does not trigger RO feedback", async ({
+    initTestBed,
+    page,
+    createListDriver,
+  }) => {
+    // EXPECTED FAILURE until #3830 is fixed. The assertion states the behaviour
+    // we want; test.fail() records that we do not have it yet, so CI stays green
+    // on a known defect and turns red the moment it is fixed — at which point
+    // this annotation comes off and the test becomes the regression gate.
+    test.fail();
+
+    // Collected in the page, not via page.on("pageerror"): under the dev server
+    // Vite's client installs its own window error handler and swallows this one,
+    // so Playwright's pageerror hook never sees it and the test reports a false
+    // clean. addInitScript runs before any app or Vite client code, and the
+    // capture-phase listener sees the event first.
+    await page.addInitScript(() => {
+      (window as any).__roErrors = [];
+      window.addEventListener(
+        "error",
+        (e: any) => {
+          const msg = String(e?.message ?? e);
+          if (/ResizeObserver loop/i.test(msg)) (window as any).__roErrors.push(msg);
+        },
+        true,
+      );
+    });
+
+    // Rows carry a generation in their id, so each replacement yields item
+    // identities the list has never seen — the shape that forces remounts.
+    await initTestBed(`
+      <Fragment var.gen="{0}"
+        var.items="{Array.from({length: 300}, (_, i) => ({ id: 'g0-row-' + i, name: 'Item ' + i }))}">
+        <Button testId="replace" label="Replace"
+          onClick="gen = gen + 1; items = Array.from({length: 300}, (_, i) => ({ id: 'g' + gen + '-row-' + i, name: 'Item ' + i }))" />
+        <List testId="testList" height="300px" data="{items}">
+          <Text>{$item.name}</Text>
+        </List>
+      </Fragment>
+    `);
+
+    const driver = await createListDriver("testList");
+    await expect(driver.component).toBeVisible();
+    await expect(page.getByText("Item 0", { exact: true })).toBeVisible();
+
+    // Several replacements, each a full identity change across 300 rows.
+    for (let i = 0; i < 5; i++) {
+      await page.getByTestId("replace").click();
+      await page.waitForTimeout(150);
+    }
+    await expect(page.getByText("Item 0", { exact: true })).toBeVisible();
+
+    const roErrors = await page.evaluate(() => (window as any).__roErrors ?? []);
+    expect(roErrors).toEqual([]);
+  });
+
+  // Control for the test above: the same 300-row List, mounted and scrolled but
+  // never replaced. Separates "wholesale identity replacement triggers it" from
+  // "any large virtualized List triggers it", which are different defects with
+  // different fixes.
+  test("control: mount and scroll without replacement", async ({
+    initTestBed,
+    page,
+    createListDriver,
+  }) => {
+    // EXPECTED FAILURE until #3830 is fixed — see the note above.
+    test.fail();
+
+    await page.addInitScript(() => {
+      (window as any).__roErrors = [];
+      window.addEventListener(
+        "error",
+        (e: any) => {
+          const msg = String(e?.message ?? e);
+          if (/ResizeObserver loop/i.test(msg)) (window as any).__roErrors.push(msg);
+        },
+        true,
+      );
+    });
+
+    await initTestBed(`
+      <List testId="testList" height="300px"
+        data="{Array.from({length: 300}, (_, i) => ({ id: 'row-' + i, name: 'Item ' + i }))}">
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver("testList");
+    await expect(driver.component).toBeVisible();
+
+    for (let i = 0; i < 5; i++) {
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(150);
+    }
+
+    const roErrors = await page.evaluate(() => (window as any).__roErrors ?? []);
+    expect(roErrors).toEqual([]);
+  });
+});
