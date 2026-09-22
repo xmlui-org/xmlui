@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { test } from "./fixtures";
+import { test, projectNames } from "./fixtures";
 
 test("No unknown component errors", async ({ page }) => {
   await page.gotoWithMode("/");
@@ -74,4 +74,34 @@ test("client-side nav works after direct URL entry", async ({ page }) => {
   await page.getByRole("link", { name: "Home" }).click();
   await expect(page.getByRole("heading", { name: "Home" })).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
+});
+
+// The standalone test app loads the UMD bundle into an already-parsed document
+// (see test-app/index.js), so every test above covers the late-load path that
+// xmlui-org/xmlui#3786 reported as a silent blank page. What those tests do not
+// cover is the run-once guard that makes the fix safe for apps which adopted the
+// re-dispatch workaround — that needs a second event.
+test("boots once when DOMContentLoaded is re-dispatched after a late load", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== projectNames.STANDALONE,
+    "guards the standalone bundle's own boot path",
+  );
+
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error") errors.push(msg.text());
+  });
+
+  await page.gotoWithMode("/");
+  await expect(page.getByRole("heading", { name: "Home Page", exact: true })).toHaveCount(1);
+
+  // The workaround #3786 forced on downstream apps: re-dispatch the event the
+  // late-loaded bundle missed. With the readyState fallback in place the app has
+  // already booted, so this must be a no-op rather than a second boot.
+  await page.evaluate(() => document.dispatchEvent(new Event("DOMContentLoaded")));
+
+  await expect(page.getByRole("heading", { name: "Home Page", exact: true })).toHaveCount(1);
+  expect(errors).toHaveLength(0);
 });
