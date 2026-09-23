@@ -28,14 +28,37 @@ registerCSSInjection({ injectCSS, removeCSS });
 
 const Xmlui = new StandaloneExtensionManager();
 
-document.addEventListener("DOMContentLoaded", function () {
+let booted = false;
+
+// Boots the app (or activates islands) exactly once.
+//
+// The guard matters as much as the readyState fallback below: re-dispatching
+// DOMContentLoaded is the natural workaround for a bundle that loads late, so
+// apps that already adopted it would otherwise boot twice once the fallback
+// lands.
+function boot() {
+  if (booted) {
+    return;
+  }
+  booted = true;
+
   const islandTargets = document.querySelectorAll("[data-xmlui-src]");
   if (islandTargets.length > 0) {
     activateIslands(islandTargets);
   } else {
     startApp(undefined, undefined, Xmlui);
   }
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  // The document already finished parsing, so DOMContentLoaded can never fire
+  // again — waiting for it would leave the page silently blank. Any load that
+  // is not parser-blocking lands here: dynamic script insertion, defer, or a
+  // module with a top-level await.
+  boot();
+}
 
 window.React = React;
 // @ts-ignore

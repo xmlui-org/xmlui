@@ -6,9 +6,10 @@ if (import.meta.env) {
 } else {
   // Standalone mode: load UMD bundles then kick off the app.
   // With top-level await, Chrome fires DOMContentLoaded before this module
-  // completes, so the UMD's DOMContentLoaded startup listener will have
-  // already missed its event by the time the scripts are appended.
-  // We therefore re-dispatch DOMContentLoaded ourselves after loading.
+  // completes, so the bundle is appended to an already-parsed document. The
+  // standalone entry point detects that via document.readyState and boots
+  // itself — this module deliberately does nothing to help, so these tests
+  // cover the late-load path (xmlui-org/xmlui#3786).
   const load = (src) =>
     new Promise((resolve, reject) => {
       const s = document.createElement("script");
@@ -19,6 +20,4 @@ if (import.meta.env) {
     });
   await load("/public/js/xmlui-standalone.umd.js");
   await load("/public/js/xmlui-test-extension.js");
-  // Retrigger DOMContentLoaded so the UMD's startup handler fires.
-  document.dispatchEvent(new Event("DOMContentLoaded"));
 }
