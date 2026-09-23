@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import classnames from "classnames";
 import { RenderPropSticky } from "react-sticky-el";
 import styles from "./StickyBox.module.scss";
@@ -21,10 +21,15 @@ type Props = React.HTMLAttributes<HTMLElement> & {
 };
 
 export const StickyBox = memo(function StickyBox({ children, style, to = defaultProps.to, className, classes, ...rest }: Props) {
-  const sentinelRef = useRef(null);
+  // Callback ref, not useRef: `useScrollParent` resolves the scroll parent in an
+  // effect keyed on the node it is handed, and a ref mutation does not re-render.
+  // Seeded from `sentinelRef.current` this hook saw `null` on first render and
+  // never re-ran, so StickyBox resolved its scroll parent only when something
+  // else happened to re-render it. Same pattern as `wrapper` just below.
+  const [sentinel, setSentinel] = useState<HTMLElement | null>(null);
   const [wrapper, setWrapper] = useState(null);
   const [stuck, setStuck] = useState(false);
-  const scrollParent = useScrollParent(sentinelRef.current);
+  const scrollParent = useScrollParent(sentinel);
   const realBackground = useRealBackground(scrollParent);
   useEffect(() => {
     if (wrapper) {
@@ -63,7 +68,7 @@ export const StickyBox = memo(function StickyBox({ children, style, to = default
       )}
       <div
         style={HIDDEN_STYLE}
-        ref={sentinelRef}
+        ref={setSentinel}
         className={to === "top" ? styles.sentinel : ""}
       />
     </>
