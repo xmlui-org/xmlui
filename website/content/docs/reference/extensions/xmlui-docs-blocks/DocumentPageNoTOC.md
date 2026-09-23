@@ -20,10 +20,6 @@ This component supports the following behaviors:
 
 Markdown content string.
 
-### `url`
-
-URL to load markdown from.
-
 ### `width`
 
 Optional width.

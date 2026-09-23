@@ -2,6 +2,21 @@ import { expect, test } from "xmlui/testing";
 
 const EXT = { extensionIds: "xmlui-docs-blocks" };
 
+test.describe("Document pages", () => {
+  test("DocumentPageNoTOC does not let an obsolete url hide slot content", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<DocumentPageNoTOC url="/unused-document.md">
+        <Text>Document supplied through the slot</Text>
+      </DocumentPageNoTOC>`,
+      EXT,
+    );
+    await expect(page.getByText("Document supplied through the slot", { exact: true })).toBeVisible();
+  });
+});
+
 // =============================================================================
 // TBD
 // =============================================================================

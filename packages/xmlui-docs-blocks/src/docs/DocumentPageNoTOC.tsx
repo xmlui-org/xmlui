@@ -6,7 +6,6 @@ export const DocumentPageNoTOCMd: ComponentMetadata = createMetadata({
   description: "Document page without table of contents.",
   props: {
     content: { description: "Markdown content string." },
-    url: { description: "URL to load markdown from." },
     width: { description: "Optional width." },
   },
 });

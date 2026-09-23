@@ -32,10 +32,6 @@ Max TOC heading level.
 
 Show a page-level Inspector button and enable tracing for markdown playgrounds on this page.
 
-### `url`
-
-URL to load markdown from.
-
 ## Events
 
 This component does not have any events.
