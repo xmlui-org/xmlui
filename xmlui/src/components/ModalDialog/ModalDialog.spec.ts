@@ -5,6 +5,49 @@ import { expect, test } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Open/Close", () => {
+  test("defers child DataSource requests until opened (#2673)", async ({ page, initTestBed }) => {
+    let modalRequests = 0;
+    await page.route("**/api/modal-2673-data", async (route) => {
+      modalRequests++;
+      await route.fulfill({ json: { message: "Dialog data loaded" } });
+    });
+    await page.route("**/api/modal-2673-ready", async (route) => {
+      await route.fulfill({ json: { message: "Page data loaded" } });
+    });
+
+    await initTestBed(`
+      <Fragment>
+        <ModalDialog id="modal" title="Deferred data">
+          <DataSource id="dialogData" url="/api/modal-2673-data" />
+          <Text testId="dialog-data">{dialogData.value.message}</Text>
+        </ModalDialog>
+        <DataSource id="pageData" url="/api/modal-2673-ready" />
+        <Text testId="page-data">{pageData.value.message}</Text>
+        <Button onClick="modal.open()">Open dialog</Button>
+      </Fragment>
+    `);
+
+    // Let an independent DataSource finish while the dialog is still closed,
+    // rather than sampling the counter immediately after mounting the app.
+    await expect(page.getByTestId("page-data")).toHaveText("Page data loaded");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    const openButton = page.getByRole("button", { name: "Open dialog", exact: true });
+    await expect(openButton).toBeVisible();
+    const requestsWhileClosed = modalRequests;
+
+    await openButton.click();
+    await expect(page.getByRole("dialog", { name: "Deferred data" })).toBeVisible();
+    await expect(page.getByTestId("dialog-data")).toHaveText("Dialog data loaded");
+    expect(modalRequests).toBeGreaterThan(0);
+
+    // #2673: children can be absent from the DOM while their DataSource still
+    // fetches. Count requests, not just DOM nodes, to catch that side effect.
+    // Only the final assertion is an expected failure: setup/opening failures
+    // must stay unexpected. Remove this annotation when the defect is fixed.
+    test.fail(true, "#2673: a closed ModalDialog still runs its child DataSource");
+    expect(requestsWhileClosed).toBe(0);
+  });
+
   test("Imperative open - without params", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
