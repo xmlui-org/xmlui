@@ -4,9 +4,9 @@
     maxWidth="$maxWidth-content-DocumentPageNoTOC">
     <Breadcrumbs defaultItems="{$props.defaultItems}" />
     <Markdown
-      when="{$props.content || $props.url}"
+      when="{$props.content}"
       content="{$props.content}" />
-    <Slot when="{!$props.content && !$props.url}" />
+    <Slot when="{!$props.content}" />
     <DocumentLinks />
   </Stack>
 </Component>
