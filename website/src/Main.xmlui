@@ -873,6 +873,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Align values in collapsible section summaries"
+                            to="/docs/howto/align-values-in-collapsible-summaries"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Build a grouped list with headers"
                             to="/docs/howto/group-items-in-list-by-a-property"
                         />
