@@ -8,7 +8,7 @@
 - **Events that carry the playhead**: `play`, `pause`, `seeked` and `ended` each report `currentTime`, so the path a listener took through the media can be rebuilt from events alone
 - **Methods**: `play()`, `pause()`, `seek(seconds)` and `getCurrentTime()`
 
-```xmlui-pg copy display name="Example: a video"
+```xmlui-pg copy display name="Example: a video" height="480px"
 <App>
   <MediaPlayer src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" />
 </App>
@@ -31,7 +31,7 @@
 
 If you rebuild a listener's path from events, note one browser behavior: when the user starts dragging the scrubber while the media is playing, the browser pauses first, and that `pause` event reports the position being dragged *to*, not the last position played. To measure how long a stretch played, use the `play` position plus the elapsed wall-clock time, rather than that `pause` event's `currentTime`.
 
-```xmlui-pg copy display name="Example: custom controls" height="420px"
+```xmlui-pg copy display name="Example: custom controls" height="540px"
 <App var.position="{0}">
   <MediaPlayer
     id="player"
@@ -122,7 +122,7 @@ The playback speed, where `1` is normal speed.
 
 The URL of an image to show before video playback starts. Applies only when `kind` is `video`; ignored for audio.
 
-```xmlui-pg copy display name="Example: poster"
+```xmlui-pg copy display name="Example: poster" height="600px"
 <App>
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
@@ -166,7 +166,7 @@ Fires when the media's duration (and, for video, its dimensions) are known. The 
 
 - `event`: An object with `duration` (seconds) and, for video, `videoWidth` and `videoHeight`.
 
-```xmlui-pg copy display name="Example: loadedMetadata"
+```xmlui-pg copy display name="Example: loadedMetadata" height="520px"
 <App var.info="">
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
@@ -192,7 +192,7 @@ Fires when playback starts or resumes. The handler receives `{ currentTime }`, t
 
 - `event`: An object with the playhead position (`currentTime`, seconds).
 
-```xmlui-pg copy display name="Example: log plays, pauses and seeks" height="440px"
+```xmlui-pg copy display name="Example: log plays, pauses and seeks" height="640px"
 <App var.log="{[]}">
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"

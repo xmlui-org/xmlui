@@ -6,7 +6,7 @@
 - **Events that carry the playhead**: `play`, `pause`, `seeked` and `ended` each report `currentTime`, so the path a listener took through the media can be rebuilt from events alone
 - **Methods**: `play()`, `pause()`, `seek(seconds)` and `getCurrentTime()`
 
-```xmlui-pg copy display name="Example: a video"
+```xmlui-pg copy display name="Example: a video" height="480px"
 <App>
   <MediaPlayer src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" />
 </App>
@@ -29,7 +29,7 @@
 
 If you rebuild a listener's path from events, note one browser behavior: when the user starts dragging the scrubber while the media is playing, the browser pauses first, and that `pause` event reports the position being dragged *to*, not the last position played. To measure how long a stretch played, use the `play` position plus the elapsed wall-clock time, rather than that `pause` event's `currentTime`.
 
-```xmlui-pg copy display name="Example: custom controls" height="420px"
+```xmlui-pg copy display name="Example: custom controls" height="540px"
 <App var.position="{0}">
   <MediaPlayer
     id="player"
@@ -62,7 +62,7 @@ Formats are not checked or filtered. Whether a given file plays depends on the b
 
 %-PROP-START poster
 
-```xmlui-pg copy display name="Example: poster"
+```xmlui-pg copy display name="Example: poster" height="600px"
 <App>
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
@@ -74,7 +74,7 @@ Formats are not checked or filtered. Whether a given file plays depends on the b
 
 %-EVENT-START play
 
-```xmlui-pg copy display name="Example: log plays, pauses and seeks" height="440px"
+```xmlui-pg copy display name="Example: log plays, pauses and seeks" height="640px"
 <App var.log="{[]}">
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
@@ -92,7 +92,7 @@ Formats are not checked or filtered. Whether a given file plays depends on the b
 
 %-EVENT-START loadedMetadata
 
-```xmlui-pg copy display name="Example: loadedMetadata"
+```xmlui-pg copy display name="Example: loadedMetadata" height="520px"
 <App var.info="">
   <MediaPlayer
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
