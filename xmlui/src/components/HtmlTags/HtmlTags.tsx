@@ -247,7 +247,7 @@ export const htmlAsideTagRenderer = wrapComponent("aside", createHtmlTag("aside"
 
 export const HtmlAudioMd = createMetadata({
   status: "deprecated",
-  description: "This component renders an HTML `audio` tag.",
+  description: "This component renders an HTML `audio` tag. Use `MediaPlayer` with `kind=\"audio\"` instead.",
   isHtmlTag: true,
   props: {
     autoPlay: {
@@ -2089,7 +2089,7 @@ export const htmlVarTagRenderer = wrapComponent("var", createHtmlTextTag("var"),
 
 export const HtmlVideoMd = createMetadata({
   status: "deprecated",
-  description: "This component renders an HTML `video` tag.",
+  description: "This component renders an HTML `video` tag. Use `MediaPlayer` instead.",
   isHtmlTag: true,
   props: {
     autoPlay: {

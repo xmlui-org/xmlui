@@ -1,0 +1,33 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "MediaPlayer";
+
+@layer components {
+  .mediaPlayer {
+    display: block;
+    max-width: 100%;
+  }
+
+  // Video scales to its container; the frame keeps its aspect ratio
+  .video {
+    width: 100%;
+    height: auto;
+  }
+
+  // Audio fills its container too, so both kinds size the same way
+  .audio {
+    width: 100%;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

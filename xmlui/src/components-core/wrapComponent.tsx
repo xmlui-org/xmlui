@@ -511,6 +511,14 @@ function mergeWithMetadata(
  * gotFocus/lostFocus → focus:change. Returns undefined for
  * events with no matching trace kind (no event emitted).
  */
+function isPlainTraceData(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Object.getPrototypeOf(value) === Object.prototype
+  );
+}
+
 function eventNameToTraceKind(xmluiName: string): string | undefined {
   switch (xmluiName) {
     case "didChange":
@@ -892,6 +900,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             eventName: eventType,
             ariaName: ariaLabel,
             nativeEvent: event,
+            // A plain `traceData` payload becomes the entry's `data`: exporters drop
+            // `nativeEvent` (it is usually a live DOM/library event), so this is
+            // the channel for values that must survive an Inspector export. It is
+            // copied because safeClone marks a second reference to one object as circular.
+            ...(isPlainTraceData(event?.traceData) && { data: { ...event.traceData } }),
             ...(typeof offsetX === "number" && { offsetX, offsetY }),
             ownerFileId,
             ownerSource,
@@ -1602,6 +1615,11 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             eventName: eventType,
             ariaName: ariaLabel,
             nativeEvent: event,
+            // A plain `traceData` payload becomes the entry's `data`: exporters drop
+            // `nativeEvent` (it is usually a live DOM/library event), so this is
+            // the channel for values that must survive an Inspector export. It is
+            // copied because safeClone marks a second reference to one object as circular.
+            ...(isPlainTraceData(event?.traceData) && { data: { ...event.traceData } }),
             ...(typeof offsetX === "number" && { offsetX, offsetY }),
             ownerFileId,
             ownerSource,
