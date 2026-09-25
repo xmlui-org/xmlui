@@ -1420,6 +1420,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Show a multi-line or formatted tooltip"
+                            to="/docs/howto/show-a-multi-line-or-formatted-tooltip"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Embed an external site in an IFrame"
                             to="/docs/howto/embed-an-external-site-in-an-iframe"
                         />
