@@ -372,6 +372,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/PointerLayer",
+          "label": "PointerLayer",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/ProgressBar",
           "label": "ProgressBar",
           "icon": "component"

@@ -33,6 +33,7 @@ import { I18nMd } from "./I18n/I18n";
 import { LocaleMd } from "./Locale/Locale";
 import { IFrameMd } from "./IFrame/IFrame";
 import { MediaPlayerMd } from "./MediaPlayer/MediaPlayer";
+import { PointerLayerMd } from "./PointerLayer/PointerLayer";
 import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
 import { LinkMd } from "./Link/Link";
@@ -367,6 +368,7 @@ Object.assign(metadataRegistry, {
   Locale: LocaleMd,
   IFrame: IFrameMd,
   MediaPlayer: MediaPlayerMd,
+  PointerLayer: PointerLayerMd,
   Image: ImageMd,
   IncludeMarkup: IncludeMarkupMd,
   Items: ItemsMd,

@@ -1440,6 +1440,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Annotate a video with pointer ink"
+                            to="/docs/howto/annotate-a-video-with-pointer-ink"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Lazy-load images for performance"
                             to="/docs/howto/lazy-load-images-for-performance"
                         />
