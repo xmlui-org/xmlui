@@ -52,6 +52,7 @@ import { noResultComponentRenderer } from "./NoResult/NoResult";
 import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
 import { iconComponentRenderer } from "./Icon/Icon";
 import { iframeComponentRenderer } from "./IFrame/IFrame";
+import { mediaPlayerComponentRenderer } from "./MediaPlayer/MediaPlayer";
 import { itemsComponentRenderer } from "./Items/Items";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
 import { retryPolicyComponentRenderer } from "./RetryPolicy/RetryPolicy";
@@ -603,6 +604,9 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_IFrame !== "false") {
       this.registerCoreComponent(iframeComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_MediaPlayer !== "false") {
+      this.registerCoreComponent(mediaPlayerComponentRenderer);
     }
 
     if (import.meta.env.VITE_USED_COMPONENTS_Markdown !== "false") {

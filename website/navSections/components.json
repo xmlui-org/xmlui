@@ -287,6 +287,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/MediaPlayer",
+          "label": "MediaPlayer",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/MenuItem",
           "label": "MenuItem",
           "icon": "component"

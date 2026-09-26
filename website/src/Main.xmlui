@@ -1435,6 +1435,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Log a media player's playhead path"
+                            to="/docs/howto/log-a-media-players-playhead-path"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Lazy-load images for performance"
                             to="/docs/howto/lazy-load-images-for-performance"
                         />
