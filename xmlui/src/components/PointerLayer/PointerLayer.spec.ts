@@ -380,7 +380,83 @@ test.describe("Shape tools", () => {
     expect(e.y1).toBeCloseTo(0.25, 2);
     expect(e.x2).toBe(e.x1);
     expect(e.y2).toBe(e.y1);
+    expect(e.pointerShape).toBe("ring");
     await expect(page.getByTestId("layer").locator("svg circle")).toHaveCount(1);
+  });
+
+  // Tip and overall length of the arrow polygon, in layer pixels
+  const arrowGeometry = (page: any) =>
+    page
+      .getByTestId("layer")
+      .locator("svg g[data-ink-kind='pointer'] polygon")
+      .evaluate((el: SVGPolygonElement) => {
+        const pts = el
+          .getAttribute("points")!
+          .trim()
+          .split(/\s+/)
+          .map((p) => p.split(",").map(Number));
+        // Tail midpoint: between outline points 3 and 4 (u = -L, v = +/-0.12L)
+        const tail = [(pts[3][0] + pts[4][0]) / 2, (pts[3][1] + pts[4][1]) / 2];
+        return {
+          count: pts.length,
+          tip: pts[0],
+          length: Math.hypot(pts[0][0] - tail[0], pts[0][1] - tail[1]),
+          // up-right means the tail is down-left of the tip
+          tailDx: tail[0] - pts[0][0],
+          tailDy: tail[1] - pts[0][1],
+        };
+      });
+
+  async function clickArmed(page: any, x: number, y: number) {
+    const b = await box(page);
+    await withKeys(page, ["Meta"], async () => {
+      await page.mouse.move(b.x + x, b.y + y);
+      await page.mouse.down();
+      await page.mouse.up();
+    });
+  }
+
+  test("pointerShape='arrow' drops an arrow tipped on the point", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(layer(`tool="pointer" pointerShape="arrow"`));
+    await clickArmed(page, 100, 75);
+    await expect.poll(async () => (await testStateDriver.testState())?.pointerShape).toBe(
+      "arrow",
+    );
+    const e = await testStateDriver.testState();
+    expect(e.x1).toBeCloseTo(0.25, 2);
+    expect(e.y1).toBeCloseTo(0.25, 2);
+    await expect(page.getByTestId("layer").locator("svg circle")).toHaveCount(0);
+    const g = await arrowGeometry(page);
+    expect(g.count).toBe(7);
+    expect(g.tip[0]).toBeCloseTo(100, 0);
+    expect(g.tip[1]).toBeCloseTo(75, 0);
+    // 6% of the 400px layer width
+    expect(g.length).toBeCloseTo(24, 1);
+    // The shaft trails down and to the left of the tip, at 45 degrees
+    expect(g.tailDx).toBeLessThan(0);
+    expect(g.tailDy).toBeGreaterThan(0);
+    expect(Math.abs(g.tailDx)).toBeCloseTo(Math.abs(g.tailDy), 3);
+  });
+
+  test("the arrow's length follows the content width", async ({ initTestBed, page }) => {
+    // Square picture in a 400x300 layer: the picture is 300px wide
+    await initTestBed(layer(`tool="pointer" pointerShape="arrow" contentAspect="1"`));
+    await clickArmed(page, 200, 150);
+    await expect(
+      page.getByTestId("layer").locator("svg g[data-ink-kind='pointer'] polygon"),
+    ).toHaveCount(1);
+    const g = await arrowGeometry(page);
+    expect(g.length).toBeCloseTo(18, 1);
+  });
+
+  test("only the pointer tool reports pointerShape", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(layer(`tool="rect" pointerShape="arrow"`));
+    await withKeys(page, ["Meta"], () => drag(page, 40, 30, 200, 150));
+    await expect.poll(async () => (await testStateDriver.testState())?.tool).toBe("rect");
+    expect("pointerShape" in (await testStateDriver.testState())).toBe(false);
   });
 
   test("shapes fade like freehand ink", async ({ initTestBed, page }) => {
@@ -452,5 +528,23 @@ test.describe("Tracing", () => {
     expect(shape.kind).toBe("native:pointer.shapeEnd");
     expect(shape.data.tool).toBe("arrow");
     expect(shape.data.x2).toBeCloseTo(0.5, 2);
+  });
+
+  test("the pointer mark's shape is traced", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<PointerLayer id="markTrace" testId="layer" width="400px" height="300px"
+         drawModifier="none" tool="pointer" pointerShape="arrow">
+         <Stack height="300px" />
+       </PointerLayer>`,
+      { xmluiConfig: { xsVerbose: true } },
+    );
+    const b = await box(page);
+    await page.mouse.move(b.x + 100, b.y + 100);
+    await page.mouse.down();
+    await page.mouse.up();
+    await expect.poll(async () => (await pointerTraces(page, "markTrace")).length).toBe(1);
+    const [mark] = await pointerTraces(page, "markTrace");
+    expect(mark.data.tool).toBe("pointer");
+    expect(mark.data.pointerShape).toBe("arrow");
   });
 });

@@ -104,6 +104,21 @@ Turns the layer on. When `false`, it reports nothing, draws nothing, and every c
 
 How long a finished stroke takes to fade out, in milliseconds. A stroke stays fully visible while it is being drawn. `0` keeps strokes until `clear()` is called.
 
+### `pointerShape` [#pointershape]
+
+> [!DEF]  default: **"ring"**
+
+The mark the `pointer` tool drops: a `ring` around the pressed point, or an `arrow` whose tip is on the point, pointing up and to the right. The arrow is filled in `color` with a thin white outline, and its length is 6% of the content width (the picture's width when `contentAspect` is set).
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `ring` | A ring around the pressed point **(default)** |
+| `arrow` | A block arrow whose tip is on the pressed point |
+
+The `arrow` mark is a block arrow sized relative to the content, so it keeps the same proportion to a video at any player size. When the `pointer` tool fires `shapeEnd`, the event includes `pointerShape`, so a recording can redraw the same mark.
+
 ### `sampleMs` [#samplems]
 
 > [!DEF]  default: **50**
@@ -149,8 +164,8 @@ Available values:
 
 Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geometry instead: press where the shape starts, drag, and release. Hold Shift to make a square, a circle, or a line at a multiple of 45°. Hold Alt to draw a rectangle or ellipse outward from its center.
 
-```xmlui-pg copy display name="Example: drawing tools" height="480px"
-<App var.tool="arrow" var.last="">
+```xmlui-pg copy display name="Example: drawing tools" height="540px"
+<App var.tool="arrow" var.mark="ring" var.last="">
   <HStack>
     <Button label="freehand" variant="{tool === 'freehand' ? 'solid' : 'outlined'}" onClick="tool = 'freehand'" />
     <Button label="line" variant="{tool === 'line' ? 'solid' : 'outlined'}" onClick="tool = 'line'" />
@@ -159,8 +174,14 @@ Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geome
     <Button label="ellipse" variant="{tool === 'ellipse' ? 'solid' : 'outlined'}" onClick="tool = 'ellipse'" />
     <Button label="pointer" variant="{tool === 'pointer' ? 'solid' : 'outlined'}" onClick="tool = 'pointer'" />
   </HStack>
+  <HStack when="{tool === 'pointer'}">
+    <Text>Pointer mark:</Text>
+    <Button label="ring" variant="{mark === 'ring' ? 'solid' : 'outlined'}" onClick="mark = 'ring'" />
+    <Button label="arrow" variant="{mark === 'arrow' ? 'solid' : 'outlined'}" onClick="mark = 'arrow'" />
+  </HStack>
   <PointerLayer
     tool="{tool}"
+    pointerShape="{mark}"
     onShapeEnd="(e) => last = e.tool + ' from (' + e.x1.toFixed(2) + ', ' + e.y1.toFixed(2)
       + ') to (' + e.x2.toFixed(2) + ', ' + e.y2.toFixed(2) + ')'">
     <Card height="240px">
@@ -196,9 +217,9 @@ Fires as the pointer moves over the layer, at most once per `sampleMs`. The hand
 
 ### `shapeEnd` [#shapeend]
 
-Fires when a shape tool finishes (every tool except `freehand`). The handler receives `{ tool, x1, y1, x2, y2, time, duration, color, width }`. For `line` and `arrow`, (x1, y1) is the start and (x2, y2) the end. For `rect` and `ellipse`, they are the top-left and bottom-right corners. For `pointer`, both are the pressed point. `time` is the wall-clock time the drag began, and `duration` how long it lasted, in milliseconds.
+Fires when a shape tool finishes (every tool except `freehand`). The handler receives `{ tool, x1, y1, x2, y2, time, duration, color, width }`. For `line` and `arrow`, (x1, y1) is the start and (x2, y2) the end. For `rect` and `ellipse`, they are the top-left and bottom-right corners. For `pointer`, both are the pressed point, and the event also carries `pointerShape`. `time` is the wall-clock time the drag began, and `duration` how long it lasted, in milliseconds.
 
-**Signature**: `shapeEnd(event: { tool: string; x1: number; y1: number; x2: number; y2: number; time: number; duration: number; color: string; width: number }): void`
+**Signature**: `shapeEnd(event: { tool: string; x1: number; y1: number; x2: number; y2: number; time: number; duration: number; color: string; width: number; pointerShape?: string }): void`
 
 - `event`: The shape's tool, corners, timing, color and width.
 

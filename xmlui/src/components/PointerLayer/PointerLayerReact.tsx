@@ -21,6 +21,7 @@ type DrawModifier = "meta" | "alt" | "ctrl" | "shift" | "none";
 type ShowPointer = "held" | "always" | "none";
 type Tool = "freehand" | "line" | "arrow" | "rect" | "ellipse" | "pointer";
 type ShapeTool = Exclude<Tool, "freehand">;
+type PointerShape = "ring" | "arrow";
 type StrokePoint = { x: number; y: number; t: number };
 
 type ShapeEvent = {
@@ -33,12 +34,15 @@ type ShapeEvent = {
   duration: number;
   color: string;
   width: number;
+  // Only for the pointer tool
+  pointerShape?: PointerShape;
 };
 
 type Props = {
   enabled?: boolean;
   drawModifier?: DrawModifier;
   tool?: Tool;
+  pointerShape?: PointerShape;
   color?: string;
   strokeWidth?: number;
   fadeMs?: number;
@@ -89,6 +93,7 @@ type Rendered =
       color: string;
       width: number;
       ended: boolean;
+      pointerShape: PointerShape;
     };
 
 type Current =
@@ -110,6 +115,7 @@ type Current =
       anchor: [number, number]; // layer pixels
       a: [number, number]; // layer pixels, after constraints
       b: [number, number];
+      pointerShape: PointerShape;
     };
 
 const MODIFIER_FLAG: Record<
@@ -123,6 +129,33 @@ const MODIFIER_FLAG: Record<
 };
 
 const POINTER_RING_RADIUS = 14;
+
+// The pointer arrow's overall length, as a fraction of the content width
+// (Bram Studio's render uses the same measure, so live ink and takes match)
+const POINTER_ARROW_LENGTH = 0.06;
+
+// A block arrow with its tip at (x, y), pointing up and to the right at 45
+// degrees. Outline in axis coordinates (u along the arrow, tip at 0; v across
+// it), in multiples of the length L.
+const ARROW_OUTLINE: Array<[number, number]> = [
+  [0, 0],
+  [-0.45, 0.32],
+  [-0.45, 0.12],
+  [-1, 0.12],
+  [-1, -0.12],
+  [-0.45, -0.12],
+  [-0.45, -0.32],
+];
+
+function arrowPoints(x: number, y: number, length: number): string {
+  const d = [Math.SQRT1_2, -Math.SQRT1_2]; // along the arrow: up-right on screen
+  const n = [Math.SQRT1_2, Math.SQRT1_2]; // across it
+  return ARROW_OUTLINE.map(([u, v]) => {
+    const px = x + (u * d[0] + v * n[0]) * length;
+    const py = y + (u * d[1] + v * n[1]) * length;
+    return `${round(px)},${round(py)}`;
+  }).join(" ");
+}
 
 // perfect-freehand outline polygon -> SVG path data (quadratic smoothing,
 // as in the library's README)
@@ -217,10 +250,12 @@ function ShapeSvg({
   item,
   width,
   height,
+  arrowLength,
 }: {
   item: Extract<Rendered, { kind: ShapeTool }>;
   width: number;
   height: number;
+  arrowLength: number;
 }) {
   const x1 = item.a[0] * width;
   const y1 = item.a[1] * height;
@@ -262,7 +297,17 @@ function ShapeSvg({
         />
       );
     case "pointer":
-      return <circle cx={x1} cy={y1} r={POINTER_RING_RADIUS} {...stroke} />;
+      return item.pointerShape === "arrow" ? (
+        <polygon
+          points={arrowPoints(x1, y1, arrowLength)}
+          fill={item.color}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+          strokeLinejoin="round"
+        />
+      ) : (
+        <circle cx={x1} cy={y1} r={POINTER_RING_RADIUS} {...stroke} />
+      );
   }
 }
 
@@ -272,6 +317,7 @@ export const PointerLayer = memo(
       enabled = true,
       drawModifier = "meta",
       tool = "freehand",
+      pointerShape = "ring",
       color = "#ff3b30",
       strokeWidth = 4,
       fadeMs = 1500,
@@ -444,6 +490,7 @@ export const PointerLayer = memo(
         anchor: at,
         a: at,
         b: at,
+        pointerShape,
       };
       setItems((all) => [
         ...all,
@@ -455,6 +502,7 @@ export const PointerLayer = memo(
           color,
           width: strokeWidth,
           ended: false,
+          pointerShape,
         },
       ]);
     };
@@ -521,6 +569,7 @@ export const PointerLayer = memo(
         duration: Math.round(performance.now() - cur.startPerf),
         color,
         width: strokeWidth,
+        ...(cur.kind === "pointer" && { pointerShape: cur.pointerShape }),
       };
       trace("shapeEnd", payload);
       onShapeEnd?.(payload);
@@ -532,6 +581,8 @@ export const PointerLayer = memo(
     // The overlay takes input only while armed, or while a stroke or shape
     // begun armed is still in progress (releasing the key doesn't end it)
     const overlayActive = enabled && (armed || drawing);
+    const arrowLength =
+      contentRect(size.width, size.height, contentAspect).width * POINTER_ARROW_LENGTH;
 
     return (
       <div
@@ -556,7 +607,12 @@ export const PointerLayer = memo(
               {s.kind === "freehand" ? (
                 <path d={freehandPath(s, size.width, size.height)} fill={s.color} />
               ) : (
-                <ShapeSvg item={s} width={size.width} height={size.height} />
+                <ShapeSvg
+                  item={s}
+                  width={size.width}
+                  height={size.height}
+                  arrowLength={arrowLength}
+                />
               )}
             </g>
           ))}

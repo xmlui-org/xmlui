@@ -12093,6 +12093,22 @@ export default {
         "isStrictEnum": true,
         "defaultValue": "freehand"
       },
+      "pointerShape": {
+        "description": "The mark the `pointer` tool drops: a `ring` around the pressed point, or an `arrow` whose tip is on the point, pointing up and to the right. The arrow is filled in `color` with a thin white outline, and its length is 6% of the content width (the picture's width when `contentAspect` is set).",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "ring",
+            "description": "A ring around the pressed point"
+          },
+          {
+            "value": "arrow",
+            "description": "A block arrow whose tip is on the pressed point"
+          }
+        ],
+        "isStrictEnum": true,
+        "defaultValue": "ring"
+      },
       "color": {
         "description": "The color of the ink and the pointer indicator.",
         "valueType": "string",
@@ -12161,8 +12177,8 @@ export default {
         }
       },
       "shapeEnd": {
-        "description": "Fires when a shape tool finishes (every tool except `freehand`). The handler receives `{ tool, x1, y1, x2, y2, time, duration, color, width }`. For `line` and `arrow`, (x1, y1) is the start and (x2, y2) the end. For `rect` and `ellipse`, they are the top-left and bottom-right corners. For `pointer`, both are the pressed point. `time` is the wall-clock time the drag began, and `duration` how long it lasted, in milliseconds.",
-        "signature": "shapeEnd(event: { tool: string; x1: number; y1: number; x2: number; y2: number; time: number; duration: number; color: string; width: number }): void",
+        "description": "Fires when a shape tool finishes (every tool except `freehand`). The handler receives `{ tool, x1, y1, x2, y2, time, duration, color, width }`. For `line` and `arrow`, (x1, y1) is the start and (x2, y2) the end. For `rect` and `ellipse`, they are the top-left and bottom-right corners. For `pointer`, both are the pressed point, and the event also carries `pointerShape`. `time` is the wall-clock time the drag began, and `duration` how long it lasted, in milliseconds.",
+        "signature": "shapeEnd(event: { tool: string; x1: number; y1: number; x2: number; y2: number; time: number; duration: number; color: string; width: number; pointerShape?: string }): void",
         "parameters": {
           "event": "The shape's tool, corners, timing, color and width."
         }

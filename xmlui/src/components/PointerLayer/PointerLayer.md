@@ -26,8 +26,8 @@ Hold the Command key (on macOS; the Windows key elsewhere) and drag over the car
 
 Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geometry instead: press where the shape starts, drag, and release. Hold Shift to make a square, a circle, or a line at a multiple of 45°. Hold Alt to draw a rectangle or ellipse outward from its center.
 
-```xmlui-pg copy display name="Example: drawing tools" height="480px"
-<App var.tool="arrow" var.last="">
+```xmlui-pg copy display name="Example: drawing tools" height="540px"
+<App var.tool="arrow" var.mark="ring" var.last="">
   <HStack>
     <Button label="freehand" variant="{tool === 'freehand' ? 'solid' : 'outlined'}" onClick="tool = 'freehand'" />
     <Button label="line" variant="{tool === 'line' ? 'solid' : 'outlined'}" onClick="tool = 'line'" />
@@ -36,8 +36,14 @@ Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geome
     <Button label="ellipse" variant="{tool === 'ellipse' ? 'solid' : 'outlined'}" onClick="tool = 'ellipse'" />
     <Button label="pointer" variant="{tool === 'pointer' ? 'solid' : 'outlined'}" onClick="tool = 'pointer'" />
   </HStack>
+  <HStack when="{tool === 'pointer'}">
+    <Text>Pointer mark:</Text>
+    <Button label="ring" variant="{mark === 'ring' ? 'solid' : 'outlined'}" onClick="mark = 'ring'" />
+    <Button label="arrow" variant="{mark === 'arrow' ? 'solid' : 'outlined'}" onClick="mark = 'arrow'" />
+  </HStack>
   <PointerLayer
     tool="{tool}"
+    pointerShape="{mark}"
     onShapeEnd="(e) => last = e.tool + ' from (' + e.x1.toFixed(2) + ', ' + e.y1.toFixed(2)
       + ') to (' + e.x2.toFixed(2) + ', ' + e.y2.toFixed(2) + ')'">
     <Card height="240px">
@@ -47,6 +53,12 @@ Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geome
   <Text value="Last shape: {last}" />
 </App>
 ```
+
+%-PROP-END
+
+%-PROP-START pointerShape
+
+The `arrow` mark is a block arrow sized relative to the content, so it keeps the same proportion to a video at any player size. When the `pointer` tool fires `shapeEnd`, the event includes `pointerShape`, so a recording can redraw the same mark.
 
 %-PROP-END
 
