@@ -54,6 +54,7 @@ interface ImportMetaEnv {
   readonly VITE_USED_COMPONENTS_Icon: string;
   readonly VITE_USED_COMPONENTS_IFrame: string;
   readonly VITE_USED_COMPONENTS_MediaPlayer: string;
+  readonly VITE_USED_COMPONENTS_PointerLayer: string;
   readonly VITE_USED_COMPONENTS_Image: string;
   readonly VITE_USED_COMPONENTS_Items: string;
   readonly VITE_USED_COMPONENTS_Link: string;
