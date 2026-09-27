@@ -53,6 +53,7 @@ import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUp
 import { iconComponentRenderer } from "./Icon/Icon";
 import { iframeComponentRenderer } from "./IFrame/IFrame";
 import { mediaPlayerComponentRenderer } from "./MediaPlayer/MediaPlayer";
+import { pointerLayerComponentRenderer } from "./PointerLayer/PointerLayer";
 import { itemsComponentRenderer } from "./Items/Items";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
 import { retryPolicyComponentRenderer } from "./RetryPolicy/RetryPolicy";
@@ -607,6 +608,9 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_MediaPlayer !== "false") {
       this.registerCoreComponent(mediaPlayerComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_PointerLayer !== "false") {
+      this.registerCoreComponent(pointerLayerComponentRenderer);
     }
 
     if (import.meta.env.VITE_USED_COMPONENTS_Markdown !== "false") {
