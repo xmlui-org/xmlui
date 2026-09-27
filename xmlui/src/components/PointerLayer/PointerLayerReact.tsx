@@ -24,6 +24,19 @@ type ShapeTool = Exclude<Tool, "freehand">;
 type PointerShape = "ring" | "arrow";
 type StrokePoint = { x: number; y: number; t: number };
 
+// Content placed over the children at picture coordinates: (x, y) is the
+// top-left corner; width and height are fractions of the picture
+export type Anchor = {
+  id: string | number;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  [key: string]: unknown;
+};
+
+type AnchorDragEvent = { id: string | number; x: number; y: number; dx: number; dy: number };
+
 type ShapeEvent = {
   tool: ShapeTool;
   x1: number;
@@ -69,6 +82,12 @@ type Props = {
     width: number;
   }) => void;
   onShapeEnd?: (event: ShapeEvent) => void;
+  anchors?: Anchor[];
+  anchorRenderer?: (item: Anchor) => ReactNode;
+  anchorDrag?: boolean;
+  onAnchorDragStart?: (event: AnchorDragEvent) => void;
+  onAnchorDragMove?: (event: AnchorDragEvent) => void;
+  onAnchorDragEnd?: (event: AnchorDragEvent) => void;
   // Passed by wrapComponent only when verbose tracing is on (captureNativeEvents)
   onNativeEvent?: (event: Record<string, unknown>) => void;
 };
@@ -333,6 +352,12 @@ export const PointerLayer = memo(
       onStrokeStart,
       onStrokeEnd,
       onShapeEnd,
+      anchors,
+      anchorRenderer,
+      anchorDrag = false,
+      onAnchorDragStart,
+      onAnchorDragMove,
+      onAnchorDragEnd,
       onNativeEvent,
       ...rest
     }: Props,
@@ -578,6 +603,115 @@ export const PointerLayer = memo(
     // Finished ink fades, then is removed
     const removeItem = (id: number) => setItems((all) => all.filter((s) => s.id !== id));
 
+    // --- Anchors: dragging reports positions; the host moves the anchor ---
+    const anchorDragRef = useRef<{
+      id: string | number;
+      pointerId: number;
+      startClient: [number, number];
+      start: { x: number; y: number };
+      lastSent: number;
+      last: AnchorDragEvent;
+    } | null>(null);
+
+    const anchorDragEvent = (clientX: number, clientY: number): AnchorDragEvent | null => {
+      const drag = anchorDragRef.current;
+      const el = layerRef.current;
+      if (!drag || !el) return null;
+      const pic = contentRect(el.clientWidth, el.clientHeight, contentAspect);
+      if (pic.width <= 0 || pic.height <= 0) return null;
+      const dx = (clientX - drag.startClient[0]) / pic.width;
+      const dy = (clientY - drag.startClient[1]) / pic.height;
+      return {
+        id: drag.id,
+        x: round(drag.start.x + dx),
+        y: round(drag.start.y + dy),
+        dx: round(dx),
+        dy: round(dy),
+      };
+    };
+
+    // Ending a drag must not depend on the dragged anchor's element surviving:
+    // if the host drops or replaces that anchor mid-drag, its element unmounts
+    // and its own pointerup never runs. So a drag also ends on a window-level
+    // release, and when its anchor leaves `anchors`. Ending is idempotent.
+    const finishAnchorDragRef = useRef<(at?: [number, number]) => void>(() => {});
+    const windowReleaseRef = useRef<((e: PointerEvent) => void) | null>(null);
+
+    finishAnchorDragRef.current = (at?: [number, number]) => {
+      const drag = anchorDragRef.current;
+      if (!drag) return;
+      const ev = (at && anchorDragEvent(at[0], at[1])) || drag.last;
+      anchorDragRef.current = null;
+      if (windowReleaseRef.current) {
+        window.removeEventListener("pointerup", windowReleaseRef.current);
+        window.removeEventListener("pointercancel", windowReleaseRef.current);
+        windowReleaseRef.current = null;
+      }
+      trace("anchorDragEnd", ev);
+      onAnchorDragEnd?.(ev);
+    };
+
+    // The dragged anchor left `anchors`: end the drag where it last was
+    useEffect(() => {
+      const drag = anchorDragRef.current;
+      if (drag && !(anchors ?? []).some((a) => a.id === drag.id)) {
+        finishAnchorDragRef.current();
+      }
+    }, [anchors]);
+
+    // Don't leave a window listener behind if the layer unmounts mid-drag
+    useEffect(
+      () => () => {
+        if (windowReleaseRef.current) {
+          window.removeEventListener("pointerup", windowReleaseRef.current);
+          window.removeEventListener("pointercancel", windowReleaseRef.current);
+        }
+      },
+      [],
+    );
+
+    const handleAnchorDown = (anchor: Anchor, e: React.PointerEvent<HTMLDivElement>) => {
+      if (!enabled || !anchorDrag || e.button !== 0 || anchorDragRef.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+      const first: AnchorDragEvent = { id: anchor.id, x: anchor.x, y: anchor.y, dx: 0, dy: 0 };
+      anchorDragRef.current = {
+        id: anchor.id,
+        pointerId: e.pointerId,
+        startClient: [e.clientX, e.clientY],
+        start: { x: anchor.x, y: anchor.y },
+        lastSent: performance.now(),
+        last: first,
+      };
+      const pointerId = e.pointerId;
+      const onWindowRelease = (we: PointerEvent) => {
+        if (we.pointerId === pointerId) finishAnchorDragRef.current([we.clientX, we.clientY]);
+      };
+      windowReleaseRef.current = onWindowRelease;
+      window.addEventListener("pointerup", onWindowRelease);
+      window.addEventListener("pointercancel", onWindowRelease);
+      onAnchorDragStart?.(first);
+    };
+
+    const handleAnchorMove = (e: React.PointerEvent<HTMLDivElement>) => {
+      const drag = anchorDragRef.current;
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const now = performance.now();
+      if (now - drag.lastSent < sampleMs) return;
+      const ev = anchorDragEvent(e.clientX, e.clientY);
+      if (!ev) return;
+      drag.lastSent = now;
+      drag.last = ev;
+      onAnchorDragMove?.(ev);
+    };
+
+    const handleAnchorEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+      const drag = anchorDragRef.current;
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      finishAnchorDragRef.current([e.clientX, e.clientY]);
+    };
+
     // The overlay takes input only while armed, or while a stroke or shape
     // begun armed is still in progress (releasing the key doesn't end it)
     const overlayActive = enabled && (armed || drawing);
@@ -594,6 +728,34 @@ export const PointerLayer = memo(
         onPointerLeave={handleLeave}
       >
         {children}
+        {anchors && anchors.length > 0 && (
+          <div className={styles.anchors} data-part-id="anchors">
+            {anchors.map((anchor) => {
+              const pic = contentRect(size.width, size.height, contentAspect);
+              const draggable = enabled && anchorDrag && !overlayActive;
+              return (
+                <div
+                  key={anchor.id}
+                  data-anchor-id={anchor.id}
+                  className={classnames(styles.anchor, { [styles.draggable]: draggable })}
+                  style={{
+                    left: pic.x + anchor.x * pic.width,
+                    top: pic.y + anchor.y * pic.height,
+                    width: anchor.width != null ? anchor.width * pic.width : undefined,
+                    height: anchor.height != null ? anchor.height * pic.height : undefined,
+                  }}
+                  onPointerDown={draggable ? (e) => handleAnchorDown(anchor, e) : undefined}
+                  onPointerMove={handleAnchorMove}
+                  onPointerUp={handleAnchorEnd}
+                  onPointerCancel={handleAnchorEnd}
+                  onLostPointerCapture={handleAnchorEnd}
+                >
+                  {anchorRenderer?.(anchor)}
+                </div>
+              );
+            })}
+          </div>
+        )}
         <svg className={styles.ink} aria-hidden="true">
           {items.map((s) => (
             <g

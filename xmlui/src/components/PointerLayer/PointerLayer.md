@@ -79,6 +79,40 @@ With `drawModifier="none"`, every drag draws. That suits a dedicated drawing sur
 
 %-PROP-END
 
+%-PROP-START anchors
+
+Anchors place XMLUI content over the children at picture coordinates, such as captions or callouts over a video. Each anchor's `x` and `y` is its top-left corner, and `width` and `height` are fractions of the picture, so anchored content keeps its place and proportion as the player resizes or letterboxes.
+
+Anchored content ignores the pointer by default, so the video's controls keep working through it. With `anchorDrag`, the user can drag an anchor: the layer reports the new position, and the app moves the anchor by updating `anchors`. Update it from both `anchorDragMove` and `anchorDragEnd`: moves are throttled by `sampleMs`, and the end event carries the final position. Derive draggable anchors from state that stays present during async work: if the dragged anchor disappears from `anchors` mid-drag (for example, because it comes from a `DataSource` that's empty while a new request loads), the drag ends at its last position. Hold Command and drag to draw over the callouts; the ink shows on top.
+
+```xmlui-pg copy display name="Example: callouts over a video" height="600px"
+<App
+  var.aspect="{undefined}"
+  var.callouts="{[
+    { id: 1, x: 0.05, y: 0.08, width: 0.34, text: 'Drag me' },
+    { id: 2, x: 0.55, y: 0.62, width: 0.38, text: 'Callouts stay on the picture' }
+  ]}">
+  <PointerLayer
+    contentAspect="{aspect}"
+    anchors="{callouts}"
+    anchorDrag="true"
+    onAnchorDragMove="(e) => callouts = callouts.map((c) => c.id === e.id ? { ...c, x: e.x, y: e.y } : c)"
+    onAnchorDragEnd="(e) => callouts = callouts.map((c) => c.id === e.id ? { ...c, x: e.x, y: e.y } : c)">
+    <MediaPlayer
+      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+      onLoadedMetadata="(e) => aspect = e.videoWidth / e.videoHeight" />
+    <property name="anchorTemplate">
+      <Card padding="$space-2" backgroundColor="rgba(255, 255, 255, 0.9)">
+        <Text variant="strong" value="{$item.text}" />
+      </Card>
+    </property>
+  </PointerLayer>
+  <Text value="{callouts.map((c) => c.id + ': (' + c.x.toFixed(2) + ', ' + c.y.toFixed(2) + ')').join('   ')}" />
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START contentAspect
 
 Over a video, the picture often doesn't fill the element: black bars pad it to the element's shape. Set `contentAspect` to the video's `videoWidth / videoHeight`, which `MediaPlayer`'s `loadedMetadata` event supplies, and coordinates are measured against the picture itself. A point on the picture's left edge is `x = 0`, even with bars beside it.

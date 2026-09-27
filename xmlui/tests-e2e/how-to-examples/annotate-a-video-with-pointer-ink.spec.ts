@@ -122,3 +122,40 @@ test.describe("Jump back to an annotation", { tag: "@website" }, () => {
     await expect(rows.nth(2)).toHaveClass(/_selected_/);
   });
 });
+
+test.describe("Pin callouts to the picture", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(
+    markdown,
+    "pin-callouts-to-the-picture",
+  );
+
+  test("Command-click adds a callout; dragging it updates its position", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await waitForExample(page);
+    const v = await page.locator("video").boundingBox();
+    if (!v) throw new Error("video has no box");
+
+    // Command-click a quarter of the way in: the pointer tool's shapeEnd adds a callout
+    await page.keyboard.down("Meta");
+    await page.mouse.click(v.x + v.width * 0.25, v.y + v.height * 0.25);
+    await page.keyboard.up("Meta");
+    const rows = page.getByRole("row");
+    await expect(rows).toHaveCount(2);
+    await expect(rows.nth(1)).toContainText("Callout 1");
+    await expect(rows.nth(1)).toContainText("0.250");
+
+    // Drag the callout 10% of the width to the right
+    const callout = page.locator("[data-anchor-id='1']");
+    await expect(callout).toBeAttached();
+    const c = await callout.boundingBox();
+    await page.mouse.move(c!.x + 10, c!.y + 10);
+    await page.mouse.down();
+    await page.mouse.move(c!.x + 10 + v.width * 0.05, c!.y + 10);
+    await page.mouse.move(c!.x + 10 + v.width * 0.1, c!.y + 10);
+    await page.mouse.up();
+    await expect(rows.nth(1)).toContainText("0.350");
+  });
+});
