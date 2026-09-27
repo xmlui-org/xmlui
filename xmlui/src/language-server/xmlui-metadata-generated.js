@@ -12149,6 +12149,19 @@ export default {
         "isStrictEnum": true,
         "defaultValue": "held"
       },
+      "anchors": {
+        "description": "Content to place over the children at picture coordinates, as an array of `{ id, x, y, width?, height? }`. `x` and `y` are the top-left corner and `width` and `height` are fractions of the picture, all in the same 0-1 space as the events (letterbox-aware with `contentAspect`). Each anchor renders `anchorTemplate`. Changing an anchor's `x` or `y` moves it without re-creating its content. Anchored content sits above the children and below the ink, and ignores the pointer unless `anchorDrag` is set.",
+        "valueType": "any"
+      },
+      "anchorTemplate": {
+        "description": "The content rendered for each item of `anchors`, with the anchor available as `$item`.",
+        "valueType": "ComponentDef"
+      },
+      "anchorDrag": {
+        "description": "Lets the user drag anchored content (without holding the draw key), reporting `anchorDragStart`, `anchorDragMove` and `anchorDragEnd`. The layer doesn't move the anchor itself: update `anchors` from the events to move it.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "contentAspect": {
         "description": "The aspect ratio (width / height) of the picture inside the layer, such as a video's `videoWidth / videoHeight`. When set, coordinates are normalized to that picture as it is fitted into the layer (letterbox bars fall outside 0-1). When not set, coordinates are normalized to the layer itself.",
         "valueType": "number"
@@ -12182,6 +12195,32 @@ export default {
         "parameters": {
           "event": "The shape's tool, corners, timing, color and width."
         }
+      },
+      "anchorDragStart": {
+        "description": "Fires when the user starts dragging an anchor (requires `anchorDrag`). The handler receives `{ id, x, y, dx, dy }` with the anchor's current top-left and zero offsets.",
+        "signature": "anchorDragStart(event: { id: any; x: number; y: number; dx: number; dy: number }): void",
+        "parameters": {
+          "event": "The anchor's id, position and offset."
+        }
+      },
+      "anchorDragMove": {
+        "description": "Fires while an anchor is dragged, at most once per `sampleMs`. The handler receives `{ id, x, y, dx, dy }`: the new top-left in picture coordinates, and the offset since the drag began. Assign `x` and `y` back to the anchor to move it.",
+        "signature": "anchorDragMove(event: { id: any; x: number; y: number; dx: number; dy: number }): void",
+        "parameters": {
+          "event": "The anchor's id, new position and offset."
+        }
+      },
+      "anchorDragEnd": {
+        "description": "Fires when an anchor drag ends, with the final `{ id, x, y, dx, dy }`.",
+        "signature": "anchorDragEnd(event: { id: any; x: number; y: number; dx: number; dy: number }): void",
+        "parameters": {
+          "event": "The anchor's id, final position and offset."
+        }
+      }
+    },
+    "contextVars": {
+      "$item": {
+        "description": "The anchor being rendered by `anchorTemplate`: its `id`, `x`, `y`, `width`, `height`, and any other fields it carries."
       }
     },
     "apis": {

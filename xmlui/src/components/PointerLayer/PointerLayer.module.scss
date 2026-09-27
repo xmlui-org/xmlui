@@ -18,6 +18,29 @@ $component: "PointerLayer";
     min-width: 0;
   }
 
+  // Stacking, bottom to top: children, anchors (1), input overlay (2),
+  // ink (3), pointer dot (4). A Command-drag over an anchor still draws, and
+  // the ink shows above anchored content.
+  .anchors {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  // Anchored content ignores the pointer by default, so the children's own
+  // controls keep working through it
+  .anchor {
+    position: absolute;
+    pointer-events: none;
+
+    &.draggable {
+      pointer-events: auto;
+      cursor: move;
+      touch-action: none;
+    }
+  }
+
   .ink {
     position: absolute;
     inset: 0;
@@ -25,7 +48,7 @@ $component: "PointerLayer";
     height: 100%;
     overflow: visible;
     pointer-events: none;
-    z-index: 2;
+    z-index: 3;
   }
 
   .fading {
@@ -42,7 +65,7 @@ $component: "PointerLayer";
     transform: translate(-50%, -50%);
     opacity: 0.85;
     pointer-events: none;
-    z-index: 3;
+    z-index: 4;
   }
 
   // Transparent input surface: hit-testable only while drawing is armed, so
@@ -50,7 +73,7 @@ $component: "PointerLayer";
   .overlay {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 2;
     pointer-events: none;
 
     &.active {

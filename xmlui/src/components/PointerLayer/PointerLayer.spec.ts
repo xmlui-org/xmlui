@@ -473,6 +473,237 @@ test.describe("Shape tools", () => {
 });
 
 // =============================================================================
+// ANCHORS
+// =============================================================================
+
+test.describe("Anchors", () => {
+  // An anchor's box relative to the layer's box, in pixels
+  async function anchorBox(page: any, id: string | number) {
+    const layer = await box(page);
+    const a = await page
+      .getByTestId("layer")
+      .locator(`[data-anchor-id="${id}"]`)
+      .boundingBox();
+    if (!a) throw new Error(`anchor ${id} has no box`);
+    return {
+      left: Math.round(a.x - layer.x),
+      top: Math.round(a.y - layer.y),
+      width: Math.round(a.width),
+      height: Math.round(a.height),
+    };
+  }
+
+  const TEMPLATE = `
+    <property name="anchorTemplate">
+      <Stack testId="anchor-{$item.id}" width="100%" height="100%" backgroundColor="rgba(0,0,0,0.2)" />
+    </property>`;
+
+  test("places anchors in layer coordinates", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <PointerLayer testId="layer" width="400px" height="300px"
+        anchors="{[{ id: 1, x: 0.25, y: 0.5, width: 0.5, height: 0.2 }]}">
+        <Stack height="300px" />
+        ${TEMPLATE}
+      </PointerLayer>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    expect(await anchorBox(page, 1)).toEqual({ left: 100, top: 150, width: 200, height: 60 });
+  });
+
+  test("with contentAspect, anchors follow the letterboxed picture", async ({
+    initTestBed,
+    page,
+  }) => {
+    // 400x300 layer, aspect 2: the picture is 400x200 at y = 50
+    await initTestBed(`
+      <PointerLayer testId="layer" width="400px" height="300px" contentAspect="2"
+        anchors="{[{ id: 1, x: 0, y: 0, width: 0.5, height: 0.5 }, { id: 2, x: 0.5, y: 0.5 }]}">
+        <Stack height="300px" />
+        ${TEMPLATE}
+      </PointerLayer>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    expect(await anchorBox(page, 1)).toEqual({ left: 0, top: 50, width: 200, height: 100 });
+    const second = await anchorBox(page, 2);
+    expect(second.left).toBe(200);
+    expect(second.top).toBe(150);
+  });
+
+  test("anchors re-place when the layer resizes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.w="400px">
+        <PointerLayer testId="layer" width="{w}" height="300px"
+          anchors="{[{ id: 1, x: 0.5, y: 0.5, width: 0.25 }]}">
+          <Stack height="300px" />
+          ${TEMPLATE}
+        </PointerLayer>
+        <Button testId="wider" onClick="w = '800px'" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    expect((await anchorBox(page, 1)).left).toBe(200);
+    await page.getByTestId("wider").click();
+    await expect.poll(async () => (await anchorBox(page, 1)).left).toBe(400);
+    expect((await anchorBox(page, 1)).width).toBe(200);
+  });
+
+  test("moving an anchor doesn't re-create its content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.x="{0.1}">
+        <PointerLayer testId="layer" width="400px" height="300px"
+          anchors="{[{ id: 1, x: x, y: 0.1, width: 0.25, height: 0.25 }]}">
+          <Stack height="300px" />
+          ${TEMPLATE}
+        </PointerLayer>
+        <Button testId="move" onClick="x = 0.6" />
+      </Fragment>
+    `);
+    const content = page.getByTestId("anchor-1");
+    await expect(content).toBeAttached();
+    await content.evaluate((el: any) => (el.__marker = "same-node"));
+    expect((await anchorBox(page, 1)).left).toBe(40);
+    await page.getByTestId("move").click();
+    await expect.poll(async () => (await anchorBox(page, 1)).left).toBe(240);
+    expect(await content.evaluate((el: any) => el.__marker)).toBe("same-node");
+  });
+
+  test("anchors let clicks through to the children", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <PointerLayer testId="layer" width="400px" height="300px"
+        anchors="{[{ id: 1, x: 0, y: 0, width: 1, height: 1 }]}">
+        <Button testId="under" label="Under" onClick="testState = 'clicked'" />
+        ${TEMPLATE}
+      </PointerLayer>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    const b = await page.getByTestId("under").boundingBox();
+    await page.mouse.click(b!.x + b!.width / 2, b!.y + b!.height / 2);
+    await expect.poll(testStateDriver.testState).toBe("clicked");
+  });
+
+  test("Command-drag over an anchor still draws, and ink stacks above anchors", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <PointerLayer testId="layer" width="400px" height="300px" anchorDrag="true"
+        anchors="{[{ id: 1, x: 0, y: 0, width: 1, height: 1 }]}"
+        onStrokeEnd="testState = 'drew'" onAnchorDragStart="testState = 'dragged'">
+        <Stack height="300px" />
+        ${TEMPLATE}
+      </PointerLayer>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    await page.keyboard.down("Meta");
+    await drag(page, 50, 50, 200, 150);
+    await page.keyboard.up("Meta");
+    await expect.poll(testStateDriver.testState).toBe("drew");
+    const z = await page.getByTestId("layer").evaluate((el: HTMLElement) => ({
+      anchors: Number(getComputedStyle(el.querySelector("[data-part-id='anchors']")!).zIndex),
+      overlay: Number(getComputedStyle(el.querySelector("[data-part-id='overlay']")!).zIndex),
+      ink: Number(getComputedStyle(el.querySelector("svg")!).zIndex),
+    }));
+    expect(z.anchors).toBeLessThan(z.overlay);
+    expect(z.overlay).toBeLessThan(z.ink);
+  });
+
+  test("anchorDrag reports the new position; the host moves the anchor", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.anchors="{[{ id: 'a', x: 0.25, y: 0.5, width: 0.25, height: 0.2 }]}">
+        <PointerLayer testId="layer" width="400px" height="300px" anchorDrag="true" sampleMs="0"
+          anchors="{anchors}"
+          onAnchorDragMove="(e) => anchors = [{ ...anchors[0], x: e.x, y: e.y }]"
+          onAnchorDragEnd="(e) => testState = e">
+          <Stack height="300px" />
+          ${TEMPLATE}
+        </PointerLayer>
+      </Fragment>
+    `);
+    await expect(page.getByTestId("anchor-a")).toBeAttached();
+    const start = await anchorBox(page, "a");
+    const layer = await box(page);
+    // Grab the anchor's middle and move it 40px right, 30px down
+    const gx = layer.x + start.left + start.width / 2;
+    const gy = layer.y + start.top + start.height / 2;
+    await page.mouse.move(gx, gy);
+    await page.mouse.down();
+    await page.mouse.move(gx + 20, gy + 15);
+    await page.mouse.move(gx + 40, gy + 30);
+    await page.mouse.up();
+    await expect.poll(async () => (await testStateDriver.testState())?.id).toBe("a");
+    const e = await testStateDriver.testState();
+    expect(e.dx).toBeCloseTo(0.1, 2);
+    expect(e.dy).toBeCloseTo(0.1, 2);
+    expect(e.x).toBeCloseTo(0.35, 2);
+    expect(e.y).toBeCloseTo(0.6, 2);
+    // The host applied the moves, so the anchor followed
+    expect((await anchorBox(page, "a")).left).toBe(start.left + 40);
+  });
+
+  test("an anchor removed mid-drag ends its drag, and later drags still work", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Studio's report on #3922: an anchor that left `anchors` during its drag
+    // unmounted before its own pointerup ran, and every later drag was refused
+    await initTestBed(`
+      <Fragment
+        var.anchors="{[
+          { id: 'a', x: 0.05, y: 0.1, width: 0.2, height: 0.2 },
+          { id: 'b', x: 0.6, y: 0.6, width: 0.2, height: 0.2 }
+        ]}"
+        var.starts="{[]}" var.ends="{[]}">
+        <PointerLayer testId="layer" width="400px" height="300px" anchorDrag="true" sampleMs="0"
+          anchors="{anchors}"
+          onAnchorDragStart="(e) => starts = [...starts, e.id]"
+          onAnchorDragMove="(e) => anchors = anchors.filter((a) => a.id !== e.id)"
+          onAnchorDragEnd="(e) => ends = [...ends, e.id]">
+          <Stack height="300px" />
+          ${TEMPLATE}
+        </PointerLayer>
+        <Text testId="starts" value="{starts.join(',')}" />
+        <Text testId="ends" value="{ends.join(',')}" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("anchor-a")).toBeAttached();
+    const layer = await box(page);
+
+    // Drag a: the first move removes it from anchors mid-drag
+    await page.mouse.move(layer.x + 60, layer.y + 60);
+    await page.mouse.down();
+    await page.mouse.move(layer.x + 80, layer.y + 80);
+    await expect(page.getByTestId("anchor-a")).toHaveCount(0);
+    await page.mouse.up();
+    await expect(page.getByTestId("ends")).toHaveText("a");
+
+    // Dragging b must still start
+    await page.mouse.move(layer.x + 280, layer.y + 210);
+    await page.mouse.down();
+    await page.mouse.move(layer.x + 300, layer.y + 220);
+    await page.mouse.up();
+    await expect(page.getByTestId("starts")).toHaveText("a,b");
+  });
+
+  test("without anchorDrag, anchors aren't draggable", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <PointerLayer testId="layer" width="400px" height="300px"
+        anchors="{[{ id: 1, x: 0.25, y: 0.25, width: 0.5, height: 0.5 }]}"
+        onAnchorDragStart="testState = 'dragged'">
+        <Stack height="300px" />
+        ${TEMPLATE}
+      </PointerLayer>
+    `);
+    await expect(page.getByTestId("anchor-1")).toBeAttached();
+    await drag(page, 200, 150, 260, 200);
+    await page.waitForTimeout(200);
+    expect(await testStateDriver.testState()).toBeNull();
+  });
+});
+
+// =============================================================================
 // TRACING
 // =============================================================================
 
@@ -546,5 +777,24 @@ test.describe("Tracing", () => {
     const [mark] = await pointerTraces(page, "markTrace");
     expect(mark.data.tool).toBe("pointer");
     expect(mark.data.pointerShape).toBe("arrow");
+  });
+
+  test("an anchor drag's end is traced", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<PointerLayer id="anchorTrace" testId="layer" width="400px" height="300px" anchorDrag="true"
+         anchors="{[{ id: 7, x: 0.25, y: 0.25, width: 0.5, height: 0.5 }]}">
+         <Stack height="300px" />
+         <property name="anchorTemplate">
+           <Stack width="100%" height="100%" />
+         </property>
+       </PointerLayer>`,
+      { xmluiConfig: { xsVerbose: true } },
+    );
+    await drag(page, 200, 150, 240, 180);
+    await expect.poll(async () => (await pointerTraces(page, "anchorTrace")).length).toBe(1);
+    const [end] = await pointerTraces(page, "anchorTrace");
+    expect(end.kind).toBe("native:pointer.anchorDragEnd");
+    expect(end.data.id).toBe(7);
+    expect(end.data.dx).toBeCloseTo(0.1, 2);
   });
 });

@@ -22,6 +22,10 @@ Hold the Command key (on macOS; the Windows key elsewhere) and drag over the car
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$item`: The anchor being rendered by `anchorTemplate`: its `id`, `x`, `y`, `width`, `height`, and any other fields it carries.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -35,6 +39,50 @@ This component supports the following behaviors:
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
+
+### `anchorDrag` [#anchordrag]
+
+> [!DEF]  default: **false**
+
+Lets the user drag anchored content (without holding the draw key), reporting `anchorDragStart`, `anchorDragMove` and `anchorDragEnd`. The layer doesn't move the anchor itself: update `anchors` from the events to move it.
+
+### `anchors` [#anchors]
+
+Content to place over the children at picture coordinates, as an array of `{ id, x, y, width?, height? }`. `x` and `y` are the top-left corner and `width` and `height` are fractions of the picture, all in the same 0-1 space as the events (letterbox-aware with `contentAspect`). Each anchor renders `anchorTemplate`. Changing an anchor's `x` or `y` moves it without re-creating its content. Anchored content sits above the children and below the ink, and ignores the pointer unless `anchorDrag` is set.
+
+Anchors place XMLUI content over the children at picture coordinates, such as captions or callouts over a video. Each anchor's `x` and `y` is its top-left corner, and `width` and `height` are fractions of the picture, so anchored content keeps its place and proportion as the player resizes or letterboxes.
+
+Anchored content ignores the pointer by default, so the video's controls keep working through it. With `anchorDrag`, the user can drag an anchor: the layer reports the new position, and the app moves the anchor by updating `anchors`. Update it from both `anchorDragMove` and `anchorDragEnd`: moves are throttled by `sampleMs`, and the end event carries the final position. Derive draggable anchors from state that stays present during async work: if the dragged anchor disappears from `anchors` mid-drag (for example, because it comes from a `DataSource` that's empty while a new request loads), the drag ends at its last position. Hold Command and drag to draw over the callouts; the ink shows on top.
+
+```xmlui-pg copy display name="Example: callouts over a video" height="600px"
+<App
+  var.aspect="{undefined}"
+  var.callouts="{[
+    { id: 1, x: 0.05, y: 0.08, width: 0.34, text: 'Drag me' },
+    { id: 2, x: 0.55, y: 0.62, width: 0.38, text: 'Callouts stay on the picture' }
+  ]}">
+  <PointerLayer
+    contentAspect="{aspect}"
+    anchors="{callouts}"
+    anchorDrag="true"
+    onAnchorDragMove="(e) => callouts = callouts.map((c) => c.id === e.id ? { ...c, x: e.x, y: e.y } : c)"
+    onAnchorDragEnd="(e) => callouts = callouts.map((c) => c.id === e.id ? { ...c, x: e.x, y: e.y } : c)">
+    <MediaPlayer
+      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+      onLoadedMetadata="(e) => aspect = e.videoWidth / e.videoHeight" />
+    <property name="anchorTemplate">
+      <Card padding="$space-2" backgroundColor="rgba(255, 255, 255, 0.9)">
+        <Text variant="strong" value="{$item.text}" />
+      </Card>
+    </property>
+  </PointerLayer>
+  <Text value="{callouts.map((c) => c.id + ': (' + c.x.toFixed(2) + ', ' + c.y.toFixed(2) + ')').join('   ')}" />
+</App>
+```
+
+### `anchorTemplate` [#anchortemplate]
+
+The content rendered for each item of `anchors`, with the anchor available as `$item`.
 
 ### `color` [#color]
 
@@ -193,6 +241,30 @@ Freehand ink is hard to keep tidy with a mouse. The shape tools draw clean geome
 ```
 
 ## Events [#events]
+
+### `anchorDragEnd` [#anchordragend]
+
+Fires when an anchor drag ends, with the final `{ id, x, y, dx, dy }`.
+
+**Signature**: `anchorDragEnd(event: { id: any; x: number; y: number; dx: number; dy: number }): void`
+
+- `event`: The anchor's id, final position and offset.
+
+### `anchorDragMove` [#anchordragmove]
+
+Fires while an anchor is dragged, at most once per `sampleMs`. The handler receives `{ id, x, y, dx, dy }`: the new top-left in picture coordinates, and the offset since the drag began. Assign `x` and `y` back to the anchor to move it.
+
+**Signature**: `anchorDragMove(event: { id: any; x: number; y: number; dx: number; dy: number }): void`
+
+- `event`: The anchor's id, new position and offset.
+
+### `anchorDragStart` [#anchordragstart]
+
+Fires when the user starts dragging an anchor (requires `anchorDrag`). The handler receives `{ id, x, y, dx, dy }` with the anchor's current top-left and zero offsets.
+
+**Signature**: `anchorDragStart(event: { id: any; x: number; y: number; dx: number; dy: number }): void`
+
+- `event`: The anchor's id, position and offset.
 
 ### `pointerMove` [#pointermove]
 
