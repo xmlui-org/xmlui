@@ -66,6 +66,26 @@ The `Markdown` component supports these basic elements.
 
 See [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
 
+## Collapsible sections
+
+A blockquote whose first line starts with `[!DETAILS]` renders as a collapsible section (an `ExpandableItem`). The rest of that first line is the summary, and the following lines are the content. Use `[!SDETAILS]` to show a switch instead of a chevron. The summary is rendered as inline Markdown, so emphasis, strikethrough and code work in it. Without summary text, the section is labeled "Details".
+
+```xmlui-pg copy display name="Collapsible sections with formatted summaries" height="240px"
+<App>
+  <Markdown>
+    <![CDATA[
+> [!DETAILS] **1,850** Rent
+> Paid on the *1st*.
+
+> [!SDETAILS] Utilities `monthly`
+> Power, water and internet.
+]]>
+  </Markdown>
+</App>
+```
+
+A summary is a single line of text. For summaries with structure, such as a value column, use `ExpandableItem` in XMLUI markup; see [Align values in collapsible section summaries](/docs/howto/align-values-in-collapsible-summaries).
+
 ## Native HTML
 
 `Markdown` allows a subset of HTML. For example, while Markdown itself does not support `rowspan` and `colspan` in tables, you can use HTML directly.

@@ -772,6 +772,68 @@ const HorizontalRule = () => {
   return <hr className={styles.horizontalRule} />;
 };
 
+/**
+ * Splits rendered inline nodes at the first "\n" (a Markdown soft line break), keeping element
+ * structure on both sides: an element that contains the break is cloned into a head part and a
+ * tail part.
+ */
+function splitAtFirstLineBreak(children: React.ReactNode): {
+  head: React.ReactNode[];
+  tail: React.ReactNode[];
+  found: boolean;
+} {
+  const head: React.ReactNode[] = [];
+  const tail: React.ReactNode[] = [];
+  let found = false;
+
+  React.Children.toArray(children).forEach((node) => {
+    if (found) {
+      tail.push(node);
+      return;
+    }
+    if (typeof node === "string") {
+      const index = node.indexOf("\n");
+      if (index < 0) {
+        head.push(node);
+      } else {
+        found = true;
+        head.push(node.slice(0, index));
+        tail.push(node.slice(index + 1));
+      }
+      return;
+    }
+    if (React.isValidElement(node) && (node.props as any)?.children != null) {
+      const inner = splitAtFirstLineBreak((node.props as any).children);
+      if (inner.found) {
+        found = true;
+        if (inner.head.length > 0) {
+          head.push(React.cloneElement(node, { key: "summary-head" } as any, ...inner.head));
+        }
+        if (inner.tail.length > 0) {
+          tail.push(React.cloneElement(node, { key: "summary-tail" } as any, ...inner.tail));
+        }
+        return;
+      }
+    }
+    head.push(node);
+  });
+
+  return { head, tail, found };
+}
+
+/** Drops empty strings and trims whitespace at the outer edges of a node list. */
+function trimNodes(nodes: React.ReactNode[]): React.ReactNode[] {
+  const result = [...nodes];
+  if (typeof result[0] === "string") {
+    result[0] = (result[0] as string).trimStart();
+  }
+  const last = result.length - 1;
+  if (last >= 0 && typeof result[last] === "string") {
+    result[last] = (result[last] as string).trimEnd();
+  }
+  return result.filter((node) => node !== "" && node !== null && node !== undefined);
+}
+
 type BlockquoteProps = {
   children: React.ReactNode;
   style?: CSSProperties;
@@ -834,44 +896,38 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     const processedChildren = React.Children.map(children, processNode);
 
-    // Handle [!DETAILS] or [!SDETAILS] adornment
+    // Handle [!DETAILS] or [!SDETAILS] adornment. The first line of the first paragraph is the
+    // summary; it keeps its rendered inline Markdown (emphasis, code, links). The rest of that
+    // paragraph and all later blocks form the collapsible body.
     if (type === "details" || type === "sdetails") {
-      // Extract summary from the original text
-      const originalText = allText;
-      const detailsMatch = originalText.match(/\[!(S?DETAILS)\](.*?)(?:\n|$)/);
-      const summaryText = detailsMatch && detailsMatch[2] ? detailsMatch[2].trim() : "Details";
       const withSwitch = type === "sdetails";
-
-      // Create separate content children without the summary line
-      // We need to find the first Text element and remove the summary from it
-      let contentWithoutSummary = [];
+      // "[!DETAILS]" directly followed by a line break has no summary text; the marker removal
+      // above also consumed that line break, so the whole first paragraph is body content.
+      const hasSummaryText = !/\[!S?DETAILS\][ \t]*(?:\n|$)/.test(allText);
+      let summaryNodes: React.ReactNode[] = [];
+      const contentWithoutSummary: React.ReactNode[] = [];
       let foundFirstTextElement = false;
 
-      React.Children.forEach(processedChildren, (child, index) => {
-        // Process the first text element to remove the summary line
+      React.Children.forEach(processedChildren, (child) => {
         if (!foundFirstTextElement && React.isValidElement(child) && child.props?.children) {
           foundFirstTextElement = true;
-
-          // Get the child's text content
-          const childText = extractTextContent(child.props.children);
-
-          // Skip the first line which contains the summary
-          const lines = childText.split("\n");
-          if (lines.length > 1) {
-            // Create modified element with remaining content
-            const remainingContent = lines.slice(1).join("\n");
-            if (remainingContent.trim()) {
-              contentWithoutSummary.push(React.cloneElement(child, child.props, remainingContent));
-            }
+          const { head, tail } = hasSummaryText
+            ? splitAtFirstLineBreak(child.props.children)
+            : { head: [], tail: React.Children.toArray(child.props.children) };
+          summaryNodes = trimNodes(head);
+          const bodyNodes = trimNodes(tail);
+          if (bodyNodes.length > 0) {
+            contentWithoutSummary.push(React.cloneElement(child, child.props, ...bodyNodes));
           }
         } else {
-          // Keep all other elements unchanged
           contentWithoutSummary.push(child);
         }
       });
 
+      const summary = summaryNodes.length > 0 ? <>{summaryNodes}</> : "Details";
+
       return (
-        <ExpandableItem summary={summaryText} withSwitch={withSwitch}>
+        <ExpandableItem summary={summary} withSwitch={withSwitch}>
           {contentWithoutSummary}
         </ExpandableItem>
       );
