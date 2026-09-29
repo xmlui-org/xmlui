@@ -418,6 +418,8 @@ type TableProps = {
   paginationControlsLocation?: TablePaginationControlsLocation;
   rowDisabledPredicate?: (item: any) => boolean;
   rowUnselectablePredicate?: (item: any) => boolean;
+  /** Returns the styling variant name of a row (see `rowVariantStyle`), or a falsy value. */
+  rowVariant?: (item: any) => unknown;
   sortBy?: string;
   sortingDirection?: SortingDirection;
   defaultSortDirection?: SortingDirection;
@@ -502,6 +504,47 @@ function getScrollMetrics(virtualizer: VirtualizerHandle | null): CollectionScro
     scrollSize: virtualizer?.scrollSize ?? 0,
     viewportSize: virtualizer?.viewportSize ?? 0,
   };
+}
+
+const ROW_VARIANT_NAME = /^[A-Za-z][A-Za-z0-9_-]*$/;
+const warnedRowVariants = new Set<string>();
+
+/**
+ * Resolves a row's styling variant name. Returns `undefined` for no variant, for a non-string
+ * result, and for a name that is not a valid theme-variable segment (warned about once in dev).
+ */
+function resolveRowVariant(
+  rowVariant: ((item: any) => unknown) | undefined,
+  item: any,
+): string | undefined {
+  if (!rowVariant) return undefined;
+  const name = rowVariant(item);
+  if (!name) return undefined;
+  if (typeof name !== "string" || !ROW_VARIANT_NAME.test(name)) {
+    const key = String(name);
+    if (import.meta.env.DEV && !warnedRowVariants.has(key)) {
+      warnedRowVariants.add(key);
+      console.warn(
+        `Table: rowVariant returned "${key}", which is not a valid variant name. Use a name ` +
+          `that starts with a letter and contains only letters, digits, "-" and "_".`,
+      );
+    }
+    return undefined;
+  }
+  return name;
+}
+
+/**
+ * The CSS custom properties that carry a row variant's theme values into the row's SCSS rules.
+ * An undefined theme variable leaves its custom property invalid, so the SCSS fallbacks (the
+ * row's normal background and hover color, the inherited text color) apply.
+ */
+function rowVariantStyle(variant: string): CSSProperties {
+  return {
+    "--row-variant-bg": toCssVar(`$backgroundColor-row-${variant}-Table`),
+    "--row-variant-bg-hover": toCssVar(`$backgroundColor-row-${variant}-Table--hover`),
+    "--row-variant-text": toCssVar(`$textColor-row-${variant}-Table`),
+  } as CSSProperties;
 }
 
 function defaultIsRowDisabled(_: any) {
@@ -1206,6 +1249,7 @@ export const Table = memo(
       currentPageIndex = 0,
       rowDisabledPredicate = defaultIsRowDisabled,
       rowUnselectablePredicate = defaultIsRowUnselectable,
+      rowVariant,
       sortBy,
       sortingDirection,
       defaultSortDirection = defaultProps.defaultSortDirection,
@@ -2243,6 +2287,7 @@ export const Table = memo(
     const rowState = {
       focusedIndex,
       rowDisabledPredicate,
+      rowVariant,
       noBottomBorder,
       effectiveUserSelectRow,
       toggleRow,
@@ -2491,6 +2536,7 @@ export const Table = memo(
           const effectiveRowWebkitUserSelect =
             s.effectiveUserSelectRow as React.CSSProperties["WebkitUserSelect"];
           const isExpanded = !!s.expandedRowIdMap[row.id];
+          const variant = resolveRowVariant(s.rowVariant, row.original);
           return (
             <tr
               data-index={rowIndex}
@@ -2509,8 +2555,11 @@ export const Table = memo(
                 minWidth: isExpanded ? s.totalColumnWidth : "max-content",
                 userSelect: effectiveRowUserSelect,
                 WebkitUserSelect: effectiveRowWebkitUserSelect,
+                ...(variant ? rowVariantStyle(variant) : undefined),
               }}
+              data-row-variant={variant || undefined}
               className={classnames(styles.row, {
+                [styles.variantRow]: !!variant,
                 [styles.selected]: row.getIsSelected(),
                 [styles.focused]: s.focusedIndex === rowIndex,
                 [styles.disabled]: s.rowDisabledPredicate(row.original),

@@ -18340,6 +18340,10 @@ export default {
         "description": "This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.",
         "valueType": "any"
       },
+      "rowVariant": {
+        "description": "This property defines a function that names a styling variant for a row. The function receives the row item and returns a variant name (such as `\"playing\"` or `\"warning\"`), or a falsy value for no variant. A row with variant `<name>` uses the `backgroundColor-row-<name>-Table`, `backgroundColor-row-<name>-Table--hover` and `textColor-row-<name>-Table` theme variables. A variant background takes precedence over striped rows; selected and hovered rows keep their own background, while the variant's text color still applies. Names must start with a letter and contain only letters, digits, `-` and `_`.",
+        "valueType": "any"
+      },
       "rowUnselectablePredicate": {
         "description": "This property defines a predicate function with a return value that determines if the row should be unselectable. The function retrieves the item to display and should return a Boolean-like value. This property only has an effect when the `rowsSelectable` property is set to `true`.",
         "valueType": "any"

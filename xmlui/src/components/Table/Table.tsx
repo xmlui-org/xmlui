@@ -292,6 +292,18 @@ export const TableMd = createMetadata({
         `a Boolean-like value.`,
       valueType: "any",
     },
+    rowVariant: {
+      description:
+        `This property defines a function that names a styling variant for a row. The function ` +
+        `receives the row item and returns a variant name (such as \`"playing"\` or ` +
+        `\`"warning"\`), or a falsy value for no variant. A row with variant \`<name>\` uses the ` +
+        `\`backgroundColor-row-<name>-Table\`, \`backgroundColor-row-<name>-Table--hover\` and ` +
+        `\`textColor-row-<name>-Table\` theme variables. A variant background takes precedence ` +
+        `over striped rows; selected and hovered rows keep their own background, while the ` +
+        `variant's text color still applies. Names must start with a letter and contain only ` +
+        `letters, digits, \`-\` and \`_\`.`,
+      valueType: "any",
+    },
     rowUnselectablePredicate: {
       description:
         `This property defines a predicate function with a return value that determines if the ` +
@@ -932,8 +944,11 @@ const TableWithColumns = memo(
         [node.children, node.props.rowDetailTemplate],
       );
 
+      // --- A rowVariant function can read any state, so without an explicit `refreshOn` the rows
+      // --- re-evaluate it on every render (as with eventful cell content).
       const shouldForceRefresh =
-        (node.props.refreshOn === undefined && hasEventfulCellContent) ||
+        (node.props.refreshOn === undefined &&
+          (hasEventfulCellContent || node.props.rowVariant !== undefined)) ||
         prevRefreshOnRef.current !== refreshOn;
       if (shouldForceRefresh) {
         prevRefreshOnRef.current = refreshOn;
@@ -1001,6 +1016,8 @@ const TableWithColumns = memo(
       const stableRowDisabledPredicate = useEvent((item: any) =>
         lookupSyncCallback(rowDisabledPredicate)?.(item),
       );
+      const rowVariant = node.props.rowVariant;
+      const stableRowVariant = useEvent((item: any) => lookupSyncCallback(rowVariant)?.(item));
       const rowUnselectablePredicate = node.props.rowUnselectablePredicate;
       const stableRowUnselectablePredicate = useEvent((item: any) =>
         lookupSyncCallback(rowUnselectablePredicate)?.(item),
@@ -1271,6 +1288,7 @@ const TableWithColumns = memo(
               headerHeight={extractValue.asSize(node.props.headerHeight)}
               rowDisabledPredicate={stableRowDisabledPredicate}
               rowUnselectablePredicate={stableRowUnselectablePredicate}
+              rowVariant={rowVariant ? stableRowVariant : undefined}
               sortBy={extractValue(node.props?.sortBy)}
               sortingDirection={extractValue(node.props?.sortDirection)}
               defaultSortDirection={extractValue.asOptionalString(

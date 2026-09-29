@@ -5,8 +5,9 @@ Make rows stand out in a `Table`, either one row that your app picks from code, 
 | You want to highlight | Use |
 | --- | --- |
 | One row chosen by the app: the current step, the playing item, the record open in a side panel | [The table's selection](#highlight-one-row-from-code), set with `selectId()` |
-| Every row whose data matches a condition, such as all overdue tasks | [Conditional styles in the cell templates](#style-rows-by-their-data) |
-| One row, in a table whose selection is already used for selecting | Conditional styles in the cell templates, comparing `$item` with the app's state |
+| Every row whose data matches a condition, such as all overdue tasks | [A row variant](#tint-whole-rows-with-a-row-variant), named by `rowVariant` |
+| One row, in a table whose selection is already used for selecting | A row variant, comparing the item with the app's state |
+| Some cells of a row, such as a bold title or a red date | [Conditional styles in the cell templates](#style-cells-by-their-row-data) |
 
 ## Highlight one row from code
 
@@ -65,7 +66,45 @@ Use `rowClick` instead when a click should *do* something, such as open or play 
 
 The highlight color comes from the `backgroundColor-selected-Table` theme variable, which defaults to `$color-primary-100`. Hovering a selected row uses `backgroundColor-selected-Table--hover`.
 
-## Style rows by their data
+## Tint whole rows with a row variant
+
+`rowVariant` takes a function that receives a row's item and returns a variant name, or nothing for no variant. A row with the variant `overdue` takes its colors from theme variables named after it:
+
+- `backgroundColor-row-overdue-Table` tints the whole row, cell padding included;
+- `backgroundColor-row-overdue-Table--hover` is used while the pointer is over the row (it falls back to the normal row hover color);
+- `textColor-row-overdue-Table` colors the row's plain text.
+
+Define the variables in a `Theme` around the table or in your app's theme. Variant names must start with a letter and contain only letters, digits, `-` and `_`.
+
+```xmlui-pg copy display name="Tint whole rows with a row variant" id="tint-whole-rows-with-a-row-variant" height="300px"
+<App var.playingId="{3}">
+  <Theme
+    backgroundColor-row-overdue-Table="$color-danger-100"
+    textColor-row-overdue-Table="$color-danger-500"
+    backgroundColor-row-playing-Table="$color-warn-100">
+    <Table
+      data="{[
+        { id: 1, title: 'Fix login bug', status: 'overdue' },
+        { id: 2, title: 'Update docs', status: 'on-track' },
+        { id: 3, title: 'Redesign dashboard', status: 'at-risk' },
+        { id: 4, title: 'Migrate database', status: 'overdue' }
+      ]}"
+      rowsSelectable="true"
+      rowVariant="{(item) => item.id === playingId ? 'playing'
+        : item.status === 'overdue' ? 'overdue' : null}">
+      <Column bindTo="title" header="Task" />
+      <Column bindTo="status" header="Status" />
+    </Table>
+  </Theme>
+  <Button label="Play next" onClick="playingId = playingId % 4 + 1" />
+</App>
+```
+
+The overdue tasks are tinted red with red text, and the task in `playingId` is tinted yellow. The function can read data and app state alike: click **Play next** and the tint moves with `playingId`. Selection still works independently: a selected row shows the selected background, and a variant's text color stays visible on it. The precedence is selected, then hover, then the variant, then striping.
+
+The columns keep their plain `bindTo` rendering; no column needs a template. A `Text` inside a cell template sets its own color, so `textColor-row-<name>-Table` affects only plain cell text.
+
+## Style cells by their row data
 
 Every Column's cell template has access to `$item`, the full row object. Use conditional expressions on `backgroundColor`, `fontWeight`, `color`, or any visual prop within the cell template to highlight the row's content based on its data. Wrapping the cell content in a styled container makes the effect consistent across all columns.
 
@@ -135,9 +174,11 @@ Every Column's cell template has access to `$item`, the full row object. Use con
 
 **Keep the app's state in step with `selectionDidChange`**: clicks and arrow keys also move the selection. `selectionDidChange` reports every change; `rowClick` reports only clicks.
 
+**Use `rowVariant` to tint whole rows by data or state**: the function names a variant per row, and the `backgroundColor-row-<name>-Table` and `textColor-row-<name>-Table` theme variables style it. The condition is written once, not in every column.
+
 **Use `$item` in conditional expressions on visual props**: Since `$item` exposes the full row object inside every Column template, expressions like `color="{$item.status === 'overdue' ? '$color-danger' : ''}"` can drive any visual change based on any data field.
 
-**Apply the same condition across all columns for a row-wide effect**: To make an entire row look highlighted, repeat the conditional style on each Column's template. This is more verbose than a single `rowStyle` prop, but it gives you full control over which columns participate.
+**Style cells when only some of them should change**: a cell template can make one column bold or color one value. For a whole-row tint, prefer `rowVariant`.
 
 **`Badge` with `colorMap` is the simplest per-value color mapping**: For a status or category column, `colorMap` maps each value to a color in a single declarative object — no ternary chain needed.
 
@@ -151,4 +192,4 @@ Every Column's cell template has access to `$item`, the full row object. Use con
 - [Sort a table by a computed value](/docs/howto/sort-a-table-by-a-computed-value) — combine computed fields with conditional styling
 - [Enable multi-row selection in a table](/docs/howto/enable-multi-row-selection-in-a-table) — use selection state to highlight active rows
 - [Log a media player's playhead path](/docs/howto/log-a-media-players-playhead-path) — highlight the playing clip's row with `selectId()`
-- [Table](/docs/reference/components/Table) — `selectId`, `clearSelection`, `selectionDidChange`, `rowClick` and the `backgroundColor-selected-Table` theme variable
+- [Table](/docs/reference/components/Table) — `rowVariant`, `selectId`, `clearSelection`, `selectionDidChange`, `rowClick` and the `backgroundColor-selected-Table` theme variable
