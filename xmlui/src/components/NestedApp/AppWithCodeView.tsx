@@ -57,7 +57,10 @@ It supports both side-by-side and stacked layouts.`,
     },
     height: {
       description:
-        `The height of the nested app. If not set, the default height is ${DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT}.`,
+        `The height of the nested app. An explicit height is fixed. If not set, the playground ` +
+        `reserves ${DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT} before it mounts, then grows to fit content ` +
+        `that overflows it (also when the content grows later), up to 85% of the viewport height. ` +
+        `It never shrinks below ${DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT}.`,
       valueType: "length",
       defaultValue: DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT,
     },

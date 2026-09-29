@@ -11,6 +11,7 @@ import classnames from "classnames";
 import Logo from "./logo.svg?react";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { ThemedIcon } from "../Icon/Icon";
+import { nextFitHeight } from "./contentOverflow";
 
 type AppWithCodeViewReactProps = {
   // Markdown content to display in the left column
@@ -41,6 +42,7 @@ type AppWithCodeViewReactProps = {
 };
 
 export const DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT = "320px";
+const DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT_PX = parseInt(DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT, 10);
 const LOCAL_TONE_CONTROLLER_PATTERN = /<\s*(ToneSwitch|ToneChangerButton)(?=[\s/>])/;
 
 function hasLocalToneController(app: string, components: any[] = []) {
@@ -104,7 +106,29 @@ export function AppWithCodeViewReact({
     config?.defaultTone === undefined &&
     !hasLocalThemes &&
     !hasLocalToneSwitcher;
-  const effectiveHeight = height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT;
+  // --- Without an explicit height, the box reserves the default height before the nested app
+  // --- mounts (so lazy mounting causes no layout shift), then grows to fit content that
+  // --- overflows it, up to a viewport-relative cap. It never shrinks. An explicit height is fixed.
+  const fitsContent = height === undefined || height === null || height === "";
+  const [fitHeight, setFitHeight] = useState<number | null>(null);
+  const handleContentOverflow = useCallback((overflow: number) => {
+    setFitHeight((previous) => {
+      const current = previous ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT_PX;
+      const next = nextFitHeight(
+        current,
+        overflow,
+        DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT_PX,
+        window.innerHeight,
+      );
+      return next > current ? next : previous;
+    });
+  }, []);
+  const effectiveHeight = fitsContent
+    ? fitHeight !== null
+      ? `${fitHeight}px`
+      : DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT
+    : height;
+  const contentOverflowHandler = fitsContent ? handleContentOverflow : undefined;
   const shouldMountImmediately = immediate ?? false;
 
   const safePopOutUrl = withoutTrailingSlash(
@@ -141,7 +165,11 @@ export function AppWithCodeViewReact({
     return (
       <>
         {!!markdown && !splitView && <Markdown>{markdown}</Markdown>}
-        <div className={styles.nestedAppContainer} style={{ height: effectiveHeight }}>
+        <div
+          className={styles.nestedAppContainer}
+          style={{ height: effectiveHeight }}
+          data-playground-fit={fitsContent ? "content" : "fixed"}
+        >
           {!noHeader && (
             <div className={styles.header}>
               {!splitView && <span className={styles.headerText}>{title}</span>}
@@ -227,6 +255,7 @@ export function AppWithCodeViewReact({
               refreshVersion={refreshVersion}
               withSplashScreen={withSplashScreen}
               immediate={shouldMountImmediately}
+              onContentOverflow={contentOverflowHandler}
             />
           </div>
         </div>
@@ -248,6 +277,7 @@ export function AppWithCodeViewReact({
         refreshVersion={refreshVersion}
         withSplashScreen={withSplashScreen}
         immediate={shouldMountImmediately}
+        onContentOverflow={contentOverflowHandler}
       />
     </>
   );
