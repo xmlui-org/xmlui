@@ -1267,6 +1267,18 @@ test.describe("Theme Variables", () => {
     await expect(component).toHaveCSS("font-style", EXPECTED);
   });
 
+  test("fontVariant theme variable", async ({ initTestBed, createTextDriver }) => {
+    const EXPECTED = "small-caps";
+    await initTestBed('<Text value="Hello, World" />', {
+      testThemeVars: {
+        "fontVariant-Text": EXPECTED,
+      },
+    });
+    const component = (await createTextDriver()).component;
+
+    await expect(component).toHaveCSS("font-variant-caps", EXPECTED);
+  });
+
   test("fontWeight theme variable", async ({ initTestBed, createTextDriver }) => {
     const EXPECTED = "900";
     await initTestBed('<Text value="Hello, World" />', {

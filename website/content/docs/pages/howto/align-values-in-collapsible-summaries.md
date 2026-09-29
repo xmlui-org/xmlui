@@ -175,15 +175,15 @@ summaries inside:
 </App>
 ```
 
-Now the em dashes share one position. Two cautions remain:
+Now the em dashes share one position. Two notes:
 
 - **It depends on the font.** The font has to provide tabular figures, and its
   punctuation space has to match its comma. Change the font and check the
   column again.
-- **Use the layout property, not the theme variable.** `ExpandableItem` lists a
-  `fontVariant-summary-ExpandableItem` theme variable, but setting it through
-  `Theme` leaves `font-variant-numeric` at `normal` on the summary, and the
-  column still drifts.
+- **The layout property is scoped to one `Markdown`.** To turn on tabular
+  figures for every collapsible summary under a `Theme`, whether it comes from
+  an `ExpandableItem` or a `[!DETAILS]` block, set the
+  `fontVariant-summary-ExpandableItem` theme variable to `tabular-nums` instead.
 
 ## Summary
 

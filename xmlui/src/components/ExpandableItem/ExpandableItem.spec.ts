@@ -1256,3 +1256,19 @@ test.describe("Edge cases", () => {
     await expect(driver.getSummary().nth(1)).toContainText("Child");
   });
 });
+
+test.describe("Theme Variables", () => {
+  test("fontVariant-summary-ExpandableItem applies to the summary", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(`
+      <Theme fontVariant-summary-ExpandableItem="tabular-nums">
+        <ExpandableItem testId="test-id-component" summary="Total: 1,234">Content</ExpandableItem>
+      </Theme>
+    `);
+    const driver = await createExpandableItemDriver();
+
+    await expect(driver.getSummary()).toHaveCSS("font-variant-numeric", "tabular-nums");
+  });
+});
