@@ -519,14 +519,6 @@ function isPlainTraceData(value: unknown): value is Record<string, unknown> {
   );
 }
 
-function cloneTraceData(value: Record<string, unknown>): Record<string, unknown> {
-  try {
-    return structuredClone(value);
-  } catch {
-    return JSON.parse(JSON.stringify(value));
-  }
-}
-
 function eventNameToTraceKind(xmluiName: string): string | undefined {
   switch (xmluiName) {
     case "didChange":
@@ -910,10 +902,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             nativeEvent: event,
             // A plain `traceData` payload becomes the entry's `data`: exporters drop
             // `nativeEvent` (it is usually a live DOM/library event), so this is
-            // the channel for values that must survive an Inspector export. It is
-            // deep-copied because safeClone marks any second reference to one object
-            // (including a nested array, such as a stroke's points) as circular.
-            ...(isPlainTraceData(event?.traceData) && { data: cloneTraceData(event.traceData) }),
+            // the channel for values that must survive an Inspector export.
+            ...(isPlainTraceData(event?.traceData) && { data: event.traceData }),
             ...(typeof offsetX === "number" && { offsetX, offsetY }),
             ownerFileId,
             ownerSource,
@@ -1626,10 +1616,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             nativeEvent: event,
             // A plain `traceData` payload becomes the entry's `data`: exporters drop
             // `nativeEvent` (it is usually a live DOM/library event), so this is
-            // the channel for values that must survive an Inspector export. It is
-            // deep-copied because safeClone marks any second reference to one object
-            // (including a nested array, such as a stroke's points) as circular.
-            ...(isPlainTraceData(event?.traceData) && { data: cloneTraceData(event.traceData) }),
+            // the channel for values that must survive an Inspector export.
+            ...(isPlainTraceData(event?.traceData) && { data: event.traceData }),
             ...(typeof offsetX === "number" && { offsetX, offsetY }),
             ownerFileId,
             ownerSource,

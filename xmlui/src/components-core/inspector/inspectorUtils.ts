@@ -37,34 +37,91 @@ import { processAuditEntry } from "../audit/pipeline";
 // =============================================================================
 
 /**
+ * Maximum number of objects `safeStringify` expands before it stops repeating shared subtrees.
+ * Expanding a shared object at every occurrence can grow exponentially for a pathological
+ * DAG; past this budget the value is serialized again with each repeat replaced by "[Shared]".
+ */
+const MAX_EXPANDED_OBJECTS = 200_000;
+
+class ExpansionBudgetExceeded extends Error {}
+
+/**
+ * Replaces values JSON cannot (or should not) represent in the inspector log with placeholders.
+ * Returns `undefined` when the value needs no placeholder.
+ */
+function placeholderFor(val: any): string | undefined {
+  if (typeof val === "function") return "[Function]";
+  if (typeof window !== "undefined") {
+    if (val === window) return "[Window]";
+    if (typeof document !== "undefined" && val === document) return "[Document]";
+  }
+  if (val && typeof Node !== "undefined" && val instanceof Node) {
+    return "[DOM Node]";
+  }
+  return undefined;
+}
+
+/**
  * Safely stringify a value to JSON, handling circular references and special objects.
+ *
+ * Only a true cycle (an object that is one of its own ancestors) becomes "[Circular]". An object
+ * reached more than once through different paths (a shared reference) is serialized in full at
+ * each occurrence.
  */
 export function safeStringify(value: any): string {
   if (value === undefined) return "undefined";
-  const seen = new WeakSet();
   try {
-    return JSON.stringify(
-      value,
-      (_key, val) => {
-        if (typeof val === "function") return "[Function]";
-        if (typeof window !== "undefined") {
-          if (val === window) return "[Window]";
-          if (typeof document !== "undefined" && val === document) return "[Document]";
-        }
-        if (val && typeof Node !== "undefined" && val instanceof Node) {
-          return "[DOM Node]";
-        }
-        if (val && typeof val === "object") {
-          if (seen.has(val)) return "[Circular]";
-          seen.add(val);
-        }
-        return val;
-      },
-      2,
-    );
+    return stringifyWithAncestors(value);
+  } catch (error) {
+    if (!(error instanceof ExpansionBudgetExceeded)) return String(value);
+  }
+  try {
+    return stringifyMarkingRepeats(value);
   } catch {
     return String(value);
   }
+}
+
+function stringifyWithAncestors(value: any): string {
+  // JSON.stringify walks depth-first and calls the replacer with `this` bound to the object that
+  // holds the current key. Unwinding the stack down to that holder leaves exactly the ancestors
+  // of the current value on it.
+  const ancestors: object[] = [];
+  let expanded = 0;
+  return JSON.stringify(
+    value,
+    function (this: any, _key, val) {
+      const placeholder = placeholderFor(val);
+      if (placeholder !== undefined) return placeholder;
+      if (val && typeof val === "object") {
+        while (ancestors.length > 0 && ancestors[ancestors.length - 1] !== this) {
+          ancestors.pop();
+        }
+        if (ancestors.includes(val)) return "[Circular]";
+        if (++expanded > MAX_EXPANDED_OBJECTS) throw new ExpansionBudgetExceeded();
+        ancestors.push(val);
+      }
+      return val;
+    },
+    2,
+  );
+}
+
+function stringifyMarkingRepeats(value: any): string {
+  const seen = new WeakSet();
+  return JSON.stringify(
+    value,
+    (_key, val) => {
+      const placeholder = placeholderFor(val);
+      if (placeholder !== undefined) return placeholder;
+      if (val && typeof val === "object") {
+        if (seen.has(val)) return "[Shared]";
+        seen.add(val);
+      }
+      return val;
+    },
+    2,
+  );
 }
 
 /**

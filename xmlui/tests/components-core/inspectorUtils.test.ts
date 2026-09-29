@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   safeStringify,
+  safeClone,
   simpleStringify,
   prefixLines,
   formatDiff,
@@ -66,6 +67,44 @@ describe("inspectorUtils", () => {
       expect(result).toContain("[Circular]");
     });
 
+    it("serializes a shared (non-circular) object in full at each occurrence", () => {
+      const shared = { a: 1 };
+      const result = JSON.parse(safeStringify({ x: shared, y: shared }));
+      expect(result).toEqual({ x: { a: 1 }, y: { a: 1 } });
+    });
+
+    it("serializes an object repeated in an array in full", () => {
+      const rec = { id: 7, tags: ["t"] };
+      const result = JSON.parse(safeStringify([rec, rec, { nested: rec }]));
+      expect(result).toEqual([rec, rec, { nested: rec }]);
+    });
+
+    it("marks only the back-reference of a cycle reached through a shared object", () => {
+      const shared: any = { name: "s" };
+      shared.self = shared;
+      const result = JSON.parse(safeStringify({ x: shared, y: shared }));
+      expect(result).toEqual({
+        x: { name: "s", self: "[Circular]" },
+        y: { name: "s", self: "[Circular]" },
+      });
+    });
+
+    it("marks a deep back-reference to an ancestor as circular", () => {
+      const root: any = { child: { grandchild: {} } };
+      root.child.grandchild.up = root;
+      const result = JSON.parse(safeStringify(root));
+      expect(result).toEqual({ child: { grandchild: { up: "[Circular]" } } });
+    });
+
+    it("falls back to marking repeats when shared subtrees would expand exponentially", () => {
+      // 40 levels, each pointing twice at the next: 2^40 paths when expanded in full.
+      let node: any = { leaf: true };
+      for (let i = 0; i < 40; i++) node = { left: node, right: node };
+      const result = JSON.parse(safeStringify(node));
+      expect(result.left.left.left).toBeTypeOf("object");
+      expect(result.right).toBe("[Shared]");
+    });
+
     it("handles Window object", () => {
       const obj = { win: window };
       const result = safeStringify(obj);
@@ -89,6 +128,23 @@ describe("inspectorUtils", () => {
   // ==========================================================================
   // SIMPLE STRINGIFY
   // ==========================================================================
+  describe("safeClone", () => {
+    it("keeps shared references instead of replacing them with [Circular]", () => {
+      const status = { state: "ok" };
+      const clone = safeClone({ recStatus: [status, status], latest: status });
+      expect(clone).toEqual({
+        recStatus: [{ state: "ok" }, { state: "ok" }],
+        latest: { state: "ok" },
+      });
+    });
+
+    it("still replaces a true cycle with [Circular]", () => {
+      const a: any = { v: 1 };
+      a.me = a;
+      expect(safeClone(a)).toEqual({ v: 1, me: "[Circular]" });
+    });
+  });
+
   describe("simpleStringify", () => {
     it("handles undefined", () => {
       expect(simpleStringify(undefined)).toBe("undefined");
