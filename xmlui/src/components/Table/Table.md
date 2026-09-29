@@ -943,6 +943,36 @@ The following example disables all table rows where the item's quantity exceeds 
 
 %-PROP-END
 
+%-PROP-START rowVariant
+
+The following example tints the rows of low-stock items. The function returns the variant name `low` for them, and the `backgroundColor-row-low-Table` and `textColor-row-low-Table` theme variables style those rows:
+
+```xmlui-pg copy display name="Example: rowVariant" height="260px"
+<App>
+  <Theme
+    backgroundColor-row-low-Table="$color-warn-100"
+    textColor-row-low-Table="$color-danger-500">
+    <Table
+      data="{[
+        { id: 1, name: 'Apples', quantity: 5 },
+        { id: 2, name: 'Bananas', quantity: 0 },
+        { id: 3, name: 'Carrots', quantity: 100 },
+        { id: 4, name: 'Spinach', quantity: 1 }
+      ]}"
+      rowVariant="{(item) => item.quantity < 2 ? 'low' : null}">
+      <Column bindTo="name" />
+      <Column bindTo="quantity" />
+    </Table>
+  </Theme>
+</App>
+```
+
+The function can also read app state, for example `rowVariant="{(item) => item.id === playingId ? 'playing' : null}"`, and the rows update when that state changes. Selected and hovered rows keep their own background, while the variant's text color still applies. `backgroundColor-row-<name>-Table--hover` sets the hover color of a variant row.
+
+See [Highlight rows conditionally](/docs/howto/highlight-rows-conditionally#tint-whole-rows-with-a-row-variant) for more.
+
+%-PROP-END
+
 %-PROP-START rowsSelectable
 
 The default value is `false`.

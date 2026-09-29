@@ -106,3 +106,41 @@ test.describe("highlight-one-row-from-code", { tag: "@website" }, () => {
     await expect(row(page, "Redesign dashboard")).toHaveClass(/selected/);
   });
 });
+
+test.describe("tint-whole-rows-with-a-row-variant", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(
+    markdown,
+    "Tint whole rows with a row variant",
+  );
+  const row = (page: any, title: string) => page.locator("tbody tr").filter({ hasText: title });
+  const bg = (page: any, title: string) =>
+    row(page, title).evaluate((el: Element) => getComputedStyle(el).backgroundColor);
+
+  test("overdue rows and the playing row carry their variants", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(row(page, "Fix login bug")).toHaveAttribute("data-row-variant", "overdue");
+    await expect(row(page, "Migrate database")).toHaveAttribute("data-row-variant", "overdue");
+    await expect(row(page, "Redesign dashboard")).toHaveAttribute("data-row-variant", "playing");
+    await expect(row(page, "Update docs")).not.toHaveAttribute("data-row-variant");
+  });
+
+  test("variant rows are tinted and overdue text is colored", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(row(page, "Update docs")).toBeVisible();
+    const plain = await bg(page, "Update docs");
+    expect(await bg(page, "Fix login bug")).not.toBe(plain);
+    expect(await bg(page, "Redesign dashboard")).not.toBe(plain);
+    expect(await bg(page, "Redesign dashboard")).not.toBe(await bg(page, "Fix login bug"));
+    const plainColor = await row(page, "Update docs").evaluate(
+      (el: Element) => getComputedStyle(el).color,
+    );
+    await expect(row(page, "Fix login bug")).not.toHaveCSS("color", plainColor);
+  });
+
+  test("the playing tint follows the app state", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await page.getByRole("button", { name: "Play next" }).click();
+    await expect(row(page, "Migrate database")).toHaveAttribute("data-row-variant", "playing");
+    await expect(row(page, "Redesign dashboard")).not.toHaveAttribute("data-row-variant");
+  });
+});

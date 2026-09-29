@@ -313,15 +313,29 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
       border-bottom: $borderBottom-cell-Table;
       --pinned-cell-bg: #{$backgroundColor-row-Table};
       --checkbox-cell-bg: #{$backgroundColor-selectionCell-Table};
+      --row-base-bg: #{$backgroundColor-row-Table};
 
       &.evenRow {
         background-color: $backgroundColor-evenRow-Table;
         --pinned-cell-bg: #{$backgroundColor-evenRow-Table};
+        --row-base-bg: #{$backgroundColor-evenRow-Table};
       }
 
       &.oddRow {
         background-color: $backgroundColor-oddRow-Table;
         --pinned-cell-bg: #{$backgroundColor-oddRow-Table};
+        --row-base-bg: #{$backgroundColor-oddRow-Table};
+      }
+
+      // Row variant (`rowVariant`): the row carries --row-variant-* custom properties that
+      // point at `backgroundColor-row-<name>-Table` and friends. A variant whose theme variable
+      // is undefined falls back to the row's normal (or striped) background. Declared after
+      // striping and before hover/selected, so selected and hovered rows keep their own
+      // background; the variant's text color applies in every state.
+      &.variantRow {
+        background-color: var(--row-variant-bg, var(--row-base-bg));
+        --pinned-cell-bg: var(--row-variant-bg, var(--row-base-bg));
+        color: var(--row-variant-text);
       }
 
       &.selected {
@@ -342,6 +356,15 @@ $borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover"
 
         .cell {
           background-color: $backgroundColor-row-Table--hover;
+        }
+      }
+
+      &.variantRow:hover {
+        background-color: var(--row-variant-bg-hover, #{$backgroundColor-row-Table--hover});
+        --pinned-cell-bg: var(--row-variant-bg-hover, #{$backgroundColor-pinnedCell-Table--hover});
+
+        .cell {
+          background-color: var(--row-variant-bg-hover, #{$backgroundColor-row-Table--hover});
         }
       }
 

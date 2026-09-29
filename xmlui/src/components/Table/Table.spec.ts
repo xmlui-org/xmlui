@@ -8036,3 +8036,123 @@ test.describe("sorting data without an id field", () => {
     await expect(firstNameCell(page)).toHaveText("a-item");
   });
 });
+
+test.describe("rowVariant", () => {
+  const DATA = `[
+    { id: 1, name: 'Alpha', state: 'playing' },
+    { id: 2, name: 'Beta', state: 'new' },
+    { id: 3, name: 'Gamma', state: '' }
+  ]`;
+  const RED = "rgb(255, 0, 0)";
+  const GREEN = "rgb(0, 128, 0)";
+  const BLUE = "rgb(0, 0, 255)";
+  const row = (page: any, name: string) => page.locator("tbody tr").filter({ hasText: name });
+
+  test("applies the variant's background and text color theme variables", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Theme backgroundColor-row-playing-Table="${RED}" textColor-row-playing-Table="${BLUE}" backgroundColor-row-new-Table="${GREEN}">
+      <Table data="{${DATA}}" rowVariant="{(item) => item.state}">
+        <Column bindTo="name" />
+      </Table>
+      </Theme>`,
+    );
+    await expect(row(page, "Alpha")).toHaveAttribute("data-row-variant", "playing");
+    await expect(row(page, "Alpha")).toHaveCSS("background-color", RED);
+    await expect(row(page, "Alpha")).toHaveCSS("color", BLUE);
+    await expect(row(page, "Beta")).toHaveCSS("background-color", GREEN);
+    await expect(row(page, "Gamma")).not.toHaveAttribute("data-row-variant");
+  });
+
+  test("a variant without theme variables keeps the normal and striped backgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Theme backgroundColor-oddRow-Table="${GREEN}">
+      <Table data="{${DATA}}" striped="true" rowVariant="{() => 'undeclared'}">
+        <Column bindTo="name" />
+      </Table>
+      </Theme>`,
+    );
+    await expect(row(page, "Beta")).toHaveAttribute("data-row-variant", "undeclared");
+    await expect(row(page, "Beta")).toHaveCSS("background-color", GREEN);
+  });
+
+  test("a variant background wins over striping", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Theme backgroundColor-oddRow-Table="${GREEN}" backgroundColor-row-new-Table="${RED}">
+      <Table data="{${DATA}}" striped="true" rowVariant="{(item) => item.state}">
+        <Column bindTo="name" />
+      </Table>
+      </Theme>`,
+    );
+    await expect(row(page, "Beta")).toHaveCSS("background-color", RED);
+  });
+
+  test("a selected row keeps the selected background and the variant text color", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Theme backgroundColor-selected-Table="${GREEN}" backgroundColor-row-playing-Table="${RED}" textColor-row-playing-Table="${BLUE}">
+      <Table id="t" data="{${DATA}}" rowsSelectable="true" rowVariant="{(item) => item.state}">
+        <Column bindTo="name" />
+      </Table>
+      <Button testId="select" label="Select" onClick="t.selectId(1)" />
+      </Theme>`,
+    );
+    await expect(row(page, "Alpha")).toHaveCSS("background-color", RED);
+    await page.getByTestId("select").click();
+    await expect(row(page, "Alpha")).toHaveClass(/selected/);
+    await expect(row(page, "Alpha")).toHaveCSS("background-color", GREEN);
+    await expect(row(page, "Alpha")).toHaveCSS("color", BLUE);
+  });
+
+  test("hover uses the variant hover color, falling back to the row hover color", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Theme backgroundColor-row-Table--hover="${GREEN}" backgroundColor-row-playing-Table="${RED}" backgroundColor-row-playing-Table--hover="${BLUE}" backgroundColor-row-new-Table="${RED}">
+      <Table data="{${DATA}}" rowVariant="{(item) => item.state}">
+        <Column bindTo="name" />
+      </Table>
+      </Theme>`,
+    );
+    await row(page, "Alpha").hover();
+    await expect(row(page, "Alpha")).toHaveCSS("background-color", BLUE);
+    await row(page, "Beta").hover();
+    await expect(row(page, "Beta")).toHaveCSS("background-color", GREEN);
+  });
+
+  test("updates when the state the function reads changes", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Theme backgroundColor-row-playing-Table="${RED}">
+      <Fragment var.playingId="{1}">
+        <Table data="{${DATA}}" rowVariant="{(item) => item.id === playingId ? 'playing' : null}">
+          <Column bindTo="name" />
+        </Table>
+        <Button testId="next" label="Next" onClick="playingId = playingId + 1" />
+      </Fragment>
+      </Theme>`,
+    );
+    await expect(row(page, "Alpha")).toHaveAttribute("data-row-variant", "playing");
+    await page.getByTestId("next").click();
+    await expect(row(page, "Beta")).toHaveAttribute("data-row-variant", "playing");
+    await expect(row(page, "Beta")).toHaveCSS("background-color", RED);
+    await expect(row(page, "Alpha")).not.toHaveAttribute("data-row-variant");
+  });
+
+  test("ignores a name that is not a valid variant", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Table data="{${DATA}}" rowVariant="{() => 'not valid!'}">
+        <Column bindTo="name" />
+      </Table>`,
+    );
+    await expect(row(page, "Alpha")).toBeVisible();
+    await expect(page.locator("tbody tr[data-row-variant]")).toHaveCount(0);
+  });
+});
