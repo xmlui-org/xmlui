@@ -24,6 +24,7 @@ import {
   useStyles,
 } from "../../components-core/theming/StyleContext";
 import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
+import { observeContentOverflow } from "./contentOverflow";
 
 type NestedAppProps = {
   api?: any;
@@ -38,6 +39,11 @@ type NestedAppProps = {
   withSplashScreen?: boolean;
   className?: string;
   inheritsHostTheme?: boolean;
+  /**
+   * Called with the number of pixels the nested app's content overflows its box by. The host can
+   * grow the box to fit. When omitted, the content is not observed.
+   */
+  onContentOverflow?: (overflow: number) => void;
 };
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
@@ -160,6 +166,7 @@ export const NestedApp = memo(function NestedApp({
   withSplashScreen = false,
   className,
   inheritsHostTheme = false,
+  onContentOverflow,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -409,6 +416,19 @@ export const NestedApp = memo(function NestedApp({
     toneToApply,
     refreshVersion,
   ]);
+
+  // --- Report content overflow so the host can grow the playground box to fit
+  const onContentOverflowRef = useRef(onContentOverflow);
+  onContentOverflowRef.current = onContentOverflow;
+  const observesOverflow = !!onContentOverflow;
+  useEffect(() => {
+    const shadowRoot = shadowRef.current;
+    const host = rootRef.current;
+    if (!observesOverflow || !shadowRoot || !host) return;
+    return observeContentOverflow(shadowRoot, host, (overflow) =>
+      onContentOverflowRef.current?.(overflow),
+    );
+  }, [observesOverflow]);
 
   const mountedRef = useRef(false);
   useEffect(() => {

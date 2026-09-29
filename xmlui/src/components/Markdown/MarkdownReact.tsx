@@ -222,9 +222,13 @@ function PlaygroundSampRenderer(props: any) {
     />
   );
   if (appProps.noFrame === true) {
-    return (
-      <div style={{ height: appProps.height ?? DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT }}>{content}</div>
-    );
+    // Without an explicit height the playground grows to fit its content, so the wrapper only
+    // reserves the default height instead of fixing it.
+    const wrapperStyle =
+      appProps.height !== undefined
+        ? { height: appProps.height }
+        : { minHeight: DEFAULT_IMPLICIT_PLAYGROUND_HEIGHT };
+    return <div style={wrapperStyle}>{content}</div>;
   }
   return content;
 }

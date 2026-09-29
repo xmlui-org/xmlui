@@ -252,6 +252,17 @@ auto-height rendering. The best long-term authoring pattern is to give important
 docs examples explicit, example-specific heights. The `320px` default remains a
 safe fallback.
 
+**Update (fit to content, #3918):** `320px` is now a reserve, not a fixed height.
+After a playground without an explicit `height` mounts, it grows to fit content
+that overflows its App's page-level scroll container, up to 85% of the viewport
+height, and never shrinks (`xmlui/src/components/NestedApp/contentOverflow.ts`).
+The pre-mount placeholder is unchanged, so lazy mounting still reserves space.
+Growth happens once per example, usually while it is still below the viewport
+(apps mount within the `800px` root margin), and the grown height is kept while
+the app hibernates. Boxes that grow above the reading position rely on the
+browser's scroll anchoring. Explicit heights are still fixed, so hand-tuned
+heights are now only needed to pin a size.
+
 ## Change 5: Normalize Empty Optional ComponentDef Collections
 
 Affected files:
