@@ -7,12 +7,12 @@ you can get real columns depends on where the list is written.
 | Where the list is written | What the summary can hold | How the column lines up |
 | --- | --- | --- |
 | XMLUI markup, `ExpandableItem` | Components | Layout, exactly, in any font |
-| Markdown, `> [!DETAILS]` | One trimmed plain string | Invisible spacing characters, and only with tabular figures |
+| Markdown, `> [!DETAILS]` | One trimmed line of inline Markdown | Invisible spacing characters, and only with tabular figures |
 
 In XMLUI, the summary of an `ExpandableItem` is a slot that holds components, so
 a collapsed row can have real columns. In Markdown, a `[!DETAILS]` summary is a
-plain string, so the collapsed view has no structure, and the best you can do is
-imitate columns with typography. **If the collapsed view needs structure, build
+single line of inline Markdown: it can use emphasis or code, but it has no
+layout, and the best you can do is imitate columns with typography. **If the collapsed view needs structure, build
 that part in XMLUI.**
 
 ## Build the summary from components
@@ -72,11 +72,12 @@ summary, and the following lines become the content:
 </App>
 ```
 
-Under the hood this is an `ExpandableItem` too, but the Markdown path hands it
-the summary as a string: the text after `[!DETAILS]`, with leading and trailing
-whitespace trimmed. There is no Markdown syntax that reaches the component
-summary slot, so a `[!DETAILS]` summary can't contain an `HStack`, a
-fixed-width box, or anything else that would make a column.
+Under the hood this is an `ExpandableItem` too. The Markdown path hands it the
+rest of the first line after `[!DETAILS]`, with leading and trailing whitespace
+trimmed. That line is rendered as inline Markdown, so `**bold**`, `*italic*`
+and `` `code` `` work in a summary. It is still only a line of text: there is
+no Markdown syntax for an `HStack`, a fixed-width box, or anything else that
+would make a column.
 
 The trim matters for the next section. A figure space (U+2007) counts as
 whitespace, so padding at the start of a summary disappears. A Braille pattern
@@ -191,10 +192,10 @@ Now the em dashes share one position. Two notes:
 end-aligned `Text` in an `HStack` gives exact columns in any font, with no
 special characters.
 
-**A `[!DETAILS]` summary written in Markdown is one trimmed string.** It has no
-columns to align; the U+2800 / U+2007 / U+2008 padding recipe only imitates
-them, and only with tabular figures, which you switch on with
-`fontVariant="tabular-nums"` on the `Markdown` component.
+**A `[!DETAILS]` summary written in Markdown is one trimmed line of text.** It
+can use inline formatting, but it has no columns to align; the U+2800 / U+2007 /
+U+2008 padding recipe only imitates them, and only with tabular figures, which
+you switch on with `fontVariant="tabular-nums"` on the `Markdown` component.
 
 **If the collapsed view needs structure, build that part in XMLUI.**
 

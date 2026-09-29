@@ -1267,3 +1267,94 @@ test.describe("allowHtml", () => {
     await expect(driver.component).toContainText("cmd @{ LogName = 22 } then <b>bold?</b>");
   });
 });
+
+test.describe("[!DETAILS] summaries", () => {
+  test("plain summary renders as text and body stays collapsed", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!DETAILS] Rent
+> Paid on the 1st.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    const summary = driver.component.locator('[data-part-id="summary"]');
+    await expect(summary).toHaveText("Rent");
+    await expect(driver.component.getByText("Paid on the 1st.")).not.toBeVisible();
+  });
+
+  test("summary keeps inline Markdown formatting", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!DETAILS] **4,795** Housing \`monthly\`
+> Rent and utilities.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    const summary = driver.component.locator('[data-part-id="summary"]');
+    await expect(summary.locator("strong")).toHaveText("4,795");
+    await expect(summary.locator("code")).toHaveText("monthly");
+    await expect(summary).toContainText("4,795 Housing monthly");
+    await expect(summary).not.toContainText("Rent and utilities.");
+  });
+
+  test("first body line keeps inline Markdown formatting", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!DETAILS] Housing
+> Rent is **due** on the 1st.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await driver.component.locator('[data-part-id="summary"]').click();
+    const content = driver.component.locator('[data-part-id="content"]');
+    await expect(content.locator("strong")).toHaveText("due");
+    await expect(content).toContainText("Rent is due on the 1st.");
+    await expect(content).not.toContainText("Housing");
+  });
+
+  test("summary alone with body in a later paragraph", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!DETAILS] *Groceries*
+>
+> Four trips to the market.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    const summary = driver.component.locator('[data-part-id="summary"]');
+    await expect(summary.locator("em")).toHaveText("Groceries");
+    await summary.click();
+    await expect(driver.component.locator('[data-part-id="content"]')).toContainText(
+      "Four trips to the market.",
+    );
+  });
+
+  test("empty summary falls back to 'Details'", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!DETAILS]
+> Hidden body.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    await expect(driver.component.locator('[data-part-id="summary"]')).toHaveText("Details");
+    await driver.component.locator('[data-part-id="summary"]').click();
+    await expect(driver.component.locator('[data-part-id="content"]')).toHaveText("Hidden body.");
+  });
+
+  test("[!SDETAILS] summary keeps formatting and renders a switch", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[
+> [!SDETAILS] **Utilities**
+> Power and water.
+]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    const summary = driver.component.locator('[data-part-id="summary"]');
+    await expect(summary.locator("strong")).toHaveText("Utilities");
+    await expect(summary.locator("input[type=checkbox]")).toBeAttached();
+  });
+});
