@@ -690,16 +690,28 @@ function getScrollMetrics(virtualizer: VirtualizerHandle | null): CollectionScro
  * update a `shift` ref in the same pass.
  *
  * That's all encapsulated in this handy hook, to keep the logic out of the component.
+ *
+ * A change counts as a prepend only when the previous rows survive intact as the tail of the new
+ * ones (`new = [added…] + old`), checked at the tail's head and at the last row. A filter, sort or
+ * wholesale replacement also changes the first row, but shifting on it keeps the distance from the
+ * end, so a short → long switch would land near the bottom (#3936). Rows added at both ends in one
+ * update don't shift. Section rows from `groupBy` may lack `idKey`, so an undefined key never
+ * counts as a match.
  */
 const useShift = (listData: any[], idKey: any) => {
   const previousListData = useRef<any[] | undefined>();
   const shouldShift = useRef<boolean>();
   if (listData !== previousListData.current) {
-    if (listData?.[0]?.[idKey] !== previousListData.current?.[0]?.[idKey]) {
-      shouldShift.current = true;
-    } else {
-      shouldShift.current = false;
-    }
+    const prev = previousListData.current;
+    const prevFirstKey = prev?.[0]?.[idKey];
+    const added = (listData?.length ?? 0) - (prev?.length ?? 0);
+    shouldShift.current =
+      !!prev &&
+      prev.length > 0 &&
+      added > 0 &&
+      prevFirstKey !== undefined &&
+      listData[added]?.[idKey] === prevFirstKey &&
+      listData[listData.length - 1]?.[idKey] === prev[prev.length - 1]?.[idKey];
     previousListData.current = listData;
   }
   return shouldShift.current;

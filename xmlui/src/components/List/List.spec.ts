@@ -3332,3 +3332,163 @@ test.describe("ResizeObserver feedback", () => {
     expect(roErrors).toEqual([]);
   });
 });
+
+// =============================================================================
+// SHIFT (#3936): virtua's `shift` only on true prepends
+// =============================================================================
+
+test.describe("shift on data change", () => {
+  // Shaped like the #3936 report: a filter switches between "open" (35 rows),
+  // "closed" (388) and "both" (closed rows first, the open rows lower down).
+  // Before the fix, any first-row change counted as a prepend, so a short →
+  // long switch kept the distance from the END and landed near the bottom.
+  const DATA = `
+    var.open="{Array.from({ length: 35 }, (_, i) => ({ id: 'o' + (i + 1), name: 'open ' + (i + 1) }))}"
+    var.closed="{Array.from({ length: 388 }, (_, i) => ({ id: 'c' + (i + 1), name: 'closed ' + (i + 1) }))}"
+    var.prepended="{[...Array.from({ length: 20 }, (_, i) => ({ id: 'p' + (i + 1), name: 'prepended ' + (i + 1) })), ...open]}"
+    var.both="{[closed[0], closed[1], closed[2], ...open, ...closed.slice(3)]}"
+  `;
+  const BUTTONS = `
+    <Button testId="open" label="open" onClick="rows = open" />
+    <Button testId="closed" label="closed" onClick="rows = closed" />
+    <Button testId="both" label="both" onClick="rows = both" />
+    <Button testId="prepend" label="prepend" onClick="rows = prepended" />
+  `;
+
+  const apps = {
+    "outside-scroll": (initial: string) => `
+      <VStack ${DATA} var.rows="{${initial}}">
+        <VStack testId="scroller" height="300px" overflowY="scroll">
+          <List id="testList" data="{rows}">
+            <Text height="30px">{$item.name}</Text>
+          </List>
+        </VStack>
+        ${BUTTONS}
+      </VStack>
+    `,
+    "inside-scroll": (initial: string) => `
+      <VStack ${DATA} var.rows="{${initial}}">
+        <List id="testList" testId="scroller" height="300px" data="{rows}">
+          <Text height="30px">{$item.name}</Text>
+        </List>
+        ${BUTTONS}
+      </VStack>
+    `,
+  };
+
+  // The element that actually scrolls: the only one whose content overflows.
+  const scrollTopOf = (page: any) =>
+    page.evaluate(() => {
+      let found = -1;
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          found = Math.round(el.scrollTop);
+        }
+      });
+      return found;
+    });
+
+  const setScrollTop = (page: any, value: number) =>
+    page.evaluate((v: number) => {
+      document.querySelectorAll("*").forEach((el: any) => {
+        if (el.scrollHeight > el.clientHeight + 20 && el.clientHeight > 50) {
+          el.scrollTop = v;
+        }
+      });
+    }, value);
+
+  for (const [mode, app] of Object.entries(apps)) {
+    test(`short → long replacement with a new first row stays at the top (${mode})`, async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(app("open"));
+      await expect(page.getByText("open 1", { exact: true })).toBeVisible();
+
+      await page.getByTestId("closed").click();
+      await expect(page.getByText("closed 1", { exact: true })).toBeVisible();
+      await expect.poll(() => scrollTopOf(page)).toBe(0);
+    });
+  }
+
+  test("replacement whose old first row survives lower down stays at the top", async ({
+    initTestBed,
+    page,
+  }) => {
+    // open → both: "open 1" is still present, but below closed rows, so the
+    // old list is not the tail of the new one.
+    await initTestBed(apps["outside-scroll"]("open"));
+    await expect(page.getByText("open 1", { exact: true })).toBeVisible();
+
+    await page.getByTestId("both").click();
+    await expect(page.getByText("closed 1", { exact: true })).toBeVisible();
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+  });
+
+  test("first data after an empty list stays at the top", async ({ initTestBed, page }) => {
+    await initTestBed(apps["outside-scroll"]("[]"));
+
+    await page.getByTestId("closed").click();
+    await expect(page.getByText("closed 1", { exact: true })).toBeVisible();
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+  });
+
+  test("replacement while scrolled down keeps the offset, not the distance from the end", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(apps["outside-scroll"]("open"));
+    await expect(page.getByText("open 1", { exact: true })).toBeVisible();
+    // Row 15 at the top: 15 * 30px.
+    await setScrollTop(page, 450);
+    await expect.poll(() => scrollTopOf(page)).toBe(450);
+
+    await page.getByTestId("closed").click();
+    await expect(page.getByText("closed 16", { exact: true })).toBeVisible();
+    await expect.poll(() => scrollTopOf(page)).toBe(450);
+  });
+
+  test("a true prepend keeps the viewed row in place", async ({ initTestBed, page }) => {
+    // Chat-history shape: 20 rows added above, the old rows intact below.
+    await initTestBed(apps["outside-scroll"]("open"));
+    await expect(page.getByText("open 1", { exact: true })).toBeVisible();
+    await setScrollTop(page, 450);
+    await expect.poll(() => scrollTopOf(page)).toBe(450);
+
+    await page.getByTestId("prepend").click();
+    // 450px + 20 prepended rows * 30px.
+    await expect.poll(() => scrollTopOf(page)).toBe(1050);
+    await expect(page.getByText("open 16", { exact: true })).toBeVisible();
+  });
+
+  test("groupBy growth does not shift when idKey is absent from section rows", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Section header and footer rows carry `id` and `key`, never `uid`. If the
+    // prepend check matched undefined keys, adding group B below would read as
+    // a prepend and scroll group A out of view.
+    await initTestBed(`
+      <VStack
+        var.groupA="{Array.from({ length: 12 }, (_, i) => ({ uid: 'a' + i, grp: 'A', name: 'a ' + i }))}"
+        var.groupB="{Array.from({ length: 12 }, (_, i) => ({ uid: 'b' + i, grp: 'B', name: 'b ' + i }))}"
+        var.rows="{groupA}">
+        <VStack testId="scroller" height="300px" overflowY="scroll">
+          <List id="testList" idKey="uid" groupBy="grp" data="{rows}">
+            <property name="groupHeaderTemplate">
+              <Text height="30px">group {$group.key}</Text>
+            </property>
+            <Text height="30px">{$item.name}</Text>
+          </List>
+        </VStack>
+        <Button testId="grow" label="grow" onClick="rows = [...groupA, ...groupB]" />
+      </VStack>
+    `);
+    await expect(page.getByText("group A", { exact: true })).toBeVisible();
+
+    await page.getByTestId("grow").click();
+    await expect(page.getByText("b 0", { exact: true })).toBeAttached();
+    await expect.poll(() => scrollTopOf(page)).toBe(0);
+    await expect(page.getByText("group A", { exact: true })).toBeVisible();
+  });
+});
