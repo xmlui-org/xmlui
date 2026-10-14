@@ -1,4 +1,4 @@
-import produce from "immer";
+import produce, { original } from "immer";
 import { cloneDeep, isPlainObject, keyBy, setWith, unset } from "lodash-es";
 
 import type { ContainerState } from "../../abstractions/ContainerDefs";
@@ -10,6 +10,46 @@ import { isRenderInProgress } from "../scheduler";
 import { evalTrace } from "../script-runner/eval-trace";
 
 const MAX_STATE_TRANSITION_LENGTH = 100;
+
+/**
+ * Loader entry keys compared by content rather than identity: a loader may send a fresh but
+ * equal object for them on every load.
+ */
+const CONTENT_COMPARED_LOADER_KEYS = new Set(["pageInfo", "responseHeaders"]);
+
+/** Whether two values are identical, or plain objects with the same keys and identical values */
+function shallowEqual(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (!isPlainObject(a) || !isPlainObject(b)) return false;
+  const aKeys = Object.keys(a as object);
+  const bKeys = Object.keys(b as object);
+  return (
+    aKeys.length === bKeys.length &&
+    aKeys.every((key) => Object.is((a as any)[key], (b as any)[key]))
+  );
+}
+
+/**
+ * Whether writing `patch` onto a loader's current state entry would change anything.
+ *
+ * A loader action that sets only values already in place must leave the entry untouched: an
+ * entry replaced by an equal copy is still a new container state, and redraws the component
+ * that owns the loader for nothing (#3941; the render trace reports it as `identityOnly`).
+ * A missing entry always counts as a change, so the entry is still created.
+ * @param current The loader's entry as stored before this action (not an immer draft)
+ * @param patch The fields the action sets
+ */
+export function loaderPatchChanges(
+  current: Record<string, any> | undefined,
+  patch: Record<string, any>,
+): boolean {
+  if (current === undefined || current === null) return true;
+  return Object.keys(patch).some((key) =>
+    CONTENT_COMPARED_LOADER_KEYS.has(key)
+      ? !shallowEqual(current[key], patch[key])
+      : !Object.is(current[key], patch[key]),
+  );
+}
 
 /**
  * This function creates a reducer for the container state. For diagnostics, it may
@@ -55,59 +95,71 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       }
     }
 
+    // --- Applies a loader action's fields to the loader's entry, unless they are all in place
+    // --- already. The comparison reads the stored entry, not the draft: a nested object read
+    // --- through an immer draft is a proxy, never identical to the incoming value.
+    function writeLoaderPatch(patch: Record<string, any>) {
+      if (!loaderPatchChanges(loaderEntryBeforeAction(), patch)) return;
+      state[uid] = { ...state[uid], ...patch };
+      storeNextValue(state[uid]);
+    }
+
+    function loaderEntryBeforeAction(): Record<string, any> | undefined {
+      return (original(state) as ContainerState | undefined)?.[uid];
+    }
+
     // --- Apply the action
     switch (action.type) {
       case ContainerActionKind.LOADER_IN_PROGRESS_CHANGED: {
-        state[uid] = {
-          ...state[uid],
+        writeLoaderPatch({
           inProgress: action.payload.inProgress,
           ...(action.payload.resetCancellation && {
             cancelled: false,
             lastCancelReason: undefined,
           }),
-        };
-        storeNextValue(state[uid]);
+        });
         break;
       }
       case ContainerActionKind.LOADER_IS_REFETCHING_CHANGED: {
-        state[uid] = { ...state[uid], isRefetching: action.payload.isRefetching };
-        storeNextValue(state[uid]);
+        writeLoaderPatch({ isRefetching: action.payload.isRefetching });
         break;
       }
       case ContainerActionKind.LOADER_LOADED: {
         const { data, pageInfo, responseHeaders } = action.payload;
+        const current = loaderEntryBeforeAction();
         // Preserve any existing state properties (e.g., custom component state).
         // Only clear inProgress when actual data arrives; when data is undefined
         // (reset/cleanup call), preserve inProgress so an in-flight fetch stays visible.
-        state[uid] = {
-          ...state[uid],
+        // byId derives from the value: keep it while the value is the same reference.
+        writeLoaderPatch({
           value: data,
-          byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
+          byId:
+            current && Object.is(current.value, data)
+              ? current.byId
+              : Array.isArray(data)
+                ? keyBy(data, (item) => item.$id)
+                : undefined,
           ...(data !== undefined && { inProgress: false }),
           loaded: data !== undefined,
           pageInfo,
           responseHeaders,
-        };
-        storeNextValue(state[uid]);
+        });
         break;
       }
       case ContainerActionKind.LOADER_ERROR: {
         const { error } = action.payload;
-        state[uid] = {
-          ...state[uid],
+        writeLoaderPatch({
           error,
           inProgress: false,
           loaded: true,
           cancelled: false,
           lastCancelReason: undefined,
-        };
-        storeNextValue(state[uid]);
+        });
         break;
       }
       case ContainerActionKind.LOADER_CANCELLED: {
-        const currentPageInfo = state[uid]?.pageInfo;
-        state[uid] = {
-          ...state[uid],
+        const currentPageInfo = loaderEntryBeforeAction()?.pageInfo;
+        writeLoaderPatch({
           inProgress: false,
           isRefetching: false,
           ...(currentPageInfo && {
@@ -119,8 +171,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
           }),
           cancelled: true,
           lastCancelReason: action.payload.cancelReason,
-        };
-        storeNextValue(state[uid]);
+        });
         break;
       }
       case ContainerActionKind.EVENT_HANDLER_STARTED: {
