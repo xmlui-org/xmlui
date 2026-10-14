@@ -3,6 +3,7 @@ import {
   forwardRef,
   memo,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -34,6 +35,7 @@ import { useGlobalVariables } from "../state/global-variables";
 import { useRoutingParams } from "../state/routing-state";
 import { useAppContext } from "../AppContext";
 import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
+import { RenderPassContext, RenderPassTracker } from "../inspector/render-logging";
 import {
   filterCyclicLocalDefinitions,
   getCyclicLocalDefinitionNames,
@@ -145,6 +147,37 @@ export const StateContainer = memo(
     const memoedVars = useRef<MemoedVars>(new Map());
     const appContext = useAppContext();
     const xsVerbose = appContext.xmluiConfig?.xsVerbose === true;
+
+    // --- Inspector: one `render:pass` entry per pass of App, a UDC or an explicit
+    // --- container, with its cause and duration (see inspector/render-logging.ts)
+    const parentPass = useContext(RenderPassContext);
+    const passTrackerRef = useRef<RenderPassTracker | null>(null);
+    if (xsVerbose) {
+      const innerType = (node as any).children?.[0]?.type;
+      const passInfo = {
+        component:
+          node.udcName ?? (node.uid === "root" ? "App" : (innerType ?? node.type ?? "anon")),
+        uid: node.uid ?? node.containerUid?.description,
+        isUdc: !!node.udcName,
+        // --- Implicit (`var.`) containers and per-item template containers (Items,
+        // --- List rows: they carry contextVars) fold into their owner's pass.
+        isImplicit:
+          node.uid !== "root" && !node.udcName && (!!isImplicit || !!node.contextVars),
+        source: (node as any).children?.[0]?.debug?.source,
+      };
+      if (!passTrackerRef.current) passTrackerRef.current = new RenderPassTracker(passInfo);
+      else passTrackerRef.current.setInfo(passInfo);
+      passTrackerRef.current.beginRender(parentPass);
+    } else {
+      // --- Inert when the inspector is off: the dispatch and API hooks below
+      // --- reach the tracker only through this ref.
+      passTrackerRef.current = null;
+    }
+    const passTracker = xsVerbose ? passTrackerRef.current : null;
+    useLayoutEffect(() => {
+      passTracker?.commit();
+    });
+
     const udcEvalOptions = useMemo<EvalTreeOptions>(() => {
       if (!node.udcContract) return EMPTY_OBJECT;
       return {
@@ -229,7 +262,16 @@ export const StateContainer = memo(
     // --- contains the debug configuration; it may enable (or disable) logging.
     const debugView = useDebugView();
     const containerReducer = createContainerReducer(debugView);
-    const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
+    const [componentState, reducerDispatch] = useReducer(containerReducer, EMPTY_OBJECT);
+    // --- Every action reaching this reducer passes here, so the inspector can note
+    // --- the trace id and the kind of each uid at dispatch time.
+    const dispatch: ContainerDispatcher = useCallback(
+      (action) => {
+        passTrackerRef.current?.noteDispatch(action);
+        reducerDispatch(action);
+      },
+      [reducerDispatch],
+    );
 
     // ========================================================================
     // LAYER 3: COMPONENT APIS
@@ -244,6 +286,28 @@ export const StateContainer = memo(
         [componentState, componentApis],
       ),
     );
+
+    passTracker?.observe({
+      props: {
+        node,
+        resolvedKey,
+        parentState,
+        parentGlobalVars,
+        parentStatePartChanged,
+        parentRegisterComponentApi,
+        parentDispatch,
+        parentRenderContext,
+        layoutContextRef,
+        uidInfoRef,
+        isImplicit,
+        fullParentStateRef,
+        children,
+        ...rest,
+      },
+      componentState: componentStateWithApis,
+      version,
+      propSources: node.udcPropSources?.current,
+    });
 
     // ========================================================================
     // LAYER 4: CONTEXT VARIABLES
@@ -448,6 +512,7 @@ export const StateContainer = memo(
     // ========================================================================
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
+      passTrackerRef.current?.noteApi(uid);
       setComponentApis(
         produce((draft) => {
           if (!draft[uid]) {
@@ -456,6 +521,7 @@ export const StateContainer = memo(
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
               draft[uid][key] = value;
+              passTrackerRef.current?.noteField(uid, key);
             }
           });
         }),
@@ -567,7 +633,7 @@ export const StateContainer = memo(
     // RENDERING
     // ========================================================================
 
-    return (
+    const rendered = (
       <ErrorBoundary node={node} location={"container"}>
         <FnDepsProvider value={functionDeps}>
           <Container
@@ -595,6 +661,11 @@ export const StateContainer = memo(
           </Container>
         </FnDepsProvider>
       </ErrorBoundary>
+    );
+    return passTracker ? (
+      <RenderPassContext.Provider value={passTracker.handle}>{rendered}</RenderPassContext.Provider>
+    ) : (
+      rendered
     );
   }),
 );

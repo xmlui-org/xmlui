@@ -34,6 +34,12 @@ export interface ContainerWrapperDef extends ComponentDef {
 
   // --- UDC sandbox contract active for this container, when rendering a UDC.
   udcContract?: UdcContract;
+
+  // --- When rendering a UDC: its name and the markup source of each prop, so the
+  // --- inspector can name the UDC and flag a prop whose source is unchanged but
+  // --- whose value has a new identity (see inspector/render-logging.ts).
+  udcName?: string;
+  udcPropSources?: { current: Record<string, any> | undefined };
 }
 
 /**

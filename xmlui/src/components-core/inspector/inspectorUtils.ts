@@ -376,7 +376,9 @@ export interface XsLogEntry {
  * Push a log entry to window._xsLogs with max limit enforcement.
  *
  * @param entry - The log entry to push.
- * @param xsLogMax - Maximum buffer size. When the buffer is full:
+ * @param xsLogMax - Maximum buffer size. Defaults to the app's configured
+ *   `xsVerboseLogMax` (published by AppContent as `window._xsLogMax`), else 200.
+ *   When the buffer is full:
  *   - `"drop-oldest"` (default): evicts the oldest evictable entries.
  *   - `"drop-newest"`: drops `entry` and returns `false`.
  *   - `"block"`: drops `entry`, emits an `audit-buffer-overflow` info entry,
@@ -385,7 +387,7 @@ export interface XsLogEntry {
  */
 export function pushXsLog(
   entry: XsLogEntry,
-  xsLogMax: number = 200,
+  xsLogMaxArg?: number,
   onOverflow: "drop-oldest" | "drop-newest" | "block" = "drop-oldest",
 ): boolean {
   if (typeof window === "undefined") return false;
@@ -393,6 +395,8 @@ export function pushXsLog(
   // _xsLogs is only initialized by AppContent when xsVerbose=true.
   // If it doesn't exist, tracing is off — noop.
   if (!Array.isArray(w._xsLogs)) return false;
+  const xsLogMax =
+    xsLogMaxArg ?? (Number.isFinite(w._xsLogMax) && w._xsLogMax > 0 ? w._xsLogMax : 200);
 
   const atCapacity = Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length >= xsLogMax;
 
