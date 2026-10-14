@@ -38,10 +38,13 @@ export type RenderPassCause =
   | { kind: "mount" }
   /** Own `var` keys changed */
   | { kind: "state"; keys: string[] }
-  /** A component's own state changed (e.g. a MediaPlayer's currentTime) */
-  | { kind: "componentState"; uid: string; fields?: string[] }
-  /** A DataSource / APICall state changed */
-  | { kind: "loader"; uid: string; fields?: string[] }
+  /**
+   * A component's own state changed (e.g. a MediaPlayer's currentTime).
+   * `identityOnly`: the entry was replaced by one with equal values.
+   */
+  | { kind: "componentState"; uid: string; fields?: string[]; identityOnly?: true }
+  /** A DataSource / APICall state changed; `identityOnly` as above */
+  | { kind: "loader"; uid: string; fields?: string[]; identityOnly?: true }
   /** UDC props changed */
   | { kind: "props"; names: string[]; sameSourceNewIdentity?: string[] }
   /** Pass-through from the parent: which inputs from the parent changed */
@@ -105,8 +108,14 @@ export const RenderPassContext = createContext<RenderPassHandle | null>(null);
 export interface RenderPassSnapshot {
   /** The container's own props (the inputs its memo compares) */
   props: Record<string, any>;
-  /** Reducer state merged with component APIs */
+  /**
+   * The container's raw reducer state. Compared as is: immer keeps unchanged
+   * entries' identity. (The merged state with APIs rebuilds every entry on each
+   * merge, so diffing it would report every key as changed.)
+   */
   componentState: Record<string | symbol, any>;
+  /** The container's raw component-API map, keyed by uid */
+  componentApis?: Record<symbol, any>;
   version: number;
   /** For a UDC: the markup source of each prop at this pass */
   propSources?: Record<string, any>;
@@ -180,17 +189,30 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
 
   const causes: RenderPassCause[] = [];
 
-  // --- Own state: vars are keyed by name, loaders and components by uid symbol
+  // --- Own state: vars are keyed by name, loaders and components by uid symbol;
+  // --- component APIs are a separate map keyed by uid
   const stateKeys: string[] = [];
+  const changedUids: symbol[] = [];
   changedKeys(prev.componentState, next.componentState).forEach((key) => {
-    if (typeof key === "string") {
-      stateKeys.push(key);
-      return;
-    }
-    const fields = uidFields.get(key);
+    if (typeof key === "string") stateKeys.push(key);
+    else changedUids.push(key);
+  });
+  changedKeys(prev.componentApis, next.componentApis).forEach((key) => {
+    if (typeof key === "symbol" && !changedUids.includes(key)) changedUids.push(key);
+  });
+  if (stateKeys.length > 0) causes.push({ kind: "state", keys: stateKeys });
+  changedUids.forEach((key) => {
+    // --- Fields: what differs between the uid's previous and current entries
+    // --- (state and API), else what was recorded at dispatch time.
+    const diffed = new Set<string>([
+      ...changedKeys(prev.componentState?.[key], next.componentState?.[key]),
+      ...changedKeys(prev.componentApis?.[key], next.componentApis?.[key]),
+    ].map(keyLabel));
+    const fields = diffed.size > 0 ? diffed : uidFields.get(key);
     const entry = {
       uid: keyLabel(key),
       ...(fields && fields.size > 0 && { fields: Array.from(fields) }),
+      ...(diffed.size === 0 && { identityOnly: true as const }),
     };
     causes.push(
       uidKinds.get(key) === "loader"
@@ -198,7 +220,6 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
         : { kind: "componentState", ...entry },
     );
   });
-  if (stateKeys.length > 0) causes.unshift({ kind: "state", keys: stateKeys });
 
   // --- Inputs from the parent
   const changedProps = changedKeys(prev.props, next.props)
@@ -335,6 +356,10 @@ export class RenderPassTracker {
     this.handle.passId = this.passId;
     this.handle.open = true;
     this.handle.traceId = this.pendingTraceId ?? (parent?.open ? parent.traceId : undefined);
+    // --- Consumed here, not at commit: a change dispatched from a descendant's
+    // --- layout effect lands after this pass has read its cause, and belongs to
+    // --- the next pass.
+    this.pendingTraceId = undefined;
   }
 
   /** Record a reducer action at dispatch time */
@@ -390,12 +415,30 @@ export class RenderPassTracker {
 
   /** Compare with the previous pass; folds into the parent pass when implicit */
   observe(snapshot: RenderPassSnapshot) {
+    // --- Consume only the fields of uids that changed in this pass. A dispatch made
+    // --- while this pass renders reaches the state only in the next pass, so its
+    // --- fields stay pending until then.
+    const changed = new Set<symbol>();
+    if (this.prev) {
+      [
+        ...changedKeys(this.prev.componentState, snapshot.componentState),
+        ...changedKeys(this.prev.componentApis, snapshot.componentApis),
+      ].forEach((key) => {
+        if (typeof key === "symbol") changed.add(key);
+      });
+    }
+    const uidFields = new Map<symbol, Set<string>>();
+    const pending = new Map<symbol, Set<string>>();
+    this.uidFields.forEach((fields, uid) =>
+      (changed.has(uid) ? uidFields : pending).set(uid, fields),
+    );
+    this.uidFields = pending;
     this.causes = buildCauses({
       prev: this.prev,
       next: snapshot,
       isUdc: this.info.isUdc,
       uidKinds: this.uidKinds,
-      uidFields: this.uidFields,
+      uidFields,
       parentPassId: this.parentPassId,
     });
     this.prev = snapshot;
@@ -409,8 +452,6 @@ export class RenderPassTracker {
     const endMs = performance.now();
     this.handle.open = false;
     const traceId = this.handle.traceId;
-    this.pendingTraceId = undefined;
-    this.uidFields = new Map();
     if (this.folded) return;
 
     const { component, uid, isUdc, isImplicit, source } = this.info;

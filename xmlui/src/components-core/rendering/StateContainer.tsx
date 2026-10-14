@@ -304,7 +304,8 @@ export const StateContainer = memo(
         children,
         ...rest,
       },
-      componentState: componentStateWithApis,
+      componentState,
+      componentApis,
       version,
       propSources: node.udcPropSources?.current,
     });
