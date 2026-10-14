@@ -42,6 +42,52 @@ known), and structured payload. Filtering by `kind` is the fastest way to
 focus on a specific subsystem — for example showing only `app:fetch`
 entries while debugging a network problem.
 
+## Render passes
+
+With `xsVerbose` on, the trace records a `render:pass` entry each time a
+container re-renders. A container is `App`, a user-defined component, or an
+explicit `<Container>`. The entry says why the container re-rendered, and how
+long it took.
+
+A **pass** is one render of one container: from the start of its render to
+the moment its whole subtree is committed. Components that aren't containers,
+such as `Text`, `Button` or `Stack`, get no entry of their own; their render
+time is included in their container's pass. A container that has a `var.`,
+and each row of `Items` or `List`, renders inside its owner's pass. It is
+counted there (`implicitContainers`, `folded`) rather than given its own
+entry, unless it re-renders on its own.
+
+| Field | Meaning |
+|---|---|
+| `passId`, `parentPassId` | This pass, and the pass it rendered inside, if any |
+| `component`, `uid`, `udc` | The user-defined component's name, `App`, or the container's type |
+| `startMs`, `durationMs` | `performance.now()` at render start; time to commit, including the subtree |
+| `traceId` | The trace of the handler whose change caused the pass, when there was one |
+| `cause` | Why the pass happened: one or more of the entries below |
+| `implicitContainers`, `folded` | Containers rendered inside this pass, grouped by component and cause, with a count |
+
+Each `cause` entry is one of:
+
+- `state` with `keys`: the container's own variables changed.
+- `componentState` with `uid` and `fields`: a component's state or API changed (a `MediaPlayer`'s `ended`, an event handler's `…InProgress` flag).
+- `loader` with `uid` and `fields`: a `DataSource` or `APICall` changed.
+- `props` with `names`: a user-defined component's props changed. `sameSourceNewIdentity` lists function props whose markup is unchanged but whose value is new.
+- `parent` with `passId`, `inputs` and `keys`: the parent re-rendered and passed down something new.
+- `mount`: the first render.
+- `unknown`: nothing the container receives changed. Usually a React context did.
+
+A `componentState` or `loader` cause marked `identityOnly` means the entry was
+replaced by one with equal values. The pass did no useful work.
+
+**Reading durations.** A pass's duration includes every pass rendered inside
+it, so add up only passes with no `parentPassId`. Durations are upper bounds:
+anything React does between render and commit is counted too. React may merge
+quick successive changes into one pass, so one assignment can produce at most
+one pass, not exactly one.
+
+Raise the trace size with `xsVerboseLogMax` in `xmluiConfig`; a single
+interaction in a large app can produce hundreds of entries.
+
 ## Related
 
 - [Managed React Overview](/docs/managed-react/overview)

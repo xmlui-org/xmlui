@@ -62,3 +62,4 @@ re-evaluation cost from handler timings alone is speculation.
 
 - [Scripting](/docs/guides/scripting) — the `xs` language and its restrictions
 - [App component](/docs/reference/components/App) — the `App` namespace
+- [Render passes](/docs/managed-react/observability-substrate#render-passes) — which component re-rendered, why, and for how long
