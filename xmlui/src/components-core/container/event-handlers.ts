@@ -36,6 +36,7 @@ import { executeCompiledStatementSync } from "../script-compiler";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { createEventEvalOptions } from "../script-runner/eval-options";
+import { EVENT_FLAG_READS, mayReadEventFlag } from "../optimization/eventFlagReads";
 import {
   executeCompiledEventAsyncHandler,
   UnsupportedCompiledScriptNodeError,
@@ -307,8 +308,19 @@ export function createEventHandlers(config: EventHandlerConfig) {
       };
 
       // --- Check if the event handler can sign its lifecycle state
+      // --- `<event>InProgress` is written only when the app may read it: each write is a new
+      // --- container state that redraws the owner (#3941). Decided once per run, so start,
+      // --- completion and error agree: a flag set to true is always cleared.
+      let signsEventLifecycle: boolean | undefined;
       const canSignEventLifecycle = () => {
-        return uid.description !== undefined && effectiveOptions?.eventName !== undefined;
+        signsEventLifecycle ??=
+          uid.description !== undefined &&
+          effectiveOptions?.eventName !== undefined &&
+          mayReadEventFlag(
+            (appContext?.appGlobals as any)?.[EVENT_FLAG_READS],
+            effectiveOptions.eventName,
+          );
+        return signsEventLifecycle;
       };
 
       // Ensure stateRef reflects the latest parent state before reading it.

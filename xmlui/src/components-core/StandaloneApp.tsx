@@ -68,6 +68,7 @@ import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree"
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 import { computeUsesForTree } from "./optimization/computedUses";
+import { collectEventFlagReads, EVENT_FLAG_READS } from "./optimization/eventFlagReads";
 import { getOptimizerMetadata } from "./optimization/metadataLookup";
 import { createDebugSourceUrl } from "./script-compiler/source";
 import { applyBuildScriptCompilationSettings } from "./script-compiler/build-settings";
@@ -506,8 +507,14 @@ function StandaloneApp({
       ...(appGlobals || {}),
       ...(globals || {}),
       ...lsOverrides,
+      // --- Which `<event>InProgress` flags the app can read, computed from the very definitions
+      // --- rendered here. Event handlers skip writing the others, each of which would redraw
+      // --- the handler's owner twice per run (#3941). A symbol keeps it out of markup.
+      [EVENT_FLAG_READS]: entryPoint
+        ? collectEventFlagReads([entryPoint, ...(components ?? [])])
+        : undefined,
     };
-  }, [appGlobals, globals, name]);
+  }, [appGlobals, globals, name, entryPoint, components]);
 
   const themesWithExtensions = useMemo(
     () => [
