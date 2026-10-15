@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useRef } from "react";
+import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -256,6 +256,30 @@ export function buildLinkMap(
   return linkMap;
 }
 
+/**
+ * A signature of a navigation hierarchy's shape: each node's type, label, target and icon, with
+ * its children, in order. Everything else in a node (`parent`, `pathSegments`, `prevLink`,
+ * `nextLink`, `firstLink`, `lastLink`) is derived from that shape, so two hierarchies with the
+ * same signature produce link maps with the same content.
+ *
+ * The NavPanel registers its link map only when this changes. Rebuilding the hierarchy (which
+ * happens on every App state change, because the NavPanel's value extractor is new) used to
+ * register an equal but new map each time; that changed `$linkInfo` in every container and
+ * redrew all of them (#3941, engine item 4).
+ */
+export function navHierarchySignature(navLinks: NavHierarchyNode[] | undefined): string {
+  if (!navLinks) return "";
+  const shape = (nodes: NavHierarchyNode[]): unknown[] =>
+    nodes.map((node) => [
+      node.type,
+      node.label,
+      node.to ?? null,
+      node.icon ?? null,
+      node.children ? shape(node.children) : null,
+    ]);
+  return JSON.stringify(shape(navLinks));
+}
+
 import { defaultProps } from "./NavPanel.defaults";
 
 interface INavPanelContext {
@@ -486,14 +510,19 @@ export const NavPanel = memo(forwardRef(function NavPanel(
   // Footer only in vertical layouts: vertical, vertical-sticky, vertical-full-header
   const hasFooter = !!footerContent && vertical;
 
-  // Register the linkMap when navLinks change
+  // Register the linkMap only when the hierarchy's shape changes (see navHierarchySignature).
+  // The hierarchy is rebuilt on every App state change; registering each equal copy made
+  // `$linkInfo` new in every container and redrew all of them (#3941).
   const registerLinkMap = linkInfoContext?.registerLinkMap;
+  const navLinksSignature = useMemo(() => navHierarchySignature(navLinks), [navLinks]);
+  const navLinksRef = useRef(navLinks);
+  navLinksRef.current = navLinks;
   useEffect(() => {
-    if (registerLinkMap && navLinks) {
-      const linkMap = buildLinkMap(navLinks);
-      registerLinkMap(linkMap);
+    const links = navLinksRef.current;
+    if (registerLinkMap && links) {
+      registerLinkMap(buildLinkMap(links));
     }
-  }, [navLinks, registerLinkMap]);
+  }, [navLinksSignature, registerLinkMap]);
 
   if (inDrawer) {
     return (
