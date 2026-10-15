@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "",
+  "items": [
+    {
+      "id": "npm-oidc-repository-fields",
+      "status": "proposed",
+      "files": [
+        "packages/xmlui-ai-blocks/package.json",
+        "packages/xmlui-animations/package.json",
+        "packages/xmlui-calendar/package.json",
+        "packages/xmlui-crm-blocks/package.json",
+        "packages/xmlui-devtools/package.json",
+        "packages/xmlui-dnd-list/package.json",
+        "packages/xmlui-docs-blocks/package.json",
+        "packages/xmlui-echart/package.json",
+        "packages/xmlui-gauge/package.json",
+        "packages/xmlui-grid-layout/package.json",
+        "packages/xmlui-masonry/package.json",
+        "packages/xmlui-pdf/package.json",
+        "packages/xmlui-react-flow/package.json",
+        "packages/xmlui-recharts/package.json",
+        "packages/xmlui-search/package.json",
+        "packages/xmlui-tiptap-editor/package.json",
+        "packages/xmlui-website-blocks/package.json",
+        "tools/create-xmlui-hello-world/package.json"
+      ]
+    }
+  ]
+}
