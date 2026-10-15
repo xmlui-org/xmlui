@@ -113,6 +113,10 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       case ContainerActionKind.LOADER_IN_PROGRESS_CHANGED: {
         writeLoaderPatch({
           inProgress: action.payload.inProgress,
+          // --- A refetch starts both flags in one write: one redraw of the owner, not two (#3941)
+          ...(action.payload.isRefetching !== undefined && {
+            isRefetching: action.payload.isRefetching,
+          }),
           ...(action.payload.resetCancellation && {
             cancelled: false,
             lastCancelReason: undefined,

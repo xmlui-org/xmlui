@@ -23,7 +23,15 @@ export interface LoaderRendererDef {
   hints?: ComponentMetadata;
 }
 
-export type LoaderInProgressChangedFn = (isInProgress: boolean, resetCancellation?: boolean) => void;
+/**
+ * Signs a loader's in-progress state. `isRefetching`, when given, is written in the same state
+ * change, so a refetch that starts both flags redraws the owner once, not twice (#3941).
+ */
+export type LoaderInProgressChangedFn = (
+  isInProgress: boolean,
+  resetCancellation?: boolean,
+  isRefetching?: boolean,
+) => void;
 export type LoaderLoadedFn = (data: any, pageInfo?: any, responseHeaders?: Record<string, string>) => void;
 export type LoaderErrorFn = (error: any) => void;
 export type LoaderCancelledFn = (reason?: string) => void;
