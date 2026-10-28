@@ -1152,6 +1152,9 @@ export function AppContent({
     if (!Array.isArray(w._xsLogs)) {
       w._xsLogs = [];
     }
+    // The configured buffer size, for every pushXsLog call that doesn't pass
+    // one: without it, the first such call trims the shared buffer to 200.
+    w._xsLogMax = xsLogMax;
     if (!w._xsStartupTrace) {
       w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
     }

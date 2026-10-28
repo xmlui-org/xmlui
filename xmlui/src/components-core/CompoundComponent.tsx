@@ -1,4 +1,4 @@
-import React, { forwardRef, isValidElement, useMemo } from "react";
+import React, { forwardRef, isValidElement, useMemo, useRef } from "react";
 import type { LayoutContext } from "../abstractions/RendererDefs";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -275,6 +275,12 @@ export const CompoundComponent = forwardRef(
       return hasAny ? result : undefined;
     }, [contextVars, receivedContextVarSpec]);
 
+    const xsVerbose = appContext?.xmluiConfig?.xsVerbose === true;
+    // --- A ref, not a memo dependency: a new `node.props` identity must not
+    // --- rebuild the container node (and re-render the UDC) just for the inspector.
+    const propSourcesRef = useRef<Record<string, any> | undefined>(undefined);
+    propSourcesRef.current = node.props;
+
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       // Discard any stale `computedUses` from `compound` so the runtime restructure (wrap-in-Container)
@@ -333,6 +339,9 @@ export const CompoundComponent = forwardRef(
         uses: scopedGlobalKeys, // Only inherit permitted globals, not local parent vars
         computedGlobalUses, // Lifted from body — see comment above
         udcContract: effectiveContract,
+        // --- Inspector only: the UDC's name and a stable ref to its props' markup
+        // --- source. Absent unless xsVerbose is on, so they never affect rendering.
+        ...(xsVerbose && { udcName: node.type, udcPropSources: propSourcesRef }),
         props: {
           debug: (compound as any).debug || (compound.props as any)?.debug,
         },
@@ -341,6 +350,8 @@ export const CompoundComponent = forwardRef(
     }, [
       api,
       compound,
+      node.type,
+      xsVerbose,
       effectiveContract,
       emitUdcDiagnostic,
       propagatedContextVars,
