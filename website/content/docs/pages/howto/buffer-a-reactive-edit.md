@@ -136,6 +136,6 @@ Saving on every keystroke fires requests too aggressively and can cause the curs
 
 ## See also
 
-- [React to button click, not keystrokes](/docs/howto/react-to-button-click-not-keystrokes) - commit a value only when the user explicitly submits
+- React to button click, not keystrokes - commit a value only when the user explicitly submits
 - [Assign a complex JSON literal to a variable](/docs/howto/assign-a-complex-json-literal-to-a-component-variable) - initialize structured state with an object literal
 - [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) - share editing state across components that are not parent-child

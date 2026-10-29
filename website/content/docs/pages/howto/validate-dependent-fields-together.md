@@ -85,5 +85,5 @@ Use this pattern when the Confirm Password field should show its own validation 
 - [Form component](/docs/reference/components/Form) - `onWillSubmit`, `onSubmit`, and `data`
 - [TextBox component](/docs/reference/components/TextBox) - `onValidate`, `noSubmit`, and built-in validators
 - [PasswordInput component](/docs/reference/components/PasswordInput) - password field with the same validation API
-- [Handle Form willSubmit return values](/docs/howto/handle-form-willsubmit-return-values) - full return-value reference
+- [Transform form data before submission](/docs/howto/transform-form-data-before-submission) - full return-value reference
 - [Transform form data before submission](/docs/howto/transform-form-data-before-submission) - reshaping submitted data with `onWillSubmit`

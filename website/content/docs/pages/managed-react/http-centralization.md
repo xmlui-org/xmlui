@@ -51,8 +51,8 @@ rejected with a clear diagnostic and recorded in the trace.
 
 ## Related
 
-- [DataSource](/docs/components/DataSource)
-- [APICall](/docs/components/APICall)
+- [DataSource](/docs/reference/components/DataSource)
+- [APICall](/docs/reference/components/APICall)
 - [DOM API Isolation](/docs/managed-react/dom-api-isolation)
 - [Fetch Lifecycle](/docs/managed-react/fetch-lifecycle)
 - [Managed React Overview](/docs/managed-react/overview)

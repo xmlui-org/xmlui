@@ -6,7 +6,7 @@ A user-defined component, e.g. `Dashboard.xmlui`, may define scripting logic in 
 
 ## Component
 
-The XMLUI engine provides a suite of [built-in components](/docs/reference/components/_overview). You will typically augment these with [user-defined components](/docs/reference/components-intro). Both are represented in markup using XML tags for component names and attributes for properties.
+The XMLUI engine provides a suite of [built-in components](/docs/reference/components/_overview). You will typically augment these with [user-defined components](/docs/components-intro). Both are represented in markup using XML tags for component names and attributes for properties.
 
 ## Component ID
 

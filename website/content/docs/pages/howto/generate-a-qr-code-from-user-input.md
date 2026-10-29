@@ -56,6 +56,6 @@ The `QRCode` component renders an SVG QR code from any string. Because XMLUI is 
 
 ## See also
 
-- [Render a Markdown file as a page](/docs/howto/render-a-markdown-file-as-a-page) — display dynamic content from a string
+- [Render Markdown content as a page](/docs/howto/render-markdown-content-as-a-page) — display dynamic content from a string
 - [Lazy-load images for performance](/docs/howto/lazy-load-images-for-performance) — defer offscreen media to improve load time
 - [Embed an external site in an IFrame](/docs/howto/embed-an-external-site-in-an-iframe) — embed external content inline

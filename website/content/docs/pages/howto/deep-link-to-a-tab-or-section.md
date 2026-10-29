@@ -54,5 +54,5 @@ The example below shows the live URL above the tabs so you can watch the deep li
 ## See also
 
 - [Navigate programmatically](/docs/howto/navigate-programmatically) — use `navigate()` to update the URL without a `Link` click
-- [Build nested page routes](/docs/howto/build-nested-page-routes) — use route-level pages instead of tabs for deeper URL hierarchies
+- Build nested page routes — use route-level pages instead of tabs for deeper URL hierarchies
 - [Highlight the active nav link](/docs/howto/highlight-the-active-nav-link) — mark which sidebar link matches the current route

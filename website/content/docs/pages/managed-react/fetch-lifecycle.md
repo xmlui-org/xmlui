@@ -34,7 +34,7 @@ managed lifecycle prevents.
 
 ## Related
 
-- [DataSource](/docs/components/DataSource)
-- [APICall](/docs/components/APICall)
+- [DataSource](/docs/reference/components/DataSource)
+- [APICall](/docs/reference/components/APICall)
 - [Centralized HTTP](/docs/managed-react/http-centralization)
 - [Managed React Overview](/docs/managed-react/overview)

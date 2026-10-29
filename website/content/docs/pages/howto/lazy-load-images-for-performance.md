@@ -53,4 +53,4 @@ As you scroll down, new image requests appear in the Network tab — confirming 
 
 - [Build a responsive card grid](/docs/howto/build-a-responsive-card-grid) — arrange image cards that reflow across breakpoints
 - [Embed an external site in an IFrame](/docs/howto/embed-an-external-site-in-an-iframe) — embed external media content securely
-- [Add entrance animations to content](/docs/howto/add-entrance-animations-to-content) — fade images in as they scroll into view
+- Add entrance animations to content — fade images in as they scroll into view

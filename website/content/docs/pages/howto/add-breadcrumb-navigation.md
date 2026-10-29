@@ -78,6 +78,6 @@ XMLUI has no built-in breadcrumb — you compose one from `Link` and `Text`. Rat
 
 ## See also
 
-- [Build nested page routes](/docs/howto/build-nested-page-routes) — create the multi-level URL hierarchy that breadcrumbs navigate
+- Build nested page routes — create the multi-level URL hierarchy that breadcrumbs navigate
 - [Navigate programmatically](/docs/howto/navigate-programmatically) — use `navigate()` to move between pages from code instead of links
 - [Highlight the active nav link](/docs/howto/highlight-the-active-nav-link) — visually indicate the current route in a sidebar menu

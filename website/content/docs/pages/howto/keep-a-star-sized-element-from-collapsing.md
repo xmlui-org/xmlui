@@ -47,4 +47,4 @@ width, leaving the rest of the row for the `*` element:
   A fixed value (`8rem`, `120px`) = exactly that.
 - Same rule applies vertically with `height`. See also
   [Set the width of an input field in an HStack](/docs/howto/set-width-for-input-fields-in-a-horizontal-layout)
-  and the star-size explanation in [Layout](/docs/layout).
+  and the star-size explanation in [Layout](/docs/guides/layout).

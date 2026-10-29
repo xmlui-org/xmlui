@@ -55,5 +55,5 @@ Each heading level (H1–H6) gets its own family of theme variables sharing the 
 ## See also
 
 - [Override a component's theme vars](/docs/howto/override-a-components-theme-vars) — how `<Theme>` scoping works
-- [Generate a table of contents](/docs/howto/generate-a-table-of-contents) — TableOfContents consumes your heading hierarchy
-- [Define custom Text variants in a theme](/docs/howto/define-custom-text-variants-in-a-theme) — extend the type scale with named Text variants
+- Generate a table of contents — TableOfContents consumes your heading hierarchy
+- [Style text with custom variants](/docs/howto/style-text-with-custom-variants) — extend the type scale with named Text variants

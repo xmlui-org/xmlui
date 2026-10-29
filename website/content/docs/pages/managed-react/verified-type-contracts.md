@@ -218,4 +218,4 @@ means expression-bound values are intentionally left to runtime validation.
 - [Build Validation Analyzers](/docs/managed-react/build-validation-analyzers)
 - [Managed React Overview](/docs/managed-react/overview)
 - [Components](/docs/components-intro)
-- [Validation](/docs/forms)
+- [Validation](/docs/guides/forms)

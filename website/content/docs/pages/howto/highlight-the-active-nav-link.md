@@ -73,6 +73,6 @@ Use `NavLink` to automatically indicate which route the user is on with zero man
 
 ## See also
 
-- [Collapse the nav panel on mobile](/docs/howto/collapse-the-nav-panel-on-mobile) — hide the nav panel on small screens and toggle it with a button
-- [Build nested page routes](/docs/howto/build-nested-page-routes) — add sub-navigation links that highlight within a nested route
+- Collapse the nav panel on mobile — hide the nav panel on small screens and toggle it with a button
+- Build nested page routes — add sub-navigation links that highlight within a nested route
 - [Add breadcrumb navigation](/docs/howto/add-breadcrumb-navigation) — provide a secondary active-route indicator alongside the sidebar
