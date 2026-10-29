@@ -341,6 +341,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Obtain a function that can execute a script synchronously
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
     (action) => {
+      // --- A function, or an already-parsed arrow expression, needs no extraction. Running
+      // --- the extractor over one would re-parse its source text as a `{...}` template, and
+      // --- the body of `function(p) { return ...; }` reads as an unclosed binding (#3674).
+      if (typeof action === "function" || isArrowExpressionObject(action)) {
+        return lookupSyncCallback(action, uid);
+      }
       return lookupSyncCallback(valueExtractor(action), uid);
     },
     [lookupSyncCallback, uid, valueExtractor],
