@@ -243,6 +243,87 @@ describe("render-logging", () => {
     });
   });
 
+  describe("RenderPassTracker, components rendered per pass", () => {
+    const info = (component: string, extra: any = {}) => ({
+      component,
+      isUdc: false,
+      isImplicit: false,
+      ...extra,
+    });
+
+    it("counts renders by type and resets them each pass", () => {
+      const app = new RenderPassTracker(info("App"));
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.handle.noteRender("Text");
+      app.handle.noteRender("Text");
+      app.handle.noteRender("Button");
+      app.commit();
+
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.handle.noteRender("Text");
+      app.commit();
+
+      expect(logs()[0]).toMatchObject({ rendered: { Text: 2, Button: 1 }, renderedCount: 3 });
+      expect(logs()[1]).toMatchObject({ rendered: { Text: 1 }, renderedCount: 1 });
+      expect(logs()[1].renderedOutsidePass).toBeUndefined();
+    });
+
+    it("counts a folded implicit container's renders toward its owner's pass", () => {
+      const app = new RenderPassTracker(info("App"));
+      const row = new RenderPassTracker(info("HStack", { isImplicit: true }));
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.handle.noteRender("Items");
+      row.beginRender(app.handle);
+      row.observe(snapshot());
+      row.handle.noteRender("HStack");
+      row.handle.noteRender("Text");
+      row.commit();
+      app.commit();
+
+      expect(logs()).toHaveLength(1);
+      expect(logs()[0]).toMatchObject({
+        rendered: { Items: 1, HStack: 1, Text: 1 },
+        renderedCount: 3,
+      });
+    });
+
+    it("keeps a nested container's renders out of its parent's count", () => {
+      const app = new RenderPassTracker(info("App"));
+      const udc = new RenderPassTracker(info("Heavy", { isUdc: true }));
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.handle.noteRender("Heavy");
+      udc.beginRender(app.handle);
+      udc.observe(snapshot());
+      udc.handle.noteRender("Text");
+      udc.commit();
+      app.commit();
+
+      const [udcEntry, appEntry] = logs();
+      expect(appEntry.rendered).toEqual({ Heavy: 1 });
+      expect(udcEntry.rendered).toEqual({ Text: 1 });
+    });
+
+    it("reports renders between passes with the next pass", () => {
+      const app = new RenderPassTracker(info("App"));
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.commit();
+
+      app.handle.noteRender("Slider");
+
+      app.beginRender(null);
+      app.observe(snapshot());
+      app.commit();
+
+      expect(logs()[0].renderedOutsidePass).toBeUndefined();
+      expect(logs()[1]).toMatchObject({ renderedCount: 0, renderedOutsidePass: { Slider: 1 } });
+    });
+  });
+
   describe("RenderPassTracker, changes landing after a pass has read its cause", () => {
     it("carries a dispatch from a descendant's layout effect to the next pass (#3942 gate 5)", () => {
       // --- Regression: fields and trace id were cleared at commit, which runs after
