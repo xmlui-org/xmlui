@@ -171,4 +171,4 @@ the `fit-content` value controls.
 - [Stop a `width="*"` element from collapsing](/docs/howto/keep-a-star-sized-element-from-collapsing)
 - [Set the width of an input field in an HStack](/docs/howto/set-width-for-input-fields-in-a-horizontal-layout)
 - [Fill remaining vertical space](/docs/howto/fill-remaining-vertical-space) — the `height="*"` counterpart
-- [Layout](/docs/layout)
+- [Layout](/docs/guides/layout)

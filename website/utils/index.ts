@@ -67,14 +67,64 @@ plainTextBlogContent = Object.fromEntries(
   Object.entries(plainTextBlogContent).filter(([key]) => !(blogFrontmatter[key]?.draft === true)),
 );
 
+// Docs search keys come from content file paths ("pages/markup.md" -> "/docs/markup"), but
+// src/Main.xmlui serves some of those pages under /docs/guides/. Each entry maps a derived
+// path (and anything below it) to the route its Page uses; keep in sync with Main.xmlui.
+const GUIDE_PAGES = [
+  "app-structure",
+  "forms",
+  "hosted-deployment",
+  "layout",
+  "markup",
+  "modal-dialogs",
+  "playground-and-codefence",
+  "refactoring",
+  "routing-and-links",
+  "scoping",
+  "scripting",
+  "user-defined-components",
+  "visibility",
+  "working-with-markdown",
+  "working-with-text",
+];
+const DOCS_ROUTE_PREFIXES: [string, string][] = [
+  ["/docs/wrap-component/_overview", "/docs/guides/wrap-component"],
+  ["/docs/wrap-component", "/docs/guides/wrap-component"],
+  ...GUIDE_PAGES.map((page): [string, string] => [`/docs/${page}`, `/docs/guides/${page}`]),
+];
+
+// Content files that no Page in src/Main.xmlui serves (stale copies, drafts, unrouted pages).
+// They are left out of search so results never lead to a missing page.
+const DOCS_SEARCH_EXCLUDED = [
+  "/docs/news-and-reviews",
+  "/docs/reference-extensions",
+  "/docs/test",
+  "/docs/styles-and-themes/themes",
+  "/docs/wrap-component/grid-layout",
+  "/docs/xmlui-animations",
+  "/docs/xmlui-pdf",
+  "/docs/xmlui-spreadsheet",
+];
+
+function isAtOrBelow(path: string, prefix: string): boolean {
+  return path === prefix || path.startsWith(prefix + "/");
+}
+
+function toDocsRoute(path: string): string {
+  const entry = DOCS_ROUTE_PREFIXES.find(([from]) => isAtOrBelow(path, from));
+  return entry ? entry[1] + path.slice(entry[0].length) : path;
+}
+
 const staticSearchData: SearchItemData[] = [
-  ...Object.entries(plainTextDocsContent).map(([key, value]) => {
+  ...Object.entries(plainTextDocsContent)
+    .filter(([key]) => !DOCS_SEARCH_EXCLUDED.some((prefix) => isAtOrBelow(key, prefix)))
+    .map(([key, value]) => {
       const lines = value.split("\n");
       const firstLine = lines.length > 0 ? lines[0] : "";
       // Remove title after matching, since it is in the "label"
       const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
       return {
-        path: key,
+        path: toDocsRoute(key),
         title: firstLine,
         content: restContent,
         category: SEARCH_CATEGORIES[0], // "docs"

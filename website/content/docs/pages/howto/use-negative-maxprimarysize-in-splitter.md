@@ -47,5 +47,5 @@ A negative `maxPrimarySize` means "container size minus this amount" — so `max
 ## See also
 
 - [Create a resizable split view](/docs/howto/create-a-resizable-split-view) — basic HSplitter/VSplitter setup
-- [Generate a table of contents](/docs/howto/generate-a-table-of-contents) — TableOfContents inside an HSplitter
-- [Dock children in a Stack panel](/docs/howto/dock-children-in-a-stack-panel) — alternative layout for divided panels
+- Generate a table of contents — TableOfContents inside an HSplitter
+- [Dock elements to panel edges](/docs/howto/dock-elements-to-panel-edges) — alternative layout for divided panels

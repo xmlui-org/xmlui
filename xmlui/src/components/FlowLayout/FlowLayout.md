@@ -1,6 +1,6 @@
 %-DESC-START
 
-For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/docs/layout#flowlayout).
+For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/docs/guides/layout#flowlayout).
 
 ## Using `SpaceFiller` with `FlowLayout`
 

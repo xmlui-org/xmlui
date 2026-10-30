@@ -142,7 +142,7 @@ The [NavPanel](/docs/reference/components/NavPanel) defines [NavLink](/docs/refe
   </Pages>
 ```
 
-Each [Page](/docs/reference/components/Page) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/docs/reference/components-intro) to encapsulate UI constructs.
+Each [Page](/docs/reference/components/Page) is a container that binds to a route and holds XMLUI markup. Although you can put anything in there, our demo shows what we think is a best practice: use [Components](/docs/components-intro) to encapsulate UI constructs.
 
 ## Footer
 

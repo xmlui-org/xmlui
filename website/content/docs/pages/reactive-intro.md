@@ -70,7 +70,7 @@ It embeds a reference to `lines.value`. When you loaded this page, that URL fetc
 
 There's a name for this pattern: reactive data binding. It's what spreadsheets do when a change in one cell propagates to others that refer to it. And it's what the popular framework React enables for web apps. React, as you may know, is a complex beast that only expert programmers can tame. Fortunately the expert programmers who build XMLUI have done that for you. When you build apps declaratively with XMLUI you enjoy the benefit of reactive data binding without the burden of React's complexity.
 
-Reactive expressions update when the XMLUI variables or component state they read changes. For conditional rendering with `when`, keep the expression focused on explicit state such as component values, `DataSource.loaded`, or local `var` values. See [Visibility and Responsive Display](/docs/visibility#reactivity-of-when) for the precise `when` rules.
+Reactive expressions update when the XMLUI variables or component state they read changes. For conditional rendering with `when`, keep the expression focused on explicit state such as component values, `DataSource.loaded`, or local `var` values. See [Visibility and Responsive Display](/docs/guides/visibility#reactivity-of-when) for the precise `when` rules.
 
 So far we've seen examples of built-in XMLUI components. But it's easy to make your own too, in the next chapter we'll see how.
 

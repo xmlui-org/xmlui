@@ -73,7 +73,7 @@ Pop this app into the playground (click the leftmost icon in the example header)
 ---
 
 **See also**
-- [Visibility](/docs/visibility) — full `when-*` resolution rules, inference, and breakpoint range patterns
+- [Visibility](/docs/guides/visibility) — full `when-*` resolution rules, inference, and breakpoint range patterns
 - [Layout Properties](/docs/styles-and-themes/layout-props) — breakpoint-suffixed sizing properties
 - [Table component](/docs/reference/components/Table) — columns and sorting
 - [List component](/docs/reference/components/List) — item templates

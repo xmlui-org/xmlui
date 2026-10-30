@@ -72,4 +72,4 @@ A drawer slides in from the edge of the viewport and sits on top of the main con
 
 - [Build a fullscreen modal dialog](/docs/howto/build-a-fullscreen-modal-dialog) — use a modal overlay instead of a slide-in panel
 - [Dock elements to panel edges](/docs/howto/dock-elements-to-panel-edges) — anchor elements inside a layout without overlaying
-- [Collapse the nav panel on mobile](/docs/howto/collapse-the-nav-panel-on-mobile) — use `NavPanel` with a toggle button for navigation drawers
+- Collapse the nav panel on mobile — use `NavPanel` with a toggle button for navigation drawers

@@ -62,4 +62,4 @@ Download the SVG, save it under your `resources/` folder, register it under `res
 
 - [Create a custom color theme](/docs/howto/create-a-custom-color-theme) — customise the visual identity alongside icons
 - [Add a dropdown menu to a button](/docs/howto/add-a-dropdown-menu-to-a-button) — use custom icons on menu items
-- [Build a toolbar with overflow menu](/docs/howto/build-a-toolbar-with-overflow-menu) — toolbar buttons with custom icons
+- Build a toolbar with overflow menu — toolbar buttons with custom icons

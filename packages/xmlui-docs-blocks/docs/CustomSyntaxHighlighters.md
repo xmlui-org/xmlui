@@ -129,5 +129,5 @@ backgroundColor: {
 
 ## See also
 
-- [Code fences and playgrounds](/docs/playground-and-codefence) — markdown code block metadata
+- [Code fences and playgrounds](/docs/guides/playground-and-codefence) — markdown code block metadata
 - [App globals](/docs/app-globals#codehighlighter) — how XMLUI receives a `codeHighlighter`

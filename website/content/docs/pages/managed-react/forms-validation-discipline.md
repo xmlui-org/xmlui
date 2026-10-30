@@ -287,9 +287,9 @@ default flips to `true` in the next major release.
 
 ## Related
 
-- [`Form`](/docs/components/Form) — the underlying component reference
+- [`Form`](/docs/reference/components/Form) — the underlying component reference
   with every prop, event, and method.
-- [`FormItem`](/docs/components/FormItem) — the field wrapper with the
+- [`FormItem`](/docs/reference/components/FormItem) — the field wrapper with the
   `validator`, `validatorParams`, and severity props.
 - [Cooperative Concurrency](/docs/managed-react/cooperative-concurrency)
   — the `$cancel` token + `handlerPolicy` machinery that

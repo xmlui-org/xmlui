@@ -50,4 +50,4 @@ Use a reactive boolean variable (`var.authenticated`) to toggle between a login 
 ## See also
 
 - [Navigate programmatically](/docs/howto/navigate-programmatically) — redirect to the original page after successful login
-- [Build nested page routes](/docs/howto/build-nested-page-routes) — protect specific nested routes while leaving others public
+- Build nested page routes — protect specific nested routes while leaving others public

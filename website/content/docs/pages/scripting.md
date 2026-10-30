@@ -388,7 +388,7 @@ The browser globals you use in ordinary JavaScript are not accessible inside XML
 | Unavailable | Use instead |
 |-------------|-------------|
 | `fetch()` | `<DataSource>` for queries, `<APICall>` for mutations |
-| `setTimeout()` / `setInterval()` | [`delay(ms)`](/docs/markup#delay) helper function; [`pollIntervalInSeconds`](/docs/reference/components/DataSource#pollintervalinseconds) on `DataSource` |
+| `setTimeout()` / `setInterval()` | [`delay(ms)`](/docs/guides/markup#delay) helper function; [`pollIntervalInSeconds`](/docs/reference/components/DataSource#pollintervalinseconds) on `DataSource` |
 | `window`, `document` | Not accessible; use XMLUI layout and [navigation APIs](/docs/globals#navigate) |
 | `console.log()` | Available for debugging, but only in development mode |
 
