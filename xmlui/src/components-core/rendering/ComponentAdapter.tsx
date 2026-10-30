@@ -1,5 +1,13 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
-import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
@@ -15,6 +23,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
+import { RenderPassContext } from "../inspector/render-logging";
 import {
   fireBeforeDispose,
   reportLifecycleEvent,
@@ -213,6 +222,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       events: node.events || (EMPTY_OBJECT as Record<string, any>),
     };
   }, [node]);
+
+  // --- Inspector: count this render toward the open `render:pass`. The context
+  // --- has a provider only while `xsVerbose` is on, so this is a no-op otherwise.
+  const renderPass = useContext(RenderPassContext);
+  renderPass?.noteRender(safeNode.type);
 
   // --- Each component receives a unique identifier
   const uid = useMemo(() => Symbol(safeNode.uid), [safeNode.uid]);

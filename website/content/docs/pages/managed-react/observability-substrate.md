@@ -52,7 +52,8 @@ long it took.
 A **pass** is one render of one container: from the start of its render to
 the moment its whole subtree is committed. Components that aren't containers,
 such as `Text`, `Button` or `Stack`, get no entry of their own; their render
-time is included in their container's pass. A container that has a `var.`,
+time is included in their container's pass, and they are counted in its
+`rendered` field. A container that has a `var.`,
 and each row of `Items` or `List`, renders inside its owner's pass. It is
 counted there (`implicitContainers`, `folded`) rather than given its own
 entry, unless it re-renders on its own.
@@ -65,6 +66,14 @@ entry, unless it re-renders on its own.
 | `traceId` | The trace of the handler whose change caused the pass, when there was one |
 | `cause` | Why the pass happened: one or more of the entries below |
 | `implicitContainers`, `folded` | Containers rendered inside this pass, grouped by component and cause, with a count |
+| `rendered`, `renderedCount` | Components rendered in this pass, counted by type, and their total. A nested container's components are counted in its own entry, not here |
+| `renderedOutsidePass` | Components that rendered while no pass was open, counted by type and reported with the next pass. Omitted when there were none |
+
+**Reading `rendered`.** A component is counted when XMLUI re-evaluates it. A
+component skipped because its inputs didn't change is not counted. So
+`renderedCount` measures how far one change spread. To count everything
+rendered for one change, add up `renderedCount` over a top-level pass and
+every pass whose `parentPassId` leads back to it.
 
 Each `cause` entry is one of:
 
