@@ -3492,3 +3492,132 @@ test.describe("shift on data change", () => {
     await expect(page.getByText("group A", { exact: true })).toBeVisible();
   });
 });
+
+test.describe("rows reading outer variables", () => {
+  test("a row updates when an outer variable changes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack var.expanded="{[]}">
+        <List data="{[{id: 1}, {id: 2}]}" height="200px">
+          <VStack>
+            <Button
+              testId="toggle{$item.id}"
+              label="row {$item.id}"
+              onClick="expanded = [...expanded, $item.id]" />
+            <Text when="{expanded.includes($item.id)}" value="detail {$item.id}" />
+          </VStack>
+        </List>
+      </VStack>
+    `);
+
+    await page.getByTestId("toggle1").click();
+    await expect(page.getByText("detail 1", { exact: true })).toBeVisible();
+  });
+
+  test("row handlers see the new value of an outer variable", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.expanded="{[]}">
+        <List data="{[{id: 1}, {id: 2}]}" height="200px">
+          <Button
+            testId="toggle{$item.id}"
+            label="row {$item.id}"
+            onClick="expanded = [...expanded, $item.id]; testState = expanded.length" />
+        </List>
+      </VStack>
+    `);
+
+    await page.getByTestId("toggle1").click();
+    await expect.poll(testStateDriver.testState).toEqual(1);
+    await page.getByTestId("toggle2").click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("a row updates with a false when in emptyListTemplate", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack var.expanded="{[]}">
+        <List data="{[{id: 1}]}" height="200px">
+          <property name="emptyListTemplate">
+            <Text when="{false}" value="Nothing here" />
+          </property>
+          <VStack>
+            <Button
+              testId="toggle{$item.id}"
+              label="row {$item.id}"
+              onClick="expanded = [...expanded, $item.id]" />
+            <Text when="{expanded.includes($item.id)}" value="detail {$item.id}" />
+          </VStack>
+        </List>
+      </VStack>
+    `);
+
+    await page.getByTestId("toggle1").click();
+    await expect(page.getByText("detail 1", { exact: true })).toBeVisible();
+  });
+});
+
+test.describe("refreshOn Property", () => {
+  test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <List data="{[{id: 1, name: 'Row A'}]}" height="200px" refreshOn="{parentValue}">
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </List>
+        <Button onClick="parentValue = 2" testId="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await page.getByTestId("btn").click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("does not update event handler closures when refreshOn is unchanged", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <List data="{[{id: 1, name: 'Row A'}]}" height="200px" refreshOn="{refreshWatch}">
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </List>
+        <Button onClick="parentValue = 2" testId="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await page.getByTestId("btn").click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+  });
+
+  test("updates only when refreshOn changes, even with a rendering emptyListTemplate", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <List data="{[{id: 1, name: 'Row A'}]}" height="200px" refreshOn="{refreshWatch}">
+          <property name="emptyListTemplate"><Text value="Nothing here" /></property>
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </List>
+        <Button onClick="parentValue = 2" testId="btn" label="Change" />
+        <Button onClick="refreshWatch = 2" testId="refresh" label="Refresh" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    await page.getByTestId("btn").click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await page.getByTestId("refresh").click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+});

@@ -265,6 +265,8 @@ type DynamicHeightListProps = {
   renderCache?: boolean;
   renderCacheSize?: number;
   virtualBufferSize?: number;
+  // Not read here: a change gets past this memo so the rows see the new version.
+  renderVersion?: number;
   // Selection props
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
