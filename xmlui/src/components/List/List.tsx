@@ -792,6 +792,7 @@ const ListWithSelection = memo(function ListWithSelection({
       onScroll={lookupEventHandler("scroll")}
       onVisibleRangeDidChange={lookupEventHandler("visibleRangeDidChange")}
       keyBindings={extractValue(node.props.keyBindings)}
+      renderVersion={renderVersionRef.current}
       itemRenderer={stableItemRenderer}
       sectionRenderer={stableSectionRenderer}
       sectionFooterRenderer={stableSectionFooterRenderer}
