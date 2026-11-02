@@ -21,6 +21,8 @@ type Pass = {
   durationMs: number;
   cause: Array<{ kind: string; keys?: string[]; names?: string[] }>;
   folded?: Array<{ component: string; count: number }>;
+  rendered?: Record<string, number>;
+  renderedCount?: number;
 };
 
 async function passes(page: Page): Promise<Pass[]> {
@@ -98,6 +100,9 @@ test.describe("render:pass trace (#3942)", () => {
     // --- The 300 rows render inside each App pass, folded into it
     for (const p of ticks) {
       expect(p.folded?.find((g) => g.component === "HStack")?.count).toBe(300);
+      // --- ...and every row's components are counted toward the App pass
+      expect(p.rendered).toMatchObject({ HStack: 300, Button: 300 });
+      expect(p.rendered?.Text).toBeGreaterThanOrEqual(600);
     }
     annotateDurations("App passes", ticks);
   });
@@ -123,6 +128,14 @@ test.describe("render:pass trace (#3942)", () => {
     );
     // --- The instrument did record Heavy: its mount is in the same trace
     expect(all.some((p) => p.component === "Heavy" && p.cause[0].kind === "mount")).toBe(true);
+    // --- App passes render only App's own few components; the rows stay behind the UDC
+    for (const p of ticks) {
+      expect(p.rendered?.HStack).toBeUndefined();
+      expect(p.renderedCount).toBeLessThan(10);
+    }
+    // --- The rows were counted once, in Heavy's mount pass
+    const heavyMount = all.find((p) => p.component === "Heavy" && p.cause[0].kind === "mount");
+    expect(heavyMount?.rendered?.HStack).toBe(300);
     annotateDurations("App passes", ticks);
   });
 

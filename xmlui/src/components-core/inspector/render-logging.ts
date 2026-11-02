@@ -20,6 +20,12 @@
  * top-level passes only. The figure is an upper bound: anything React does
  * between render and commit is counted too.
  *
+ * `rendered` counts, by type, the XMLUI components rendered in the pass (each
+ * `ComponentAdapter` run reports to the nearest open pass), up to the next
+ * emitting container. A component skipped by a memo boundary is not counted.
+ * Renders that arrive while no pass is open are reported with the container's
+ * next entry as `renderedOutsidePass`.
+ *
  * Everything here is inert unless `xsVerbose` is on.
  */
 
@@ -100,6 +106,8 @@ export interface RenderPassHandle {
   open: boolean;
   traceId?: string;
   fold(entry: FoldedContainer): void;
+  /** Count one XMLUI component render (a `ComponentAdapter` run) toward this pass */
+  noteRender(type: string): void;
 }
 
 export const RenderPassContext = createContext<RenderPassHandle | null>(null);
@@ -320,6 +328,10 @@ export class RenderPassTracker {
   private folded = false;
   private causes: RenderPassCause[] = [];
   private foldedChildren: FoldedContainer[] = [];
+  /** Components rendered in this pass, by type */
+  private rendered = new Map<string, number>();
+  /** Components rendered while no pass was open, reported with the next pass */
+  private renderedOutside = new Map<string, number>();
   private pendingTraceId: string | undefined;
   private readonly uidKinds = new Map<symbol, UidKind>();
   private uidFields = new Map<symbol, Set<string>>();
@@ -338,6 +350,14 @@ export class RenderPassTracker {
           tracker.foldedChildren.push(entry);
         }
       },
+      noteRender(type: string) {
+        // --- A folded implicit container counts toward the pass it is part of
+        if (tracker.folded && tracker.parent?.open) {
+          tracker.parent.noteRender(type);
+        } else {
+          addCount(tracker.handle.open ? tracker.rendered : tracker.renderedOutside, type);
+        }
+      },
     };
   }
 
@@ -353,6 +373,7 @@ export class RenderPassTracker {
     this.folded = this.info.isImplicit && this.parentPassId !== undefined;
     this.passId = this.folded ? this.parentPassId! : nextPassId();
     this.foldedChildren = [];
+    this.rendered = new Map();
     this.handle.passId = this.passId;
     this.handle.open = true;
     this.handle.traceId = this.pendingTraceId ?? (parent?.open ? parent.traceId : undefined);
@@ -455,6 +476,8 @@ export class RenderPassTracker {
     if (this.folded) return;
 
     const { component, uid, isUdc, isImplicit, source } = this.info;
+    const outside = this.renderedOutside;
+    this.renderedOutside = new Map();
     pushXsLog({
       ts: Date.now(),
       perfTs: this.startMs,
@@ -474,8 +497,21 @@ export class RenderPassTracker {
         implicitContainers: this.foldedChildren.length,
         folded: groupFolded(this.foldedChildren),
       }),
+      rendered: Object.fromEntries(this.rendered),
+      renderedCount: sumCounts(this.rendered),
+      ...(outside.size > 0 && { renderedOutsidePass: Object.fromEntries(outside) }),
     });
   }
+}
+
+function addCount(counts: Map<string, number>, type: string) {
+  counts.set(type, (counts.get(type) ?? 0) + 1);
+}
+
+function sumCounts(counts: Map<string, number>): number {
+  let total = 0;
+  counts.forEach((n) => (total += n));
+  return total;
 }
 
 const LOADER_FIELDS: Record<string, string> = {
