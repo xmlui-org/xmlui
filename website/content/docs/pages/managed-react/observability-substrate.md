@@ -52,7 +52,8 @@ long it took.
 A **pass** is one render of one container: from the start of its render to
 the moment its whole subtree is committed. Components that aren't containers,
 such as `Text`, `Button` or `Stack`, get no entry of their own; their render
-time is included in their container's pass. A container that has a `var.`,
+time is included in their container's pass, and they are counted in its
+`rendered` field. A container that has a `var.`,
 and each row of `Items` or `List`, renders inside its owner's pass. It is
 counted there (`implicitContainers`, `folded`) rather than given its own
 entry, unless it re-renders on its own.
@@ -65,6 +66,15 @@ entry, unless it re-renders on its own.
 | `traceId` | The trace of the handler whose change caused the pass, when there was one |
 | `cause` | Why the pass happened: one or more of the entries below |
 | `implicitContainers`, `folded` | Containers rendered inside this pass, grouped by component and cause, with a count |
+| `rendered`, `renderedCount` | Components rendered in this pass, counted by type, and their total. A nested container's components are counted in its own entry, not here |
+| `renderedOutsidePass` | Components that rendered while no pass was open, counted by type and reported with the next pass. Omitted when there were none |
+| `necessary` | `true` if the pass is a mount or any cause changed something the container's bindings read; `false` if no cause did. Omitted when a cause can't be judged |
+
+**Reading `rendered`.** A component is counted when XMLUI re-evaluates it. A
+component skipped because its inputs didn't change is not counted. So
+`renderedCount` measures how far one change spread. To count everything
+rendered for one change, add up `renderedCount` over a top-level pass and
+every pass whose `parentPassId` leads back to it.
 
 Each `cause` entry is one of:
 
@@ -78,6 +88,35 @@ Each `cause` entry is one of:
 
 A `componentState` or `loader` cause marked `identityOnly` means the entry was
 replaced by one with equal values. The pass did no useful work.
+
+**Reading `read` and `necessary`.** Each `state`, `componentState`, `loader`,
+`props` and `parent` cause also says whether the container's bindings read
+what it changed:
+
+- `read: true` means a binding reads the changed path, or a path above or below it. A binding on `ds.value.length` reads a change to `ds.value`, and a binding on `ds` reads every field of `ds`.
+- `read: false` means no binding does. `readPaths` then lists what the bindings do read under the same name, for example `["ds.value"]` when `ds.inProgress` changed.
+- An `identityOnly` cause is never read: nothing changed.
+
+The paths come from the container's markup and code-behind: props, vars,
+`when`, loader props and templates, anywhere under the container. Event
+handlers are left out, because they read state when they run, not when the
+container renders. A binding behind a `when` that is false still counts, so
+`read: false` is certain and `read: true` may overstate.
+
+A pass with `necessary: false` changed nothing its container's bindings read.
+To see how much of an app's rendering that is, sum the top-level passes:
+
+```js
+(() => {
+  const P = (window._xsLogs ?? []).filter((e) => e.kind === "render:pass");
+  const ids = new Set(P.map((e) => e.passId));
+  const top = P.filter((e) => !ids.has(e.parentPassId));
+  const ms = (list) => Math.round(list.reduce((s, e) => s + e.durationMs, 0));
+  const unneeded = top.filter((e) => e.necessary === false);
+  console.log(`${unneeded.length} of ${top.length} top-level passes, ` +
+    `${ms(unneeded)} of ${ms(top)} ms, changed nothing a binding reads`);
+})();
+```
 
 **Reading durations.** A pass's duration includes every pass rendered inside
 it, so add up only passes with no `parentPassId`. Durations are upper bounds:
