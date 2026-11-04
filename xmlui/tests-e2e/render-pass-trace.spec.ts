@@ -286,6 +286,39 @@ test.describe("render:pass trace (#3942)", () => {
     }
   });
 
+  test("read verdicts: a component's own state counts as read by it (#3941)", async ({
+    initTestBed,
+    page,
+  }) => {
+    // --- Select and Slider display their value from the container's state[uid],
+    // --- not through a binding, so the render that delivers it is needed
+    await initTestBed(
+      `<App>
+  <Select testId="sel">
+    <Option value="a" label="Apple" />
+    <Option value="b" label="Banana" />
+  </Select>
+  <Slider testId="sld" minValue="0" maxValue="10" />
+  <Text value="READY" />
+</App>`,
+      VERBOSE,
+    );
+    await expect(page.getByText("READY")).toBeVisible();
+    await page.waitForTimeout(500);
+    const mark = (await passes(page)).length;
+    await page.getByTestId("sel").click();
+    await page.getByRole("option", { name: "Banana" }).click();
+    await page.getByRole("slider").first().focus();
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(500);
+    const ownState = (await passes(page))
+      .slice(mark)
+      .filter((p) => p.component === "App")
+      .filter((p) => p.cause.some((c) => c.kind === "componentState" && c.fields?.includes("value")));
+    expect(ownState.length).toBeGreaterThan(0);
+    for (const p of ownState) expect(p.necessary).toBe(true);
+  });
+
   test("no render:pass entries when xsVerbose is off", async ({ initTestBed, page }) => {
     await initTestBed(
       `<App var.n="{0}" var.t0="{0}" var.t1="{0}">

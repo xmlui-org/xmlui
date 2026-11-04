@@ -64,8 +64,16 @@ export type RenderPassCause =
   /**
    * A component's own state changed (e.g. a MediaPlayer's currentTime).
    * `identityOnly`: the entry was replaced by one with equal values.
+   * `ownState`: the fields of the component's own (reducer) state that changed,
+   * as opposed to its registered API. The component reads these itself.
    */
-  | ({ kind: "componentState"; uid: string; fields?: string[]; identityOnly?: true } & ReadVerdict)
+  | ({
+      kind: "componentState";
+      uid: string;
+      fields?: string[];
+      ownState?: string[];
+      identityOnly?: true;
+    } & ReadVerdict)
   /** A DataSource / APICall state changed; `identityOnly` as above */
   | ({ kind: "loader"; uid: string; fields?: string[]; identityOnly?: true } & ReadVerdict)
   /** UDC props changed */
@@ -231,10 +239,13 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
   changedUids.forEach((key) => {
     // --- Fields: what differs between the uid's previous and current entries
     // --- (state and API), else what was recorded at dispatch time.
+    const stateFields = changedKeys(prev.componentState?.[key], next.componentState?.[key]).map(
+      keyLabel,
+    );
     const diffed = new Set<string>([
-      ...changedKeys(prev.componentState?.[key], next.componentState?.[key]),
-      ...changedKeys(prev.componentApis?.[key], next.componentApis?.[key]),
-    ].map(keyLabel));
+      ...stateFields,
+      ...changedKeys(prev.componentApis?.[key], next.componentApis?.[key]).map(keyLabel),
+    ]);
     const fields = diffed.size > 0 ? diffed : uidFields.get(key);
     const entry = {
       uid: keyLabel(key),
@@ -244,7 +255,7 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
     causes.push(
       uidKinds.get(key) === "loader"
         ? { kind: "loader", ...entry }
-        : { kind: "componentState", ...entry },
+        : { kind: "componentState", ...entry, ...(stateFields.length > 0 && { ownState: stateFields }) },
     );
   });
 
@@ -354,8 +365,10 @@ function changedRoots(cause: RenderPassCause): string[] {
 
 /**
  * Mark each cause with whether the container's bindings read what it changed.
- * An `identityOnly` write changed nothing, so it is never read. A cause that
- * doesn't name what changed gets no verdict.
+ * An `identityOnly` write changed nothing, so it is never read. A component's
+ * own state counts as read by that component: `ComponentAdapter` hands
+ * `state[uid]` to its renderer, and controls such as `Select` and `Slider`
+ * display from it. A cause that doesn't name what changed gets no verdict.
  */
 export function annotateReads(
   causes: RenderPassCause[],
@@ -366,7 +379,9 @@ export function annotateReads(
     const paths = changedPaths(cause);
     if (!paths) return cause;
     const identityOnly = "identityOnly" in cause && cause.identityOnly;
-    const read = !identityOnly && paths.some((path) => isPathRead(readPaths, path));
+    const ownStateChanged = cause.kind === "componentState" && !!cause.ownState?.length;
+    const read =
+      !identityOnly && (ownStateChanged || paths.some((path) => isPathRead(readPaths, path)));
     if (read) return { ...cause, read: true };
     const under = changedRoots(cause).flatMap((root) => readPathsUnder(readPaths, root));
     return { ...cause, read: false, ...(under.length > 0 && { readPaths: under }) };

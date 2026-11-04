@@ -91,7 +91,7 @@ describe("render-logging", () => {
       // --- Fields come from diffing the uid's entries (ds: value; takePlayer: currentTime)
       expect(causes).toEqual([
         { kind: "loader", uid: "ds", fields: ["value"] },
-        { kind: "componentState", uid: "takePlayer", fields: ["currentTime"] },
+        { kind: "componentState", uid: "takePlayer", fields: ["currentTime"], ownState: ["currentTime"] },
       ]);
     });
 
@@ -142,7 +142,7 @@ describe("render-logging", () => {
         ]),
       });
       expect(causes).toEqual([
-        { kind: "componentState", uid: "takePlayer", fields: ["ended"] },
+        { kind: "componentState", uid: "takePlayer", fields: ["ended"], ownState: ["ended"] },
         // --- An equal-valued copy: flagged, with the field recorded at dispatch
         { kind: "componentState", uid: "annotTab", fields: ["nudgeInProgress"], identityOnly: true },
       ]);
@@ -383,6 +383,40 @@ describe("render-logging", () => {
       );
       expect(read).toMatchObject({ read: true });
       expect(unread).toMatchObject({ read: false, readPaths: ["ds.value"] });
+    });
+
+    it("counts a component's own state as read by it, but not its API", () => {
+      const [own, api] = annotateReads(
+        [
+          { kind: "componentState", uid: "slider", fields: ["value", "focus"], ownState: ["value"] },
+          { kind: "componentState", uid: "dlg", fields: ["open", "close"] },
+        ],
+        reads,
+      );
+      expect(own).toMatchObject({ read: true });
+      expect(api).toMatchObject({ read: false });
+    });
+
+    it("separates own state from API fields when building a cause", () => {
+      const uid = Symbol("slider");
+      const [cause] = buildCauses({
+        prev: snapshot({ componentState: { [uid]: { value: 1 } }, componentApis: { [uid]: { focus: 1 } } }),
+        next: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 2 } } }),
+        isUdc: false,
+        uidKinds: new Map(),
+        uidFields: new Map(),
+      });
+      expect(cause).toMatchObject({ kind: "componentState", uid: "slider", ownState: ["value"] });
+      expect((cause as any).fields.sort()).toEqual(["focus", "value"]);
+
+      const [apiOnly] = buildCauses({
+        prev: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 2 } } }),
+        next: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 3 } } }),
+        isUdc: false,
+        uidKinds: new Map(),
+        uidFields: new Map(),
+      });
+      expect((apiOnly as any).ownState).toBeUndefined();
     });
 
     it("never counts an identity-only write as read", () => {

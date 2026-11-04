@@ -96,6 +96,7 @@ what it changed:
 - `read: true` means a binding reads the changed path, or a path above or below it. A binding on `ds.value.length` reads a change to `ds.value`, and a binding on `ds` reads every field of `ds`.
 - `read: false` means no binding does. `readPaths` then lists what the bindings do read under the same name, for example `["ds.value"]` when `ds.inProgress` changed.
 - An `identityOnly` cause is never read: nothing changed.
+- A component's own state counts as read by that component. Controls such as `Select` and `Slider` display their value from it, so a `componentState` cause whose `ownState` lists changed fields is `read: true` even when no binding reads them. A change to a component's registered API only (`fields` without `ownState`) is judged against the bindings.
 
 The paths come from the container's markup and code-behind: props, vars,
 `when`, loader props and templates, anywhere under the container. Event
