@@ -4,4 +4,5 @@ export const defaultProps = {
   dialogTitle: "XMLUI Inspector",
   dialogWidth: "95vw",
   dialogHeight: "95vh",
+  fetchMissing: false,
 };

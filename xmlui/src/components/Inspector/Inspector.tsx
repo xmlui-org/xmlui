@@ -19,9 +19,20 @@ export const InspectorMd = createMetadata({
     src: {
       description:
         "Path to the inspector HTML file. The file must be accessible " +
-        "from the app's root directory.",
+        "from the app's root directory. The viewer imports `xmlui-parser.es.js` " +
+        "from the same directory.",
       valueType: "string",
       defaultValue: defaultProps.src,
+    },
+    fetchMissing: {
+      description:
+        "When `true`, a viewer file that is missing locally (`xs-diff.html` or " +
+        "`xmlui-parser.es.js`) is loaded from the `xmlui` npm package on jsDelivr, " +
+        "pinned to the version of the running runtime. Local files still take " +
+        "precedence. When `false`, the Inspector never fetches from the network and " +
+        "shows an error naming the missing file instead.",
+      valueType: "boolean",
+      defaultValue: defaultProps.fetchMissing,
     },
     tooltip: {
       description: "Tooltip text shown when hovering over the inspector icon.",
@@ -55,5 +66,6 @@ export const InspectorMd = createMetadata({
 
 export const inspectorComponentRenderer = wrapComponent(COMP, Inspector, InspectorMd, {
   strings: ["tooltip", "dialogTitle", "dialogWidth", "dialogHeight"],
+  booleans: ["fetchMissing"],
   exposeRegisterApi: true,
 });

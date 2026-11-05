@@ -430,6 +430,27 @@ export default ({ mode = "lib" }) => {
     plugins = [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dtsPlugin()] as Plugin[];
   }
 
+  if (mode === "standalone") {
+    // Ship the Inspector's viewer files beside the UMD bundle, so the npm package
+    // gives them a versioned jsDelivr URL (Inspector `fetchMissing`, #3946).
+    // `xmlui-parser.es.js` comes from `build:inspector-parser`, which
+    // `build:xmlui-standalone` runs first.
+    plugins.push(
+      copy({
+        hook: "writeBundle",
+        targets: [
+          {
+            src: [
+              "dist/inspector/xmlui-parser.es.js",
+              "../website/public/xmlui/xs-diff.html",
+            ],
+            dest: "dist/standalone",
+          },
+        ],
+      }) as Plugin,
+    );
+  }
+
   if (mode === "lib") {
     plugins.push(
       copy({

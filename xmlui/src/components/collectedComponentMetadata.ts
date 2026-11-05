@@ -212,6 +212,7 @@ import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 import { ContextMenuMd } from "./ContextMenu/ContextMenu";
 import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
+import { InspectorMd } from "./Inspector/Inspector";
 import { StickySectionMd } from "./StickySection/StickySection";
 import { DrawerMd } from "./Drawer/Drawer";
 import { TileGridMd } from "./TileGrid/TileGrid";
@@ -371,6 +372,7 @@ Object.assign(metadataRegistry, {
   PointerLayer: PointerLayerMd,
   Image: ImageMd,
   IncludeMarkup: IncludeMarkupMd,
+  Inspector: InspectorMd,
   Items: ItemsMd,
   Link: LinkMd,
   List: ListMd,
