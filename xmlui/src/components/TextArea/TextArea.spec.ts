@@ -1001,6 +1001,149 @@ test.describe("Api", () => {
 });
 
 // =============================================================================
+// SELECTION API AND EVENT (#3959)
+// =============================================================================
+
+test.describe("Selection", () => {
+  // --- Clicking inside the left padding of the first line places the caret at offset 0
+  const startOfText = { position: { x: 3, y: 12 } };
+
+  test("selectionDidChange reports a click, including one in an already-focused field", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea initialValue="Hello World" onSelectionDidChange="(sel) => testState = sel" />
+    `);
+    const textarea = page.getByRole("textbox");
+
+    await textarea.click(startOfText);
+    await expect.poll(testStateDriver.testState).toEqual({ start: 0, end: 0 });
+
+    await page.keyboard.press("End");
+    await expect.poll(testStateDriver.testState).toEqual({ start: 11, end: 11 });
+
+    // --- The field already has focus; gotFocus would not fire here
+    await textarea.click(startOfText);
+    await expect.poll(testStateDriver.testState).toEqual({ start: 0, end: 0 });
+  });
+
+  test("selectionDidChange reports cursor keys and keyboard selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea initialValue="Hello World" onSelectionDidChange="(sel) => testState = sel" />
+    `);
+    await page.getByRole("textbox").click(startOfText);
+
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual({ start: 2, end: 2 });
+
+    await page.keyboard.press("Shift+ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual({ start: 2, end: 5 });
+  });
+
+  test("selectionDidChange reports a mouse drag selection", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea initialValue="Hello World" onSelectionDidChange="(sel) => testState = sel" />
+    `);
+    const box = await page.getByRole("textbox").boundingBox();
+    await page.mouse.move(box!.x + 3, box!.y + 12);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width - 3, box!.y + 12, { steps: 5 });
+    await page.mouse.up();
+
+    await expect
+      .poll(async () => {
+        const sel = (await testStateDriver.testState()) as { start: number; end: number };
+        return sel && sel.start === 0 && sel.end === 11;
+      })
+      .toBe(true);
+  });
+
+  test("selectionDidChange reports caret moves while typing", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea onSelectionDidChange="(sel) => testState = sel" />
+    `);
+    await page.getByRole("textbox").click();
+    await page.keyboard.type("abc");
+    await expect.poll(testStateDriver.testState).toEqual({ start: 3, end: 3 });
+  });
+
+  test("selectionDidChange does not refire for an unchanged position", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TextArea
+        initialValue="Hello World"
+        onSelectionDidChange="testState = (testState ?? 0) + 1" />
+    `);
+    await page.getByRole("textbox").click(startOfText);
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    // --- Already at offset 0: these keys don't move the caret
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Home");
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("selectionDidChange fires again after blur, at the same position", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <TextArea
+          initialValue="Hello World"
+          onSelectionDidChange="testState = (testState ?? 0) + 1" />
+        <Button testId="elsewhere" label="Elsewhere" />
+      </Fragment>
+    `);
+    const textarea = page.getByRole("textbox");
+    await textarea.click(startOfText);
+    await expect.poll(testStateDriver.testState).toEqual(1);
+
+    await page.getByTestId("elsewhere").click();
+    await textarea.click(startOfText);
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("getSelection returns the caret and selection", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <TextArea id="ta" initialValue="Hello World" />
+        <Button testId="read" onClick="testState = ta.getSelection()" />
+      </Fragment>
+    `);
+    await page.getByRole("textbox").click(startOfText);
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+
+    // --- Reading after the field lost focus still reports its last selection
+    await page.getByTestId("read").click();
+    await expect.poll(testStateDriver.testState).toEqual({ start: 1, end: 3 });
+  });
+
+  for (const variant of ['autoSize="true"', 'resize="both"']) {
+    test(`selectionDidChange works with ${variant}`, async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <TextArea ${variant} initialValue="Hello World" onSelectionDidChange="(sel) => testState = sel" />
+      `);
+      await page.getByRole("textbox").click(startOfText);
+      await page.keyboard.press("End");
+      await expect.poll(testStateDriver.testState).toEqual({ start: 11, end: 11 });
+    });
+  }
+});
+
+// =============================================================================
 // REGRESSION TESTS
 // =============================================================================
 

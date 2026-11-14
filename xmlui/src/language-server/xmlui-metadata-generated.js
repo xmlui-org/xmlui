@@ -20484,6 +20484,13 @@ export default {
         "parameters": {
           "newValue": "The new value of the component."
         }
+      },
+      "selectionDidChange": {
+        "description": "This event fires when the caret moves or the selected text changes in the `TextArea`: after a click (including one inside an already-focused field), a cursor key, a drag selection, or an edit. It fires after the browser has placed the caret, and not again for an unchanged position.",
+        "signature": "selectionDidChange(selection: { start: number, end: number }): void",
+        "parameters": {
+          "selection": "The character offsets of the selection. `start` equals `end` when nothing is selected and the caret sits at that offset."
+        }
       }
     },
     "apis": {
@@ -20501,6 +20508,10 @@ export default {
       "insert": {
         "description": "This method inserts the specified text at the current cursor position of the `TextArea` component, leaving the caret just after the inserted text.",
         "signature": "insert(text: string): void"
+      },
+      "getSelection": {
+        "description": "This method returns the caret position and selection of the `TextArea` as character offsets. `start` equals `end` when nothing is selected. It returns `undefined` when the component isn't rendered.",
+        "signature": "getSelection(): { start: number, end: number } | undefined"
       }
     },
     "themeVars": {

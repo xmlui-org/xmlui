@@ -185,6 +185,22 @@ Note how clicking elsewhere resets the text to the original.
 
 %-EVENT-END
 
+%-EVENT-START selectionDidChange
+
+Click anywhere in the text, move the caret with the arrow keys, or select a range. The handler receives the selection as character offsets; `start` equals `end` when nothing is selected. The event fires after the browser has placed the caret, so it works for a click inside a field that already has focus, which `gotFocus` doesn't report.
+
+```xmlui-pg copy display name="Example: selectionDidChange"
+<App var.sel="{{ start: 0, end: 0 }}" var.text="The quick brown fox jumps over the lazy dog">
+  <TextArea
+    initialValue="{text}"
+    onSelectionDidChange="(s) => sel = s" />
+  <Text value="Caret: {sel.start}, selection end: {sel.end}" />
+  <Text value="Selected: '{text.substring(sel.start, sel.end)}'" />
+</App>
+```
+
+%-EVENT-END
+
 %-API-START focus
 
 ```xmlui-pg copy display name="Example: focus"
@@ -204,6 +220,22 @@ In the example below, typing in the `TextArea` will also display the length of t
 <App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />
+</App>
+```
+
+%-API-END
+
+%-API-START getSelection
+
+Read the caret and selection on demand, here from a button. The field keeps its last selection after it loses focus.
+
+```xmlui-pg copy display name="Example: getSelection"
+<App var.report="">
+  <TextArea id="editor" initialValue="Select some of this text, then click the button." />
+  <Button
+    label="Where is the caret?"
+    onClick="const s = editor.getSelection(); report = s.start + '-' + s.end" />
+  <Text value="Selection: {report}" />
 </App>
 ```
 
