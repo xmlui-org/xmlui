@@ -12399,6 +12399,21 @@ export default {
         "valueType": "ComponentDef"
       }
     },
+    "events": {
+      "textSelectionDidChange": {
+        "description": "This event fires when the user selects text across the rendered items: after a mouse drag ends, or per step of a keyboard selection. It doesn't fire again for an unchanged selection, and fires once with `null` items when the selection leaves this component. Defining it wraps each item in a `display: contents` element, so CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.",
+        "signature": "textSelectionDidChange(selection: { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }): void",
+        "parameters": {
+          "selection": "`startItem` and `endItem` are the items holding the two ends of the selection, in document order whichever way it was made; `startIndex` and `endIndex` are their `$itemIndex` values; `text` is the selected text. The items and indices are `null` when the selection isn't wholly inside this component. A plain click reports a collapsed selection: `text` is empty and `startIndex` equals `endIndex`."
+        }
+      }
+    },
+    "apis": {
+      "getTextSelection": {
+        "description": "This method returns the current text selection in the same shape the `textSelectionDidChange` event passes. Giving the component an `id` makes it callable and wraps each item as described for that event.",
+        "signature": "getTextSelection(): { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }"
+      }
+    },
     "opaque": true
   },
   "Link": {
