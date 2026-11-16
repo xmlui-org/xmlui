@@ -109,6 +109,10 @@ export interface EventHandlerConfig {
   // Used to refresh stateRef before handler execution when the Container is
   // memo-blocked by computedUses and the layout effect hasn't re-fired.
   componentStateRef?: React.MutableRefObject<Record<string, any>>;
+  // With read-scoped rendering (#3941) the Container may not re-render after a
+  // statement's state change, so refresh stateRef from componentStateRef (the
+  // owner's live state) before each statement, not only when the handler starts.
+  refreshBeforeEachStatement?: boolean;
   // Stable ref to the full (un-narrowed) parent state set by ComponentWrapper.
   // Updated every time the parent renders, even when Container is memo-blocked.
   fullParentStateRef?: React.MutableRefObject<Record<string, any> | undefined>;
@@ -190,6 +194,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
     mountedRef,
     statementPromises,
     parsedStatementsRef,
+    refreshBeforeEachStatement,
   } = config;
 
   let lastFp: Record<string, any> | undefined = undefined;
@@ -382,6 +387,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
       const getComponentStateClone = () => {
         changes.length = 0;
+        if (refreshBeforeEachStatement) refreshStateRef();
         const originalState = stateRef.current;
         // Shallow-copy the root so that $this, $cancel, and context overrides
         // are scoped to this invocation without touching stateRef.current.

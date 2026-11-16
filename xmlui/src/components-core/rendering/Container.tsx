@@ -1,6 +1,7 @@
 import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
 import {
   cloneElement,
+  createContext,
   forwardRef,
   Fragment,
   isValidElement,
@@ -39,6 +40,36 @@ import type { EvalTreeOptions } from "../script-runner/BindingTreeEvaluationCont
 
 // Re-export for backward compatibility
 export { getCurrentTrace } from "../inspector/inspectorUtils";
+
+/**
+ * With read-scoped rendering (#3941), a getter for the enclosing StateContainer's
+ * live state. A container under a skipped subtree doesn't re-render, so the
+ * parent state it was given goes stale; its event handlers combine its own
+ * latest state with this getter instead (see `latestStateRef`).
+ */
+export const LiveStateContext = createContext<(() => Record<string | symbol, any>) | null>(null);
+
+/**
+ * With read-scoped rendering (#3941), the enclosing StateContainers' count of
+ * handler writes to a variable: the container's own count plus its parent's.
+ * Summing up the chain over-counts a shadowed name, which only costs a render.
+ */
+export const WriteStampContext = createContext<((key: string) => number) | null>(null);
+
+/**
+ * With read-scoped rendering (#3941), the uids of the loaders declared by the
+ * enclosing containers. A nested implicit container sees their entries in its
+ * combined state; they are loader state, not a component's own state.
+ */
+export const LoaderNamesContext = createContext<ReadonlySet<string> | null>(null);
+
+/**
+ * With read-scoped rendering (#3941), whether a component's field is registered
+ * API only (not reducer state), asked of the container that holds the uid.
+ */
+export const ApiOnlyFieldContext = createContext<
+  ((uid: symbol, field: string) => boolean) | null
+>(null);
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -86,6 +117,18 @@ type Props = {
   parentRenderContext?: ParentRenderContext;
   /** Reference to UID information */
   uidInfoRef?: RefObject<Record<string, any>>;
+  /**
+   * With read-scoped rendering (#3941), the latest state of the owning
+   * StateContainer, updated on every render. `componentState` may then be the
+   * state from an earlier render, so event handlers read this instead.
+   */
+  latestStateRef?: MutableRefObject<Record<string, any>>;
+  /**
+   * With read-scoped rendering (#3941), where this Container puts the function
+   * that resolves its pending statement promises, so the owning StateContainer
+   * can resolve them on a version change this Container doesn't render for.
+   */
+  statementCommitRef?: MutableRefObject<(() => void) | null>;
   /** Child elements to render */
   children?: ReactNode;
 };
@@ -123,6 +166,8 @@ export const Container = memo(
       isImplicit,
       fullParentStateRef,
       uidInfoRef: parentUidInfoRef,
+      latestStateRef,
+      statementCommitRef,
       children,
       ...rest
     }: Props,
@@ -220,6 +265,15 @@ export const Container = memo(
         resolve();
       }
     }, [version]);
+    // --- With read-scoped rendering this Container may not re-render on a version
+    // --- change, so the owning StateContainer resolves the promises instead
+    if (statementCommitRef) {
+      statementCommitRef.current = () => {
+        for (const resolve of statementPromises.current.values()) {
+          resolve();
+        }
+      };
+    }
 
     // --- Ensure that component disposal resolves all pending statement promises.
     useEffect(() => {
@@ -253,7 +307,9 @@ export const Container = memo(
       appContext,
       handlerLogger,
       stateRef,
-      componentStateRef,
+      // --- Read-scoped rendering may skip this render; handlers then read the
+      // --- owner's latest state, which it updates on every render
+      componentStateRef: latestStateRef ?? componentStateRef,
       fullParentStateRef,
       getThemeVar,
       dispatch,
@@ -270,6 +326,7 @@ export const Container = memo(
       mountedRef,
       statementPromises,
       parsedStatementsRef,
+      refreshBeforeEachStatement: !!latestStateRef,
     });
 
     // ========================================================================

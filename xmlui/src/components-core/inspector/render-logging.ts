@@ -431,6 +431,8 @@ export class RenderPassTracker {
   private rendered = new Map<string, number>();
   /** Components rendered while no pass was open, reported with the next pass */
   private renderedOutside = new Map<string, number>();
+  /** Read-scoped rendering handed Container last render's state this pass */
+  private stateHeld = false;
   private pendingTraceId: string | undefined;
   private readonly uidKinds = new Map<symbol, UidKind>();
   private uidFields = new Map<symbol, Set<string>>();
@@ -462,6 +464,15 @@ export class RenderPassTracker {
 
   setInfo(info: RenderPassInfo) {
     this.info = info;
+  }
+
+  /**
+   * Record whether read-scoped rendering held this pass's state (#3941): the
+   * container handed Container the state from its last render, so the subtree
+   * re-renders only if some other input changed (see `renderedCount`).
+   */
+  setStateHeld(held: boolean) {
+    this.stateHeld = held;
   }
 
   /** Call first thing in the container's render */
@@ -596,6 +607,7 @@ export class RenderPassTracker {
       durationMs: Math.round((endMs - this.startMs) * 1000) / 1000,
       cause: this.causes,
       ...necessaryField(this.causes),
+      ...(this.stateHeld && { stateHeld: true }),
       ...(this.foldedChildren.length > 0 && {
         implicitContainers: this.foldedChildren.length,
         folded: groupFolded(this.foldedChildren),

@@ -27,7 +27,13 @@ import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
-import { Container } from "./Container";
+import {
+  Container,
+  ApiOnlyFieldContext,
+  LiveStateContext,
+  LoaderNamesContext,
+  WriteStampContext,
+} from "./Container";
 import { createVariableLogger } from "../inspector/variable-logging";
 import { mergeComponentApis, useCombinedState, useMergedState } from "../state/state-layers";
 import { useVars, isParsedValue } from "../state/variable-resolution";
@@ -37,6 +43,24 @@ import { useAppContext } from "../AppContext";
 import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 import { RenderPassContext, RenderPassTracker } from "../inspector/render-logging";
 import { bindingReadPathsOf } from "../optimization/bindingReads";
+import {
+  type HeldState,
+  holdsState,
+  loaderNamesOf,
+  definitionUidsOf,
+  expandFunctionReads,
+  readRootsOf,
+  writeStampsOf,
+} from "../optimization/readScopedRender";
+
+const LOADER_ACTIONS = new Set<string>([
+  ContainerActionKind.LOADER_LOADED,
+  ContainerActionKind.LOADER_IN_PROGRESS_CHANGED,
+  ContainerActionKind.LOADER_IS_REFETCHING_CHANGED,
+  ContainerActionKind.LOADER_ERROR,
+  ContainerActionKind.LOADER_CANCELLED,
+]);
+const EMPTY_SET: ReadonlySet<string> = new Set();
 import {
   filterCyclicLocalDefinitions,
   getCyclicLocalDefinitionNames,
@@ -269,9 +293,15 @@ export const StateContainer = memo(
     const [componentState, reducerDispatch] = useReducer(containerReducer, EMPTY_OBJECT);
     // --- Every action reaching this reducer passes here, so the inspector can note
     // --- the trace id and the kind of each uid at dispatch time.
+    // --- Loader uids, as the step 1 trace classifies them: those receiving a
+    // --- loader action. Read-scoped rendering doesn't count their entries as
+    // --- a component's own state.
+    const loaderUidsRef = useRef<Set<symbol>>(new Set());
     const dispatch: ContainerDispatcher = useCallback(
       (action) => {
         passTrackerRef.current?.noteDispatch(action);
+        const uid = (action as any)?.payload?.uid;
+        if (typeof uid === "symbol" && LOADER_ACTIONS.has(action.type)) loaderUidsRef.current.add(uid);
         reducerDispatch(action);
       },
       [reducerDispatch],
@@ -513,6 +543,142 @@ export const StateContainer = memo(
     }, [combinedState]);
 
     // ========================================================================
+    // READ-SCOPED RENDERING (#3941, xmluiConfig.readScopedRendering)
+    // ========================================================================
+
+    // When nothing this container's bindings read has changed, and no
+    // component's own state has, hand Container the state it got last time:
+    // its memo then skips the subtree. Writes still land in state.
+    const readScopedEnabled = appContext.xmluiConfig?.readScopedRendering === true;
+    const readScoped = readScopedEnabled;
+    const scopedReadPaths = useMemo(
+      () =>
+        readScoped ? expandFunctionReads(bindingReadPathsOf(node), functionDeps) : ("all" as const),
+      [readScoped, node, functionDeps],
+    );
+    const parentLoaderNames = useContext(LoaderNamesContext);
+    const scopedLoaderNames = useMemo(() => {
+      if (!readScoped) return EMPTY_SET;
+      const own = loaderNamesOf(node);
+      if (!parentLoaderNames?.size) return own;
+      if (!own.size) return parentLoaderNames;
+      return new Set([...parentLoaderNames, ...own]) as ReadonlySet<string>;
+    }, [readScoped, node, parentLoaderNames]);
+    // --- Handler writes per variable, counted in statePartChanged. A write in
+    // --- place keeps the value's identity, so identity alone can't see it.
+    const writeStampsRef = useRef<Map<string, number>>(new Map());
+    const parentStampOf = useContext(WriteStampContext);
+    const parentStampOfRef = useRef(parentStampOf);
+    parentStampOfRef.current = parentStampOf;
+    const stampOf = useCallback(
+      (key: string): number =>
+        (writeStampsRef.current.get(key) ?? 0) + (parentStampOfRef.current?.(key) ?? 0),
+      [],
+    );
+    // --- A component's registered API vs its reducer state, asked of the
+    // --- container that holds the uid (an implicit container's components
+    // --- register with an ancestor)
+    const ownApisRef = useRef(componentApis);
+    ownApisRef.current = componentApis;
+    const ownReducerStateRef = useRef(componentState);
+    ownReducerStateRef.current = componentState;
+    const parentIsApiOnlyField = useContext(ApiOnlyFieldContext);
+    const parentIsApiOnlyFieldRef = useRef(parentIsApiOnlyField);
+    parentIsApiOnlyFieldRef.current = parentIsApiOnlyField;
+    // --- The uids this container's definition names: an API-only field of one
+    // --- of them is read only by bindings the read set already sees
+    const definitionUidsRef = useRef<ReadonlySet<string>>(EMPTY_SET);
+    definitionUidsRef.current = readScoped ? definitionUidsOf(node) : EMPTY_SET;
+    const isApiOnlyField = useCallback((uid: symbol, field: string): boolean => {
+      if (loaderUidsRef.current.has(uid)) return true;
+      const api = (ownApisRef.current as any)?.[uid];
+      if (api) {
+        if (!(field in api)) return false;
+        const state = (ownReducerStateRef.current as any)?.[uid];
+        if (state && typeof state === "object" && field in state) return false;
+        // --- A uid made at render time may have readers made at render time too
+        return !!uid.description && definitionUidsRef.current.has(uid.description);
+      }
+      if (uid in ((ownReducerStateRef.current as any) ?? {})) return false;
+      return parentIsApiOnlyFieldRef.current?.(uid, field) ?? false;
+    }, []);
+    const heldStateRef = useRef<HeldState | null>(null);
+    const latestStateRef = useRef<Record<string, any>>(resolvedCombinedState);
+    latestStateRef.current = resolvedCombinedState;
+    let containerState = resolvedCombinedState;
+    let containerVersion = version;
+    let stateHeld = false;
+    if (readScoped) {
+      // --- An implicit container forwards its components' state to the parent's
+      // --- reducer, so their own state reaches it only through the combined
+      // --- state. Either way the source includes registered APIs: an API value
+      // --- counts unless `isApiOnlyField` says only visible bindings read it.
+      const ownStateSource = isImplicit ? resolvedCombinedState : componentStateWithApis;
+      const next: HeldState = {
+        state: resolvedCombinedState,
+        raw: ownStateSource,
+        version,
+        stamps: writeStampsOf(readRootsOf(scopedReadPaths), stampOf),
+      };
+      if (holdsState(heldStateRef.current, next, scopedReadPaths, scopedLoaderNames, isApiOnlyField)) {
+        containerState = heldStateRef.current!.state;
+        containerVersion = heldStateRef.current!.version;
+        stateHeld = true;
+      } else {
+        heldStateRef.current = next;
+      }
+    }
+    passTracker?.setStateHeld(stateHeld);
+
+    // --- A handler waits after each statement that writes state until the
+    // --- version change renders. Container resolves that wait when it renders;
+    // --- with the version held, it may not, so resolve it here as well.
+    const statementCommitRef = useRef<(() => void) | null>(null);
+    useLayoutEffect(() => {
+      if (readScopedEnabled) statementCommitRef.current?.();
+    }, [version, readScopedEnabled]);
+
+    // --- Handlers see live state. A container under a held subtree doesn't
+    // --- re-render, so the parent state it holds goes stale. Its live state is
+    // --- its own latest state, with every value it inherited unchanged from its
+    // --- parent's state (as of its last render) replaced by the parent's live
+    // --- value. Every container gets this while the switch is on, implicit
+    // --- ones included, since any of them can sit under a held subtree.
+    const parentLiveState = useContext(LiveStateContext);
+    const parentLiveStateRef = useRef(parentLiveState);
+    parentLiveStateRef.current = parentLiveState;
+    const parentStateAtRenderRef = useRef(parentState);
+    parentStateAtRenderRef.current = parentState;
+    const liveState = useCallback((): Record<string | symbol, any> => {
+      const own = latestStateRef.current;
+      const parentLive = parentLiveStateRef.current;
+      if (!parentLive) return own;
+      const parentNow = parentLive();
+      const parentThen = (parentStateAtRenderRef.current ?? EMPTY_OBJECT) as Record<
+        string | symbol,
+        any
+      >;
+      let live: Record<string | symbol, any> | null = null;
+      for (const key of Reflect.ownKeys(parentNow)) {
+        const mine = (own as any)[key];
+        // --- The container's own value (a var shadowing the parent's) wins
+        if (key in own && !Object.is(mine, parentThen[key])) continue;
+        if (Object.is(mine, parentNow[key])) continue;
+        live ??= { ...own };
+        live[key] = parentNow[key];
+      }
+      return live ?? own;
+    }, []);
+    const liveStateRef = useMemo(
+      () => ({
+        get current() {
+          return liveState();
+        },
+      }),
+      [liveState],
+    ) as MutableRefObject<Record<string, any>>;
+
+    // ========================================================================
     // COMPONENT API REGISTRATION
     // ========================================================================
 
@@ -570,10 +736,16 @@ export const StateContainer = memo(
         const isLocalVar = key in localVars;
         const isGlobalVar = key in globalVars;
         const isRoot = node.uid === "root";
+        const countWrite = () => {
+          if (typeof key !== "string") return;
+          const stamps = writeStampsRef.current;
+          stamps.set(key, (stamps.get(key) ?? 0) + 1);
+        };
 
         // Check local variables FIRST - they shadow globals
         if (isLocalVar) {
           // Local variable - handle locally (even if same name as global)
+          countWrite();
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
             payload: {
@@ -591,6 +763,7 @@ export const StateContainer = memo(
             // Use stableCurrentGlobalVars as localVars so the reducer can see
             // the original structure of the global variable (e.g., the full array)
             // when applying path-based updates like push operations.
+            countWrite();
             dispatch({
               type: ContainerActionKind.STATE_PART_CHANGED,
               payload: {
@@ -607,6 +780,7 @@ export const StateContainer = memo(
           }
         } else if (key in componentStateRef.current) {
           // Component state - handle locally
+          countWrite();
           dispatch({
             type: ContainerActionKind.STATE_PART_CHANGED,
             payload: {
@@ -644,12 +818,14 @@ export const StateContainer = memo(
           <Container
             resolvedKey={resolvedKey}
             node={node}
-            componentState={resolvedCombinedState}
+            componentState={containerState}
+            latestStateRef={readScopedEnabled ? liveStateRef : undefined}
             globalVars={stableCurrentGlobalVars}
             dispatch={dispatch}
             parentDispatch={parentDispatch}
             setVersion={setVersion}
-            version={version}
+            version={containerVersion}
+            statementCommitRef={readScopedEnabled ? statementCommitRef : undefined}
             statePartChanged={statePartChanged}
             registerComponentApi={registerComponentApi}
             parentRegisterComponentApi={parentRegisterComponentApi}
@@ -667,10 +843,21 @@ export const StateContainer = memo(
         </FnDepsProvider>
       </ErrorBoundary>
     );
-    return passTracker ? (
-      <RenderPassContext.Provider value={passTracker.handle}>{rendered}</RenderPassContext.Provider>
+    const withLiveState = readScopedEnabled ? (
+      <LiveStateContext.Provider value={liveState}>
+        <WriteStampContext.Provider value={stampOf}>
+          <LoaderNamesContext.Provider value={scopedLoaderNames}>
+            <ApiOnlyFieldContext.Provider value={isApiOnlyField}>{rendered}</ApiOnlyFieldContext.Provider>
+          </LoaderNamesContext.Provider>
+        </WriteStampContext.Provider>
+      </LiveStateContext.Provider>
     ) : (
       rendered
+    );
+    return passTracker ? (
+      <RenderPassContext.Provider value={passTracker.handle}>{withLiveState}</RenderPassContext.Provider>
+    ) : (
+      withLiveState
     );
   }),
 );

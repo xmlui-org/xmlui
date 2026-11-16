@@ -29,6 +29,10 @@ import { isParsedValue } from "../state/variable-resolution";
 
 export type BindingReadPaths = ReadonlySet<string> | "all";
 
+/** Props whose string value names a variable the renderer reads (see `addNamedVariableProps`) */
+const VARIABLE_NAME_PROPS = ["syncWithVar"] as const;
+const IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+
 const cache = new WeakMap<object, BindingReadPaths>();
 
 /** The member paths read by bindings anywhere in `node`'s definition, or `"all"` */
@@ -147,11 +151,28 @@ function computeReadPaths(root: ComponentDef): BindingReadPaths {
     });
   };
 
+  // --- Some props name a variable as a plain string, and the renderer reads it
+  // --- by building an expression at render time (Table, List and TileGrid
+  // --- `syncWithVar` do `extractValue(`{${name}}`)`). No binding mentions the
+  // --- variable, so count the name itself as read.
+  const addNamedVariableProps = (props: Record<string, unknown> | undefined) => {
+    if (!props) return;
+    for (const prop of VARIABLE_NAME_PROPS) {
+      const name = props[prop];
+      if (typeof name === "string" && IDENTIFIER_RE.test(name.trim())) paths.add(name.trim());
+      else if (name !== undefined && typeof name !== "string") addValue(name);
+    }
+  };
+
   function visit(node: ComponentDef) {
     if (seen.has(node)) return;
     seen.add(node);
     const def = node as any;
+    // --- `id="{expr}"` is a binding too: the parser keeps it as the uid, and
+    // --- the renderer resolves it (e.g. Bookmark's anchor, the container key)
+    if (typeof def.uid === "string") addValue(def.uid);
     addRecord(def.props);
+    addNamedVariableProps(def.props);
     addRecord(def.vars);
     addRecord(def.api);
     addValue(def.when);
