@@ -59,5 +59,5 @@ Use `onUnmount` on the component that owns a visible panel to run synchronous cl
 ## See also
 
 - [Run a one-time action on page load](/docs/howto/run-a-one-time-action-on-page-load) — run setup when a component appears
-- [Save work before a page or panel closes](/docs/howto/save-work-before-a-page-or-panel-closes) — use `onBeforeDispose` for async cleanup
+- Save work before a page or panel closes — use `onBeforeDispose` for async cleanup
 - [Managed Lifecycle Vocabulary](/docs/managed-react/managed-lifecycle-vocabulary) — full lifecycle model

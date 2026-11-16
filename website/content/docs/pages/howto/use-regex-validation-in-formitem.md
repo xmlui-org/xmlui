@@ -60,5 +60,5 @@ Write regex patterns with curly-brace quantifiers safely in XML attributes and c
 ## See also
 
 - [Do custom form validation](/docs/howto/do-custom-form-validation) — arbitrary async validation with `onValidate`
-- [Handle Form willSubmit return values](/docs/howto/handle-form-willsubmit-return-values) — final payload transformation or cancellation
+- [Transform form data before submission](/docs/howto/transform-form-data-before-submission) — final payload transformation or cancellation
 - [Use built-in form validation](/docs/howto/use-built-in-form-validation) — `required`, `minLength`, `min`/`max` built-ins

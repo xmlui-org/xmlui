@@ -129,7 +129,7 @@ which is what the create-app templates do out of the box:
 
 ## Related
 
-- [Theming](/docs/theming)
+- [Theming](/docs/themes-intro)
 - [Centralized HTTP](/docs/managed-react/http-centralization)
 - [Verified Type Contracts](/docs/managed-react/verified-type-contracts)
 - [Managed React Overview](/docs/managed-react/overview)

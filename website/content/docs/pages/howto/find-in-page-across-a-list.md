@@ -100,7 +100,7 @@ The whole trick is a **find plan** — a pure function of `(rows, needle, cursor
 
 ## Package it as a reusable component
 
-Once you have wired this once, the spine — the find box, the cursor, the plan, the List, the scroll — is identical for every list. Move it into a [user-defined component](/docs/user-defined-components) and each consumer supplies only its `data` and how to render a row. The component decorates every row with `__needle` / `__activeOcc` and re-exposes it to your markup through a named [`Slot`](/docs/reference/components/Slot), so the whole find machinery becomes one tag:
+Once you have wired this once, the spine — the find box, the cursor, the plan, the List, the scroll — is identical for every list. Move it into a [user-defined component](/docs/guides/user-defined-components) and each consumer supplies only its `data` and how to render a row. The component decorates every row with `__needle` / `__activeOcc` and re-exposes it to your markup through a named [`Slot`](/docs/reference/components/Slot), so the whole find machinery becomes one tag:
 
 ```xmlui-pg copy display name="The same find, packaged as a reusable component" height="600px"
 <App>
@@ -191,7 +191,7 @@ Once you have wired this once, the spine — the find box, the cursor, the plan,
 The example rebuilds the plan on every keystroke and every step, which is fine for a bounded list. Two things change when the List is long enough to virtualize:
 
 - **Minimal-remount keying matters.** The cursor-stable-except-active `key` above is already the right discipline — it keeps per-step remounts to ≤2 even when thousands of rows are mounted. Baking the cursor into every key instead would remount every visible row per keystroke, each re-parsing its Markdown. See [Keep per-item state in an Items or List loop](/docs/howto/keep-per-item-state-in-a-loop) for the identity substrate.
-- **Memoize the plan.** Recomputing occurrence counts for every row on every cursor *step* is wasted work — counts only change when the needle or the data changes. Cache the per-row counts keyed on the needle, and let a pure cursor step reuse them, cloning only the active row. A memo cache is non-reactive state, so it lives in an imperative helper (a `window.*` function loaded from `index.html`, per [Scripting](/docs/scripting)) rather than a reactive variable — which is also the natural point to package the whole spine into a reusable component.
+- **Memoize the plan.** Recomputing occurrence counts for every row on every cursor *step* is wasted work — counts only change when the needle or the data changes. Cache the per-row counts keyed on the needle, and let a pure cursor step reuse them, cloning only the active row. A memo cache is non-reactive state, so it lives in an imperative helper (a `window.*` function loaded from `index.html`, per [Scripting](/docs/guides/scripting)) rather than a reactive variable — which is also the natural point to package the whole spine into a reusable component.
 
 ## See also
 

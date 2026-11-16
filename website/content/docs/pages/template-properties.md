@@ -58,7 +58,7 @@ Template properties enable you to define custom markup for specific parts of com
 | Component | Template | Description |
 |-----------|----------|-------------|
 | [Splitter](/docs/reference/components/Splitter) | [`splitterTemplate`](/docs/reference/components/Splitter#splittertemplate) | Template for the splitter handle/divider |
-| [Backdrop](/docs/reference/components/Backdrop) | [`overlayTemplate`](/docs/reference/components/Backdrop#overlaytemplate) | Template for optional overlay content |
+| [Backdrop](/docs/reference/extensions/xmlui-website-blocks/Backdrop) | [`overlayTemplate`](/docs/reference/extensions/xmlui-website-blocks/Backdrop#overlaytemplate) | Template for optional overlay content |
 
 ## Utility Components
 

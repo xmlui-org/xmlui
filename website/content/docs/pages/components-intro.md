@@ -10,8 +10,8 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 [DataSource](/docs/reference/components/DataSource),
 [APICall](/docs/reference/components/APICall) ...
 
-**Display**: [Avatar](/docs/reference/docs/reference/components/Avatar),
-[Card](/docs/reference/docs/reference/components/Card), [Heading](/docs/reference/docs/reference/components/Heading), [Image](/docs/reference/docs/reference/components/Image),
+**Display**: [Avatar](/docs/reference/components/Avatar),
+[Card](/docs/reference/components/Card), [Heading](/docs/reference/components/Heading), [Image](/docs/reference/components/Image),
 [Icon](/docs/reference/components/Icon),
 [Markdown](/docs/reference/components/Markdown),
 [Text](/docs/reference/components/Text),

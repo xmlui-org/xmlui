@@ -1,5 +1,346 @@
 # xmlui
 
+## 0.14.28
+
+### Patch Changes
+
+- 0fa89e8: Add an experimental MediaPlayer component for audio and video, with playback events that carry the playhead position, play/pause/seek methods, and reactive paused/ended/duration state. Components that capture native events can now attach a plain `traceData` object, which is recorded as the Inspector log entry's `data` and survives trace export.
+- c0746a1: Add an experimental PointerLayer component that draws live, fading ink over its children while a modifier key is held (freehand strokes, or line, arrow, rectangle, ellipse and pointer shapes, with the pointer drawn as a ring or a block arrow), and reports pointer movement, finished strokes and finished shapes as events in normalized coordinates. It can also place app content over its children at picture coordinates (`anchors` with an `anchorTemplate`), optionally draggable. Trace payloads that components attach to native events are now deep-copied, so nested values such as a stroke's points survive the Inspector export.
+- c54aa21: Arrow function bodies now compile, including helpers called from a binding.
+
+  A `Globals.xs` helper or a `<script>` function is stored as an arrow expression, so calling
+  one from a binding — `var.rows="{applyFilters(cases, query)}"` — walked its body through the
+  interpreter on every reactive invalidation, however much of the app had compiled. The body
+  now compiles through the synchronous statement target.
+
+  Arrow _values_ keep their existing shape. Emitting plain JavaScript functions instead is
+  smaller and faster, and was tried: an XMLScript arrow is not a JavaScript function, and the
+  shape is how the framework recognises one and routes it through the callback plumbing that
+  supplies state propagation, synchronous calling and event arguments — as well as how
+  rendering shows a function as a placeholder rather than its source.
+
+  `async` arrows are now refused in every position. In callback position both paths used to
+  run them with the keyword quietly ignored — `xs.map(async x => x)` produced `[1]` where
+  JavaScript gives `[Promise]` — while the same arrow in value position was refused. XMLUI
+  awaits async calls on its own, so real promise semantics are not available, and refusing is
+  what the language already did elsewhere.
+
+  Markdown's rendering of functions inside binding expressions is more robust: a function
+  renders as `[xmlui function]` whatever shape the engine gave it, and the same placeholder
+  now applies inside an array, which previously rendered a syntax tree.
+
+- c54aa21: Destructured and rest arrow parameters now compile in binding expressions.
+
+  `{items.map(({ id }) => id)}` is an ordinary idiom, and it compiled inside an event handler
+  while raising a hard error inside a binding. That asymmetry mattered more than it looks:
+  the binding path has no fallback catch, so a refused construct there is an app-breaking
+  error rather than a slow path. Turning on `compileScripts` could crash an app over a
+  parameter shape that worked everywhere else.
+
+  `event-async` already knew how to compile these. The collectors that flatten a
+  destructuring pattern now live in one place and both targets use them, so the two cannot
+  drift apart again. Array, object, nested and aliased patterns are covered, as are rest
+  parameters.
+
+  Sharing them turned up a mis-coded diagnostic and fixed it. Both targets carried a copy of
+  the identifier check, testing the same thing and failing differently: one raised an
+  unsupported-node error naming the construct, the other a plain `Error`, which was then
+  reported as `compile-source-unavailable` — "compilation failed for some other reason". Same
+  input, two diagnostics, depending on where it appeared.
+
+- c54aa21: Helper functions called from a binding now run compiled, and a refused construct no longer crashes the app.
+
+  A `Globals.xs` helper or a `<script>` function is stored as an arrow expression, so calling
+  one from a binding — `var.rows="{applyFilters(cases, query)}"` — walked its body through the
+  interpreter on every reactive invalidation, however much of the app had compiled. This was
+  the shape the original performance report was about. The build-time artifact on the
+  declaration could not serve here: it targets the async event path and returns a promise,
+  which a synchronous binding cannot accept. The synchronous statement target now compiles the
+  same body for this context.
+
+  Two related fixes came with it. Synchronous binding evaluation had no fallback for a
+  construct the compiler refuses, so instead of running slowly it threw and took the app down;
+  the asynchronous path has caught this since compilation was introduced, and now both do.
+  And the strict-compilation guard for arrow bodies was firing before compilation was
+  attempted, reporting arrows that compile perfectly well — a guard that reports
+  interpretation has to stand where interpretation happens.
+
+- c54aa21: `APICall`'s `mockExecute` handler now compiles like every other event handler.
+
+  It was the only event excluded from compilation, and no reason for the exclusion was
+  recorded anywhere — not in the commit that added it, not in that change's plan notes, not
+  in a comment. The likely motive is that `mockExecute` is the one handler whose return value
+  is load-bearing, since it replaces an API response outright, and the original compilation
+  work predated the step that copies a compiled handler's result into the same place the
+  interpreted one leaves it.
+
+  Verified against the shapes a real `mockExecute` takes before removing it: literal
+  responses, the injected request context (`$queryParams`, `$requestBody`, `$requestHeaders`,
+  `$cookies`), branching on a request value, the arrow form with both expression and block
+  bodies, and an awaited delegate. Compiled and interpreted agree on all of them.
+
+- c54aa21: Regular expressions now compile instead of silently producing wrong answers.
+
+  Regular expressions are the only non-primitive literal XMLScript produces, and both
+  compiler targets handed them to `JSON.stringify`, which renders one as `{}`.
+
+  In binding expressions that was silent. `text.replace(/ /g, "-")` compiled to a call with
+  an empty object as its pattern and returned the text unchanged; `text.split(/,\s*/)`
+  returned the whole string as a single element; `/^a/.test(text)` returned `undefined`. No
+  error, no diagnostic, no fallback marker — the build reported success while the app
+  computed the wrong thing. In event handlers a guard caught the same case and fell back to
+  interpretation, so it was merely slow, and any handler containing a pattern lost its
+  compilation.
+
+  Both paths now render patterns as real ones: `new RegExp(source, flags)` for direct
+  emission, and the same inside the serialized AST that lazy arrows embed for the
+  interpreter. Regular expressions are no longer a reason for a script to fall back.
+
+  The interpreter had a related bug this exposed. The parser builds a literal's `RegExp`
+  once and stores it on the AST node, so every evaluation returned the same instance and a
+  `g` or `y` pattern carried its `lastIndex` across evaluations — `/a/g.test(s)` evaluated
+  four times returned `true, true, true, false`. A regular expression literal builds a fresh
+  object each time it is evaluated in JavaScript; both paths do that now.
+
+- a348858: `compileScripts` set in `xmlui.config.json` now reaches the browser, so bindings actually compile.
+
+  Binding expressions — every `var.` initializer and every attribute binding — are the one script
+  kind with no build-time artifact: prop values are stored as strings and parsed lazily in the
+  browser, so each binding compiles there on first evaluation and is cached. That makes the runtime
+  switch the whole story for bindings.
+
+  The runtime read that switch only from the app description (`src/config.ts` / `config.json`).
+  `xmlui.config.json` — the documented place for it, and the one the CLI reads — lives on the build
+  machine and never reached the browser. An app that configured compilation there got its event
+  handlers and script declarations compiled into the emitted modules and then, at runtime, neither
+  used them (compiled-handler dispatch is gated on the same runtime switch) nor compiled a single
+  binding. The build reported hundreds of compiled artifacts while the app ran fully interpreted.
+
+  `xmlui start` and `xmlui build` now bake the script-compilation settings stated in
+  `xmlui.config.json` into the app, and the runtime reads them back, keeping the documented
+  precedence: the file wins over the app description, in both directions. An app that configures
+  compilation only in its description is unaffected. `xmlui build` also stopped discarding the
+  `define` block assembled by `getViteConfig`.
+
+  The build summary now names what it compiled and what it did not:
+
+  ```
+  [xmlui] Script compilation: 128 compiled artifact(s) (74 event handler(s), 54 declaration function(s)) from 130 script block(s) in 24 file(s)
+  [xmlui] Binding expressions (`var.` initializers and attribute bindings) are not compiled here: prop values are parsed lazily in the browser, so each one compiles on its first evaluation and is cached. The app's startup line reports the mode it actually runs in.
+  ```
+
+  A single undifferentiated total read as complete success while an entire category sat at zero,
+  which is what made this expensive to diagnose from the outside. The startup inventory line says
+  the same thing in the browser console.
+
+  Three more binding sites that dropped the switch now honour it as well. `Globals.xs`
+  variable initializers were evaluated through a hand-built context carrying no options,
+  and so were `APICall`'s `progressExtractor` and its polling `condition` — the latter two
+  on every poll. Nothing downstream re-derived the switch for any of them, unlike a
+  component's `var.`. `shouldCompileScripts` also reads the build-resolved setting
+  directly now, so a caller that assembles an app context by hand cannot silently fall
+  back to the interpreter.
+
+  `Globals.xs` _functions_ are unaffected by that change and did not need it: code-behind
+  collects them as arrow expressions, which binding evaluation routes to the interpreter
+  by design — a compiled global function comes from its build-time `#function-` artifact.
+
+- 0510188: Fix: `fontVariant-*` theme variables (e.g. `fontVariant-Text`, `fontVariant-summary-ExpandableItem`) are now applied. The shared `textVars` mixin previously declared them but never output `font-variant`, so they had no effect on Badge, ExpandableItem, Heading, Link, Markdown, ModalDialog, NestedApp, TableOfContents and Text.
+- 55bbdb2: Fix: Inspector trace logs and exports no longer record shared (non-circular) references as `"[Circular]"`. An object reached through several paths, such as a record repeated in a DataSource result, is now serialized in full at each occurrence; only a true cycle is marked `"[Circular]"`. For very large shared structures, repeats past an expansion budget are marked `"[Shared]"`.
+- 6c8244e: `List` no longer jumps toward the bottom when its data is replaced by a longer list with a different first row.
+
+  `List` keeps the viewed row in place when rows are prepended (chat history, for example) by turning on virtua's `shift`. It used to treat any change of the first row's key as a prepend, so a filter or sort that replaced the data was shifted too. virtua then kept the distance from the end, and a short → long switch landed near the bottom of the new list (#3936).
+
+  A change now counts as a prepend only when the previous rows survive intact at the end of the new ones. Filters, sorts, wholesale replacements and the first data after an empty list keep the scroll offset instead: at the top they stay at the top. True prepends behave as before.
+
+- d7ef82f: Markdown `[!DETAILS]` / `[!SDETAILS]` summaries now render as inline Markdown, so emphasis, strikethrough and code in the summary line keep their formatting. Fix: the first body line of a details block no longer loses its inline formatting.
+- c54aa21: Destructured and rest parameters now compile on named function declarations.
+
+  `function pick({ a }) { return a; }` fell back to interpretation while `({ a }) => a`
+  compiled — the same pattern, two answers, depending on how the function was spelled. Both
+  compiler targets now route arrow and named-declaration parameters through the same
+  collector, so array, object, nested and aliased patterns work in either form, and rest
+  parameters with them.
+
+  Probing each remaining entry before implementing it removed two from the list rather than
+  closing them. Non-`let` for-init (`for (const i = 0; …)`) is rejected by the parser, so
+  neither path ever sees it, and `async` used as a statement value is rejected by the
+  interpreter. Both had been recorded as constructs the compiler fails to handle; they are
+  language boundaries.
+
+  One entry moved the other way. `xs.map(async x => x)` — `async` in callback position — does
+  run in the interpreter, ignoring the keyword, so it is a genuine gap and in a binding it is
+  a hard error rather than a fallback. It is left refused on purpose: matching the
+  interpreter means compiling `async` as though it were absent, and whether that suits
+  XMLUI's auto-await model is a language decision rather than a compiler one.
+
+- c54aa21: Object literal getters and setters now compile in binding expressions.
+
+  `{ ({ get total() { return items.length; } }).total }` was refused by the compiler while
+  the interpreter evaluated it correctly, closure and all. In a binding that refusal was a
+  hard error rather than a fallback, because the binding path has no catch.
+
+  Event handlers still fall back on an accessor, and that is deliberate rather than an
+  oversight. Every function body the event target emits is `async` and threads awaits through
+  its expressions; a property accessor cannot be async, because it has to return a value
+  rather than a promise. Compiling one there needs a synchronous emission mode that does not
+  exist yet. The asymmetry points the right way: refusing costs a fallback in the event path,
+  which catches it, and cost a crash in the binding path, which does not.
+
+- e4e2bc1: Playgrounds (`xmlui-pg` fences and `AppWithCodeView`) without an explicit `height` now grow to fit their content after they mount, instead of scrolling inside a fixed 320px box. They still reserve 320px before mounting, grow again when content grows later, never shrink, and stop at 85% of the viewport height, past which they scroll. An explicit `height` stays fixed.
+- d9b0655: The standalone bundle now boots when it loads after `DOMContentLoaded`.
+
+  The boot trigger was registered as a `DOMContentLoaded` listener with no fallback, so a
+  bundle that evaluated after the document finished parsing waited for an event that could
+  never fire again: a blank page, no error, nothing in the console. Every load that is not
+  parser-blocking hit this — dynamic `<script>` insertion, `defer`, and any module whose
+  top-level `await` defers evaluation past the event. The entry point now checks
+  `document.readyState` and boots directly when parsing is already done.
+
+  Booting is idempotent. Re-dispatching `DOMContentLoaded` was the natural workaround for
+  the blank page, so apps that adopted it would otherwise have booted twice once the
+  fallback landed; a second event — real or synthetic — is now a no-op.
+
+  Refs #3786.
+
+- c54aa21: Synchronous callbacks now compile their whole body, not just their expressions.
+
+  `Table` `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat` and every sync
+  callback prop ran through a statement queue with no compiled target. With `compileScripts`
+  on, their leaf expressions compiled while the loops and branches around them stayed
+  interpreted — and that combination measured _slower_ than interpreting the lot, because a
+  small expression pays the artifact cache lookup without earning it back. These run per row,
+  per render.
+
+  A `statement-sync` target closes it. A statement-heavy body over 1000 rows went from 1.9×
+  slower than the interpreter to 2.47× faster. Across the shapes this path serves: a branch
+  is 1.44× faster, an array method 1.62× faster, a simple predicate is parity, and a bare
+  member chain is about 1.18× slower — roughly 0.4 ns per evaluation, where the compiled path
+  pays a call and a cache lookup without doing less work.
+
+  Handlers written as an arrow — `rowDisabledPredicate="{(row) => row.locked}"`, the common
+  form — compile too, along with the per-statement hook that flushes state changes outward,
+  so a handler's writes surface at the same moment they did before.
+
+- 4348c95: `StickyBox` now resolves its scroll parent deterministically.
+
+  The scroll parent was resolved from a `useRef` whose node is rendered further down
+  the component, so on first render the hook received `null`. A ref mutation does not
+  re-render and the resolved value was already `null`, so nothing re-ran the lookup:
+  `StickyBox` found its scroller only when something _else_ happened to re-render it
+  after mount. Everything it gates — stickiness, and the children themselves — rode on
+  that incidental re-render.
+
+  The sentinel is now a callback ref, matching the pattern the component already used
+  for its wrapper, so mounting the node re-runs the lookup on its own.
+
+  No API change. This is a robustness fix for a timing hazard; it is not a
+  demonstrated fix for xmlui-org/xmlui#2864, whose reported symptom did not reproduce
+  across six nesting and data-timing configurations — those configurations are now
+  covered by the component's first spec file.
+
+- c54aa21: Added `strictCompilation`: any script that would run interpreted becomes an error.
+
+  Set it alongside `compileScripts` and XMLUI stops falling back quietly. It catches more
+  than a refused construct, which is the point — a script can end up interpreted three ways,
+  and only the first leaves a trace: the compiler refused something and a caller fell back;
+  the compiled path chose to interpret (a lazy arrow, or anything on the synchronous
+  statement queue, which has no compiled target); or the evaluation context never carried the
+  switch at all. An app could report zero fallbacks while running mostly interpreted, so the
+  rule enforced is not "no fallbacks" but "no interpretation", guarded at the interpreter's
+  own entry points.
+
+  The report shows the offending line with a caret under the construct, the component and
+  event it belongs to, what to write instead, the diagnostic code, and how to relax the
+  setting. A violation with no compiler error behind it reads differently on purpose — it
+  says the code was never handed to the compiler, rather than blaming a construct that is not
+  there.
+
+  `xmlui build` fails with every violation at once, sorted by file, so adopting strict mode
+  does not mean discovering constructs one build cycle at a time. `xmlui start` reports them
+  and keeps serving. Without `compileScripts` the setting is inert, and the CLI says so
+  rather than ignoring the combination.
+
+  Expect violations today: the synchronous statement queue has no compiled target, so
+  `Table` `rowDisabledPredicate`, `List` `groupBy`, `Slider` `valueFormat` and every sync
+  callback prop will be flagged. This is a diagnostic tool for finding what does not compile,
+  not yet a production setting.
+
+- c54aa21: `strictCompilation` now reports by default whenever `compileScripts` is on.
+
+  The setting accepts `"off" | "report" | "error"` as well as a boolean. Left unset with
+  `compileScripts` on it reports: every script that would run interpreted is named once in
+  the console, and nothing fails. `true` still makes it an error, failing the build with
+  every violation at once. `false` restores silent fallbacks.
+
+  Reporting rather than failing is the default deliberately. A hard error would break an app
+  the moment it met any interpretation nobody predicted, and finding out what nobody
+  predicted is the entire reason to have this on. One case settles it: an app declaring
+  `compileScripts` in its app description rather than in `xmlui.config.json` still gets an
+  interpreted mock backend, so failing by default would break every mock request in it.
+
+  Each distinct site is reported once rather than once per evaluation, because these checks
+  sit on per-row, per-render paths and a violation logged every time would bury what it
+  exists to surface.
+
+- 8862e6f: Fix: a fill-height child of a `TabItem` (for example a `Splitter` with `height="100%"`) no longer overflows the tabs box and gets clipped. The tab panel can now shrink into the space the tabs container offers, so `Tabs height="*"` → `Splitter height="100%"` works without an explicit `height` on the `TabItem`.
+- ac72bd3: Fix: `Table`'s `rowDetailTemplate` now renders beneath its row instead of beside it. An expanded row already carried `flex-wrap: wrap`, but the row's `min-width: max-content` reserved space for the detail on the cell line (a wrapping flex container measures `max-content` as if every item shared one line), and the detail's flex basis matched the column total rather than the row. The detail therefore sat to the right of the last cell, and scrolled off-screen entirely once the columns overflowed horizontally.
+- dbe0a99: Table: new `rowVariant` property for per-row styling that is independent of selection. The function receives a row item and returns a variant name (or nothing); a row with variant `<name>` is styled by the `backgroundColor-row-<name>-Table`, `backgroundColor-row-<name>-Table--hover` and `textColor-row-<name>-Table` theme variables. A variant background wins over striping; selected and hovered rows keep their own background while the variant's text color still applies. Rows re-evaluate the function when the state it reads changes.
+- c54aa21: Five evaluation sites now honour `compileScripts`, and synchronous callbacks stop slipping the DOM sandbox.
+
+  Each of these built its evaluation context by hand, or called `extractParam` without
+  options, so the switch never reached them and they ran interpreted whatever the app asked
+  for — nothing downstream re-derives it. Loader-reference resolution in `ComponentWrapper`
+  runs for every prop of every node on re-render; `PageableLoader`'s page selectors run twice
+  per page fetch; `RestApiProxy` evaluates arrow-valued request parameters per request; and
+  an emulated `Backend`'s operation handlers and helpers run per mock request, where the
+  scripts are often the largest in the app.
+
+  Three of them pass options without an app context on purpose. They resolve loader
+  references and page selectors, and handing them an app context would widen identifier
+  resolution and change which expressions resolve — a behaviour change that does not belong
+  in a wiring fix.
+
+  `Backend` reads the settings the build baked in, since it is constructed far from React.
+  An app that declares `compileScripts` only in its app description and never in
+  `xmlui.config.json` still gets an interpreted mock backend.
+
+  `runCodeSync` is the exception, and deliberately so. Its context carried no options at all,
+  which was a semantic divergence as much as a performance one: a synchronous callback got
+  no `strictDomSandbox`, no `allowConsole`, and no config-driven
+  `defaultToOptionalMemberAccess`, so it slipped the sandbox that asynchronous handlers
+  enforce. That is fixed. Compilation stays off there: the synchronous statement queue has no
+  compiled target, so turning it on compiles only the leaf expressions while control flow
+  stays interpreted, and measured over the shapes this serves — `Table` `rowDisabledPredicate`,
+  `List` `groupBy`, `Slider` `valueFormat`, all evaluated per row per render — that is 1.3×
+  to 1.7× slower, not faster. It will inherit the switch once a compiled target for
+  synchronous statements exists.
+
+- c54aa21: Added an XMLScript conformance corpus that measures coverage against the language.
+
+  Every case runs through both the interpreter and the compiler, comparing the returned
+  value and the resulting local context — a construct that merely compiles is not covered,
+  it has to mean the same thing either way.
+
+  What makes it different from the hand-written parity lists it joins is that coverage is
+  derived rather than declared. Each case's parsed tree is walked to see which AST node types
+  it actually reaches, and the total is asserted against the node types the language
+  declares, so a gap fails the suite by name instead of going unnoticed. Node types that no
+  case can reach carry a written reason, and that excuse list is itself guarded against
+  becoming a dumping ground.
+
+  Coverage is measured on a second axis too, because the first one is not enough: a regular
+  expression is a `T_LITERAL`, indistinguishable from a string to a walk over node types.
+  Deleting the regex case costs no node-type coverage at all — which is precisely how the
+  regular-expression miscompile survived a corpus of several hundred hand-written parity
+  cases. Literal value kinds are therefore asserted separately.
+
+  Building it corrected three entries in the framework's own picture of what does not
+  compile. `await`, destructuring assignment (`[a, b] = pair`) and `void` are rejected by the
+  interpreter as well, so they are language boundaries rather than constructs the compiler
+  fails to handle. It also pinned a wart: `var` parses and is then discarded by both paths,
+  so `var a = 1; return a;` evaluates to `undefined`.
+
 ## 0.14.27
 
 ### Patch Changes

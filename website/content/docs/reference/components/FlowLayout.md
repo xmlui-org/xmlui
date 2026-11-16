@@ -5,7 +5,7 @@
 
 `FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line.
 
-For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/docs/layout#flowlayout).
+For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/docs/guides/layout#flowlayout).
 
 ## Using `SpaceFiller` with `FlowLayout` [#using-spacefiller-with-flowlayout]
 

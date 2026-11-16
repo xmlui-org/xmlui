@@ -501,7 +501,7 @@ This method returns the column headers from the most recently parsed CSV file.
 
 Returns an array of column header names (available when `parseAs="csv"` and `header: true`, which is the default).
 
-Click to save: [sample-products.csv](/docs/resources/files/sample-products.csv). Then browse to sample-products.csv.
+Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
 
 ```xmlui-pg copy display name="Example: getFields"
 <App var.products="{[]}">

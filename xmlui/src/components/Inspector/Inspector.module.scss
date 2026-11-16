@@ -76,6 +76,29 @@ $borderColor-dialog-Inspector: createThemeVar("borderColor-dialog-#{$component}"
     height: 100%;
   }
 
+  // Shown instead of the iframe while the viewer resolves, or when a viewer file is missing.
+  .message {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    font-size: 14px;
+    text-align: center;
+    overflow: auto;
+  }
+
+  .messageUrls {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: monospace;
+    font-size: 12px;
+    word-break: break-all;
+  }
+
   :export {
     themeVars: t.json-stringify($themeVars);
   }

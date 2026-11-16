@@ -89,7 +89,7 @@ knows the correct value. For example:
 labelled `"Pagination"` and page buttons with names such as `"Next page"` or
 `"Page 2 (current)"`. Disclosure-style components such as
 [NavGroup](/docs/reference/components/NavGroup),
-[Accordion](/docs/reference/components/Accordion), and
+Accordion, and
 [ExpandableItem](/docs/reference/components/ExpandableItem) update `aria-expanded`
 as they open and close.
 

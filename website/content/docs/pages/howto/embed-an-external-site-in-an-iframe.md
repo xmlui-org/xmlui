@@ -45,6 +45,6 @@ Use `IFrame` with `sandbox` and `allow` for secure third-party embeds.
 
 ## See also
 
-- [Render a Markdown file as a page](/docs/howto/render-a-markdown-file-as-a-page) — display rich content without an iframe
+- [Render Markdown content as a page](/docs/howto/render-markdown-content-as-a-page) — display rich content without an iframe
 - [Generate a QR code from user input](/docs/howto/generate-a-qr-code-from-user-input) — another way to render dynamic content inline
 - [Lazy-load images for performance](/docs/howto/lazy-load-images-for-performance) — defer offscreen media to improve initial load time

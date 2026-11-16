@@ -74,7 +74,7 @@ Comparing against a number is more concise than chaining boolean flags like `med
 
 ## See also
 
-- [Collapse the nav panel on mobile](/docs/howto/collapse-the-nav-panel-on-mobile) — fully hide the nav panel behind a toggle button on small screens
+- Collapse the nav panel on mobile — fully hide the nav panel behind a toggle button on small screens
 - [Make NavPanel width responsive](/docs/globals#mediasize) — `mediaSize` global reference
 - [Show a slide-in settings drawer](/docs/howto/show-a-slide-in-settings-drawer) — an alternative slide-in navigation pattern
 

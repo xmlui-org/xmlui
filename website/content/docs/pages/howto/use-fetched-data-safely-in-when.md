@@ -89,7 +89,7 @@ A `DataSource` value is usually `undefined` before the first successful load. XM
 
 ## See also
 
-- [Visibility and Responsive Display](/docs/visibility#reactivity-of-when) — how `when` re-evaluates
+- [Visibility and Responsive Display](/docs/guides/visibility#reactivity-of-when) — how `when` re-evaluates
 - [Hide an element until its DataSource is ready](/docs/howto/hide-an-element-until-its-datasource-is-ready) — use `loaded` and `inProgress`
 - [Prevent undefined requests in chained DataSources](/docs/howto/prevent-undefined-requests-in-chained-datasources) — guard dependent requests
 - [React to value changes with debounce](/docs/howto/debounce-with-changelistener) — derive state from changing values

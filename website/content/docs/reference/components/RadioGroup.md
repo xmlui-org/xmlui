@@ -10,7 +10,7 @@
 - **Accessibility support**: Proper keyboard navigation and screen reader compatibility
 - **Validation indicators**: Visual feedback for error, warning, and valid states
 
-`RadioGroup` is often used in forms. See [this guide](/docs/guide/forms) for details.
+`RadioGroup` is often used in forms. See [this guide](/docs/guides/forms) for details.
 
 **Context variables available during execution:**
 

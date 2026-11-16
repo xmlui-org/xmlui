@@ -79,4 +79,4 @@ Nest `SubMenuItem` inside `DropdownMenu` for two or more levels of menu hierarch
 
 - [Add a dropdown menu to a button](/docs/howto/add-a-dropdown-menu-to-a-button) — set up the top-level dropdown and its trigger
 - [Disable menu items conditionally](/docs/howto/disable-menu-items-conditionally) — grey out inapplicable actions inside any menu level
-- [Build a toolbar with overflow menu](/docs/howto/build-a-toolbar-with-overflow-menu) — collapse toolbar items into a dropdown when space is tight
+- Build a toolbar with overflow menu — collapse toolbar items into a dropdown when space is tight

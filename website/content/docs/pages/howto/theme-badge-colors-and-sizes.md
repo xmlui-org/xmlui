@@ -57,5 +57,5 @@ Badge renders as a small label, either rectangular (`shape="badge"`) or pill-sha
 ## See also
 
 - [Override a component's theme vars](/docs/howto/override-a-components-theme-vars) — how `<Theme>` scoping works
-- [Define custom Text variants in a theme](/docs/howto/define-custom-text-variants-in-a-theme) — create pill-style Text variants as an alternative to Badge
+- [Style text with custom variants](/docs/howto/style-text-with-custom-variants) — create pill-style Text variants as an alternative to Badge
 - [Render a flat list with custom cards](/docs/howto/render-a-flat-list-with-custom-cards) — use `colorMap` to dynamically set Badge themeColor

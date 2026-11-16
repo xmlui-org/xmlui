@@ -92,7 +92,7 @@ These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`:
 </Component>
 ```
 
-A [user-defined component](/docs/reference/components-intro) like `Dashboard` can define any set of names and values. `InfoCard` receives them in its `$props` [context variable](/docs/context-variables). `InfoCard` is opinionated about `borderRadius` and `boxShadow`. It could also receive these in `$props` but chooses not to. And while it is strongly opinionated about the `borderRadius`, which it hardcodes, it is willing to use the theme variable `$boxShadow-spread` so that setting can be theme-governed.
+A [user-defined component](/docs/components-intro) like `Dashboard` can define any set of names and values. `InfoCard` receives them in its `$props` [context variable](/docs/context-variables). `InfoCard` is opinionated about `borderRadius` and `boxShadow`. It could also receive these in `$props` but chooses not to. And while it is strongly opinionated about the `borderRadius`, which it hardcodes, it is willing to use the theme variable `$boxShadow-spread` so that setting can be theme-governed.
 
 Here's a more complete version of the row of `InfoCard`s used in the Invoices app.
 
