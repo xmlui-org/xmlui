@@ -153,6 +153,8 @@ Drag across several words. The handler receives the items at both ends of the se
 
 Defining this event (or giving `Items` an `id`) wraps each item in an element with `display: contents`, which maps the selection back to items. It doesn't affect flex or gap layout, but CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.
 
+`text` is the browser's own selected text (`selection.toString()`), so it follows layout rather than what you see. Items laid out in an `HStack` or another flex container come back separated by newlines, the same as a copy and paste, because the browser treats each flex child as a block. The gap between words isn't text. If you want spaces, normalize it in the handler: `sel.text.replace(/\n/g, " ")`.
+
 ## Exposed Methods [#exposed-methods]
 
 ### `getTextSelection` [#gettextselection]
