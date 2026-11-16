@@ -1810,3 +1810,31 @@ test.describe("Validation Feedback", () => {
     await expect(labels).toHaveCount(1);
   });
 });
+
+// --- Inside a doc playground (an xmlui-pg fence, rendered by NestedApp in a shadow root)
+test.describe("Selection inside a shadow root", () => {
+  const playground = (app: string) =>
+    `<Markdown><![CDATA[${["```xmlui-pg", app, "```"].join("\n")}]]></Markdown>`;
+
+  test("selectionDidChange fires for a click and for keyboard selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      playground(`<App var.sel="">
+  <TextArea initialValue="The quick brown fox"
+    onSelectionDidChange="(s) => sel = s.start + '-' + s.end" />
+  <Text value="sel: {sel}" />
+</App>`),
+    );
+    // --- Test ids don't reach inside the nested app, so elements are found by role and text
+    const ta = page.getByRole("textbox");
+    await ta.click();
+    await page.keyboard.press("Home");
+    await expect(page.getByText(/^sel:/)).toHaveText("sel: 0-0");
+    await page.keyboard.press("Shift+ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+    await page.keyboard.press("Shift+ArrowRight");
+    await expect(page.getByText(/^sel:/)).toHaveText("sel: 0-3");
+  });
+});

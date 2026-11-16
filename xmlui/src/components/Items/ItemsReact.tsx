@@ -26,6 +26,51 @@ export type ItemsTextSelection = {
 
 const SELECTION_ATTR = "data-xmlui-items-sel";
 
+/**
+ * The two ends of the current selection and its text, read through the root `el` lives in.
+ *
+ * In the light DOM this is `document.getSelection()`. Inside a shadow root (a NestedApp
+ * playground or an island), `document.getSelection()` reports the shadow host as both ends, so
+ * the selection is read through the shadow root instead: the standard
+ * `Selection.getComposedRanges()` where available, else Chromium's `ShadowRoot.getSelection()`.
+ * Ends come back unordered; callers sort them.
+ */
+function readSelectionEnds(el: Element | null): { a: Node; b: Node; text: string } | null {
+  if (typeof document === "undefined") return null;
+  const docSel = document.getSelection();
+  const root = el?.getRootNode();
+  if (typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot) {
+    const composed = (docSel as any)?.getComposedRanges;
+    if (docSel && typeof composed === "function" && docSel.rangeCount > 0) {
+      let ranges: StaticRange[] | undefined;
+      try {
+        ranges = composed.call(docSel, { shadowRoots: [root] });
+      } catch {
+        // --- Earlier form of the API: shadow roots as arguments
+        try {
+          ranges = composed.call(docSel, root);
+        } catch {
+          ranges = undefined;
+        }
+      }
+      const r = ranges?.[0];
+      if (r && root.contains(r.startContainer) && root.contains(r.endContainer)) {
+        const live = document.createRange();
+        live.setStart(r.startContainer, r.startOffset);
+        live.setEnd(r.endContainer, r.endOffset);
+        return { a: r.startContainer, b: r.endContainer, text: live.toString() };
+      }
+    }
+    const shadowSel: Selection | null = (root as any).getSelection?.() ?? null;
+    if (shadowSel && shadowSel.rangeCount > 0 && shadowSel.anchorNode && shadowSel.focusNode) {
+      return { a: shadowSel.anchorNode, b: shadowSel.focusNode, text: shadowSel.toString() };
+    }
+    return null;
+  }
+  if (!docSel || docSel.rangeCount === 0 || !docSel.anchorNode || !docSel.focusNode) return null;
+  return { a: docSel.anchorNode, b: docSel.focusNode, text: docSel.toString() };
+}
+
 import { defaultProps } from "./Items.defaults";
 
 function getItemKey(item: any, index: number): string | number {
@@ -65,6 +110,9 @@ export function Items({
   const itemsRef = useRef<any[]>(itemsToRender);
   itemsRef.current = itemsToRender;
 
+  // --- Any wrapper span; its root node (document or shadow root) is where the selection is read
+  const firstWrapperRef = useRef<HTMLSpanElement | null>(null);
+
   const getTextSelection = useCallback((): ItemsTextSelection => {
     const outside: ItemsTextSelection = {
       text: "",
@@ -73,8 +121,8 @@ export function Items({
       startIndex: null,
       endIndex: null,
     };
-    const sel = typeof window !== "undefined" ? window.getSelection() : null;
-    if (!sel || sel.rangeCount === 0 || !sel.anchorNode || !sel.focusNode) {
+    const ends = readSelectionEnds(firstWrapperRef.current);
+    if (!ends) {
       return outside;
     }
     const selector = `[${SELECTION_ATTR}="${CSS.escape(instanceId)}"]`;
@@ -85,15 +133,15 @@ export function Items({
       const index = Number(host.dataset.index);
       return Number.isInteger(index) ? index : null;
     };
-    const anchor = indexOf(sel.anchorNode);
-    const focus = indexOf(sel.focusNode);
+    const anchor = indexOf(ends.a);
+    const focus = indexOf(ends.b);
     if (anchor === null || focus === null) {
       return outside;
     }
     const startIndex = Math.min(anchor, focus);
     const endIndex = Math.max(anchor, focus);
     return {
-      text: sel.toString(),
+      text: ends.text,
       startItem: itemsRef.current[startIndex] ?? null,
       endItem: itemsRef.current[endIndex] ?? null,
       startIndex,
@@ -177,6 +225,7 @@ export function Items({
           <Fragment key={key}>
             {trackSelection ? (
               <span
+                ref={index === 0 ? firstWrapperRef : undefined}
                 style={{ display: "contents" }}
                 {...{ [SELECTION_ATTR]: instanceId }}
                 data-index={index}

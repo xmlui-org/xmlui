@@ -212,21 +212,68 @@ export const TextArea = memo(
       onBlur?.();
     };
 
-    // --- Report caret and selection moves (#3959). React's onSelect fires after the browser
-    // --- has placed the caret: on mouseup, on cursor keys, and on edits, including collapsed
-    // --- selections and clicks inside an already-focused field.
-    const handleSelect = useCallback(
-      (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-        if (!onSelectionDidChange) return;
-        const el = e.currentTarget;
-        const selection = { start: el.selectionStart, end: el.selectionEnd };
-        const last = lastSelectionRef.current;
-        if (last && last.start === selection.start && last.end === selection.end) return;
-        lastSelectionRef.current = selection;
-        onSelectionDidChange(selection);
-      },
-      [onSelectionDidChange],
+    // --- Report caret and selection moves (#3959): after the browser has placed the caret, on
+    // --- mouseup, cursor keys and edits, including collapsed selections and clicks inside an
+    // --- already-focused field. Native listeners rather than React's onSelect: onSelect only
+    // --- fires when document.activeElement is the field, which isn't true inside a shadow root
+    // --- (a NestedApp playground or an island), where activeElement is the shadow host.
+    const onSelectionDidChangeRef = useRef(onSelectionDidChange);
+    onSelectionDidChangeRef.current = onSelectionDidChange;
+    const reportSelection = useCallback((el: HTMLTextAreaElement) => {
+      const handler = onSelectionDidChangeRef.current;
+      if (!handler) return;
+      const selection = { start: el.selectionStart, end: el.selectionEnd };
+      const last = lastSelectionRef.current;
+      if (last && last.start === selection.start && last.end === selection.end) return;
+      lastSelectionRef.current = selection;
+      handler(selection);
+    }, []);
+    const boundSelectionElRef = useRef<{ el: HTMLTextAreaElement; unbind: () => void } | null>(
+      null,
     );
+    // --- Bind to whichever <textarea> is rendered (plain, autoSize or resizable); rebinding only
+    // --- when that element changes
+    useEffect(() => {
+      const el = inputRef.current;
+      const bound = boundSelectionElRef.current;
+      if (bound?.el === el) return;
+      bound?.unbind();
+      boundSelectionElRef.current = null;
+      if (!el) return;
+      // --- The same triggers and rules as React's select plugin: report only while the field has
+      // --- focus, and not while a mouse button is down (focus and caret placement each change
+      // --- the selection; the press reports once on mouseup). Focus is judged by the field's own
+      // --- root, document or shadow root, which is the part React gets wrong in a shadow root.
+      // --- The field's own "selectionchange"/"input" events are not used: they also fire for
+      // --- programmatic value updates, at mount and while React re-sets a controlled value.
+      let mouseDown = false;
+      const hasFocus = () => (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+      const report = () => {
+        if (!mouseDown && hasFocus()) reportSelection(el);
+      };
+      const onMouseDown = () => {
+        mouseDown = true;
+      };
+      const onMouseUp = () => {
+        if (!mouseDown) return;
+        mouseDown = false;
+        report();
+      };
+      const docEvents = ["selectionchange", "keydown", "keyup", "dragend"];
+      docEvents.forEach((type) => document.addEventListener(type, report, true));
+      el.addEventListener("mousedown", onMouseDown);
+      // --- A drag may end outside the field
+      document.addEventListener("mouseup", onMouseUp, true);
+      boundSelectionElRef.current = {
+        el,
+        unbind: () => {
+          docEvents.forEach((type) => document.removeEventListener(type, report, true));
+          el.removeEventListener("mousedown", onMouseDown);
+          document.removeEventListener("mouseup", onMouseUp, true);
+        },
+      };
+    });
+    useEffect(() => () => boundSelectionElRef.current?.unbind(), []);
 
     const getSelection = useCallback((): TextAreaSelection | undefined => {
       const el = inputRef.current;
@@ -332,7 +379,6 @@ export const TextArea = memo(
       onFocus: handleOnFocus,
       onBlur: handleOnBlur,
       onKeyDown: handleEnter,
-      onSelect: handleSelect,
       autoComplete: normalizeAutoComplete(autoComplete),
       autoCorrect: normalizeOnOff(autoCorrect),
       spellCheck,
