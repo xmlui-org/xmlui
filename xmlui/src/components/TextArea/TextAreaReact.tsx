@@ -51,6 +51,7 @@ type Props = {
   enterSubmits?: boolean;
   escResets?: boolean;
   onDidChange?: (e: any) => void;
+  onSelectionDidChange?: (selection: TextAreaSelection) => void;
   onFocus?: () => void;
   onBlur?: () => void;
   controlled?: boolean;
@@ -74,6 +75,8 @@ type Props = {
   invalidMessages?: string[];
 };
 
+export type TextAreaSelection = { start: number; end: number };
+
 const normalizeOnOff = (value: boolean | undefined) =>
   value === undefined ? undefined : value ? "on" : "off";
 
@@ -95,6 +98,7 @@ export const TextArea = memo(
       initialValue = defaultProps.initialValue,
       resize,
       onDidChange = defaultProps.onDidChange,
+      onSelectionDidChange,
       onFocus = defaultProps.onFocus,
       onBlur = defaultProps.onBlur,
       controlled = defaultProps.controlled,
@@ -192,6 +196,9 @@ export const TextArea = memo(
       }
     };
 
+    // --- The last selection reported through selectionDidChange
+    const lastSelectionRef = useRef<TextAreaSelection | null>(null);
+
     // --- Manage obtaining and losing the focus
     const handleOnFocus = () => {
       setFocused(true);
@@ -199,8 +206,32 @@ export const TextArea = memo(
     };
     const handleOnBlur = () => {
       setFocused(false);
+      // --- Forget the last reported selection, so the next click into the field reports
+      // --- its caret even when it lands where the previous one was
+      lastSelectionRef.current = null;
       onBlur?.();
     };
+
+    // --- Report caret and selection moves (#3959). React's onSelect fires after the browser
+    // --- has placed the caret: on mouseup, on cursor keys, and on edits, including collapsed
+    // --- selections and clicks inside an already-focused field.
+    const handleSelect = useCallback(
+      (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+        if (!onSelectionDidChange) return;
+        const el = e.currentTarget;
+        const selection = { start: el.selectionStart, end: el.selectionEnd };
+        const last = lastSelectionRef.current;
+        if (last && last.start === selection.start && last.end === selection.end) return;
+        lastSelectionRef.current = selection;
+        onSelectionDidChange(selection);
+      },
+      [onSelectionDidChange],
+    );
+
+    const getSelection = useCallback((): TextAreaSelection | undefined => {
+      const el = inputRef.current;
+      return el ? { start: el.selectionStart, end: el.selectionEnd } : undefined;
+    }, []);
 
     const focus = useCallback(() => {
       setTimeout(() => {
@@ -245,8 +276,9 @@ export const TextArea = memo(
         focus,
         insert,
         setValue,
+        getSelection,
       });
-    }, [focus, insert, registerComponentApi, setValue]);
+    }, [focus, insert, registerComponentApi, setValue, getSelection]);
 
     // --- Handle the Enter key press
     const handleEnter = useCallback(
@@ -300,6 +332,7 @@ export const TextArea = memo(
       onFocus: handleOnFocus,
       onBlur: handleOnBlur,
       onKeyDown: handleEnter,
+      onSelect: handleSelect,
       autoComplete: normalizeAutoComplete(autoComplete),
       autoCorrect: normalizeOnOff(autoCorrect),
       spellCheck,

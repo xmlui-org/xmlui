@@ -299,6 +299,26 @@ This event is triggered when the TextArea has lost the focus.
 
 **Signature**: `lostFocus(): void`
 
+### `selectionDidChange` [#selectiondidchange]
+
+This event fires when the caret moves or the selected text changes in the `TextArea`: after a click (including one inside an already-focused field), a cursor key, a drag selection, or an edit. It fires after the browser has placed the caret, and not again for an unchanged position.
+
+**Signature**: `selectionDidChange(selection: { start: number, end: number }): void`
+
+- `selection`: The character offsets of the selection. `start` equals `end` when nothing is selected and the caret sits at that offset.
+
+Click anywhere in the text, move the caret with the arrow keys, or select a range. The handler receives the selection as character offsets; `start` equals `end` when nothing is selected. The event fires after the browser has placed the caret, so it works for a click inside a field that already has focus, which `gotFocus` doesn't report.
+
+```xmlui-pg copy display name="Example: selectionDidChange"
+<App var.sel="{{ start: 0, end: 0 }}" var.text="The quick brown fox jumps over the lazy dog">
+  <TextArea
+    initialValue="{text}"
+    onSelectionDidChange="(s) => sel = s" />
+  <Text value="Caret: {sel.start}, selection end: {sel.end}" />
+  <Text value="Selected: '{text.substring(sel.start, sel.end)}'" />
+</App>
+```
+
 ## Exposed Methods [#exposed-methods]
 
 ### `focus` [#focus]
@@ -311,6 +331,24 @@ This method sets the focus on the `TextArea` component.
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
+</App>
+```
+
+### `getSelection` [#getselection]
+
+This method returns the caret position and selection of the `TextArea` as character offsets. `start` equals `end` when nothing is selected. It returns `undefined` when the component isn't rendered.
+
+**Signature**: `getSelection(): { start: number, end: number } | undefined`
+
+Read the caret and selection on demand, here from a button. The field keeps its last selection after it loses focus.
+
+```xmlui-pg copy display name="Example: getSelection"
+<App var.report="">
+  <TextArea id="editor" initialValue="Select some of this text, then click the button." />
+  <Button
+    label="Where is the caret?"
+    onClick="const s = editor.getSelection(); report = s.start + '-' + s.end" />
+  <Text value="Selection: {report}" />
 </App>
 ```
 

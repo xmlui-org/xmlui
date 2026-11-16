@@ -125,11 +125,55 @@ This property reverses the order in which data is mapped to template components.
 
 ## Events [#events]
 
-This component does not have any events.
+### `textSelectionDidChange` [#textselectiondidchange]
+
+This event fires when the user selects text across the rendered items: after a mouse drag ends, or per step of a keyboard selection. It doesn't fire again for an unchanged selection, and fires once with `null` items when the selection leaves this component. Defining it wraps each item in a `display: contents` element, so CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.
+
+**Signature**: `textSelectionDidChange(selection: { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }): void`
+
+- `selection`: `startItem` and `endItem` are the items holding the two ends of the selection, in document order whichever way it was made; `startIndex` and `endIndex` are their `$itemIndex` values; `text` is the selected text. The items and indices are `null` when the selection isn't wholly inside this component. A plain click reports a collapsed selection: `text` is empty and `startIndex` equals `endIndex`.
+
+Drag across several words. The handler receives the items at both ends of the selection, in reading order whichever way you dragged, plus the selected text. A plain click reports a collapsed selection (`text` is empty), so the example ignores it.
+
+```xmlui-pg copy display name="Example: textSelectionDidChange" height="160px"
+<App var.picked="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items
+      data="{['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']}"
+      onTextSelectionDidChange="(sel) => {
+        if (!sel.text || sel.startIndex === null) return;
+        picked = sel.startItem + ' … ' + sel.endItem + ' (' + sel.startIndex + '-' + sel.endIndex + ')';
+      }">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Text value="Selected: {picked}" />
+</App>
+```
+
+Defining this event (or giving `Items` an `id`) wraps each item in an element with `display: contents`, which maps the selection back to items. It doesn't affect flex or gap layout, but CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.
+
+`text` is the browser's own selected text (`selection.toString()`), so it follows layout rather than what you see. Items laid out in an `HStack` or another flex container come back separated by newlines, the same as a copy and paste, because the browser treats each flex child as a block. The gap between words isn't text. If you want spaces, normalize it in the handler: `sel.text.replace(/\n/g, " ")`.
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `getTextSelection` [#gettextselection]
+
+This method returns the current text selection in the same shape the `textSelectionDidChange` event passes. Giving the component an `id` makes it callable and wraps each item as described for that event.
+
+**Signature**: `getTextSelection(): { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }`
+
+```xmlui-pg copy display name="Example: getTextSelection" height="160px"
+<App var.report="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items id="words" data="{['Select', 'some', 'of', 'these', 'words']}">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Button label="What is selected?" onClick="const s = words.getTextSelection(); report = s.startIndex === null ? 'nothing here' : s.startItem + ' … ' + s.endItem" />
+  <Text value="{report}" />
+</App>
+```
 
 ## Styling [#styling]
 

@@ -72,6 +72,48 @@ You can use also API bindings to display data:
 
 %-PROP-END
 
+%-EVENT-START textSelectionDidChange
+
+Drag across several words. The handler receives the items at both ends of the selection, in reading order whichever way you dragged, plus the selected text. A plain click reports a collapsed selection (`text` is empty), so the example ignores it.
+
+```xmlui-pg copy display name="Example: textSelectionDidChange" height="160px"
+<App var.picked="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items
+      data="{['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']}"
+      onTextSelectionDidChange="(sel) => {
+        if (!sel.text || sel.startIndex === null) return;
+        picked = sel.startItem + ' … ' + sel.endItem + ' (' + sel.startIndex + '-' + sel.endIndex + ')';
+      }">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Text value="Selected: {picked}" />
+</App>
+```
+
+Defining this event (or giving `Items` an `id`) wraps each item in an element with `display: contents`, which maps the selection back to items. It doesn't affect flex or gap layout, but CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.
+
+`text` is the browser's own selected text (`selection.toString()`), so it follows layout rather than what you see. Items laid out in an `HStack` or another flex container come back separated by newlines, the same as a copy and paste, because the browser treats each flex child as a block. The gap between words isn't text. If you want spaces, normalize it in the handler: `sel.text.replace(/\n/g, " ")`.
+
+%-EVENT-END
+
+%-API-START getTextSelection
+
+```xmlui-pg copy display name="Example: getTextSelection" height="160px"
+<App var.report="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items id="words" data="{['Select', 'some', 'of', 'these', 'words']}">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Button label="What is selected?" onClick="const s = words.getTextSelection(); report = s.startIndex === null ? 'nothing here' : s.startItem + ' … ' + s.endItem" />
+  <Text value="{report}" />
+</App>
+```
+
+%-API-END
+
 %-STYLE-START
 
 The `Items` component does not support styling.

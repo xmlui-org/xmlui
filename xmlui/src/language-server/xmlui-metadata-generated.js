@@ -12399,6 +12399,21 @@ export default {
         "valueType": "ComponentDef"
       }
     },
+    "events": {
+      "textSelectionDidChange": {
+        "description": "This event fires when the user selects text across the rendered items: after a mouse drag ends, or per step of a keyboard selection. It doesn't fire again for an unchanged selection, and fires once with `null` items when the selection leaves this component. Defining it wraps each item in a `display: contents` element, so CSS aimed at the parent's direct children (`> *`, `:first-child`) matches those wrappers.",
+        "signature": "textSelectionDidChange(selection: { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }): void",
+        "parameters": {
+          "selection": "`startItem` and `endItem` are the items holding the two ends of the selection, in document order whichever way it was made; `startIndex` and `endIndex` are their `$itemIndex` values; `text` is the selected text. The items and indices are `null` when the selection isn't wholly inside this component. A plain click reports a collapsed selection: `text` is empty and `startIndex` equals `endIndex`."
+        }
+      }
+    },
+    "apis": {
+      "getTextSelection": {
+        "description": "This method returns the current text selection in the same shape the `textSelectionDidChange` event passes. Giving the component an `id` makes it callable and wraps each item as described for that event.",
+        "signature": "getTextSelection(): { text: string, startItem: any, endItem: any, startIndex: number | null, endIndex: number | null }"
+      }
+    },
     "opaque": true
   },
   "Link": {
@@ -20484,6 +20499,13 @@ export default {
         "parameters": {
           "newValue": "The new value of the component."
         }
+      },
+      "selectionDidChange": {
+        "description": "This event fires when the caret moves or the selected text changes in the `TextArea`: after a click (including one inside an already-focused field), a cursor key, a drag selection, or an edit. It fires after the browser has placed the caret, and not again for an unchanged position.",
+        "signature": "selectionDidChange(selection: { start: number, end: number }): void",
+        "parameters": {
+          "selection": "The character offsets of the selection. `start` equals `end` when nothing is selected and the caret sits at that offset."
+        }
       }
     },
     "apis": {
@@ -20501,6 +20523,10 @@ export default {
       "insert": {
         "description": "This method inserts the specified text at the current cursor position of the `TextArea` component, leaving the caret just after the inserted text.",
         "signature": "insert(text: string): void"
+      },
+      "getSelection": {
+        "description": "This method returns the caret position and selection of the `TextArea` as character offsets. `start` equals `end` when nothing is selected. It returns `undefined` when the component isn't rendered.",
+        "signature": "getSelection(): { start: number, end: number } | undefined"
       }
     },
     "themeVars": {

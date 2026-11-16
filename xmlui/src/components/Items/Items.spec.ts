@@ -597,3 +597,198 @@ test.describe("Function dependency tracking across containers", () => {
     await expect(page.getByTestId("btn-b")).toContainText("YES");
   });
 });
+
+// =============================================================================
+// TEXT SELECTION (#3959)
+// =============================================================================
+
+test.describe("Text selection", () => {
+  const WORDS = `{['alpha', 'bravo', 'charlie', 'delta', 'echo']}`;
+
+  // --- Drag from the left edge of one word to the right edge of another
+  async function drag(page: any, fromTestId: string, toTestId: string) {
+    const from = await page.getByTestId(fromTestId).boundingBox();
+    const to = await page.getByTestId(toTestId).boundingBox();
+    await page.mouse.move(from.x + 1, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width - 1, to.y + to.height / 2, { steps: 8 });
+    await page.mouse.up();
+  }
+
+  // --- Select programmatically from the start of one element's text to the end of another's
+  async function select(page: any, fromTestId: string, toTestId: string) {
+    await page.evaluate(
+      ([fromId, toId]: string[]) => {
+        const textOf = (id: string) => {
+          const el = document.querySelector(`[data-testid="${id}"]`)!;
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          return walker.nextNode() as Text;
+        };
+        const a = textOf(fromId);
+        const b = textOf(toId);
+        window.getSelection()!.setBaseAndExtent(a, 0, b, b.length);
+      },
+      [fromTestId, toTestId],
+    );
+  }
+
+  test("a mouse drag reports the first and last items once", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HStack wrapContent="true" gap="$space-1">
+        <Items data="${WORDS}"
+          onTextSelectionDidChange="(sel) => testState = [...(testState ?? []), sel]">
+          <Text testId="w-{$itemIndex}" value="{$item}" />
+        </Items>
+      </HStack>
+    `);
+    await drag(page, "w-1", "w-3");
+    await expect
+      .poll(async () => {
+        const events = (await testStateDriver.testState()) as any[];
+        const last = events?.[events.length - 1];
+        return last && [last.startIndex, last.endIndex, last.startItem, last.endItem];
+      })
+      .toEqual([1, 3, "bravo", "delta"]);
+    const events = (await testStateDriver.testState()) as any[];
+    // --- The mousedown's collapsed caret may report first, then the drag reports once
+    expect(events.filter((e) => e.text !== "").length).toBe(1);
+    expect(events[events.length - 1].text).toContain("charlie");
+  });
+
+  test("a backwards drag reports document order", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HStack wrapContent="true" gap="$space-1">
+        <Items data="${WORDS}" onTextSelectionDidChange="(sel) => testState = sel">
+          <Text testId="w-{$itemIndex}" value="{$item}" />
+        </Items>
+      </HStack>
+    `);
+    const from = await page.getByTestId("w-3").boundingBox();
+    const to = await page.getByTestId("w-1").boundingBox();
+    await page.mouse.move(from!.x + from!.width - 1, from!.y + from!.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to!.x + 1, to!.y + to!.height / 2, { steps: 8 });
+    await page.mouse.up();
+    await expect
+      .poll(async () => {
+        const sel = (await testStateDriver.testState()) as any;
+        return sel && [sel.startIndex, sel.endIndex];
+      })
+      .toEqual([1, 3]);
+  });
+
+  test("a click reports a collapsed selection on that item", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HStack wrapContent="true" gap="$space-1">
+        <Items data="${WORDS}" onTextSelectionDidChange="(sel) => testState = sel">
+          <Text testId="w-{$itemIndex}" value="{$item}" />
+        </Items>
+      </HStack>
+    `);
+    await page.getByTestId("w-2").click();
+    await expect
+      .poll(async () => {
+        const sel = (await testStateDriver.testState()) as any;
+        return sel && [sel.text, sel.startIndex, sel.endIndex, sel.startItem];
+      })
+      .toEqual(["", 2, 2, "charlie"]);
+  });
+
+  test("a selection made without the pointer reports, and doesn't refire unchanged", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HStack wrapContent="true" gap="$space-1">
+        <Items data="${WORDS}"
+          onTextSelectionDidChange="(sel) => testState = [...(testState ?? []), sel.startIndex + '-' + sel.endIndex]">
+          <Text testId="w-{$itemIndex}" value="{$item}" />
+        </Items>
+      </HStack>
+    `);
+    await select(page, "w-0", "w-2");
+    await expect.poll(testStateDriver.testState).toEqual(["0-2"]);
+    await select(page, "w-0", "w-2");
+    await select(page, "w-0", "w-4");
+    await expect.poll(testStateDriver.testState).toEqual(["0-2", "0-4"]);
+  });
+
+  test("leaving the component reports null items once", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack>
+        <HStack wrapContent="true" gap="$space-1">
+          <Items data="${WORDS}"
+            onTextSelectionDidChange="(sel) => testState = [...(testState ?? []), sel.startItem]">
+            <Text testId="w-{$itemIndex}" value="{$item}" />
+          </Items>
+        </HStack>
+        <Text testId="outside" value="Outside the list" />
+        <Text testId="outside2" value="Also outside" />
+      </VStack>
+    `);
+    await select(page, "w-1", "w-1");
+    await expect.poll(testStateDriver.testState).toEqual(["bravo"]);
+    await select(page, "outside", "outside");
+    await select(page, "outside2", "outside2");
+    // --- A selection straddling the boundary is not wholly inside either
+    await select(page, "w-1", "outside");
+    await expect.poll(testStateDriver.testState).toEqual(["bravo", null]);
+  });
+
+  test("getTextSelection returns the current selection", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <HStack wrapContent="true" gap="$space-1">
+        <Items id="words" data="${WORDS}"
+          onTextSelectionDidChange="testState = words.getTextSelection()">
+          <Text testId="w-{$itemIndex}" value="{$item}" />
+        </Items>
+      </HStack>
+    `);
+    await select(page, "w-2", "w-3");
+    await expect
+      .poll(async () => {
+        const sel = (await testStateDriver.testState()) as any;
+        // --- The browser separates text from different flex items with a line break
+        return sel && [sel.startItem, sel.endItem, sel.text.replace(/\s+/g, "")];
+      })
+      .toEqual(["charlie", "delta", "charliedelta"]);
+  });
+
+  test("nested Items resolve to their own items", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack>
+        <Items data="{[{ id: 'p0', words: ['one', 'two'] }, { id: 'p1', words: ['three', 'four', 'five'] }]}"
+          onTextSelectionDidChange="(sel) => testState = sel.startItem?.id + ':' + sel.startIndex + '-' + sel.endIndex">
+          <HStack gap="$space-1">
+            <Items data="{$item.words}">
+              <Text testId="{$item}" value="{$item}" />
+            </Items>
+          </HStack>
+        </Items>
+      </VStack>
+    `);
+    await select(page, "four", "five");
+    await expect.poll(testStateDriver.testState).toEqual("p1:1-1");
+  });
+
+  test("Items renders no wrappers unless it is opted in", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <HStack testId="plain">
+          <Items data="${WORDS}"><Text value="{$item}" /></Items>
+        </HStack>
+        <HStack testId="tracked">
+          <Items data="${WORDS}" onTextSelectionDidChange="testState = 1">
+            <Text value="{$item}" />
+          </Items>
+        </HStack>
+        <HStack testId="withId">
+          <Items id="named" data="${WORDS}"><Text value="{$item}" /></Items>
+        </HStack>
+      </VStack>
+    `);
+    await expect(page.getByTestId("plain").locator("span[data-xmlui-items-sel]")).toHaveCount(0);
+    await expect(page.getByTestId("tracked").locator("span[data-xmlui-items-sel]")).toHaveCount(5);
+    await expect(page.getByTestId("withId").locator("span[data-xmlui-items-sel]")).toHaveCount(5);
+  });
+});

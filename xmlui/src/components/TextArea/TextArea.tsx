@@ -147,6 +147,19 @@ export const TextAreaMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
+    selectionDidChange: {
+      description:
+        `This event fires when the caret moves or the selected text changes in the \`${COMP}\`: ` +
+        `after a click (including one inside an already-focused field), a cursor key, a drag ` +
+        `selection, or an edit. It fires after the browser has placed the caret, and not again ` +
+        `for an unchanged position.`,
+      signature: "selectionDidChange(selection: { start: number, end: number }): void",
+      parameters: {
+        selection:
+          "The character offsets of the selection. `start` equals `end` when nothing is selected " +
+          "and the caret sits at that offset.",
+      },
+    },
   },
   apis: {
     focus: {
@@ -161,6 +174,13 @@ export const TextAreaMd = createMetadata({
     insert: {
       description: `This method inserts the specified text at the current cursor position of the \`${COMP}\` component, leaving the caret just after the inserted text.`,
       signature: "insert(text: string): void",
+    },
+    getSelection: {
+      description:
+        `This method returns the caret position and selection of the \`${COMP}\` as character ` +
+        `offsets. \`start\` equals \`end\` when nothing is selected. It returns \`undefined\` ` +
+        `when the component isn't rendered.`,
+      signature: "getSelection(): { start: number, end: number } | undefined",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -204,6 +224,7 @@ export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaM
       enabled={extractValue.asOptionalBoolean(node.props.enabled)}
       placeholder={extractValue(node.props.placeholder)}
       onDidChange={lookupEventHandler("didChange")}
+      onSelectionDidChange={lookupEventHandler("selectionDidChange")}
       onFocus={lookupEventHandler("gotFocus")}
       onBlur={lookupEventHandler("lostFocus")}
       readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
