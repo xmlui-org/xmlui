@@ -758,10 +758,33 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const { width, height } = page.viewportSize();
 
       if (!themedDescription.noFragmentWrapper) {
-        await page.getByTestId(_markerTestId).waitFor({
+        const markerTimeout = isCI && browserName === "webkit" ? 60_000 : undefined;
+        const markerWait = page.getByTestId(_markerTestId).waitFor({
           state: "attached",
-          timeout: isCI && browserName === "webkit" ? 60_000 : undefined,
+          timeout: markerTimeout,
         });
+        if (extensionIds.length > 0) {
+          // An extension that fails to load never renders the marker: the
+          // TestBed shows "Error: Failed to load extensions: …" instead
+          // (TestBed.tsx). Fail as soon as that appears, with its message,
+          // rather than waiting out the extension timeout above.
+          const loadError = page.getByText(/^Error: Failed to load extensions:/);
+          const errorWait = loadError
+            .waitFor({ state: "attached", timeout: markerTimeout })
+            .then(async () => {
+              const message = (await loadError.first().textContent()) ?? "";
+              throw new Error(
+                `The test bed could not load extension(s) ${extensionIds.join(", ")}. ${message}`,
+              );
+            });
+          // Whichever wait loses keeps running until the page closes; keep its
+          // rejection from being reported as unhandled.
+          markerWait.catch(() => {});
+          errorWait.catch(() => {});
+          await Promise.race([markerWait, errorWait]);
+        } else {
+          await markerWait;
+        }
       }
 
       // Wait for fonts to load, then one animation frame + one macrotask
