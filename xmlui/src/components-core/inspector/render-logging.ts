@@ -26,12 +26,23 @@
  * Renders that arrive while no pass is open are reported with the container's
  * next entry as `renderedOutsidePass`.
  *
+ * Each cause also says whether the container's bindings read what changed
+ * (`read`), checked against the container's static read set
+ * (optimization/bindingReads.ts), and each entry says whether any cause was
+ * read (`necessary`). A pass with `necessary: false` is one the rule proposed
+ * on #3941 would remove: nothing its bindings read changed.
+ *
  * Everything here is inert unless `xsVerbose` is on.
  */
 
 import { createContext } from "react";
 import { ContainerActionKind } from "../rendering/containers";
 import { getCurrentTrace, pushXsLog } from "./inspectorUtils";
+import {
+  type BindingReadPaths,
+  isPathRead,
+  readPathsUnder,
+} from "../optimization/bindingReads";
 
 // ============================================================================
 // TYPES
@@ -39,22 +50,36 @@ import { getCurrentTrace, pushXsLog } from "./inspectorUtils";
 
 export const RENDER_PASS_KIND = "render:pass";
 
+/**
+ * Whether the container's bindings read what a cause changed. `readPaths`,
+ * when `read` is false, lists what they do read under the same uid or key.
+ */
+export type ReadVerdict = { read?: boolean; readPaths?: string[] };
+
 /** One reason for a render pass. A pass may have several. */
 export type RenderPassCause =
   | { kind: "mount" }
   /** Own `var` keys changed */
-  | { kind: "state"; keys: string[] }
+  | ({ kind: "state"; keys: string[] } & ReadVerdict)
   /**
    * A component's own state changed (e.g. a MediaPlayer's currentTime).
    * `identityOnly`: the entry was replaced by one with equal values.
+   * `ownState`: the fields of the component's own (reducer) state that changed,
+   * as opposed to its registered API. The component reads these itself.
    */
-  | { kind: "componentState"; uid: string; fields?: string[]; identityOnly?: true }
+  | ({
+      kind: "componentState";
+      uid: string;
+      fields?: string[];
+      ownState?: string[];
+      identityOnly?: true;
+    } & ReadVerdict)
   /** A DataSource / APICall state changed; `identityOnly` as above */
-  | { kind: "loader"; uid: string; fields?: string[]; identityOnly?: true }
+  | ({ kind: "loader"; uid: string; fields?: string[]; identityOnly?: true } & ReadVerdict)
   /** UDC props changed */
-  | { kind: "props"; names: string[]; sameSourceNewIdentity?: string[] }
+  | ({ kind: "props"; names: string[]; sameSourceNewIdentity?: string[] } & ReadVerdict)
   /** Pass-through from the parent: which inputs from the parent changed */
-  | { kind: "parent"; passId?: number; inputs: string[]; keys?: string[] }
+  | ({ kind: "parent"; passId?: number; inputs: string[]; keys?: string[] } & ReadVerdict)
   /** Nothing captured explains the pass (e.g. a React context changed) */
   | { kind: "unknown"; detail?: string };
 
@@ -136,6 +161,8 @@ export interface RenderPassInfo {
   isUdc: boolean;
   isImplicit: boolean;
   source?: any;
+  /** The member paths the container's bindings read (optimization/bindingReads.ts) */
+  readPaths?: BindingReadPaths;
 }
 
 type UidKind = "loader" | "componentState";
@@ -212,10 +239,13 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
   changedUids.forEach((key) => {
     // --- Fields: what differs between the uid's previous and current entries
     // --- (state and API), else what was recorded at dispatch time.
+    const stateFields = changedKeys(prev.componentState?.[key], next.componentState?.[key]).map(
+      keyLabel,
+    );
     const diffed = new Set<string>([
-      ...changedKeys(prev.componentState?.[key], next.componentState?.[key]),
-      ...changedKeys(prev.componentApis?.[key], next.componentApis?.[key]),
-    ].map(keyLabel));
+      ...stateFields,
+      ...changedKeys(prev.componentApis?.[key], next.componentApis?.[key]).map(keyLabel),
+    ]);
     const fields = diffed.size > 0 ? diffed : uidFields.get(key);
     const entry = {
       uid: keyLabel(key),
@@ -225,7 +255,7 @@ export function buildCauses(input: BuildCausesInput): RenderPassCause[] {
     causes.push(
       uidKinds.get(key) === "loader"
         ? { kind: "loader", ...entry }
-        : { kind: "componentState", ...entry },
+        : { kind: "componentState", ...entry, ...(stateFields.length > 0 && { ownState: stateFields }) },
     );
   });
 
@@ -298,6 +328,75 @@ function buildPropsCause(
     names,
     ...(sameSource.length > 0 && { sameSourceNewIdentity: sameSource }),
   };
+}
+
+/**
+ * The state paths a cause changed, or undefined when the cause doesn't say
+ * (a parent pass-through without keys, a mount, an unknown cause).
+ */
+function changedPaths(cause: RenderPassCause): string[] | undefined {
+  switch (cause.kind) {
+    case "state":
+      return cause.keys;
+    case "loader":
+    case "componentState":
+      return cause.fields?.length ? cause.fields.map((f) => `${cause.uid}.${f}`) : [cause.uid];
+    case "props":
+      return cause.names.map((name) => `$props.${name}`);
+    case "parent":
+      return cause.keys?.length ? cause.keys : undefined;
+    default:
+      return undefined;
+  }
+}
+
+/** The root names a cause changed, for listing what is read under them */
+function changedRoots(cause: RenderPassCause): string[] {
+  switch (cause.kind) {
+    case "loader":
+    case "componentState":
+      return [cause.uid];
+    case "props":
+      return ["$props"];
+    default:
+      return changedPaths(cause) ?? [];
+  }
+}
+
+/**
+ * Mark each cause with whether the container's bindings read what it changed.
+ * An `identityOnly` write changed nothing, so it is never read. A component's
+ * own state counts as read by that component: `ComponentAdapter` hands
+ * `state[uid]` to its renderer, and controls such as `Select` and `Slider`
+ * display from it. A cause that doesn't name what changed gets no verdict.
+ */
+export function annotateReads(
+  causes: RenderPassCause[],
+  readPaths: BindingReadPaths | undefined,
+): RenderPassCause[] {
+  if (!readPaths) return causes;
+  return causes.map((cause) => {
+    const paths = changedPaths(cause);
+    if (!paths) return cause;
+    const identityOnly = "identityOnly" in cause && cause.identityOnly;
+    const ownStateChanged = cause.kind === "componentState" && !!cause.ownState?.length;
+    const read =
+      !identityOnly && (ownStateChanged || paths.some((path) => isPathRead(readPaths, path)));
+    if (read) return { ...cause, read: true };
+    const under = changedRoots(cause).flatMap((root) => readPathsUnder(readPaths, root));
+    return { ...cause, read: false, ...(under.length > 0 && { readPaths: under }) };
+  });
+}
+
+/**
+ * Whether a pass was needed under the rule: true if it is a mount or any cause
+ * was read, false if every cause was unread, undefined if a cause without a
+ * verdict leaves it open.
+ */
+export function passNecessity(causes: RenderPassCause[]): boolean | undefined {
+  if (causes.some((c) => c.kind === "mount" || (c as ReadVerdict).read === true)) return true;
+  if (causes.length > 0 && causes.every((c) => (c as ReadVerdict).read === false)) return false;
+  return undefined;
 }
 
 function sameMarkupSource(a: any, b: any): boolean {
@@ -454,14 +553,17 @@ export class RenderPassTracker {
       (changed.has(uid) ? uidFields : pending).set(uid, fields),
     );
     this.uidFields = pending;
-    this.causes = buildCauses({
-      prev: this.prev,
-      next: snapshot,
-      isUdc: this.info.isUdc,
-      uidKinds: this.uidKinds,
-      uidFields,
-      parentPassId: this.parentPassId,
-    });
+    this.causes = annotateReads(
+      buildCauses({
+        prev: this.prev,
+        next: snapshot,
+        isUdc: this.info.isUdc,
+        uidKinds: this.uidKinds,
+        uidFields,
+        parentPassId: this.parentPassId,
+      }),
+      this.info.readPaths,
+    );
     this.prev = snapshot;
     if (this.folded) {
       this.parent!.fold({ component: this.info.component, uid: this.info.uid, cause: this.causes });
@@ -493,6 +595,7 @@ export class RenderPassTracker {
       startMs: this.startMs,
       durationMs: Math.round((endMs - this.startMs) * 1000) / 1000,
       cause: this.causes,
+      ...necessaryField(this.causes),
       ...(this.foldedChildren.length > 0 && {
         implicitContainers: this.foldedChildren.length,
         folded: groupFolded(this.foldedChildren),
@@ -502,6 +605,11 @@ export class RenderPassTracker {
       ...(outside.size > 0 && { renderedOutsidePass: Object.fromEntries(outside) }),
     });
   }
+}
+
+function necessaryField(causes: RenderPassCause[]): { necessary?: boolean } {
+  const necessary = passNecessity(causes);
+  return necessary === undefined ? {} : { necessary };
 }
 
 function addCount(counts: Map<string, number>, type: string) {

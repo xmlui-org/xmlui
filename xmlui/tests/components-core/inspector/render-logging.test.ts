@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   RENDER_PASS_KIND,
   RenderPassTracker,
+  annotateReads,
   buildCauses,
+  passNecessity,
   changedKeys,
   groupFolded,
   keyLabel,
@@ -89,7 +91,7 @@ describe("render-logging", () => {
       // --- Fields come from diffing the uid's entries (ds: value; takePlayer: currentTime)
       expect(causes).toEqual([
         { kind: "loader", uid: "ds", fields: ["value"] },
-        { kind: "componentState", uid: "takePlayer", fields: ["currentTime"] },
+        { kind: "componentState", uid: "takePlayer", fields: ["currentTime"], ownState: ["currentTime"] },
       ]);
     });
 
@@ -140,7 +142,7 @@ describe("render-logging", () => {
         ]),
       });
       expect(causes).toEqual([
-        { kind: "componentState", uid: "takePlayer", fields: ["ended"] },
+        { kind: "componentState", uid: "takePlayer", fields: ["ended"], ownState: ["ended"] },
         // --- An equal-valued copy: flagged, with the field recorded at dispatch
         { kind: "componentState", uid: "annotTab", fields: ["nudgeInProgress"], identityOnly: true },
       ]);
@@ -365,6 +367,140 @@ describe("render-logging", () => {
     it("falls back to 200 when no size is published", () => {
       for (let i = 0; i < 300; i++) pushXsLog({ ts: i, kind: "test" });
       expect(logs()).toHaveLength(200);
+    });
+  });
+
+  describe("read verdicts (#3941)", () => {
+    const reads = new Set(["ds.value", "expanded", "$props.title"]);
+
+    it("marks a loader field the bindings read, and one they don't", () => {
+      const [read, unread] = annotateReads(
+        [
+          { kind: "loader", uid: "ds", fields: ["value"] },
+          { kind: "loader", uid: "ds", fields: ["inProgress", "isRefetching"] },
+        ],
+        reads,
+      );
+      expect(read).toMatchObject({ read: true });
+      expect(unread).toMatchObject({ read: false, readPaths: ["ds.value"] });
+    });
+
+    it("counts a component's own state as read by it, but not its API", () => {
+      const [own, api] = annotateReads(
+        [
+          { kind: "componentState", uid: "slider", fields: ["value", "focus"], ownState: ["value"] },
+          { kind: "componentState", uid: "dlg", fields: ["open", "close"] },
+        ],
+        reads,
+      );
+      expect(own).toMatchObject({ read: true });
+      expect(api).toMatchObject({ read: false });
+    });
+
+    it("separates own state from API fields when building a cause", () => {
+      const uid = Symbol("slider");
+      const [cause] = buildCauses({
+        prev: snapshot({ componentState: { [uid]: { value: 1 } }, componentApis: { [uid]: { focus: 1 } } }),
+        next: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 2 } } }),
+        isUdc: false,
+        uidKinds: new Map(),
+        uidFields: new Map(),
+      });
+      expect(cause).toMatchObject({ kind: "componentState", uid: "slider", ownState: ["value"] });
+      expect((cause as any).fields.sort()).toEqual(["focus", "value"]);
+
+      const [apiOnly] = buildCauses({
+        prev: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 2 } } }),
+        next: snapshot({ componentState: { [uid]: { value: 2 } }, componentApis: { [uid]: { focus: 3 } } }),
+        isUdc: false,
+        uidKinds: new Map(),
+        uidFields: new Map(),
+      });
+      expect((apiOnly as any).ownState).toBeUndefined();
+    });
+
+    it("never counts an identity-only write as read", () => {
+      const [cause] = annotateReads(
+        [{ kind: "loader", uid: "ds", fields: ["value"], identityOnly: true }],
+        reads,
+      );
+      expect(cause).toMatchObject({ read: false });
+    });
+
+    it("checks state keys, UDC props and parent keys", () => {
+      const causes = annotateReads(
+        [
+          { kind: "state", keys: ["expanded"] },
+          { kind: "state", keys: ["atBottom"] },
+          { kind: "props", names: ["title"] },
+          { kind: "parent", inputs: ["parentState"], keys: ["enrichments"] },
+        ],
+        reads,
+      );
+      expect(causes.map((c: any) => c.read)).toEqual([true, false, true, false]);
+    });
+
+    it("gives no verdict where the cause doesn't say what changed", () => {
+      const causes = annotateReads(
+        [{ kind: "mount" }, { kind: "unknown" }, { kind: "parent", inputs: ["node"] }],
+        reads,
+      );
+      expect(causes.every((c: any) => c.read === undefined)).toBe(true);
+    });
+
+    it("counts everything as read when the read set is all", () => {
+      const [cause] = annotateReads([{ kind: "loader", uid: "ds", fields: ["inProgress"] }], "all");
+      expect(cause).toMatchObject({ read: true });
+    });
+
+    it("calls a pass necessary if any cause was read or it mounted", () => {
+      expect(passNecessity([{ kind: "mount" }])).toBe(true);
+      expect(
+        passNecessity([
+          { kind: "loader", uid: "ds", read: false },
+          { kind: "state", keys: ["expanded"], read: true },
+        ]),
+      ).toBe(true);
+    });
+
+    it("calls a pass unnecessary only if every cause was unread", () => {
+      expect(
+        passNecessity([
+          { kind: "loader", uid: "ds", read: false },
+          { kind: "componentState", uid: "slider", read: false },
+        ]),
+      ).toBe(false);
+      expect(
+        passNecessity([{ kind: "loader", uid: "ds", read: false }, { kind: "unknown" }]),
+      ).toBeUndefined();
+    });
+
+    it("emits read and necessary from the tracker", () => {
+      const tracker = new RenderPassTracker({
+        component: "App",
+        isUdc: false,
+        isImplicit: false,
+        readPaths: new Set(["count"]),
+      });
+      tracker.beginRender(null);
+      tracker.observe(snapshot({ componentState: { count: 0, other: 0 } }));
+      tracker.commit();
+      tracker.beginRender(null);
+      tracker.observe(snapshot({ componentState: { count: 0, other: 1 } }));
+      tracker.commit();
+      tracker.beginRender(null);
+      tracker.observe(snapshot({ componentState: { count: 1, other: 1 } }));
+      tracker.commit();
+
+      expect(logs()[0]).toMatchObject({ necessary: true });
+      expect(logs()[1]).toMatchObject({
+        cause: [{ kind: "state", keys: ["other"], read: false }],
+        necessary: false,
+      });
+      expect(logs()[2]).toMatchObject({
+        cause: [{ kind: "state", keys: ["count"], read: true }],
+        necessary: true,
+      });
     });
   });
 });

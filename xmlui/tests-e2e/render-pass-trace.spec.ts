@@ -19,10 +19,19 @@ type Pass = {
   component: string;
   traceId?: string;
   durationMs: number;
-  cause: Array<{ kind: string; keys?: string[]; names?: string[] }>;
+  cause: Array<{
+    kind: string;
+    keys?: string[];
+    names?: string[];
+    uid?: string;
+    fields?: string[];
+    read?: boolean;
+    readPaths?: string[];
+  }>;
   folded?: Array<{ component: string; count: number }>;
   rendered?: Record<string, number>;
   renderedCount?: number;
+  necessary?: boolean;
 };
 
 async function passes(page: Page): Promise<Pass[]> {
@@ -210,6 +219,104 @@ test.describe("render:pass trace (#3942)", () => {
     expect(app.filter((p) => hasStateKey(p, "count"))).toHaveLength(0);
     expect(clockTicks.filter((p) => p.parentPassId !== undefined)).toHaveLength(0);
     annotateDurations("Clock passes", clockTicks);
+  });
+
+  test("read verdicts: a var nothing binds is unread, a bound one is read (#3941)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<App var.shown="{0}" var.unused="{0}">
+  <Timer interval="20" enabled="{shown &lt; 5}" onTick="unused = unused + 1; shown = shown + 1" />
+  <Timer interval="20" once="true" initialDelay="400" onTick="unused = unused + 1" />
+  <Text value="RESULT {shown}" />
+</App>`,
+      VERBOSE,
+    );
+    await expect(page.getByText("RESULT 5")).toBeVisible();
+    await page.waitForTimeout(800);
+    const app = (await passes(page)).filter((p) => p.component === "App" && p.cause[0].kind !== "mount");
+    // --- A pass that changed only `unused` would be removed by the rule
+    const unusedOnly = app.filter((p) => p.cause.length === 1 && p.cause[0].keys?.join() === "unused");
+    expect(unusedOnly.length).toBeGreaterThan(0);
+    for (const p of unusedOnly) {
+      expect(p.cause[0].read).toBe(false);
+      expect(p.necessary).toBe(false);
+    }
+    // --- Passes that changed `shown` are needed
+    const withShown = app.filter((p) => p.cause.some((c) => c.keys?.includes("shown")));
+    expect(withShown.length).toBeGreaterThan(0);
+    for (const p of withShown) expect(p.necessary).toBe(true);
+  });
+
+  test("read verdicts: unread loader flags are unread, a bound value is read (#3941)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<App>
+  <DataSource id="ds" url="/api/items" />
+  <Text value="COUNT {ds.value ? ds.value.length : 0}" />
+</App>`,
+      {
+        ...VERBOSE,
+        apiInterceptor: {
+          operations: {
+            items: { url: "/api/items", method: "get", handler: `return [1, 2, 3];` },
+          },
+        },
+      },
+    );
+    await expect(page.getByText("COUNT 3")).toBeVisible();
+    await page.waitForTimeout(500);
+    const causes = (await passes(page))
+      .filter((p) => p.component === "App")
+      .flatMap((p) => p.cause)
+      .filter((c) => c.kind === "loader" && c.uid === "ds");
+    const valueCause = causes.find((c) => c.fields?.includes("value"));
+    expect(valueCause?.read).toBe(true);
+    // --- Every other write to `ds` (its loading flags, its re-registered API
+    // --- methods) changes something no binding reads
+    const others = causes.filter((c) => c.fields?.length && !c.fields.includes("value"));
+    expect(others.some((c) => c.fields!.includes("inProgress"))).toBe(true);
+    expect(others.some((c) => c.fields!.includes("refetch"))).toBe(true);
+    for (const c of others) {
+      expect(c.read).toBe(false);
+      expect(c.readPaths).toEqual(["ds.value", "ds.value.length"]);
+    }
+  });
+
+  test("read verdicts: a component's own state counts as read by it (#3941)", async ({
+    initTestBed,
+    page,
+  }) => {
+    // --- Select and Slider display their value from the container's state[uid],
+    // --- not through a binding, so the render that delivers it is needed
+    await initTestBed(
+      `<App>
+  <Select testId="sel">
+    <Option value="a" label="Apple" />
+    <Option value="b" label="Banana" />
+  </Select>
+  <Slider testId="sld" minValue="0" maxValue="10" />
+  <Text value="READY" />
+</App>`,
+      VERBOSE,
+    );
+    await expect(page.getByText("READY")).toBeVisible();
+    await page.waitForTimeout(500);
+    const mark = (await passes(page)).length;
+    await page.getByTestId("sel").click();
+    await page.getByRole("option", { name: "Banana" }).click();
+    await page.getByRole("slider").first().focus();
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(500);
+    const ownState = (await passes(page))
+      .slice(mark)
+      .filter((p) => p.component === "App")
+      .filter((p) => p.cause.some((c) => c.kind === "componentState" && c.fields?.includes("value")));
+    expect(ownState.length).toBeGreaterThan(0);
+    for (const p of ownState) expect(p.necessary).toBe(true);
   });
 
   test("no render:pass entries when xsVerbose is off", async ({ initTestBed, page }) => {

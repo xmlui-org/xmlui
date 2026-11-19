@@ -36,6 +36,7 @@ import { useRoutingParams } from "../state/routing-state";
 import { useAppContext } from "../AppContext";
 import { pushXsLog, getCurrentTrace } from "../inspector/inspectorUtils";
 import { RenderPassContext, RenderPassTracker } from "../inspector/render-logging";
+import { bindingReadPathsOf } from "../optimization/bindingReads";
 import {
   filterCyclicLocalDefinitions,
   getCyclicLocalDefinitionNames,
@@ -164,6 +165,9 @@ export const StateContainer = memo(
         isImplicit:
           node.uid !== "root" && !node.udcName && (!!isImplicit || !!node.contextVars),
         source: (node as any).children?.[0]?.debug?.source,
+        // --- What this container's bindings read, to say whether each cause
+        // --- changed any of it (cached per definition node)
+        readPaths: bindingReadPathsOf(node),
       };
       if (!passTrackerRef.current) passTrackerRef.current = new RenderPassTracker(passInfo);
       else passTrackerRef.current.setInfo(passInfo);

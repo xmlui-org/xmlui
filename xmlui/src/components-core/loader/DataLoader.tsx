@@ -559,8 +559,8 @@ function DataLoader({
   const loadingToastIdRef = useRef<string | undefined>(undefined);
   // Manages the in-progress toast and delegates to loaderInProgressChanged.
   const handleInProgressChange: LoaderInProgressChangedFn = useCallback(
-    (isInProgress, resetCancellation) => {
-      loaderInProgressChanged(isInProgress, resetCancellation);
+    (isInProgress, resetCancellation, isRefetching) => {
+      loaderInProgressChanged(isInProgress, resetCancellation, isRefetching);
 
       const inProgressMessage = extractParam(
         stateRef.current.state,

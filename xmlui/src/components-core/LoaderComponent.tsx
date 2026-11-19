@@ -106,8 +106,8 @@ export function LoaderComponent({
   );
 
   const memoedLoaderInProgressChanged = useCallback(
-    (isInProgress: boolean, resetCancellation?: boolean) => {
-      dispatch(loaderInProgressChanged(uid, isInProgress, resetCancellation));
+    (isInProgress: boolean, resetCancellation?: boolean, isRefetching?: boolean) => {
+      dispatch(loaderInProgressChanged(uid, isInProgress, resetCancellation, isRefetching));
     },
     [dispatch, uid],
   );
@@ -165,13 +165,20 @@ export function LoaderComponent({
 }
 
 // Signs that a particular loader (`uid`) has just started fetching its data (or executing its operation).
-function loaderInProgressChanged(uid: symbol, isInProgress: boolean, resetCancellation?: boolean) {
+// `isRefetching`, when defined, is set in the same action (#3941).
+function loaderInProgressChanged(
+  uid: symbol,
+  isInProgress: boolean,
+  resetCancellation?: boolean,
+  isRefetching?: boolean,
+) {
   return {
     type: ContainerActionKind.LOADER_IN_PROGRESS_CHANGED,
     payload: {
       uid,
       inProgress: isInProgress,
       resetCancellation,
+      isRefetching,
     },
   };
 }

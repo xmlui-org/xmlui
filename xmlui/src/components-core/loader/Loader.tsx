@@ -134,6 +134,11 @@ export function Loader({
     };
   }, [pollIntervalInSeconds, refetch]);
 
+  // --- The query's status for `refetch()`, read through a ref so that the registered API keeps
+  // --- its identity (#3941, engine item 3).
+  const statusRef = useRef(status);
+  statusRef.current = status;
+
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
   const prevIsFetching = usePrevious(isFetching);
@@ -144,11 +149,22 @@ export function Loader({
   // react-query cache) from being replayed as a fresh error on mount.
   const hasFetchCompletedRef = useRef(false);
 
+  // --- The fetch state last reported, with the function it was reported to
+  const reportedInProgressRef = useRef<{ report: typeof loaderInProgressChanged; value: boolean }>();
+
   useIsomorphicLayoutEffect(() => {
     if (isFetching && !prevIsFetching) {
       cancelReasonRef.current = undefined;
     }
-    loaderInProgressChanged(isFetching || isLoading);
+    // --- Report react-query's fetch state only when it changes. This effect also re-runs when
+    // --- `prevIsFetching` catches up one render later; re-reporting then could overwrite a newer
+    // --- write, e.g. undo a `cancel()` that had already cleared `inProgress` (#3941).
+    const inProgress = isFetching || isLoading;
+    const reported = reportedInProgressRef.current;
+    if (reported?.report !== loaderInProgressChanged || reported.value !== inProgress) {
+      reportedInProgressRef.current = { report: loaderInProgressChanged, value: inProgress };
+      loaderInProgressChanged(inProgress);
+    }
     if (prevIsFetching && !isFetching) {
       hasFetchCompletedRef.current = true;
     }
@@ -228,7 +244,10 @@ export function Loader({
       cancel,
       refetch: (options) => {
         cancelReasonRef.current = undefined;
-        loaderInProgressChanged(true, true);
+        // --- Set `isRefetching` with `inProgress`, as react-query is about to (it is
+        // --- `isFetching && !isLoading`, and `isLoading` means no data yet). Written separately,
+        // --- the two flags redrew the owner twice when a refetch started (#3941).
+        loaderInProgressChanged(true, true, statusRef.current !== "loading");
         void refetch(options);
       },
       update: async (updater) => {
