@@ -792,3 +792,54 @@ test.describe("Text selection", () => {
     await expect(page.getByTestId("withId").locator("span[data-xmlui-items-sel]")).toHaveCount(5);
   });
 });
+
+// --- Inside a doc playground (an xmlui-pg fence, rendered by NestedApp in a shadow root)
+test.describe("Text selection inside a shadow root", () => {
+  const playground = (app: string) =>
+    `<Markdown><![CDATA[${["```xmlui-pg", app, "```"].join("\n")}]]></Markdown>`;
+
+  // --- Test ids don't reach inside the nested app, so words are found by text
+  async function drag(page: any, fromWord: string, toWord: string) {
+    const from = await page.getByText(fromWord, { exact: true }).boundingBox();
+    const to = await page.getByText(toWord, { exact: true }).boundingBox();
+    await page.mouse.move(from.x + 1, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width - 1, to.y + to.height / 2, { steps: 8 });
+    await page.mouse.up();
+  }
+
+  test("a drag reports the first and last items", async ({ initTestBed, page }) => {
+    await initTestBed(
+      playground(`<App var.picked="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items data="{['alpha', 'bravo', 'charlie', 'delta', 'echo']}"
+      onTextSelectionDidChange="(sel) => { if (sel.text && sel.startIndex !== null) picked = sel.startItem + '-' + sel.endItem + ' ' + sel.startIndex + '-' + sel.endIndex; }">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Text value="picked: {picked}" />
+</App>`),
+    );
+    await expect(page.getByText("delta", { exact: true })).toBeVisible();
+    await drag(page, "bravo", "delta");
+    await expect(page.getByText(/^picked:/)).toHaveText("picked: bravo-delta 1-3");
+  });
+
+  test("getTextSelection() reads a selection", async ({ initTestBed, page }) => {
+    await initTestBed(
+      playground(`<App var.report="">
+  <HStack wrapContent="true" gap="$space-1">
+    <Items id="words" data="{['alpha', 'bravo', 'charlie', 'delta', 'echo']}">
+      <Text value="{$item}" />
+    </Items>
+  </HStack>
+  <Button label="Ask" onClick="const s = words.getTextSelection(); report = s.startIndex === null ? 'none' : s.startItem + '-' + s.endItem" />
+  <Text value="report: {report}" />
+</App>`),
+    );
+    await expect(page.getByText("delta", { exact: true })).toBeVisible();
+    await drag(page, "bravo", "delta");
+    await page.getByRole("button", { name: "Ask" }).click();
+    await expect(page.getByText(/^report:/)).toHaveText("report: bravo-delta");
+  });
+});
