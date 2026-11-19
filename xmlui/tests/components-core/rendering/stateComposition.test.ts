@@ -1,5 +1,59 @@
 import { describe, it, expect } from "vitest";
 import { cloneDeep, merge, pick } from "lodash-es";
+import { renderHook } from "@testing-library/react";
+import { useCombinedState } from "../../../src/components-core/state/state-layers";
+
+// --- The real hook (#3969): it must not rebuild the combined state while its
+// --- layers are unchanged. A getter on a layer counts how often it's merged.
+describe("useCombinedState (hook)", () => {
+  function countingLayer(value: number) {
+    const counter = { reads: 0 };
+    const layer = {};
+    Object.defineProperty(layer, "x", {
+      enumerable: true,
+      get() {
+        counter.reads++;
+        return value;
+      },
+    });
+    return { layer, counter };
+  }
+
+  it("doesn't re-merge when re-rendered with the same layers", () => {
+    const { layer, counter } = countingLayer(1);
+    const other = { y: 2 };
+    const { result, rerender } = renderHook(({ a, b }) => useCombinedState(a, b), {
+      initialProps: { a: layer as any, b: other as any },
+    });
+    const first = result.current;
+    const readsAfterMount = counter.reads;
+    rerender({ a: layer, b: other });
+    rerender({ a: layer, b: other });
+    expect(counter.reads).toBe(readsAfterMount);
+    expect(result.current).toBe(first);
+    expect(result.current).toEqual({ x: 1, y: 2 });
+  });
+
+  it("re-merges when a layer changes, later layers winning", () => {
+    const { result, rerender } = renderHook(({ a, b }) => useCombinedState(a, b), {
+      initialProps: { a: { x: 1, y: 1 } as any, b: { y: 2 } as any },
+    });
+    const first = result.current;
+    expect(first).toEqual({ x: 1, y: 2 });
+    rerender({ a: { x: 3, y: 1 }, b: { y: 2 } });
+    expect(result.current).not.toBe(first);
+    expect(result.current).toEqual({ x: 3, y: 2 });
+  });
+
+  it("keeps identity when a changed layer has equal content", () => {
+    const { result, rerender } = renderHook(({ a }) => useCombinedState(a, undefined), {
+      initialProps: { a: { x: 1 } as any },
+    });
+    const first = result.current;
+    rerender({ a: { x: 1 } });
+    expect(result.current).toBe(first);
+  });
+});
 
 // ============================================================================
 // State Composition Helper Functions Unit Tests

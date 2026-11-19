@@ -267,15 +267,21 @@ export const STATE_LAYER_DOCUMENTATION = {
  * @returns Combined state with memoization and shallow comparison
  */
 export function useCombinedState(...states: (ContainerState | undefined)[]): ContainerState {
+  // --- Depend on the layers themselves, not on the rest-parameter array: that
+  // --- array is new on every call, so `[states]` never hit and every container
+  // --- rebuilt (and re-compared) its combined state on every render (#3969).
+  // --- Each call site passes a fixed number of layers, so the deps length is stable.
   const combined: ContainerState = useMemo(() => {
-    let ret: ContainerState = {};
-    states.forEach((state = EMPTY_OBJECT) => {
-      if (state !== EMPTY_OBJECT) {
-        ret = { ...ret, ...state };
+    const ret: ContainerState = {};
+    for (const state of states) {
+      if (state !== undefined && state !== EMPTY_OBJECT) {
+        // --- One target object instead of a fresh spread per layer; later layers win
+        Object.assign(ret, state);
       }
-    });
+    }
     return ret;
-  }, [states]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, states);
   return useShallowCompareMemoize(combined);
 }
 
