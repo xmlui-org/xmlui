@@ -99,21 +99,40 @@ export class StyleRegistry {
   // NEW: A set to specifically track hashes injected by SSR.
   public ssrHashes: Set<string> = new Set();
 
+  // --- Entries by style-object identity and layer, so registering the same object
+  // --- again (e.g. a component type's shared theme object, #3969) skips the
+  // --- sorted-key serialization and hashing. Assumes style objects aren't mutated
+  // --- after registration, which holds for the memoized objects callers pass.
+  // --- Cache entries are never removed, so an identity hit can't be stale.
+  private byIdentity = new WeakMap<object, Map<string, StyleCacheEntry>>();
+
   public register(styles: StyleObjectType, layer = "dynamic"): StyleCacheEntry {
+    const isObject = styles !== null && typeof styles === "object";
+    if (isObject) {
+      const hit = this.byIdentity.get(styles)?.get(layer);
+      if (hit) return hit;
+    }
+
     const key = stableJSONStringify({ layer, styles });
     const styleHash = hashString(key);
 
-    const cachedEntry = this.cache.get(styleHash);
-    if (cachedEntry) {
-      return cachedEntry;
+    let entry = this.cache.get(styleHash);
+    if (!entry) {
+      // The entry point for our new recursive generator.
+      const className = `css-${styleHash}`;
+      const css = this._generateCss(`.${className}`, styles);
+      entry = { className, styleHash, css, layer };
+      this.cache.set(styleHash, entry);
     }
 
-    // The entry point for our new recursive generator.
-    const className = `css-${styleHash}`;
-    const css = this._generateCss(`.${className}`, styles);
-
-    const entry: StyleCacheEntry = { className, styleHash, css, layer };
-    this.cache.set(styleHash, entry);
+    if (isObject) {
+      let byLayer = this.byIdentity.get(styles);
+      if (!byLayer) {
+        byLayer = new Map();
+        this.byIdentity.set(styles, byLayer);
+      }
+      byLayer.set(layer, entry);
+    }
     return entry;
   }
 
