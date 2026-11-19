@@ -89,6 +89,7 @@ const App: StandaloneAppDescription = {
 | `maxZIndex` | Sets the highest allowed `zIndex` value in layout-style validation. |
 | `notifications` | Toast notification defaults. |
 | `prefetchedContent` | Startup content cache for pre-fetched resources. |
+| `readScopedRendering` | Experimental: re-renders a container only when something its bindings read changed. |
 | `requireFormCsrf` | Requires mutating forms to provide a CSRF token. |
 | `scheduler` | Selects the handler scheduler mode. |
 | `searchIndexEnabled` | Enables startup search index construction. |
@@ -518,6 +519,26 @@ xmluiConfig: {
   prefetchedContent: {
     "/pages/home.md": "# Welcome",
   },
+}
+```
+
+---
+
+### `readScopedRendering`
+
+```ts
+readScopedRendering?: boolean; // default: false
+```
+
+Experimental. When `true`, a container (the app, a user-defined component, or an element with a `var.`) re-renders its children only when something one of its bindings reads has changed, or a component's own state has (a `Select`'s or `Slider`'s value). A change nothing displays, such as a DataSource's `inProgress` flag when no binding reads it, still updates state, but doesn't re-render the screen that owns it.
+
+Event handlers always see the latest state, including values that didn't cause a re-render.
+
+What a container's bindings read is worked out from its markup and code-behind: props, vars, `when`, DataSource props and templates. A binding that reads something outside XMLUI's state, for example a `window` property that changes on its own, isn't seen. Such a binding may show a stale value with this setting on. With `xsVerbose` on, each `render:pass` trace entry shows whether the pass was needed (`necessary`) and whether this setting held it back (`stateHeld`). See [the observability substrate](/docs/managed-react/observability-substrate).
+
+```ts
+xmluiConfig: {
+  readScopedRendering: true,
 }
 ```
 

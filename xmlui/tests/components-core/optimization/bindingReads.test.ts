@@ -82,6 +82,18 @@ describe("bindingReadPathsOf (#3941)", () => {
     expect(readsOf(root).has("slider.value")).toBe(true);
   });
 
+  it("counts a variable named by syncWithVar as read", () => {
+    const root = node("Fragment", {
+      children: [node("Table", { props: { syncWithVar: "syncState", data: "{rows}" } })],
+    });
+    const reads = bindingReadPathsOf(root);
+    expect(reads).not.toBe("all");
+    expect([...(reads as Set<string>)].sort()).toEqual(["rows", "syncState"]);
+    // --- not an identifier: nothing named, and not an analysis failure
+    const bad = node("Fragment", { children: [node("Table", { props: { syncWithVar: "a-b" } })] });
+    expect([...(bindingReadPathsOf(bad) as Set<string>)]).toEqual([]);
+  });
+
   it("reads everything when the code-behind can't be analysed", () => {
     const root = node("App", { scriptCollected: { hasInvalidStatements: true } as any });
     expect(bindingReadPathsOf(root)).toBe("all");
@@ -116,5 +128,16 @@ describe("isPathRead and readPathsUnder (#3941)", () => {
   it("lists what is read under a root", () => {
     expect(readPathsUnder(reads, "ds")).toEqual(["ds.value"]);
     expect(readPathsUnder(reads, "nothing")).toEqual([]);
+  });
+});
+
+describe("bindingReadPathsOf: a bound id (#3941)", () => {
+  it("counts what an id binding reads, and nothing for a plain id", async () => {
+    const { xmlUiMarkupToComponent } = await import("../../../src/components-core/xmlui-parser");
+    const { component } = xmlUiMarkupToComponent(
+      `<VStack var.dynId="x"><Bookmark id="{dynId}" /><Text id="plain" /></VStack>`,
+    ) as any;
+    expect(component.children[0].uid).toBe("{dynId}");
+    expect([...readsOf(component)]).toEqual(["dynId"]);
   });
 });

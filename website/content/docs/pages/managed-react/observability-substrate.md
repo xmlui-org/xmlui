@@ -69,6 +69,7 @@ entry, unless it re-renders on its own.
 | `rendered`, `renderedCount` | Components rendered in this pass, counted by type, and their total. A nested container's components are counted in its own entry, not here |
 | `renderedOutsidePass` | Components that rendered while no pass was open, counted by type and reported with the next pass. Omitted when there were none |
 | `necessary` | `true` if the pass is a mount or any cause changed something the container's bindings read; `false` if no cause did. Omitted when a cause can't be judged |
+| `stateHeld` | With [`readScopedRendering`](/docs/xmlui-config#readscopedrendering) on: the container handed its children the state from its previous render, because nothing its bindings read changed. The children then re-render only if another input changed, and `renderedCount` is 0 when none did. Omitted otherwise |
 
 **Reading `rendered`.** A component is counted when XMLUI re-evaluates it. A
 component skipped because its inputs didn't change is not counted. So

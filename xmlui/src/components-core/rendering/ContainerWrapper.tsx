@@ -5,6 +5,7 @@ import {
   type ReactNode,
   type RefObject,
   useMemo,
+  useRef,
 } from "react";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
@@ -13,7 +14,7 @@ import type { ContainerDispatcher } from "../abstractions/ComponentRenderer";
 import type { ProxyAction } from "../rendering/buildProxy";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { StateContainer } from "./StateContainer";
-import { useShallowCompareMemoize } from "../utils/hooks";
+import { shallowCompare } from "../utils/misc";
 import { isContainerLike as isContainerLikeShared } from "./ContainerUtils";
 import type { UdcContract } from "../udc-sandbox";
 
@@ -167,6 +168,53 @@ type Props = {
   children?: ReactNode;
 };
 
+// --- Node fields compared one level deeper than the node itself: a node whose
+// --- `props`, `loaders` or `children` are new objects with the same entries
+// --- counts as unchanged (#3941).
+const CONTENT_COMPARED_NODE_FIELDS = new Set(["props", "loaders", "children"]);
+
+/**
+ * Whether two component nodes are equal for wrapping: every field is the same
+ * value (`Object.is`), except `props`, `loaders` and `children`, which may be
+ * different objects (or arrays) with the same entries.
+ */
+export function nodeContentEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
+  const aKeys = Object.keys(a);
+  if (aKeys.length !== Object.keys(b).length) return false;
+  for (const key of aKeys) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+    const av = a[key];
+    const bv = b[key];
+    if (Object.is(av, bv)) continue;
+    if (
+      CONTENT_COMPARED_NODE_FIELDS.has(key) &&
+      av &&
+      bv &&
+      typeof av === "object" &&
+      typeof bv === "object" &&
+      shallowCompare(av, bv)
+    ) {
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Keeps the previous node while `nodeContentEqual` holds, so its identity
+ * changes only when its content does.
+ */
+export function useNodeContentMemoize<T>(node: T): T {
+  const ref = useRef<T>(node);
+  if (node !== ref.current && !nodeContentEqual(node, ref.current)) {
+    ref.current = node;
+  }
+  return ref.current;
+}
+
 /**
  * This component is a container that manages the state of its children. It
  * provides a context for the children to access the state and the API of the
@@ -197,7 +245,9 @@ export const ContainerWrapper = memo(
     // all top-level fields are the same values. Without stabilisation,
     // getWrappedWithContainer runs again and StateContainer.memo sees a new `node`
     // prop — triggering an unnecessary full re-render of the container subtree.
-    const stableNode = useShallowCompareMemoize(node);
+    // The fields that most often arrive with a new identity but equal contents
+    // (`props`, `loaders`, `children`) are compared one level deeper (#3941).
+    const stableNode = useNodeContentMemoize(node);
 
     // --- Make sure the component node is wrapped with a container
     const containerizedNode = useMemo(() => getWrappedWithContainer(stableNode), [stableNode]);
