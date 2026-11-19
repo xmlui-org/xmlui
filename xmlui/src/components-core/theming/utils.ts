@@ -36,11 +36,32 @@ export const SizeScaleReadableKeys = {
   "3xl": "Triple Extra Large",
 } as const;
 
+/**
+ * The theme-variable object for a component type in a theme scope is the same for
+ * every instance, so it's built once per (descriptor, scope theme vars, registry)
+ * and shared (#3969). Every instance used to build its own 79-entry (Text) to
+ * 221-entry (Button) object, keep it alive in a memo, and have `useStyles`
+ * serialize it again; in WebKit that cost about 0.125 MB per instance.
+ */
+const componentThemeVarsCache = new WeakMap<
+  object,
+  WeakMap<object, WeakMap<object, Record<string, string>>>
+>();
+
 export function useComponentThemeClass(descriptor: ComponentMetadata) {
   let themeScope = useTheme();
   const componentRegistry = useComponentRegistry();
 
   const themeVars = useMemo(() => {
+    // --- Shared per component type and theme scope
+    const scopeVars = themeScope.themeVars as object | undefined;
+    const byScope =
+      descriptor && scopeVars && componentRegistry
+        ? componentThemeVarsCache.get(descriptor)?.get(scopeVars)
+        : undefined;
+    const cached = byScope?.get(componentRegistry as object);
+    if (cached) return cached;
+
     const ret = {};
 
     // --- Theme vars defined by the component itself
@@ -75,6 +96,19 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
       }
     });
 
+    if (descriptor && scopeVars && componentRegistry) {
+      let perScope = componentThemeVarsCache.get(descriptor);
+      if (!perScope) {
+        perScope = new WeakMap();
+        componentThemeVarsCache.set(descriptor, perScope);
+      }
+      let perRegistry = perScope.get(scopeVars);
+      if (!perRegistry) {
+        perRegistry = new WeakMap();
+        perScope.set(scopeVars, perRegistry);
+      }
+      perRegistry.set(componentRegistry as object, ret);
+    }
     return ret;
   }, [
     descriptor?.themeVars,

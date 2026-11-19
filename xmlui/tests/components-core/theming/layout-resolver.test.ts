@@ -1523,3 +1523,75 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 });
+
+// --- The fast path resolves only the properties a component sets (#3969). These
+// --- pin the cases it must not change.
+describe("Layout resolver: only the properties that are set", () => {
+  const md = { mediaSize: { sizeIndex: 2 } } as any; // md
+  const xl = { mediaSize: { sizeIndex: 4 } } as any; // xl
+
+  it("a breakpoint-only property resolves at its breakpoint", () => {
+    const result = resolveLayoutProps({ "width-md": "40px" } as any, md);
+    expect(result.cssProps.width).toBe("40px");
+  });
+
+  it("a breakpoint-only property is absent at another breakpoint", () => {
+    const result = resolveLayoutProps({ "width-md": "40px" } as any, xl);
+    expect(result.cssProps.width).toBeUndefined();
+  });
+
+  it("a breakpoint value wins over the plain value", () => {
+    const result = resolveLayoutProps({ width: "10px", "width-md": "40px" } as any, md);
+    expect(result.cssProps.width).toBe("40px");
+  });
+
+  it("the plain value applies when no breakpoint value matches", () => {
+    const result = resolveLayoutProps({ width: "10px", "width-lg": "40px" } as any, md);
+    expect(result.cssProps.width).toBe("10px");
+  });
+
+  it("xl falls back to lg", () => {
+    const result = resolveLayoutProps({ "padding-lg": "8px" } as any, xl);
+    expect(result.cssProps.padding).toBe("8px");
+  });
+
+  it("a theme reference in a breakpoint value is resolved", () => {
+    const result = resolveLayoutProps({ "gap-md": "$space-2" } as any, md);
+    expect(result.cssProps.gap).toBe(toCssVar("$space-2"));
+  });
+
+  // --- fontStyle is the one property with a validation pattern (layoutPatterns)
+  it("an invalid value is still reported", () => {
+    const result = resolveLayoutProps({ fontStyle: "bogus" } as any);
+    expect(result.issues.has("fontStyle")).toBe(true);
+  });
+
+  it("an invalid breakpoint value is reported under its breakpoint key", () => {
+    const result = resolveLayoutProps({ "fontStyle-md": "bogus" } as any, md);
+    expect(result.issues.has("fontStyle-md")).toBe(true);
+  });
+
+  it("null and undefined values resolve to nothing", () => {
+    const result = resolveLayoutProps({ width: undefined, height: null } as any, md);
+    expect(result.cssProps.width).toBeUndefined();
+    expect(result.cssProps.height).toBeUndefined();
+  });
+
+  it("no layout props gives the shared empty result", () => {
+    const a = resolveLayoutProps({});
+    const b = resolveLayoutProps({ label: "not a layout prop" } as any);
+    expect(a).toBe(b);
+    expect(Object.keys(a.cssProps)).toHaveLength(0);
+  });
+
+  it("derived properties still apply (paddingHorizontal, wrapContent, canShrink)", () => {
+    const result = resolveLayoutProps(
+      { paddingHorizontal: "4px", wrapContent: "true", canShrink: "false" } as any,
+      md,
+    );
+    expect(result.cssProps.paddingLeft).toBe("4px");
+    expect(result.cssProps.paddingRight).toBe("4px");
+    expect(result.cssProps.flexWrap).toBe("wrap");
+    expect(result.cssProps.flexShrink).toBe(0);
+  });
+});

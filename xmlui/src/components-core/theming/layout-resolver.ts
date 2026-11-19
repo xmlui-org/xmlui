@@ -60,6 +60,12 @@ export function resolveLayoutProps(
   // --- "spacing" mode: allow dimensions + padding + margin + gap
   const spacingOnly = mode === "spacing";
 
+  // --- Which layout properties this component sets at all, plain or per breakpoint.
+  // --- `transformLayoutValue` returns early for the rest, so a component with a few
+  // --- layout props doesn't build and look up 7 keys for each of ~96 properties on
+  // --- every render (#3969: this was the largest per-instance startup allocator).
+  const { present: presentProps, withBreakpoints: breakpointProps } = scanLayoutProps(layoutProps);
+
   // Get the list of layout properties to ignore from layout context
   const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
   const shouldIgnore = (prop: string) => ignoreLayoutProps.includes(prop);
@@ -307,8 +313,10 @@ export function resolveLayoutProps(
 
   // --- Replaces all variable occurrences in the input string with the result of toCssVar
   function transformLayoutValue(prop: string): string {
+    // --- Not set at all, plain or per breakpoint: nothing to resolve
+    if (!presentProps.has(prop)) return undefined;
     const defValue = resolveSingleValue();
-    if (layoutContext?.mediaSize?.sizeIndex !== undefined) {
+    if (layoutContext?.mediaSize?.sizeIndex !== undefined && breakpointProps.has(prop)) {
       const sizeIndex = layoutContext.mediaSize?.sizeIndex;
       const xsValue = resolveSingleValue("xs");
       const smValue = resolveSingleValue("sm");
@@ -353,11 +361,13 @@ export function resolveLayoutProps(
         singleInput = singleInput.toString();
       }
 
-      // --- Evaluate
+      // --- Evaluate (theme references start with "$"; skip the regex without one)
       const value = singleInput
-        ? (singleInput as string).replace(themeVarCapturesRegex, (match: string) =>
-            toCssVar(match.trim()),
-          )
+        ? (singleInput as string).includes("$")
+          ? (singleInput as string).replace(themeVarCapturesRegex, (match: string) =>
+              toCssVar(match.trim()),
+            )
+          : (singleInput as string)
         : undefined;
 
       if (singleInput !== value) {
@@ -436,6 +446,37 @@ export function resolveLayoutProps(
  * Converts the specified themeID to a CSS var string
  * @param c segment to convert
  */
+const BREAKPOINT_SUFFIXES = new Set(["xs", "sm", "md", "lg", "xl", "xxl"]);
+const NO_PROPS: ReadonlySet<string> = new Set();
+const NO_LAYOUT_PROPS = { present: NO_PROPS, withBreakpoints: NO_PROPS };
+
+/**
+ * The base property names `layoutProps` sets, plain (`width`) or per breakpoint
+ * (`width-md`), and the subset that has any breakpoint key. One pass over the
+ * keys, done once per `resolveLayoutProps` call.
+ */
+function scanLayoutProps(layoutProps: LayoutProps): {
+  present: ReadonlySet<string>;
+  withBreakpoints: ReadonlySet<string>;
+} {
+  let present: Set<string> | undefined;
+  let withBreakpoints: Set<string> | undefined;
+  for (const key in layoutProps) {
+    // --- Same test as resolveSingleValue: null/undefined resolve to nothing
+    if ((layoutProps as any)[key] == undefined) continue;
+    const dash = key.lastIndexOf("-");
+    if (dash > 0 && BREAKPOINT_SUFFIXES.has(key.slice(dash + 1))) {
+      const base = key.slice(0, dash);
+      (present ??= new Set()).add(base);
+      (withBreakpoints ??= new Set()).add(base);
+    } else {
+      (present ??= new Set()).add(key);
+    }
+  }
+  if (!present) return NO_LAYOUT_PROPS;
+  return { present, withBreakpoints: withBreakpoints ?? NO_PROPS };
+}
+
 export function toCssVar(c: string): string {
   return `var(--${THEME_VAR_PREFIX}-${c.substring(1)})`;
 }
