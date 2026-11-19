@@ -398,35 +398,52 @@ export function pushXsLog(
   const xsLogMax =
     xsLogMaxArg ?? (Number.isFinite(w._xsLogMax) && w._xsLogMax > 0 ? w._xsLogMax : 200);
 
-  const atCapacity = Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length >= xsLogMax;
-
-  if (atCapacity) {
-    if (onOverflow === "drop-newest") {
-      return false;
-    }
-    if (onOverflow === "block") {
-      // Emit overflow diagnostic (but only if there's room to avoid recursion)
-      if (w._xsLogs.length < xsLogMax + 10) {
-        w._xsLogs.push(
-          safeClone({
-            ts: Date.now(),
-            kind: "audit",
-            code: "audit-buffer-overflow",
-            severity: "warn",
-            message: `Audit log buffer overflow (capacity: ${xsLogMax}). Entry dropped.`,
-          }),
-        );
+  const preservedEntry = isPreservedLogKind(entry?.kind);
+  const bounded = Number.isFinite(xsLogMax) && xsLogMax > 0;
+  if (bounded) {
+    // --- Each class has its own cap (#3969): high-frequency entries `xsLogMax`, the kinds
+    // --- kept for interaction replay PRESERVED_LOG_FACTOR times that.
+    const preservedMax = xsLogMax * PRESERVED_LOG_FACTOR;
+    const counts = xsLogCounts(w);
+    const full = preservedEntry ? counts.preserved >= preservedMax : counts.evictable >= xsLogMax;
+    if (full) {
+      if (onOverflow === "drop-newest") {
+        return false;
       }
-      return false;
+      if (onOverflow === "block") {
+        // Emit overflow diagnostic (but only if there's room to avoid recursion)
+        if (w._xsLogs.length < xsLogMax + preservedMax + 10) {
+          w._xsLogs.push(
+            safeClone({
+              ts: Date.now(),
+              kind: "audit",
+              code: "audit-buffer-overflow",
+              severity: "warn",
+              message: `Audit log buffer overflow (capacity: ${xsLogMax}). Entry dropped.`,
+            }),
+          );
+        }
+        return false;
+      }
+      // --- "drop-oldest" (default): bring the full class down to TRIM_TARGET of its cap in one
+      // --- pass, so the trim runs once per batch of pushes rather than on every push
+      trimXsLogs(
+        w._xsLogs,
+        preservedEntry ? xsLogMax : Math.floor(xsLogMax * TRIM_TARGET),
+        preservedEntry ? Math.floor(preservedMax * TRIM_TARGET) : preservedMax,
+      );
     }
-    // "drop-oldest" (default): trim before adding
-    splicePreservingInteractions(w._xsLogs, xsLogMax - 1);
   }
 
   // Safe-clone the entry to prevent circular references from live objects
   // (e.g., React Query cache) from poisoning _xsLogs and breaking JSON export.
   const cloned = safeClone(entry);
+  // --- Counts as of now (after any trim), then account for the new entry
+  const counts = xsLogCounts(w);
   w._xsLogs.push(cloned);
+  if (preservedEntry) counts.preserved++;
+  else counts.evictable++;
+  counts.length = w._xsLogs.length;
   // Phase 4 of plan #15: forward to the audit pipeline (redaction → sampling → sinks).
   try {
     processAuditEntry(cloned);
@@ -437,47 +454,100 @@ export function pushXsLog(
 }
 
 /**
- * Trim _xsLogs to the max size while preserving events critical for Playwright
- * test generation and semantic trace comparison. High-frequency events
- * (state:changes, component:vars:*) are evictable; everything needed to
- * reconstruct user journeys (interactions, navigation, APIs, handlers,
- * modals, toasts) is preserved.
+ * Kinds kept for Playwright test generation and semantic trace comparison:
+ * everything needed to reconstruct user journeys (interactions, navigation,
+ * APIs, handlers, modals, toasts), plus any `native:*` entry. High-frequency
+ * kinds (state:changes, component:vars:*) are evictable.
  */
-export function splicePreservingInteractions(logs: any[], maxSize: number): void {
-  const preserved = new Set([
-    "interaction",
-    "navigate",
-    "api:start",
-    "api:complete",
-    "api:error",
-    "handler:start",
-    "handler:complete",
-    "modal:show",
-    "modal:confirm",
-    "modal:cancel",
-    "toast",
-    "submenu:open",
-    "selection:change",
-    "focus:change",
-    "method:call",
-    "value:change",
-  ]);
-  const keep: any[] = [];
-  const evictable: any[] = [];
-  for (const entry of logs) {
-    if (preserved.has(entry.kind) || entry.kind?.startsWith("native:")) {
-      keep.push(entry);
-    } else {
-      evictable.push(entry);
+const PRESERVED_LOG_KINDS = new Set([
+  "interaction",
+  "navigate",
+  "api:start",
+  "api:complete",
+  "api:error",
+  "handler:start",
+  "handler:complete",
+  "modal:show",
+  "modal:confirm",
+  "modal:cancel",
+  "toast",
+  "submenu:open",
+  "selection:change",
+  "focus:change",
+  "method:call",
+  "value:change",
+]);
+
+export function isPreservedLogKind(kind: unknown): boolean {
+  return typeof kind === "string" && (PRESERVED_LOG_KINDS.has(kind) || kind.startsWith("native:"));
+}
+
+/**
+ * Preserved kinds have their own cap, this many times `xsVerboseLogMax` (#3969).
+ * Without one they were never evicted, so a long-lived app with tracing on grew
+ * the buffer for its whole life.
+ */
+export const PRESERVED_LOG_FACTOR = 10;
+
+/** A trim brings a full class down to this share of its cap, so it runs once per batch. */
+const TRIM_TARGET = 0.9;
+
+type XsLogCounts = { logs: any[]; length: number; preserved: number; evictable: number };
+
+/**
+ * Per-class entry counts for `w._xsLogs`, kept on `w._xsLogCounts` so the
+ * capacity check on each push is O(1). Recounted when the array was replaced
+ * or changed length behind pushXsLog's back (a direct push, a test, a host).
+ */
+function xsLogCounts(w: any): XsLogCounts {
+  const logs: any[] = w._xsLogs;
+  let counts: XsLogCounts | undefined = w._xsLogCounts;
+  if (!counts || counts.logs !== logs || counts.length !== logs.length) {
+    let preserved = 0;
+    for (const entry of logs) {
+      if (isPreservedLogKind(entry?.kind)) preserved++;
+    }
+    counts = { logs, length: logs.length, preserved, evictable: logs.length - preserved };
+    w._xsLogCounts = counts;
+  }
+  return counts;
+}
+
+/**
+ * Keep the newest `maxEvictable` high-frequency entries and the newest
+ * `maxPreserved` preserved ones, in place, in their original order. One
+ * backward pass to choose and one forward pass to compact: no sort and no
+ * merged copy, since the buffer is already in insertion order.
+ */
+export function trimXsLogs(logs: any[], maxEvictable: number, maxPreserved: number): void {
+  const keep = new Uint8Array(logs.length);
+  let evictable = 0;
+  let preserved = 0;
+  for (let i = logs.length - 1; i >= 0; i--) {
+    if (isPreservedLogKind(logs[i]?.kind)) {
+      if (preserved < maxPreserved) {
+        keep[i] = 1;
+        preserved++;
+      }
+    } else if (evictable < maxEvictable) {
+      keep[i] = 1;
+      evictable++;
     }
   }
-  const evictableSlot = maxSize - keep.length;
-  const trimmed = evictableSlot > 0 ? evictable.slice(-evictableSlot) : [];
-  const merged = [...keep, ...trimmed].sort(
-    (a, b) => (a.perfTs || a.ts || 0) - (b.perfTs || b.ts || 0),
-  );
-  logs.length = 0;
-  logs.push(...merged);
+  let write = 0;
+  for (let i = 0; i < logs.length; i++) {
+    if (keep[i]) logs[write++] = logs[i];
+  }
+  logs.length = write;
+}
+
+/**
+ * Trim _xsLogs so it holds at most `maxSize` high-frequency entries and at most
+ * `maxSize * PRESERVED_LOG_FACTOR` preserved ones (see PRESERVED_LOG_KINDS).
+ * Kept for callers of the earlier API; pushXsLog uses trimXsLogs directly.
+ */
+export function splicePreservingInteractions(logs: any[], maxSize: number): void {
+  trimXsLogs(logs, maxSize, maxSize * PRESERVED_LOG_FACTOR);
 }
 
 /**

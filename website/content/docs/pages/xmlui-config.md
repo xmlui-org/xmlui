@@ -643,6 +643,8 @@ xmluiConfig: {
 }
 ```
 
+To trace one browser session without changing the config, set `localStorage["xmlui:xsVerbose"] = "true"` and reload. It wins over the config, including `xsVerbose: false`. `localStorage["xmlui:xsVerboseLogMax"]` sets [`xsVerboseLogMax`](#xsverboselogmax) the same way. Remove the keys and reload to turn it off.
+
 ---
 
 ### `xsVerboseLogMax`
@@ -651,7 +653,7 @@ xmluiConfig: {
 xsVerboseLogMax?: number; // default: 200
 ```
 
-Limits the number of log entries emitted when `xsVerbose` is `true`. This prevents the console from being overwhelmed in apps with many reactive expressions.
+Bounds the trace buffer (`window._xsLogs`) that `xsVerbose` fills. High-frequency entries, such as state changes, are kept up to this number. The kinds kept for replaying a user's journey (interactions, navigation, API calls, handlers, modals, toasts, value and selection changes, and `native:*` events) have their own bound of 10 times this number. When either reaches its bound, its oldest entries are dropped, down to 90% of the bound, so the buffer stays bounded in an app left open for hours.
 
 ```ts
 xmluiConfig: {

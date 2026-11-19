@@ -7,6 +7,8 @@ import {
   formatDiff,
   formatChange,
   pushXsLog,
+  splicePreservingInteractions,
+  PRESERVED_LOG_FACTOR,
   createLogEntry,
   generateTraceId,
   pushTrace,
@@ -307,7 +309,81 @@ describe("inspectorUtils", () => {
       for (let i = 0; i < 250; i++) {
         pushXsLog({ ts: i, kind: "test" });
       }
-      expect((window as any)._xsLogs).toHaveLength(200);
+      // --- Trimmed in batches to 90% of the cap, so the length cycles between 181 and 200
+      const logs = (window as any)._xsLogs;
+      expect(logs.length).toBeLessThanOrEqual(200);
+      expect(logs.length).toBeGreaterThan(180);
+      expect(logs[logs.length - 1].ts).toBe(249);
+    });
+
+    // --- #3969: the kinds kept for interaction replay used to be exempt from the cap
+    it("bounds preserved kinds at PRESERVED_LOG_FACTOR times the cap", () => {
+      (window as any)._xsLogs = [];
+      for (let i = 0; i < 1000; i++) {
+        pushXsLog({ ts: i, kind: i % 2 ? "handler:start" : "api:complete" }, 20);
+      }
+      const logs = (window as any)._xsLogs;
+      expect(logs.length).toBeLessThanOrEqual(20 * PRESERVED_LOG_FACTOR);
+      expect(logs.length).toBeGreaterThan(20 * PRESERVED_LOG_FACTOR * 0.9);
+      expect(logs[logs.length - 1].ts).toBe(999);
+    });
+
+    it("keeps preserved entries through a flood of high-frequency ones", () => {
+      (window as any)._xsLogs = [];
+      pushXsLog({ ts: 0, kind: "interaction" }, 10);
+      pushXsLog({ ts: 1, kind: "native:click" }, 10);
+      for (let i = 2; i < 500; i++) {
+        pushXsLog({ ts: i, kind: "state:changes" }, 10);
+      }
+      const logs = (window as any)._xsLogs;
+      expect(logs.filter((e: any) => e.kind === "state:changes").length).toBeLessThanOrEqual(10);
+      expect(logs.map((e: any) => e.kind).slice(0, 2)).toEqual(["interaction", "native:click"]);
+      expect(logs[logs.length - 1].ts).toBe(499);
+    });
+
+    it("keeps entries in insertion order after a trim", () => {
+      (window as any)._xsLogs = [];
+      for (let i = 0; i < 300; i++) {
+        pushXsLog({ ts: i, kind: i % 3 === 0 ? "navigate" : "state:changes" }, 20);
+      }
+      const ts = (window as any)._xsLogs.map((e: any) => e.ts);
+      expect(ts).toEqual([...ts].sort((a: number, b: number) => a - b));
+    });
+
+    it("trims in batches, not on every push", () => {
+      (window as any)._xsLogs = [];
+      const lengths: number[] = [];
+      for (let i = 0; i < 400; i++) {
+        pushXsLog({ ts: i, kind: "state:changes" }, 100);
+        lengths.push((window as any)._xsLogs.length);
+      }
+      // --- After filling, a trim drops to 90 and the next 10 pushes only append
+      const trims = lengths.filter((n, i) => i > 0 && n < lengths[i - 1]).length;
+      expect(trims).toBeLessThanOrEqual(Math.ceil(300 / 10) + 1);
+      expect(Math.min(...lengths.slice(100))).toBeGreaterThanOrEqual(91);
+    });
+
+    it("recounts when the buffer is replaced or pushed to directly", () => {
+      (window as any)._xsLogs = [];
+      for (let i = 0; i < 5; i++) pushXsLog({ ts: i, kind: "state:changes" }, 5);
+      (window as any)._xsLogs.push({ ts: 5, kind: "audit" }); // a direct push
+      pushXsLog({ ts: 6, kind: "state:changes" }, 5);
+      expect((window as any)._xsLogs.length).toBeLessThanOrEqual(5);
+      (window as any)._xsLogs = [{ ts: 7, kind: "state:changes" }]; // replaced
+      pushXsLog({ ts: 8, kind: "state:changes" }, 5);
+      expect((window as any)._xsLogs.map((e: any) => e.ts)).toEqual([7, 8]);
+    });
+  });
+
+  describe("splicePreservingInteractions", () => {
+    it("bounds both classes and keeps order", () => {
+      const logs = [
+        ...Array.from({ length: 50 }, (_, i) => ({ ts: i, kind: i % 2 ? "toast" : "state:changes" })),
+      ];
+      splicePreservingInteractions(logs, 2);
+      expect(logs.filter((e) => e.kind === "state:changes").map((e) => e.ts)).toEqual([46, 48]);
+      expect(logs.filter((e) => e.kind === "toast").length).toBe(20);
+      expect(logs.map((e) => e.ts)).toEqual([...logs.map((e) => e.ts)].sort((a, b) => a - b));
     });
   });
 
