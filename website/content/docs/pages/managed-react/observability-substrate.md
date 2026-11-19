@@ -127,7 +127,9 @@ quick successive changes into one pass, so one assignment can produce at most
 one pass, not exactly one.
 
 Raise the trace size with `xsVerboseLogMax` in `xmluiConfig`; a single
-interaction in a large app can produce hundreds of entries.
+interaction in a large app can produce hundreds of entries. It bounds the
+high-frequency entries; the kinds kept for replaying a journey (interactions,
+API calls, handlers, navigation and the like) are bounded at 10 times it.
 
 ## Related
 

@@ -484,24 +484,38 @@ function StandaloneApp({
     icons,
   } = standaloneApp || {};
 
-  const globalProps = useMemo(() => {
-    // Allow per-browser-session opt-in to xsVerbose via localStorage, so an
-    // in-app diagnostic toggle can flip tracing without editing config.json.
-    // Key namespace `xmlui:*` keeps the surface bounded and discoverable.
-    const lsOverrides: Record<string, any> = {};
+  // Allow per-browser-session opt-in to xsVerbose via localStorage, so an
+  // in-app diagnostic toggle can flip tracing without editing config.json.
+  // Key namespace `xmlui:*` keeps the surface bounded and discoverable.
+  // Re-read when the app's config changes (a new app mounts).
+  const lsOverrides = useMemo(() => {
+    const overrides: Record<string, any> = {};
     if (typeof localStorage !== "undefined") {
       try {
         if (localStorage.getItem("xmlui:xsVerbose") === "true") {
-          lsOverrides.xsVerbose = true;
+          overrides.xsVerbose = true;
         }
         const lsLogMax = localStorage.getItem("xmlui:xsVerboseLogMax");
         if (lsLogMax !== null && !Number.isNaN(Number(lsLogMax))) {
-          lsOverrides.xsVerboseLogMax = Number(lsLogMax);
+          overrides.xsVerboseLogMax = Number(lsLogMax);
         }
       } catch {
         // localStorage may throw in sandboxed/private contexts; ignore.
       }
     }
+    return overrides;
+  }, [appGlobals, xmluiConfig]);
+
+  // --- Tracing reads `xmluiConfig` (AppContent's `_xsLogs` setup, test-id decoration
+  // --- below), so the overrides must land there, and win over the config's own value,
+  // --- including an explicit `xsVerbose: false` (#3969). They stay in globalProps too.
+  const effectiveXmluiConfig = useMemo(
+    () =>
+      Object.keys(lsOverrides).length > 0 ? { ...(xmluiConfig ?? {}), ...lsOverrides } : xmluiConfig,
+    [xmluiConfig, lsOverrides],
+  );
+
+  const globalProps = useMemo(() => {
     return {
       name: name,
       ...(appGlobals || {}),
@@ -514,7 +528,7 @@ function StandaloneApp({
         ? collectEventFlagReads([entryPoint, ...(components ?? [])])
         : undefined,
     };
-  }, [appGlobals, globals, name, entryPoint, components]);
+  }, [appGlobals, globals, name, entryPoint, components, lsOverrides]);
 
   const themesWithExtensions = useMemo(
     () => [
@@ -547,7 +561,7 @@ function StandaloneApp({
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
   // --- Also enable when xsVerbose is true (for inspector support).
-  const xsVerbose = xmluiConfig?.xsVerbose ?? appGlobals?.xsVerbose;
+  const xsVerbose = effectiveXmluiConfig?.xsVerbose ?? appGlobals?.xsVerbose;
   const shouldDecorateWithTestId =
     decorateComponentsWithTestId ||
     xsVerbose === true ||
@@ -581,7 +595,7 @@ function StandaloneApp({
                 : ""
           }
           globalProps={globalProps}
-          xmluiConfig={xmluiConfig}
+          xmluiConfig={effectiveXmluiConfig}
           globalVars={filterGlobalVars(globalVars)}
           defaultTheme={defaultTheme}
           defaultTone={defaultTone as ThemeTone}
